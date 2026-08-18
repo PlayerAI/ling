@@ -1,0 +1,151 @@
+CST
+tokens
+  0: type @0..4 "type"
+  1: whitespace @4..5 " "
+  2: identifier @5..11 "人物"
+  3: whitespace @11..12 " "
+  4: equals @12..13 "="
+  5: newline @13..14 "\n"
+  6: whitespace @14..18 "    "
+  7: indent @18..18 ""
+  8: left_brace @18..19 "{"
+  9: whitespace @19..20 " "
+  10: identifier @20..26 "姓名"
+  11: colon @26..27 ":"
+  12: whitespace @27..28 " "
+  13: identifier @28..32 "Text"
+  14: soft_newline @32..33 "\n"
+  15: whitespace @33..39 "      "
+  16: mutable @39..46 "mutable"
+  17: whitespace @46..47 " "
+  18: identifier @47..53 "血量"
+  19: colon @53..54 ":"
+  20: whitespace @54..55 " "
+  21: identifier @55..58 "Int"
+  22: whitespace @58..59 " "
+  23: right_brace @59..60 "}"
+  24: newline @60..61 "\n"
+  25: newline @61..62 "\n"
+  26: dedent @62..62 ""
+  27: type @62..66 "type"
+  28: whitespace @66..67 " "
+  29: identifier @67..73 "状态"
+  30: whitespace @73..74 " "
+  31: equals @74..75 "="
+  32: newline @75..76 "\n"
+  33: whitespace @76..80 "    "
+  34: indent @80..80 ""
+  35: pipe @80..81 "|"
+  36: whitespace @81..82 " "
+  37: identifier @82..88 "健康"
+  38: newline @88..89 "\n"
+  39: whitespace @89..93 "    "
+  40: pipe @93..94 "|"
+  41: whitespace @94..95 " "
+  42: identifier @95..101 "受伤"
+  43: whitespace @101..102 " "
+  44: of @102..104 "of"
+  45: whitespace @104..105 " "
+  46: identifier @105..108 "Int"
+  47: newline @108..109 "\n"
+  48: newline @109..110 "\n"
+  49: dedent @110..110 ""
+  50: let @110..113 "let"
+  51: whitespace @113..114 " "
+  52: identifier @114..120 "描述"
+  53: whitespace @120..121 " "
+  54: identifier @121..127 "状态"
+  55: whitespace @127..128 " "
+  56: equals @128..129 "="
+  57: newline @129..130 "\n"
+  58: whitespace @130..134 "    "
+  59: indent @134..134 ""
+  60: match @134..139 "match"
+  61: whitespace @139..140 " "
+  62: identifier @140..146 "状态"
+  63: whitespace @146..147 " "
+  64: with @147..151 "with"
+  65: newline @151..152 "\n"
+  66: whitespace @152..156 "    "
+  67: pipe @156..157 "|"
+  68: whitespace @157..158 " "
+  69: identifier @158..164 "健康"
+  70: whitespace @164..165 " "
+  71: right_arrow @165..167 "->"
+  72: newline @167..168 "\n"
+  73: whitespace @168..176 "        "
+  74: indent @176..176 ""
+  75: text @176..184 "\"健康\""
+  76: newline @184..185 "\n"
+  77: whitespace @185..189 "    "
+  78: dedent @189..189 ""
+  79: pipe @189..190 "|"
+  80: whitespace @190..191 " "
+  81: identifier @191..197 "受伤"
+  82: whitespace @197..198 " "
+  83: identifier @198..204 "程度"
+  84: whitespace @204..205 " "
+  85: right_arrow @205..207 "->"
+  86: newline @207..208 "\n"
+  87: whitespace @208..216 "        "
+  88: indent @216..216 ""
+  89: identifier @216..222 "程度"
+  90: newline @222..223 "\n"
+  91: dedent @223..223 ""
+  92: dedent @223..223 ""
+  93: eof @223..223 ""
+tree
+  program tokens=0..94
+    type_declaration tokens=0..27
+      record_type tokens=8..24
+        field_declaration tokens=9..14
+          type_expression tokens=12..14
+        field_declaration tokens=15..22
+          type_expression tokens=20..22
+    type_declaration tokens=27..50
+      variant_type tokens=35..49
+        variant_case tokens=35..38
+        variant_case tokens=39..47
+          type_expression tokens=45..47
+    let_declaration tokens=50..93
+      pattern tokens=51..53
+      pattern tokens=53..55
+      sequence tokens=60..92
+        match_expression tokens=60..92
+          name_expression tokens=61..63
+          match_case tokens=66..79
+            pattern tokens=68..70
+            sequence tokens=75..77
+              literal_expression tokens=75..76
+          match_case tokens=79..92
+            pattern tokens=80..84
+            sequence tokens=89..91
+              name_expression tokens=89..90
+
+AST
+program @0..222
+  type @0..60 人物
+    record
+      field @20..32 姓名
+        type_expression @28..32 Text
+      mutable_field @39..58 血量
+        type_expression @55..58 Int
+  type @62..108 状态
+    variant
+      case @80..88 健康
+      case @93..108 受伤
+        type_expression @105..108 Int
+  let @110..222
+    binding @114..120 描述
+    parameter @121..127 状态
+    sequence @134..222
+      match @134..222
+        name @140..146 状态
+        match_case @156..184
+          pattern @158..164 健康
+          sequence @176..184
+            literal @176..184 text("健康")
+        match_case @189..222
+          pattern @191..204 受伤 程度
+          sequence @216..222
+            name @216..222 程度

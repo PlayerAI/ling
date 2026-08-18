@@ -1,0 +1,42 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/ling-ast",
+    "crates/ling-cli",
+    "crates/ling-diagnostics",
+    "crates/ling-effects",
+    "crates/ling-eval",
+    "crates/ling-hir",
+    "crates/ling-resolve",
+    "crates/ling-semantic",
+    "crates/ling-source",
+    "crates/ling-syntax",
+    "crates/ling-types",
+    "crates/ling-unicode",
+    "tools/unicode-gen",
+]
+default-members = ["crates/ling-cli"]
+exclude = ["fuzz"]
+
+[workspace.package]
+version = "0.0.1-dev"
+edition = "2024"
+rust-version = "1.85"
+license = "Apache-2.0"
+repository = "https://github.com/PlayerAI/ling"
+
+[workspace.dependencies]
+blake3 = "1.8.6"
+num-bigint = "0.5.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+toml = "1.1.4"
+unicode-ident = "1.0.24"
+unicode-normalization = "0.1.25"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }

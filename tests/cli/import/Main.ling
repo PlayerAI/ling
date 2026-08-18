@@ -1,0 +1,5 @@
+module Main
+
+import Game.Math as M
+
+let answer = M.answer

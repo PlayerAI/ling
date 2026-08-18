@@ -1,0 +1,35 @@
+[package]
+name = "ling-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4.13"
+ling-ast = { path = "../crates/ling-ast" }
+ling-source = { path = "../crates/ling-source" }
+ling-syntax = { path = "../crates/ling-syntax" }
+
+[[bin]]
+name = "source_bytes"
+path = "fuzz_targets/source_bytes.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "lexer_utf8"
+path = "fuzz_targets/lexer_utf8.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "parser_utf8"
+path = "fuzz_targets/parser_utf8.rs"
+test = false
+doc = false
+bench = false

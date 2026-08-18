@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.97.1
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Verify generated Unicode tables
+        run: |
+          cargo run -p unicode-gen --locked
+          git diff --exit-code -- crates/ling-unicode/src/generated.rs
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run Clippy
+        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: Run tests
+        run: cargo test --workspace --all-features --locked
+      - name: Build documentation
+        run: cargo doc --workspace --all-features --no-deps --locked
+
+  fuzz-smoke:
+    name: fuzz corpus smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2026-08-15
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: fuzz -> target
+      - name: Install pinned cargo-fuzz
+        run: cargo install cargo-fuzz --version 0.13.2 --locked
+      - name: Replay Source corpus
+        run: cargo fuzz run source_bytes fuzz/corpus/source_bytes -- -runs=256
+      - name: Replay Lexer corpus
+        run: cargo fuzz run lexer_utf8 fuzz/corpus/lexer_utf8 -- -runs=256
+      - name: Replay Parser and AST corpus
+        run: cargo fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256

@@ -1,8 +1,8 @@
 # 下一步实现计划：从 AST 到可运行 Hello World
 
-> 状态：执行计划草案 0.1  
+> 状态：Hello World 纵向切片已在本地完成（实现记录 0.2）
 > 日期：2026-08-18  
-> 当前基线：Source / Unicode / Lexer / Layout / Parser / CST / AST 主路径已实现  
+> 当前基线：从 Source 到 Checked Core、Semantic Snapshot 和 Interpreter 的文件执行主路径已实现
 > 目标版本：`0.0.1-dev`  
 > 规范依据：[RFC-0001](RFC-0001.md)、[SEMANTICS](SEMANTICS.md)、[IMPLEMENTATION](IMPLEMENTATION.md)  
 > 地位：本文只定义工程顺序和验收证据，不创造语言语义；与 Accepted RFC 冲突时，以 Accepted RFC 为准。
@@ -11,7 +11,7 @@
 
 ## 1. 本轮目标
 
-下一轮以仓库中的 [`examples/hello.ling`](../examples/hello.ling) 为最小纵向切片，完成以下可观察结果：
+本轮以仓库中的 [`examples/hello.ling`](../examples/hello.ling) 为最小纵向切片，已完成以下可观察结果：
 
 ```text
 cargo run --locked -- run examples/hello.ling
@@ -43,7 +43,7 @@ SourceFile
 
 ## 2. 当前状态与已知缺口
 
-### 2.1 已实现
+### 2.1 实施前基线
 
 - Rust workspace、统一 lint、锁定依赖和三平台 CI；
 - 原始 UTF-8 byte span、BOM 和 LF/CRLF/CR 映射；
@@ -52,9 +52,18 @@ SourceFile
 - Lexer、offside layout、有限恢复 Parser、lossless CST；
 - 去 trivia、保留 Span 和标识符安全元数据的 AST；
 - 最小 CLI 和 conformance runner；
-- `examples/hello.ling` 可通过 AST Lowering，CLI 当前以 `L-IMPL-0001` 停在 `completed_stage = "ast"`。
+- `examples/hello.ling` 当时仅可通过 AST Lowering，CLI 以 `L-IMPL-0001` 停在 `completed_stage = "ast"`。
 
-### 2.2 M2 验收债务
+### 2.2 当前实现结果
+
+- 新增 HIR、Resolver、Type、Effect/Capability、Semantic Snapshot 和 Evaluator crate，并保持 Cargo 依赖无环；
+- `check`、`run`、`semantic` 共用同一条真实语义管线，CLI 不含 Hello World 特判；
+- module/import、词法作用域、HM 风格推导、保守 Value Restriction、局部可变性、`State<T>`、Capability 和 Seed 内置项按 Accepted 决议实现；
+- Semantic ID 使用版本化 canonical bytes 和 BLAKE3，已由独立进程确定性测试及空白不变性测试覆盖；
+- `examples/hello.ling` 的 `check` 返回 `0`，`run` 精确输出 `你好，零\n`，`semantic` 输出 `ling.semantic/0.1`；
+- G-12/Audit、G-14/REPL 以及完整 record/ADT 语言面仍属于后续批次，相关命令继续显式返回 `L-IMPL-0001`。
+
+### 2.3 M2 验收债务（已关闭）
 
 在进入语义实现前，先完成 M2 的剩余出口条件：
 
@@ -66,9 +75,9 @@ SourceFile
 
 M2 债务可以与规范决议起草并行，但必须在 Resolver 接口冻结前完成。
 
-### 2.3 阻断级规范问题
+### 2.4 阻断级规范问题（决议状态）
 
-以下问题仍为 `待定`，不得由 Rust 类型或测试快照暗中决定：
+下表记录实施前的阻断点。G-06 至 G-11、G-15 已形成 Accepted 决议并回填实现；G-12 仍由后续 Audit 批次处理：
 
 | 缺口 | 阻断阶段 | 本轮需要的最小决议 |
 | --- | --- | --- |
@@ -81,7 +90,7 @@ M2 债务可以与规范决议起草并行，但必须在 Resolver 接口冻结�
 | G-12 | Audit | Audit grammar、显示元数据和 round-trip 等价关系 |
 | G-15 | CLI/Eval | `main` 合法签名、返回类型、Effect 上限、运行失败到退出码/JSON 的映射 |
 
-每个问题应形成独立 decision 文档，先为 `Proposed`，评审接受后改为 `Accepted`，并回填 [IMPLEMENTATION §6](IMPLEMENTATION.md#6-规范缺口清单)。G-14 REPL 不阻断文件模式 Hello World，可在本轮后半段独立决议；在此之前不实现交互式会话语义。
+每个问题应形成独立 decision 文档，先为 `Proposed`，评审接受后改为 `Accepted`，并回填 [IMPLEMENTATION §6](IMPLEMENTATION.md#6-规范缺口清单)。本轮已按此流程关闭 G-06 至 G-11、G-15。G-12/Audit 和 G-14/REPL 不阻断文件模式 Hello World，未决议前不实现对应用户协议。
 
 ## 3. 架构边界
 
@@ -336,7 +345,7 @@ git diff --exit-code -- crates/ling-unicode/src/generated.rs
 - conformance fixture 必须声明规范条款，不用快照替代语义断言；
 - 诊断测试断言 code、Span 和稳定 Facts，不固定可改善的自然语言全文；
 - 不以 Rust `Debug` 输出作为公开 JSON、Semantic ID 或测试协议；
-- Windows、Linux、macOS CI 同时通过后，才能宣称阶段出口完成。
+- Windows、Linux、macOS CI 均已配置；远程三平台运行结果必须在首次推送后确认，确认前不得宣称跨平台门禁已通过。
 
 ## 7. 建议提交顺序
 
@@ -359,15 +368,15 @@ G-12/Audit 和 G-14/REPL 可在 Hello World 文件执行主路径完成后进入
 
 本计划的“完成”只表示 Hello World 纵向切片完成，不等于 `v0.0.1 Seed` 发布完成。必须同时满足：
 
-- [ ] M2 验收债务关闭；
-- [ ] G-06 至 G-11、G-15 有 Accepted 决议并与实现一致；
-- [ ] `examples/hello.ling` 不含特殊标记或测试专用语法；
-- [ ] Resolver、Type、Effect、Capability、Snapshot、Interpreter 均为真实执行路径；
-- [ ] `check` 成功返回 `0`；
-- [ ] `run` 输出 `你好，零` 并返回 `0`；
-- [ ] 缺 Capability、类型错误和名称错误在执行前被拒绝；
-- [ ] Semantic JSON 可复现并通过 Schema 测试；
-- [ ] 全 workspace fmt、Clippy、tests、docs、Unicode idempotence 和三平台 CI 通过；
-- [ ] README 的状态、命令示例和未实现能力与实际行为一致。
+- [x] M2 验收债务关闭；
+- [x] G-06 至 G-11、G-15 有 Accepted 决议并与实现一致；
+- [x] `examples/hello.ling` 不含特殊标记或测试专用语法；
+- [x] Resolver、Type、Effect、Capability、Snapshot、Interpreter 均为真实执行路径；
+- [x] `check` 成功返回 `0`；
+- [x] `run` 输出 `你好，零` 并返回 `0`；
+- [x] 缺 Capability、类型错误和名称错误在执行前被拒绝；
+- [x] Semantic JSON 可复现并通过 Schema 测试；
+- [ ] 全 workspace fmt、Clippy、tests、docs、Unicode idempotence 和三平台 CI 通过：本地门禁已通过，远程三平台 CI 待首次推送后确认；
+- [x] README 的状态、命令示例和未实现能力与实际行为一致。
 
 完成后，下一计划再处理完整 record/ADT 示例、Audit round-trip、REPL 会话和 `v0.0.1` 全部发布门禁。

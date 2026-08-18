@@ -265,16 +265,16 @@ Unicode 17.0.0 的权威输入来自 Unicode Consortium 的版本化目录：
 | G-03 | M2 | record 字段分隔符不一致 | 换行、`;`、尾分隔符及 REPL 单行形式 | [DEC-0005](decisions/0005-seed-literals-and-delimiters.md) |
 | G-04 | M2 | Text/Int/f64 字面量不完整 | 转义、进制、分隔符、指数、溢出、NaN/Infinity 的源码与 JSON 表示；`Char` 明确不进入 Seed | [DEC-0005](decisions/0005-seed-literals-and-delimiters.md) |
 | G-05 | M2 | offside 子集不精确 | 列计算、空行/注释、续行、错误恢复、嵌套容器规则 | [DEC-0006](decisions/0006-offside-layout.md) |
-| G-06 | M3 | module/import 与多文件边界 | 文件到模块映射、import 解析、循环、重复模块、入口模块发现 | 待定 |
-| G-07 | M3 | 简化 Value Restriction | 可泛化表达式集合、mutable/Effect 交互、诊断 | 待定 |
-| G-08 | M3 | Borrow 范围冲突 | RFC §6.6 与 SEMANTICS §29 的优先解释；参数字段赋值是否影响调用方；若后置，示例如何改写 | 待定 |
-| G-09 | M4 | `State<T>` 与 Capability 本体 | `State<T>` 可见性；Capability 是静态要求、运行时值或二者；宿主能力失败如何分类 | 待定 |
-| G-10 | M4 | Seed 内置项 | `max`、`min`、`Console.write`、格式化及示例所需集合的规范名称、类型、Effect/Capability | 待定 |
-| G-11 | M5 | Semantic ID 身份模型 | 逻辑身份与内容哈希是否分离、依赖变化传播、互递归、canonical bytes 与版本迁移 | 待定 |
+| G-06 | M3 | module/import 与多文件边界 | 文件到模块映射、import 解析、循环、重复模块、入口模块发现 | [DEC-0007](decisions/0007-module-and-file-boundaries.md) |
+| G-07 | M3 | 简化 Value Restriction | 可泛化表达式集合、mutable/Effect 交互、诊断 | [DEC-0008](decisions/0008-seed-value-restriction.md) |
+| G-08 | M3 | Borrow 范围冲突 | RFC §6.6 与 SEMANTICS §29 的优先解释；参数字段赋值是否影响调用方；若后置，示例如何改写 | [DEC-0009](decisions/0009-seed-borrow-and-mutation-boundary.md) |
+| G-09 | M4 | `State<T>` 与 Capability 本体 | `State<T>` 可见性；Capability 是静态要求、运行时值或二者；宿主能力失败如何分类 | [DEC-0010](decisions/0010-state-and-capability-model.md) |
+| G-10 | M4 | Seed 内置项 | `max`、`min`、`Console.write`、格式化及示例所需集合的规范名称、类型、Effect/Capability | [DEC-0011](decisions/0011-seed-builtins.md) |
+| G-11 | M5 | Semantic ID 身份模型 | 逻辑身份与内容哈希是否分离、依赖变化传播、互递归、canonical bytes 与版本迁移 | [DEC-0012](decisions/0012-semantic-identity-and-canonical-bytes.md) |
 | G-12 | M5 | Audit Source grammar | 可解析语法、显示元数据边界、唯一性及 round-trip 等价关系 | 待定 |
 | G-13 | M1 | Source 位置单位 | byte span 的半开区间、line 基数、column 使用 byte/scalar/UTF-16/grapheme 中哪一种、换行规范化映射 | [DEC-0002](decisions/0002-source-position-units.md) |
 | G-14 | M6 | REPL 会话语义 | 多行输入、重定义、阴影、失败事务、会话 Capability、脚本模式输出 | 待定 |
-| G-15 | M6 | `main` 与运行错误 | 允许的入口签名、返回类型、Effect 上限、Result/Fault 到退出码和 JSON 的映射 | 待定 |
+| G-15 | M6 | `main` 与运行错误 | 允许的入口签名、返回类型、Effect 上限、Result/Fault 到退出码和 JSON 的映射 | [DEC-0013](decisions/0013-main-and-runtime-failures.md) |
 
 ---
 

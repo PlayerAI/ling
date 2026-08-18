@@ -1,0 +1,4 @@
+arguments = ["check", "--format", "json", "case.ling"]
+exit_code = 1
+normative_clauses = ["DEC-0007 §Import", "NEXT-STEPS §5"]
+diagnostic_codes = ["L-NAME-0001"]

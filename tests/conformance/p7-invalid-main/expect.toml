@@ -1,0 +1,4 @@
+arguments = ["run", "--format", "json", "case.ling"]
+exit_code = 1
+normative_clauses = ["DEC-0013 §入口", "NEXT-STEPS §5"]
+diagnostic_codes = ["L-ENTRY-0003"]

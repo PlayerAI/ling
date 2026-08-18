@@ -1,0 +1,4 @@
+module Main
+
+let main () =
+    Console.write "未授权"

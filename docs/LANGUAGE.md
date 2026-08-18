@@ -141,7 +141,7 @@ type 人物 =
       mutable 血量: i32 }
 
 let 受到伤害 伤害 人物 =
-    人物.血量 <- max 0 (人物.血量 - 伤害)
+    { 人物 with 血量 = max 0 (人物.血量 - 伤害) }
 ```
 
 ### 3.2 Audit Source
@@ -244,37 +244,29 @@ let 结果 =
 
 默认采用空格函数应用，不要求大量括号。
 
-### 4.4 参数模式与自动 Borrow
+### 4.4 Seed 参数值语义
 
-函数参数默认按 Value 读取。若函数体需要修改参数指向的 Place，编译器可以推导短生命周期的可变 Borrow：
+v0.0.1 Seed 的函数参数按 Value 传递，参数 binding 不可变。需要修改 record 的函数返回新值：
 
 ```fsharp
 let 受到伤害 伤害 人物 =
-    人物.血量 <- max 0 (人物.血量 - 伤害)
+    { 人物 with 血量 = max 0 (人物.血量 - 伤害) }
 ```
 
-Audit Source 展开为近似：
+Audit Source 中的类型为：
 
 ```text
-受到伤害 : Int -> &mut 人物 -> Unit
+受到伤害 : Int -> 人物 -> 人物
 ```
 
-调用：
+调用方显式写回当前函数内的 mutable local：
 
 ```fsharp
-受到伤害 30 关羽
+let mutable 关羽 = 初始人物
+关羽 <- 受到伤害 30 关羽
 ```
 
-只有当 `关羽` 是可变 Place 时才合法；编译器在调用期间自动建立并立即结束 `&mut` Borrow。存在歧义、跨 suspension point、公共 ABI 或复杂生命周期时，必须显式写出：
-
-```fsharp
-let 受到伤害 伤害 (人物: &mut 人物) =
-    ...
-
-受到伤害 30 (borrow mut 关羽)
-```
-
-自动 Borrow 必须显示在 Audit Source 和 Semantic Graph 中，不能成为隐藏的别名行为。
+Seed 不实现 Resource、Borrow、`&mut`、隐式引用传递或 Borrow Edge。对参数字段赋值必须拒绝；完整 Borrow 模型保留给后续 RFC。
 
 ### 4.5 Pipeline
 
@@ -386,8 +378,8 @@ type 人物 =
       最大血量: i32 }
 
 let 恢复生命 数值 人物 =
-    人物.血量 <-
-        min 人物.最大血量 (人物.血量 + 数值)
+    { 人物 with
+        血量 = min 人物.最大血量 (人物.血量 + 数值) }
 ```
 
 中文标识符不是：

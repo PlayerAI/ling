@@ -1,0 +1,4 @@
+let total values =
+    values
+    |> map calculate
+    |> sum

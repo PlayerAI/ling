@@ -681,43 +681,21 @@ let mutable x = e
 - 当前 Actor 的可变 state；
 - Kernel 中独占的可写 buffer element。
 
-### 9.3 参数模式与 Place-to-Borrow
+### 9.3 Seed 参数值语义
 
-函数参数在静态语义中具有使用模式：
+v0.0.1 Seed 的函数参数只有 `Value` 使用模式，参数 binding 不可变。Seed 不推导 `BorrowShared`、`BorrowMutable` 或 `Move`，也不生成 Borrow Edge。
 
-```text
-Value
-BorrowShared
-BorrowMutable
-Move
-```
-
-若参数未显式标注，编译器可以根据函数体推导：
-
-- 只读字段访问通常为 `Value` 或 `BorrowShared`；
-- 对参数字段赋值要求 `BorrowMutable`；
-- 消费 Resource 要求 `Move`。
-
-调用时，若形参要求 `&mut T`，实参是类型为 `T` 的可变 Place，编译器可以插入一个仅覆盖该调用的隐式 reborrow：
+更新 record 参数时，函数返回新的 record value，调用方显式写回 mutable local：
 
 ```fsharp
-受到伤害 30 关羽
+let 受到伤害 伤害 人物 =
+    { 人物 with 血量 = max 0 (人物.血量 - 伤害) }
+
+let mutable 关羽 = 初始人物
+关羽 <- 受到伤害 30 关羽
 ```
 
-规范化 Core 等价于：
-
-```text
-受到伤害 30 (borrow_mut 关羽)
-```
-
-限制：
-
-- 自动 Borrow 不得跨 `await` 或 Actor turn；
-- 不得改变公共 ABI；
-- 若存在多个可行 Borrow/Move 解释，必须要求显式标注；
-- Audit Source 必须显示实际 Borrow；
-- Semantic Graph 必须保存 Borrow Edge；
-- Critical Profile 可以要求公共边界全部显式。
+参数字段赋值、隐式 reborrow、`&mut` 参数和调用方可见的参数别名修改在 Seed 中必须拒绝。完整的 Borrow/Move 参数模式保留给后续 RFC。
 
 ### 9.4 Assignment
 
@@ -1955,14 +1933,14 @@ type 人物 =
       mutable 血量: Int }
 
 let 受到伤害 伤害 人物 =
-    人物.血量 <- max 0 (人物.血量 - 伤害)
+    { 人物 with 血量 = max 0 (人物.血量 - 伤害) }
 
 let main () =
     let mutable 关羽 =
         { 姓名 = "关羽"
           血量 = 100 }
 
-    受到伤害 30 关羽
+    关羽 <- 受到伤害 30 关羽
     Console.write 关羽.姓名
 ```
 
@@ -1970,8 +1948,8 @@ let main () =
 
 ```text
 受到伤害:
-    Int -> &mut 人物 -> Unit
-    effects {State<人物>}
+    Int -> 人物 -> 人物
+    effects {}
 
 main:
     Unit -> Unit
@@ -1979,7 +1957,7 @@ main:
     requires {Console.Write}
 ```
 
-在 v0.0.1 简化实现中，可以先将局部可变 record 解释为 Interpreter Cell；Semantic Graph 仍应使用正式 `PlaceAssign`，避免未来重写 AST。
+v0.0.1 的 Interpreter Cell 只承载当前函数内的 mutable local binding。Record copy 必须产生独立 Value，字段可变性不得实现为调用方可观察的共享 Cell；Semantic Graph 对显式写回使用 `PlaceAssign`。
 
 ---
 

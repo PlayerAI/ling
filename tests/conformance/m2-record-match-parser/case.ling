@@ -1,0 +1,14 @@
+type 人物 =
+    { 姓名: Text
+      mutable 血量: Int }
+
+type 状态 =
+    | 健康
+    | 受伤 of Int
+
+let 描述 状态 =
+    match 状态 with
+    | 健康 ->
+        "健康"
+    | 受伤 程度 ->
+        程度

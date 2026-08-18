@@ -10,15 +10,15 @@
 
 ### 项目状态
 
-Ling 目前处于 `v0.0.1 Seed` 的早期实现阶段。Rust workspace、Source/Unicode/Diagnostic 基础层、Lexer、Offside Layout、Parser/CST、AST Lowering 与最小 CLI 已建立；名称解析、类型系统、Semantic Graph 和解释器仍未实现，因此当前版本不能用于运行 Ling 程序，更不是生产编译器或运行时。
+Ling 目前处于 `v0.0.1 Seed` 的早期实现阶段。Hello World 纵向切片已完整贯通 Source、Parser/CST/AST、Resolved HIR、类型、Effect/Capability、Semantic Snapshot 和 Checked Core Interpreter；`check`、`run`、`semantic` 已可用于当前实现的 Seed 子集。完整 record/ADT 验收、Audit round-trip 与 REPL 仍未完成，因此这仍不是生产编译器或运行时。
 
 | 项目 | 当前状态 |
 | --- | --- |
 | 语言名称 | 中文名：零；英文名：Ling |
 | CLI | `ling` |
 | 源文件扩展名 | `.ling` |
-| 当前里程碑 | M2 Parser（Parser/CST/AST 主路径已完成，验收加固进行中） |
-| 实现状态 | UTF-8 SourceMap、Unicode 17 生成表/XID/NFC/UTS #39、双语 JSON Diagnostic、Lexer、Offside Layout、Parser/CST、AST Lowering、最小 CLI 与 conformance runner 已落地 |
+| 当前里程碑 | Hello World 纵向切片（`docs/NEXT-STEPS.md`）已完成，继续收口完整 `v0.0.1 Seed` |
+| 实现状态 | Unicode 17、Lexer/Layout、Parser/CST/AST、module/import、Resolved HIR、HM 类型与任意精度 Int、Effect/Capability、确定性 Semantic Graph、解释器、CLI 与 conformance runner 已落地 |
 | 稳定性 | 设计可能变化，接受的 RFC 才能冻结语义 |
 
 ### 构建与验证
@@ -31,11 +31,15 @@ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 cargo run --locked -- --version
 ```
 
-当前 `check` 已能读取源码、验证 UTF-8、处理 BOM/换行映射，并执行 Unicode 标识符检查、Lexer/Layout、Parser/CST 与 AST Lowering，输出 `ling.diagnostic/0.1`；合法 AST 随后会以 `L-IMPL-0001` 明确拒绝尚未实现的名称解析与语义阶段，而不会伪装检查成功：
+`check`、`run` 和 `semantic` 复用同一条真实编译路径；`check` 不执行 `main`，`run` 只解释完成名称、类型、Place、Effect 和 Capability 检查的 ProgramSnapshot，`semantic` 输出确定性的 `ling.semantic/0.1`：
 
 ```bash
-cargo run --locked -- check --format json tests/conformance/m0-source-pipeline/case.ling
+cargo run --locked -- check examples/hello.ling
+cargo run --locked -- run examples/hello.ling
+cargo run --locked -- semantic examples/hello.ling
 ```
+
+Hello World 的运行输出为 `你好，零`。`audit` 与 `repl` 在对应规范决议和实现完成前继续以 `L-IMPL-0001` 明确拒绝。
 
 ### 语言使命
 
@@ -53,13 +57,16 @@ Ling 希望让程序同时适合人类表达、机器分析和 AI 辅助开发�
 
 ```fsharp
 let 受到伤害 伤害 人物 =
-    人物.血量 <- max 0 (人物.血量 - 伤害)
+    { 人物 with 血量 = max 0 (人物.血量 - 伤害) }
+
+let mutable 关羽 = 初始人物
+关羽 <- 受到伤害 30 关羽
 ```
 
 其中：
 
 - `=` 用于创建绑定和初始化；`<-` 只用于修改已有的可变 Place。
-- 函数默认使用空格应用，例如 `受到伤害 30 关羽`。
+- 函数默认使用空格应用；Seed 参数按 Value 传递，更新由返回值和调用方显式写回完成。
 - 中文名称经过 Unicode 规则、NFC 归一化和混淆字符诊断。
 - 名称与定义身份分离，未来可以为同一个 Semantic Definition 提供中文、英文和历史别名。
 
@@ -111,6 +118,12 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 │   ├── ling-diagnostics/
 │   ├── ling-syntax/
 │   ├── ling-ast/
+│   ├── ling-hir/
+│   ├── ling-resolve/
+│   ├── ling-types/
+│   ├── ling-effects/
+│   ├── ling-semantic/
+│   ├── ling-eval/
 │   └── ling-cli/
 ├── tests/
 │   └── conformance/
@@ -183,15 +196,15 @@ Ling 仍处于早期设计阶段。请在生产使用、标准化承诺或大规
 
 ### Project status
 
-Ling is in the early implementation phase of `v0.0.1 Seed`. The Rust workspace, Source/Unicode/Diagnostic foundations, lexer, offside layout, Parser/CST, AST lowering, and minimal CLI now exist. Name resolution, the type system, Semantic Graph, and interpreter remain unimplemented, so this version cannot yet execute Ling programs and is not a production compiler or runtime.
+Ling is in the early implementation phase of `v0.0.1 Seed`. The Hello World vertical slice now runs through Source, Parser/CST/AST, resolved HIR, types, Effects/Capabilities, a semantic snapshot, and the checked-core interpreter. `check`, `run`, and `semantic` work for the implemented Seed subset. Full record/ADT acceptance, Audit round-tripping, and the REPL remain incomplete, so this is still not a production compiler or runtime.
 
 | Item | Current status |
 | --- | --- |
 | Language name | Chinese: 零; English: Ling |
 | CLI | `ling` |
 | Source extension | `.ling` |
-| Current milestone | M2 Parser (Parser/CST/AST main path complete; acceptance hardening in progress) |
-| Implementation | UTF-8 SourceMap, generated Unicode 17 XID/NFC/UTS #39 tables, bilingual JSON diagnostics, Lexer, Offside Layout, Parser/CST, AST lowering, minimal CLI, and conformance runner implemented |
+| Current milestone | The `docs/NEXT-STEPS.md` Hello World vertical slice is complete; full `v0.0.1 Seed` work continues |
+| Implementation | Unicode 17, Lexer/Layout, Parser/CST/AST, modules/imports, resolved HIR, HM types with arbitrary-precision Int, Effects/Capabilities, deterministic Semantic Graph, interpreter, CLI, and conformance runner implemented |
 | Stability | The design may change; accepted RFCs are the mechanism for freezing semantics |
 
 ### Build and verification
@@ -204,11 +217,15 @@ cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 cargo run --locked -- --version
 ```
 
-The current `check` path reads the source, validates UTF-8, handles BOM/newline mapping, performs Unicode identifier checks, Lexer/Layout processing, Parser/CST construction, and AST lowering, and emits `ling.diagnostic/0.1`. A valid AST then rejects the missing name-resolution and semantic stages explicitly with `L-IMPL-0001` instead of pretending that checking succeeded:
+`check`, `run`, and `semantic` share one real compilation path. `check` does not execute `main`; `run` interprets only a ProgramSnapshot that passed name, type, Place, Effect, and Capability checks; and `semantic` emits deterministic `ling.semantic/0.1` JSON:
 
 ```bash
-cargo run --locked -- check --format json tests/conformance/m0-source-pipeline/case.ling
+cargo run --locked -- check examples/hello.ling
+cargo run --locked -- run examples/hello.ling
+cargo run --locked -- semantic examples/hello.ling
 ```
+
+Hello World prints `你好，零`. Until their governing decisions and implementations are complete, `audit` and `repl` continue to fail explicitly with `L-IMPL-0001`.
 
 ### Mission
 
@@ -226,13 +243,16 @@ Example syntax:
 
 ```fsharp
 let 受到伤害 伤害 人物 =
-    人物.血量 <- max 0 (人物.血量 - 伤害)
+    { 人物 with 血量 = max 0 (人物.血量 - 伤害) }
+
+let mutable 关羽 = 初始人物
+关羽 <- 受到伤害 30 关羽
 ```
 
 In this example:
 
 - `=` creates bindings and initializes values; `<-` modifies an existing mutable Place.
-- Functions use space application by default, for example `受到伤害 30 关羽`.
+- Functions use space application by default. Seed parameters use value semantics, so updates return a value and the caller writes it back explicitly.
 - Chinese names are processed with Unicode rules, NFC normalization, and confusable-character diagnostics.
 - Names are separate from definition identity, allowing future Chinese, English, and historical aliases for one Semantic Definition.
 
@@ -284,6 +304,12 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 │   ├── ling-diagnostics/
 │   ├── ling-syntax/
 │   ├── ling-ast/
+│   ├── ling-hir/
+│   ├── ling-resolve/
+│   ├── ling-types/
+│   ├── ling-effects/
+│   ├── ling-semantic/
+│   ├── ling-eval/
 │   └── ling-cli/
 ├── tests/
 │   └── conformance/

@@ -30,6 +30,28 @@ This file is the single source of truth for stable diagnostic-code allocation. A
 | `L-SYNTAX-0006` | Delimiter 在 EOF 前未闭合 / Delimiter is not closed before EOF | delimiter 在文件结尾前未闭合 | delimiter is not closed before the end of the file | `expected` | — | `0.0.1-dev` |
 | `L-SYNTAX-0010` | Parser 遇到不符合当前 grammar 的 token / Parser encounters a token outside the current grammar | 语法错误：需要 `{expected}` | syntax error: expected `{expected}` | `context`, `expected`, `found` | — | `0.0.1-dev` |
 | `L-SYNTAX-0011` | Parser recursion 超过 512 层 / Parser recursion exceeds 512 levels | 语法嵌套超过 512 层 | syntax nesting exceeds 512 levels | `maximum_depth` | — | `0.0.1-dev` |
+| `L-NAME-0001` | 引用无法解析 / Reference cannot be resolved | 未定义名称“{name}” | undefined name `{name}` | — | — | `0.0.1-dev` |
+| `L-NAME-0002` | 同一作用域重复定义 / Duplicate definition in one scope | 名称“{name}”在同一作用域中重复定义 | name `{name}` is defined more than once in the same scope | — | — | `0.0.1-dev` |
+| `L-NAME-0003` | module 声明或 Seed module 边界非法 / Invalid module declaration or Seed module boundary | module 规则无效 | invalid module rule | 可选 / optional: `expected_module`, `actual_module` | — | `0.0.1-dev` |
+| `L-NAME-0004` | import alias 重复 / Duplicate import alias | import 别名“{alias}”重复 | import alias `{alias}` is duplicated | — | — | `0.0.1-dev` |
+| `L-NAME-0005` | Seed import graph 包含 cycle / Seed import graph contains a cycle | Seed 不允许 import cycle | Ling Seed rejects import cycles | — | — | `0.0.1-dev` |
+| `L-NAME-0006` | 同一作用域存在 UTS #39 confusable collision / One scope contains a UTS #39 confusable collision | 名称视觉混淆 | names are confusable in the same scope | — | — | `0.0.1-dev` |
+| `L-NAME-0007` | module scope 重定义保留内置名称 / Module scope redefines a reserved builtin name | 模块作用域不能重定义内置名称“{name}” | module scope cannot redefine built-in name `{name}` | — | — | `0.0.1-dev` |
+| `L-NAME-0008` | import module 或精确大小写路径不存在 / Imported module or exact-case path is absent | 找不到 import 模块“{module}” | imported module `{module}` was not found | `module` | — | `0.0.1-dev` |
+| `L-TYPE-0001` | 类型无法统一或表达式不可调用 / Types cannot unify or an expression is not callable | 类型不匹配 | type mismatch | 可选 / optional: `generalization`, `restriction_reason` | — | `0.0.1-dev` |
+| `L-TYPE-0002` | occurs check 检测到无限类型 / Occurs check detects an infinite type | 类型推导产生无限类型 | type inference produced an infinite type | — | — | `0.0.1-dev` |
+| `L-TYPE-0003` | 函数参数数量不匹配 / Function argument count mismatch | 参数数量不匹配 | argument count mismatch | — | — | `0.0.1-dev` |
+| `L-TYPE-0004` | nominal record 字段不存在 / Nominal record field is absent | record 中不存在字段“{field}” | record has no field named `{field}` | — | — | `0.0.1-dev` |
+| `L-TYPE-0005` | 字段集合无法唯一确定 nominal record / Field set does not identify one nominal record | 无法唯一确定 nominal record 类型 | record fields do not identify one nominal record type | — | — | `0.0.1-dev` |
+| `L-TYPE-0006` | match 非穷尽 / Match is non-exhaustive | match 非穷尽 | match is non-exhaustive | — | — | `0.0.1-dev` |
+| `L-MUT-0001` | 赋值目标不是合法 mutable Place / Assignment target is not a legal mutable Place | 赋值左侧不可修改 | assignment target is not mutable | — | — | `0.0.1-dev` |
+| `L-CAP-0001` | module 缺少所需 Capability / Module lacks a required Capability | 模块缺少 Capability 声明“{capability}” | module is missing required capability `{capability}` | — | — | `0.0.1-dev` |
+| `L-CAP-0002` | Capability 不属于 Seed / Capability is outside Seed | Seed 不支持 Capability“{capability}” | Ling Seed does not support capability `{capability}` | — | — | `0.0.1-dev` |
+| `L-CAP-0003` | module 声明了未使用的 Capability / Module declares an unused Capability | 模块声明了未使用的 Capability | module declares an unused capability | — | — | `0.0.1-dev` |
+| `L-ENTRY-0001` | run 入口 module 不是 Main / Run entry module is not Main | run 入口模块必须是 Main | the run entry module must be `Main` | — | — | `0.0.1-dev` |
+| `L-ENTRY-0002` | Main 缺少 main / Main has no main | Main 模块缺少 main 定义 | module `Main` does not define `main` | — | — | `0.0.1-dev` |
+| `L-ENTRY-0003` | main 签名或参数 pattern 非法 / Invalid main signature or parameter pattern | main 必须具有 Unit -> Unit 和 Unit pattern | `main` must have Unit -> Unit and a Unit pattern | — | — | `0.0.1-dev` |
+| `L-RUNTIME-0001` | Checked Core 求值或宿主 Capability 发生 Runtime Fault / Checked Core or host Capability raises a Runtime Fault | 运行时 Fault | runtime Fault | `category` | — | `0.0.1-dev` |
 | `L-IMPL-0001` | 所请求路径依赖尚未实现的编译阶段 / Requested path requires a compiler stage not yet implemented | `{command}` 命令所需的编译阶段尚未实现 | the compiler stage required by `{command}` is not implemented yet | `command`, `completed_stage`; 可选 / optional: `source_name`, `had_bom`, `unicode_version`, `token_count` | — | `0.0.1-dev` |
 
 ## 兼容性边界 / Compatibility boundary

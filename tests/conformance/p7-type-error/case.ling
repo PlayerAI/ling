@@ -1,0 +1,5 @@
+module Main
+    requires Console.Write
+
+let main () =
+    Console.write 1

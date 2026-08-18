@@ -1,0 +1,7 @@
+let 总伤害 人物列表 =
+    人物列表
+    |> map 计算伤害
+    |> sum
+
+let mutable 总数 = 0
+let 更新 value = 总数 <- value

@@ -1,0 +1,4 @@
+arguments = ["check", "--format", "json", "case.ling"]
+exit_code = 1
+normative_clauses = ["RFC-0001 §6.2", "RFC-0001 §7.3"]
+diagnostic_codes = ["L-TYPE-0001"]
