@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>零语言（Ling）设计评审</title>
+<style>
+  :root {
+    --ink: #24292f;
+    --muted: #57606a;
+    --line: #d0d7de;
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --accent: #0550ae;
+    --good: #1a7f37;
+    --warn: #9a6700;
+    --code-bg: #eff1f3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.75;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 64px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 32px; }
+  .kicker { color: var(--muted); font-size: 14px; letter-spacing: 0.05em; margin: 0 0 8px; }
+  h1 { font-size: 30px; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0; font-size: 15px; }
+  h2 {
+    font-size: 21px; margin: 40px 0 16px; padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  h2 .no { color: var(--muted); font-weight: 400; margin-right: 8px; }
+  p { margin: 12px 0; }
+  ul, ol { margin: 12px 0; padding-left: 24px; }
+  li { margin: 8px 0; }
+  code {
+    background: var(--code-bg); border-radius: 4px;
+    padding: 2px 6px; font-size: 0.92em;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  pre {
+    background: var(--code-bg); border-radius: 8px; padding: 14px 16px;
+    overflow-x: auto; font-size: 13.5px; line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 8px; padding: 16px 20px; margin: 14px 0;
+  }
+  .card h3 { margin: 0 0 8px; font-size: 17px; }
+  .card p:last-child { margin-bottom: 0; }
+  .risk { border-left: 4px solid var(--warn); }
+  .tag {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    border-radius: 999px; padding: 1px 10px; margin-left: 8px;
+    vertical-align: middle;
+  }
+  .tag.done { color: var(--good); border: 1px solid var(--good); }
+  .tag.open { color: var(--warn); border: 1px solid var(--warn); }
+  .verdict {
+    background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: 8px; padding: 16px 20px;
+  }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker">设计评审 · 2026-08-18</p>
+  <h1>零语言（Ling）设计评审</h1>
+  <p class="sub">评审对象：<code>LANGUAGE.md</code> · <code>SEMANTICS.md</code> · <code>RFC-0001.md</code>（v0.0.1 Seed 草案）</p>
+</header>
+
+<main>
+
+<h2><span class="no">一、</span>总体判断</h2>
+
+<div class="verdict">
+  <p>这是一套少见的“知道自己要什么”的语言设计：v0.0.1 的范围切割、显式非目标、“为完成 v0.0.1 而伪造能力视为失败”这条线，体现了真正的工程纪律。</p>
+  <p>但它的风险不在执行，而在于<strong>同时押注了四五个各自都未被验证过的设计赌注</strong>——跨 Profile 统一语义、Effect/Capability/Ownership 全推导、Semantic Graph 双视图一致、AI 语义事务——这些赌注之间还会互相放大难度。文档的成熟度分布并不均匀：工程治理部分（RFC 流程、验收标准、测试策略）是资深水准；语言核心语义里有几笔（自动 Borrow、跨 Profile 语义）还停在愿望层面。两者之间的差距，就是接下来真正的工作量所在。</p>
+</div>
+
+<h2><span class="no">二、</span>设计上正确的决策</h2>
+
+<ul>
+  <li><strong>“可以省略，不可隐瞒”（§2.2）</strong>是整套设计的定海神针。推导型语言最大的敌人是隐藏行为，这条原则配合 Audit Source 的强制展开，方向正确。</li>
+  <li><strong>Effect 与 Capability 分开（§8）</strong>：行为事实和授权事实本来就是两件事，Pony 和 Koka 各做了一半，这里合起来想清楚了。时间、随机、网络不再是环境函数而是显式 Effect，对测试和回放的价值是实打实的。</li>
+  <li><strong>合同证据阶梯（§9）</strong>：<code>Proved / RuntimeChecked / Tested / Assumed / Unverified</code> 五档，且“不得把测试通过显示成已证明”——大多数形式化工具都没有这种诚实。</li>
+  <li><strong>Unicode 安全不是装饰品（§5）</strong>：UAX #31 + UTS #39/#55 + NFC + 作用域内 confusable 检测，比几乎所有“支持 Unicode 标识符”的语言（包括 Rust）都认真。说明中文标识符是当真的一等公民，不是噱头。</li>
+  <li><strong>ASCII 关键字 + 中文标识符</strong>的分工务实。翻译关键字历来制造方言分裂，这个坑躲开了。</li>
+  <li><strong>REPL 必须复用同一套 Parser/Checker/Interpreter（RFC §11.3）</strong>、规范优先级高于实现、错误码稳定且不来自自然语言——这些是老手才会写进 RFC 的条款。</li>
+</ul>
+
+<h2><span class="no">三、</span>质疑与风险</h2>
+
+<div class="card risk">
+  <h3>1. “一门语言，三种严格程度”是最大的未验证假设 <span class="tag open">待验证</span></h3>
+  <p>§2.4 说不是“Debug 时 GC 语言、Release 变 Rust”，但恰恰需要证明的就是这一点。Ownership 是会传染的：按 GC 假设写的代码（自由别名、闭包抓引用）在 Resource 纪律下根本编不过。如果 Explore 代码通常无法不重写就进 Critical，承诺就塌缩成“一套语法、三门语言”——正是文档宣称要避免的东西。同类尝试（Swift 的 noncopyable、Austral）都是单模型收尾。</p>
+  <p>建议这个机制<strong>最早写 RFC</strong>：拿出同一个非平凡函数在三个 Profile 下编译通过的具体样例，证明可移植性存在，否则趁早修改承诺。连带问题：<code>Int</code> 是任意精度（§6.2），那 Critical Profile 里 <code>Int</code> 是什么？跨 Profile 数值语义现在是有缝的。</p>
+</div>
+
+<div class="card risk">
+  <h3>2. <code>=</code> 身兼绑定和赋值 <span class="tag done">已采纳，改为 &lt;-</span></h3>
+  <p>原设计中 <code>=</code> 在三个上下文里意思不同（绑定 / 字段初始化 / 可变赋值），需要 <code>EqualsExpression</code> 延后消歧，并让“创建不可变绑定”和“修改已有 Place”这两个语义相反的操作共用同一个符号——优化的是新手前 10 分钟的熟悉感，付出的是永久的解析复杂度和教学困惑。</p>
+  <p><strong>处理结果：</strong>赋值已改为 F# 风格的 <code>&lt;-</code>，<code>=</code> 只承担绑定与初始化，词法层面无歧义。已同步修订 <code>LANGUAGE.md</code> §4.2、<code>SEMANTICS.md</code> §9.4、<code>RFC-0001.md</code> §6.4 / §8 EBNF / §8.1 / §20.4 / §21.5 及全部示例。</p>
+</div>
+
+<div class="card risk">
+  <h3>3. 自动 Borrow 推导是把 Rust 最难的东西做成了隐式 <span class="tag open">待验证</span></h3>
+  <p>§4.4 / §9.3 从函数体推导参数是不是 <code>&amp;mut</code>，意味着函数的类型取决于它的实现——改一行实现（加一处写），远处的调用方就变了。HM 类型推导是成熟的，可变义务推导不是。Rust 当年刻意让签名显式、把推导留在函数体内，换来的就是可预期的错误信息和分离编译。</p>
+  <p>好在 v0.0.1 的受限版本（只允许局部可变 binding、不许逃逸）是正确的试探姿势。建议长期保持“<strong>签名显式、调用点隐式 reborrow</strong>”，别把体→签名的泄漏固化进语言。</p>
+</div>
+
+<div class="card risk">
+  <h3>4. 中文标识符的难点不在词法，在生态 <span class="tag open">待办</span></h3>
+  <p>文档把编译器内的部分解决得很好，但真实成本在外面：IME 与中英文标点切换的输入摩擦、CI 日志和终端字体、grep、代码评审工具。设计其实已经握有正确答案——Semantic ID 与显示名解耦 + 多语言别名（§5.8），能让同一项目在中文团队和英文团队各有视图。</p>
+  <p>但别名被推迟到 v0.0.1 之后，这意味着第一批代码（含标准库命名）会在别名系统存在之前定型，顺序上有风险。如果中文标识符是旗舰特性，<strong>别名 RFC 应该提前，而不是推后</strong>。</p>
+</div>
+
+<div class="card risk">
+  <h3>5. Semantic Graph 的 round-trip 会悄悄吃掉预算 <span class="tag open">待观察</span></h3>
+  <p>“语义身份优先”的终局要同时维护 Author Source 和 Audit Source 两个可编辑视图且机械一致（§14.3）。Unison 走了很多年证明这条路能走通但极其昂贵——而人类依然活在 git diff 和 GitHub review 的文本世界里。<code>parse_audit(render_audit(g)) = g</code> 这个要求写进文档是对的，但请预期它会消耗比 Parser 本身更多的人力。</p>
+</div>
+
+<div class="card risk">
+  <h3>6. AI 治理有投机性基础设施的味道；推导域叠加会放大报错难度 <span class="tag open">待观察</span></h3>
+  <p>“AI 不属于 TCB”（§2.3）的立场完全赞同，但在还没有真实用户时就设计 Semantic Transaction 的前置条件、保留约束、provenance 全套机制，是在为不存在的流量建收费站。v0.0.1 只做查询图输出、事务后置——这个裁剪是对的，保持住。</p>
+  <p>另外，Effect Row + Ownership + Region + Placement + Contract 全都进函数类型且全靠推导。推导失败时，用户面对的是五个约束域同时报错的场面，那会让 Rust 的 borrow 错误显得亲切。<code>ling explain</code> 应该是 v0.0.1 的一等公民，不是附属命令。</p>
+</div>
+
+<h2><span class="no">四、</span>命名核查：<code>ling</code></h2>
+
+<p>拼音“零”→ <strong>ling</strong>，转换本身很优雅，中文含义保住了。但 <code>ling</code> 也不是净土，只是冲突远比 Vercel 的 Zerolang 小：</p>
+
+<ul>
+  <li><a href="https://github.com/np/ling">np/ling</a>：学术实验语言（LINear LaNGuage，线性类型 + 进程演算），自带 <code>ling</code> CLI。冷门且多年不活跃，但它确实是一门叫 ling 的语言。</li>
+  <li><a href="https://erlangforums.com/t/beam-there-done-that-with-maxim-kharchenko-on-erlang-without-an-os-and-building-ling/5850">LING（Erlang-on-Xen unikernel VM）</a>：不是语言，是 BEAM 的独立运行时，同样冷门。</li>
+</ul>
+
+<p>结论：这两个都够 obscure，不构成 Zerolang 那种“同赛道 + 同理念 + 同名”的致命冲突，<code>ling</code> 可以用。但 RFC-0002 冻结前应补一次正式检索：crates.io / npm 的 <code>ling</code> 占用、<code>.ling</code> 扩展名冲突、商标库，并在文档里留下检索记录。</p>
+
+<h2><span class="no">五、</span>优先行动建议</h2>
+
+<ol>
+  <li><strong>先证“跨 Profile 可移植”</strong>：同一个带可变状态的函数，Explore 和 Critical 各编一遍，把过程和限制写成 RFC。这是整个设计的承重墙。</li>
+  <li><strong>在语法冻结前重新表决 <code>=</code> 赋值</strong>。<span class="tag done">已完成</span> 已采纳 <code>&lt;-</code> 方案，三份文档已同步修改。</li>
+  <li><strong>把多语言别名提前到标准库命名定型之前</strong>，否则第一批代码会把命名惯例锁死在单一语言上。</li>
+</ol>
+
+</main>
+
+<footer>
+  <p>本评审基于 2026-08-18 的文档版本（LANGUAGE.md 草案 0.1 · SEMANTICS.md 草案 0.1 · RFC-0001 Draft）。评审意见仅针对设计文本，未验证任何实现。</p>
+</footer>
+
+</div>
+</body>
+</html>
