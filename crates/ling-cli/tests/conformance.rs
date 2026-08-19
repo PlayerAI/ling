@@ -447,7 +447,7 @@ fn tty_script_command() -> Command {
             .arg("-qefc")
             .arg(format!("{executable} repl --format human"))
             .arg("/dev/null")
-            .env("TERM", "dumb");
+            .env("TERM", "xterm");
         command
     }
 
@@ -459,7 +459,7 @@ fn tty_script_command() -> Command {
             .arg("/dev/null")
             .arg(env!("CARGO_BIN_EXE_ling"))
             .args(["repl", "--format", "human"])
-            .env("TERM", "dumb");
+            .env("TERM", "xterm");
         command
     }
 }

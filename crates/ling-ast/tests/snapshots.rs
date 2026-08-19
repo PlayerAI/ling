@@ -18,6 +18,7 @@ fn cst_and_ast_snapshots_are_stable() {
     for (index, case) in CASES.iter().enumerate() {
         let directory = root.join(case);
         let source_text = fs::read_to_string(directory.join("case.ling"))
+            .map(|text| normalize_newlines(&text))
             .unwrap_or_else(|error| panic!("failed to read snapshot source `{case}`: {error}"));
         let source = SourceFile::from_bytes(
             SourceId::new(u32::try_from(index).expect("three snapshot cases")),
@@ -39,6 +40,7 @@ fn cst_and_ast_snapshots_are_stable() {
             render_ast(&program)
         );
         let expected = fs::read_to_string(directory.join("syntax.snap"))
+            .map(|text| normalize_newlines(&text))
             .unwrap_or_else(|error| panic!("failed to read snapshot `{case}`: {error}"));
         if expected == "pending\n" {
             panic!("generated syntax snapshot `{case}`:\n{actual}");
@@ -48,6 +50,10 @@ fn cst_and_ast_snapshots_are_stable() {
             "syntax snapshot `{case}` changed; review semantic impact before updating it"
         );
     }
+}
+
+fn normalize_newlines(text: &str) -> String {
+    text.replace("\r\n", "\n")
 }
 
 fn render_cst(source: &SourceFile, parsed: &ParsedSource) -> String {
