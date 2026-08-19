@@ -376,7 +376,7 @@ G-12/Audit 和 G-14/REPL 可在 Hello World 文件执行主路径完成后进入
 - [x] `run` 输出 `你好，零` 并返回 `0`；
 - [x] 缺 Capability、类型错误和名称错误在执行前被拒绝；
 - [x] Semantic JSON 可复现并通过 Schema 测试；
-- [ ] 全 workspace fmt、Clippy、tests、docs、Unicode idempotence 和三平台 CI 通过：本地门禁已通过，远程三平台 CI 待首次推送后确认；
+- [x] 全 workspace fmt、Clippy、tests、docs、Unicode idempotence 和候选 SHA 的三平台 CI 已通过；
 - [x] README 的状态、命令示例和未实现能力与实际行为一致。
 
 后续工作由 [`NEXT-STEPS-SEED.md`](NEXT-STEPS-SEED.md) 接续，处理完整 record/ADT 示例、Audit round-trip、REPL 会话和 `v0.0.1` 全部发布门禁。

@@ -108,4 +108,4 @@ The excluded fuzz lockfile adds four indirect packages not already listed above:
 - build/test/fuzz-only native boundaries are isolated in `cc`, `libfuzzer-sys`, platform support crates, and their target-selected dependencies; `libfuzzer-sys` is never linked into `ling`.
 - This is an engineering inventory based on locked manifests and cached source for the stated versions, not legal advice or a proof of transitive code safety. Any lockfile change invalidates the inventory and requires review.
 
-The exact package versions remain authoritative in `Cargo.lock` and `fuzz/Cargo.lock`. The locked per-package license/MSRV/unsafe-presence inventory is complete for the current graphs; release readiness still depends on the protocol decisions, clean candidate commit, and same-SHA three-platform CI recorded in `SEED-RELEASE-REPORT.md`.
+The exact package versions remain authoritative in `Cargo.lock` and `fuzz/Cargo.lock`. The locked per-package license/MSRV/unsafe-presence inventory is complete for the candidate graphs; the clean candidate and same-SHA platform/fuzz/MSRV CI evidence are recorded in `SEED-RELEASE-REPORT.md`.

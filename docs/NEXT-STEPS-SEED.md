@@ -1,8 +1,8 @@
 # 下一步开发计划：从 Hello World 到 `v0.0.1 Seed`
 
-> 状态：P8～P11 已实现；P12 等待候选 commit 与远程三平台 CI
+> 状态：P8～P12 已完成；候选 SHA 全部门禁通过，等待 release tag 单独授权
 > 日期：2026-08-18
-> 基线 commit：`a88e5ef89abc3c26e0910016dc6305ee79c53e3e`
+> 候选 commit：`652d19b9eaec2ab607edfe1a1e7ea742c861cf91`
 > 当前基线：Hello World 已贯通 Source、Syntax、HIR、Resolver、Type、Effect/Capability、Semantic Snapshot、Interpreter 与 CLI
 > 目标版本：`0.0.1-dev` 功能闭合；是否发布和打标签不由本文授权
 > 规范依据：[RFC-0001](RFC-0001.md)、[SEMANTICS](SEMANTICS.md)、[IMPLEMENTATION](IMPLEMENTATION.md) 及已接受的 [decisions](decisions/)
@@ -62,10 +62,10 @@ cargo run --locked --offline -- audit examples/人物.ling
 | `match` | 已检查 scrutinee、guard 与分支结果类型 | 增加 Bool/nominal variant 穷尽性、不可达分支和稳定 witness |
 | `Option / Result` | DEC-0014 已 Accepted | 已由 Resolver 注入 `Ling.Prelude`，泛型 constructor、保留名称和稳定 provenance 已验证 |
 | 高阶 Effect | 普通调用图传播已存在 | `map` 必须传播 callback Effect，并由结果推导 Capability |
-| Semantic JSON | writer/reader、RFC §6.11 全部节点类别、resolved source/owner/target ID、扩展字段兼容、负向结构验证与独立进程确定性均已完成 | 仅剩候选 SHA 的跨平台 CI 证据；不在 Seed 冻结 experimental Schema |
+| Semantic JSON | writer/reader、RFC §6.11 全部节点类别、resolved source/owner/target ID、扩展字段兼容、负向结构验证与独立进程确定性均已完成 | 候选 SHA 跨平台 CI 已通过；Seed 仍不冻结 experimental Schema |
 | Audit | DEC-0015 已 Accepted | `AuditModel`、canonical renderer/parser、`L-AUDIT-*`、round-trip 与 CLI 独立进程确定性已验证 |
 | REPL | DEC-0016 已 Accepted | 事务会话、多行/EOF、重定义 generation、回滚、Capability 与 human/JSON 脚本模式已验证 |
-| 发布门禁 | 本地 workspace 门禁已通过，CI 已配置 | 需要完整 Seed conformance、真实三平台结果和干净发布 commit |
+| 发布门禁 | 本地 workspace、完整 Seed conformance、真实三平台/fuzz/MSRV CI 与干净候选 commit 均已通过 | 仅剩 release tag 单独授权 |
 
 现有 `m2-record-match-parser` fixture 的 `match` 两个分支分别返回 `Text` 与 `Int`，预期 `L-TYPE-0001` 是正确反例，不是 record/ADT 成功验收。不得把该 fixture 当作完整类型和执行证据。
 
@@ -377,10 +377,10 @@ cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline
 - [x] G-12 Accepted，Audit renderer/parser/round-trip 与 CLI 通过；
 - [x] G-14 Accepted，REPL transaction、脚本模式和 Core 复用通过；
 - [x] RFC §18 与 IMPLEMENTATION §10 的追踪矩阵已建立，所有未完成项均有明确阻断原因；
-- [x] fmt、Clippy、tests、Rustdoc、release build、Unicode idempotence 与 fuzz target 编译已通过；实际 fuzz smoke 仍由 Ubuntu CI 验证；
-- [ ] Windows、Linux、macOS 对同一候选 commit 的 CI 全绿；
+- [x] fmt、Clippy、tests、Rustdoc、release build、Unicode idempotence 与 fuzz target 编译已通过；实际 fuzz smoke 已在 Ubuntu CI 通过；
+- [x] Windows、Linux、macOS 对候选 `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 的 CI 全绿；
 - [x] 依赖、许可证、错误码、README、示例和已知限制已同步；
-- [ ] 工作区干净，未实现能力无静默执行路径；
-- [x] 未执行 tag/push；后续仍只在单独确认后执行。
+- [x] 候选提交审计时工作区干净，未实现能力无静默执行路径；
+- [x] 候选 commits 已在单独确认后 push；release tag 尚未执行，仍需单独确认。
 
 完成上述条件后，下一阶段再评估 `v0.1 Living` 的 VM、增量编译、Formatter、LSP 与基础 Trait，不在本计划中提前实现。

@@ -1,15 +1,16 @@
 # `v0.0.1 Seed` 发布门禁报告 / Release Gate Report
 
-> 结论 / Verdict: **NOT READY — candidate commit, remote CI, and real-TTY evidence pending**
+> 结论 / Verdict: **READY FOR TAG AUTHORIZATION — all required local and remote gates pass**
 > 报告日期 / Report date: 2026-08-19
-> 仓库基线 / Repository baseline: `a88e5ef89abc3c26e0910016dc6305ee79c53e3e`
+> 候选提交 / Candidate commit: `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`
 > 分支 / Branch: `main`
+> CI: [run #4](https://github.com/PlayerAI/ling/actions/runs/32247366834), `success`
 > Schema: `ling.semantic/0.1`
 > Unicode: `17.0.0`
 
-本文件是当前工作区的门禁快照，不是发布声明，也不授权 commit、tag 或 push。当前实现尚未形成候选 commit，因此不能填写候选 SHA 或远程 CI run。
+本文件记录已经验证的候选提交与发布门禁，但不是发布声明，也不授权 commit、tag 或 push。候选提交的本地工作区在审计时干净，且 `origin/main` 指向同一 SHA。
 
-This file is a gate snapshot for the current worktree, not a release declaration and not authorization to commit, tag, or push. The implementation is not yet a candidate commit, so no candidate SHA or remote CI run can be claimed.
+This file records the verified candidate and release gates, but it is not a release declaration or authorization to commit, tag, or push. At audit time the candidate worktree was clean and `origin/main` resolved to the same SHA.
 
 ## 本地环境 / Local environment
 
@@ -40,45 +41,53 @@ This file is a gate snapshot for the current worktree, not a release declaration
 - REPL binding、编译/运行失败回滚、重定义 generation、旧 closure、confusable/type 重定义、多行中文、EOF、Console JSON event、human/JSON 脚本模式和 file/session Core 等价测试。
 - RFC §6.11 全部 Semantic Graph 节点类别、deterministic owner/source IDs、reader/Audit round-trip 与悬空 owner/source 负例；
 - `L-INTERNAL-0001` 稳定 incident ID、`ling.internal-incident/0.1` 本地重现报告、Semantic reader 独立 round-trip，以及 internal/snapshot/host failure 的 exit `5`/`6`/`4` 分离。
-- Rustyline TTY 的显式 `Interrupted`/`Eof` 路径，以及 Windows 本地通过的 Ctrl-C session-state 单元测试；Linux/macOS 的真实 PTY 进程 fixture 已纳入 conformance，等待候选 SHA CI 执行。
+- Rustyline TTY 的显式 `Interrupted`/`Eof` 路径、Windows 本地通过的 Ctrl-C session-state 单元测试，以及在候选 SHA 的 Linux/macOS CI 中通过的真实 PTY 进程 fixture。
 - Seed literal 边界（非有限 `f64`、前导零、Char 显式拒绝）、结构相等性边界与 Value Restriction 来源 Facts。
 - 作用域内 confusable、单个可疑混写名、module/import alias 安全检查，以及 built-in namespace 保护。
 - local/higher-order Effect 传播、已解析 root type 的 `State<T>`，以及 Graph/Audit 中不泄漏 nominal DefinitionId 的用户可见类型文本。
 
-Passed in the current worktree on 2026-08-19: formatting; offline Clippy with denied warnings; 138 locked, offline tests plus doc-tests; offline Rustdoc and release builds; Rust 1.85 MSRV verification; offline fuzz-target compilation; Unicode generation idempotence; process-level example coverage; Prelude conformance; complete RFC §6.11 Semantic Graph node coverage; deterministic Audit round-tripping; transactional human/JSON REPL coverage; stable internal incident reports; and distinct internal/snapshot/host failure handling.
+Passed for the candidate on 2026-08-19: formatting; offline Clippy with denied warnings; 138 Windows tests plus doc-tests; offline Rustdoc and release builds; Rust 1.85 MSRV verification; offline fuzz-target compilation; Unicode generation idempotence; process-level example coverage; Prelude conformance; complete RFC §6.11 Semantic Graph node coverage; deterministic Audit round-tripping; transactional human/JSON REPL coverage; stable internal incident reports; and distinct internal/snapshot/host failure handling.
 
-## 明确阻断项 / Explicit blockers
+## 远程候选证据 / Remote candidate evidence
 
-1. Windows 本地 fuzz executable 以 `STATUS_DLL_NOT_FOUND (0xc0000135)` 退出；target 可编译，实际 ASan/libFuzzer smoke 仍由 Ubuntu CI 执行。
-2. 当前工作区有预期中的未提交实现变更，不满足“发布工作区干净”。
-3. 尚无同一候选 SHA 的 Windows、Linux、macOS 远程 CI 结果。
-4. 未获得 commit、tag 或 push 的单独危险操作确认。
-5. Linux/macOS 的真实 PTY Ctrl-C 进程 fixture 已实现但尚未在候选 SHA CI 执行；Windows 真实 TTY 按键证据尚未记录。
+CI run #4 由候选 SHA `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 的 push 触发。所有 job 均以 `success` 完成：
 
-1. The Windows fuzz executable exits with `STATUS_DLL_NOT_FOUND (0xc0000135)`. Targets compile; the real ASan/libFuzzer smoke remains an Ubuntu CI gate.
-2. The worktree intentionally contains uncommitted implementation changes and is not release-clean.
-3. No Windows/Linux/macOS results exist for one candidate SHA.
-4. No separate confirmation has authorized commit, tag, or push operations.
-5. A real-PTY Ctrl-C process fixture exists for Linux/macOS but has not run in candidate-SHA CI; real Windows TTY keystroke evidence is not yet recorded.
+CI run #4 was triggered by candidate SHA `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`. Every job completed with `success`:
+
+| Job | Result |
+| --- | --- |
+| [ubuntu-latest](https://github.com/PlayerAI/ling/actions/runs/32247366834/job/96050714148) | `success` — includes the real-PTY Ctrl-C fixture |
+| [macos-latest](https://github.com/PlayerAI/ling/actions/runs/32247366834/job/96050714297) | `success` — includes the real-PTY Ctrl-C fixture |
+| [windows-latest](https://github.com/PlayerAI/ling/actions/runs/32247366834/job/96050714138) | `success` |
+| [fuzz corpus smoke](https://github.com/PlayerAI/ling/actions/runs/32247366834/job/96050713868) | `success` — pinned nightly, all three corpora |
+| [Rust 1.85 MSRV](https://github.com/PlayerAI/ling/actions/runs/32247366834/job/96050714055) | `success` |
+
+## 剩余受控操作 / Remaining controlled action
+
+唯一剩余发布操作是创建并推送指向候选 SHA 的 annotated tag `v0.0.1`。该操作尚未执行，必须由用户单独明确授权。
+
+The only remaining release action is creating and pushing the annotated `v0.0.1` tag at the candidate SHA. It has not been performed and requires separate explicit user authorization.
 
 ## 已知限制 / Known limitations
 
 - 当前 evaluator 只接受进程内 checker 构造的 `ProgramSnapshot`; Semantic JSON reader 不提供 JSON/Audit → executable conversion。
 - 穷尽性分析有意只覆盖 Seed 承诺的 `Bool` 与 nominal variants；Int、List 和 guarded completeness 后置。
+- Windows 本地 ASan/libFuzzer executable 受工具链运行时限制不能作为发布证据；候选 SHA 的三个 corpus 已在 Ubuntu nightly fuzz job 实际执行并通过。
 - REPL 的宿主 Capability 当前只通过 `--capability Console.Write` 配置；网络、文件、时间与随机能力不属于 Seed。
-- 交互式 REPL 使用 Rustyline 的显式 `Interrupted`/`Eof` 事件；自动化测试覆盖 pending-buffer 清理和 committed-state 保留，Linux/macOS 真实 PTY fixture 等待远程执行，Windows 仍需手工按键证据。
+- 交互式 REPL 使用 Rustyline 的显式 `Interrupted`/`Eof` 事件；自动化测试覆盖 pending-buffer 清理和 committed-state 保留，Linux/macOS 真实 PTY fixture 已在候选 CI 通过。Windows 完整测试矩阵已通过，但真实 Windows Console 的手工按键 smoke 尚未记录；它是后续平台验证建议，不是 Accepted Seed 验收阻断项。
 - Semantic Schema 与 IDs 保持 experimental；不兼容变更必须升级版本并补迁移说明。
 - Accepted Seed 当前定义 `f64` literal、类型、pattern 与 IEEE 相等性；算术/比较 operator 的 overload/defaulting 规则尚无 Accepted 决议，实现不猜测该语义。
 - Seed 不以用户级高阶 Effect Row 多态为验收要求；当前已解析调用图覆盖 `map` callback 和直接用户 wrapper 传播。
 
 - The evaluator accepts only in-process checked `ProgramSnapshot` values; the Semantic JSON reader exposes no JSON/Audit-to-executable conversion.
 - Exhaustiveness intentionally covers only Seed `Bool` and nominal variants; Int, List, and guarded completeness remain deferred.
+- A local Windows ASan/libFuzzer executable is not usable as release evidence because of toolchain runtime constraints; all three candidate-SHA corpora executed successfully in the Ubuntu nightly fuzz job.
 - The REPL host currently configures only `Console.Write` through `--capability Console.Write`; network, file, time, and random capabilities are outside Seed.
-- The interactive REPL uses Rustyline's explicit `Interrupted`/`Eof` events. Automated tests cover pending-buffer clearing and committed-state preservation; the Linux/macOS real-PTY fixture awaits remote execution, while Windows still needs manual keystroke evidence.
+- The interactive REPL uses Rustyline's explicit `Interrupted`/`Eof` events. Automated tests cover pending-buffer clearing and committed-state preservation, and the Linux/macOS real-PTY fixture passed candidate CI. The complete Windows matrix is green, but a manual real-Windows-Console keystroke smoke has not been recorded; it is recommended follow-up platform evidence, not an Accepted Seed release blocker.
 - Semantic Schema and IDs remain experimental; incompatible changes require a version bump and migration notes.
 - Accepted Seed currently defines `f64` literals, types, patterns, and IEEE equality. Arithmetic/comparison operator overloading and defaulting have no Accepted decision, so the implementation does not invent those semantics.
 - User-level higher-order Effect Row polymorphism is not a Seed acceptance requirement; the resolved call graph covers `map` callbacks and direct user-wrapper propagation.
 
-当阻断项全部关闭后，应从干净候选 commit 重新执行完整矩阵，把候选 SHA 与三平台 CI URL 回填到本报告，再由用户单独授权 commit/tag/push。
+全部功能与证据门禁已经关闭。后续不得改变候选提交内容；只有获得用户单独明确授权后，才能创建并推送 `v0.0.1` tag。
 
-After every blocker is closed, rerun the complete matrix from a clean candidate commit, record its SHA and three-platform CI URLs here, and obtain separate user authorization for commit/tag/push.
+All functional and evidence gates are closed. The candidate content must not change; create and push the `v0.0.1` tag only after separate explicit user authorization.

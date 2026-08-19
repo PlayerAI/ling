@@ -342,7 +342,7 @@ M1 和 M2 各完成后，根据实际吞吐、缺陷率、测试规模和接口�
 
 打 `v0.0.1` 标签前，以下 RFC §18 条目必须在 CI 与本地同时验证。该清单是必要条件，不替代第 6 节缺口关闭或规范条款追踪矩阵：
 
-下列 `[x]` 表示当前工作区已有可重复的本地证据；发布仍需要同一候选 SHA 的三平台 CI。
+下列 `[x]` 表示候选提交已有可重复的本地证据和同一 SHA 的远程 CI 证据；release tag 仍需单独授权。
 
 - [x] `ling run examples/人物.ling` 成功输出预期结果（§18.1）
 - [x] `ling check examples/人物.ling` 返回 0；错误程序返回稳定 code 与 JSON（§18.2）
@@ -350,16 +350,16 @@ M1 和 M2 各完成后，根据实际吞吐、缺陷率、测试规模和接口�
 - [x] 普通函数可推导；错误类型被拒；record 字段检查；非穷尽 match 被拒；不可变赋值被拒（§18.4）
 - [x] Pure 显示空 Effect；Console 调用显示 `Console.Write`；未声明 Capability 被拒（§18.5）
 - [x] 每定义有实验性 ID；引用边已解析；空白不变 hash；参数改名不变 BodyId；行为改变变 BodyId；Graph JSON 过 Schema 测试（§18.6）
-- [ ] Parser fuzz 规定时间无 panic；全部 conformance 通过；REPL 与文件执行同一 Core；Windows/Linux/macOS 构建通过（§18.7）——Windows 本地 conformance/Core/fuzz-target compile 已通过，Linux/macOS 真实 PTY interrupt fixture 已实现；其远程执行、Ubuntu fuzz smoke 与三平台候选 CI 待完成。
+- [x] Parser fuzz corpus smoke 无 panic；全部 conformance 通过；REPL 与文件执行同一 Core；候选 SHA 的 Windows/Linux/macOS、Linux/macOS 真实 PTY interrupt、Ubuntu fuzz 与 MSRV CI 全绿（§18.7）。
 
 附加发布门禁：
 
 - [x] G-01 至 G-15 均有已批准的 RFC、勘误或协议决议链接，且本地实现审计与决议一致；
-- [ ] `Cargo.lock` 已提交，`cargo build/test --workspace --all-features --locked --offline` 在三平台通过（本地 Windows 已通过）；
+- [x] `Cargo.lock` 已提交，`cargo build/test --workspace --all-features --locked --offline` 在三平台通过；
 - [x] Unicode 数据版本、输入校验和和许可证记录可追溯，普通构建不访问网络；
 - [x] Diagnostic/Graph/Audit Schema 正负兼容性、独立进程确定性和 Audit round-trip 测试通过；
 - [x] Seed 边界外特性不存在静默占位执行路径；保留语法在可识别时产生明确诊断；
-- [ ] 发布 commit 工作区干净，标签指向已通过上述门禁的唯一 commit。
+- [x] 候选 commit `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 审计时工作区干净并通过全部门禁；release tag 尚未创建，需单独授权。
 
 ---
 

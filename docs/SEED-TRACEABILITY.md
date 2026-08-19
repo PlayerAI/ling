@@ -1,12 +1,12 @@
 # Seed 规范追踪矩阵 / Seed Specification Traceability
 
 > 状态 / Status: working evidence index for `v0.0.1-dev`
-> 基线 / Baseline: `a88e5ef89abc3c26e0910016dc6305ee79c53e3e`
+> 候选 / Candidate: `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`
 > 更新日期 / Updated: 2026-08-19
 
-本文把 RFC-0001 §18 和 `IMPLEMENTATION.md` §10 映射到可重复执行的实现与测试证据。`已验证（本地）` 不等同于发布通过；需要 Accepted 决议、候选 commit 和同一 SHA 的三平台 CI 结果时，状态明确保留为阻断。
+本文把 RFC-0001 §18 和 `IMPLEMENTATION.md` §10 映射到可重复执行的实现与测试证据。Accepted 决议、本地门禁与同一候选 SHA 的三平台、fuzz、MSRV CI 均已闭合；发布 tag 仍需单独授权。
 
-This document maps RFC-0001 §18 and `IMPLEMENTATION.md` §10 to repeatable implementation and test evidence. “Verified locally” is not a release claim; requirements for accepted decisions, a candidate commit, and three-platform CI remain explicit blockers.
+This document maps RFC-0001 §18 and `IMPLEMENTATION.md` §10 to repeatable implementation and test evidence. Accepted decisions, local gates, and the same-candidate-SHA platform, fuzz, and MSRV CI are closed; the release tag still requires separate authorization.
 
 | 条款 / Clause | 正向证据 / Positive evidence | 反向证据 / Negative evidence | 实现路径 / Implementation | 状态 / Status |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ This document maps RFC-0001 §18 and `IMPLEMENTATION.md` §10 to repeatable impl
 | §18.4 类型与 Place | `ling-types` generic record/ADT/Prelude, expected record, record/wildcard/tuple/constructor patterns, exhaustive match and mutable field tests; `p8-prelude-run`, `p8-record-pattern-run` | mismatch, missing/duplicate/unknown field, `p8-prelude-redefinition`, `p8-constructor-arity`, `p8-match-nonexhaustive`, `p8-unreachable-case`, `p8-immutable-field` | `ling-resolve`, `ling-types`, `ling-eval` | 已验证（本地） / Verified locally |
 | §18.5 Effect/Capability | pure/Console tests; `map` callback propagation test | `p7-missing-capability`, `p9-map-missing-capability` | `ling-effects` resolved call graph | 已验证（本地） / Verified locally |
 | §18.6 Semantic Graph / Audit | all RFC §6.11 categories (`Module`, `Type`, `Field`, `Variant`, `Binding`, `Function`, `Parameter`, `Pattern`, `Expression`, `Effect`, `Capability`); deterministic node/source/owner IDs; canonical Semantic/Audit round-trip and independent-process byte equality | bad Graph/Audit schema/version/ID/node kind, duplicate IDs, dangling/cyclic owners, dangling source IDs/targets, unknown core fields | `ling-semantic`, `ling-format`, `ling-cli audit` | 已验证（本地） / Verified locally |
-| §18.7 稳定性 | workspace tests; Rust 1.85 MSRV check; shared compiler library; transactional REPL unit/process tests; Rustyline interrupt path; Linux/macOS real-PTY interrupt fixture; parser fuzz corpora; CI matrix config | parser recovery; compile/runtime rollback; incomplete/invalid submissions | `.github/workflows/ci.yml`, `fuzz/`, `ling-cli::session` | Windows 本地 Core 已验证；Unix PTY fixture、Ubuntu fuzz 与候选 SHA 三平台 CI 待执行 / Windows-local Core verified; Unix PTY fixture, Ubuntu fuzz, and candidate-SHA matrix pending |
+| §18.7 稳定性 | workspace tests; Rust 1.85 MSRV check; shared compiler library; transactional REPL unit/process tests; Rustyline interrupt path; Linux/macOS real-PTY interrupt fixture; parser fuzz corpora; CI matrix config | parser recovery; compile/runtime rollback; incomplete/invalid submissions | `.github/workflows/ci.yml`, `fuzz/`, `ling-cli::session` | 已验证：候选 SHA 的 Windows/Linux/macOS、Unix PTY、Ubuntu fuzz 与 MSRV 全绿 / Verified: candidate-SHA Windows/Linux/macOS, Unix PTY, Ubuntu fuzz, and MSRV are green |
 
 ## Seed 增量条款 / Seed Incremental Requirements
 
@@ -46,7 +46,7 @@ This document maps RFC-0001 §18 and `IMPLEMENTATION.md` §10 to repeatable impl
 | Seed 相等性边界 | primitive/tuple/list/record/variant type tests; `p12-function-equality` | 已验证（本地） / Verified locally |
 | Seed `f64` 字面量 | finite lexer validation; IEEE equality evaluator test; `p12-f64-equality-run`; non-finite overflow rejection | 已验证（本地） / Verified locally |
 | Seed Value Restriction | polymorphic list/record/constructor values; mutable/expansive/mutable-field restriction reasons and JSON Facts | 已验证（本地） / Verified locally |
-| 三平台候选结果 | CI matrix exists | 阻断：尚无候选 commit 的远程结果 / Blocked: no remote candidate results |
+| 三平台候选结果 | [CI run #4](https://github.com/PlayerAI/ling/actions/runs/32247366834), candidate `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` | 已验证：5/5 jobs `success` / Verified: 5/5 jobs succeeded |
 
 ## 重复执行 / Reproduction
 
@@ -60,6 +60,6 @@ cargo +1.85 check --workspace --all-features --locked --offline
 cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline
 ```
 
-只有矩阵中所有阻断项关闭、同一候选 SHA 的 Windows/Linux/macOS CI 全绿且工作区干净时，才能把本文作为发布证据。
+候选 `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 已满足所有阻断项关闭、同一 SHA 的 Windows/Linux/macOS CI 全绿和审计时工作区干净，因此本矩阵可作为 tag 授权前的发布证据。
 
-This matrix becomes release evidence only after every blocker is closed, Windows/Linux/macOS CI is green for the same candidate SHA, and the release worktree is clean.
+Candidate `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` has closed every blocker, passed Windows/Linux/macOS CI on the same SHA, and had a clean worktree at audit time, so this matrix is release evidence for tag authorization.
