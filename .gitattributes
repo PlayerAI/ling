@@ -1,0 +1,2 @@
+# Unicode inputs are integrity-checked against their exact upstream bytes.
+tools/unicode-gen/data/** -text

@@ -230,9 +230,12 @@ fn repl_tty_interrupt_discards_pending_submission_but_preserves_state() {
     let mut cursor = expect_pty_output(&receiver, &mut observed, 0, b"ling> ");
 
     input
-        .write_all(b"let answer = 42\r\r")
-        .expect("committed submission is written");
-    input.flush().expect("committed submission is flushed");
+        .write_all(b"let answer = 42\r")
+        .expect("submission line is written");
+    input.flush().expect("submission line is flushed");
+    cursor = expect_pty_output(&receiver, &mut observed, cursor, b"....> ");
+    input.write_all(b"\r").expect("commit line is written");
+    input.flush().expect("commit line is flushed");
     cursor = expect_pty_output(&receiver, &mut observed, cursor, b"answer : Int");
     cursor = expect_pty_output(&receiver, &mut observed, cursor, b"ling> ");
 
@@ -247,9 +250,18 @@ fn repl_tty_interrupt_discards_pending_submission_but_preserves_state() {
     cursor = expect_pty_output(&receiver, &mut observed, cursor, b"ling> ");
 
     input
-        .write_all(b"answer\r\r")
-        .expect("post-interrupt expression is written");
-    input.flush().expect("post-interrupt expression is flushed");
+        .write_all(b"answer\r")
+        .expect("post-interrupt expression line is written");
+    input
+        .flush()
+        .expect("post-interrupt expression line is flushed");
+    cursor = expect_pty_output(&receiver, &mut observed, cursor, b"....> ");
+    input
+        .write_all(b"\r")
+        .expect("post-interrupt commit line is written");
+    input
+        .flush()
+        .expect("post-interrupt commit line is flushed");
     cursor = expect_pty_output(&receiver, &mut observed, cursor, b"42 : Int");
     let _ = expect_pty_output(&receiver, &mut observed, cursor, b"ling> ");
 
