@@ -7,7 +7,8 @@ use std::fmt;
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_hir as hir;
 use ling_resolve::{
-    BindingKey, Builtin, DefinitionId, ExpressionKey, ModuleId, ReferenceTarget, ResolvedProgram,
+    BindingKey, Builtin, DefinitionId, DefinitionKind, ExpressionKey, ModuleId, PreludeDefinition,
+    ReferenceTarget, ResolvedProgram,
 };
 use ling_source::Span;
 use num_bigint::BigInt;
@@ -88,14 +89,22 @@ impl TypeArena {
             Type::Function { parameters, result } => {
                 let mut parts = parameters
                     .iter()
-                    .map(|parameter| self.display(*parameter))
+                    .map(|parameter| match self.get(*parameter) {
+                        Type::Function { .. } => format!("({})", self.display(*parameter)),
+                        _ => self.display(*parameter),
+                    })
                     .collect::<Vec<_>>();
                 parts.push(self.display(*result));
                 parts.join(" -> ")
             }
-            Type::NominalRecord { definition, .. } | Type::NominalVariant { definition, .. } => {
-                definition.to_string()
+            Type::NominalRecord {
+                definition,
+                arguments,
             }
+            | Type::NominalVariant {
+                definition,
+                arguments,
+            } => display_nominal(self, definition, arguments),
             Type::Variable(variable) => format!("'t{variable}"),
             Type::Error => "<error>".to_owned(),
         }
@@ -123,11 +132,13 @@ pub struct RecordFieldInfo {
 pub struct RecordInfo {
     pub definition: DefinitionId,
     pub name: String,
+    pub parameters: Vec<String>,
     pub fields: Vec<RecordFieldInfo>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct VariantCaseInfo {
+    pub definition: DefinitionId,
     pub name: String,
     pub payload: Option<TypeId>,
 }
@@ -136,6 +147,7 @@ pub struct VariantCaseInfo {
 pub struct VariantInfo {
     pub definition: DefinitionId,
     pub name: String,
+    pub parameters: Vec<String>,
     pub cases: Vec<VariantCaseInfo>,
 }
 
@@ -147,9 +159,11 @@ pub struct TypedProgram {
     definition_types: BTreeMap<DefinitionId, TypeId>,
     binding_types: BTreeMap<BindingKey, TypeId>,
     place_types: BTreeMap<ExpressionKey, TypeId>,
+    place_root_types: BTreeMap<ExpressionKey, TypeId>,
     integers: BTreeMap<ExpressionKey, BigInt>,
     records: BTreeMap<DefinitionId, RecordInfo>,
     variants: BTreeMap<DefinitionId, VariantInfo>,
+    warnings: Vec<Diagnostic>,
 }
 
 impl TypedProgram {
@@ -194,6 +208,16 @@ impl TypedProgram {
     }
 
     #[must_use]
+    pub fn place_root_type(&self, key: ExpressionKey) -> Option<TypeId> {
+        self.place_root_types.get(&key).copied()
+    }
+
+    #[must_use]
+    pub fn display_type(&self, id: TypeId) -> String {
+        display_resolved_type(&self.arena, &self.resolved, id)
+    }
+
+    #[must_use]
     pub fn integer(&self, key: ExpressionKey) -> Option<&BigInt> {
         self.integers.get(&key)
     }
@@ -207,6 +231,11 @@ impl TypedProgram {
     pub fn variants(&self) -> &BTreeMap<DefinitionId, VariantInfo> {
         &self.variants
     }
+
+    #[must_use]
+    pub fn warnings(&self) -> &[Diagnostic] {
+        &self.warnings
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -219,14 +248,45 @@ pub struct TypeError {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum TypeErrorKind {
-    Mismatch { expected: String, actual: String },
+    Mismatch {
+        expected: String,
+        actual: String,
+    },
     InfiniteType,
-    NotCallable { actual: String },
-    Arity { expected: usize, actual: usize },
-    UnknownField { field: String },
+    NotCallable {
+        actual: String,
+    },
+    Arity {
+        expected: usize,
+        actual: usize,
+    },
+    UnknownField {
+        field: String,
+    },
     AmbiguousRecord,
+    DuplicateRecordField {
+        field: String,
+    },
+    MissingRecordFields {
+        fields: Vec<String>,
+    },
+    NonExhaustiveMatch {
+        witness: String,
+    },
+    InvalidConstructorPattern {
+        constructor: String,
+        expected: usize,
+        actual: usize,
+    },
     InvalidInteger,
-    InvalidAssignment { reason: &'static str },
+    InvalidAssignment {
+        reason: &'static str,
+        mutability: &'static str,
+        field: Option<String>,
+    },
+    UnsupportedEquality {
+        actual: String,
+    },
     UnsupportedTypeSyntax,
 }
 
@@ -264,15 +324,48 @@ impl TypeError {
                 "无法从字段唯一确定 nominal record 类型".to_owned(),
                 "record fields do not identify one nominal record type".to_owned(),
             ),
+            TypeErrorKind::DuplicateRecordField { field } => (
+                codes::DUPLICATE_RECORD_FIELD,
+                format!("record 字段“{field}”重复"),
+                format!("record field `{field}` is duplicated"),
+            ),
+            TypeErrorKind::MissingRecordFields { fields } => (
+                codes::MISSING_RECORD_FIELDS,
+                format!("record 缺少字段：{}", fields.join("、")),
+                format!("record is missing fields: {}", fields.join(", ")),
+            ),
+            TypeErrorKind::NonExhaustiveMatch { witness } => (
+                codes::NON_EXHAUSTIVE_MATCH,
+                format!("match 非穷尽；缺少模式 {witness}"),
+                format!("match is non-exhaustive; missing pattern {witness}"),
+            ),
+            TypeErrorKind::InvalidConstructorPattern {
+                constructor,
+                expected,
+                actual,
+            } => (
+                codes::INVALID_CONSTRUCTOR_PATTERN,
+                format!(
+                    "constructor 模式“{constructor}”参数数量不匹配：期望 {expected}，实际 {actual}"
+                ),
+                format!(
+                    "constructor pattern `{constructor}` has wrong arity: expected {expected}, found {actual}"
+                ),
+            ),
             TypeErrorKind::InvalidInteger => (
                 codes::TYPE_MISMATCH,
                 "整数 literal 无法解析".to_owned(),
                 "integer literal could not be parsed".to_owned(),
             ),
-            TypeErrorKind::InvalidAssignment { reason } => (
+            TypeErrorKind::InvalidAssignment { reason, .. } => (
                 codes::INVALID_ASSIGNMENT,
                 format!("赋值左侧不可修改：{reason}"),
                 format!("assignment target is not mutable: {reason}"),
+            ),
+            TypeErrorKind::UnsupportedEquality { actual } => (
+                codes::UNSUPPORTED_EQUALITY,
+                format!("类型 {actual} 不支持相等性比较"),
+                format!("type {actual} does not support equality"),
             ),
             TypeErrorKind::UnsupportedTypeSyntax => (
                 codes::TYPE_MISMATCH,
@@ -286,6 +379,47 @@ impl TypeError {
             diagnostic = diagnostic
                 .with_fact("generalization", "restricted")
                 .with_fact("restriction_reason", reason);
+        }
+        match &self.kind {
+            TypeErrorKind::UnknownField { field }
+            | TypeErrorKind::DuplicateRecordField { field } => {
+                diagnostic = diagnostic.with_fact("field", field.as_str());
+            }
+            TypeErrorKind::MissingRecordFields { fields } => {
+                diagnostic = diagnostic.with_fact("fields", fields.join(","));
+            }
+            TypeErrorKind::NonExhaustiveMatch { witness } => {
+                diagnostic = diagnostic.with_fact("witness", witness.as_str());
+            }
+            TypeErrorKind::InvalidConstructorPattern {
+                constructor,
+                expected,
+                actual,
+            } => {
+                diagnostic = diagnostic
+                    .with_fact("constructor", constructor.as_str())
+                    .with_fact(
+                        "expected_arity",
+                        u64::try_from(*expected).unwrap_or(u64::MAX),
+                    )
+                    .with_fact("actual_arity", u64::try_from(*actual).unwrap_or(u64::MAX));
+            }
+            TypeErrorKind::InvalidAssignment {
+                reason,
+                mutability,
+                field,
+            } => {
+                diagnostic = diagnostic
+                    .with_fact("reason", *reason)
+                    .with_fact("mutability", *mutability);
+                if let Some(field) = field {
+                    diagnostic = diagnostic.with_fact("field", field.as_str());
+                }
+            }
+            TypeErrorKind::UnsupportedEquality { actual } => {
+                diagnostic = diagnostic.with_fact("type", actual.as_str());
+            }
+            _ => {}
         }
         diagnostic
     }
@@ -329,6 +463,14 @@ enum InferType {
     Error,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+enum PatternCoverage {
+    CatchAll,
+    Boolean(bool),
+    Constructor(DefinitionId),
+    Other,
+}
+
 #[derive(Clone, Debug)]
 struct Scheme {
     quantified: BTreeSet<u32>,
@@ -347,29 +489,36 @@ impl Scheme {
 #[derive(Clone)]
 struct InternalRecord {
     name: String,
+    parameters: Vec<(String, u32)>,
     fields: BTreeMap<String, (bool, InferType)>,
 }
 
 #[derive(Clone)]
 struct InternalVariant {
     name: String,
+    parameters: Vec<(String, u32)>,
     cases: BTreeMap<String, Option<InferType>>,
+    constructors: BTreeMap<String, DefinitionId>,
 }
 
 struct Inferencer {
     resolved: ResolvedProgram,
     next_variable: u32,
     substitutions: BTreeMap<u32, InferType>,
+    restricted_variables: BTreeMap<u32, &'static str>,
     definitions: BTreeMap<DefinitionId, Scheme>,
     bindings: BTreeMap<BindingKey, Scheme>,
     inferred_expressions: BTreeMap<ExpressionKey, InferType>,
     inferred_definitions: BTreeMap<DefinitionId, InferType>,
     inferred_bindings: BTreeMap<BindingKey, InferType>,
     inferred_places: BTreeMap<ExpressionKey, InferType>,
+    inferred_place_roots: BTreeMap<ExpressionKey, InferType>,
+    equality_constraints: Vec<(ModuleId, Span, InferType)>,
     integers: BTreeMap<ExpressionKey, BigInt>,
     records: BTreeMap<DefinitionId, InternalRecord>,
     variants: BTreeMap<DefinitionId, InternalVariant>,
     errors: Vec<TypeError>,
+    warnings: Vec<Diagnostic>,
     current_module: ModuleId,
 }
 
@@ -380,25 +529,31 @@ impl Inferencer {
             resolved,
             next_variable: 0,
             substitutions: BTreeMap::new(),
+            restricted_variables: BTreeMap::new(),
             definitions: BTreeMap::new(),
             bindings: BTreeMap::new(),
             inferred_expressions: BTreeMap::new(),
             inferred_definitions: BTreeMap::new(),
             inferred_bindings: BTreeMap::new(),
             inferred_places: BTreeMap::new(),
+            inferred_place_roots: BTreeMap::new(),
+            equality_constraints: Vec::new(),
             integers: BTreeMap::new(),
             records: BTreeMap::new(),
             variants: BTreeMap::new(),
             errors: Vec::new(),
+            warnings: Vec::new(),
             current_module,
         }
     }
 
     fn run(mut self) -> Result<TypedProgram, Vec<TypeError>> {
         self.seed_builtins();
+        self.seed_prelude();
         self.index_nominal_types();
         self.predeclare_values();
         self.infer_definitions();
+        self.check_equality_constraints();
 
         if !self.errors.is_empty() {
             self.errors.sort_by(|left, right| {
@@ -454,6 +609,15 @@ impl Inferencer {
                 (key, intern_type(&value, &mut arena, &mut index))
             })
             .collect();
+        let place_root_types = self
+            .inferred_place_roots
+            .clone()
+            .into_iter()
+            .map(|(key, value)| {
+                let value = self.apply(value);
+                (key, intern_type(&value, &mut arena, &mut index))
+            })
+            .collect();
         let records = self
             .records
             .iter()
@@ -476,6 +640,11 @@ impl Inferencer {
                     RecordInfo {
                         definition: id.clone(),
                         name: record.name.clone(),
+                        parameters: record
+                            .parameters
+                            .iter()
+                            .map(|(name, _)| name.clone())
+                            .collect(),
                         fields,
                     },
                 )
@@ -489,6 +658,7 @@ impl Inferencer {
                     .cases
                     .iter()
                     .map(|(name, payload)| VariantCaseInfo {
+                        definition: variant.constructors[name].clone(),
                         name: name.clone(),
                         payload: payload.clone().map(|payload| {
                             intern_type(&self.apply(payload), &mut arena, &mut index)
@@ -500,6 +670,11 @@ impl Inferencer {
                     VariantInfo {
                         definition: id.clone(),
                         name: variant.name.clone(),
+                        parameters: variant
+                            .parameters
+                            .iter()
+                            .map(|(name, _)| name.clone())
+                            .collect(),
                         cases,
                     },
                 )
@@ -513,9 +688,11 @@ impl Inferencer {
             definition_types,
             binding_types,
             place_types,
+            place_root_types,
             integers: self.integers,
             records,
             variants,
+            warnings: self.warnings,
         })
     }
 
@@ -574,8 +751,132 @@ impl Inferencer {
         );
     }
 
+    fn seed_prelude(&mut self) {
+        let option_parameter = self.fresh_variable_id();
+        let option_id = self.resolved.prelude_id(PreludeDefinition::Option).clone();
+        let some_id = self.resolved.prelude_id(PreludeDefinition::Some).clone();
+        let none_id = self.resolved.prelude_id(PreludeDefinition::None).clone();
+        let option = InferType::Variant {
+            definition: option_id.clone(),
+            arguments: vec![InferType::Variable(option_parameter)],
+        };
+        let option_quantified = BTreeSet::from([option_parameter]);
+        self.variants.insert(
+            option_id.clone(),
+            InternalVariant {
+                name: "Option".to_owned(),
+                parameters: vec![("'a".to_owned(), option_parameter)],
+                cases: BTreeMap::from([
+                    ("None".to_owned(), None),
+                    (
+                        "Some".to_owned(),
+                        Some(InferType::Variable(option_parameter)),
+                    ),
+                ]),
+                constructors: BTreeMap::from([
+                    ("None".to_owned(), none_id.clone()),
+                    ("Some".to_owned(), some_id.clone()),
+                ]),
+            },
+        );
+        self.insert_prelude_scheme(
+            option_id,
+            Scheme {
+                quantified: option_quantified.clone(),
+                value: option.clone(),
+            },
+        );
+        self.insert_prelude_scheme(
+            some_id,
+            Scheme {
+                quantified: option_quantified.clone(),
+                value: function(vec![InferType::Variable(option_parameter)], option.clone()),
+            },
+        );
+        self.insert_prelude_scheme(
+            none_id,
+            Scheme {
+                quantified: option_quantified,
+                value: option,
+            },
+        );
+
+        let result_value_parameter = self.fresh_variable_id();
+        let result_error_parameter = self.fresh_variable_id();
+        let result_id = self.resolved.prelude_id(PreludeDefinition::Result).clone();
+        let ok_id = self.resolved.prelude_id(PreludeDefinition::Ok).clone();
+        let error_id = self.resolved.prelude_id(PreludeDefinition::Error).clone();
+        let result = InferType::Variant {
+            definition: result_id.clone(),
+            arguments: vec![
+                InferType::Variable(result_value_parameter),
+                InferType::Variable(result_error_parameter),
+            ],
+        };
+        let result_quantified = BTreeSet::from([result_value_parameter, result_error_parameter]);
+        self.variants.insert(
+            result_id.clone(),
+            InternalVariant {
+                name: "Result".to_owned(),
+                parameters: vec![
+                    ("'a".to_owned(), result_value_parameter),
+                    ("'e".to_owned(), result_error_parameter),
+                ],
+                cases: BTreeMap::from([
+                    (
+                        "Error".to_owned(),
+                        Some(InferType::Variable(result_error_parameter)),
+                    ),
+                    (
+                        "Ok".to_owned(),
+                        Some(InferType::Variable(result_value_parameter)),
+                    ),
+                ]),
+                constructors: BTreeMap::from([
+                    ("Error".to_owned(), error_id.clone()),
+                    ("Ok".to_owned(), ok_id.clone()),
+                ]),
+            },
+        );
+        self.insert_prelude_scheme(
+            result_id,
+            Scheme {
+                quantified: result_quantified.clone(),
+                value: result.clone(),
+            },
+        );
+        self.insert_prelude_scheme(
+            ok_id,
+            Scheme {
+                quantified: result_quantified.clone(),
+                value: function(
+                    vec![InferType::Variable(result_value_parameter)],
+                    result.clone(),
+                ),
+            },
+        );
+        self.insert_prelude_scheme(
+            error_id,
+            Scheme {
+                quantified: result_quantified,
+                value: function(vec![InferType::Variable(result_error_parameter)], result),
+            },
+        );
+    }
+
+    fn insert_prelude_scheme(&mut self, id: DefinitionId, scheme: Scheme) {
+        self.definitions.insert(id.clone(), scheme.clone());
+        self.inferred_definitions.insert(id, scheme.value);
+    }
+
     fn index_nominal_types(&mut self) {
         let modules = self.resolved.modules().to_vec();
+        let mut declaration_parameters = BTreeMap::new();
+
+        // First register every type name so declarations may refer to types
+        // that appear later in the same module. Declaration parameters use a
+        // distinct, stable inference variable per name and are quantified at
+        // the nominal boundary.
         for module in &modules {
             self.current_module = module.id;
             for declaration in &module.hir.types {
@@ -586,95 +887,308 @@ impl Inferencer {
                 else {
                     continue;
                 };
+                let mut seen = BTreeSet::new();
+                let parameters = declaration
+                    .parameters
+                    .iter()
+                    .filter_map(|parameter| {
+                        if seen.insert(parameter.normalized.clone()) {
+                            Some((parameter.normalized.clone(), self.fresh_variable_id()))
+                        } else {
+                            self.push_error(
+                                module.id,
+                                parameter.span,
+                                TypeErrorKind::UnsupportedTypeSyntax,
+                                None,
+                            );
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                let quantified = parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .collect::<BTreeSet<_>>();
+                let arguments = parameters
+                    .iter()
+                    .map(|(_, variable)| InferType::Variable(*variable))
+                    .collect::<Vec<_>>();
+                declaration_parameters.insert(id.clone(), parameters.clone());
                 match &declaration.definition {
-                    hir::TypeDefinition::Record(fields) => {
-                        let fields = fields
-                            .iter()
-                            .map(|field| {
-                                (
-                                    field.name.normalized.clone(),
-                                    (
-                                        field.mutable,
-                                        self.type_syntax(module.id, &field.field_type),
-                                    ),
-                                )
-                            })
-                            .collect();
+                    hir::TypeDefinition::Record(_) => {
                         self.records.insert(
                             id.clone(),
                             InternalRecord {
                                 name: declaration.name.normalized.clone(),
-                                fields,
+                                parameters,
+                                fields: BTreeMap::new(),
                             },
                         );
                         let nominal = InferType::Record {
                             definition: id.clone(),
-                            arguments: Vec::new(),
+                            arguments,
                         };
-                        self.definitions
-                            .insert(id.clone(), Scheme::mono(nominal.clone()));
+                        self.definitions.insert(
+                            id.clone(),
+                            Scheme {
+                                quantified,
+                                value: nominal.clone(),
+                            },
+                        );
                         self.inferred_definitions.insert(id, nominal);
                     }
-                    hir::TypeDefinition::Variant(cases) => {
-                        let cases_by_name = cases
-                            .iter()
-                            .map(|case| {
-                                (
-                                    case.name.normalized.clone(),
-                                    case.payload
-                                        .as_ref()
-                                        .map(|payload| self.type_syntax(module.id, payload)),
-                                )
-                            })
-                            .collect::<BTreeMap<_, _>>();
+                    hir::TypeDefinition::Variant(_) => {
                         self.variants.insert(
                             id.clone(),
                             InternalVariant {
                                 name: declaration.name.normalized.clone(),
-                                cases: cases_by_name.clone(),
+                                parameters,
+                                cases: BTreeMap::new(),
+                                constructors: BTreeMap::new(),
                             },
                         );
                         let nominal = InferType::Variant {
                             definition: id.clone(),
-                            arguments: Vec::new(),
+                            arguments,
                         };
-                        self.definitions
-                            .insert(id.clone(), Scheme::mono(nominal.clone()));
+                        self.definitions.insert(
+                            id.clone(),
+                            Scheme {
+                                quantified,
+                                value: nominal.clone(),
+                            },
+                        );
                         self.inferred_definitions
                             .insert(id.clone(), nominal.clone());
+                    }
+                    hir::TypeDefinition::Alias(_) => {
+                        let placeholder = self.fresh();
+                        self.definitions.insert(
+                            id.clone(),
+                            Scheme {
+                                quantified,
+                                value: placeholder.clone(),
+                            },
+                        );
+                        self.inferred_definitions.insert(id, placeholder);
+                    }
+                }
+            }
+        }
+
+        // Resolve alias templates in dependency order. Record and variant
+        // nominal identities are already available from the first pass, while
+        // an alias never observes another alias's unresolved placeholder.
+        let mut pending_aliases = modules
+            .iter()
+            .flat_map(|module| {
+                module.hir.types.iter().filter_map(|declaration| {
+                    if !matches!(declaration.definition, hir::TypeDefinition::Alias(_)) {
+                        return None;
+                    }
+                    self.resolved
+                        .definition_id(module.id, &declaration.name.normalized)
+                        .cloned()
+                        .map(|id| (id, (module.id, declaration.clone())))
+                })
+            })
+            .collect::<BTreeMap<_, _>>();
+        let alias_ids = pending_aliases.keys().cloned().collect::<BTreeSet<_>>();
+        while !pending_aliases.is_empty() {
+            let ready = pending_aliases
+                .iter()
+                .filter_map(|(id, (module, declaration))| {
+                    let hir::TypeDefinition::Alias(alias) = &declaration.definition else {
+                        unreachable!("pending entries are aliases")
+                    };
+                    self.alias_dependencies(*module, alias, &alias_ids)
+                        .iter()
+                        .all(|dependency| !pending_aliases.contains_key(dependency))
+                        .then(|| id.clone())
+                })
+                .collect::<Vec<_>>();
+            if ready.is_empty() {
+                for (module, declaration) in pending_aliases.values() {
+                    self.push_error(
+                        *module,
+                        declaration.span,
+                        TypeErrorKind::UnsupportedTypeSyntax,
+                        None,
+                    );
+                }
+                break;
+            }
+            for id in ready {
+                let (module, declaration) = pending_aliases
+                    .remove(&id)
+                    .expect("ready alias remains pending");
+                let hir::TypeDefinition::Alias(alias) = &declaration.definition else {
+                    unreachable!("pending entries are aliases")
+                };
+                let parameters = declaration_parameters.get(&id).cloned().unwrap_or_default();
+                let parameter_environment = parameters
+                    .iter()
+                    .map(|(name, variable)| (name.clone(), InferType::Variable(*variable)))
+                    .collect::<BTreeMap<_, _>>();
+                let quantified = parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .collect::<BTreeSet<_>>();
+                let alias_type =
+                    self.type_syntax_with_parameters(module, alias, &parameter_environment);
+                let placeholder = self
+                    .definitions
+                    .get(&id)
+                    .map(|scheme| scheme.value.clone())
+                    .unwrap_or(InferType::Error);
+                self.unify(placeholder, alias_type.clone(), module, alias.span, None);
+                let alias_type = self.apply(alias_type);
+                self.definitions.insert(
+                    id.clone(),
+                    Scheme {
+                        quantified,
+                        value: alias_type.clone(),
+                    },
+                );
+                self.inferred_definitions.insert(id, alias_type);
+            }
+        }
+
+        // Populate fields, constructor signatures, and aliases only after all
+        // names are available. Every occurrence of a declaration parameter is
+        // resolved through the same environment.
+        for module in &modules {
+            self.current_module = module.id;
+            for declaration in &module.hir.types {
+                let Some(id) = self
+                    .resolved
+                    .definition_id(module.id, &declaration.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                let parameters = declaration_parameters.get(&id).cloned().unwrap_or_default();
+                let parameter_environment = parameters
+                    .iter()
+                    .map(|(name, variable)| (name.clone(), InferType::Variable(*variable)))
+                    .collect::<BTreeMap<_, _>>();
+                let quantified = parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .collect::<BTreeSet<_>>();
+                match &declaration.definition {
+                    hir::TypeDefinition::Record(fields) => {
+                        let mut indexed = BTreeMap::new();
+                        for field in fields {
+                            let field_type = self.type_syntax_with_parameters(
+                                module.id,
+                                &field.field_type,
+                                &parameter_environment,
+                            );
+                            if indexed
+                                .insert(field.name.normalized.clone(), (field.mutable, field_type))
+                                .is_some()
+                            {
+                                self.push_error(
+                                    module.id,
+                                    field.span,
+                                    TypeErrorKind::DuplicateRecordField {
+                                        field: field.name.normalized.clone(),
+                                    },
+                                    None,
+                                );
+                            }
+                        }
+                        if let Some(record) = self.records.get_mut(&id) {
+                            record.fields = indexed;
+                        }
+                    }
+                    hir::TypeDefinition::Variant(cases) => {
+                        let nominal = InferType::Variant {
+                            definition: id.clone(),
+                            arguments: parameters
+                                .iter()
+                                .map(|(_, variable)| InferType::Variable(*variable))
+                                .collect(),
+                        };
+                        let mut indexed = BTreeMap::new();
+                        let mut constructors = BTreeMap::new();
                         for case in cases {
+                            let payload = case.payload.as_ref().map(|payload| {
+                                self.type_syntax_with_parameters(
+                                    module.id,
+                                    payload,
+                                    &parameter_environment,
+                                )
+                            });
+                            indexed.insert(case.name.normalized.clone(), payload.clone());
                             if let Some(constructor_id) = self
                                 .resolved
                                 .definition_id(module.id, &case.name.normalized)
                                 .cloned()
                             {
-                                let constructor_type = case.payload.as_ref().map_or_else(
+                                constructors
+                                    .insert(case.name.normalized.clone(), constructor_id.clone());
+                                let constructor_type = payload.map_or_else(
                                     || nominal.clone(),
-                                    |payload| {
-                                        function(
-                                            vec![self.type_syntax(module.id, payload)],
-                                            nominal.clone(),
-                                        )
-                                    },
+                                    |payload| function(vec![payload], nominal.clone()),
                                 );
                                 self.definitions.insert(
                                     constructor_id.clone(),
-                                    Scheme::mono(constructor_type.clone()),
+                                    Scheme {
+                                        quantified: quantified.clone(),
+                                        value: constructor_type.clone(),
+                                    },
                                 );
                                 self.inferred_definitions
                                     .insert(constructor_id, constructor_type);
                             }
                         }
+                        if let Some(variant) = self.variants.get_mut(&id) {
+                            variant.cases = indexed;
+                            variant.constructors = constructors;
+                        }
                     }
-                    hir::TypeDefinition::Alias(alias) => {
-                        let alias_type = self.type_syntax(module.id, alias);
-                        self.definitions
-                            .insert(id.clone(), Scheme::mono(alias_type.clone()));
-                        self.inferred_definitions.insert(id, alias_type);
-                    }
+                    hir::TypeDefinition::Alias(_) => {}
                 }
             }
         }
+    }
+
+    fn alias_dependencies(
+        &self,
+        module: ModuleId,
+        syntax: &hir::TypeSyntax,
+        aliases: &BTreeSet<DefinitionId>,
+    ) -> BTreeSet<DefinitionId> {
+        let mut dependencies = BTreeSet::new();
+        let mut position = 0;
+        while position < syntax.atoms.len() {
+            let hir::TypeAtom::Name(first) = &syntax.atoms[position] else {
+                position += 1;
+                continue;
+            };
+            let mut names = vec![first.normalized.clone()];
+            position += 1;
+            while syntax
+                .atoms
+                .get(position)
+                .is_some_and(|atom| matches!(atom, hir::TypeAtom::Dot))
+            {
+                position += 1;
+                let Some(hir::TypeAtom::Name(segment)) = syntax.atoms.get(position) else {
+                    break;
+                };
+                names.push(segment.normalized.clone());
+                position += 1;
+            }
+            if let Some(definition) = self.resolve_type_definition(module, &names) {
+                if aliases.contains(&definition) {
+                    dependencies.insert(definition);
+                }
+            }
+        }
+        dependencies
     }
 
     fn predeclare_values(&mut self) {
@@ -717,7 +1231,21 @@ impl Inferencer {
                         value
                     })
                     .collect::<Vec<_>>();
-                let body = self.infer_expression(module.id, &definition.value);
+                let annotation = definition
+                    .annotation
+                    .as_ref()
+                    .map(|annotation| (annotation, self.type_syntax(module.id, annotation)));
+                let body = match &annotation {
+                    Some((_, expected)) => self.infer_expression_with_expected(
+                        module.id,
+                        &definition.value,
+                        expected.clone(),
+                    ),
+                    None => self.infer_expression(module.id, &definition.value),
+                };
+                if let Some((annotation, expected)) = annotation {
+                    self.unify(expected, body.clone(), module.id, annotation.span, None);
+                }
                 let inferred = if parameter_types.is_empty() {
                     body
                 } else {
@@ -736,13 +1264,18 @@ impl Inferencer {
                     None,
                 );
                 let inferred = self.apply(inferred);
-                let scheme = if definition.mutable {
-                    Scheme::mono(inferred.clone())
-                } else if !definition.parameters.is_empty() || non_expansive(&definition.value.kind)
-                {
-                    self.generalize(inferred.clone())
-                } else {
-                    Scheme::mono(inferred.clone())
+                let restriction = self.value_restriction(
+                    module.id,
+                    definition.mutable,
+                    &definition.parameters,
+                    &definition.value,
+                );
+                let scheme = match restriction {
+                    None => self.generalize(inferred.clone()),
+                    Some(reason) => {
+                        self.register_restriction(&inferred, reason);
+                        Scheme::mono(inferred.clone())
+                    }
                 };
                 self.definitions.insert(id.clone(), scheme);
                 self.inferred_definitions.insert(id, inferred);
@@ -798,6 +1331,7 @@ impl Inferencer {
                     let body = self.infer_expression(module, &case.body);
                     self.unify(result.clone(), body, module, case.body.span, None);
                 }
+                self.check_match_coverage(module, scrutinee_type, cases, expression.span);
                 result
             }
             hir::ExpressionKind::Assignment { place, value } => {
@@ -844,6 +1378,11 @@ impl Inferencer {
                 use hir::BinaryOperator as Operator;
                 match operator {
                     Operator::Equal | Operator::NotEqual => {
+                        self.equality_constraints.push((
+                            module,
+                            expression.span,
+                            left_type.clone(),
+                        ));
                         self.unify(left_type, right_type, module, expression.span, None);
                         InferType::Bool
                     }
@@ -906,11 +1445,22 @@ impl Inferencer {
                 InferType::List(Box::new(element_type))
             }
             hir::ExpressionKind::Record(fields) => {
-                self.infer_record(module, fields, expression.span)
+                self.infer_record(module, fields, expression.span, None)
             }
             hir::ExpressionKind::RecordUpdate { base, fields } => {
                 let base_type = self.infer_expression(module, base);
+                let mut seen = BTreeSet::new();
                 for field in fields {
+                    if !seen.insert(field.name.normalized.as_str()) {
+                        self.push_error(
+                            module,
+                            field.span,
+                            TypeErrorKind::DuplicateRecordField {
+                                field: field.name.normalized.clone(),
+                            },
+                            None,
+                        );
+                    }
                     let expected = self.project_field(
                         base_type.clone(),
                         &field.name,
@@ -943,7 +1493,19 @@ impl Inferencer {
                 value
             })
             .collect::<Vec<_>>();
-        let body = self.infer_expression(module, &binding.value);
+        let annotation = binding
+            .annotation
+            .as_ref()
+            .map(|annotation| (annotation, self.type_syntax(module, annotation)));
+        let body = match &annotation {
+            Some((_, expected)) => {
+                self.infer_expression_with_expected(module, &binding.value, expected.clone())
+            }
+            None => self.infer_expression(module, &binding.value),
+        };
+        if let Some((annotation, expected)) = annotation {
+            self.unify(expected, body.clone(), module, annotation.span, None);
+        }
         let inferred = if parameter_types.is_empty() {
             body
         } else {
@@ -953,17 +1515,14 @@ impl Inferencer {
             self.unify(placeholder, inferred.clone(), module, binding.span, None);
         }
         let inferred = self.apply(inferred);
-        let restriction = if binding.mutable {
-            Some("mutable_binding")
-        } else if !binding.parameters.is_empty() || non_expansive(&binding.value.kind) {
-            None
-        } else {
-            Some("expansive_rhs")
-        };
-        let scheme = if restriction.is_none() {
-            self.generalize(inferred.clone())
-        } else {
-            Scheme::mono(inferred.clone())
+        let restriction =
+            self.value_restriction(module, binding.mutable, &binding.parameters, &binding.value);
+        let scheme = match restriction {
+            None => self.generalize(inferred.clone()),
+            Some(reason) => {
+                self.register_restriction(&inferred, reason);
+                Scheme::mono(inferred.clone())
+            }
         };
         self.bindings.insert(key, scheme);
         self.inferred_bindings.insert(key, inferred);
@@ -971,11 +1530,20 @@ impl Inferencer {
 
     fn bind_pattern(&mut self, module: ModuleId, pattern: &hir::Pattern, value: InferType) {
         match &pattern.kind {
-            hir::PatternKind::Binding { id, .. } => {
-                let key = BindingKey::new(module, *id);
-                self.bindings.insert(key, Scheme::mono(value.clone()));
-                self.inferred_bindings.insert(key, value);
+            hir::PatternKind::Binding { id, name } => {
+                if let Some(constructor) = self
+                    .resolved
+                    .pattern_constructor(module, pattern.id)
+                    .cloned()
+                {
+                    self.bind_constructor_pattern(module, pattern, name, &constructor, &[], value);
+                } else {
+                    let key = BindingKey::new(module, *id);
+                    self.bindings.insert(key, Scheme::mono(value.clone()));
+                    self.inferred_bindings.insert(key, value);
+                }
             }
+            hir::PatternKind::Wildcard => {}
             hir::PatternKind::Unit => {
                 self.unify(InferType::Unit, value, module, pattern.span, None);
             }
@@ -1001,27 +1569,328 @@ impl Inferencer {
                     self.bind_pattern(module, element, element_type);
                 }
             }
-            hir::PatternKind::Constructor { name, arguments } => {
+            hir::PatternKind::Record(fields) => {
+                self.bind_record_pattern(module, pattern, fields, value);
+            }
+            hir::PatternKind::Constructor {
+                name, arguments, ..
+            } => {
                 let constructor = self
                     .resolved
-                    .definition_id(module, &name.normalized)
+                    .pattern_constructor(module, pattern.id)
                     .cloned();
                 if let Some(constructor) = constructor {
-                    let constructor_type =
-                        self.reference_type(&ReferenceTarget::Definition(constructor));
-                    let argument_types = arguments.iter().map(|_| self.fresh()).collect::<Vec<_>>();
-                    let result = self.infer_application(
-                        constructor_type,
-                        argument_types.clone(),
+                    self.bind_constructor_pattern(
+                        module,
+                        pattern,
+                        name,
+                        &constructor,
+                        arguments,
+                        value,
+                    );
+                }
+            }
+        }
+    }
+
+    fn bind_constructor_pattern(
+        &mut self,
+        module: ModuleId,
+        pattern: &hir::Pattern,
+        name: &hir::Name,
+        constructor: &DefinitionId,
+        arguments: &[hir::Pattern],
+        value: InferType,
+    ) {
+        let constructor_type =
+            self.reference_type(&ReferenceTarget::Definition(constructor.clone()));
+        match constructor_type {
+            InferType::Function { parameters, result } => {
+                if arguments.len() != parameters.len() {
+                    self.push_error(
                         module,
                         pattern.span,
+                        TypeErrorKind::InvalidConstructorPattern {
+                            constructor: name.normalized.clone(),
+                            expected: parameters.len(),
+                            actual: arguments.len(),
+                        },
+                        None,
                     );
-                    self.unify(result, value, module, pattern.span, None);
-                    for (argument, argument_type) in arguments.iter().zip(argument_types) {
+                }
+                self.unify(*result, value, module, pattern.span, None);
+                for (index, argument) in arguments.iter().enumerate() {
+                    let argument_type = parameters
+                        .get(index)
+                        .cloned()
+                        .unwrap_or_else(|| self.fresh());
+                    self.bind_pattern(module, argument, argument_type);
+                }
+            }
+            constructor_type => {
+                if !arguments.is_empty() {
+                    self.push_error(
+                        module,
+                        pattern.span,
+                        TypeErrorKind::InvalidConstructorPattern {
+                            constructor: name.normalized.clone(),
+                            expected: 0,
+                            actual: arguments.len(),
+                        },
+                        None,
+                    );
+                    for argument in arguments {
+                        let argument_type = self.fresh();
                         self.bind_pattern(module, argument, argument_type);
                     }
                 }
+                self.unify(constructor_type, value, module, pattern.span, None);
             }
+        }
+    }
+
+    fn bind_record_pattern(
+        &mut self,
+        module: ModuleId,
+        pattern: &hir::Pattern,
+        fields: &[hir::RecordPatternField],
+        value: InferType,
+    ) {
+        let mut names = BTreeSet::new();
+        for field in fields {
+            if !names.insert(field.name.normalized.as_str()) {
+                self.push_error(
+                    module,
+                    field.span,
+                    TypeErrorKind::DuplicateRecordField {
+                        field: field.name.normalized.clone(),
+                    },
+                    None,
+                );
+            }
+        }
+
+        let (definition, arguments) = match self.apply(value.clone()) {
+            InferType::Record {
+                definition,
+                arguments,
+            } => (definition, arguments),
+            InferType::Variable(variable) => {
+                let candidates = self
+                    .records
+                    .iter()
+                    .filter(|(_, record)| {
+                        names.iter().all(|name| record.fields.contains_key(*name))
+                    })
+                    .map(|(definition, _)| definition.clone())
+                    .collect::<Vec<_>>();
+                if candidates.len() != 1 {
+                    self.push_error(module, pattern.span, TypeErrorKind::AmbiguousRecord, None);
+                    for field in fields {
+                        let field_type = self.fresh();
+                        self.bind_pattern(module, &field.pattern, field_type);
+                    }
+                    return;
+                }
+                let definition = candidates[0].clone();
+                let arguments = (0..self.records[&definition].parameters.len())
+                    .map(|_| self.fresh())
+                    .collect::<Vec<_>>();
+                self.bind_variable(
+                    variable,
+                    InferType::Record {
+                        definition: definition.clone(),
+                        arguments: arguments.clone(),
+                    },
+                    module,
+                    pattern.span,
+                    None,
+                );
+                (definition, arguments)
+            }
+            InferType::Error => {
+                for field in fields {
+                    let field_type = self.fresh();
+                    self.bind_pattern(module, &field.pattern, field_type);
+                }
+                return;
+            }
+            actual => {
+                self.push_error(
+                    module,
+                    pattern.span,
+                    TypeErrorKind::Mismatch {
+                        expected: "nominal record".to_owned(),
+                        actual: display_infer(&actual, &self.resolved),
+                    },
+                    None,
+                );
+                for field in fields {
+                    let field_type = self.fresh();
+                    self.bind_pattern(module, &field.pattern, field_type);
+                }
+                return;
+            }
+        };
+
+        let record = self.records[&definition].clone();
+        let replacements = record
+            .parameters
+            .iter()
+            .map(|(_, variable)| *variable)
+            .zip(arguments)
+            .collect::<BTreeMap<_, _>>();
+        for field in fields {
+            let Some((_, field_type)) = record.fields.get(&field.name.normalized) else {
+                self.push_error(
+                    module,
+                    field.span,
+                    TypeErrorKind::UnknownField {
+                        field: field.name.normalized.clone(),
+                    },
+                    None,
+                );
+                let field_type = self.fresh();
+                self.bind_pattern(module, &field.pattern, field_type);
+                continue;
+            };
+            self.bind_pattern(
+                module,
+                &field.pattern,
+                replace_variables(field_type, &replacements),
+            );
+        }
+    }
+
+    fn check_match_coverage(
+        &mut self,
+        module: ModuleId,
+        scrutinee: InferType,
+        cases: &[hir::MatchCase],
+        match_span: Span,
+    ) {
+        let mut all_covered = false;
+        let mut booleans = BTreeSet::new();
+        let mut constructors = BTreeSet::new();
+
+        for case in cases {
+            let coverage = self.pattern_coverage(module, &case.pattern);
+            let already_covered = match &coverage {
+                PatternCoverage::CatchAll => all_covered,
+                PatternCoverage::Boolean(value) => all_covered || booleans.contains(value),
+                PatternCoverage::Constructor(definition) => {
+                    all_covered || constructors.contains(definition)
+                }
+                PatternCoverage::Other => all_covered,
+            };
+            if already_covered {
+                let source_name = self
+                    .resolved
+                    .module(module)
+                    .map(|module| module.hir.source_name.clone())
+                    .unwrap_or_default();
+                self.warnings.push(
+                    Diagnostic::new(
+                        codes::UNREACHABLE_MATCH_CASE,
+                        Severity::Warning,
+                        "match 分支不可达",
+                        "match case is unreachable",
+                    )
+                    .with_primary_span(DiagnosticSpan::new(&source_name, case.pattern.span))
+                    .with_fact("reason", "covered_by_previous_unguarded_case"),
+                );
+            }
+            if case.guard.is_some() || already_covered {
+                continue;
+            }
+            match coverage {
+                PatternCoverage::CatchAll => all_covered = true,
+                PatternCoverage::Boolean(value) => {
+                    booleans.insert(value);
+                }
+                PatternCoverage::Constructor(definition) => {
+                    constructors.insert(definition);
+                }
+                PatternCoverage::Other => {}
+            }
+        }
+
+        if all_covered {
+            return;
+        }
+        let witness = match self.apply(scrutinee) {
+            InferType::Bool => [false, true]
+                .into_iter()
+                .find(|value| !booleans.contains(value))
+                .map(|value| value.to_string()),
+            InferType::Variant { definition, .. } => {
+                self.variants.get(&definition).and_then(|variant| {
+                    variant.constructors.iter().find_map(|(name, constructor)| {
+                        (!constructors.contains(constructor)).then(|| name.clone())
+                    })
+                })
+            }
+            _ => None,
+        };
+        if let Some(witness) = witness {
+            self.push_error(
+                module,
+                match_span,
+                TypeErrorKind::NonExhaustiveMatch { witness },
+                None,
+            );
+        }
+    }
+
+    fn pattern_coverage(&self, module: ModuleId, pattern: &hir::Pattern) -> PatternCoverage {
+        if let Some(constructor) = self
+            .resolved
+            .pattern_constructor(module, pattern.id)
+            .cloned()
+        {
+            let covers_payload = match &pattern.kind {
+                hir::PatternKind::Binding { .. } => true,
+                hir::PatternKind::Constructor { arguments, .. } => arguments
+                    .iter()
+                    .all(|argument| self.pattern_is_irrefutable(module, argument)),
+                _ => false,
+            };
+            return if covers_payload {
+                PatternCoverage::Constructor(constructor)
+            } else {
+                PatternCoverage::Other
+            };
+        }
+        match &pattern.kind {
+            hir::PatternKind::Binding { .. } | hir::PatternKind::Wildcard => {
+                PatternCoverage::CatchAll
+            }
+            hir::PatternKind::Literal(hir::Literal::Boolean(value)) => {
+                PatternCoverage::Boolean(*value)
+            }
+            _ => PatternCoverage::Other,
+        }
+    }
+
+    fn pattern_is_irrefutable(&self, module: ModuleId, pattern: &hir::Pattern) -> bool {
+        if self
+            .resolved
+            .pattern_constructor(module, pattern.id)
+            .is_some()
+        {
+            return false;
+        }
+        match &pattern.kind {
+            hir::PatternKind::Binding { .. }
+            | hir::PatternKind::Wildcard
+            | hir::PatternKind::Unit => true,
+            hir::PatternKind::Tuple(elements) => elements
+                .iter()
+                .all(|element| self.pattern_is_irrefutable(module, element)),
+            hir::PatternKind::Record(fields) => fields
+                .iter()
+                .all(|field| self.pattern_is_irrefutable(module, &field.pattern)),
+            hir::PatternKind::Literal(_) | hir::PatternKind::Constructor { .. } => false,
         }
     }
 
@@ -1039,15 +1908,22 @@ impl Inferencer {
             Some(ReferenceTarget::Binding(binding)) => {
                 let info = &self.resolved.bindings()[&binding];
                 if !info.mutable {
-                    let reason = if info.parameter {
-                        "function parameters are immutable values"
+                    let (reason, mutability) = if info.parameter {
+                        (
+                            "function parameters are immutable values",
+                            "immutable_parameter",
+                        )
                     } else {
-                        "local binding is not declared mutable"
+                        ("local binding is not declared mutable", "immutable_binding")
                     };
                     self.push_error(
                         module,
                         place.span,
-                        TypeErrorKind::InvalidAssignment { reason },
+                        TypeErrorKind::InvalidAssignment {
+                            reason,
+                            mutability,
+                            field: place.fields.first().map(|field| field.normalized.clone()),
+                        },
                         None,
                     );
                 }
@@ -1059,12 +1935,16 @@ impl Inferencer {
                     place.span,
                     TypeErrorKind::InvalidAssignment {
                         reason: "only current-function mutable locals are assignable",
+                        mutability: "non_local",
+                        field: place.fields.first().map(|field| field.normalized.clone()),
                     },
                     None,
                 );
                 InferType::Error
             }
         };
+        self.inferred_place_roots
+            .insert(ExpressionKey::new(module, assignment.id), value.clone());
         for field in &place.fields {
             value = self.project_field(value, field, module, field.span, true);
         }
@@ -1073,16 +1953,94 @@ impl Inferencer {
         value
     }
 
+    fn infer_expression_with_expected(
+        &mut self,
+        module: ModuleId,
+        expression: &hir::Expression,
+        expected: InferType,
+    ) -> InferType {
+        if let hir::ExpressionKind::Record(fields) = &expression.kind {
+            let key = ExpressionKey::new(module, expression.id);
+            let value = self.infer_record(module, fields, expression.span, Some(expected));
+            self.inferred_expressions.insert(key, value.clone());
+            value
+        } else {
+            self.infer_expression(module, expression)
+        }
+    }
+
     fn infer_record(
         &mut self,
         module: ModuleId,
         fields: &[hir::RecordField],
         span: Span,
+        expected: Option<InferType>,
     ) -> InferType {
-        let field_names = fields
-            .iter()
-            .map(|field| field.name.normalized.as_str())
-            .collect::<BTreeSet<_>>();
+        let mut field_names = BTreeSet::new();
+        let mut duplicate = false;
+        for field in fields {
+            if !field_names.insert(field.name.normalized.as_str()) {
+                duplicate = true;
+                self.push_error(
+                    module,
+                    field.span,
+                    TypeErrorKind::DuplicateRecordField {
+                        field: field.name.normalized.clone(),
+                    },
+                    None,
+                );
+            }
+        }
+        if let Some(InferType::Record {
+            definition,
+            arguments,
+        }) = expected.map(|expected| self.apply(expected))
+        {
+            let Some(record) = self.records.get(&definition).cloned() else {
+                return InferType::Error;
+            };
+            let replacements = record
+                .parameters
+                .iter()
+                .map(|(_, variable)| *variable)
+                .zip(arguments.iter().cloned())
+                .collect::<BTreeMap<_, _>>();
+            for field in fields {
+                let Some((_, field_type)) = record.fields.get(&field.name.normalized) else {
+                    self.push_error(
+                        module,
+                        field.span,
+                        TypeErrorKind::UnknownField {
+                            field: field.name.normalized.clone(),
+                        },
+                        None,
+                    );
+                    self.infer_expression(module, &field.value);
+                    continue;
+                };
+                let expected = replace_variables(field_type, &replacements);
+                let actual = self.infer_expression(module, &field.value);
+                self.unify(expected, actual, module, field.span, None);
+            }
+            let missing = record
+                .fields
+                .keys()
+                .filter(|name| !field_names.contains(name.as_str()))
+                .cloned()
+                .collect::<Vec<_>>();
+            if !missing.is_empty() {
+                self.push_error(
+                    module,
+                    span,
+                    TypeErrorKind::MissingRecordFields { fields: missing },
+                    None,
+                );
+            }
+            return InferType::Record {
+                definition,
+                arguments,
+            };
+        }
         let candidates = self
             .records
             .iter()
@@ -1097,7 +2055,80 @@ impl Inferencer {
             .map(|(id, _)| id.clone())
             .collect::<Vec<_>>();
         if candidates.len() != 1 {
-            self.push_error(module, span, TypeErrorKind::AmbiguousRecord, None);
+            if !duplicate {
+                let supplied_contains = self
+                    .records
+                    .iter()
+                    .filter(|(_, record)| {
+                        record
+                            .fields
+                            .keys()
+                            .all(|field| field_names.contains(field.as_str()))
+                    })
+                    .map(|(id, _)| id.clone())
+                    .collect::<Vec<_>>();
+                if supplied_contains.len() == 1 {
+                    let definition = supplied_contains[0].clone();
+                    let record = self.records[&definition].clone();
+                    let arguments = record
+                        .parameters
+                        .iter()
+                        .map(|_| self.fresh())
+                        .collect::<Vec<_>>();
+                    let replacements = record
+                        .parameters
+                        .iter()
+                        .map(|(_, variable)| *variable)
+                        .zip(arguments.iter().cloned())
+                        .collect::<BTreeMap<_, _>>();
+                    for field in fields {
+                        let actual = self.infer_expression(module, &field.value);
+                        if let Some((_, field_type)) = record.fields.get(&field.name.normalized) {
+                            let expected = replace_variables(field_type, &replacements);
+                            self.unify(expected, actual, module, field.span, None);
+                        } else {
+                            self.push_error(
+                                module,
+                                field.span,
+                                TypeErrorKind::UnknownField {
+                                    field: field.name.normalized.clone(),
+                                },
+                                None,
+                            );
+                        }
+                    }
+                    return InferType::Record {
+                        definition,
+                        arguments,
+                    };
+                }
+                let containing = self
+                    .records
+                    .iter()
+                    .filter(|(_, record)| {
+                        field_names
+                            .iter()
+                            .all(|field| record.fields.contains_key(*field))
+                    })
+                    .map(|(id, _)| id.clone())
+                    .collect::<Vec<_>>();
+                if containing.len() == 1 {
+                    let missing = self.records[&containing[0]]
+                        .fields
+                        .keys()
+                        .filter(|field| !field_names.contains(field.as_str()))
+                        .cloned()
+                        .collect::<Vec<_>>();
+                    self.push_error(
+                        module,
+                        span,
+                        TypeErrorKind::MissingRecordFields { fields: missing },
+                        None,
+                    );
+                } else {
+                    self.push_error(module, span, TypeErrorKind::AmbiguousRecord, None);
+                }
+            }
             for field in fields {
                 self.infer_expression(module, &field.value);
             }
@@ -1105,14 +2136,26 @@ impl Inferencer {
         }
         let definition = candidates[0].clone();
         let record = self.records[&definition].clone();
+        let arguments = record
+            .parameters
+            .iter()
+            .map(|_| self.fresh())
+            .collect::<Vec<_>>();
+        let replacements = record
+            .parameters
+            .iter()
+            .map(|(_, variable)| *variable)
+            .zip(arguments.iter().cloned())
+            .collect::<BTreeMap<_, _>>();
         for field in fields {
-            let expected = record.fields[&field.name.normalized].1.clone();
+            let expected =
+                replace_variables(&record.fields[&field.name.normalized].1, &replacements);
             let actual = self.infer_expression(module, &field.value);
             self.unify(expected, actual, module, field.span, None);
         }
         InferType::Record {
             definition,
-            arguments: Vec::new(),
+            arguments,
         }
     }
 
@@ -1125,18 +2168,64 @@ impl Inferencer {
         require_mutable: bool,
     ) -> InferType {
         let target = self.apply(target);
-        let InferType::Record { definition, .. } = target else {
-            self.push_error(
-                module,
-                span,
-                TypeErrorKind::UnknownField {
-                    field: field.normalized.clone(),
-                },
-                None,
-            );
-            return InferType::Error;
+        let (definition, arguments) = match target {
+            InferType::Record {
+                definition,
+                arguments,
+            } => (definition, arguments),
+            InferType::Variable(variable) => {
+                let candidates = self
+                    .records
+                    .iter()
+                    .filter(|(_, record)| record.fields.contains_key(&field.normalized))
+                    .map(|(id, _)| id.clone())
+                    .collect::<Vec<_>>();
+                if candidates.len() != 1 {
+                    self.push_error(
+                        module,
+                        span,
+                        if candidates.is_empty() {
+                            TypeErrorKind::UnknownField {
+                                field: field.normalized.clone(),
+                            }
+                        } else {
+                            TypeErrorKind::AmbiguousRecord
+                        },
+                        None,
+                    );
+                    return InferType::Error;
+                }
+                let definition = candidates[0].clone();
+                let parameter_count = self.records[&definition].parameters.len();
+                let arguments = (0..parameter_count)
+                    .map(|_| self.fresh())
+                    .collect::<Vec<_>>();
+                self.bind_variable(
+                    variable,
+                    InferType::Record {
+                        definition: definition.clone(),
+                        arguments: arguments.clone(),
+                    },
+                    module,
+                    span,
+                    None,
+                );
+                (definition, arguments)
+            }
+            InferType::Error => return InferType::Error,
+            _ => {
+                self.push_error(
+                    module,
+                    span,
+                    TypeErrorKind::UnknownField {
+                        field: field.normalized.clone(),
+                    },
+                    None,
+                );
+                return InferType::Error;
+            }
         };
-        let Some(record) = self.records.get(&definition) else {
+        let Some(record) = self.records.get(&definition).cloned() else {
             return InferType::Error;
         };
         let Some((mutable, field_type)) = record.fields.get(&field.normalized).cloned() else {
@@ -1156,11 +2245,19 @@ impl Inferencer {
                 span,
                 TypeErrorKind::InvalidAssignment {
                     reason: "record field is not declared mutable",
+                    mutability: "immutable_field",
+                    field: Some(field.normalized.clone()),
                 },
                 None,
             );
         }
-        field_type
+        let replacements = record
+            .parameters
+            .iter()
+            .map(|(_, variable)| *variable)
+            .zip(arguments)
+            .collect::<BTreeMap<_, _>>();
+        replace_variables(&field_type, &replacements)
     }
 
     fn infer_application(
@@ -1170,12 +2267,13 @@ impl Inferencer {
         module: ModuleId,
         span: Span,
     ) -> InferType {
+        let restriction_reason = self.restriction_reason(&callable);
         let callable = self.apply(callable);
         match callable {
             InferType::Variable(variable) => {
                 let result = self.fresh();
                 let expected = function(arguments, result.clone());
-                self.bind_variable(variable, expected, module, span, None);
+                self.bind_variable(variable, expected, module, span, restriction_reason);
                 result
             }
             InferType::Function { parameters, result } => {
@@ -1187,12 +2285,18 @@ impl Inferencer {
                             expected: parameters.len(),
                             actual: arguments.len(),
                         },
-                        None,
+                        restriction_reason,
                     );
                     return InferType::Error;
                 }
                 for (expected, actual) in parameters.iter().zip(&arguments) {
-                    self.unify(expected.clone(), actual.clone(), module, span, None);
+                    self.unify(
+                        expected.clone(),
+                        actual.clone(),
+                        module,
+                        span,
+                        restriction_reason,
+                    );
                 }
                 if arguments.len() == parameters.len() {
                     *result
@@ -1206,9 +2310,9 @@ impl Inferencer {
                     module,
                     span,
                     TypeErrorKind::NotCallable {
-                        actual: display_infer(&self.apply(actual)),
+                        actual: display_infer(&self.apply(actual), &self.resolved),
                     },
-                    None,
+                    restriction_reason,
                 );
                 InferType::Error
             }
@@ -1231,87 +2335,286 @@ impl Inferencer {
     }
 
     fn type_syntax(&mut self, module: ModuleId, syntax: &hir::TypeSyntax) -> InferType {
-        let names = syntax
-            .atoms
-            .iter()
-            .filter_map(|atom| match atom {
-                hir::TypeAtom::Name(name) => Some(name.normalized.as_str()),
-                _ => None,
-            })
-            .collect::<Vec<_>>();
-        if syntax.atoms.len() == 1 {
-            if let hir::TypeAtom::Name(name) = &syntax.atoms[0] {
-                return match name.normalized.as_str() {
-                    "Unit" => InferType::Unit,
-                    "Bool" => InferType::Bool,
-                    "Int" => InferType::Int,
-                    "f64" => InferType::Float64,
-                    "Text" => InferType::Text,
-                    custom => self
-                        .resolved
-                        .definition_id(module, custom)
-                        .cloned()
-                        .and_then(|id| self.definitions.get(&id).map(|scheme| scheme.value.clone()))
-                        .unwrap_or(InferType::Error),
-                };
-            }
-            if matches!(syntax.atoms[0], hir::TypeAtom::Variable(_)) {
-                return self.fresh();
-            }
+        self.type_syntax_with_parameters(module, syntax, &BTreeMap::new())
+    }
+
+    fn type_syntax_with_parameters(
+        &mut self,
+        module: ModuleId,
+        syntax: &hir::TypeSyntax,
+        declaration_parameters: &BTreeMap<String, InferType>,
+    ) -> InferType {
+        if syntax.atoms.iter().any(|atom| {
+            matches!(atom, hir::TypeAtom::Variable(name) if !declaration_parameters.contains_key(&name.normalized))
+        }) {
+            self.push_error(
+                module,
+                syntax.span,
+                TypeErrorKind::UnsupportedTypeSyntax,
+                None,
+            );
+            return InferType::Error;
         }
-        if syntax
-            .atoms
-            .iter()
-            .any(|atom| matches!(atom, hir::TypeAtom::Arrow))
+        let mut variables = declaration_parameters.clone();
+        let mut position = 0;
+        let parsed = self.parse_function_type(
+            module,
+            &syntax.atoms,
+            &mut position,
+            &mut variables,
+            syntax.span,
+        );
+        if position != syntax.atoms.len() {
+            self.push_error(
+                module,
+                syntax.span,
+                TypeErrorKind::UnsupportedTypeSyntax,
+                None,
+            );
+            InferType::Error
+        } else {
+            parsed
+        }
+    }
+
+    fn parse_function_type(
+        &mut self,
+        module: ModuleId,
+        atoms: &[hir::TypeAtom],
+        position: &mut usize,
+        variables: &mut BTreeMap<String, InferType>,
+        span: Span,
+    ) -> InferType {
+        let left = self.parse_product_type(module, atoms, position, variables, span);
+        if atoms
+            .get(*position)
+            .is_some_and(|atom| matches!(atom, hir::TypeAtom::Arrow))
         {
-            let mut parts = Vec::new();
-            let mut start = 0;
-            for (index, atom) in syntax.atoms.iter().enumerate() {
-                if matches!(atom, hir::TypeAtom::Arrow) {
-                    parts.push(self.simple_type_atom(module, &syntax.atoms[start..index]));
-                    start = index + 1;
+            *position += 1;
+            let right = self.parse_function_type(module, atoms, position, variables, span);
+            if let InferType::Function {
+                mut parameters,
+                result,
+            } = right
+            {
+                parameters.insert(0, left);
+                InferType::Function { parameters, result }
+            } else {
+                function(vec![left], right)
+            }
+        } else {
+            left
+        }
+    }
+
+    fn parse_product_type(
+        &mut self,
+        module: ModuleId,
+        atoms: &[hir::TypeAtom],
+        position: &mut usize,
+        variables: &mut BTreeMap<String, InferType>,
+        span: Span,
+    ) -> InferType {
+        let first = self.parse_primary_type(module, atoms, position, variables, span);
+        let mut elements = vec![first];
+        while atoms
+            .get(*position)
+            .is_some_and(|atom| matches!(atom, hir::TypeAtom::Product))
+        {
+            *position += 1;
+            elements.push(self.parse_primary_type(module, atoms, position, variables, span));
+        }
+        if elements.len() == 1 {
+            elements.pop().expect("one product element")
+        } else {
+            InferType::Tuple(elements)
+        }
+    }
+
+    fn parse_primary_type(
+        &mut self,
+        module: ModuleId,
+        atoms: &[hir::TypeAtom],
+        position: &mut usize,
+        variables: &mut BTreeMap<String, InferType>,
+        span: Span,
+    ) -> InferType {
+        match atoms.get(*position) {
+            Some(hir::TypeAtom::Variable(name)) => {
+                *position += 1;
+                if let Some(value) = variables.get(&name.normalized) {
+                    value.clone()
+                } else {
+                    let value = self.fresh();
+                    variables.insert(name.normalized.clone(), value.clone());
+                    value
                 }
             }
-            parts.push(self.simple_type_atom(module, &syntax.atoms[start..]));
-            if let Some(result) = parts.pop() {
-                return function(parts, result);
+            Some(hir::TypeAtom::LeftParen) => {
+                *position += 1;
+                let value = self.parse_function_type(module, atoms, position, variables, span);
+                if atoms
+                    .get(*position)
+                    .is_some_and(|atom| matches!(atom, hir::TypeAtom::RightParen))
+                {
+                    *position += 1;
+                    value
+                } else {
+                    self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+                    InferType::Error
+                }
+            }
+            Some(hir::TypeAtom::Name(_)) => {
+                let mut names = Vec::new();
+                let hir::TypeAtom::Name(first) = &atoms[*position] else {
+                    unreachable!("match checked above")
+                };
+                names.push(first.normalized.clone());
+                *position += 1;
+                while atoms
+                    .get(*position)
+                    .is_some_and(|atom| matches!(atom, hir::TypeAtom::Dot))
+                {
+                    *position += 1;
+                    let Some(hir::TypeAtom::Name(segment)) = atoms.get(*position) else {
+                        self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+                        return InferType::Error;
+                    };
+                    names.push(segment.normalized.clone());
+                    *position += 1;
+                }
+                let mut arguments = Vec::new();
+                if atoms
+                    .get(*position)
+                    .is_some_and(|atom| matches!(atom, hir::TypeAtom::LeftAngle))
+                {
+                    *position += 1;
+                    loop {
+                        arguments.push(
+                            self.parse_function_type(module, atoms, position, variables, span),
+                        );
+                        match atoms.get(*position) {
+                            Some(hir::TypeAtom::Comma) => *position += 1,
+                            Some(hir::TypeAtom::RightAngle) => {
+                                *position += 1;
+                                break;
+                            }
+                            _ => {
+                                self.push_error(
+                                    module,
+                                    span,
+                                    TypeErrorKind::UnsupportedTypeSyntax,
+                                    None,
+                                );
+                                return InferType::Error;
+                            }
+                        }
+                    }
+                }
+                self.named_type(module, &names, arguments, span)
+            }
+            _ => {
+                self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+                InferType::Error
             }
         }
-        if names.first() == Some(&"List") {
-            if let Some(hir::TypeAtom::Name(element)) = syntax.atoms.get(2) {
-                return InferType::List(Box::new(self.named_type(module, &element.normalized)));
+    }
+
+    fn named_type(
+        &mut self,
+        module: ModuleId,
+        names: &[String],
+        arguments: Vec<InferType>,
+        span: Span,
+    ) -> InferType {
+        if names.len() == 1 {
+            let primitive = match names[0].as_str() {
+                "Unit" => Some(InferType::Unit),
+                "Bool" => Some(InferType::Bool),
+                "Int" => Some(InferType::Int),
+                "f64" => Some(InferType::Float64),
+                "Text" => Some(InferType::Text),
+                _ => None,
+            };
+            if let Some(primitive) = primitive {
+                if arguments.is_empty() {
+                    return primitive;
+                }
+                self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+                return InferType::Error;
+            }
+            if names[0] == "List" {
+                if let [element] = arguments.as_slice() {
+                    return InferType::List(Box::new(element.clone()));
+                }
+                self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+                return InferType::Error;
             }
         }
-        self.push_error(
-            module,
-            syntax.span,
-            TypeErrorKind::UnsupportedTypeSyntax,
-            None,
-        );
-        InferType::Error
-    }
 
-    fn simple_type_atom(&mut self, module: ModuleId, atoms: &[hir::TypeAtom]) -> InferType {
-        match atoms {
-            [hir::TypeAtom::Name(name)] => self.named_type(module, &name.normalized),
-            [hir::TypeAtom::Variable(_)] => self.fresh(),
-            _ => InferType::Error,
+        let Some(definition) = self.resolve_type_definition(module, names) else {
+            self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+            return InferType::Error;
+        };
+        let Some(scheme) = self.definitions.get(&definition).cloned() else {
+            return InferType::Error;
+        };
+        let parameter_ids = self
+            .records
+            .get(&definition)
+            .map(|record| {
+                record
+                    .parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .collect::<Vec<_>>()
+            })
+            .or_else(|| {
+                self.variants.get(&definition).map(|variant| {
+                    variant
+                        .parameters
+                        .iter()
+                        .map(|(_, variable)| *variable)
+                        .collect::<Vec<_>>()
+                })
+            })
+            .unwrap_or_else(|| scheme.quantified.iter().copied().collect());
+        if parameter_ids.len() != arguments.len() {
+            self.push_error(
+                module,
+                span,
+                TypeErrorKind::Arity {
+                    expected: parameter_ids.len(),
+                    actual: arguments.len(),
+                },
+                None,
+            );
+            return InferType::Error;
         }
+        let replacements = parameter_ids
+            .into_iter()
+            .zip(arguments)
+            .collect::<BTreeMap<_, _>>();
+        replace_variables(&scheme.value, &replacements)
     }
 
-    fn named_type(&self, module: ModuleId, name: &str) -> InferType {
-        match name {
-            "Unit" => InferType::Unit,
-            "Bool" => InferType::Bool,
-            "Int" => InferType::Int,
-            "f64" => InferType::Float64,
-            "Text" => InferType::Text,
-            custom => self
+    fn resolve_type_definition(&self, module: ModuleId, names: &[String]) -> Option<DefinitionId> {
+        let id = match names {
+            [name] => self
                 .resolved
-                .definition_id(module, custom)
-                .and_then(|id| self.definitions.get(id))
-                .map_or(InferType::Error, |scheme| scheme.value.clone()),
-        }
+                .definition_id(module, name)
+                .or_else(|| self.resolved.prelude_definition(name)),
+            [alias, name] => self
+                .resolved
+                .module(module)
+                .and_then(|current| current.imports.get(alias))
+                .and_then(|imported| self.resolved.definition_id(*imported, name)),
+            _ => None,
+        }?;
+        self.resolved
+            .definition(id)
+            .filter(|definition| definition.kind == ling_resolve::DefinitionKind::Type)
+            .map(|definition| definition.id.clone())
     }
 
     fn unify(
@@ -1322,6 +2625,9 @@ impl Inferencer {
         span: Span,
         restriction_reason: Option<&'static str>,
     ) {
+        let restriction_reason = restriction_reason
+            .or_else(|| self.restriction_reason(&expected))
+            .or_else(|| self.restriction_reason(&actual));
         let expected = self.apply(expected);
         let actual = self.apply(actual);
         match (expected.clone(), actual.clone()) {
@@ -1365,26 +2671,38 @@ impl Inferencer {
             }
             (
                 InferType::Record {
-                    definition: left, ..
+                    definition: left,
+                    arguments: left_arguments,
                 },
                 InferType::Record {
-                    definition: right, ..
+                    definition: right,
+                    arguments: right_arguments,
                 },
-            ) if left == right => {}
+            ) if left == right && left_arguments.len() == right_arguments.len() => {
+                for (left, right) in left_arguments.into_iter().zip(right_arguments) {
+                    self.unify(left, right, module, span, restriction_reason);
+                }
+            }
             (
                 InferType::Variant {
-                    definition: left, ..
+                    definition: left,
+                    arguments: left_arguments,
                 },
                 InferType::Variant {
-                    definition: right, ..
+                    definition: right,
+                    arguments: right_arguments,
                 },
-            ) if left == right => {}
+            ) if left == right && left_arguments.len() == right_arguments.len() => {
+                for (left, right) in left_arguments.into_iter().zip(right_arguments) {
+                    self.unify(left, right, module, span, restriction_reason);
+                }
+            }
             _ => self.push_error(
                 module,
                 span,
                 TypeErrorKind::Mismatch {
-                    expected: display_infer(&expected),
-                    actual: display_infer(&actual),
+                    expected: display_infer(&expected, &self.resolved),
+                    actual: display_infer(&actual, &self.resolved),
                 },
                 restriction_reason,
             ),
@@ -1483,6 +2801,198 @@ impl Inferencer {
         Scheme { quantified, value }
     }
 
+    fn register_restriction(&mut self, value: &InferType, reason: &'static str) {
+        for variable in free_variables(value) {
+            self.restricted_variables.entry(variable).or_insert(reason);
+        }
+    }
+
+    fn restriction_reason(&self, value: &InferType) -> Option<&'static str> {
+        free_variables(value)
+            .into_iter()
+            .find_map(|variable| self.restricted_variables.get(&variable).copied())
+    }
+
+    fn value_restriction(
+        &self,
+        module: ModuleId,
+        mutable: bool,
+        parameters: &[hir::Pattern],
+        value: &hir::Expression,
+    ) -> Option<&'static str> {
+        if mutable {
+            Some("mutable_binding")
+        } else if !parameters.is_empty() {
+            None
+        } else if self.contains_mutable_record_value(module, value) {
+            Some("mutable_field")
+        } else if self.is_non_expansive(module, value) {
+            None
+        } else {
+            Some("expansive_rhs")
+        }
+    }
+
+    fn is_non_expansive(&self, module: ModuleId, expression: &hir::Expression) -> bool {
+        match &expression.kind {
+            hir::ExpressionKind::Name { reference, .. }
+            | hir::ExpressionKind::Projection { reference, .. } => self
+                .resolved
+                .reference(module, *reference)
+                .is_some_and(|target| match target {
+                    ReferenceTarget::Definition(definition) => self
+                        .resolved
+                        .definition(definition)
+                        .is_some_and(|definition| !definition.mutable),
+                    ReferenceTarget::Binding(binding) => self
+                        .resolved
+                        .bindings()
+                        .get(binding)
+                        .is_some_and(|binding| !binding.mutable),
+                }),
+            hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => true,
+            hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => elements
+                .iter()
+                .all(|element| self.is_non_expansive(module, element)),
+            hir::ExpressionKind::Record(fields) => fields
+                .iter()
+                .all(|field| self.is_non_expansive(module, &field.value)),
+            hir::ExpressionKind::Application {
+                function,
+                arguments,
+            } => {
+                self.expression_definition(module, function)
+                    .and_then(|definition| self.resolved.definition(definition))
+                    .is_some_and(|definition| {
+                        definition.kind == ling_resolve::DefinitionKind::Constructor
+                    })
+                    && arguments
+                        .iter()
+                        .all(|argument| self.is_non_expansive(module, argument))
+            }
+            _ => false,
+        }
+    }
+
+    fn contains_mutable_record_value(
+        &self,
+        module: ModuleId,
+        expression: &hir::Expression,
+    ) -> bool {
+        let record_is_mutable = if matches!(expression.kind, hir::ExpressionKind::Record(_)) {
+            self.inferred_expressions
+                .get(&ExpressionKey::new(module, expression.id))
+                .cloned()
+                .map(|value| self.apply(value))
+                .and_then(|value| match value {
+                    InferType::Record { definition, .. } => Some(definition),
+                    _ => None,
+                })
+                .and_then(|definition| self.records.get(&definition))
+                .is_some_and(|record| record.fields.values().any(|(mutable, _)| *mutable))
+        } else {
+            false
+        };
+        if record_is_mutable {
+            return true;
+        }
+        match &expression.kind {
+            hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => elements
+                .iter()
+                .any(|element| self.contains_mutable_record_value(module, element)),
+            hir::ExpressionKind::Record(fields) => fields
+                .iter()
+                .any(|field| self.contains_mutable_record_value(module, &field.value)),
+            hir::ExpressionKind::Application { arguments, .. } => arguments
+                .iter()
+                .any(|argument| self.contains_mutable_record_value(module, argument)),
+            _ => false,
+        }
+    }
+
+    fn expression_definition(
+        &self,
+        module: ModuleId,
+        expression: &hir::Expression,
+    ) -> Option<&DefinitionId> {
+        let reference = match &expression.kind {
+            hir::ExpressionKind::Name { reference, .. }
+            | hir::ExpressionKind::Projection { reference, .. } => *reference,
+            _ => return None,
+        };
+        match self.resolved.reference(module, reference)? {
+            ReferenceTarget::Definition(definition) => Some(definition),
+            ReferenceTarget::Binding(_) => None,
+        }
+    }
+
+    fn check_equality_constraints(&mut self) {
+        let constraints = std::mem::take(&mut self.equality_constraints);
+        for (module, span, value) in constraints {
+            let actual = self.apply(value);
+            if !self.supports_equality(&actual, &mut BTreeSet::new()) {
+                self.push_error(
+                    module,
+                    span,
+                    TypeErrorKind::UnsupportedEquality {
+                        actual: display_infer(&actual, &self.resolved),
+                    },
+                    None,
+                );
+            }
+        }
+    }
+
+    fn supports_equality(&self, value: &InferType, visited: &mut BTreeSet<InferType>) -> bool {
+        let value = self.apply(value.clone());
+        if !visited.insert(value.clone()) {
+            return true;
+        }
+        match value {
+            InferType::Unit
+            | InferType::Bool
+            | InferType::Int
+            | InferType::Float64
+            | InferType::Text
+            | InferType::Error => true,
+            InferType::Tuple(elements) => elements
+                .iter()
+                .all(|element| self.supports_equality(element, visited)),
+            InferType::List(element) => self.supports_equality(&element, visited),
+            InferType::Record {
+                definition,
+                arguments,
+            } => self.records.get(&definition).is_some_and(|record| {
+                let replacements = record
+                    .parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .zip(arguments)
+                    .collect::<BTreeMap<_, _>>();
+                record.fields.values().all(|(_, field)| {
+                    self.supports_equality(&replace_variables(field, &replacements), visited)
+                })
+            }),
+            InferType::Variant {
+                definition,
+                arguments,
+            } => self.variants.get(&definition).is_some_and(|variant| {
+                let replacements = variant
+                    .parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .zip(arguments)
+                    .collect::<BTreeMap<_, _>>();
+                variant.cases.values().all(|payload| {
+                    payload.as_ref().is_none_or(|payload| {
+                        self.supports_equality(&replace_variables(payload, &replacements), visited)
+                    })
+                })
+            }),
+            InferType::Function { .. } | InferType::Variable(_) => false,
+        }
+    }
+
     fn fresh(&mut self) -> InferType {
         InferType::Variable(self.fresh_variable_id())
     }
@@ -1517,21 +3027,6 @@ fn function(parameters: Vec<InferType>, result: InferType) -> InferType {
     InferType::Function {
         parameters,
         result: Box::new(result),
-    }
-}
-
-fn non_expansive(kind: &hir::ExpressionKind) -> bool {
-    match kind {
-        hir::ExpressionKind::Name { .. }
-        | hir::ExpressionKind::Literal(_)
-        | hir::ExpressionKind::Unit => true,
-        hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => {
-            elements.iter().all(|element| non_expansive(&element.kind))
-        }
-        hir::ExpressionKind::Record(fields) => {
-            fields.iter().all(|field| non_expansive(&field.value.kind))
-        }
-        _ => false,
     }
 }
 
@@ -1676,7 +3171,23 @@ fn intern_type(
     arena.intern(value, index)
 }
 
-fn display_infer(value: &InferType) -> String {
+fn display_nominal(arena: &TypeArena, definition: &DefinitionId, arguments: &[TypeId]) -> String {
+    if arguments.is_empty() {
+        definition.to_string()
+    } else {
+        format!(
+            "{}<{}>",
+            definition,
+            arguments
+                .iter()
+                .map(|argument| arena.display(*argument))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
+fn display_infer(value: &InferType, resolved: &ResolvedProgram) -> String {
     match value {
         InferType::Unit => "Unit".to_owned(),
         InferType::Bool => "Bool".to_owned(),
@@ -1687,21 +3198,125 @@ fn display_infer(value: &InferType) -> String {
             "({})",
             elements
                 .iter()
-                .map(display_infer)
+                .map(|element| display_infer(element, resolved))
                 .collect::<Vec<_>>()
                 .join(" * ")
         ),
-        InferType::List(element) => format!("List<{}>", display_infer(element)),
+        InferType::List(element) => format!("List<{}>", display_infer(element, resolved)),
         InferType::Function { parameters, result } => {
-            let mut parts = parameters.iter().map(display_infer).collect::<Vec<_>>();
-            parts.push(display_infer(result));
+            let mut parts = parameters
+                .iter()
+                .map(|parameter| match parameter {
+                    InferType::Function { .. } => {
+                        format!("({})", display_infer(parameter, resolved))
+                    }
+                    _ => display_infer(parameter, resolved),
+                })
+                .collect::<Vec<_>>();
+            parts.push(display_infer(result, resolved));
             parts.join(" -> ")
         }
-        InferType::Record { definition, .. } | InferType::Variant { definition, .. } => {
-            definition.to_string()
+        InferType::Record {
+            definition,
+            arguments,
+        }
+        | InferType::Variant {
+            definition,
+            arguments,
+        } => {
+            let name = nominal_display_name(resolved, definition);
+            if arguments.is_empty() {
+                name
+            } else {
+                format!(
+                    "{}<{}>",
+                    name,
+                    arguments
+                        .iter()
+                        .map(|argument| display_infer(argument, resolved))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                )
+            }
         }
         InferType::Variable(variable) => format!("'t{variable}"),
         InferType::Error => "<error>".to_owned(),
+    }
+}
+
+fn display_resolved_type(arena: &TypeArena, resolved: &ResolvedProgram, id: TypeId) -> String {
+    match arena.get(id) {
+        Type::Unit => "Unit".to_owned(),
+        Type::Bool => "Bool".to_owned(),
+        Type::Int => "Int".to_owned(),
+        Type::Float64 => "f64".to_owned(),
+        Type::Text => "Text".to_owned(),
+        Type::Tuple(elements) => format!(
+            "({})",
+            elements
+                .iter()
+                .map(|element| display_resolved_type(arena, resolved, *element))
+                .collect::<Vec<_>>()
+                .join(" * ")
+        ),
+        Type::List(element) => {
+            format!("List<{}>", display_resolved_type(arena, resolved, *element))
+        }
+        Type::Function { parameters, result } => {
+            let mut parts = parameters
+                .iter()
+                .map(|parameter| match arena.get(*parameter) {
+                    Type::Function { .. } => {
+                        format!("({})", display_resolved_type(arena, resolved, *parameter))
+                    }
+                    _ => display_resolved_type(arena, resolved, *parameter),
+                })
+                .collect::<Vec<_>>();
+            parts.push(display_resolved_type(arena, resolved, *result));
+            parts.join(" -> ")
+        }
+        Type::NominalRecord {
+            definition,
+            arguments,
+        }
+        | Type::NominalVariant {
+            definition,
+            arguments,
+        } => {
+            let name = nominal_display_name(resolved, definition);
+            if arguments.is_empty() {
+                name
+            } else {
+                format!(
+                    "{}<{}>",
+                    name,
+                    arguments
+                        .iter()
+                        .map(|argument| display_resolved_type(arena, resolved, *argument))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                )
+            }
+        }
+        Type::Variable(variable) => format!("'t{variable}"),
+        Type::Error => "<error>".to_owned(),
+    }
+}
+
+fn nominal_display_name(resolved: &ResolvedProgram, definition: &DefinitionId) -> String {
+    let info = resolved
+        .definition(definition)
+        .expect("a typed nominal type has a resolved definition");
+    let ambiguous = resolved
+        .definitions()
+        .values()
+        .filter(|candidate| candidate.kind == DefinitionKind::Type && candidate.name == info.name)
+        .nth(1)
+        .is_some();
+    if ambiguous {
+        format!("{}.{}", info.module_name, info.name)
+    } else {
+        info.name.clone()
     }
 }
 
@@ -1722,6 +3337,26 @@ mod tests {
         let ast = lower_ast(&source, &parsed).expect("valid AST");
         let hir = hir::lower(source.name(), &ast).expect("valid HIR");
         ling_resolve::resolve(vec![hir], "Main").expect("resolves")
+    }
+
+    fn resolved_modules(sources: &[(&str, &str)]) -> ResolvedProgram {
+        let programs = sources
+            .iter()
+            .enumerate()
+            .map(|(index, (name, text))| {
+                let source = SourceFile::from_bytes(
+                    SourceId::new(u32::try_from(index).expect("test source index fits")),
+                    *name,
+                    text.as_bytes().to_vec(),
+                )
+                .expect("valid source");
+                let parsed = parse(&source);
+                assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+                let ast = lower_ast(&source, &parsed).expect("valid AST");
+                hir::lower(source.name(), &ast).expect("valid HIR")
+            })
+            .collect();
+        ling_resolve::resolve(programs, "Main").expect("resolves")
     }
 
     #[test]
@@ -1774,5 +3409,529 @@ mod tests {
                 .iter()
                 .any(|error| matches!(error.kind, TypeErrorKind::InfiniteType))
         );
+    }
+
+    #[test]
+    fn value_restriction_preserves_values_and_reports_stable_reasons() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "type Box<'a> = { value: 'a }\n\n",
+            "let test () =\n",
+            "    let empty = []\n",
+            "    let intValues: List<Int> = empty\n",
+            "    let textValues: List<Text> = empty\n",
+            "    let box = { value = [] }\n",
+            "    let intBox: Box<List<Int>> = box\n",
+            "    let textBox: Box<List<Text>> = box\n",
+            "    let option = Some []\n",
+            "    let intOption: Option<List<Int>> = option\n",
+            "    let textOption: Option<List<Text>> = option\n",
+            "    ()\n",
+        )))
+        .expect("non-expansive list, record, and constructor values generalize");
+
+        let mutable_binding = check(resolved(concat!(
+            "module Main\n\n",
+            "let test () =\n",
+            "    let mutable id value = value\n",
+            "    id 1\n",
+            "    id \"text\"\n",
+            "    ()\n",
+        )))
+        .expect_err("mutable bindings remain monomorphic");
+        let mutable_binding_error = mutable_binding
+            .iter()
+            .find(|error| {
+                matches!(error.kind, TypeErrorKind::Mismatch { .. })
+                    && error.restriction_reason == Some("mutable_binding")
+            })
+            .expect("mutable restriction is attached to the mismatch");
+        let diagnostic: serde_json::Value = serde_json::from_str(
+            &mutable_binding_error
+                .to_diagnostic()
+                .render_json()
+                .expect("diagnostic serializes"),
+        )
+        .expect("diagnostic JSON parses");
+        assert_eq!(diagnostic["facts"]["generalization"], "restricted");
+        assert_eq!(diagnostic["facts"]["restriction_reason"], "mutable_binding");
+        let expansive = check(resolved(concat!(
+            "module Main\n\n",
+            "type TextValues = { values: List<Text> }\n\n",
+            "let test () =\n",
+            "    let values = if true then [] else []\n",
+            "    sum values\n",
+            "    let texts: TextValues = { values = values }\n",
+            "    ()\n",
+        )))
+        .expect_err("expansive bindings remain monomorphic");
+        assert!(expansive.iter().any(|error| {
+            matches!(error.kind, TypeErrorKind::Mismatch { .. })
+                && error.restriction_reason == Some("expansive_rhs")
+        }));
+
+        let mutable_field = check(resolved(concat!(
+            "module Main\n\n",
+            "type MutableBox<'a> = { mutable value: 'a }\n\n",
+            "let test () =\n",
+            "    let box = { value = [] }\n",
+            "    let ints: MutableBox<List<Int>> = box\n",
+            "    let texts: MutableBox<List<Text>> = box\n",
+            "    ()\n",
+        )))
+        .expect_err("records with mutable fields remain monomorphic");
+        assert!(mutable_field.iter().any(|error| {
+            matches!(error.kind, TypeErrorKind::Mismatch { .. })
+                && error.restriction_reason == Some("mutable_field")
+        }));
+    }
+
+    #[test]
+    fn equality_accepts_seed_values_and_rejects_functions() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "type Point = { x: Int; y: Int }\n",
+            "type State =\n",
+            "    | Healthy\n",
+            "    | Hurt of Int\n\n",
+            "let primitive = 1.5 == 1.5\n",
+            "let tupleValue = (1, \"x\") == (1, \"x\")\n",
+            "let listValue = [1; 2] == [1; 2]\n",
+            "let recordValue = { x = 1; y = 2 } == { x = 1; y = 2 }\n",
+            "let variantValue = Hurt 1 == Hurt 1\n",
+        )))
+        .expect("all implemented structural Seed values support equality");
+
+        let function = check(resolved(concat!(
+            "module Main\n\n",
+            "let identity value = value\n",
+            "let invalid = identity == identity\n",
+        )))
+        .expect_err("functions do not have structural equality");
+        let error = function
+            .iter()
+            .find(|error| matches!(error.kind, TypeErrorKind::UnsupportedEquality { .. }))
+            .expect("function equality has a dedicated type error");
+        assert_eq!(error.to_diagnostic().code(), codes::UNSUPPORTED_EQUALITY);
+    }
+
+    #[test]
+    fn instantiates_generic_records_and_prelude_variants_independently() {
+        let typed = check(resolved(concat!(
+            "module Main\n\n",
+            "type Box<'a> =\n",
+            "    { value: 'a }\n\n",
+            "let intBox = { value = 1 }\n",
+            "let textBox = { value = \"text\" }\n",
+            "let intOption: Option<Int> = Some 1\n",
+            "let textOption: Option<Text> = Some \"text\"\n",
+            "let intResult: Result<Int, Text> = Ok 1\n",
+            "let textError: Result<Int, Text> = Error \"failed\"\n",
+            "let unwrapOrZero option =\n",
+            "    match option with\n",
+            "    | Some value -> value\n",
+            "    | None -> 0\n",
+        )))
+        .expect("generic nominal declarations instantiate per use");
+        for definition in [PreludeDefinition::Option, PreludeDefinition::Result] {
+            assert!(
+                typed
+                    .variants()
+                    .contains_key(typed.resolved().prelude_id(definition))
+            );
+        }
+    }
+
+    #[test]
+    fn rejects_incomplete_and_duplicate_record_literals() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "type Person =\n",
+            "    { name: Text\n",
+            "      age: Int }\n\n",
+            "let person = { age = 1; name = \"Ling\" }\n",
+        )))
+        .expect("record field order is not semantically significant");
+
+        let missing = check(resolved(concat!(
+            "module Main\n\n",
+            "type Person =\n",
+            "    { name: Text\n",
+            "      age: Int }\n\n",
+            "let person = { name = \"Ling\" }\n",
+        )))
+        .expect_err("missing record fields must fail");
+        assert!(missing.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::MissingRecordFields { fields } if fields == &["age".to_owned()]
+        )));
+
+        let duplicate = check(resolved(concat!(
+            "module Main\n\n",
+            "type Person = { name: Text }\n\n",
+            "let person = { name = \"Ling\"; name = \"Zero\" }\n",
+        )))
+        .expect_err("duplicate record fields must fail");
+        assert!(duplicate.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::DuplicateRecordField { field } if field == "name"
+        )));
+
+        let unknown = check(resolved(concat!(
+            "module Main\n\n",
+            "type Person = { name: Text; age: Int }\n\n",
+            "let person = { name = \"Ling\"; age = 1; city = \"Shanghai\" }\n",
+        )))
+        .expect_err("unknown record fields must fail precisely");
+        assert!(unknown.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::UnknownField { field } if field == "city"
+        )));
+
+        let wrong_type = check(resolved(concat!(
+            "module Main\n\n",
+            "type Person = { name: Text; age: Int }\n\n",
+            "let person = { name = \"Ling\"; age = \"old\" }\n",
+        )))
+        .expect_err("record field values must match their declared types");
+        assert!(
+            wrong_type
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::Mismatch { .. }))
+        );
+    }
+
+    #[test]
+    fn expected_nominal_type_disambiguates_identical_record_fields() {
+        let typed = check(resolved(concat!(
+            "module Main\n\n",
+            "type WorldPoint = { x: Int; y: Int }\n",
+            "type ScreenPoint = { x: Int; y: Int }\n\n",
+            "let origin: WorldPoint = { x = 0; y = 0 }\n",
+        )))
+        .expect("an explicit nominal annotation disambiguates a record literal");
+        let entry = typed.resolved().entry();
+        let origin = typed
+            .resolved()
+            .definition_id(entry, "origin")
+            .expect("origin definition");
+        let origin_type = typed.definition_type(origin).expect("origin type");
+        let world_point = typed
+            .resolved()
+            .definition_id(entry, "WorldPoint")
+            .expect("WorldPoint definition");
+        assert!(matches!(
+            typed.arena().get(origin_type),
+            Type::NominalRecord { definition, .. } if definition == world_point
+        ));
+
+        let errors = check(resolved(concat!(
+            "module Main\n\n",
+            "type WorldPoint = { x: Int; y: Int }\n",
+            "type ScreenPoint = { x: Int; y: Int }\n\n",
+            "let origin = { x = 0; y = 0 }\n",
+        )))
+        .expect_err("the same literal is ambiguous without an expected nominal type");
+        assert!(
+            errors
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::AmbiguousRecord))
+        );
+    }
+
+    #[test]
+    fn validates_constructor_pattern_arity() {
+        let errors = check(resolved(concat!(
+            "module Main\n\n",
+            "type State =\n",
+            "    | Healthy\n",
+            "    | Hurt of Int\n\n",
+            "let invalid state =\n",
+            "    match state with\n",
+            "    | Hurt -> 1\n",
+            "    | Healthy -> 0\n",
+        )))
+        .expect_err("payload constructors require a payload pattern");
+        assert!(errors.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::InvalidConstructorPattern {
+                constructor,
+                expected: 1,
+                actual: 0,
+            } if constructor == "Hurt"
+        )));
+    }
+
+    #[test]
+    fn checks_boolean_and_variant_exhaustiveness_with_stable_witnesses() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "let complete value =\n",
+            "    match value with\n",
+            "    | true -> 1\n",
+            "    | false -> 0\n",
+        )))
+        .expect("both Boolean values are exhaustive");
+
+        let boolean = check(resolved(concat!(
+            "module Main\n\n",
+            "let incomplete value =\n",
+            "    match value with\n",
+            "    | true -> 1\n",
+        )))
+        .expect_err("a single Boolean branch is incomplete");
+        assert!(boolean.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::NonExhaustiveMatch { witness } if witness == "false"
+        )));
+
+        let variant = check(resolved(concat!(
+            "module Main\n\n",
+            "type State =\n",
+            "    | Healthy\n",
+            "    | Hurt of Int\n",
+            "    | Dead\n\n",
+            "let incomplete state =\n",
+            "    match state with\n",
+            "    | Healthy -> 1\n",
+        )))
+        .expect_err("missing variant constructors must fail");
+        assert!(variant.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::NonExhaustiveMatch { witness } if witness == "Dead"
+        )));
+    }
+
+    #[test]
+    fn reports_unreachable_cases_and_ignores_guards_for_coverage() {
+        let typed = check(resolved(concat!(
+            "module Main\n\n",
+            "let duplicate value =\n",
+            "    match value with\n",
+            "    | true -> 1\n",
+            "    | true -> 2\n",
+            "    | false -> 0\n",
+        )))
+        .expect("unreachable cases are warnings");
+        assert_eq!(typed.warnings().len(), 1);
+        assert_eq!(typed.warnings()[0].code(), codes::UNREACHABLE_MATCH_CASE);
+
+        let errors = check(resolved(concat!(
+            "module Main\n\n",
+            "let guarded value =\n",
+            "    match value with\n",
+            "    | true when true -> 1\n",
+            "    | false -> 0\n",
+        )))
+        .expect_err("a guarded branch does not prove coverage");
+        assert!(errors.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::NonExhaustiveMatch { witness } if witness == "true"
+        )));
+    }
+
+    #[test]
+    fn types_wildcard_tuple_and_refutable_constructor_payload_patterns() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "type PairBox =\n",
+            "    | Pair of Int * Int\n",
+            "    | Empty\n\n",
+            "let sumPair value =\n",
+            "    match value with\n",
+            "    | Pair (left, right) -> left + right\n",
+            "    | Empty -> 0\n\n",
+            "let ignore value =\n",
+            "    match value with\n",
+            "    | _ -> 0\n",
+        )))
+        .expect("tuple payloads and wildcard cases type-check");
+
+        let errors = check(resolved(concat!(
+            "module Main\n\n",
+            "type State =\n",
+            "    | Healthy\n",
+            "    | Hurt of Int\n\n",
+            "let describe state =\n",
+            "    match state with\n",
+            "    | Healthy -> 0\n",
+            "    | Hurt 0 -> 1\n",
+        )))
+        .expect_err("a literal payload pattern does not cover its constructor");
+        assert!(errors.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::NonExhaustiveMatch { witness } if witness == "Hurt"
+        )));
+    }
+
+    #[test]
+    fn types_record_patterns_and_rejects_invalid_pattern_fields() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "type Point = { x: Int; y: Int }\n\n",
+            "let xCoordinate point =\n",
+            "    match point with\n",
+            "    | { x = value; y = _ } -> value\n",
+        )))
+        .expect("record fields constrain and bind a nominal record pattern");
+
+        let unknown = check(resolved(concat!(
+            "module Main\n\n",
+            "type Point = { x: Int; y: Int }\n\n",
+            "let invalid =\n",
+            "    match { x = 1; y = 2 } with\n",
+            "    | { z = _ } -> 0\n",
+        )))
+        .expect_err("unknown record-pattern fields must fail");
+        assert!(unknown.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::UnknownField { field } if field == "z"
+        )));
+
+        let duplicate = check(resolved(concat!(
+            "module Main\n\n",
+            "type Point = { x: Int; y: Int }\n\n",
+            "let invalid =\n",
+            "    match { x = 1; y = 2 } with\n",
+            "    | { x = left; x = right } -> left + right\n",
+        )))
+        .expect_err("duplicate record-pattern fields must fail");
+        assert!(duplicate.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::DuplicateRecordField { field } if field == "x"
+        )));
+    }
+
+    #[test]
+    fn enforces_return_type_annotations() {
+        check(resolved("module Main\n\nlet identity value: Int = value\n"))
+            .expect("matching return annotation type-checks");
+        let errors = check(resolved(
+            "module Main\n\nlet invalid value: Text = value + 1\n",
+        ))
+        .expect_err("mismatched return annotation must fail");
+        assert!(
+            errors
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::Mismatch { .. }))
+        );
+
+        let undeclared = check(resolved("module Main\n\ntype Box<'a> = { value: 'b }\n"))
+            .expect_err("nominal declarations cannot use undeclared type parameters");
+        assert!(
+            undeclared
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::UnsupportedTypeSyntax))
+        );
+
+        let cycle = check(resolved(concat!(
+            "module Main\n\n",
+            "type First<'a> = Second<'a>\n",
+            "type Second<'a> = First<'a>\n",
+        )))
+        .expect_err("recursive aliases are rejected deterministically");
+        assert_eq!(
+            cycle
+                .iter()
+                .filter(|error| matches!(error.kind, TypeErrorKind::UnsupportedTypeSyntax))
+                .count(),
+            2
+        );
+    }
+
+    #[test]
+    fn enforces_mutable_roots_fields_and_parameter_value_semantics() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "type Counter = { mutable value: Int }\n\n",
+            "let update () =\n",
+            "    let mutable counter = { value = 0 }\n",
+            "    counter.value <- 1\n",
+            "    counter\n",
+        )))
+        .expect("a mutable field on a mutable local is assignable");
+
+        let immutable_root = check(resolved(concat!(
+            "module Main\n\n",
+            "type Counter = { mutable value: Int }\n\n",
+            "let update () =\n",
+            "    let counter = { value = 0 }\n",
+            "    counter.value <- 1\n",
+        )))
+        .expect_err("an immutable local is not an assignment root");
+        assert!(immutable_root.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::InvalidAssignment {
+                mutability: "immutable_binding",
+                field: Some(field),
+                ..
+            } if field == "value"
+        )));
+
+        let immutable_field = check(resolved(concat!(
+            "module Main\n\n",
+            "type Counter = { value: Int }\n\n",
+            "let update () =\n",
+            "    let mutable counter = { value = 0 }\n",
+            "    counter.value <- 1\n",
+        )))
+        .expect_err("an immutable field is not assignable");
+        assert!(immutable_field.iter().any(|error| matches!(
+            &error.kind,
+            TypeErrorKind::InvalidAssignment {
+                mutability: "immutable_field",
+                field: Some(field),
+                ..
+            } if field == "value"
+        )));
+
+        let parameter = check(resolved(concat!(
+            "module Main\n\n",
+            "type Counter = { mutable value: Int }\n\n",
+            "let update counter = counter.value <- 1\n",
+        )))
+        .expect_err("function parameters use value semantics and are immutable roots");
+        assert!(parameter.iter().any(|error| matches!(
+            error.kind,
+            TypeErrorKind::InvalidAssignment {
+                mutability: "immutable_parameter",
+                ..
+            }
+        )));
+    }
+
+    #[test]
+    fn checks_cross_module_generic_aliases_and_constructor_patterns() {
+        check(resolved_modules(&[
+            (
+                "Main.ling",
+                concat!(
+                    "module Main\n\n",
+                    "import Domain.State as State\n\n",
+                    "let describe value =\n",
+                    "    match value with\n",
+                    "    | State.Hurt amount -> amount\n",
+                    "    | State.Healthy -> 0\n",
+                    "\nlet result = describe (State.Hurt 30)\n",
+                    "let foreign: State.Box<Int> = { value = 2 }\n",
+                ),
+            ),
+            (
+                "Domain/State.ling",
+                concat!(
+                    "module Domain.State\n\n",
+                    "type Box<'a> = { value: 'a }\n",
+                    "type Alias<'a> = Box<'a>\n",
+                    "type Forward<'a> = Later<'a>\n",
+                    "type Later<'a> = Box<'a>\n",
+                    "let aliasValue: Alias<Int> = { value = 1 }\n",
+                    "let forwardValue: Forward<Int> = { value = 2 }\n",
+                    "type State =\n",
+                    "    | Healthy\n",
+                    "    | Hurt of Int\n",
+                ),
+            ),
+        ]))
+        .expect("qualified constructors and generic aliases type-check across modules");
     }
 }

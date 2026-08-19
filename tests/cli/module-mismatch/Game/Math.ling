@@ -1,0 +1,3 @@
+module Game.Maths
+
+let answer = 42

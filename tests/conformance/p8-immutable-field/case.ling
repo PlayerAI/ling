@@ -1,0 +1,7 @@
+module Main
+
+type Counter = { value: Int }
+
+let update () =
+    let mutable counter = { value = 0 }
+    counter.value <- 1

@@ -445,8 +445,13 @@ impl<'tokens> Parser<'tokens> {
         }
         self.depth += 1;
         match self.current_kind() {
-            TokenKind::Identifier
-            | TokenKind::Integer
+            TokenKind::Identifier => {
+                self.bump_any();
+                while self.eat(TokenKind::Dot) {
+                    self.expect(TokenKind::Identifier, "qualified constructor pattern");
+                }
+            }
+            TokenKind::Integer
             | TokenKind::Float
             | TokenKind::Text
             | TokenKind::True
@@ -460,6 +465,27 @@ impl<'tokens> Parser<'tokens> {
                     }
                 }
                 self.expect(TokenKind::RightParen, context);
+            }
+            TokenKind::LeftBrace => {
+                self.bump_any();
+                self.eat_member_separators();
+                while !self.at(TokenKind::RightBrace) && !self.at(TokenKind::Eof) {
+                    self.expect(TokenKind::Identifier, "record pattern field");
+                    self.expect(TokenKind::Equals, "record pattern field");
+                    if !self.starts_pattern() {
+                        self.unexpected(&[TokenKind::Identifier], "record field pattern");
+                    }
+                    while self.starts_pattern()
+                        && !matches!(
+                            self.current_kind(),
+                            TokenKind::Semicolon | TokenKind::SoftNewline | TokenKind::RightBrace
+                        )
+                    {
+                        self.parse_pattern(context);
+                    }
+                    self.eat_member_separators();
+                }
+                self.expect(TokenKind::RightBrace, context);
             }
             _ => self.unexpected(&[TokenKind::Identifier], context),
         }
@@ -495,6 +521,10 @@ impl<'tokens> Parser<'tokens> {
             children.push(child);
             if self.at(TokenKind::Newline) {
                 self.eat_newlines(false);
+            } else if self.previous_significant_kind() == Some(TokenKind::Dedent) {
+                // A nested body consumes its closing Dedent before returning.
+                // That token is also the separator between the nested form and
+                // the next expression in this enclosing sequence.
             } else if !self.at(TokenKind::Dedent) {
                 self.unexpected(&[TokenKind::Newline, TokenKind::Dedent], "sequence");
                 self.recover_to_line_boundary();
@@ -804,6 +834,7 @@ impl<'tokens> Parser<'tokens> {
         if update {
             children.push(self.parse_primary_expression());
             self.expect(TokenKind::With, "record update");
+            self.eat_member_separators();
         }
         while !self.at(TokenKind::RightBrace) && !self.at(TokenKind::Eof) {
             let field_start = self.position;
@@ -899,6 +930,7 @@ impl<'tokens> Parser<'tokens> {
                 | TokenKind::True
                 | TokenKind::False
                 | TokenKind::LeftParen
+                | TokenKind::LeftBrace
         )
     }
 
@@ -985,6 +1017,14 @@ impl<'tokens> Parser<'tokens> {
             index = self.next_nontrivia_index(index + 1);
         }
         self.tokens.get(index).map(Token::kind)
+    }
+
+    fn previous_significant_kind(&self) -> Option<TokenKind> {
+        self.tokens[..self.position.min(self.tokens.len())]
+            .iter()
+            .rev()
+            .find(|token| !token.kind().is_trivia())
+            .map(Token::kind)
     }
 
     fn at(&self, kind: TokenKind) -> bool {
@@ -1122,6 +1162,42 @@ mod tests {
             "{:?}",
             parsed.parse_errors()
         );
+    }
+
+    #[test]
+    fn parses_nested_bodies_followed_by_sibling_expressions() {
+        let parsed = parse_text(concat!(
+            "type 人物 =\n",
+            "    { 血量: Int }\n",
+            "\n",
+            "let 更新 人物 =\n",
+            "    { 人物 with\n",
+            "        血量 = 70 }\n",
+            "\n",
+            "let main () =\n",
+            "    let 总和 =\n",
+            "        [1; 2; 3]\n",
+            "        |> map 更新\n",
+            "\n",
+            "    Console.write \"done\"\n",
+        ));
+
+        assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+    }
+
+    #[test]
+    fn parses_record_wildcard_and_tuple_patterns() {
+        let parsed = parse_text(concat!(
+            "module Main\n\n",
+            "type Point = { x: Int; y: Int }\n\n",
+            "let describe point =\n",
+            "    match point with\n",
+            "    | { x = value; y = _ } -> value\n\n",
+            "let first pair =\n",
+            "    match pair with\n",
+            "    | (left, _) -> left\n",
+        ));
+        assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
     }
 
     #[test]

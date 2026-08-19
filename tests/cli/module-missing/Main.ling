@@ -1,0 +1,5 @@
+module Main
+
+import Missing.Module
+
+let value = 1

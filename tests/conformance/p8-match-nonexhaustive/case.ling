@@ -1,0 +1,10 @@
+module Main
+
+type State =
+    | Healthy
+    | Hurt of Int
+    | Dead
+
+let describe state =
+    match state with
+    | Healthy -> 0

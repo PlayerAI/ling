@@ -61,7 +61,7 @@ SourceFile
 - module/import、词法作用域、HM 风格推导、保守 Value Restriction、局部可变性、`State<T>`、Capability 和 Seed 内置项按 Accepted 决议实现；
 - Semantic ID 使用版本化 canonical bytes 和 BLAKE3，已由独立进程确定性测试及空白不变性测试覆盖；
 - `examples/hello.ling` 的 `check` 返回 `0`，`run` 精确输出 `你好，零\n`，`semantic` 输出 `ling.semantic/0.1`；
-- G-12/Audit、G-14/REPL 以及完整 record/ADT 语言面仍属于后续批次，相关命令继续显式返回 `L-IMPL-0001`。
+- 后续 Seed 收口批次已完成完整 record/ADT、注入式 `Option`/`Result` Prelude、Audit round-trip 和事务式 REPL；详见 [`NEXT-STEPS-SEED.md`](NEXT-STEPS-SEED.md) 与接受的 DEC-0014～0016。
 
 ### 2.3 M2 验收债务（已关闭）
 
@@ -77,7 +77,7 @@ M2 债务可以与规范决议起草并行，但必须在 Resolver 接口冻结�
 
 ### 2.4 阻断级规范问题（决议状态）
 
-下表记录实施前的阻断点。G-06 至 G-11、G-15 已形成 Accepted 决议并回填实现；G-12 仍由后续 Audit 批次处理：
+下表记录实施前的阻断点。G-06 至 G-12、G-14 和 G-15 均已形成 Accepted 决议并回填实现；该表保留为历史追踪，不表示仍有未决语义：
 
 | 缺口 | 阻断阶段 | 本轮需要的最小决议 |
 | --- | --- | --- |
@@ -90,7 +90,7 @@ M2 债务可以与规范决议起草并行，但必须在 Resolver 接口冻结�
 | G-12 | Audit | Audit grammar、显示元数据和 round-trip 等价关系 |
 | G-15 | CLI/Eval | `main` 合法签名、返回类型、Effect 上限、运行失败到退出码/JSON 的映射 |
 
-每个问题应形成独立 decision 文档，先为 `Proposed`，评审接受后改为 `Accepted`，并回填 [IMPLEMENTATION §6](IMPLEMENTATION.md#6-规范缺口清单)。本轮已按此流程关闭 G-06 至 G-11、G-15。G-12/Audit 和 G-14/REPL 不阻断文件模式 Hello World，未决议前不实现对应用户协议。
+每个问题应形成独立 decision 文档，先为 `Proposed`，评审接受后改为 `Accepted`，并回填 [IMPLEMENTATION §6](IMPLEMENTATION.md#6-规范缺口清单)。Hello World 批次按此流程关闭 G-06 至 G-11、G-15；后续 Seed 收口批次通过 Accepted DEC-0015/0016 关闭 G-12/Audit 与 G-14/REPL。
 
 ## 3. 架构边界
 
@@ -379,4 +379,4 @@ G-12/Audit 和 G-14/REPL 可在 Hello World 文件执行主路径完成后进入
 - [ ] 全 workspace fmt、Clippy、tests、docs、Unicode idempotence 和三平台 CI 通过：本地门禁已通过，远程三平台 CI 待首次推送后确认；
 - [x] README 的状态、命令示例和未实现能力与实际行为一致。
 
-完成后，下一计划再处理完整 record/ADT 示例、Audit round-trip、REPL 会话和 `v0.0.1` 全部发布门禁。
+后续工作由 [`NEXT-STEPS-SEED.md`](NEXT-STEPS-SEED.md) 接续，处理完整 record/ADT 示例、Audit round-trip、REPL 会话和 `v0.0.1` 全部发布门禁。

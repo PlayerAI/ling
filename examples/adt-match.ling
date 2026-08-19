@@ -1,0 +1,19 @@
+module Main
+    requires Console.Write
+
+type 生存状态 =
+    | 健康
+    | 受伤 of Int
+    | 死亡
+
+let 描述 状态 =
+    match 状态 with
+    | 健康 ->
+        "健康"
+    | 受伤 程度 ->
+        Text.format "受伤 {}" 程度
+    | 死亡 ->
+        "死亡"
+
+let main () =
+    Console.write (描述 (受伤 30))

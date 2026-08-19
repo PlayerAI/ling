@@ -1,0 +1,5 @@
+arguments = ["check", "--format", "json", "case.ling"]
+exit_code = 1
+normative_clauses = ["SEMANTICS §3.6", "LANGUAGE §5.7"]
+stdout = ""
+diagnostic_codes = ["L-NAME-0009"]

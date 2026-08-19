@@ -1,0 +1,5 @@
+module B
+
+import Main
+
+let value = 1

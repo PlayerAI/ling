@@ -1,0 +1,5 @@
+arguments = ["run", "--format", "json", "case.ling"]
+exit_code = 0
+normative_clauses = ["SEMANTICS §6.6", "NEXT-STEPS-SEED P8-P9"]
+stdout = "受伤 30\n"
+diagnostic_codes = []

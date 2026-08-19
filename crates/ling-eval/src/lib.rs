@@ -172,6 +172,39 @@ pub fn execute_main(
     Interpreter::new(snapshot, console).execute_main(main)
 }
 
+/// Canonical, host-independent result of evaluating one checked definition.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct EvaluatedValue {
+    rendered: String,
+    unit: bool,
+}
+
+impl EvaluatedValue {
+    #[must_use]
+    pub fn rendered(&self) -> &str {
+        &self.rendered
+    }
+
+    #[must_use]
+    pub const fn is_unit(&self) -> bool {
+        self.unit
+    }
+}
+
+/// Evaluates a checked top-level definition without granting unchecked input
+/// access to the interpreter.
+pub fn evaluate_definition(
+    snapshot: &ProgramSnapshot,
+    definition: &DefinitionId,
+    console: &mut dyn Console,
+) -> Result<EvaluatedValue, RuntimeFault> {
+    let value = Interpreter::new(snapshot, console).definition_value(definition)?;
+    Ok(EvaluatedValue {
+        rendered: render_value(&value),
+        unit: matches!(value, Value::Unit),
+    })
+}
+
 type Cell = Rc<RefCell<Value>>;
 type Environment = BTreeMap<BindingKey, Cell>;
 
@@ -540,26 +573,18 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 builtin,
                 arguments: Vec::new(),
             }),
+            DefinitionOrigin::Prelude(_) => self.constructor_value(definition).ok_or_else(|| {
+                self.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
+                    invariant: "Prelude definition is not a constructor value",
+                })
+            }),
             DefinitionOrigin::User { module } => {
                 let resolved_module = resolved
                     .module(module)
                     .expect("resolved definition module exists");
                 if info.kind == DefinitionKind::Constructor {
-                    if let Some((variant, case, has_payload)) =
-                        self.find_constructor(module, &info.name)
-                    {
-                        return if has_payload {
-                            Ok(Value::Constructor {
-                                definition: variant,
-                                case,
-                            })
-                        } else {
-                            Ok(Value::Variant {
-                                definition: variant,
-                                case,
-                                payload: None,
-                            })
-                        };
+                    if let Some(value) = self.constructor_value(definition) {
+                        return Ok(value);
                     }
                 }
                 let value = resolved_module
@@ -588,25 +613,35 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
         }
     }
 
-    fn find_constructor(
-        &self,
-        module: ModuleId,
-        name: &str,
-    ) -> Option<(DefinitionId, String, bool)> {
+    fn constructor_value(&self, constructor: &DefinitionId) -> Option<Value> {
+        self.find_constructor(constructor)
+            .map(|(definition, case, has_payload)| {
+                if has_payload {
+                    Value::Constructor { definition, case }
+                } else {
+                    Value::Variant {
+                        definition,
+                        case,
+                        payload: None,
+                    }
+                }
+            })
+    }
+
+    fn find_constructor(&self, constructor: &DefinitionId) -> Option<(DefinitionId, String, bool)> {
         let typed = self.snapshot.checked().typed();
         typed.variants().iter().find_map(|(definition, variant)| {
-            let belongs_to_module = typed
-                .resolved()
-                .definition(definition)
-                .is_some_and(|info| matches!(info.origin, DefinitionOrigin::User { module: owner } if owner == module));
-            if !belongs_to_module {
-                return None;
-            }
             variant
                 .cases
                 .iter()
-                .find(|case| case.name == name)
-                .map(|case| (definition.clone(), case.name.clone(), case.payload.is_some()))
+                .find(|case| &case.definition == constructor)
+                .map(|case| {
+                    (
+                        definition.clone(),
+                        case.name.clone(),
+                        case.payload.is_some(),
+                    )
+                })
         })
     }
 
@@ -774,12 +809,23 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     ) -> Result<bool, RuntimeFault> {
         match &pattern.kind {
             hir::PatternKind::Binding { id, .. } => {
+                if let Some((definition, case)) = self.pattern_constructor(module, pattern) {
+                    return Ok(matches!(
+                        value,
+                        Value::Variant {
+                            definition: actual_definition,
+                            case: actual_case,
+                            payload: None,
+                        } if actual_definition == &definition && actual_case == &case
+                    ));
+                }
                 environment.insert(
                     BindingKey::new(module, *id),
                     Rc::new(RefCell::new(value.clone())),
                 );
                 Ok(true)
             }
+            hir::PatternKind::Wildcard => Ok(true),
             hir::PatternKind::Unit => Ok(matches!(value, Value::Unit)),
             hir::PatternKind::Literal(pattern) => Ok(literal_matches(pattern, value)),
             hir::PatternKind::Tuple(patterns) => {
@@ -796,11 +842,39 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 }
                 Ok(true)
             }
-            hir::PatternKind::Constructor { name, arguments } => {
-                let Value::Variant { case, payload, .. } = value else {
+            hir::PatternKind::Record(patterns) => {
+                let Value::Record { fields, .. } = value else {
                     return Ok(false);
                 };
-                if &name.normalized != case {
+                for pattern in patterns {
+                    let Some(value) = fields.get(&pattern.name.normalized) else {
+                        return Ok(false);
+                    };
+                    if !self.match_pattern(module, &pattern.pattern, value, environment)? {
+                        return Ok(false);
+                    }
+                }
+                Ok(true)
+            }
+            hir::PatternKind::Constructor { arguments, .. } => {
+                let Some((expected_definition, expected_case)) =
+                    self.pattern_constructor(module, pattern)
+                else {
+                    return Err(self.fault(
+                        module,
+                        pattern.span,
+                        "constructor pattern is unresolved",
+                    ));
+                };
+                let Value::Variant {
+                    definition,
+                    case,
+                    payload,
+                } = value
+                else {
+                    return Ok(false);
+                };
+                if definition != &expected_definition || case != &expected_case {
                     return Ok(false);
                 }
                 match (arguments.as_slice(), payload.as_deref()) {
@@ -812,6 +886,17 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 }
             }
         }
+    }
+
+    fn pattern_constructor(
+        &self,
+        module: ModuleId,
+        pattern: &hir::Pattern,
+    ) -> Option<(DefinitionId, String)> {
+        let resolved = self.snapshot.checked().typed().resolved();
+        let constructor = resolved.pattern_constructor(module, pattern.id)?;
+        self.find_constructor(constructor)
+            .map(|(definition, case, _)| (definition, case))
     }
 
     fn eval_binary(
@@ -1007,6 +1092,71 @@ fn values_equal(left: &Value, right: &Value) -> bool {
     }
 }
 
+fn render_value(value: &Value) -> String {
+    match value {
+        Value::Unit => "()".to_owned(),
+        Value::Bool(value) => value.to_string(),
+        Value::Int(value) => value.to_string(),
+        Value::Float64(value) => value.to_string(),
+        Value::Text(value) => render_text(value),
+        Value::Tuple(values) => format!(
+            "({})",
+            values
+                .iter()
+                .map(render_value)
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        Value::List(values) => format!(
+            "[{}]",
+            values
+                .iter()
+                .map(render_value)
+                .collect::<Vec<_>>()
+                .join("; ")
+        ),
+        Value::Record { fields, .. } => format!(
+            "{{ {} }}",
+            fields
+                .iter()
+                .map(|(name, value)| format!("{name} = {}", render_value(value)))
+                .collect::<Vec<_>>()
+                .join("; ")
+        ),
+        Value::Variant { case, payload, .. } => payload.as_ref().map_or_else(
+            || case.clone(),
+            |payload| format!("{case} {}", render_value(payload)),
+        ),
+        Value::Closure(_) => "<function>".to_owned(),
+        Value::Builtin { builtin, arguments } => {
+            format!("<builtin:{}:{}>", builtin.qualified_name(), arguments.len())
+        }
+        Value::Constructor { case, .. } => format!("<constructor:{case}>"),
+    }
+}
+
+fn render_text(value: &str) -> String {
+    let mut rendered = String::with_capacity(value.len().saturating_add(2));
+    rendered.push('"');
+    for character in value.chars() {
+        match character {
+            '"' => rendered.push_str("\\\""),
+            '\\' => rendered.push_str("\\\\"),
+            '\n' => rendered.push_str("\\n"),
+            '\r' => rendered.push_str("\\r"),
+            '\t' => rendered.push_str("\\t"),
+            character if character.is_control() => {
+                use std::fmt::Write as _;
+                write!(rendered, "\\u{{{:x}}}", u32::from(character))
+                    .expect("writing to a String cannot fail");
+            }
+            character => rendered.push(character),
+        }
+    }
+    rendered.push('"');
+    rendered
+}
+
 #[cfg(test)]
 mod tests {
     use ling_ast::lower as lower_ast;
@@ -1057,5 +1207,168 @@ mod tests {
             }
         ));
         assert_eq!(fault.to_diagnostic().code(), codes::RUNTIME_FAULT);
+    }
+
+    #[test]
+    fn map_and_application_evaluate_strictly_left_to_right() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let writeAndReturn value =\n",
+            "    Console.write (Text.format \"{}\" value)\n",
+            "    value\n\n",
+            "let main () =\n",
+            "    map writeAndReturn [3; 1; 2]\n",
+            "    max (writeAndReturn 4) (writeAndReturn 5)\n",
+            "    ()\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("ordered program executes");
+        assert_eq!(console.output(), "3\n1\n2\n4\n5\n");
+    }
+
+    #[test]
+    fn integer_builtins_preserve_arbitrary_precision_negatives_and_empty_sum() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let huge = 340282366920938463463374607431768211456\n\n",
+            "let main () =\n",
+            "    let total = sum [max huge (-1); min (-5) (-2); sum []]\n",
+            "    Console.write (Text.format \"{}\" total)\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("integer builtins execute");
+        assert_eq!(
+            console.output(),
+            "340282366920938463463374607431768211451\n"
+        );
+    }
+
+    #[test]
+    fn finite_float_literals_and_equality_execute_with_ieee_semantics() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    if 1.5e-2 == 0.015 then\n",
+            "        Console.write \"equal\"\n",
+            "    else\n",
+            "        Console.write \"different\"\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("float equality executes");
+        assert_eq!(console.output(), "equal\n");
+    }
+
+    #[test]
+    fn record_copy_update_and_mutable_fields_preserve_value_semantics() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "type Counter = { mutable value: Int }\n\n",
+            "let main () =\n",
+            "    let mutable original = { value = 1 }\n",
+            "    let mutablyCopied = original\n",
+            "    let updated = { original with value = 3 }\n",
+            "    let mutable changed = mutablyCopied\n",
+            "    changed.value <- 2\n",
+            "    Console.write (Text.format \"{}\" original.value)\n",
+            "    Console.write (Text.format \"{}\" changed.value)\n",
+            "    Console.write (Text.format \"{}\" updated.value)\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("record copies execute");
+        assert_eq!(console.output(), "1\n2\n3\n");
+    }
+
+    #[test]
+    fn text_format_rejects_non_singleton_placeholder_counts() {
+        for (template, expected_count) in [("no placeholder", 0), ("{} and {}", 2)] {
+            let snapshot = snapshot(&format!(
+                concat!(
+                    "module Main\n\n",
+                    "let main () =\n",
+                    "    Text.format \"{template}\" 1\n",
+                    "    ()\n",
+                ),
+                template = template
+            ));
+            let main = locate_main(snapshot.checked()).expect("valid main");
+            let mut console = MemoryConsole::default();
+            let fault = execute_main(&snapshot, &main, &mut console)
+                .expect_err("invalid placeholder count faults");
+            assert!(matches!(
+                fault.kind,
+                RuntimeFaultKind::InvalidFormatPlaceholderCount { count }
+                    if count == expected_count
+            ));
+            assert_eq!(fault.to_diagnostic().code(), codes::RUNTIME_FAULT);
+        }
+    }
+
+    #[test]
+    fn wildcard_and_tuple_constructor_payload_patterns_execute() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "type PairBox =\n",
+            "    | Pair of Int * Int\n",
+            "    | Empty\n\n",
+            "let describe value =\n",
+            "    match value with\n",
+            "    | Pair (left, right) -> Text.format \"{}\" (left + right)\n",
+            "    | _ -> \"empty\"\n\n",
+            "let main () = Console.write (describe (Pair (2, 3)))\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("pattern program executes");
+        assert_eq!(console.output(), "5\n");
+    }
+
+    #[test]
+    fn prelude_option_and_result_constructors_execute() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let unwrap option =\n",
+            "    match option with\n",
+            "    | Some value -> value\n",
+            "    | None -> 0\n\n",
+            "let resultValue result =\n",
+            "    match result with\n",
+            "    | Ok value -> value\n",
+            "    | Error _ -> 0\n\n",
+            "let main () =\n",
+            "    Console.write (Text.format \"{}\" (unwrap (Some (resultValue (Ok 7)))))\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+
+        execute_main(&snapshot, &main, &mut console).expect("Prelude constructors execute");
+
+        assert_eq!(console.output(), "7\n");
+    }
+
+    #[test]
+    fn record_patterns_execute_without_copying_unbound_fields() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "type Point = { x: Int; y: Int }\n\n",
+            "let describe point =\n",
+            "    match point with\n",
+            "    | { x = value; y = _ } -> Text.format \"{}\" value\n\n",
+            "let main () = Console.write (describe { x = 7; y = 9 })\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("record pattern executes");
+        assert_eq!(console.output(), "7\n");
     }
 }

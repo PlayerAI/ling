@@ -7,15 +7,15 @@ use std::fmt;
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_hir as hir;
 use ling_resolve::{
-    Builtin, DefinitionId, DefinitionOrigin, ExpressionKey, ModuleId, ReferenceTarget,
+    BindingKey, Builtin, DefinitionId, DefinitionOrigin, ExpressionKey, ModuleId, ReferenceTarget,
 };
 use ling_source::Span;
-use ling_types::{Type, TypedProgram};
+use ling_types::{Type, TypeId, TypedProgram};
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Effect {
     ConsoleWrite,
-    State(String),
+    State { display: String, identity: String },
 }
 
 impl Effect {
@@ -23,7 +23,15 @@ impl Effect {
     pub fn name(&self) -> String {
         match self {
             Self::ConsoleWrite => "Console.Write".to_owned(),
-            Self::State(value) => format!("State<{value}>"),
+            Self::State { display, .. } => format!("State<{display}>"),
+        }
+    }
+
+    #[must_use]
+    pub fn canonical_name(&self) -> String {
+        match self {
+            Self::ConsoleWrite => "Console.Write".to_owned(),
+            Self::State { identity, .. } => format!("State<{identity}>"),
         }
     }
 }
@@ -44,6 +52,16 @@ impl EffectRow {
     #[must_use]
     pub fn names(&self) -> Vec<String> {
         self.effects().map(Effect::name).collect()
+    }
+
+    #[must_use]
+    pub fn canonical_names(&self) -> Vec<String> {
+        let mut names = self
+            .effects()
+            .map(Effect::canonical_name)
+            .collect::<Vec<_>>();
+        names.sort();
+        names
     }
 
     fn insert(&mut self, effect: Effect) {
@@ -73,8 +91,46 @@ impl Capability {
 pub struct CheckedProgram {
     typed: TypedProgram,
     definition_effects: BTreeMap<DefinitionId, EffectRow>,
+    binding_effects: BTreeMap<BindingKey, EffectRow>,
     module_capabilities: BTreeMap<ModuleId, BTreeSet<Capability>>,
     warnings: Vec<Diagnostic>,
+}
+
+/// A function type after call-graph Effect analysis has completed.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CheckedFunctionType {
+    type_id: TypeId,
+    parameters: Vec<TypeId>,
+    result: TypeId,
+    effects: EffectRow,
+    display: String,
+}
+
+impl CheckedFunctionType {
+    #[must_use]
+    pub const fn type_id(&self) -> TypeId {
+        self.type_id
+    }
+
+    #[must_use]
+    pub fn parameters(&self) -> &[TypeId] {
+        &self.parameters
+    }
+
+    #[must_use]
+    pub const fn result(&self) -> TypeId {
+        self.result
+    }
+
+    #[must_use]
+    pub const fn effects(&self) -> &EffectRow {
+        &self.effects
+    }
+
+    #[must_use]
+    pub fn display(&self) -> &str {
+        &self.display
+    }
 }
 
 impl CheckedProgram {
@@ -94,6 +150,26 @@ impl CheckedProgram {
     }
 
     #[must_use]
+    pub fn binding_effect(&self, binding: BindingKey) -> Option<&EffectRow> {
+        self.binding_effects.get(&binding)
+    }
+
+    #[must_use]
+    pub fn definition_function_type(
+        &self,
+        definition: &DefinitionId,
+    ) -> Option<CheckedFunctionType> {
+        let type_id = self.typed.definition_type(definition)?;
+        self.function_type(type_id, self.definition_effect(definition)?)
+    }
+
+    #[must_use]
+    pub fn binding_function_type(&self, binding: BindingKey) -> Option<CheckedFunctionType> {
+        let type_id = self.typed.binding_type(binding)?;
+        self.function_type(type_id, self.binding_effect(binding)?)
+    }
+
+    #[must_use]
     pub fn module_capabilities(&self, module: ModuleId) -> Option<&BTreeSet<Capability>> {
         self.module_capabilities.get(&module)
     }
@@ -101,6 +177,23 @@ impl CheckedProgram {
     #[must_use]
     pub fn warnings(&self) -> &[Diagnostic] {
         &self.warnings
+    }
+
+    fn function_type(&self, type_id: TypeId, effects: &EffectRow) -> Option<CheckedFunctionType> {
+        let Type::Function { parameters, result } = self.typed.arena().get(type_id) else {
+            return None;
+        };
+        Some(CheckedFunctionType {
+            type_id,
+            parameters: parameters.clone(),
+            result: *result,
+            effects: effects.clone(),
+            display: format!(
+                "{} ! {{{}}}",
+                self.typed.display_type(type_id),
+                effects.names().join(", ")
+            ),
+        })
     }
 }
 
@@ -250,20 +343,18 @@ pub fn locate_main(checked: &CheckedProgram) -> Result<DefinitionId, EntryError>
         });
     }
     let main_type = checked
-        .typed
-        .definition_type(&main_id)
-        .expect("checked user definitions have types");
-    let valid = match checked.typed.arena().get(main_type) {
-        Type::Function { parameters, result } if parameters.len() == 1 => {
-            matches!(checked.typed.arena().get(parameters[0]), Type::Unit)
-                && matches!(checked.typed.arena().get(*result), Type::Unit)
-        }
-        _ => false,
-    };
+        .definition_function_type(&main_id)
+        .expect("checked function definitions have checked function types");
+    let valid = main_type.parameters().len() == 1
+        && matches!(
+            checked.typed.arena().get(main_type.parameters()[0]),
+            Type::Unit
+        )
+        && matches!(checked.typed.arena().get(main_type.result()), Type::Unit);
     if !valid {
         return Err(EntryError {
             kind: EntryErrorKind::InvalidMainSignature {
-                actual: checked.typed.arena().display(main_type),
+                actual: main_type.display().to_owned(),
             },
             source_name: module.hir.source_name.clone(),
             span: main.span,
@@ -272,33 +363,57 @@ pub fn locate_main(checked: &CheckedProgram) -> Result<DefinitionId, EntryError>
     Ok(main_id)
 }
 
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+enum Callable {
+    Definition(DefinitionId),
+    Binding(BindingKey),
+}
+
 struct Checker {
     typed: TypedProgram,
-    direct_effects: BTreeMap<DefinitionId, EffectRow>,
-    calls: BTreeMap<DefinitionId, BTreeSet<DefinitionId>>,
+    direct_effects: BTreeMap<Callable, EffectRow>,
+    calls: BTreeMap<Callable, BTreeSet<Callable>>,
+    callable_parameters: BTreeMap<Callable, Vec<Option<BindingKey>>>,
     errors: Vec<EffectError>,
     warnings: Vec<Diagnostic>,
 }
 
 impl Checker {
     fn new(typed: TypedProgram) -> Self {
+        let warnings = typed.warnings().to_vec();
         Self {
             typed,
             direct_effects: BTreeMap::new(),
             calls: BTreeMap::new(),
+            callable_parameters: BTreeMap::new(),
             errors: Vec::new(),
-            warnings: Vec::new(),
+            warnings,
         }
     }
 
     fn run(mut self) -> Result<CheckedProgram, Vec<EffectError>> {
         self.collect_direct_effects();
-        let definition_effects = self.propagate_effects();
+        let callable_effects = self.propagate_effects();
+        let definition_effects = callable_effects
+            .iter()
+            .filter_map(|(callable, effects)| match callable {
+                Callable::Definition(definition) => Some((definition.clone(), effects.clone())),
+                Callable::Binding(_) => None,
+            })
+            .collect();
+        let binding_effects = callable_effects
+            .into_iter()
+            .filter_map(|(callable, effects)| match callable {
+                Callable::Binding(binding) => Some((binding, effects)),
+                Callable::Definition(_) => None,
+            })
+            .collect();
         let module_capabilities = self.check_capabilities(&definition_effects);
         if self.errors.is_empty() {
             Ok(CheckedProgram {
                 typed: self.typed,
                 definition_effects,
+                binding_effects,
                 module_capabilities,
                 warnings: self.warnings,
             })
@@ -331,38 +446,109 @@ impl Checker {
                 else {
                     continue;
                 };
-                let mut effects = EffectRow::default();
-                let mut calls = BTreeSet::new();
-                self.visit_expression(module.id, &definition.value, &mut effects, &mut calls);
-                self.direct_effects.insert(id.clone(), effects);
-                self.calls.insert(id, calls);
+                self.register_parameters(
+                    Callable::Definition(id),
+                    module.id,
+                    &definition.parameters,
+                );
+            }
+        }
+        for module in &modules {
+            for definition in &module.hir.definitions {
+                let Some(id) = self
+                    .typed
+                    .resolved()
+                    .definition_id(module.id, &definition.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                let callable = Callable::Definition(id);
+                self.collect_callable_body(callable.clone(), module.id, &definition.value);
+                if definition.parameters.is_empty() {
+                    self.connect_alias(callable, module.id, &definition.value);
+                }
             }
         }
         for definition in self.typed.resolved().definitions().values() {
-            if let DefinitionOrigin::Builtin(builtin) = definition.origin {
-                let mut effects = EffectRow::default();
-                if builtin == Builtin::ConsoleWrite {
+            let mut effects = EffectRow::default();
+            match definition.origin {
+                DefinitionOrigin::Builtin(Builtin::ConsoleWrite) => {
                     effects.insert(Effect::ConsoleWrite);
                 }
-                self.direct_effects.insert(definition.id.clone(), effects);
-                self.calls.entry(definition.id.clone()).or_default();
+                DefinitionOrigin::Builtin(_) | DefinitionOrigin::Prelude(_) => {}
+                DefinitionOrigin::User { .. } => continue,
             }
+            let callable = Callable::Definition(definition.id.clone());
+            self.direct_effects.insert(callable.clone(), effects);
+            self.calls.entry(callable).or_default();
+        }
+    }
+
+    fn collect_callable_body(
+        &mut self,
+        callable: Callable,
+        module: ModuleId,
+        expression: &hir::Expression,
+    ) {
+        let mut effects = EffectRow::default();
+        let mut calls = BTreeSet::new();
+        self.visit_expression(module, expression, &mut effects, &mut calls);
+        self.direct_effects.insert(callable.clone(), effects);
+        self.calls.entry(callable).or_default().extend(calls);
+    }
+
+    fn register_parameters(
+        &mut self,
+        callable: Callable,
+        module: ModuleId,
+        parameters: &[hir::Pattern],
+    ) {
+        let parameters = parameters
+            .iter()
+            .map(|pattern| match pattern.kind {
+                hir::PatternKind::Binding { id, .. } => Some(BindingKey::new(module, id)),
+                _ => None,
+            })
+            .collect();
+        self.callable_parameters.insert(callable, parameters);
+    }
+
+    fn connect_alias(&mut self, alias: Callable, module: ModuleId, expression: &hir::Expression) {
+        if let Some(target) = self.expression_callable(module, expression) {
+            self.calls.entry(alias).or_default().insert(target);
         }
     }
 
     fn visit_expression(
-        &self,
+        &mut self,
         module: ModuleId,
         expression: &hir::Expression,
         effects: &mut EffectRow,
-        calls: &mut BTreeSet<DefinitionId>,
+        calls: &mut BTreeSet<Callable>,
     ) {
         match &expression.kind {
             hir::ExpressionKind::Sequence(elements) => {
                 for element in elements {
                     match element {
                         hir::SequenceElement::Let(binding) => {
-                            self.visit_expression(module, &binding.value, effects, calls);
+                            let binding_callable =
+                                Callable::Binding(BindingKey::new(module, binding.id));
+                            if binding.parameters.is_empty() {
+                                self.visit_expression(module, &binding.value, effects, calls);
+                                self.connect_alias(binding_callable, module, &binding.value);
+                            } else {
+                                self.register_parameters(
+                                    binding_callable.clone(),
+                                    module,
+                                    &binding.parameters,
+                                );
+                                self.collect_callable_body(
+                                    binding_callable,
+                                    module,
+                                    &binding.value,
+                                );
+                            }
                         }
                         hir::SequenceElement::Expression(expression) => {
                             self.visit_expression(module, expression, effects, calls);
@@ -390,20 +576,37 @@ impl Checker {
             }
             hir::ExpressionKind::Assignment { value, .. } => {
                 let key = ExpressionKey::new(module, expression.id);
-                let value_type = self
+                let state_type = self
                     .typed
-                    .place_type(key)
-                    .map(|type_id| self.typed.arena().display(type_id))
-                    .unwrap_or_else(|| "unknown".to_owned());
-                effects.insert(Effect::State(value_type));
+                    .place_root_type(key)
+                    .map(|type_id| Effect::State {
+                        display: self.typed.display_type(type_id),
+                        identity: self.typed.arena().display(type_id),
+                    })
+                    .expect("checked assignment has a root place type");
+                effects.insert(state_type);
                 self.visit_expression(module, value, effects, calls);
             }
             hir::ExpressionKind::Application {
                 function,
                 arguments,
             } => {
-                if let Some(definition) = self.expression_definition(module, function) {
-                    calls.insert(definition);
+                if let Some(callee) = self.expression_callable(module, function) {
+                    let is_map = matches!(
+                        &callee,
+                        Callable::Definition(definition)
+                            if definition == self.typed.resolved().builtin_id(Builtin::Map)
+                    );
+                    calls.insert(callee.clone());
+                    self.connect_arguments(&callee, module, arguments);
+                    if is_map {
+                        if let Some(callback) = arguments
+                            .first()
+                            .and_then(|argument| self.expression_callable(module, argument))
+                        {
+                            calls.insert(callback);
+                        }
+                    }
                 } else {
                     self.visit_expression(module, function, effects, calls);
                 }
@@ -412,7 +615,7 @@ impl Checker {
                 }
             }
             hir::ExpressionKind::Projection { target, .. } => {
-                if self.expression_definition(module, expression).is_none() {
+                if self.expression_callable(module, expression).is_none() {
                     self.visit_expression(module, target, effects, calls);
                 }
             }
@@ -445,23 +648,51 @@ impl Checker {
         }
     }
 
-    fn expression_definition(
+    fn connect_arguments(
+        &mut self,
+        callee: &Callable,
+        module: ModuleId,
+        arguments: &[hir::Expression],
+    ) {
+        let parameters = self
+            .callable_parameters
+            .get(callee)
+            .cloned()
+            .unwrap_or_default();
+        for (parameter, argument) in parameters.into_iter().zip(arguments) {
+            let Some(parameter) = parameter else {
+                continue;
+            };
+            let Some(argument) = self.expression_callable(module, argument) else {
+                continue;
+            };
+            self.calls
+                .entry(Callable::Binding(parameter))
+                .or_default()
+                .insert(argument);
+        }
+    }
+
+    fn expression_callable(
         &self,
         module: ModuleId,
         expression: &hir::Expression,
-    ) -> Option<DefinitionId> {
+    ) -> Option<Callable> {
         let reference = match &expression.kind {
             hir::ExpressionKind::Name { reference, .. }
             | hir::ExpressionKind::Projection { reference, .. } => *reference,
             _ => return None,
         };
         match self.typed.resolved().reference(module, reference) {
-            Some(ReferenceTarget::Definition(definition)) => Some(definition.clone()),
-            _ => None,
+            Some(ReferenceTarget::Definition(definition)) => {
+                Some(Callable::Definition(definition.clone()))
+            }
+            Some(ReferenceTarget::Binding(binding)) => Some(Callable::Binding(*binding)),
+            None => None,
         }
     }
 
-    fn propagate_effects(&self) -> BTreeMap<DefinitionId, EffectRow> {
+    fn propagate_effects(&self) -> BTreeMap<Callable, EffectRow> {
         let mut effects = self.direct_effects.clone();
         let mut changed = true;
         while changed {
@@ -549,6 +780,10 @@ mod tests {
     use super::*;
 
     fn typed(text: &str) -> TypedProgram {
+        typed_entry(text, "Main")
+    }
+
+    fn typed_entry(text: &str, entry: &str) -> TypedProgram {
         let source =
             SourceFile::from_bytes(SourceId::new(0), "test.ling", text.as_bytes().to_vec())
                 .expect("valid source");
@@ -556,7 +791,7 @@ mod tests {
         assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
         let ast = lower_ast(&source, &parsed).expect("valid AST");
         let hir = hir::lower(source.name(), &ast).expect("valid HIR");
-        let resolved = ling_resolve::resolve(vec![hir], "Main").expect("resolves");
+        let resolved = ling_resolve::resolve(vec![hir], entry).expect("resolves");
         ling_types::check(resolved).expect("type-checks")
     }
 
@@ -573,6 +808,13 @@ mod tests {
                 .expect("main effects")
                 .names(),
             vec!["Console.Write"]
+        );
+        assert_eq!(
+            checked
+                .definition_function_type(&main)
+                .expect("checked main function type")
+                .display(),
+            "Unit -> Unit ! {Console.Write}"
         );
     }
 
@@ -595,5 +837,189 @@ mod tests {
                 .kind,
             EntryErrorKind::MainMustHaveUnitPattern
         ));
+    }
+
+    #[test]
+    fn validates_explicit_implicit_missing_module_and_signature_entry_rules() {
+        let implicit = check(typed("let main () = ()\n")).expect("implicit Main checks");
+        locate_main(&implicit).expect("implicit Main is executable");
+
+        let library = check(typed_entry(
+            "module Library\n\nlet main () = ()\n",
+            "Library",
+        ))
+        .expect("library module checks");
+        assert!(matches!(
+            locate_main(&library).expect_err("run requires Main").kind,
+            EntryErrorKind::EntryModuleMustBeMain { actual } if actual == "Library"
+        ));
+
+        let missing = check(typed("module Main\n\nlet value = 1\n")).expect("module checks");
+        assert!(matches!(
+            locate_main(&missing).expect_err("main is required").kind,
+            EntryErrorKind::MissingMain
+        ));
+
+        let invalid =
+            check(typed("module Main\n\nlet main () = 1\n")).expect("typed function checks");
+        assert!(matches!(
+            locate_main(&invalid)
+                .expect_err("main must be Unit -> Unit")
+                .kind,
+            EntryErrorKind::InvalidMainSignature { .. }
+        ));
+    }
+
+    #[test]
+    fn map_propagates_its_callback_effect_and_capability() {
+        let source = concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let write value = Console.write (Text.format \"{}\" value)\n\n",
+            "let main () =\n",
+            "    map write [1; 2]\n",
+            "    ()\n",
+        );
+        let checked = check(typed(source)).expect("callback capability is declared");
+        let main = locate_main(&checked).expect("valid main");
+        assert_eq!(
+            checked
+                .definition_effect(&main)
+                .expect("main effects")
+                .names(),
+            vec!["Console.Write"]
+        );
+
+        let without_capability = source.replace("    requires Console.Write\n", "");
+        let errors = check(typed(&without_capability))
+            .expect_err("callback effect requires the module capability");
+        assert!(errors.iter().any(|error| matches!(
+            error.kind,
+            EffectErrorKind::MissingCapability {
+                capability: "Console.Write"
+            }
+        )));
+    }
+
+    #[test]
+    fn local_functions_are_latent_and_higher_order_wrappers_propagate_effects() {
+        let unused = check(typed(concat!(
+            "module Main\n\n",
+            "let main () =\n",
+            "    let write value = Console.write value\n",
+            "    ()\n",
+        )))
+        .expect("creating an unused local closure is Pure");
+        let unused_main = locate_main(&unused).expect("valid main");
+        assert!(
+            unused
+                .definition_effect(&unused_main)
+                .expect("main effects")
+                .is_pure()
+        );
+
+        let wrapper = concat!(
+            "module Main\n\n",
+            "let apply callback values = map callback values\n",
+            "let write value = Console.write value\n\n",
+            "let main () =\n",
+            "    apply write [\"a\"; \"b\"]\n",
+            "    ()\n",
+        );
+        let errors = check(typed(wrapper))
+            .expect_err("a callback passed through a wrapper still requires Console.Write");
+        assert!(errors.iter().any(|error| matches!(
+            error.kind,
+            EffectErrorKind::MissingCapability {
+                capability: "Console.Write"
+            }
+        )));
+
+        let declared = wrapper.replace(
+            "module Main\n\n",
+            "module Main\n    requires Console.Write\n\n",
+        );
+        let checked = check(typed(&declared)).expect("wrapper callback capability is declared");
+        let main = locate_main(&checked).expect("valid main");
+        assert_eq!(
+            checked
+                .definition_effect(&main)
+                .expect("main effects")
+                .names(),
+            vec!["Console.Write"]
+        );
+    }
+
+    #[test]
+    fn state_effects_need_no_capability_and_unused_capabilities_warn() {
+        let checked = check(typed(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "type Counter = { mutable value: Int }\n\n",
+            "let main () =\n",
+            "    let mutable count = 0\n",
+            "    count <- 1\n",
+            "    let mutable counter = { value = 0 }\n",
+            "    counter.value <- 1\n",
+        )))
+        .expect("local State does not require a host capability");
+        let main = locate_main(&checked).expect("valid main");
+        assert_eq!(
+            checked
+                .definition_effect(&main)
+                .expect("main effects")
+                .names(),
+            vec!["State<Counter>", "State<Int>"]
+        );
+        assert_eq!(
+            checked
+                .definition_function_type(&main)
+                .expect("checked main function type")
+                .display(),
+            "Unit -> Unit ! {State<Counter>, State<Int>}"
+        );
+        assert!(
+            checked
+                .warnings()
+                .iter()
+                .any(|warning| warning.code() == codes::UNUSED_CAPABILITY)
+        );
+    }
+
+    #[test]
+    fn effect_rows_are_idempotent_commutative_sets() {
+        let state = Effect::State {
+            display: "Counter".to_owned(),
+            identity: "counter-definition".to_owned(),
+        };
+        let console = Effect::ConsoleWrite;
+
+        let mut left = EffectRow::default();
+        left.insert(state.clone());
+        left.insert(console.clone());
+        left.insert(state.clone());
+
+        let mut right = EffectRow::default();
+        right.insert(console);
+        right.insert(state);
+
+        assert_eq!(left, right);
+        assert_eq!(left.names(), vec!["Console.Write", "State<Counter>"]);
+
+        let unchanged = left.clone();
+        left.extend(&right);
+        assert_eq!(left, unchanged);
+
+        let mut canonical = EffectRow::default();
+        canonical.insert(Effect::State {
+            display: "A".to_owned(),
+            identity: "z".to_owned(),
+        });
+        canonical.insert(Effect::State {
+            display: "Z".to_owned(),
+            identity: "a".to_owned(),
+        });
+        assert_eq!(canonical.names(), ["State<A>", "State<Z>"]);
+        assert_eq!(canonical.canonical_names(), ["State<a>", "State<z>"]);
     }
 }

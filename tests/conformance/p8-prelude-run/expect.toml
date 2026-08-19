@@ -1,0 +1,5 @@
+arguments = ["run", "--format", "json", "case.ling"]
+exit_code = 0
+normative_clauses = ["DEC-0014", "NEXT-STEPS-SEED P8"]
+stdout = "7\n"
+diagnostic_codes = []

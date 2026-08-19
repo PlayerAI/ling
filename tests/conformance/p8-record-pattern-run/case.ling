@@ -1,0 +1,10 @@
+module Main
+    requires Console.Write
+
+type Point = { x: Int; y: Int }
+
+let describe point =
+    match point with
+    | { x = value; y = _ } -> Text.format "{}" value
+
+let main () = Console.write (describe { x = 7; y = 9 })

@@ -1,0 +1,26 @@
+module Main
+    requires Console.Write
+
+type 人物 =
+    { 姓名: Text
+      mutable 血量: Int
+      最大血量: Int }
+
+let 受到伤害 伤害 人物 =
+    { 人物 with
+        血量 = max 0 (人物.血量 - 伤害) }
+
+let 状态文字 人物 =
+    if 人物.血量 == 0 then
+        "死亡"
+    else
+        "存活"
+
+let main () =
+    let mutable 关羽 =
+        { 姓名 = "关羽"
+          血量 = 100
+          最大血量 = 100 }
+
+    关羽 <- 受到伤害 30 关羽
+    Console.write (状态文字 关羽)

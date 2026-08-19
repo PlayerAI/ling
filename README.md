@@ -10,36 +10,44 @@
 
 ### 项目状态
 
-Ling 目前处于 `v0.0.1 Seed` 的早期实现阶段。Hello World 纵向切片已完整贯通 Source、Parser/CST/AST、Resolved HIR、类型、Effect/Capability、Semantic Snapshot 和 Checked Core Interpreter；`check`、`run`、`semantic` 已可用于当前实现的 Seed 子集。完整 record/ADT 验收、Audit round-trip 与 REPL 仍未完成，因此这仍不是生产编译器或运行时。
+Ling 目前处于 `v0.0.1 Seed` 的发布候选准备阶段。已接受 Seed 设计的语言面、Semantic/Audit、解释器、事务式 REPL、稳定诊断和本地发布门禁均已贯通；详细证据见 `docs/SEED-TRACEABILITY.md`。这仍是实验性实现，不是生产编译器或运行时；候选 commit、同一 SHA 的三平台 CI 与真实 TTY 证据仍是发布门禁。
 
 | 项目 | 当前状态 |
 | --- | --- |
 | 语言名称 | 中文名：零；英文名：Ling |
 | CLI | `ling` |
 | 源文件扩展名 | `.ling` |
-| 当前里程碑 | Hello World 纵向切片（`docs/NEXT-STEPS.md`）已完成，继续收口完整 `v0.0.1 Seed` |
-| 实现状态 | Unicode 17、Lexer/Layout、Parser/CST/AST、module/import、Resolved HIR、HM 类型与任意精度 Int、Effect/Capability、确定性 Semantic Graph、解释器、CLI 与 conformance runner 已落地 |
+| 当前里程碑 | P8～P11 已在本地实现；正在完成 P12 发布证据与候选 commit 门禁 |
+| 实现状态 | Unicode 17、Seed 前端、module/import、generic nominal types、注入式 Prelude、pattern exhaustiveness、Effect/Capability、Semantic/Audit、解释器、事务式 REPL、共享 CLI compiler 与 conformance runner 已落地 |
 | 稳定性 | 设计可能变化，接受的 RFC 才能冻结语义 |
 
 ### 构建与验证
 
-需要 Rust 1.97.1；项目声明的最低 Rust 版本为 1.85。首次构建解析并锁定依赖后，常规构建与测试使用已提交的 `Cargo.lock`：
+需要 Rust 1.97.1；项目声明的最低 Rust 版本为 1.85。先按已提交的 `Cargo.lock` 获取依赖，之后的常规构建与测试显式离线：
 
 ```bash
-cargo test --workspace --all-features --locked
-cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
-cargo run --locked -- --version
+cargo fetch --locked
+cargo test --workspace --all-features --locked --offline
+cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo run --locked --offline -- --version
 ```
 
-`check`、`run` 和 `semantic` 复用同一条真实编译路径；`check` 不执行 `main`，`run` 只解释完成名称、类型、Place、Effect 和 Capability 检查的 ProgramSnapshot，`semantic` 输出确定性的 `ling.semantic/0.1`：
+`check`、`run`、`semantic`、`audit` 和 `repl` 复用同一条真实编译路径；`run` 和 REPL 只解释完成名称、类型、Place、Effect 和 Capability 检查的 ProgramSnapshot。`semantic` 输出确定性的 `ling.semantic/0.1` JSON，`audit` 输出可 round-trip 的 `ling.audit/0.1` 文本：
 
 ```bash
-cargo run --locked -- check examples/hello.ling
-cargo run --locked -- run examples/hello.ling
-cargo run --locked -- semantic examples/hello.ling
+cargo run --locked --offline -- check examples/hello.ling
+cargo run --locked --offline -- run examples/hello.ling
+cargo run --locked --offline -- semantic examples/hello.ling
+cargo run --locked --offline -- audit examples/人物.ling
+cargo run --locked --offline -- run examples/人物.ling
+cargo run --locked --offline -- run examples/adt-match.ling
+cargo run --locked --offline -- run examples/pipeline.ling
+cargo run --locked --offline -- repl --format human
 ```
 
-Hello World 的运行输出为 `你好，零`。`audit` 与 `repl` 在对应规范决议和实现完成前继续以 `L-IMPL-0001` 明确拒绝。
+Hello World 的运行输出为 `你好，零`。脚本化 REPL 用空行分隔 submission；需要 Console 时显式传入 `--capability Console.Write`。失败 submission 不提交名称、类型或值，JSON 模式输出 `ling.repl/0.1` 事件。Human TTY 模式由 Rustyline 处理 Ctrl-C/EOF；Ctrl-C 只清空尚未提交的 buffer，保留已提交 session state。
+
+内部编译器错误使用 `L-INTERNAL-0001` 和稳定的 experimental BLAKE3 incident ID，并在操作系统临时目录的 `ling-incidents` 子目录保存 `ling.internal-incident/0.1` 最小重现报告；公开诊断只显示不含用户名的逻辑位置。Semantic reader round-trip 失败使用 `L-SNAPSHOT-0001` 与 exit `6`；宿主 I/O Fault 使用 `L-RUNTIME-0001` 与 exit `4`。
 
 ### 语言使命
 
@@ -93,7 +101,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 
 ### `v0.0.1 Seed` 范围
 
-第一阶段计划覆盖：
+当前 Seed 实现覆盖：
 
 - UTF-8、Unicode 标识符、NFC 名称归一化和基础混淆字符诊断；
 - `let`、函数、`if`、record、ADT、穷尽 `match` 和空格函数应用；
@@ -123,6 +131,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 │   ├── ling-types/
 │   ├── ling-effects/
 │   ├── ling-semantic/
+│   ├── ling-format/
 │   ├── ling-eval/
 │   └── ling-cli/
 ├── tests/
@@ -135,6 +144,9 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
     ├── RFC-0001.md
     ├── IMPLEMENTATION.md
     ├── NEXT-STEPS.md
+    ├── NEXT-STEPS-SEED.md
+    ├── SEED-TRACEABILITY.md
+    ├── SEED-RELEASE-REPORT.md
     ├── ERROR-CODES.md
     ├── DEPENDENCIES.md
     ├── decisions/
@@ -146,6 +158,9 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/RFC-0001.md`](docs/RFC-0001.md)：`v0.0.1 Seed` 的范围、语法、编译器架构、CLI、测试策略、治理规则、验收标准和风险清单。
 - [`docs/IMPLEMENTATION.md`](docs/IMPLEMENTATION.md)：`v0.0.1 Seed` 的实现计划：仓库布局、技术决策、里程碑出口标准、测试与 CI、规范缺口清单和验收清单。
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md)：从当前 AST 边界推进到可运行 Hello World 的下一步实施顺序、接口边界、决议门禁和验收矩阵。
+- [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md)：从已完成的 Hello World 纵向切片推进到完整 `v0.0.1 Seed` 的里程碑、决议门禁、验收矩阵和发布条件。
+- [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md)：RFC §18、实现路径、正反测试证据和剩余发布阻断项的双语追踪矩阵。
+- [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md)：本地质量门禁、候选状态、fuzz 环境限制和远程 CI 阻断项的双语快照。
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的稳定错误码、双语模板、Facts 与兼容性边界。
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)：Rust 直接/关键传递依赖、许可证、MSRV、`unsafe` 与审查状态。
 - [`docs/design-review.html`](docs/design-review.html)：针对上述规范的设计评审记录；它是非规范性意见，不替代已接受的 RFC。
@@ -196,36 +211,44 @@ Ling 仍处于早期设计阶段。请在生产使用、标准化承诺或大规
 
 ### Project status
 
-Ling is in the early implementation phase of `v0.0.1 Seed`. The Hello World vertical slice now runs through Source, Parser/CST/AST, resolved HIR, types, Effects/Capabilities, a semantic snapshot, and the checked-core interpreter. `check`, `run`, and `semantic` work for the implemented Seed subset. Full record/ADT acceptance, Audit round-tripping, and the REPL remain incomplete, so this is still not a production compiler or runtime.
+Ling is preparing a release candidate for `v0.0.1 Seed`. The accepted Seed language surface, Semantic/Audit pipeline, interpreter, transactional REPL, stable diagnostics, and local release gates are implemented; detailed evidence is indexed in `docs/SEED-TRACEABILITY.md`. This remains experimental rather than a production compiler or runtime; a candidate commit, three-platform CI for the same SHA, and real-TTY evidence are still release gates.
 
 | Item | Current status |
 | --- | --- |
 | Language name | Chinese: 零; English: Ling |
 | CLI | `ling` |
 | Source extension | `.ling` |
-| Current milestone | The `docs/NEXT-STEPS.md` Hello World vertical slice is complete; full `v0.0.1 Seed` work continues |
-| Implementation | Unicode 17, Lexer/Layout, Parser/CST/AST, modules/imports, resolved HIR, HM types with arbitrary-precision Int, Effects/Capabilities, deterministic Semantic Graph, interpreter, CLI, and conformance runner implemented |
+| Current milestone | P8–P11 are implemented locally; P12 release evidence and candidate-commit gates remain |
+| Implementation | Unicode 17, the Seed frontend, modules/imports, generic nominal types, injected Prelude, pattern exhaustiveness, Effects/Capabilities, Semantic/Audit, interpreter, transactional REPL, shared CLI compiler, and conformance runner implemented |
 | Stability | The design may change; accepted RFCs are the mechanism for freezing semantics |
 
 ### Build and verification
 
-Rust 1.97.1 is the pinned development toolchain; the declared MSRV is Rust 1.85. After the initial dependency resolution, normal builds and tests use the committed `Cargo.lock`:
+Rust 1.97.1 is the pinned development toolchain; the declared MSRV is Rust 1.85. Fetch the committed lockfile's dependencies once, then run normal builds and tests explicitly offline:
 
 ```bash
-cargo test --workspace --all-features --locked
-cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
-cargo run --locked -- --version
+cargo fetch --locked
+cargo test --workspace --all-features --locked --offline
+cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo run --locked --offline -- --version
 ```
 
-`check`, `run`, and `semantic` share one real compilation path. `check` does not execute `main`; `run` interprets only a ProgramSnapshot that passed name, type, Place, Effect, and Capability checks; and `semantic` emits deterministic `ling.semantic/0.1` JSON:
+`check`, `run`, `semantic`, `audit`, and `repl` share one real compilation path. `run` and the REPL interpret only ProgramSnapshots that passed name, type, Place, Effect, and Capability checks. `semantic` emits deterministic `ling.semantic/0.1` JSON, while `audit` emits round-trippable `ling.audit/0.1` text:
 
 ```bash
-cargo run --locked -- check examples/hello.ling
-cargo run --locked -- run examples/hello.ling
-cargo run --locked -- semantic examples/hello.ling
+cargo run --locked --offline -- check examples/hello.ling
+cargo run --locked --offline -- run examples/hello.ling
+cargo run --locked --offline -- semantic examples/hello.ling
+cargo run --locked --offline -- audit examples/人物.ling
+cargo run --locked --offline -- run examples/人物.ling
+cargo run --locked --offline -- run examples/adt-match.ling
+cargo run --locked --offline -- run examples/pipeline.ling
+cargo run --locked --offline -- repl --format human
 ```
 
-Hello World prints `你好，零`. Until their governing decisions and implementations are complete, `audit` and `repl` continue to fail explicitly with `L-IMPL-0001`.
+Hello World prints `你好，零`. Scripted REPL sessions separate submissions with a blank line; pass `--capability Console.Write` when Console access is required. Failed submissions do not commit names, types, or values, and JSON mode emits `ling.repl/0.1` events. Rustyline handles Ctrl-C/EOF in human TTY mode; Ctrl-C clears only the pending buffer and preserves committed session state.
+
+Internal compiler failures use `L-INTERNAL-0001` and a stable experimental BLAKE3 incident ID, with a minimal `ling.internal-incident/0.1` reproduction report saved under the OS temporary directory's `ling-incidents` folder; public diagnostics expose only a username-free logical location. Semantic reader round-trip failures use `L-SNAPSHOT-0001` and exit `6`; host I/O faults use `L-RUNTIME-0001` and exit `4`.
 
 ### Mission
 
@@ -279,7 +302,7 @@ Detailed Profile semantics and cross-Profile portability still require later RFC
 
 ### `v0.0.1 Seed` scope
 
-The first milestone is planned to cover:
+The current Seed implementation covers:
 
 - UTF-8, Unicode identifiers, NFC normalization, and basic confusable-character diagnostics;
 - `let`, functions, `if`, records, ADTs, exhaustive `match`, and space application;
@@ -309,6 +332,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 │   ├── ling-types/
 │   ├── ling-effects/
 │   ├── ling-semantic/
+│   ├── ling-format/
 │   ├── ling-eval/
 │   └── ling-cli/
 ├── tests/
@@ -321,6 +345,9 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
     ├── RFC-0001.md
     ├── IMPLEMENTATION.md
     ├── NEXT-STEPS.md
+    ├── NEXT-STEPS-SEED.md
+    ├── SEED-TRACEABILITY.md
+    ├── SEED-RELEASE-REPORT.md
     ├── ERROR-CODES.md
     ├── DEPENDENCIES.md
     ├── decisions/
@@ -332,6 +359,9 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/RFC-0001.md`](docs/RFC-0001.md): `v0.0.1 Seed` scope, syntax, compiler architecture, CLI, tests, governance, acceptance criteria, and risks.
 - [`docs/IMPLEMENTATION.md`](docs/IMPLEMENTATION.md): the `v0.0.1 Seed` implementation plan — repository layout, technical decisions, milestone exit criteria, testing and CI, the specification-gap list, and the acceptance checklist.
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md): the next implementation sequence from the current AST boundary to an executable Hello World, including interface boundaries, decision gates, and acceptance cases.
+- [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md): milestones, decision gates, acceptance cases, and release conditions for progressing from the completed Hello World slice to the full `v0.0.1 Seed` scope.
+- [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md): a bilingual mapping from RFC §18 to implementation paths, positive/negative evidence, and remaining release blockers.
+- [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md): a bilingual snapshot of local quality gates, candidate status, fuzz environment limitations, and remote-CI blockers.
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): stable `ling.diagnostic/0.1` codes, bilingual templates, Facts, and compatibility boundaries.
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md): direct and key transitive Rust dependencies, licenses, MSRV, `unsafe`, and review status.
 - [`docs/design-review.html`](docs/design-review.html): a non-normative design review of the specifications; it does not replace an accepted RFC.

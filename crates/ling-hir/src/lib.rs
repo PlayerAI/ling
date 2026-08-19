@@ -36,6 +36,16 @@ impl BindingId {
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct PatternId(u32);
+
+impl PatternId {
+    #[must_use]
+    pub const fn get(self) -> u32 {
+        self.0
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Program {
     pub source_name: String,
@@ -97,6 +107,8 @@ pub struct Definition {
     pub parameters: Vec<Pattern>,
     pub annotation: Option<TypeSyntax>,
     pub value: Expression,
+    /// REPL-only generation used to isolate session identity from file identity.
+    pub session_generation: Option<u64>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -163,17 +175,34 @@ pub enum TypeAtom {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Pattern {
+    pub id: PatternId,
     pub span: Span,
     pub kind: PatternKind,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RecordPatternField {
+    pub span: Span,
+    pub name: Name,
+    pub pattern: Pattern,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum PatternKind {
-    Binding { id: BindingId, name: Name },
+    Binding {
+        id: BindingId,
+        name: Name,
+    },
+    Wildcard,
     Unit,
     Literal(Literal),
     Tuple(Vec<Pattern>),
-    Constructor { name: Name, arguments: Vec<Pattern> },
+    Record(Vec<RecordPatternField>),
+    Constructor {
+        qualifier: Option<Name>,
+        name: Name,
+        arguments: Vec<Pattern>,
+    },
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -331,7 +360,27 @@ pub fn lower(
     source_name: impl Into<String>,
     program: &ast::Program,
 ) -> Result<Program, LowerError> {
-    Lowerer::new(source_name.into()).program(program)
+    Lowerer::new(source_name.into(), IdCounters::default()).program(program)
+}
+
+/// Next local HIR IDs for merging independently parsed REPL submissions.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct IdCounters {
+    pub expression: u32,
+    pub reference: u32,
+    pub binding: u32,
+    pub pattern: u32,
+}
+
+/// Lowers one source while allocating IDs after `counters`.
+pub fn lower_with_counters(
+    source_name: impl Into<String>,
+    program: &ast::Program,
+    counters: IdCounters,
+) -> Result<(Program, IdCounters), LowerError> {
+    let mut lowerer = Lowerer::new(source_name.into(), counters);
+    let program = lowerer.program(program)?;
+    Ok((program, lowerer.counters()))
 }
 
 struct Lowerer {
@@ -339,19 +388,30 @@ struct Lowerer {
     next_expression: u32,
     next_reference: u32,
     next_binding: u32,
+    next_pattern: u32,
 }
 
 impl Lowerer {
-    const fn new(source_name: String) -> Self {
+    const fn new(source_name: String, counters: IdCounters) -> Self {
         Self {
             source_name,
-            next_expression: 0,
-            next_reference: 0,
-            next_binding: 0,
+            next_expression: counters.expression,
+            next_reference: counters.reference,
+            next_binding: counters.binding,
+            next_pattern: counters.pattern,
         }
     }
 
-    fn program(mut self, program: &ast::Program) -> Result<Program, LowerError> {
+    const fn counters(&self) -> IdCounters {
+        IdCounters {
+            expression: self.next_expression,
+            reference: self.next_reference,
+            binding: self.next_binding,
+            pattern: self.next_pattern,
+        }
+    }
+
+    fn program(&mut self, program: &ast::Program) -> Result<Program, LowerError> {
         let mut module = None;
         let mut imports = Vec::new();
         let mut definitions = Vec::new();
@@ -423,7 +483,7 @@ impl Lowerer {
         });
 
         Ok(Program {
-            source_name: self.source_name,
+            source_name: self.source_name.clone(),
             span: program.span,
             module,
             imports,
@@ -451,6 +511,7 @@ impl Lowerer {
                 .collect::<Result<Vec<_>, _>>()?,
             annotation: declaration.annotation.as_ref().map(type_syntax),
             value: self.expression(&declaration.value)?,
+            session_generation: None,
         })
     }
 
@@ -512,48 +573,193 @@ impl Lowerer {
     }
 
     fn pattern(&mut self, pattern: &ast::Pattern) -> Result<Pattern, LowerError> {
-        let kind = match pattern.atoms.as_slice() {
-            [ast::PatternAtom::Name(binding)] => PatternKind::Binding {
-                id: self.binding_id(),
-                name: name(binding),
-            },
-            [ast::PatternAtom::LeftParen, ast::PatternAtom::RightParen] => PatternKind::Unit,
-            [ast::PatternAtom::Literal(literal)] => PatternKind::Literal(literal_value(literal)),
-            atoms
-                if atoms.len() >= 2
-                    && atoms
-                        .iter()
-                        .all(|atom| matches!(atom, ast::PatternAtom::Name(_))) =>
+        let mut position = 0;
+        let lowered = self.pattern_sequence(&pattern.atoms, &mut position, pattern.span)?;
+        if position != pattern.atoms.len() {
+            return Err(self.error(LowerErrorKind::InvalidPattern, pattern.span));
+        }
+        Ok(lowered)
+    }
+
+    fn pattern_sequence(
+        &mut self,
+        atoms: &[ast::PatternAtom],
+        position: &mut usize,
+        span: Span,
+    ) -> Result<Pattern, LowerError> {
+        if let Some(ast::PatternAtom::Name(first)) = atoms.get(*position) {
+            *position += 1;
+            let (qualifier, constructor) = if atoms
+                .get(*position)
+                .is_some_and(|atom| matches!(atom, ast::PatternAtom::Dot))
             {
-                let mut atoms = atoms.iter();
-                let Some(ast::PatternAtom::Name(constructor)) = atoms.next() else {
-                    unreachable!("guard requires names")
+                *position += 1;
+                let Some(ast::PatternAtom::Name(constructor)) = atoms.get(*position) else {
+                    return Err(self.error(LowerErrorKind::InvalidPattern, span));
                 };
-                let arguments = atoms
-                    .map(|atom| {
-                        let ast::PatternAtom::Name(binding) = atom else {
-                            unreachable!("guard requires names")
-                        };
-                        Pattern {
-                            span: binding.span,
-                            kind: PatternKind::Binding {
-                                id: self.binding_id(),
-                                name: name(binding),
-                            },
-                        }
-                    })
-                    .collect();
-                PatternKind::Constructor {
+                *position += 1;
+                (Some(name(first)), constructor)
+            } else {
+                (None, first)
+            };
+            let mut arguments = Vec::new();
+            while atoms
+                .get(*position)
+                .is_some_and(pattern_atom_starts_primary)
+            {
+                arguments.push(self.pattern_primary(atoms, position, span)?);
+            }
+            if qualifier.is_some() || !arguments.is_empty() {
+                return Ok(Pattern {
+                    id: self.pattern_id(),
+                    span,
+                    kind: PatternKind::Constructor {
+                        qualifier,
+                        name: name(constructor),
+                        arguments,
+                    },
+                });
+            }
+            let kind = if constructor.normalized == "_" {
+                PatternKind::Wildcard
+            } else {
+                PatternKind::Binding {
+                    id: self.binding_id(),
                     name: name(constructor),
-                    arguments,
+                }
+            };
+            return Ok(Pattern {
+                id: self.pattern_id(),
+                span: constructor.span,
+                kind,
+            });
+        }
+        self.pattern_primary(atoms, position, span)
+    }
+
+    fn pattern_primary(
+        &mut self,
+        atoms: &[ast::PatternAtom],
+        position: &mut usize,
+        span: Span,
+    ) -> Result<Pattern, LowerError> {
+        match atoms.get(*position) {
+            Some(ast::PatternAtom::Name(binding)) => {
+                *position += 1;
+                let kind = if binding.normalized == "_" {
+                    PatternKind::Wildcard
+                } else {
+                    PatternKind::Binding {
+                        id: self.binding_id(),
+                        name: name(binding),
+                    }
+                };
+                Ok(Pattern {
+                    id: self.pattern_id(),
+                    span: binding.span,
+                    kind,
+                })
+            }
+            Some(ast::PatternAtom::Literal(literal)) => {
+                *position += 1;
+                Ok(Pattern {
+                    id: self.pattern_id(),
+                    span,
+                    kind: PatternKind::Literal(literal_value(literal)),
+                })
+            }
+            Some(ast::PatternAtom::LeftParen) => {
+                *position += 1;
+                if atoms
+                    .get(*position)
+                    .is_some_and(|atom| matches!(atom, ast::PatternAtom::RightParen))
+                {
+                    *position += 1;
+                    return Ok(Pattern {
+                        id: self.pattern_id(),
+                        span,
+                        kind: PatternKind::Unit,
+                    });
+                }
+                let first = self.pattern_sequence(atoms, position, span)?;
+                let mut elements = vec![first];
+                let mut tuple = false;
+                while atoms
+                    .get(*position)
+                    .is_some_and(|atom| matches!(atom, ast::PatternAtom::Comma))
+                {
+                    tuple = true;
+                    *position += 1;
+                    if atoms
+                        .get(*position)
+                        .is_some_and(|atom| matches!(atom, ast::PatternAtom::RightParen))
+                    {
+                        break;
+                    }
+                    elements.push(self.pattern_sequence(atoms, position, span)?);
+                }
+                if !atoms
+                    .get(*position)
+                    .is_some_and(|atom| matches!(atom, ast::PatternAtom::RightParen))
+                {
+                    return Err(self.error(LowerErrorKind::InvalidPattern, span));
+                }
+                *position += 1;
+                if tuple {
+                    Ok(Pattern {
+                        id: self.pattern_id(),
+                        span,
+                        kind: PatternKind::Tuple(elements),
+                    })
+                } else {
+                    Ok(elements.pop().expect("grouped pattern has one element"))
                 }
             }
-            _ => return Err(self.error(LowerErrorKind::InvalidPattern, pattern.span)),
-        };
-        Ok(Pattern {
-            span: pattern.span,
-            kind,
-        })
+            Some(ast::PatternAtom::LeftBrace) => {
+                *position += 1;
+                let mut fields = Vec::new();
+                while !atoms
+                    .get(*position)
+                    .is_some_and(|atom| matches!(atom, ast::PatternAtom::RightBrace))
+                {
+                    let Some(ast::PatternAtom::Name(field)) = atoms.get(*position) else {
+                        return Err(self.error(LowerErrorKind::InvalidPattern, span));
+                    };
+                    *position += 1;
+                    if !atoms
+                        .get(*position)
+                        .is_some_and(|atom| matches!(atom, ast::PatternAtom::Equals))
+                    {
+                        return Err(self.error(LowerErrorKind::InvalidPattern, span));
+                    }
+                    *position += 1;
+                    let value = self.pattern_sequence(atoms, position, span)?;
+                    fields.push(RecordPatternField {
+                        span: field.span,
+                        name: name(field),
+                        pattern: value,
+                    });
+                    if atoms
+                        .get(*position)
+                        .is_some_and(|atom| matches!(atom, ast::PatternAtom::Semicolon))
+                    {
+                        *position += 1;
+                    } else if !atoms
+                        .get(*position)
+                        .is_some_and(|atom| matches!(atom, ast::PatternAtom::RightBrace))
+                    {
+                        return Err(self.error(LowerErrorKind::InvalidPattern, span));
+                    }
+                }
+                *position += 1;
+                Ok(Pattern {
+                    id: self.pattern_id(),
+                    span,
+                    kind: PatternKind::Record(fields),
+                })
+            }
+            _ => Err(self.error(LowerErrorKind::InvalidPattern, span)),
+        }
     }
 
     fn expression(&mut self, expression: &ast::Expression) -> Result<Expression, LowerError> {
@@ -755,6 +961,22 @@ impl Lowerer {
         self.next_binding = self.next_binding.saturating_add(1);
         id
     }
+
+    fn pattern_id(&mut self) -> PatternId {
+        let id = PatternId(self.next_pattern);
+        self.next_pattern = self.next_pattern.saturating_add(1);
+        id
+    }
+}
+
+fn pattern_atom_starts_primary(atom: &ast::PatternAtom) -> bool {
+    matches!(
+        atom,
+        ast::PatternAtom::Name(_)
+            | ast::PatternAtom::Literal(_)
+            | ast::PatternAtom::LeftParen
+            | ast::PatternAtom::LeftBrace
+    )
 }
 
 fn collect_application<'expression>(

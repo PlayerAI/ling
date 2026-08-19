@@ -5,7 +5,7 @@ use std::error::Error;
 use std::fmt;
 
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
-use ling_hir::{self as hir, BindingId, ExpressionId, ReferenceId};
+use ling_hir::{self as hir, BindingId, ExpressionId, PatternId, ReferenceId};
 use ling_source::Span;
 
 const LANGUAGE_VERSION: &str = "0.0.1-dev";
@@ -73,6 +73,29 @@ pub struct BindingKey {
     local: BindingId,
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct PatternKey {
+    module: ModuleId,
+    local: PatternId,
+}
+
+impl PatternKey {
+    #[must_use]
+    pub const fn new(module: ModuleId, local: PatternId) -> Self {
+        Self { module, local }
+    }
+
+    #[must_use]
+    pub const fn module(self) -> ModuleId {
+        self.module
+    }
+
+    #[must_use]
+    pub const fn local(self) -> PatternId {
+        self.local
+    }
+}
+
 impl BindingKey {
     #[must_use]
     pub const fn new(module: ModuleId, local: BindingId) -> Self {
@@ -112,6 +135,21 @@ impl DefinitionId {
             blake3::hash(&bytes).to_hex()
         ))
     }
+
+    fn new_repl(kind: &str, module: &str, name: &str, generation: u64) -> Self {
+        let mut bytes = Vec::new();
+        encode_part(&mut bytes, b"ling.repl-definition-id/v1");
+        encode_part(&mut bytes, LANGUAGE_VERSION.as_bytes());
+        encode_part(&mut bytes, SEMANTIC_SCHEMA.as_bytes());
+        encode_part(&mut bytes, kind.as_bytes());
+        encode_part(&mut bytes, module.as_bytes());
+        encode_part(&mut bytes, name.as_bytes());
+        encode_part(&mut bytes, &generation.to_be_bytes());
+        Self(format!(
+            "experimental:blake3:{}",
+            blake3::hash(&bytes).to_hex()
+        ))
+    }
 }
 
 impl fmt::Display for DefinitionId {
@@ -128,6 +166,40 @@ pub enum Builtin {
     Min,
     Map,
     Sum,
+}
+
+pub const PRELUDE_MODULE: &str = "Ling.Prelude";
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum PreludeDefinition {
+    Option,
+    Some,
+    None,
+    Result,
+    Ok,
+    Error,
+}
+
+impl PreludeDefinition {
+    #[must_use]
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Option => "Option",
+            Self::Some => "Some",
+            Self::None => "None",
+            Self::Result => "Result",
+            Self::Ok => "Ok",
+            Self::Error => "Error",
+        }
+    }
+
+    #[must_use]
+    pub const fn kind(self) -> DefinitionKind {
+        match self {
+            Self::Option | Self::Result => DefinitionKind::Type,
+            Self::Some | Self::None | Self::Ok | Self::Error => DefinitionKind::Constructor,
+        }
+    }
 }
 
 impl Builtin {
@@ -152,10 +224,11 @@ pub enum DefinitionKind {
     Builtin,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DefinitionOrigin {
     User { module: ModuleId },
     Builtin(Builtin),
+    Prelude(PreludeDefinition),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -163,6 +236,10 @@ pub struct DefinitionInfo {
     pub id: DefinitionId,
     pub module_name: String,
     pub name: String,
+    pub name_source: String,
+    pub name_skeleton: String,
+    pub name_scripts: Vec<String>,
+    pub name_suspicious_mixed_script: bool,
     pub kind: DefinitionKind,
     pub origin: DefinitionOrigin,
     pub mutable: bool,
@@ -199,7 +276,9 @@ pub struct ResolvedProgram {
     definitions: BTreeMap<DefinitionId, DefinitionInfo>,
     references: BTreeMap<ReferenceKey, ReferenceTarget>,
     bindings: BTreeMap<BindingKey, BindingInfo>,
+    pattern_constructors: BTreeMap<PatternKey, DefinitionId>,
     builtins: BTreeMap<Builtin, DefinitionId>,
+    prelude: BTreeMap<PreludeDefinition, DefinitionId>,
 }
 
 impl ResolvedProgram {
@@ -250,10 +329,39 @@ impl ResolvedProgram {
     }
 
     #[must_use]
+    pub fn pattern_constructor(
+        &self,
+        module: ModuleId,
+        pattern: PatternId,
+    ) -> Option<&DefinitionId> {
+        self.pattern_constructors
+            .get(&PatternKey::new(module, pattern))
+    }
+
+    #[must_use]
+    pub fn pattern_constructors(&self) -> &BTreeMap<PatternKey, DefinitionId> {
+        &self.pattern_constructors
+    }
+
+    #[must_use]
     pub fn builtin_id(&self, builtin: Builtin) -> &DefinitionId {
         self.builtins
             .get(&builtin)
             .expect("all Seed builtins are injected")
+    }
+
+    #[must_use]
+    pub fn prelude_id(&self, definition: PreludeDefinition) -> &DefinitionId {
+        self.prelude
+            .get(&definition)
+            .expect("all Seed Prelude definitions are injected")
+    }
+
+    #[must_use]
+    pub fn prelude_definition(&self, name: &str) -> Option<&DefinitionId> {
+        self.prelude
+            .iter()
+            .find_map(|(definition, id)| (definition.name() == name).then_some(id))
     }
 
     #[must_use]
@@ -288,6 +396,7 @@ pub enum ResolveErrorKind {
     ImportedModuleMustBeExplicit { module: String },
     ImportCycle { modules: Vec<String> },
     ConfusableCollision { first: String, second: String },
+    SuspiciousMixedScript { name: String, scripts: Vec<String> },
     ReservedName { name: String },
     MutableTopLevel { name: String },
 }
@@ -336,10 +445,21 @@ impl ResolveError {
                 format!("同一作用域中的名称“{first}”与“{second}”视觉混淆"),
                 format!("names `{first}` and `{second}` are confusable in the same scope"),
             ),
+            ResolveErrorKind::SuspiciousMixedScript { name, scripts } => (
+                codes::SUSPICIOUS_MIXED_SCRIPT,
+                format!(
+                    "标识符“{name}”包含 Seed 默认拒绝的可疑混合文字：{}",
+                    scripts.join(", ")
+                ),
+                format!(
+                    "identifier `{name}` contains a suspicious script mix rejected by Ling Seed: {}",
+                    scripts.join(", ")
+                ),
+            ),
             ResolveErrorKind::ReservedName { name } => (
                 codes::RESERVED_NAME,
-                format!("模块作用域不能重定义内置名称“{name}”"),
-                format!("module scope cannot redefine built-in name `{name}`"),
+                format!("模块作用域不能重定义保留名称“{name}”"),
+                format!("module scope cannot redefine reserved name `{name}`"),
             ),
             ResolveErrorKind::MutableTopLevel { name } => (
                 codes::INVALID_MODULE,
@@ -347,8 +467,14 @@ impl ResolveError {
                 format!("Ling Seed does not allow mutable top-level binding `{name}`"),
             ),
         };
-        Diagnostic::new(code, Severity::Error, zh, en)
-            .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span))
+        let diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
+            .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span));
+        match &self.kind {
+            ResolveErrorKind::SuspiciousMixedScript { name, scripts } => diagnostic
+                .with_fact("name", name.clone())
+                .with_fact("scripts", scripts.clone()),
+            _ => diagnostic,
+        }
     }
 }
 
@@ -377,7 +503,9 @@ struct Resolver {
     module_definitions: BTreeMap<ModuleId, BTreeMap<String, DefinitionId>>,
     references: BTreeMap<ReferenceKey, ReferenceTarget>,
     bindings: BTreeMap<BindingKey, BindingInfo>,
+    pattern_constructors: BTreeMap<PatternKey, DefinitionId>,
     builtins: BTreeMap<Builtin, DefinitionId>,
+    prelude: BTreeMap<PreludeDefinition, DefinitionId>,
     errors: Vec<ResolveError>,
 }
 
@@ -401,13 +529,16 @@ impl Resolver {
             module_definitions: BTreeMap::new(),
             references: BTreeMap::new(),
             bindings: BTreeMap::new(),
+            pattern_constructors: BTreeMap::new(),
             builtins: BTreeMap::new(),
+            prelude: BTreeMap::new(),
             errors: Vec::new(),
         }
     }
 
     fn run(mut self) -> Result<ResolvedProgram, Vec<ResolveError>> {
         self.inject_builtins();
+        self.inject_prelude();
         self.index_modules();
         self.resolve_imports();
         self.detect_import_cycles();
@@ -436,7 +567,9 @@ impl Resolver {
                 definitions: self.definitions,
                 references: self.references,
                 bindings: self.bindings,
+                pattern_constructors: self.pattern_constructors,
                 builtins: self.builtins,
+                prelude: self.prelude,
             })
         } else {
             self.errors.sort_by(|left, right| {
@@ -472,6 +605,10 @@ impl Resolver {
                     id: id.clone(),
                     module_name: "<builtin>".to_owned(),
                     name: qualified.to_owned(),
+                    name_source: qualified.to_owned(),
+                    name_skeleton: qualified.to_owned(),
+                    name_scripts: Vec::new(),
+                    name_suspicious_mixed_script: false,
                     kind: DefinitionKind::Builtin,
                     origin: DefinitionOrigin::Builtin(builtin),
                     mutable: false,
@@ -483,7 +620,53 @@ impl Resolver {
         }
     }
 
+    fn inject_prelude(&mut self) {
+        for definition in [
+            PreludeDefinition::Option,
+            PreludeDefinition::Some,
+            PreludeDefinition::None,
+            PreludeDefinition::Result,
+            PreludeDefinition::Ok,
+            PreludeDefinition::Error,
+        ] {
+            let kind = definition.kind();
+            let kind_name = match kind {
+                DefinitionKind::Type => "type",
+                DefinitionKind::Constructor => "constructor",
+                DefinitionKind::Value | DefinitionKind::Builtin => {
+                    unreachable!("Prelude only contains types and constructors")
+                }
+            };
+            let id = DefinitionId::new(kind_name, PRELUDE_MODULE, definition.name());
+            self.definitions.insert(
+                id.clone(),
+                DefinitionInfo {
+                    id: id.clone(),
+                    module_name: PRELUDE_MODULE.to_owned(),
+                    name: definition.name().to_owned(),
+                    name_source: definition.name().to_owned(),
+                    name_skeleton: definition.name().to_owned(),
+                    name_scripts: vec!["Latn".to_owned()],
+                    name_suspicious_mixed_script: false,
+                    kind,
+                    origin: DefinitionOrigin::Prelude(definition),
+                    mutable: false,
+                    source_name: None,
+                    span: None,
+                },
+            );
+            self.prelude.insert(definition, id);
+        }
+    }
+
+    fn prelude_definition(&self, name: &str) -> Option<&DefinitionId> {
+        self.prelude
+            .iter()
+            .find_map(|(definition, id)| (definition.name() == name).then_some(id))
+    }
+
     fn index_modules(&mut self) {
+        let mut skeletons = BTreeMap::<String, String>::new();
         for module in &self.modules {
             let name = module.hir.module.name.normalized();
             if self.module_names.insert(name.clone(), module.id).is_some() {
@@ -493,6 +676,12 @@ impl Resolver {
                     span: module.hir.module.span,
                 });
             }
+            check_qualified_name_security(
+                &mut skeletons,
+                &module.hir.module.name,
+                &module.hir.source_name,
+                &mut self.errors,
+            );
         }
     }
 
@@ -539,7 +728,7 @@ impl Resolver {
                         span: import.alias.span,
                     });
                 }
-                check_confusable(
+                check_name_security(
                     &mut skeletons,
                     &import.alias,
                     &module.hir.source_name,
@@ -613,6 +802,7 @@ impl Resolver {
                     &definition.name,
                     DefinitionKind::Value,
                     definition.mutable,
+                    definition.session_generation,
                     &mut scope,
                     &mut skeletons,
                 );
@@ -624,6 +814,7 @@ impl Resolver {
                     &declaration.name,
                     DefinitionKind::Type,
                     false,
+                    None,
                     &mut scope,
                     &mut skeletons,
                 );
@@ -635,6 +826,7 @@ impl Resolver {
                             &case.name,
                             DefinitionKind::Constructor,
                             false,
+                            None,
                             &mut scope,
                             &mut skeletons,
                         );
@@ -653,10 +845,25 @@ impl Resolver {
         name: &hir::Name,
         kind: DefinitionKind,
         mutable: bool,
+        session_generation: Option<u64>,
         scope: &mut BTreeMap<String, DefinitionId>,
         skeletons: &mut BTreeMap<String, String>,
     ) {
-        if matches!(name.normalized.as_str(), "Console" | "Text") {
+        if matches!(
+            name.normalized.as_str(),
+            "Console"
+                | "Text"
+                | "Option"
+                | "Some"
+                | "None"
+                | "Result"
+                | "Ok"
+                | "Error"
+                | "max"
+                | "min"
+                | "map"
+                | "sum"
+        ) {
             self.errors.push(ResolveError {
                 kind: ResolveErrorKind::ReservedName {
                     name: name.normalized.clone(),
@@ -671,7 +878,10 @@ impl Resolver {
             DefinitionKind::Constructor => "constructor",
             DefinitionKind::Builtin => "builtin",
         };
-        let id = DefinitionId::new(kind_name, module_name, &name.normalized);
+        let id = session_generation.map_or_else(
+            || DefinitionId::new(kind_name, module_name, &name.normalized),
+            |generation| DefinitionId::new_repl(kind_name, module_name, &name.source, generation),
+        );
         if scope.insert(name.normalized.clone(), id.clone()).is_some() {
             self.errors.push(ResolveError {
                 kind: ResolveErrorKind::DuplicateDefinition {
@@ -681,13 +891,17 @@ impl Resolver {
                 span: name.span,
             });
         }
-        check_confusable(skeletons, name, &module.hir.source_name, &mut self.errors);
+        check_name_security(skeletons, name, &module.hir.source_name, &mut self.errors);
         self.definitions.insert(
             id.clone(),
             DefinitionInfo {
                 id,
                 module_name: module_name.to_owned(),
                 name: name.normalized.clone(),
+                name_source: name.source.clone(),
+                name_skeleton: name.skeleton.clone(),
+                name_scripts: name.scripts.clone(),
+                name_suspicious_mixed_script: name.suspicious_mixed_script,
                 kind,
                 origin: DefinitionOrigin::User { module: module.id },
                 mutable,
@@ -860,6 +1074,21 @@ impl Resolver {
             );
             return;
         }
+        if let Some(id) = self
+            .prelude_definition(&name.normalized)
+            .filter(|id| {
+                self.definitions
+                    .get(*id)
+                    .is_some_and(|definition| definition.kind == DefinitionKind::Constructor)
+            })
+            .cloned()
+        {
+            self.references.insert(
+                ReferenceKey::new(module, reference),
+                ReferenceTarget::Definition(id),
+            );
+            return;
+        }
         let builtin = match name.normalized.as_str() {
             "max" => Some(Builtin::Max),
             "min" => Some(Builtin::Min),
@@ -928,20 +1157,86 @@ impl Resolver {
     ) {
         match &pattern.kind {
             hir::PatternKind::Binding { id, name } => {
-                self.bind_name(module, *id, name, false, parameter, scopes);
+                let shadowed = scopes
+                    .iter()
+                    .rev()
+                    .any(|scope| scope.names.contains_key(&name.normalized));
+                if let Some(constructor) = (!shadowed)
+                    .then(|| self.constructor_definition(module, None, &name.normalized))
+                    .flatten()
+                {
+                    self.pattern_constructors
+                        .insert(PatternKey::new(module, pattern.id), constructor);
+                } else {
+                    self.bind_name(module, *id, name, false, parameter, scopes);
+                }
             }
             hir::PatternKind::Tuple(elements) => {
                 for element in elements {
                     self.bind_pattern(module, element, parameter, scopes);
                 }
             }
-            hir::PatternKind::Constructor { arguments, .. } => {
+            hir::PatternKind::Record(fields) => {
+                for field in fields {
+                    self.bind_pattern(module, &field.pattern, parameter, scopes);
+                }
+            }
+            hir::PatternKind::Constructor {
+                qualifier,
+                name,
+                arguments,
+            } => {
+                if let Some(constructor) =
+                    self.constructor_definition(module, qualifier.as_ref(), &name.normalized)
+                {
+                    self.pattern_constructors
+                        .insert(PatternKey::new(module, pattern.id), constructor);
+                } else {
+                    let display_name = qualifier.as_ref().map_or_else(
+                        || name.normalized.clone(),
+                        |qualifier| format!("{}.{}", qualifier.normalized, name.normalized),
+                    );
+                    self.undefined(module, name.span, display_name);
+                }
                 for argument in arguments {
                     self.bind_pattern(module, argument, parameter, scopes);
                 }
             }
-            hir::PatternKind::Unit | hir::PatternKind::Literal(_) => {}
+            hir::PatternKind::Wildcard | hir::PatternKind::Unit | hir::PatternKind::Literal(_) => {}
         }
+    }
+
+    fn constructor_definition(
+        &self,
+        module: ModuleId,
+        qualifier: Option<&hir::Name>,
+        name: &str,
+    ) -> Option<DefinitionId> {
+        let owner = qualifier
+            .and_then(|qualifier| {
+                self.modules[module.0 as usize]
+                    .imports
+                    .get(&qualifier.normalized)
+            })
+            .copied()
+            .unwrap_or(module);
+        if qualifier.is_some() && owner == module {
+            return None;
+        }
+        let definition = self
+            .module_definitions
+            .get(&owner)
+            .and_then(|definitions| definitions.get(name))
+            .or_else(|| {
+                qualifier
+                    .is_none()
+                    .then(|| self.prelude_definition(name))
+                    .flatten()
+            })?;
+        self.definitions
+            .get(definition)
+            .filter(|info| info.kind == DefinitionKind::Constructor)
+            .map(|info| info.id.clone())
     }
 
     fn bind_local(&mut self, module: ModuleId, binding: &hir::LocalBinding, scopes: &mut [Scope]) {
@@ -975,7 +1270,7 @@ impl Resolver {
                 span: name.span,
             });
         }
-        check_confusable(
+        check_name_security(
             &mut scope.skeletons,
             name,
             &self.modules[module.0 as usize].hir.source_name,
@@ -1008,12 +1303,22 @@ struct Scope {
     skeletons: BTreeMap<String, String>,
 }
 
-fn check_confusable(
+fn check_name_security(
     skeletons: &mut BTreeMap<String, String>,
     name: &hir::Name,
     source_name: &str,
     errors: &mut Vec<ResolveError>,
 ) {
+    if name.suspicious_mixed_script {
+        errors.push(ResolveError {
+            kind: ResolveErrorKind::SuspiciousMixedScript {
+                name: name.normalized.clone(),
+                scripts: name.scripts.clone(),
+            },
+            source_name: source_name.to_owned(),
+            span: name.span,
+        });
+    }
     if let Some(first) = skeletons.get(&name.skeleton) {
         if first != &name.normalized {
             errors.push(ResolveError {
@@ -1027,6 +1332,48 @@ fn check_confusable(
         }
     } else {
         skeletons.insert(name.skeleton.clone(), name.normalized.clone());
+    }
+}
+
+fn check_qualified_name_security(
+    skeletons: &mut BTreeMap<String, String>,
+    name: &hir::QualifiedName,
+    source_name: &str,
+    errors: &mut Vec<ResolveError>,
+) {
+    for segment in &name.segments {
+        if segment.suspicious_mixed_script {
+            errors.push(ResolveError {
+                kind: ResolveErrorKind::SuspiciousMixedScript {
+                    name: segment.normalized.clone(),
+                    scripts: segment.scripts.clone(),
+                },
+                source_name: source_name.to_owned(),
+                span: segment.span,
+            });
+        }
+    }
+
+    let normalized = name.normalized();
+    let skeleton = name
+        .segments
+        .iter()
+        .map(|segment| segment.skeleton.as_str())
+        .collect::<Vec<_>>()
+        .join(".");
+    if let Some(first) = skeletons.get(&skeleton) {
+        if first != &normalized {
+            errors.push(ResolveError {
+                kind: ResolveErrorKind::ConfusableCollision {
+                    first: first.clone(),
+                    second: normalized,
+                },
+                source_name: source_name.to_owned(),
+                span: name.span,
+            });
+        }
+    } else {
+        skeletons.insert(skeleton, normalized);
     }
 }
 
@@ -1106,6 +1453,97 @@ mod tests {
     }
 
     #[test]
+    fn injects_prelude_definitions_and_allows_local_constructor_shadowing() {
+        let program = hir_program(
+            0,
+            "prelude.ling",
+            concat!(
+                "module Main\n\n",
+                "let wrapped = Some 1\n",
+                "let unwrap option =\n",
+                "    match option with\n",
+                "    | Some value -> value\n",
+                "    | None -> 0\n\n",
+                "let shadow () =\n",
+                "    let Some = 40\n",
+                "    Some + 2\n",
+            ),
+        );
+        let resolved = resolve(vec![program], "Main").expect("Prelude names resolve");
+
+        for definition in [
+            PreludeDefinition::Option,
+            PreludeDefinition::Some,
+            PreludeDefinition::None,
+            PreludeDefinition::Result,
+            PreludeDefinition::Ok,
+            PreludeDefinition::Error,
+        ] {
+            let id = resolved.prelude_id(definition);
+            assert!(matches!(
+                resolved.definition(id).map(|info| info.origin),
+                Some(DefinitionOrigin::Prelude(actual)) if actual == definition
+            ));
+        }
+        assert_eq!(resolved.pattern_constructors().len(), 2);
+        let local_some = resolved
+            .bindings()
+            .values()
+            .find(|binding| binding.name == "Some")
+            .expect("local Some binding")
+            .key;
+        assert!(resolved.references().values().any(
+            |target| matches!(target, ReferenceTarget::Binding(binding) if binding == &local_some)
+        ));
+    }
+
+    #[test]
+    fn rejects_module_scope_prelude_redefinition() {
+        let program = hir_program(
+            0,
+            "redefine.ling",
+            "module Main\n\ntype Option<'a> =\n    | Some of 'a\n    | None\n",
+        );
+        let errors = resolve(vec![program], "Main").expect_err("Prelude names are reserved");
+        for name in ["Option", "Some", "None"] {
+            assert!(errors.iter().any(|error| matches!(
+                &error.kind,
+                ResolveErrorKind::ReservedName { name: actual } if actual == name
+            )));
+        }
+    }
+
+    #[test]
+    fn rejects_module_builtin_redefinition_but_allows_local_shadowing() {
+        for name in ["max", "min", "map", "sum"] {
+            let program = hir_program(
+                0,
+                "builtin-redefinition.ling",
+                &format!("module Main\n\nlet {name} value = value\n"),
+            );
+            let errors = resolve(vec![program], "Main")
+                .expect_err("module-scope builtin names are reserved");
+            assert!(errors.iter().any(|error| matches!(
+                &error.kind,
+                ResolveErrorKind::ReservedName { name: actual } if actual == name
+            )));
+        }
+
+        let local = hir_program(
+            0,
+            "local-shadow.ling",
+            concat!(
+                "module Main\n\n",
+                "let useLocal () =\n",
+                "    let max value = value\n",
+                "    max 1\n",
+            ),
+        );
+        resolve(vec![local], "Main")
+            .expect("local lexical bindings may shadow unqualified builtins");
+    }
+
+    #[test]
     fn resolves_import_alias_members() {
         let main = hir_program(
             0,
@@ -1134,5 +1572,110 @@ mod tests {
                 .iter()
                 .any(|error| matches!(error.kind, ResolveErrorKind::ImportCycle { .. }))
         );
+    }
+
+    #[test]
+    fn resolves_qualified_constructor_patterns_across_modules() {
+        let main = hir_program(
+            0,
+            "Main.ling",
+            concat!(
+                "module Main\n\n",
+                "import Domain.State as State\n\n",
+                "let describe value =\n",
+                "    match value with\n",
+                "    | State.Hurt amount -> amount\n",
+                "    | State.Healthy -> 0\n",
+            ),
+        );
+        let state = hir_program(
+            1,
+            "Domain/State.ling",
+            concat!(
+                "module Domain.State\n\n",
+                "type State =\n",
+                "    | Healthy\n",
+                "    | Hurt of Int\n",
+            ),
+        );
+        let resolved = resolve(vec![main, state], "Main").expect("constructors resolve");
+        assert_eq!(resolved.pattern_constructors().len(), 2);
+        assert!(resolved.pattern_constructors().values().all(|definition| {
+            resolved
+                .definition(definition)
+                .is_some_and(|info| info.module_name == "Domain.State")
+        }));
+    }
+
+    #[test]
+    fn rejects_duplicate_binders_inside_tuple_patterns() {
+        let program = hir_program(
+            0,
+            "Main.ling",
+            "module Main\n\nlet duplicate (value, value) = value\n",
+        );
+        let errors = resolve(vec![program], "Main").expect_err("binder names must be unique");
+        assert!(errors.iter().any(|error| matches!(
+            &error.kind,
+            ResolveErrorKind::DuplicateDefinition { name } if name == "value"
+        )));
+    }
+
+    #[test]
+    fn rejects_suspicious_mixed_script_names_without_a_collision() {
+        let top_level = hir_program(0, "Main.ling", "module Main\n\nlet pаypal = 1\n");
+        let errors = resolve(vec![top_level], "Main")
+            .expect_err("a suspicious mixed-script name is rejected on its own");
+        let error = errors
+            .iter()
+            .find(|error| matches!(error.kind, ResolveErrorKind::SuspiciousMixedScript { .. }))
+            .expect("mixed-script diagnostic");
+        assert_eq!(error.to_diagnostic().code(), codes::SUSPICIOUS_MIXED_SCRIPT);
+        assert!(
+            error
+                .to_diagnostic()
+                .render_json()
+                .expect("diagnostic JSON")
+                .contains("\"scripts\":[\"Cyrl\",\"Latn\"]")
+        );
+
+        let local = hir_program(
+            1,
+            "Main.ling",
+            "module Main\n\nlet use value =\n    let pаypal = value\n    pаypal\n",
+        );
+        assert!(resolve(vec![local], "Main").is_err());
+
+        let mixed_module = hir_program(2, "Mаin.ling", "module Mаin\n\nlet value = 1\n");
+        assert!(resolve(vec![mixed_module], "Mаin").is_err());
+
+        let main = hir_program(
+            3,
+            "Main.ling",
+            "module Main\n\nimport Library as pаypal\n\nlet value = 1\n",
+        );
+        let library = hir_program(4, "Library.ling", "module Library\n\nlet value = 1\n");
+        assert!(resolve(vec![main, library], "Main").is_err());
+    }
+
+    #[test]
+    fn rejects_confusable_module_names() {
+        let latin = hir_program(0, "Paypal.ling", "module Paypal\n\nlet value = 1\n");
+        let spoofed = hir_program(1, "Pаypal.ling", "module Pаypal\n\nlet value = 2\n");
+        let errors = resolve(vec![latin, spoofed], "Paypal")
+            .expect_err("the global module scope rejects confusable names");
+        assert!(
+            errors
+                .iter()
+                .any(|error| matches!(error.kind, ResolveErrorKind::ConfusableCollision { .. }))
+        );
+    }
+
+    #[test]
+    fn allows_seed_script_combinations() {
+        for name in ["人物ID", "日本かなカナID", "韓國한글ID"] {
+            let program = hir_program(0, "Main.ling", &format!("module Main\n\nlet {name} = 1\n"));
+            resolve(vec![program], "Main").expect("allowed Seed script combination");
+        }
     }
 }

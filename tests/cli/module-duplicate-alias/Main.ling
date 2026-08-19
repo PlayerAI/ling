@@ -1,0 +1,6 @@
+module Main
+
+import A as Shared
+import B as Shared
+
+let value = 1

@@ -135,6 +135,13 @@ impl LexError {
                 "invalid numeric literal",
             )
             .with_primary_span(span),
+            LexErrorKind::UnsupportedCharacterLiteral => Diagnostic::new(
+                codes::UNSUPPORTED_CHARACTER_LITERAL,
+                Severity::Error,
+                "Ling Seed 不支持 Char 字面量；请使用 Text",
+                "Ling Seed does not support Char literals; use Text instead",
+            )
+            .with_primary_span(span),
             LexErrorKind::TabInIndentation => Diagnostic::new(
                 codes::TAB_IN_INDENTATION,
                 Severity::Error,
@@ -201,6 +208,7 @@ pub enum LexErrorKind {
     InvalidTextEscape,
     InvalidUnicodeEscape,
     InvalidNumber,
+    UnsupportedCharacterLiteral,
     TabInIndentation,
     InconsistentDedent {
         actual: u32,
@@ -259,6 +267,7 @@ impl<'source> RawLexer<'source> {
                 '/' if self.remaining().starts_with("/*") => self.lex_block_comment(),
                 '"' => self.lex_text(),
                 '0'..='9' => self.lex_number(),
+                '\'' => self.lex_apostrophe(),
                 '_' => self.lex_identifier(),
                 character if is_identifier_start(character) => self.lex_identifier(),
                 _ => self.lex_punctuation_or_error(),
@@ -460,6 +469,30 @@ impl<'source> RawLexer<'source> {
         }
     }
 
+    fn lex_apostrophe(&mut self) {
+        let start = self.offset;
+        let mut characters = self.remaining().chars();
+        debug_assert_eq!(characters.next(), Some('\''));
+        let value = characters.next();
+        let closing = characters.next();
+
+        if value.is_some_and(|value| value != '\n' && value != '\'') && closing == Some('\'') {
+            self.advance_character();
+            self.advance_character();
+            self.advance_character();
+            self.error_at(
+                LexErrorKind::UnsupportedCharacterLiteral,
+                start,
+                self.offset,
+            );
+            self.push(TokenKind::Error, start, self.offset, None);
+            return;
+        }
+
+        self.advance_character();
+        self.push(TokenKind::Apostrophe, start, self.offset, None);
+    }
+
     fn lex_number(&mut self) {
         let start = self.offset;
         if self.remaining().starts_with("0b")
@@ -505,6 +538,16 @@ impl<'source> RawLexer<'source> {
         }
 
         let normalized = spelling.replace('_', "");
+        let value_is_valid = if is_float {
+            normalized.parse::<f64>().is_ok_and(f64::is_finite)
+        } else {
+            normalized == "0" || !normalized.starts_with('0')
+        };
+        if !value_is_valid {
+            self.error_at(LexErrorKind::InvalidNumber, start, end);
+            self.push(TokenKind::Error, start, end, None);
+            return;
+        }
         let value = if is_float {
             TokenValue::Float(FloatLiteral::new(normalized))
         } else {
@@ -616,7 +659,6 @@ impl<'source> RawLexer<'source> {
             ';' => TokenKind::Semicolon,
             ':' => TokenKind::Colon,
             '.' => TokenKind::Dot,
-            '\'' => TokenKind::Apostrophe,
             '=' => TokenKind::Equals,
             '<' => TokenKind::Less,
             '>' => TokenKind::Greater,
@@ -779,7 +821,7 @@ mod tests {
 
     #[test]
     fn reports_invalid_number_and_text_escape() {
-        let lexed = lex_text("0b102 \"bad\\q\"\n");
+        let lexed = lex_text("0b102 01 0_1 1e309 \"bad\\q\"\n");
 
         assert_eq!(
             lexed
@@ -789,8 +831,43 @@ mod tests {
                 .collect::<Vec<_>>(),
             [
                 &LexErrorKind::InvalidNumber,
+                &LexErrorKind::InvalidNumber,
+                &LexErrorKind::InvalidNumber,
+                &LexErrorKind::InvalidNumber,
                 &LexErrorKind::InvalidTextEscape,
             ]
+        );
+    }
+
+    #[test]
+    fn rejects_character_literals_without_consuming_type_variable_apostrophes() {
+        let lexed = lex_text("'x' '人' 'a\n");
+
+        assert_eq!(
+            lexed
+                .errors()
+                .iter()
+                .map(LexError::kind)
+                .collect::<Vec<_>>(),
+            [
+                &LexErrorKind::UnsupportedCharacterLiteral,
+                &LexErrorKind::UnsupportedCharacterLiteral,
+            ]
+        );
+        assert_eq!(
+            significant_kinds(&lexed),
+            [
+                TokenKind::Error,
+                TokenKind::Error,
+                TokenKind::Apostrophe,
+                TokenKind::Identifier,
+                TokenKind::Newline,
+                TokenKind::Eof,
+            ]
+        );
+        assert_eq!(
+            lexed.errors()[0].to_diagnostic("test.ling").code().as_str(),
+            "L-LEX-0012"
         );
     }
 

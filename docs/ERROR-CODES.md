@@ -22,6 +22,7 @@ This file is the single source of truth for stable diagnostic-code allocation. A
 | `L-LEX-0009` | Text 包含未知或残缺的普通转义 / Text contains an unknown or incomplete ordinary escape | Text 字面量包含无效转义 | Text literal contains an invalid escape | — | — | `0.0.1-dev` |
 | `L-LEX-0010` | `\u{...}` 不是有效 Unicode scalar escape / `\u{...}` is not a valid Unicode scalar escape | Text 字面量包含无效 Unicode 转义 | Text literal contains an invalid Unicode escape | — | — | `0.0.1-dev` |
 | `L-LEX-0011` | 数字不符合 DEC-0005 / Number does not conform to DEC-0005 | 数字字面量格式无效 | invalid numeric literal | — | — | `0.0.1-dev` |
+| `L-LEX-0012` | Seed 源码使用不支持的 Char 字面量 / Seed source uses an unsupported Char literal | Ling Seed 不支持 Char 字面量；请使用 Text | Ling Seed does not support Char literals; use Text instead | — | — | `0.0.1-dev` |
 | `L-SYNTAX-0001` | 行首语义缩进包含 Tab / Leading semantic indentation contains a tab | 语义缩进不能使用 Tab | tabs are not allowed in semantic indentation | — | — | `0.0.1-dev` |
 | `L-SYNTAX-0002` | Dedent 未匹配已有 layout 层级 / Dedent does not match an existing layout level | Dedent 未对齐到已有缩进层级 | dedent does not align with an existing indentation level | `actual_column`, `recovered_column` | — | `0.0.1-dev` |
 | `L-SYNTAX-0003` | Layout/delimiter 超过 256 层 / Layout or delimiter depth exceeds 256 | Layout 或 delimiter 嵌套超过 256 层 | layout or delimiter nesting exceeds 256 levels | `maximum_depth` | — | `0.0.1-dev` |
@@ -36,23 +37,35 @@ This file is the single source of truth for stable diagnostic-code allocation. A
 | `L-NAME-0004` | import alias 重复 / Duplicate import alias | import 别名“{alias}”重复 | import alias `{alias}` is duplicated | — | — | `0.0.1-dev` |
 | `L-NAME-0005` | Seed import graph 包含 cycle / Seed import graph contains a cycle | Seed 不允许 import cycle | Ling Seed rejects import cycles | — | — | `0.0.1-dev` |
 | `L-NAME-0006` | 同一作用域存在 UTS #39 confusable collision / One scope contains a UTS #39 confusable collision | 名称视觉混淆 | names are confusable in the same scope | — | — | `0.0.1-dev` |
-| `L-NAME-0007` | module scope 重定义保留内置名称 / Module scope redefines a reserved builtin name | 模块作用域不能重定义内置名称“{name}” | module scope cannot redefine built-in name `{name}` | — | — | `0.0.1-dev` |
+| `L-NAME-0007` | module scope 重定义保留名称 / Module scope redefines a reserved name | 模块作用域不能重定义保留名称“{name}” | module scope cannot redefine reserved name `{name}` | — | — | `0.0.1-dev` |
 | `L-NAME-0008` | import module 或精确大小写路径不存在 / Imported module or exact-case path is absent | 找不到 import 模块“{module}” | imported module `{module}` was not found | `module` | — | `0.0.1-dev` |
+| `L-NAME-0009` | 标识符包含 Seed 默认禁止的 Latin/Cyrillic 或 Latin/Greek 可疑混写 / Identifier contains a suspicious Latin/Cyrillic or Latin/Greek mix rejected by Seed | 标识符包含可疑混合文字 | identifier contains a suspicious script mix | `name`, `scripts` | — | `0.0.1-dev` |
 | `L-TYPE-0001` | 类型无法统一或表达式不可调用 / Types cannot unify or an expression is not callable | 类型不匹配 | type mismatch | 可选 / optional: `generalization`, `restriction_reason` | — | `0.0.1-dev` |
 | `L-TYPE-0002` | occurs check 检测到无限类型 / Occurs check detects an infinite type | 类型推导产生无限类型 | type inference produced an infinite type | — | — | `0.0.1-dev` |
 | `L-TYPE-0003` | 函数参数数量不匹配 / Function argument count mismatch | 参数数量不匹配 | argument count mismatch | — | — | `0.0.1-dev` |
 | `L-TYPE-0004` | nominal record 字段不存在 / Nominal record field is absent | record 中不存在字段“{field}” | record has no field named `{field}` | — | — | `0.0.1-dev` |
 | `L-TYPE-0005` | 字段集合无法唯一确定 nominal record / Field set does not identify one nominal record | 无法唯一确定 nominal record 类型 | record fields do not identify one nominal record type | — | — | `0.0.1-dev` |
-| `L-TYPE-0006` | match 非穷尽 / Match is non-exhaustive | match 非穷尽 | match is non-exhaustive | — | — | `0.0.1-dev` |
-| `L-MUT-0001` | 赋值目标不是合法 mutable Place / Assignment target is not a legal mutable Place | 赋值左侧不可修改 | assignment target is not mutable | — | — | `0.0.1-dev` |
+| `L-TYPE-0006` | match 非穷尽 / Match is non-exhaustive | match 非穷尽 | match is non-exhaustive | `witness` | — | `0.0.1-dev` |
+| `L-TYPE-0007` | match 分支被前序无 guard 分支覆盖 / Match case is covered by an earlier unguarded case | match 分支不可达 | match case is unreachable | `reason` | — | `0.0.1-dev` |
+| `L-TYPE-0008` | record 构造或更新包含重复字段 / Record construction or update contains a duplicate field | record 字段重复 | record field is duplicated | `field` | — | `0.0.1-dev` |
+| `L-TYPE-0009` | record literal 缺少 nominal 类型要求的字段 / Record literal omits fields required by its nominal type | record 缺少字段 | record is missing fields | `fields`（逗号分隔、规范顺序 / comma-separated canonical order） | — | `0.0.1-dev` |
+| `L-TYPE-0010` | constructor pattern 参数数量错误 / Constructor pattern has the wrong arity | constructor 模式参数数量不匹配 | constructor pattern has the wrong arity | `constructor`, `expected_arity`, `actual_arity` | — | `0.0.1-dev` |
+| `L-TYPE-0011` | 类型不支持 Seed 相等性比较 / Type does not support Seed equality | 类型 `{type}` 不支持相等性比较 | type `{type}` does not support equality | `type` | — | `0.0.1-dev` |
+| `L-MUT-0001` | 赋值目标不是合法 mutable Place / Assignment target is not a legal mutable Place | 赋值左侧不可修改 | assignment target is not mutable | `reason`, `mutability`; 可选 / optional: `field` | — | `0.0.1-dev` |
 | `L-CAP-0001` | module 缺少所需 Capability / Module lacks a required Capability | 模块缺少 Capability 声明“{capability}” | module is missing required capability `{capability}` | — | — | `0.0.1-dev` |
 | `L-CAP-0002` | Capability 不属于 Seed / Capability is outside Seed | Seed 不支持 Capability“{capability}” | Ling Seed does not support capability `{capability}` | — | — | `0.0.1-dev` |
 | `L-CAP-0003` | module 声明了未使用的 Capability / Module declares an unused Capability | 模块声明了未使用的 Capability | module declares an unused capability | — | — | `0.0.1-dev` |
 | `L-ENTRY-0001` | run 入口 module 不是 Main / Run entry module is not Main | run 入口模块必须是 Main | the run entry module must be `Main` | — | — | `0.0.1-dev` |
 | `L-ENTRY-0002` | Main 缺少 main / Main has no main | Main 模块缺少 main 定义 | module `Main` does not define `main` | — | — | `0.0.1-dev` |
 | `L-ENTRY-0003` | main 签名或参数 pattern 非法 / Invalid main signature or parameter pattern | main 必须具有 Unit -> Unit 和 Unit pattern | `main` must have Unit -> Unit and a Unit pattern | — | — | `0.0.1-dev` |
+| `L-AUDIT-0001` | Audit Source token、字符串或数字语法非法 / Invalid Audit Source token, string, or number syntax | Audit Source 语法无效 | invalid Audit Source syntax | `audit_schema` | — | `0.0.1-dev` |
+| `L-AUDIT-0002` | Audit Source 包含未知核心字段或不兼容版本 / Audit Source contains an unknown core field or incompatible version | Audit Source 字段或版本不兼容 | incompatible Audit Source field or version | `audit_schema` | — | `0.0.1-dev` |
+| `L-AUDIT-0003` | Audit Source 缺少或重复结构字段 / Audit Source has a missing or duplicate structural field | Audit Source 结构字段缺失或重复 | missing or duplicate Audit Source structural field | `audit_schema` | — | `0.0.1-dev` |
+| `L-AUDIT-0004` | Audit model 违反结构或引用不变量 / Audit model violates structural or reference invariants | Audit model 不满足语义不变量 | Audit model violates semantic invariants | `audit_schema` | — | `0.0.1-dev` |
 | `L-RUNTIME-0001` | Checked Core 求值或宿主 Capability 发生 Runtime Fault / Checked Core or host Capability raises a Runtime Fault | 运行时 Fault | runtime Fault | `category` | — | `0.0.1-dev` |
-| `L-IMPL-0001` | 所请求路径依赖尚未实现的编译阶段 / Requested path requires a compiler stage not yet implemented | `{command}` 命令所需的编译阶段尚未实现 | the compiler stage required by `{command}` is not implemented yet | `command`, `completed_stage`; 可选 / optional: `source_name`, `had_bom`, `unicode_version`, `token_count` | — | `0.0.1-dev` |
+| `L-IMPL-0001` | **Deprecated/reserved; v0.0.1 无 emitter。** 所请求路径依赖尚未实现的编译阶段 / **Deprecated/reserved; v0.0.1 has no emitter.** Requested path requires a compiler stage not yet implemented | `{command}` 命令所需的编译阶段尚未实现 | the compiler stage required by `{command}` is not implemented yet | `command`, `completed_stage`; 可选 / optional: `source_name`, `had_bom`, `unicode_version`, `token_count` | — | `0.0.1-dev` |
+| `L-INTERNAL-0001` | 编译器内部不变量失败；不是用户程序错误 / A compiler invariant failed; this is not a user-program error | 内部编译器错误；事件 ID：`{incident_id}`；重现信息：`{reproduction}` | internal compiler error; incident ID: `{incident_id}`; reproduction: `{reproduction}` | `incident_id`, `stage`; 可选 / optional: `reproduction`, `reproduction_error`。原始 detail 只写入本地 report，不进入公开诊断 / Raw detail is written only to the local report, not the public diagnostic. | — | `0.0.1-dev` |
+| `L-SNAPSHOT-0001` | Canonical Semantic Graph 无法通过独立 reader round-trip / Canonical Semantic Graph fails an independent reader round-trip | Semantic Graph 快照验证失败 | Semantic Graph snapshot validation failed | `detail` | — | `0.0.1-dev` |
 
 ## 兼容性边界 / Compatibility boundary
 

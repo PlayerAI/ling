@@ -125,8 +125,13 @@ pub struct Pattern {
 pub enum PatternAtom {
     Name(Name),
     Literal(Literal),
+    Dot,
     LeftParen,
     RightParen,
+    LeftBrace,
+    RightBrace,
+    Equals,
+    Semicolon,
     Comma,
 }
 
@@ -545,8 +550,13 @@ impl<'input> Lowerer<'input> {
                 | TokenKind::Text
                 | TokenKind::True
                 | TokenKind::False => self.literal(token).map(PatternAtom::Literal),
+                TokenKind::Dot => Ok(PatternAtom::Dot),
                 TokenKind::LeftParen => Ok(PatternAtom::LeftParen),
                 TokenKind::RightParen => Ok(PatternAtom::RightParen),
+                TokenKind::LeftBrace => Ok(PatternAtom::LeftBrace),
+                TokenKind::RightBrace => Ok(PatternAtom::RightBrace),
+                TokenKind::Equals => Ok(PatternAtom::Equals),
+                TokenKind::Semicolon => Ok(PatternAtom::Semicolon),
                 TokenKind::Comma => Ok(PatternAtom::Comma),
                 kind => Err(self.unexpected(node, token_kind_node(kind))),
             })

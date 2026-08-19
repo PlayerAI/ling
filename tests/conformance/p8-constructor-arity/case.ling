@@ -1,0 +1,10 @@
+module Main
+
+type State =
+    | Healthy
+    | Hurt of Int
+
+let invalid state =
+    match state with
+    | Hurt -> 1
+    | Healthy -> 0

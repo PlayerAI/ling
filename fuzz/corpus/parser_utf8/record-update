@@ -1,0 +1,9 @@
+module Main
+
+type 人物 =
+    { 姓名: Text
+      mutable 血量: Int }
+
+let 受伤 伤害 人物 =
+    { 人物 with
+        血量 = max 0 (人物.血量 - 伤害) }

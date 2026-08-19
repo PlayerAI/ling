@@ -1,0 +1,15 @@
+module Main
+    requires Console.Write
+
+let unwrap option =
+    match option with
+    | Some value -> value
+    | None -> 0
+
+let resultValue result =
+    match result with
+    | Ok value -> value
+    | Error _ -> 0
+
+let main () =
+    Console.write (Text.format "{}" (unwrap (Some (resultValue (Ok 7)))))

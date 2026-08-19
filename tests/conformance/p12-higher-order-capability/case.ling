@@ -1,0 +1,8 @@
+module Main
+
+let apply callback values = map callback values
+let write value = Console.write value
+
+let main () =
+    apply write ["a"; "b"]
+    ()

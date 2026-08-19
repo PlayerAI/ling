@@ -24,19 +24,23 @@ jobs:
           toolchain: 1.97.1
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - name: Fetch locked dependencies
+        run: cargo fetch --locked
 
       - name: Verify generated Unicode tables
         run: |
-          cargo run -p unicode-gen --locked
+          cargo run -p unicode-gen --locked --offline
           git diff --exit-code -- crates/ling-unicode/src/generated.rs
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Run Clippy
-        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+        run: cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
       - name: Run tests
-        run: cargo test --workspace --all-features --locked
+        run: cargo test --workspace --all-features --locked --offline
       - name: Build documentation
-        run: cargo doc --workspace --all-features --no-deps --locked
+        run: cargo doc --workspace --all-features --no-deps --locked --offline
+      - name: Build release profile
+        run: cargo build --workspace --all-features --release --locked --offline
 
   fuzz-smoke:
     name: fuzz corpus smoke
@@ -52,9 +56,31 @@ jobs:
           workspaces: fuzz -> target
       - name: Install pinned cargo-fuzz
         run: cargo install cargo-fuzz --version 0.13.2 --locked
+      - name: Fetch locked fuzz dependencies
+        run: cargo fetch --manifest-path fuzz/Cargo.toml --locked
       - name: Replay Source corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
         run: cargo fuzz run source_bytes fuzz/corpus/source_bytes -- -runs=256
       - name: Replay Lexer corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
         run: cargo fuzz run lexer_utf8 fuzz/corpus/lexer_utf8 -- -runs=256
       - name: Replay Parser and AST corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
         run: cargo fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256
+
+  msrv:
+    name: Rust 1.85 MSRV
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.85"
+      - uses: Swatinem/rust-cache@v2
+      - name: Fetch locked dependencies
+        run: cargo fetch --locked
+      - name: Check declared MSRV
+        run: cargo check --workspace --all-features --locked --offline

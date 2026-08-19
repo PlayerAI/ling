@@ -11,10 +11,12 @@ name = "ling"
 path = "src/main.rs"
 
 [dependencies]
+blake3.workspace = true
 ling-ast = { path = "../ling-ast" }
 ling-diagnostics = { path = "../ling-diagnostics" }
 ling-effects = { path = "../ling-effects" }
 ling-eval = { path = "../ling-eval" }
+ling-format = { path = "../ling-format" }
 ling-hir = { path = "../ling-hir" }
 ling-resolve = { path = "../ling-resolve" }
 ling-semantic = { path = "../ling-semantic" }
@@ -22,6 +24,7 @@ ling-source = { path = "../ling-source" }
 ling-syntax = { path = "../ling-syntax" }
 ling-types = { path = "../ling-types" }
 ling-unicode = { path = "../ling-unicode" }
+rustyline.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]

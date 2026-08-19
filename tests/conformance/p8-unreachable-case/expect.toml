@@ -1,0 +1,5 @@
+arguments = ["check", "--format", "json", "case.ling"]
+exit_code = 0
+normative_clauses = ["NEXT-STEPS-SEED P8"]
+stdout = ""
+diagnostic_codes = ["L-TYPE-0007"]

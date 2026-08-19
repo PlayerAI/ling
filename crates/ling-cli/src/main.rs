@@ -1,17 +1,15 @@
-use std::collections::{BTreeMap, BTreeSet};
 use std::env;
 use std::ffi::OsString;
-use std::io::Write as _;
-use std::path::{Path, PathBuf};
+use std::io::{BufRead, IsTerminal as _, Write as _};
+use std::path::PathBuf;
 use std::process::ExitCode;
 
-use ling_diagnostics::{Diagnostic, DiagnosticSpan, MessageLanguage, Severity, codes};
+use ling_cli::incident::{InternalIncident, Reproduction};
+use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
+use ling_cli::{CompileFailure, compile_path};
+use ling_diagnostics::{Diagnostic, MessageLanguage};
 use ling_effects::locate_main;
 use ling_eval::{Console, HostError, HostErrorCategory};
-use ling_hir::{LowerErrorKind, Program as HirProgram};
-use ling_semantic::ProgramSnapshot;
-use ling_source::{SourceError, SourceFile, SourceId};
-use ling_syntax::parse;
 use ling_unicode::UNICODE_VERSION;
 
 const CLI_NAME: &str = "ling";
@@ -58,25 +56,31 @@ fn run(arguments: Vec<OsString>) -> u8 {
 }
 
 fn execute(options: Options) -> u8 {
-    if matches!(options.command, Command::Repl | Command::Audit) {
-        return emit_compile_error(
-            not_implemented_diagnostic(options.command, None, None, "cli"),
-            options.format,
-        );
+    if options.command == Command::Repl {
+        return execute_repl(options.format, options.capabilities);
     }
 
     let path = options
         .path
         .as_deref()
         .expect("commands other than repl require a path");
-    let compiled = match compile(path) {
+    let reproduction =
+        Reproduction::new(format!("ling {}", options.command)).with_input(path.to_string_lossy());
+    let compiled = match compile_path(path) {
         Ok(compiled) => compiled,
         Err(CompileFailure::Diagnostics(diagnostics)) => {
             return emit_compile_errors(&diagnostics, options.format);
         }
         Err(CompileFailure::Internal(message)) => {
-            eprintln!("internal compiler error: {message}");
-            return EXIT_INTERNAL_ERROR;
+            return emit_internal_incident(
+                "compile.pipeline",
+                message,
+                reproduction,
+                options.format,
+            );
+        }
+        Err(CompileFailure::SnapshotMismatch(message)) => {
+            return emit_snapshot_mismatch(&message, options.format);
         }
     };
 
@@ -95,15 +99,31 @@ fn execute(options: Options) -> u8 {
         Command::Check => EXIT_SUCCESS,
         Command::Semantic => {
             let mut stdout = std::io::stdout().lock();
-            if stdout
+            match stdout
                 .write_all(compiled.snapshot.json().as_bytes())
                 .and_then(|()| stdout.write_all(b"\n"))
-                .is_err()
             {
-                eprintln!("internal compiler error: failed to write semantic JSON");
-                EXIT_SNAPSHOT_MISMATCH
-            } else {
-                EXIT_SUCCESS
+                Ok(()) => EXIT_SUCCESS,
+                Err(error) => emit_host_io_failure("semantic.stdout", &error, options.format),
+            }
+        }
+        Command::Audit => {
+            let audit = compiled.snapshot.audit_model();
+            let rendered = match ling_format::render_audit(&audit) {
+                Ok(rendered) => rendered,
+                Err(error) => {
+                    return emit_internal_incident(
+                        "audit.render",
+                        error.to_string(),
+                        reproduction,
+                        options.format,
+                    );
+                }
+            };
+            let mut stdout = std::io::stdout().lock();
+            match stdout.write_all(rendered.as_bytes()) {
+                Ok(()) => EXIT_SUCCESS,
+                Err(error) => emit_host_io_failure("audit.stdout", &error, options.format),
             }
         }
         Command::Run => {
@@ -121,276 +141,486 @@ fn execute(options: Options) -> u8 {
                 }
             }
         }
-        Command::Repl | Command::Audit => unreachable!("handled before compilation"),
+        Command::Repl => unreachable!("handled before compilation"),
     }
 }
 
-struct Compiled {
-    snapshot: ProgramSnapshot,
-}
+fn execute_repl(format: OutputFormat, capabilities: Vec<String>) -> u8 {
+    let stdin = std::io::stdin();
+    let interactive = stdin.is_terminal() && std::io::stdout().is_terminal();
+    let mut session = Session::new(capabilities);
+    let mut buffer = String::new();
+    let mut had_compile_failure = false;
+    let mut had_runtime_failure = false;
 
-enum CompileFailure {
-    Diagnostics(Vec<Diagnostic>),
-    Internal(String),
-}
-
-fn compile(entry_path: &Path) -> Result<Compiled, CompileFailure> {
-    let root = entry_path.parent().unwrap_or_else(|| Path::new("."));
-    let mut loader = ModuleLoader::new(root.to_path_buf());
-    let entry = loader.load_entry(entry_path)?;
-    let programs = loader.programs.into_values().collect::<Vec<_>>();
-    let resolved = ling_resolve::resolve(programs, &entry).map_err(|errors| {
-        CompileFailure::Diagnostics(
-            errors
-                .iter()
-                .map(ling_resolve::ResolveError::to_diagnostic)
-                .collect(),
+    let result = if interactive {
+        execute_interactive_repl(
+            &mut session,
+            &mut buffer,
+            format,
+            &mut had_compile_failure,
+            &mut had_runtime_failure,
         )
-    })?;
-    let typed = ling_types::check(resolved).map_err(|errors| {
-        CompileFailure::Diagnostics(
-            errors
-                .iter()
-                .map(ling_types::TypeError::to_diagnostic)
-                .collect(),
+    } else {
+        execute_script_repl(
+            &mut stdin.lock(),
+            &mut session,
+            &mut buffer,
+            format,
+            &mut had_compile_failure,
+            &mut had_runtime_failure,
         )
-    })?;
-    let checked = ling_effects::check(typed).map_err(|errors| {
-        CompileFailure::Diagnostics(
-            errors
-                .iter()
-                .map(ling_effects::EffectError::to_diagnostic)
-                .collect(),
-        )
-    })?;
-    let snapshot = ling_semantic::build(checked)
-        .map_err(|error| CompileFailure::Internal(error.to_string()))?;
-    Ok(Compiled { snapshot })
-}
-
-struct ModuleLoader {
-    root: PathBuf,
-    programs: BTreeMap<String, HirProgram>,
-    paths: BTreeMap<String, PathBuf>,
-    expanded: BTreeSet<String>,
-    next_source_id: u32,
-}
-
-impl ModuleLoader {
-    fn new(root: PathBuf) -> Self {
-        Self {
-            root,
-            programs: BTreeMap::new(),
-            paths: BTreeMap::new(),
-            expanded: BTreeSet::new(),
-            next_source_id: 0,
-        }
+    };
+    if let Err(status) = result {
+        return status;
     }
 
-    fn load_entry(&mut self, path: &Path) -> Result<String, CompileFailure> {
-        let program = self.load_source(path, None)?;
-        let entry = program.module.name.normalized();
-        self.insert_program(path, program)?;
-        self.load_imports(&entry)?;
-        Ok(entry)
+    if had_runtime_failure {
+        EXIT_RUNTIME_FAULT
+    } else if had_compile_failure {
+        EXIT_COMPILE_ERROR
+    } else {
+        EXIT_SUCCESS
     }
+}
 
-    fn load_imports(&mut self, module_name: &str) -> Result<(), CompileFailure> {
-        if !self.expanded.insert(module_name.to_owned()) {
-            return Ok(());
-        }
-        let imports = self
-            .programs
-            .get(module_name)
-            .expect("loaded module exists")
-            .imports
-            .clone();
-        for import in imports {
-            let imported_name = import.module.normalized();
-            if !self.programs.contains_key(&imported_name) {
-                let path = self.import_path(&import.module);
-                if let Err(diagnostic) = self.verify_exact_import_path(&path, &import.module) {
-                    return Err(CompileFailure::Diagnostics(vec![
-                        (*diagnostic).with_primary_span(DiagnosticSpan::new(
-                            &self.programs[module_name].source_name,
-                            import.span,
-                        )),
-                    ]));
-                }
-                let program = self.load_source(&path, Some((&imported_name, import.span)))?;
-                let actual = program.module.name.normalized();
-                if actual != imported_name {
-                    return Err(CompileFailure::Diagnostics(vec![Diagnostic::new(
-                        codes::INVALID_MODULE,
-                        Severity::Error,
-                        format!(
-                            "模块声明“{actual}”与 import 名称“{imported_name}”不一致"
-                        ),
-                        format!(
-                            "module declaration `{actual}` does not match import `{imported_name}`"
-                        ),
-                    )
-                    .with_primary_span(DiagnosticSpan::new(&program.source_name, program.module.span))
-                    .with_fact("expected_module", imported_name.clone())
-                    .with_fact("actual_module", actual)]));
-                }
-                self.insert_program(&path, program)?;
+fn execute_interactive_repl(
+    session: &mut Session,
+    buffer: &mut String,
+    format: OutputFormat,
+    had_compile_failure: &mut bool,
+    had_runtime_failure: &mut bool,
+) -> Result<(), u8> {
+    let mut editor = rustyline::DefaultEditor::new()
+        .map_err(|_| emit_host_failure("repl.terminal-init", "other", format))?;
+    loop {
+        let prompt = if format == OutputFormat::Json {
+            ""
+        } else if buffer.is_empty() {
+            "ling> "
+        } else {
+            "....> "
+        };
+        match editor.readline(prompt) {
+            Ok(line) => handle_repl_line(
+                session,
+                buffer,
+                &line,
+                format,
+                had_compile_failure,
+                had_runtime_failure,
+            )?,
+            Err(rustyline::error::ReadlineError::Interrupted) => {
+                cancel_repl_submission(buffer);
             }
-            self.load_imports(&imported_name)?;
-        }
-        Ok(())
-    }
-
-    fn insert_program(&mut self, path: &Path, program: HirProgram) -> Result<(), CompileFailure> {
-        let module_name = program.module.name.normalized();
-        if let Some(previous) = self.paths.get(&module_name) {
-            if previous != path {
-                return Err(CompileFailure::Diagnostics(vec![
-                    Diagnostic::new(
-                        codes::INVALID_MODULE,
-                        Severity::Error,
-                        format!("模块“{module_name}”由多个文件声明"),
-                        format!("module `{module_name}` is declared by multiple files"),
-                    )
-                    .with_primary_span(DiagnosticSpan::new(
-                        &program.source_name,
-                        program.module.span,
-                    )),
-                ]));
+            Err(rustyline::error::ReadlineError::Eof) => {
+                return process_pending_submission(
+                    session,
+                    buffer,
+                    format,
+                    had_compile_failure,
+                    had_runtime_failure,
+                );
             }
-            return Ok(());
+            Err(rustyline::error::ReadlineError::Io(error)) => {
+                return Err(emit_host_io_failure("repl.terminal-input", &error, format));
+            }
+            Err(_) => return Err(emit_host_failure("repl.terminal-input", "other", format)),
         }
-        self.paths.insert(module_name.clone(), path.to_path_buf());
-        self.programs.insert(module_name, program);
+    }
+}
+
+fn execute_script_repl(
+    input: &mut impl BufRead,
+    session: &mut Session,
+    buffer: &mut String,
+    format: OutputFormat,
+    had_compile_failure: &mut bool,
+    had_runtime_failure: &mut bool,
+) -> Result<(), u8> {
+    let mut line = String::new();
+
+    loop {
+        line.clear();
+        match input.read_line(&mut line) {
+            Ok(0) => {
+                return process_pending_submission(
+                    session,
+                    buffer,
+                    format,
+                    had_compile_failure,
+                    had_runtime_failure,
+                );
+            }
+            Ok(_) => handle_repl_line(
+                session,
+                buffer,
+                &line,
+                format,
+                had_compile_failure,
+                had_runtime_failure,
+            )?,
+            Err(error) if error.kind() == std::io::ErrorKind::Interrupted => {
+                cancel_repl_submission(buffer);
+            }
+            Err(error) => {
+                return Err(emit_host_io_failure("repl.script-input", &error, format));
+            }
+        }
+    }
+}
+
+fn handle_repl_line(
+    session: &mut Session,
+    buffer: &mut String,
+    line: &str,
+    format: OutputFormat,
+    had_compile_failure: &mut bool,
+    had_runtime_failure: &mut bool,
+) -> Result<(), u8> {
+    if line.trim().is_empty() && !buffer.trim().is_empty() && delimiters_closed(buffer) {
+        process_submission(
+            session,
+            buffer,
+            format,
+            had_compile_failure,
+            had_runtime_failure,
+        )?;
+        buffer.clear();
+    } else {
+        buffer.push_str(line);
+        if !line.ends_with('\n') {
+            buffer.push('\n');
+        }
+    }
+    Ok(())
+}
+
+fn process_pending_submission(
+    session: &mut Session,
+    buffer: &str,
+    format: OutputFormat,
+    had_compile_failure: &mut bool,
+    had_runtime_failure: &mut bool,
+) -> Result<(), u8> {
+    if buffer.trim().is_empty() {
         Ok(())
+    } else {
+        process_submission(
+            session,
+            buffer,
+            format,
+            had_compile_failure,
+            had_runtime_failure,
+        )
+    }
+}
+
+fn cancel_repl_submission(buffer: &mut String) {
+    buffer.clear();
+}
+
+fn process_submission(
+    session: &mut Session,
+    source: &str,
+    format: OutputFormat,
+    had_compile_failure: &mut bool,
+    had_runtime_failure: &mut bool,
+) -> Result<(), u8> {
+    let mut console = ling_eval::MemoryConsole::default();
+    let outcome = session.submit(source.trim_end(), &mut console);
+    if !console.output().is_empty() {
+        match format {
+            OutputFormat::Human => {
+                write_stdout(console.output().as_bytes())
+                    .map_err(|error| emit_host_io_failure("repl.console", &error, format))?;
+            }
+            OutputFormat::Json => {
+                let submission = match &outcome {
+                    Ok(success) => success.submission,
+                    Err(failure) => failure.submission(),
+                };
+                emit_repl_json(&serde_json::json!({
+                    "schema": "ling.repl/0.1",
+                    "status": "console",
+                    "committed": false,
+                    "submission": submission,
+                    "console": console.output(),
+                }))
+                .map_err(|error| emit_host_io_failure("repl.console-json", &error, format))?;
+            }
+        }
     }
 
-    fn load_source(
-        &mut self,
-        path: &Path,
-        imported: Option<(&str, ling_source::Span)>,
-    ) -> Result<HirProgram, CompileFailure> {
-        let display_path = path.to_string_lossy().into_owned();
-        let bytes = std::fs::read(path).map_err(|error| {
-            let diagnostic = if let Some((module, _)) = imported {
-                Diagnostic::new(
-                    codes::MODULE_NOT_FOUND,
-                    Severity::Error,
-                    format!("找不到 import 模块“{module}”"),
-                    format!("imported module `{module}` was not found"),
-                )
-                .with_fact("module", module)
-            } else {
-                Diagnostic::new(
-                    codes::SOURCE_READ_FAILED,
-                    Severity::Error,
-                    format!("无法读取源码文件“{display_path}”"),
-                    format!("failed to read source file `{display_path}`"),
-                )
-                .with_fact("io_kind", stable_io_kind(error.kind()))
-            };
-            CompileFailure::Diagnostics(vec![diagnostic])
-        })?;
-        let source_id = SourceId::new(self.next_source_id);
-        self.next_source_id = self.next_source_id.saturating_add(1);
-        let source =
-            SourceFile::from_bytes(source_id, display_path.clone(), bytes).map_err(|error| {
-                CompileFailure::Diagnostics(vec![source_error_diagnostic(&display_path, error)])
-            })?;
-        let parsed = parse(&source);
-        if !parsed.lexical_errors().is_empty() {
-            return Err(CompileFailure::Diagnostics(
-                parsed
-                    .lexical_errors()
-                    .iter()
-                    .map(|error| error.to_diagnostic(source.name()))
-                    .collect(),
+    match outcome {
+        Ok(success) => emit_repl_success(&success, format)?,
+        Err(SubmissionFailure::Compile {
+            submission,
+            diagnostics,
+        }) => {
+            *had_compile_failure = true;
+            emit_repl_failure(submission, &diagnostics, format)?;
+        }
+        Err(SubmissionFailure::Runtime { submission, fault }) => {
+            *had_runtime_failure = true;
+            emit_repl_runtime_failure(submission, &fault, format)?;
+        }
+        Err(SubmissionFailure::Internal {
+            submission,
+            message,
+        }) => {
+            return Err(emit_internal_incident(
+                "repl.submission",
+                message,
+                Reproduction::new("ling repl")
+                    .with_submission(submission)
+                    .with_source(source),
+                format,
             ));
         }
-        if !parsed.parse_errors().is_empty() {
-            return Err(CompileFailure::Diagnostics(
-                parsed
-                    .parse_errors()
-                    .iter()
-                    .map(|error| error.to_diagnostic(source.name()))
-                    .collect(),
-            ));
+        Err(SubmissionFailure::SnapshotMismatch {
+            submission,
+            message,
+        }) => {
+            return Err(emit_repl_snapshot_mismatch(submission, &message, format));
         }
-        let ast = ling_ast::lower(&source, &parsed)
-            .map_err(|error| CompileFailure::Internal(format!("AST lowering failed: {error}")))?;
-        ling_hir::lower(source.name(), &ast).map_err(|error| {
-            let code = match error.kind {
-                LowerErrorKind::InvalidAssignmentPlace => codes::INVALID_ASSIGNMENT,
-                _ => codes::INVALID_MODULE,
-            };
-            CompileFailure::Diagnostics(vec![
-                Diagnostic::new(
-                    code,
-                    Severity::Error,
-                    format!("无法建立 Seed HIR：{error}"),
-                    format!("cannot construct Seed HIR: {error}"),
-                )
-                .with_primary_span(DiagnosticSpan::new(source.name(), error.span)),
-            ])
-        })
     }
+    Ok(())
+}
 
-    fn import_path(&self, module: &ling_hir::QualifiedName) -> PathBuf {
-        let mut path = self.root.clone();
-        for segment in &module.segments[..module.segments.len().saturating_sub(1)] {
-            path.push(&segment.normalized);
-        }
-        let last = &module
-            .segments
-            .last()
-            .expect("qualified import names are non-empty")
-            .normalized;
-        path.push(format!("{last}.ling"));
-        path
-    }
-
-    fn verify_exact_import_path(
-        &self,
-        path: &Path,
-        module: &ling_hir::QualifiedName,
-    ) -> Result<(), Box<Diagnostic>> {
-        let desired = module
-            .segments
-            .iter()
-            .enumerate()
-            .map(|(index, segment)| {
-                if index + 1 == module.segments.len() {
-                    format!("{}.ling", segment.normalized)
-                } else {
-                    segment.normalized.clone()
+fn emit_repl_success(success: &SubmissionSuccess, format: OutputFormat) -> Result<(), u8> {
+    match format {
+        OutputFormat::Human => {
+            if !success.warnings.is_empty() {
+                let _ = emit_diagnostics(&success.warnings, OutputFormat::Human, EXIT_SUCCESS);
+            }
+            match success.kind {
+                SubmissionKind::Expression => {
+                    if let (Some(value), Some(type_name)) = (&success.value, &success.type_name) {
+                        write_stdout(format!("{value} : {type_name}\n").as_bytes())
+                            .map_err(|error| emit_host_io_failure("repl.result", &error, format))?;
+                    }
                 }
-            })
-            .collect::<Vec<_>>();
-        let mut current = self.root.clone();
-        for component in desired {
-            let exact = std::fs::read_dir(&current).ok().is_some_and(|entries| {
-                entries.filter_map(Result::ok).any(|entry| {
-                    entry
-                        .file_name()
-                        .to_str()
-                        .is_some_and(|name| name == component)
-                })
+                SubmissionKind::ValueDeclaration => {
+                    if let (Some(name), Some(type_name)) = (&success.name, &success.type_name) {
+                        write_stdout(format!("{name} : {type_name}\n").as_bytes())
+                            .map_err(|error| emit_host_io_failure("repl.result", &error, format))?;
+                    }
+                }
+                SubmissionKind::TypeDeclaration => {
+                    if let Some(name) = &success.name {
+                        write_stdout(format!("type {name}\n").as_bytes())
+                            .map_err(|error| emit_host_io_failure("repl.result", &error, format))?;
+                    }
+                }
+            }
+        }
+        OutputFormat::Json => {
+            let mut event = serde_json::json!({
+                "schema": "ling.repl/0.1",
+                "status": "ok",
+                "committed": success.committed,
+                "submission": success.submission,
+                "effects": success.effects,
+                "capabilities": success.capabilities,
             });
-            if !exact {
-                return Err(Box::new(
-                    Diagnostic::new(
-                        codes::MODULE_NOT_FOUND,
-                        Severity::Error,
-                        format!("找不到大小写完全匹配的 import 路径“{}”", path.display()),
-                        format!("no exact-case import path exists at `{}`", path.display()),
-                    )
-                    .with_fact("module", module.normalized()),
-                ));
+            let object = event.as_object_mut().expect("JSON object literal");
+            if let Some(name) = &success.name {
+                object.insert("name".to_owned(), serde_json::json!(name));
             }
-            current.push(component);
+            if let Some(type_name) = &success.type_name {
+                object.insert("type".to_owned(), serde_json::json!(type_name));
+            }
+            if let Some(value) = &success.value {
+                object.insert("value".to_owned(), serde_json::json!(value));
+            }
+            if let Some(definition_id) = &success.definition_id {
+                object.insert("definition_id".to_owned(), serde_json::json!(definition_id));
+            }
+            if !success.warnings.is_empty() {
+                object.insert(
+                    "diagnostics".to_owned(),
+                    serde_json::Value::Array(diagnostic_values(&success.warnings)?),
+                );
+            }
+            emit_repl_json(&event)
+                .map_err(|error| emit_host_io_failure("repl.result-json", &error, format))?;
         }
-        Ok(())
     }
+    Ok(())
+}
+
+fn emit_repl_failure(
+    submission: u64,
+    diagnostics: &[Diagnostic],
+    format: OutputFormat,
+) -> Result<(), u8> {
+    match format {
+        OutputFormat::Human => {
+            let _ = emit_compile_errors(diagnostics, OutputFormat::Human);
+        }
+        OutputFormat::Json => {
+            emit_repl_json(&serde_json::json!({
+                "schema": "ling.repl/0.1",
+                "status": "compile_error",
+                "committed": false,
+                "submission": submission,
+                "diagnostics": diagnostic_values(diagnostics)?,
+            }))
+            .map_err(|error| emit_host_io_failure("repl.compile-error-json", &error, format))?;
+        }
+    }
+    Ok(())
+}
+
+fn emit_repl_runtime_failure(
+    submission: u64,
+    fault: &ling_eval::RuntimeFault,
+    format: OutputFormat,
+) -> Result<(), u8> {
+    let diagnostic = fault.to_diagnostic().with_fact("committed", false);
+    match format {
+        OutputFormat::Human => {
+            let _ = emit_diagnostics(&[diagnostic], OutputFormat::Human, EXIT_RUNTIME_FAULT);
+        }
+        OutputFormat::Json => {
+            emit_repl_json(&serde_json::json!({
+                "schema": "ling.repl/0.1",
+                "status": "runtime_error",
+                "committed": false,
+                "submission": submission,
+                "diagnostics": diagnostic_values(&[diagnostic])?,
+            }))
+            .map_err(|error| emit_host_io_failure("repl.runtime-error-json", &error, format))?;
+        }
+    }
+    Ok(())
+}
+
+fn emit_repl_snapshot_mismatch(submission: u64, message: &str, format: OutputFormat) -> u8 {
+    let diagnostic = snapshot_mismatch_diagnostic(message).with_fact("committed", false);
+    match format {
+        OutputFormat::Human => {
+            emit_diagnostics(&[diagnostic], OutputFormat::Human, EXIT_SNAPSHOT_MISMATCH)
+        }
+        OutputFormat::Json => {
+            let event = serde_json::json!({
+                "schema": "ling.repl/0.1",
+                "status": "snapshot_mismatch",
+                "committed": false,
+                "submission": submission,
+                "diagnostics": match diagnostic_values(&[diagnostic]) {
+                    Ok(values) => values,
+                    Err(status) => return status,
+                },
+            });
+            match emit_repl_json(&event) {
+                Ok(()) => EXIT_SNAPSHOT_MISMATCH,
+                Err(error) => emit_host_io_failure("repl.snapshot-mismatch-json", &error, format),
+            }
+        }
+    }
+}
+
+fn diagnostic_values(diagnostics: &[Diagnostic]) -> Result<Vec<serde_json::Value>, u8> {
+    diagnostics
+        .iter()
+        .map(|diagnostic| {
+            diagnostic
+                .render_json()
+                .map_err(|error| {
+                    emit_internal_incident(
+                        "diagnostic.render",
+                        error.to_string(),
+                        Reproduction::new("ling repl --format json"),
+                        OutputFormat::Json,
+                    )
+                })
+                .and_then(|rendered| {
+                    serde_json::from_str(&rendered).map_err(|error| {
+                        emit_internal_incident(
+                            "diagnostic.parse-rendered-json",
+                            error.to_string(),
+                            Reproduction::new("ling repl --format json"),
+                            OutputFormat::Json,
+                        )
+                    })
+                })
+        })
+        .collect()
+}
+
+fn emit_repl_json(value: &serde_json::Value) -> std::io::Result<()> {
+    let mut rendered = serde_json::to_vec(value).map_err(std::io::Error::other)?;
+    rendered.push(b'\n');
+    write_stdout(&rendered)
+}
+
+fn write_stdout(bytes: &[u8]) -> std::io::Result<()> {
+    let mut stdout = std::io::stdout().lock();
+    stdout.write_all(bytes)
+}
+
+fn delimiters_closed(source: &str) -> bool {
+    let mut delimiters = Vec::new();
+    let mut characters = source.chars().peekable();
+    let mut in_text = false;
+    let mut escaped = false;
+    let mut line_comment = false;
+    let mut block_depth = 0_u32;
+    while let Some(character) = characters.next() {
+        if line_comment {
+            if character == '\n' {
+                line_comment = false;
+            }
+            continue;
+        }
+        if block_depth > 0 {
+            if character == '/' && characters.peek() == Some(&'*') {
+                characters.next();
+                block_depth = block_depth.saturating_add(1);
+            } else if character == '*' && characters.peek() == Some(&'/') {
+                characters.next();
+                block_depth = block_depth.saturating_sub(1);
+            }
+            continue;
+        }
+        if in_text {
+            if escaped {
+                escaped = false;
+            } else if character == '\\' {
+                escaped = true;
+            } else if character == '"' {
+                in_text = false;
+            }
+            continue;
+        }
+        match character {
+            '"' => in_text = true,
+            '/' if characters.peek() == Some(&'/') => {
+                characters.next();
+                line_comment = true;
+            }
+            '/' if characters.peek() == Some(&'*') => {
+                characters.next();
+                block_depth = 1;
+            }
+            '(' | '[' | '{' => delimiters.push(character),
+            ')' | ']' | '}' => {
+                let expected = match character {
+                    ')' => '(',
+                    ']' => '[',
+                    '}' => '{',
+                    _ => unreachable!("closing delimiter matched above"),
+                };
+                if delimiters.pop() != Some(expected) {
+                    return true;
+                }
+            }
+            _ => {}
+        }
+    }
+    delimiters.is_empty() && !in_text && block_depth == 0
 }
 
 struct StdoutConsole;
@@ -413,98 +643,47 @@ const fn host_error_category(kind: std::io::ErrorKind) -> HostErrorCategory {
     }
 }
 
-const fn stable_io_kind(kind: std::io::ErrorKind) -> &'static str {
-    match kind {
-        std::io::ErrorKind::NotFound => "not_found",
-        std::io::ErrorKind::PermissionDenied => "permission_denied",
-        std::io::ErrorKind::InvalidData => "invalid_data",
-        std::io::ErrorKind::Interrupted => "interrupted",
-        _ => "other",
-    }
-}
-
-fn source_error_diagnostic(path: &str, error: SourceError) -> Diagnostic {
-    match error {
-        SourceError::InvalidUtf8 {
-            valid_up_to,
-            error_len,
-        } => {
-            let end = valid_up_to.saturating_add(error_len.unwrap_or(1));
-            Diagnostic::new(
-                codes::INVALID_UTF8,
-                Severity::Error,
-                "源码不是有效的 UTF-8",
-                "source is not valid UTF-8",
-            )
-            .with_primary_span(DiagnosticSpan::at(
-                path,
-                u32::try_from(valid_up_to).unwrap_or(u32::MAX),
-                u32::try_from(end).unwrap_or(u32::MAX),
-            ))
-            .with_fact(
-                "valid_up_to",
-                u64::try_from(valid_up_to).unwrap_or(u64::MAX),
-            )
-        }
-        SourceError::MisplacedByteOrderMark { byte_offset } => Diagnostic::new(
-            codes::MISPLACED_BOM,
-            Severity::Error,
-            "UTF-8 BOM 只能出现在文件开头",
-            "the UTF-8 byte-order mark is only allowed at the start of a file",
-        )
-        .with_primary_span(DiagnosticSpan::at(
-            path,
-            u32::try_from(byte_offset).unwrap_or(u32::MAX),
-            u32::try_from(byte_offset.saturating_add(3)).unwrap_or(u32::MAX),
-        )),
-        SourceError::TooLarge { byte_len } => Diagnostic::new(
-            codes::SOURCE_TOO_LARGE,
-            Severity::Error,
-            "源码文件超过当前实现支持的大小",
-            "source file exceeds the size supported by this implementation",
-        )
-        .with_fact("byte_len", u64::try_from(byte_len).unwrap_or(u64::MAX))
-        .with_fact("maximum_byte_len", u64::from(u32::MAX)),
-    }
-}
-
-fn not_implemented_diagnostic(
-    command: Command,
-    source: Option<&SourceFile>,
-    token_count: Option<usize>,
-    completed_stage: &'static str,
-) -> Diagnostic {
-    let mut diagnostic = Diagnostic::new(
-        codes::FEATURE_NOT_IMPLEMENTED,
-        Severity::Error,
-        format!("`{command}` 命令所需的编译阶段尚未实现"),
-        format!("the compiler stage required by `{command}` is not implemented yet"),
-    )
-    .with_fact("command", command.to_string())
-    .with_fact("completed_stage", completed_stage);
-
-    if let Some(source) = source {
-        diagnostic = diagnostic
-            .with_fact("source_name", source.name())
-            .with_fact("had_bom", source.had_bom())
-            .with_fact("unicode_version", UNICODE_VERSION.to_string());
-    }
-    if let Some(token_count) = token_count {
-        diagnostic = diagnostic.with_fact(
-            "token_count",
-            u64::try_from(token_count).unwrap_or(u64::MAX),
-        );
-    }
-
-    diagnostic
-}
-
 fn emit_compile_error(diagnostic: Diagnostic, format: OutputFormat) -> u8 {
     emit_compile_errors(&[diagnostic], format)
 }
 
 fn emit_compile_errors(diagnostics: &[Diagnostic], format: OutputFormat) -> u8 {
     emit_diagnostics(diagnostics, format, EXIT_COMPILE_ERROR)
+}
+
+fn emit_snapshot_mismatch(message: &str, format: OutputFormat) -> u8 {
+    emit_diagnostics(
+        &[snapshot_mismatch_diagnostic(message)],
+        format,
+        EXIT_SNAPSHOT_MISMATCH,
+    )
+}
+
+fn snapshot_mismatch_diagnostic(message: &str) -> Diagnostic {
+    Diagnostic::new(
+        ling_diagnostics::codes::SEMANTIC_SNAPSHOT_MISMATCH,
+        ling_diagnostics::Severity::Error,
+        "Semantic Graph 快照验证失败",
+        "Semantic Graph snapshot validation failed",
+    )
+    .with_fact("detail", message)
+}
+
+fn emit_host_io_failure(operation: &str, error: &std::io::Error, format: OutputFormat) -> u8 {
+    let category = host_error_category(error.kind()).name();
+    emit_host_failure(operation, category, format)
+}
+
+fn emit_host_failure(operation: &str, category: &str, format: OutputFormat) -> u8 {
+    let diagnostic = Diagnostic::new(
+        ling_diagnostics::codes::RUNTIME_FAULT,
+        ling_diagnostics::Severity::Error,
+        format!("宿主输出操作“{operation}”失败"),
+        format!("host output operation `{operation}` failed"),
+    )
+    .with_fact("category", category)
+    .with_fact("operation", operation);
+    emit_diagnostics(&[diagnostic], format, EXIT_RUNTIME_FAULT)
 }
 
 fn emit_diagnostics(diagnostics: &[Diagnostic], format: OutputFormat, exit_code: u8) -> u8 {
@@ -516,12 +695,38 @@ fn emit_diagnostics(diagnostics: &[Diagnostic], format: OutputFormat, exit_code:
         match rendered {
             Ok(rendered) => eprintln!("{rendered}"),
             Err(error) => {
-                eprintln!("internal compiler error: {error}");
-                return EXIT_INTERNAL_ERROR;
+                return emit_internal_incident(
+                    "diagnostic.render",
+                    error,
+                    Reproduction::new("ling diagnostics"),
+                    format,
+                );
             }
         }
     }
     exit_code
+}
+
+fn emit_internal_incident(
+    stage: &str,
+    detail: impl Into<String>,
+    reproduction: Reproduction,
+    format: OutputFormat,
+) -> u8 {
+    let incident = InternalIncident::capture(stage, detail, reproduction);
+    let diagnostic = incident.diagnostic();
+    let rendered = match format {
+        OutputFormat::Human => Ok(diagnostic.render_human(MessageLanguage::Chinese)),
+        OutputFormat::Json => diagnostic.render_json().map_err(|error| error.to_string()),
+    };
+    match rendered {
+        Ok(rendered) => eprintln!("{rendered}"),
+        Err(_) => eprintln!(
+            "error[L-INTERNAL-0001]: internal compiler error; incident ID: {}",
+            incident.id()
+        ),
+    }
+    EXIT_INTERNAL_ERROR
 }
 
 fn invalid_usage(message: &str) -> u8 {
@@ -531,7 +736,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} repl [--format human|json]"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]"
     )
 }
 
@@ -591,12 +796,14 @@ struct Options {
     command: Command,
     format: OutputFormat,
     path: Option<PathBuf>,
+    capabilities: Vec<String>,
 }
 
 impl Options {
     fn parse(command: Command, arguments: &[OsString]) -> Result<Self, String> {
         let mut format = OutputFormat::Human;
         let mut path = None;
+        let mut capabilities = Vec::new();
         let mut index = 0;
 
         while index < arguments.len() {
@@ -610,6 +817,24 @@ impl Options {
                     .ok_or_else(|| "the output format must be valid Unicode".to_owned())?;
                 format = OutputFormat::parse(value)
                     .ok_or_else(|| format!("unsupported output format `{value}`"))?;
+                index += 2;
+                continue;
+            }
+
+            if argument == "--capability" {
+                if command != Command::Repl {
+                    return Err("`--capability` is only valid with `repl`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--capability` requires a capability name".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the capability name must be valid Unicode".to_owned())?;
+                if value != "Console.Write" {
+                    return Err(format!("unsupported REPL capability `{value}`"));
+                }
+                capabilities.push(value.to_owned());
                 index += 2;
                 continue;
             }
@@ -634,6 +859,7 @@ impl Options {
             command,
             format,
             path,
+            capabilities,
         })
     }
 }
@@ -669,5 +895,31 @@ mod tests {
             Options::parse(Command::Check, &[]).unwrap_err(),
             "`check` requires a source file"
         );
+    }
+
+    #[test]
+    fn repl_completion_ignores_delimiters_in_text_and_comments() {
+        assert!(delimiters_closed("\"(\" // [\n/* { } */\n"));
+        assert!(!delimiters_closed("sum [1; 2"));
+        assert!(!delimiters_closed("/* open"));
+        assert!(delimiters_closed("sum [1; 2]"));
+    }
+
+    #[test]
+    fn repl_interrupt_clears_only_the_pending_submission() {
+        let mut session = Session::new(Vec::new());
+        let mut console = ling_eval::MemoryConsole::default();
+        session
+            .submit("let answer = 42", &mut console)
+            .expect("definition commits");
+        let mut pending = "let unfinished = (\n".to_owned();
+
+        cancel_repl_submission(&mut pending);
+
+        assert!(pending.is_empty());
+        let result = session
+            .submit("answer", &mut console)
+            .expect("committed state survives interrupt");
+        assert_eq!(result.value.as_deref(), Some("42"));
     }
 }

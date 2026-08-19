@@ -1,0 +1,8 @@
+module Main
+    requires Console.Write
+
+let main () =
+    if 1.5e-2 == 0.015 then
+        Console.write "equal"
+    else
+        Console.write "different"

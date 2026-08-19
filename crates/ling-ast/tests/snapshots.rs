@@ -223,8 +223,13 @@ fn render_pattern(output: &mut String, pattern: &Pattern, depth: usize, label: &
         atoms.push(match atom {
             PatternAtom::Name(name) => name.normalized.clone(),
             PatternAtom::Literal(literal) => literal_text(literal),
+            PatternAtom::Dot => ".".to_owned(),
             PatternAtom::LeftParen => "(".to_owned(),
             PatternAtom::RightParen => ")".to_owned(),
+            PatternAtom::LeftBrace => "{".to_owned(),
+            PatternAtom::RightBrace => "}".to_owned(),
+            PatternAtom::Equals => "=".to_owned(),
+            PatternAtom::Semicolon => ";".to_owned(),
             PatternAtom::Comma => ",".to_owned(),
         });
     }

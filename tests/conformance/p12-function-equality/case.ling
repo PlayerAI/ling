@@ -1,0 +1,4 @@
+module Main
+
+let identity value = value
+let invalid = identity == identity

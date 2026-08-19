@@ -1,0 +1,7 @@
+module Main
+
+type Person =
+    { name: Text
+      age: Int }
+
+let person = { name = "Ling" }

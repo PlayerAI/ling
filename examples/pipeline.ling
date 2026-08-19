@@ -1,0 +1,12 @@
+module Main
+    requires Console.Write
+
+let 加一 数值 = 数值 + 1
+
+let main () =
+    let 总和 =
+        [1; 2; 3]
+        |> map 加一
+        |> sum
+
+    Console.write (Text.format "{}" 总和)

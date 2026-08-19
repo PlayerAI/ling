@@ -271,9 +271,9 @@ Unicode 17.0.0 的权威输入来自 Unicode Consortium 的版本化目录：
 | G-09 | M4 | `State<T>` 与 Capability 本体 | `State<T>` 可见性；Capability 是静态要求、运行时值或二者；宿主能力失败如何分类 | [DEC-0010](decisions/0010-state-and-capability-model.md) |
 | G-10 | M4 | Seed 内置项 | `max`、`min`、`Console.write`、格式化及示例所需集合的规范名称、类型、Effect/Capability | [DEC-0011](decisions/0011-seed-builtins.md) |
 | G-11 | M5 | Semantic ID 身份模型 | 逻辑身份与内容哈希是否分离、依赖变化传播、互递归、canonical bytes 与版本迁移 | [DEC-0012](decisions/0012-semantic-identity-and-canonical-bytes.md) |
-| G-12 | M5 | Audit Source grammar | 可解析语法、显示元数据边界、唯一性及 round-trip 等价关系 | 待定 |
+| G-12 | M5 | Audit Source grammar | 可解析语法、显示元数据边界、唯一性及 round-trip 等价关系 | [DEC-0015](decisions/0015-audit-source-format.md) |
 | G-13 | M1 | Source 位置单位 | byte span 的半开区间、line 基数、column 使用 byte/scalar/UTF-16/grapheme 中哪一种、换行规范化映射 | [DEC-0002](decisions/0002-source-position-units.md) |
-| G-14 | M6 | REPL 会话语义 | 多行输入、重定义、阴影、失败事务、会话 Capability、脚本模式输出 | 待定 |
+| G-14 | M6 | REPL 会话语义 | 多行输入、重定义、阴影、失败事务、会话 Capability、脚本模式输出 | [DEC-0016](decisions/0016-repl-session-semantics.md) |
 | G-15 | M6 | `main` 与运行错误 | 允许的入口签名、返回类型、Effect 上限、Result/Fault 到退出码和 JSON 的映射 | [DEC-0013](decisions/0013-main-and-runtime-failures.md) |
 
 ---
@@ -342,21 +342,23 @@ M1 和 M2 各完成后，根据实际吞吐、缺陷率、测试规模和接口�
 
 打 `v0.0.1` 标签前，以下 RFC §18 条目必须在 CI 与本地同时验证。该清单是必要条件，不替代第 6 节缺口关闭或规范条款追踪矩阵：
 
-- [ ] `ling run examples/人物.ling` 成功输出预期结果（§18.1）
-- [ ] `ling check examples/人物.ling` 返回 0；错误程序返回稳定 code 与 JSON（§18.2）
-- [ ] `人物 / 血量 / 最大血量 / 受到伤害 / 生存状态` 全链路不损坏（§18.3）
-- [ ] 普通函数可推导；错误类型被拒；record 字段检查；非穷尽 match 被拒；不可变赋值被拒（§18.4）
-- [ ] Pure 显示空 Effect；Console 调用显示 `Console.Write`；未声明 Capability 被拒（§18.5）
-- [ ] 每定义有实验性 ID；引用边已解析；空白不变 hash；参数改名不变 BodyId；行为改变变 BodyId；Graph JSON 过 Schema 测试（§18.6）
-- [ ] Parser fuzz 规定时间无 panic；全部 conformance 通过；REPL 与文件执行同一 Core；Windows/Linux/macOS 构建通过（§18.7）
+下列 `[x]` 表示当前工作区已有可重复的本地证据；发布仍需要同一候选 SHA 的三平台 CI。
+
+- [x] `ling run examples/人物.ling` 成功输出预期结果（§18.1）
+- [x] `ling check examples/人物.ling` 返回 0；错误程序返回稳定 code 与 JSON（§18.2）
+- [x] `人物 / 血量 / 最大血量 / 受到伤害 / 生存状态` 全链路不损坏（§18.3）
+- [x] 普通函数可推导；错误类型被拒；record 字段检查；非穷尽 match 被拒；不可变赋值被拒（§18.4）
+- [x] Pure 显示空 Effect；Console 调用显示 `Console.Write`；未声明 Capability 被拒（§18.5）
+- [x] 每定义有实验性 ID；引用边已解析；空白不变 hash；参数改名不变 BodyId；行为改变变 BodyId；Graph JSON 过 Schema 测试（§18.6）
+- [ ] Parser fuzz 规定时间无 panic；全部 conformance 通过；REPL 与文件执行同一 Core；Windows/Linux/macOS 构建通过（§18.7）——Windows 本地 conformance/Core/fuzz-target compile 已通过，Linux/macOS 真实 PTY interrupt fixture 已实现；其远程执行、Ubuntu fuzz smoke 与三平台候选 CI 待完成。
 
 附加发布门禁：
 
-- [ ] G-01 至 G-15 均有已批准的 RFC、勘误或协议决议链接，且实现与决议一致；
-- [ ] `Cargo.lock` 已提交，`cargo build/test --workspace --all-features --locked` 在三平台通过；
-- [ ] Unicode 数据版本、输入校验和和许可证记录可追溯，普通构建不访问网络；
-- [ ] Diagnostic/Graph/Audit Schema 正负兼容性、独立进程确定性和 Audit round-trip 测试通过；
-- [ ] 未实现特性产生明确错误，不存在静默占位路径；
+- [x] G-01 至 G-15 均有已批准的 RFC、勘误或协议决议链接，且本地实现审计与决议一致；
+- [ ] `Cargo.lock` 已提交，`cargo build/test --workspace --all-features --locked --offline` 在三平台通过（本地 Windows 已通过）；
+- [x] Unicode 数据版本、输入校验和和许可证记录可追溯，普通构建不访问网络；
+- [x] Diagnostic/Graph/Audit Schema 正负兼容性、独立进程确定性和 Audit round-trip 测试通过；
+- [x] Seed 边界外特性不存在静默占位执行路径；保留语法在可识别时产生明确诊断；
 - [ ] 发布 commit 工作区干净，标签指向已通过上述门禁的唯一 commit。
 
 ---

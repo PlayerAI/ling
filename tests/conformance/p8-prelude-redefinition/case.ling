@@ -1,0 +1,3 @@
+module Main
+
+type Option<'a> = 'a

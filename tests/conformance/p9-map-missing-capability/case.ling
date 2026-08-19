@@ -1,0 +1,7 @@
+module Main
+
+let write value = Console.write (Text.format "{}" value)
+
+let main () =
+    map write [1; 2]
+    ()

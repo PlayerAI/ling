@@ -1,0 +1,8 @@
+module Main
+
+import Domain.State as State
+
+let value state =
+    match state with
+    | State.Healthy -> 0
+    | State.Hurt amount -> amount

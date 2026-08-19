@@ -26,6 +26,7 @@ pub mod codes {
     pub const INVALID_TEXT_ESCAPE: DiagnosticCode = DiagnosticCode::new("L-LEX-0009");
     pub const INVALID_UNICODE_ESCAPE: DiagnosticCode = DiagnosticCode::new("L-LEX-0010");
     pub const INVALID_NUMBER: DiagnosticCode = DiagnosticCode::new("L-LEX-0011");
+    pub const UNSUPPORTED_CHARACTER_LITERAL: DiagnosticCode = DiagnosticCode::new("L-LEX-0012");
     pub const TAB_IN_INDENTATION: DiagnosticCode = DiagnosticCode::new("L-SYNTAX-0001");
     pub const INCONSISTENT_DEDENT: DiagnosticCode = DiagnosticCode::new("L-SYNTAX-0002");
     pub const LAYOUT_NESTING_TOO_DEEP: DiagnosticCode = DiagnosticCode::new("L-SYNTAX-0003");
@@ -42,12 +43,18 @@ pub mod codes {
     pub const CONFUSABLE_COLLISION: DiagnosticCode = DiagnosticCode::new("L-NAME-0006");
     pub const RESERVED_NAME: DiagnosticCode = DiagnosticCode::new("L-NAME-0007");
     pub const MODULE_NOT_FOUND: DiagnosticCode = DiagnosticCode::new("L-NAME-0008");
+    pub const SUSPICIOUS_MIXED_SCRIPT: DiagnosticCode = DiagnosticCode::new("L-NAME-0009");
     pub const TYPE_MISMATCH: DiagnosticCode = DiagnosticCode::new("L-TYPE-0001");
     pub const INFINITE_TYPE: DiagnosticCode = DiagnosticCode::new("L-TYPE-0002");
     pub const CALL_ARITY: DiagnosticCode = DiagnosticCode::new("L-TYPE-0003");
     pub const UNKNOWN_FIELD: DiagnosticCode = DiagnosticCode::new("L-TYPE-0004");
     pub const AMBIGUOUS_RECORD: DiagnosticCode = DiagnosticCode::new("L-TYPE-0005");
     pub const NON_EXHAUSTIVE_MATCH: DiagnosticCode = DiagnosticCode::new("L-TYPE-0006");
+    pub const UNREACHABLE_MATCH_CASE: DiagnosticCode = DiagnosticCode::new("L-TYPE-0007");
+    pub const DUPLICATE_RECORD_FIELD: DiagnosticCode = DiagnosticCode::new("L-TYPE-0008");
+    pub const MISSING_RECORD_FIELDS: DiagnosticCode = DiagnosticCode::new("L-TYPE-0009");
+    pub const INVALID_CONSTRUCTOR_PATTERN: DiagnosticCode = DiagnosticCode::new("L-TYPE-0010");
+    pub const UNSUPPORTED_EQUALITY: DiagnosticCode = DiagnosticCode::new("L-TYPE-0011");
     pub const INVALID_ASSIGNMENT: DiagnosticCode = DiagnosticCode::new("L-MUT-0001");
     pub const MISSING_CAPABILITY: DiagnosticCode = DiagnosticCode::new("L-CAP-0001");
     pub const UNKNOWN_CAPABILITY: DiagnosticCode = DiagnosticCode::new("L-CAP-0002");
@@ -56,7 +63,12 @@ pub mod codes {
     pub const MISSING_MAIN: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0002");
     pub const INVALID_MAIN_SIGNATURE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0003");
     pub const RUNTIME_FAULT: DiagnosticCode = DiagnosticCode::new("L-RUNTIME-0001");
-    pub const FEATURE_NOT_IMPLEMENTED: DiagnosticCode = DiagnosticCode::new("L-IMPL-0001");
+    pub const AUDIT_SYNTAX: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0001");
+    pub const AUDIT_VERSION: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0002");
+    pub const AUDIT_STRUCTURE: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0003");
+    pub const AUDIT_MODEL: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0004");
+    pub const INTERNAL_COMPILER_ERROR: DiagnosticCode = DiagnosticCode::new("L-INTERNAL-0001");
+    pub const SEMANTIC_SNAPSHOT_MISMATCH: DiagnosticCode = DiagnosticCode::new("L-SNAPSHOT-0001");
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -244,6 +256,11 @@ impl Diagnostic {
         self.severity
     }
 
+    #[must_use]
+    pub const fn primary_span(&self) -> Option<&DiagnosticSpan> {
+        self.primary_span.as_ref()
+    }
+
     pub fn render_json(&self) -> Result<String, RenderError> {
         serde_json::to_string(self).map_err(RenderError)
     }
@@ -320,19 +337,19 @@ mod tests {
     #[test]
     fn human_output_can_select_either_language() {
         let diagnostic = Diagnostic::new(
-            codes::FEATURE_NOT_IMPLEMENTED,
+            codes::TYPE_MISMATCH,
             Severity::Error,
-            "尚未实现",
-            "not implemented",
+            "类型不匹配",
+            "type mismatch",
         );
 
         assert_eq!(
             diagnostic.render_human(MessageLanguage::Chinese),
-            "error[L-IMPL-0001]: 尚未实现"
+            "error[L-TYPE-0001]: 类型不匹配"
         );
         assert_eq!(
             diagnostic.render_human(MessageLanguage::English),
-            "error[L-IMPL-0001]: not implemented"
+            "error[L-TYPE-0001]: type mismatch"
         );
     }
 }

@@ -1,0 +1,5 @@
+module Main
+
+let main () =
+    Text.format "no placeholder" 1
+    ()

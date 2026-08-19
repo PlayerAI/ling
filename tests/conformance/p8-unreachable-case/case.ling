@@ -1,0 +1,7 @@
+module Main
+
+let classify value =
+    match value with
+    | true -> 1
+    | true -> 2
+    | false -> 0

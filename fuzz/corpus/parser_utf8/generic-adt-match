@@ -1,0 +1,10 @@
+module Main
+
+type Result<'a, 'e> =
+    | Ok of 'a
+    | Error of 'e
+
+let value result =
+    match result with
+    | Ok inner -> inner
+    | Error reason -> 0

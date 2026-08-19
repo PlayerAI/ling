@@ -1,0 +1,5 @@
+arguments = ["run", "--format", "json", "case.ling"]
+exit_code = 0
+normative_clauses = ["RFC-0001 §8.2 pattern", "NEXT-STEPS-SEED P8"]
+stdout = "7\n"
+diagnostic_codes = []
