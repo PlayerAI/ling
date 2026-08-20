@@ -223,3 +223,57 @@ notes = [
   "No Seed protocol is mislabeled as the ROADMAP-1.0 1.x Stable commitment.",
   "The CI workflow invokes all four governance checks; no remote CI result is claimed for this worktree.",
 ]
+
+[[task]]
+id = "GOV-0105"
+title = "Diagnostic 错误码注册表"
+state = "Done"
+release = "G0"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0104"]
+spec = [
+  "AGENTS.md",
+  "docs/ERROR-CODES.md",
+  "docs/governance/authority.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/ling_execution_plan/14-FIRST-SPRINT-CODEX-TASKS.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0016-repl-session-semantics.md",
+]
+artifacts = [
+  "docs/ERROR-CODES.md",
+  "docs/governance/error-code-lock.toml",
+  "tools/xtask/src/error_codes.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/status/GOV-0105-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask governance check-error-codes: 55 active, 1 retired, 13 domains, 55 Rust constants",
+  "changed meanings, removed/retyped Facts, retired reactivation, number backfilling, duplicate/untranslated/unregistered codes, and unstructured Repairs have negative fixtures",
+  "cargo xtask governance check-authority: 36 documents, 16 Accepted",
+  "cargo xtask governance check-gaps: 25 Open gaps, 6 gates",
+  "cargo xtask governance check-lifecycle: 17 records, 16 Accepted, 17 legacy-format migrations",
+  "cargo xtask governance check-protocols: 18 records; 9 public, 1 Internal, 8 Future",
+  "cargo test --package xtask --package ling-diagnostics --locked --offline: 56 xtask and 4 diagnostic tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --all-features --locked --offline: 196 passed",
+  "local Markdown path targets: 141 resolved",
+]
+verified_against_commit = "feed35e9c00a1e4d9e4e97224ffe787bd5e29c49"
+completion_commit = "7f4452b9c5c629b02f2cfc810529e797dff805b6"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "Accepted DEC-0001 L-<DOMAIN>-<NUMBER> identities were preserved; the lower-authority single-letter ranges were not adopted.",
+  "The accepted/current Repair wire type was preserved; no unaccepted FixPlan type or LSP placeholder was added.",
+  "No emitted diagnostic code, meaning, severity, message, Fact value/type, Repair, span, CLI behavior, language semantics, Semantic ID, or Unicode 17.0.0 data changed.",
+  "The CI workflow invokes all five governance checks; no remote CI result is claimed before push.",
+]
