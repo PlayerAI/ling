@@ -1,6 +1,6 @@
 # 下一步开发计划：从 Hello World 到 `v0.0.1 Seed`
 
-> 状态：P8～P12 已完成；候选 SHA 全部门禁通过，等待 release tag 单独授权
+> 状态：P8～P12 与全部发布门禁已完成；annotated tag `v0.0.1` 已发布
 > 日期：2026-08-18
 > 候选 commit：`652d19b9eaec2ab607edfe1a1e7ea742c861cf91`
 > 当前基线：Hello World 已贯通 Source、Syntax、HIR、Resolver、Type、Effect/Capability、Semantic Snapshot、Interpreter 与 CLI
@@ -65,7 +65,7 @@ cargo run --locked --offline -- audit examples/人物.ling
 | Semantic JSON | writer/reader、RFC §6.11 全部节点类别、resolved source/owner/target ID、扩展字段兼容、负向结构验证与独立进程确定性均已完成 | 候选 SHA 跨平台 CI 已通过；Seed 仍不冻结 experimental Schema |
 | Audit | DEC-0015 已 Accepted | `AuditModel`、canonical renderer/parser、`L-AUDIT-*`、round-trip 与 CLI 独立进程确定性已验证 |
 | REPL | DEC-0016 已 Accepted | 事务会话、多行/EOF、重定义 generation、回滚、Capability 与 human/JSON 脚本模式已验证 |
-| 发布门禁 | 本地 workspace、完整 Seed conformance、真实三平台/fuzz/MSRV CI 与干净候选 commit 均已通过 | 仅剩 release tag 单独授权 |
+| 发布门禁 | 本地 workspace、完整 Seed conformance、真实三平台/fuzz/MSRV CI 与干净候选 commit 均已通过 | annotated tag `v0.0.1` 已在明确授权后发布 |
 
 现有 `m2-record-match-parser` fixture 的 `match` 两个分支分别返回 `Text` 与 `Int`，预期 `L-TYPE-0001` 是正确反例，不是 record/ADT 成功验收。不得把该 fixture 当作完整类型和执行证据。
 
@@ -381,6 +381,6 @@ cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline
 - [x] Windows、Linux、macOS 对候选 `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 的 CI 全绿；
 - [x] 依赖、许可证、错误码、README、示例和已知限制已同步；
 - [x] 候选提交审计时工作区干净，未实现能力无静默执行路径；
-- [x] 候选 commits 已在单独确认后 push；release tag 尚未执行，仍需单独确认。
+- [x] 候选 commits 与 annotated tag `v0.0.1` 均已在对应的单独确认后 push。
 
 完成上述条件后，下一阶段再评估 `v0.1 Living` 的 VM、增量编译、Formatter、LSP 与基础 Trait，不在本计划中提前实现。

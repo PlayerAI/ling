@@ -10,7 +10,7 @@
 
 ### 项目状态
 
-Ling 的 `v0.0.1 Seed` 候选已通过本地门禁，以及同一 SHA 的 Windows、Linux、macOS、真实 Unix TTY、nightly fuzz 和 Rust 1.85 CI；详细证据见 `docs/SEED-RELEASE-REPORT.md`。这仍是实验性实现，不是生产编译器或运行时；release tag 尚未创建，必须单独授权。
+Ling 的 [`v0.0.1 Seed`](https://github.com/PlayerAI/ling/tree/v0.0.1) annotated tag 已发布。其目标提交通过本地门禁，以及同一 SHA 的 Windows、Linux、macOS、真实 Unix TTY、nightly fuzz 和 Rust 1.85 CI；详细证据见 `docs/SEED-RELEASE-REPORT.md`。这仍是实验性实现，不是生产编译器或运行时。
 
 | 项目 | 当前状态 |
 | --- | --- |
@@ -160,7 +160,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md)：从当前 AST 边界推进到可运行 Hello World 的下一步实施顺序、接口边界、决议门禁和验收矩阵。
 - [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md)：从已完成的 Hello World 纵向切片推进到完整 `v0.0.1 Seed` 的里程碑、决议门禁、验收矩阵和发布条件。
 - [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md)：RFC §18、实现路径、正反测试证据和已关闭发布门禁的双语追踪矩阵。
-- [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md)：本地质量门禁、候选 SHA、跨平台/fuzz/MSRV CI 与剩余受控发布操作的双语快照。
+- [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md)：本地质量门禁、候选 SHA、跨平台/fuzz/MSRV CI 与已发布 tag 的双语记录。
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的稳定错误码、双语模板、Facts 与兼容性边界。
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)：Rust 直接/关键传递依赖、许可证、MSRV、`unsafe` 与审查状态。
 - [`docs/design-review.html`](docs/design-review.html)：针对上述规范的设计评审记录；它是非规范性意见，不替代已接受的 RFC。
@@ -211,7 +211,7 @@ Ling 仍处于早期设计阶段。请在生产使用、标准化承诺或大规
 
 ### Project status
 
-The Ling `v0.0.1 Seed` candidate has passed the local gates and same-SHA Windows, Linux, macOS, real Unix TTY, nightly fuzz, and Rust 1.85 CI; see `docs/SEED-RELEASE-REPORT.md` for evidence. This remains experimental rather than a production compiler or runtime; the release tag has not been created and requires separate authorization.
+The annotated [`v0.0.1 Seed`](https://github.com/PlayerAI/ling/tree/v0.0.1) tag is published. Its target passed the local gates and same-SHA Windows, Linux, macOS, real Unix TTY, nightly fuzz, and Rust 1.85 CI; see `docs/SEED-RELEASE-REPORT.md` for evidence. This remains experimental rather than a production compiler or runtime.
 
 | Item | Current status |
 | --- | --- |
@@ -361,7 +361,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md): the next implementation sequence from the current AST boundary to an executable Hello World, including interface boundaries, decision gates, and acceptance cases.
 - [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md): milestones, decision gates, acceptance cases, and release conditions for progressing from the completed Hello World slice to the full `v0.0.1 Seed` scope.
 - [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md): a bilingual mapping from RFC §18 to implementation paths, positive/negative evidence, and closed release gates.
-- [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md): a bilingual snapshot of local gates, the candidate SHA, platform/fuzz/MSRV CI, and the remaining controlled release action.
+- [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md): a bilingual record of local gates, the candidate SHA, platform/fuzz/MSRV CI, and the published tag.
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): stable `ling.diagnostic/0.1` codes, bilingual templates, Facts, and compatibility boundaries.
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md): direct and key transitive Rust dependencies, licenses, MSRV, `unsafe`, and review status.
 - [`docs/design-review.html`](docs/design-review.html): a non-normative design review of the specifications; it does not replace an accepted RFC.

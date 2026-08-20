@@ -2,11 +2,11 @@
 
 > 状态 / Status: working evidence index for `v0.0.1-dev`
 > 候选 / Candidate: `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`
-> 更新日期 / Updated: 2026-08-19
+> 更新日期 / Updated: 2026-08-20
 
-本文把 RFC-0001 §18 和 `IMPLEMENTATION.md` §10 映射到可重复执行的实现与测试证据。Accepted 决议、本地门禁与同一候选 SHA 的三平台、fuzz、MSRV CI 均已闭合；发布 tag 仍需单独授权。
+本文把 RFC-0001 §18 和 `IMPLEMENTATION.md` §10 映射到可重复执行的实现与测试证据。Accepted 决议、本地门禁与同一候选 SHA 的三平台、fuzz、MSRV CI 均已闭合；annotated tag `v0.0.1` 已在明确授权后发布。
 
-This document maps RFC-0001 §18 and `IMPLEMENTATION.md` §10 to repeatable implementation and test evidence. Accepted decisions, local gates, and the same-candidate-SHA platform, fuzz, and MSRV CI are closed; the release tag still requires separate authorization.
+This document maps RFC-0001 §18 and `IMPLEMENTATION.md` §10 to repeatable implementation and test evidence. Accepted decisions, local gates, and the same-candidate-SHA platform, fuzz, and MSRV CI are closed; annotated tag `v0.0.1` was published after explicit authorization.
 
 | 条款 / Clause | 正向证据 / Positive evidence | 反向证据 / Negative evidence | 实现路径 / Implementation | 状态 / Status |
 | --- | --- | --- | --- | --- |
@@ -60,6 +60,6 @@ cargo +1.85 check --workspace --all-features --locked --offline
 cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline
 ```
 
-候选 `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 已满足所有阻断项关闭、同一 SHA 的 Windows/Linux/macOS CI 全绿和审计时工作区干净，因此本矩阵可作为 tag 授权前的发布证据。
+候选 `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 已关闭所有阻断项、通过同一 SHA 的 Windows/Linux/macOS CI，并在审计时保持工作区干净。annotated tag `v0.0.1` 现已精确指向该候选。
 
-Candidate `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` has closed every blocker, passed Windows/Linux/macOS CI on the same SHA, and had a clean worktree at audit time, so this matrix is release evidence for tag authorization.
+Candidate `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` closed every blocker, passed Windows/Linux/macOS CI on the same SHA, and had a clean worktree at audit time. Annotated tag `v0.0.1` now resolves to that exact candidate.

@@ -342,7 +342,7 @@ M1 和 M2 各完成后，根据实际吞吐、缺陷率、测试规模和接口�
 
 打 `v0.0.1` 标签前，以下 RFC §18 条目必须在 CI 与本地同时验证。该清单是必要条件，不替代第 6 节缺口关闭或规范条款追踪矩阵：
 
-下列 `[x]` 表示候选提交已有可重复的本地证据和同一 SHA 的远程 CI 证据；release tag 仍需单独授权。
+下列 `[x]` 表示候选提交已有可重复的本地证据和同一 SHA 的远程 CI 证据；annotated tag `v0.0.1` 已在单独授权后发布。
 
 - [x] `ling run examples/人物.ling` 成功输出预期结果（§18.1）
 - [x] `ling check examples/人物.ling` 返回 0；错误程序返回稳定 code 与 JSON（§18.2）
@@ -359,7 +359,7 @@ M1 和 M2 各完成后，根据实际吞吐、缺陷率、测试规模和接口�
 - [x] Unicode 数据版本、输入校验和和许可证记录可追溯，普通构建不访问网络；
 - [x] Diagnostic/Graph/Audit Schema 正负兼容性、独立进程确定性和 Audit round-trip 测试通过；
 - [x] Seed 边界外特性不存在静默占位执行路径；保留语法在可识别时产生明确诊断；
-- [x] 候选 commit `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 审计时工作区干净并通过全部门禁；release tag 尚未创建，需单独授权。
+- [x] 候选 commit `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` 审计时工作区干净并通过全部门禁；annotated tag `v0.0.1` 已发布并精确指向该 commit。
 
 ---
 

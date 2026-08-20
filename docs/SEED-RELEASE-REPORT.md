@@ -1,16 +1,18 @@
 # `v0.0.1 Seed` 发布门禁报告 / Release Gate Report
 
-> 结论 / Verdict: **READY FOR TAG AUTHORIZATION — all required local and remote gates pass**
-> 报告日期 / Report date: 2026-08-19
+> 结论 / Verdict: **RELEASED — annotated tag published after all required gates passed**
+> 报告日期 / Report date: 2026-08-20
 > 候选提交 / Candidate commit: `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`
+> 发布标签 / Release tag: [`v0.0.1`](https://github.com/PlayerAI/ling/tree/v0.0.1), annotated object `6a79db4790f882856fe77f25598e683730b09f76`
 > 分支 / Branch: `main`
 > CI: [run #4](https://github.com/PlayerAI/ling/actions/runs/32247366834), `success`
+> 文档证据 / Documentation evidence: `f06ab9e1e9551a6a831c9dac88d6fed243d1d80e`, [run #5](https://github.com/PlayerAI/ling/actions/runs/32249840838), `success`
 > Schema: `ling.semantic/0.1`
 > Unicode: `17.0.0`
 
-本文件记录已经验证的候选提交与发布门禁，但不是发布声明，也不授权 commit、tag 或 push。候选提交的本地工作区在审计时干净，且 `origin/main` 指向同一 SHA。
+本文件记录已经验证并发布的候选提交。候选工作区在审计时干净，tag 的 peeled target 与候选 SHA 完全一致；后续文档证据提交保留在 `main`，不改变已发布 tag 的内容。
 
-This file records the verified candidate and release gates, but it is not a release declaration or authorization to commit, tag, or push. At audit time the candidate worktree was clean and `origin/main` resolved to the same SHA.
+This file records the verified and published candidate. The candidate worktree was clean at audit time, and the tag's peeled target exactly matches the candidate SHA; the later documentation-evidence commit remains on `main` and does not alter the published tag.
 
 ## 本地环境 / Local environment
 
@@ -62,11 +64,11 @@ CI run #4 was triggered by candidate SHA `652d19b9eaec2ab607edfe1a1e7ea742c861cf
 | [fuzz corpus smoke](https://github.com/PlayerAI/ling/actions/runs/32247366834/job/96050713868) | `success` — pinned nightly, all three corpora |
 | [Rust 1.85 MSRV](https://github.com/PlayerAI/ling/actions/runs/32247366834/job/96050714055) | `success` |
 
-## 剩余受控操作 / Remaining controlled action
+## 发布记录 / Release record
 
-唯一剩余发布操作是创建并推送指向候选 SHA 的 annotated tag `v0.0.1`。该操作尚未执行，必须由用户单独明确授权。
+用户明确授权后，annotated tag `v0.0.1` 已于 2026-08-20 创建并推送。远程 tag object 为 `6a79db4790f882856fe77f25598e683730b09f76`，peeled target 为候选提交 `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`。CI workflow 仅监听 `main` 分支 push，因此 tag push 不产生重复 run；tag 目标已由 run #4 验证，文档证据提交已由 run #5 验证。
 
-The only remaining release action is creating and pushing the annotated `v0.0.1` tag at the candidate SHA. It has not been performed and requires separate explicit user authorization.
+After explicit user authorization, the annotated `v0.0.1` tag was created and pushed on 2026-08-20. Its remote tag object is `6a79db4790f882856fe77f25598e683730b09f76`, and its peeled target is candidate commit `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`. The CI workflow listens only to `main` branch pushes, so the tag push intentionally creates no duplicate run; run #4 verifies the tag target and run #5 verifies the documentation-evidence commit.
 
 ## 已知限制 / Known limitations
 
@@ -88,6 +90,6 @@ The only remaining release action is creating and pushing the annotated `v0.0.1`
 - Accepted Seed currently defines `f64` literals, types, patterns, and IEEE equality. Arithmetic/comparison operator overloading and defaulting have no Accepted decision, so the implementation does not invent those semantics.
 - User-level higher-order Effect Row polymorphism is not a Seed acceptance requirement; the resolved call graph covers `map` callbacks and direct user-wrapper propagation.
 
-全部功能与证据门禁已经关闭。后续不得改变候选提交内容；只有获得用户单独明确授权后，才能创建并推送 `v0.0.1` tag。
+`v0.0.1 Seed` 的功能、证据与发布门禁均已关闭。任何后续语言扩展必须进入新的版本与 Accepted RFC，不得移动或重写已发布 tag。
 
-All functional and evidence gates are closed. The candidate content must not change; create and push the `v0.0.1` tag only after separate explicit user authorization.
+The `v0.0.1 Seed` functional, evidence, and release gates are closed. Any subsequent language expansion must use a new version and Accepted RFC; the published tag must not be moved or rewritten.
