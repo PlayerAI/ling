@@ -1540,3 +1540,70 @@ notes = [
   "No public JSON Schema, Semantic ID, canonical package/graph identity, lockfile bytes, CLI option, or third-party dependency version changed.",
   "PRJ-1102 deterministic module discovery is now the next Ready project task.",
 ]
+
+[[task]]
+id = "PRJ-1102"
+title = "Deterministic module discovery"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1101"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/ERROR-CODES.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "README.md",
+  "crates/ling-project/src/discovery.rs",
+  "crates/ling-project/src/lib.rs",
+  "crates/ling-project/tests/discovery_fixtures.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/status/PRJ-1102-IMPLEMENTATION-REPORT.md",
+  "docs/governance/error-code-lock.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "tests/projects/discovery-v1/valid-multi-root/ling.toml",
+  "tests/projects/discovery-v1/implicit-non-main/ling.toml",
+  "tests/projects/discovery-v1/import-cycle-three/ling.toml",
+  "tests/projects/discovery-v1/dependency-namespace-collision/ling.toml",
+]
+acceptance = [
+  "discover_modules uses only an explicitly supplied project root and validated ling.manifest/1 model; it performs no parent search, dependency traversal, network access, lock operation, or CLI selection",
+  "source roots and traversed directories are resolved symlink-aware beneath the canonical project root, exact source-root and .ling extension case is enforced, and directory escape, cycle, alias, non-UTF-8, non-NFC, and invalid-XID paths are rejected",
+  "path-to-module mapping is deterministic; non-entry files require a first explicit matching module declaration, and omission is accepted only for the implicit Main entry fixed by DEC-0007",
+  "entry and export existence, duplicate modules, local import existence, import ordering, direct dependency namespace selection, local/dependency namespace collisions, and deterministic local import cycles are validated atomically",
+  "ModuleGraph exposes only sorted package-local logical nodes and edges; physical roots, directory enumeration order, Rust hash-map order, and debug-only state do not enter the model",
+  "L-PROJECT-0008 through L-PROJECT-0013 are registered bilingual diagnostics with bounded typed Facts, deterministic ordering, and original UTF-8 byte spans for source-local failures",
+  "15 discovery-v1 fixture directories plus creation-order, physical-root, Unicode/CRLF, invalid UTF-8, long-Fact, declaration-order, and symlink tests pass",
+  "cargo test --locked --offline -p ling-project: 9 unit, 19 integration, and documentation tests passed",
+  "cargo xtask governance check-all: 45 authority documents, 26 gaps, 20 lifecycle records, 18 protocols, and 69 total diagnostic codes passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, and 69 evidence records passed",
+  "cargo xtask support verify, ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the PRJ-1102 backlog transition",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "Unicode generator rerun was byte-idempotent and git diff --check passed",
+]
+verified_against_commit = "f76f4953070b9ae555fce24c7dcc2fbf08a36f7a"
+completion_commit = "f76f4953070b9ae555fce24c7dcc2fbf08a36f7a"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "PRJ-1102 extends the Public/Experimental ling.manifest/1 reader with explicit-root source discovery and a deterministic single-package module/import graph; it does not integrate project mode into the CLI.",
+  "Diagnostic JSON remains ling.diagnostic/0.1; six PROJECT codes are monotonic additions and no existing code meaning or payload field changes.",
+  "No public JSON Schema, Semantic ID, package content/graph identity, lockfile byte format, or third-party dependency version changed.",
+  "Unicode remains 17.0.0 and regenerated compiler/Tree-sitter tables are byte-identical.",
+  "PRJ-1103 cross-package import visibility is now the next Ready project task.",
+]

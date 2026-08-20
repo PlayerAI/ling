@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101` Done；`PRJ-1102` Ready；后续任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1102` Done；`PRJ-1103` Ready；后续任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -84,8 +84,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GOV-0109` | G0 | 发布状态机器可读化 | S | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:267`；见机器状态、生成视图与实施报告 |
 | `GOV-0110` | G0 | G0 CI 门禁 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:281`；见机器状态、CI contract 与实施报告 |
 | `PRJ-1101` | G1/Editor | 最小项目 manifest | M | Done | `03-G1-V0.1-LIVING.md:47`；见 `crates/ling-project/`、manifest-v1 fixtures、机器状态与实施报告 |
-| `PRJ-1102` | G1/Editor | Module discovery | M | Ready | `03-G1-V0.1-LIVING.md:79`；Accepted DEC-0007 与 RFC-0002、PRJ-1101 reader 已满足前置 |
-| `PRJ-1103` | G1/Editor | Import 与 visibility | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:89` |
+| `PRJ-1102` | G1/Editor | Module discovery | M | Done | `03-G1-V0.1-LIVING.md:79`；见 `ling-project` discovery、discovery-v1 fixtures、机器状态与实施报告 |
+| `PRJ-1103` | G1/Editor | Import 与 visibility | M | Ready | `03-G1-V0.1-LIVING.md:89`；PRJ-1102 确定性 ModuleGraph 已满足前置，Accepted DEC-0007 与 RFC-0002 提供语义依据 |
 | `PRJ-1104` | G1/Editor | Dependency graph | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:97` |
 | `PRJ-1105` | G1/Editor | Lock file | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:107` |
 | `PRJ-1106` | G1/Editor | Project fixtures | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:116` |
