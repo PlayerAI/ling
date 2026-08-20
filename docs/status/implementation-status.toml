@@ -1605,5 +1605,5 @@ notes = [
   "Diagnostic JSON remains ling.diagnostic/0.1; six PROJECT codes are monotonic additions and no existing code meaning or payload field changes.",
   "No public JSON Schema, Semantic ID, package content/graph identity, lockfile byte format, or third-party dependency version changed.",
   "Unicode remains 17.0.0 and regenerated compiler/Tree-sitter tables are byte-identical.",
-  "PRJ-1103 cross-package import visibility is now the next Ready project task.",
+  "PRJ-1104 package/content identity is the next Ready prerequisite; PRJ-1103 package-aware resolution must consume that identity rather than changing current Seed IDs prematurely.",
 ]

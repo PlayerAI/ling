@@ -69,8 +69,8 @@ No remote CI result, dependency package load, export-visibility decision, packag
 
 ## Intentionally deferred work
 
-- PRJ-1103: cross-package import selection against loaded dependency graphs, exported-module visibility, HIR/name-resolution integration, stable package/module/definition identity, and cross-file definition evidence.
-- PRJ-1104: recursive vendored dependency loading, package/content and graph identities, package cycles/collisions, hash vectors, and explicit offline/no-execution guards.
+- PRJ-1104: recursive vendored dependency loading, package/content and graph identities, package cycles/collisions, hash vectors, and explicit offline/no-execution guards. RFC-0002 makes this the identity prerequisite for package-aware semantic integration.
+- PRJ-1103 after PRJ-1104: cross-package import selection against loaded dependency graphs, exported-module visibility, HIR/name-resolution integration, versioned package-aware semantic identity, and cross-file definition evidence.
 - PRJ-1105: canonical `ling.lock/1` reader/writer, corruption corpus, digest verification, `--locked`, and atomic replacement.
 - PRJ-1106/1107: complete multi-project conformance fixtures, a shared project service/API, explicit CLI manifest selection, and unchanged file-mode migration evidence.
 - PRJ-1108: property tests and long-running sanitizer-backed fuzz campaigns for graph, path, cycle, and lock invariants.
