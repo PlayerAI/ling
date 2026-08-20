@@ -21,6 +21,8 @@ const PREC = {
   TYPE_APPLICATION: 3,
 };
 
+const { IDENTIFIER_PATTERN } = require("./src/unicode-identifiers.js");
+
 module.exports = grammar({
   name: "ling",
 
@@ -51,6 +53,7 @@ module.exports = grammar({
       "let",
       "mutable",
       "rec",
+      "and",
       "type",
       "of",
       "match",
@@ -74,6 +77,8 @@ module.exports = grammar({
 
     _bom: (_) => "\uFEFF",
 
+    _and_keyword: (_) => token("and"),
+
     _declaration: ($) =>
       choice(
         $.module_declaration,
@@ -81,7 +86,12 @@ module.exports = grammar({
         $.function_definition,
         $.let_declaration,
         $.type_declaration,
+        $._reserved_and_error,
       ),
+
+    // Keep `and` reachable as a terminal for global keyword extraction without
+    // accepting recursive binding groups before their language design exists.
+    _reserved_and_error: ($) => seq($._and_keyword, $._error_sentinel),
 
     module_declaration: ($) =>
       seq(
@@ -647,8 +657,7 @@ module.exports = grammar({
     _member_separator: ($) =>
       repeat1(choice(";", $._soft_newline)),
 
-    identifier: (_) =>
-      token(new RustRegex("[\\p{XID_Start}_][\\p{XID_Continue}_]*")),
+    identifier: (_) => token(new RustRegex(IDENTIFIER_PATTERN)),
 
     integer_literal: (_) =>
       token(

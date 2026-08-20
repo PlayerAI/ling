@@ -1,0 +1,21 @@
+# Ling Unicode identifier differential corpus v1
+# Unicode: 17.0.0
+# Columns: case_id, codepoints, tree_sitter, compiler, normalized_codepoints, diagnostic_code
+ascii-basic	0061	identifier	identifier	0061	-
+single-underscore	005F	identifier	identifier	005F	-
+chinese	4EBA+7269	identifier	identifier	4EBA+7269	-
+nfc-precomposed	0063+0061+0066+00E9	identifier	identifier	0063+0061+0066+00E9	-
+nfc-decomposed	0063+0061+0066+0065+0301	identifier	identifier	0063+0061+0066+00E9	-
+continue-digit	0061+0030	identifier	identifier	0061+0030	-
+supplementary-start	20000	identifier	identifier	20000	-
+unicode-17-high-start	33479	identifier	identifier	33479	-
+and-keyword	0061+006E+0064	rejected	keyword:and	-	-
+and-suffix	0061+006E+0064+005F+0074+0068+0065+006E	identifier	identifier	0061+006E+0064+005F+0074+0068+0065+006E	-
+emoji-start	1F600	rejected	invalid	-	L-LEX-0004
+combining-start	0301	rejected	invalid	-	L-LEX-0004
+after-unicode-17-high-start	3347A	rejected	invalid	-	L-LEX-0004
+join-control	0061+200D+0062	identifier	invalid	-	L-LEX-0004
+default-ignorable	0061+034F	identifier	invalid	-	L-LEX-0004
+variation-selector	0061+FE0F	identifier	invalid	-	L-LEX-0004
+private-use	E000	rejected	invalid	-	L-LEX-0004
+mixed-script-confusable	0070+0430+0079+0070+0061+006C	identifier	identifier	0070+0430+0079+0070+0061+006C	-

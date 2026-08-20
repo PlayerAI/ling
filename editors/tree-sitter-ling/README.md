@@ -6,6 +6,7 @@ The grammar is not an authority for Ling validity or semantics. Accepted RFCs an
 
 See [KNOWN-DIFFERENCES.md](KNOWN-DIFFERENCES.md) for the exact compiler/grammar differences that remain assigned to later tasks.
 The non-normative scanner decision is recorded in [docs/ADR-0001-layout-scanner.md](docs/ADR-0001-layout-scanner.md).
+The generated Unicode-token decision is recorded in [docs/ADR-0002-unicode-identifiers.md](docs/ADR-0002-unicode-identifiers.md).
 
 ## Development
 
@@ -32,13 +33,14 @@ npm run parse:examples --offline
 
 Generated parser sources under `src/` are committed. A change to `grammar.js` is complete only when regeneration produces no uncommitted diff and all corpus and example parses pass.
 
-## TS-3103 layout boundary
+## TS-3104 identifier boundary
 
-The breadth-first grammar now uses a stateful external scanner for DEC-0006 layout. It compares relative indentation, emits finite EOF dedents, distinguishes same-column case/pipeline continuations, tracks delimiter depth for soft newlines, preserves nested block comments, and serializes all incremental state. Corpus plus integration tests cover LF/CRLF, blank and comment-only lines, nested blocks, delimiter newlines, depth boundaries, missing final newlines, and incremental reparsing.
+The identifier token is generated from the repository's checksummed Unicode 17.0.0 `XID_Start` and `XID_Continue` ranges. It adds `_` as a Ling identifier start and uses Tree-sitter's global reserved-word mechanism for every Seed keyword, including the lexically reserved but syntactically deferred `and`. No host or Tree-sitter Unicode property version is consulted during grammar generation.
 
-The scanner is intentionally diagnostic-free. Tabs, inconsistent dedents, unmatched delimiters, over-depth input, and malformed comments remain compiler-owned validity decisions with registered bilingual diagnostics. The following accuracy work remains assigned to later execution-plan tasks:
+The shared differential corpus is consumed by both `ling-syntax` and the Tree-sitter integration runner. It covers ASCII, Chinese, NFC-equivalent spellings, combining continuations, supplementary-plane boundaries, `_`, `and`/`and_then`, emoji, and XID-shaped characters rejected by compiler security rules. Those permissive editor parses remain intentional: the compiler emits `L-LEX-0004` with an original UTF-8 byte span and bilingual messages suitable for the future LSP diagnostic adapter.
 
-- generated Unicode 17.0.0 identifier parity, compiler-reserved `and` exclusion, and compiler differential tests (`TS-3104`);
+The stateful external scanner remains limited to DEC-0006 layout and nested comments. It does not duplicate Unicode tables, NFC normalization, keyword classification, or identifier-security checks. The following accuracy work remains assigned to later execution-plan tasks:
+
 - exhaustive expression precedence evidence (`TS-3105`);
 - complete pattern/type edge coverage (`TS-3106`);
 - edit-state and malformed-input recovery hardening (`TS-3107`);
@@ -52,4 +54,4 @@ Until the corresponding accepted decision closes `GAP-SEED-BOOLEAN-OPERATORS-001
 
 `tree-sitter-ling` 是面向编辑器的 Ling 具体语法解析器。本目录暂作为可独立拆分的开发镜像，与编译器共享演进过程。
 
-Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner、括号内软换行、嵌套块注释、EOF dedent 与增量状态序列化；Tab、错误 dedent、超深输入等诊断仍由编译器权威判定。Unicode 17.0.0 精确一致性、完整优先级、系统错误恢复和差分测试由后续任务完成。
+Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围，并用编译器与 Tree-sitter 共享语料验证标识符边界和 `and` 保留字。NFC、禁止字符、混合书写系统与 Confusable 诊断仍由编译器权威判定。

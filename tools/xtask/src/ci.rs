@@ -50,7 +50,7 @@ const REQUIRED_GATES: &[GateContract] = &[
         name: "seed-reproducibility",
         commands: &[
             "cargo run --package unicode-gen --locked --offline",
-            "git diff --exit-code -- crates/ling-unicode/src/generated.rs",
+            "git diff --exit-code -- crates/ling-unicode/src/generated.rs editors/tree-sitter-ling/src/unicode-identifiers.generated.js",
             "cargo xtask seed reproduce",
             "cargo test --package ling-cli --test conformance seed_examples_check_run_and_emit_semantic_graphs --locked --offline",
         ],
