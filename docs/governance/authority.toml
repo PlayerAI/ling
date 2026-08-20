@@ -262,6 +262,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0014"
+title = "Portable verified bytecode and VM contract"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0014.md"
+covers = ["bytecode encoding", "register VM", "bytecode verifier", "VM evaluation order", "Runtime Fault mapping", "source maps", "bytecode compatibility"]
+depends_on = ["DEC-0002", "DEC-0007", "DEC-0010", "DEC-0011", "DEC-0012", "DEC-0013", "DEC-0017", "RFC-0002", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

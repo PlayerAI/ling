@@ -327,10 +327,9 @@
       "stability": "Experimental",
       "implemented": false,
       "profiles": [],
-      "blockers": [
-        "GAP-BYTECODE-SEMANTICS-001"
-      ],
+      "blockers": [],
       "sources": [
+        "docs/RFC-0014.md",
         "docs/ROADMAP-1.0.md"
       ]
     }
@@ -608,12 +607,11 @@
       "id": "UNSUP-VM",
       "area": "Execution",
       "capability": "Bytecode emission, verification, or VM execution",
-      "reason": "No accepted bytecode/verifier contract or implementation exists.",
-      "blockers": [
-        "GAP-BYTECODE-SEMANTICS-001"
-      ],
+      "reason": "RFC-0014 accepts the ling.bytecode/1.0 contract, but no bytecode model, encoder, decoder, verifier, or VM implementation exists yet.",
+      "blockers": [],
       "sources": [
-        "docs/governance/gap-register.toml"
+        "docs/RFC-0014.md",
+        "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"
       ]
     }
   ]

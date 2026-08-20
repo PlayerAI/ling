@@ -48,6 +48,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0014"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0014.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Freeze independent ling.bytecode/1.0 golden bytes and disassembly for the minimal Unit/Bool/Int/Text, direct-call, branch, Console.Write, and return slice.",
+  "Verify malformed envelope, table, instruction, CFG, register typing, signature, Effect, Capability, entry, source-map, and resource-limit cases with registered bilingual diagnostics and bounded failure.",
+  "Differentially compare interpreter and verified VM results, logical Console events, structured Runtime Faults, and original UTF-8 byte spans.",
+  "Fuzz arbitrary bytes and valid-model mutations, verify deterministic writer/error ordering across hosts and enumeration orders, and record strict first-version compatibility rejection.",
+]
+compatibility_impact = [
+  "Introduces the Accepted ling.bytecode/1.0 design without changing the default interpreter or claiming an implemented public protocol; the protocol remains Future until VM tasks provide the complete trusted boundary and evidence.",
+  "Author Source, existing diagnostics, Semantic IDs, JSON schemas, native ABI, Unicode 17.0.0, and current CLI behavior remain unchanged by the RFC-only milestone.",
+]
+unresolved_alternatives = [
+  "Full Seed aggregate, closure, mutation, collection, dynamic-linking, cache-identity, compression, signing, JIT, debug, and common logical heap-accounting extensions remain deferred to separately accepted minor versions or protocols.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

@@ -431,15 +431,15 @@ public_schema = false
 canonical = false
 producer = ["Future checked Typed Core to bytecode compiler"]
 consumer = ["Future bytecode verifier and VM"]
-reader_policy = "Not defined; no decoder or verifier exists."
-writer_policy = "Not defined; no bytecode magic, version, instruction set, Fault mapping, or encoding is accepted."
-unknown_field_policy = "Not defined."
-migration_tool = "Not defined."
+reader_policy = "No reader exists yet. RFC-0014 requires the future 1.0 reader to accept exactly format (1, 0), validate every bound before allocation, reject unknown executable content, and expose only independently verified programs to the VM."
+writer_policy = "No writer exists yet. RFC-0014 fixes the future 1.0 envelope, table and register instruction encoding, sorted deterministic output, checked-snapshot input, source maps, and path-free metadata."
+unknown_field_policy = "Future ling.bytecode/1.0 rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes."
+migration_tool = "No previous format exists. A future migration must decode and verify the old version before encoding the new version; no tool is implemented."
 fixtures = []
-sources = ["docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
+sources = ["docs/RFC-0014.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
 version_markers = []
-authority = ["ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["Blocked by GAP-BYTECODE-SEMANTICS-001."]
+authority = ["RFC-0014"]
+notes = ["RFC-0014 accepts the design boundary, but the protocol remains Future until VM-1201 through VM-1204 implement and verify the model, writer, decoder, verifier, VM, and corpus."]
 
 [[protocol]]
 id = "PROTO-REPLAY"

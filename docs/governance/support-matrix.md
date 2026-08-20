@@ -57,7 +57,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `BACKEND-INTERPRETER` | Reference interpreter | Host CPU | `Tier2` | `Experimental` | yes | — | — |
 | `BACKEND-KERNEL-CPU` | Kernel CPU reference/SIMD | CPU | `Unsupported` | `Experimental` | no | — | `GAP-KERNEL-DEVICE-001` |
 | `BACKEND-NATIVE` | Native AOT | Host CPU | `Unsupported` | `Experimental` | no | — | `GAP-NATIVE-BACKEND-ABI-001`<br>`GAP-OWNERSHIP-MODEL-001` |
-| `BACKEND-VM` | Bytecode virtual machine | Host CPU | `Unsupported` | `Experimental` | no | — | `GAP-BYTECODE-SEMANTICS-001` |
+| `BACKEND-VM` | Bytecode virtual machine | Host CPU | `Unsupported` | `Experimental` | no | — | — |
 
 ## Standard package stability
 
@@ -102,7 +102,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `UNSUP-PACKAGES` | Project/package | CLI project selection, package installation, publication, or registry | PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, package-aware Semantic Graph, canonical local lock protocol, complete named project fixture matrix, and project graph/lock property and manifest fuzz coverage. CLI selection/build integration, publication, and registry installation remain out of scope. | — | [`docs/RFC-0002.md`](../RFC-0002.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
 | `UNSUP-PROFILE-SELECTION` | Profile | Explore, Native, or Critical selection/enforcement | The Seed CLI has no profile option and no profile validation pass. | `GAP-CRITICAL-PROFILE-001`<br>`GAP-NATIVE-BACKEND-ABI-001` | [`docs/SEMANTICS.md`](../SEMANTICS.md)<br>[`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md) |
 | `UNSUP-SUPPORT-CLI-JSON` | CLI/protocol | ling version --format json and ling support --format json | GOV-0108 generates internal governance fixtures only; no Accepted public JSON contract or CLI command exists. | — | [`docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md`](../ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md) |
-| `UNSUP-VM` | Execution | Bytecode emission, verification, or VM execution | No accepted bytecode/verifier contract or implementation exists. | `GAP-BYTECODE-SEMANTICS-001` | [`docs/governance/gap-register.toml`](../governance/gap-register.toml) |
+| `UNSUP-VM` | Execution | Bytecode emission, verification, or VM execution | RFC-0014 accepts the ling.bytecode/1.0 contract, but no bytecode model, encoder, decoder, verifier, or VM implementation exists yet. | — | [`docs/RFC-0014.md`](../RFC-0014.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
 
 ## Tier policy
 

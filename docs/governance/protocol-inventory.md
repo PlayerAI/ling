@@ -249,14 +249,14 @@
 
 - Producer: Future checked Typed Core to bytecode compiler
 - Consumer: Future bytecode verifier and VM
-- Reader policy: Not defined; no decoder or verifier exists.
-- Writer policy: Not defined; no bytecode magic, version, instruction set, Fault mapping, or encoding is accepted.
-- Unknown-field policy: Not defined.
-- Migration tool: Not defined.
-- Authority: `ROADMAP-1.0`, `GAP-REGISTER`
-- Sources: [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
+- Reader policy: No reader exists yet. RFC-0014 requires the future 1.0 reader to accept exactly format (1, 0), validate every bound before allocation, reject unknown executable content, and expose only independently verified programs to the VM.
+- Writer policy: No writer exists yet. RFC-0014 fixes the future 1.0 envelope, table and register instruction encoding, sorted deterministic output, checked-snapshot input, source maps, and path-free metadata.
+- Unknown-field policy: Future ling.bytecode/1.0 rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes.
+- Migration tool: No previous format exists. A future migration must decode and verify the old version before encoding the new version; no tool is implemented.
+- Authority: `RFC-0014`
+- Sources: [`docs/RFC-0014.md`](../RFC-0014.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
-- Notes: Blocked by GAP-BYTECODE-SEMANTICS-001.
+- Notes: RFC-0014 accepts the design boundary, but the protocol remains Future until VM-1201 through VM-1204 implement and verify the model, writer, decoder, verifier, VM, and corpus.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 
