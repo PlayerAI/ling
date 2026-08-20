@@ -752,3 +752,81 @@ notes = [
   "GAP-SEED-BOOLEAN-OPERATORS-001 blocks TS-3105 from choosing &&/|| acceptance or precedence; TS-3102 must retain finite error behavior.",
   "No Ling parser behavior, public diagnostic, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, source span, or Unicode 17.0.0 data changed.",
 ]
+
+[[task]]
+id = "TS-3102"
+title = "宽度优先 Tree-sitter grammar skeleton"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3101"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ling_execution_plan/14-FIRST-SPRINT-CODEX-TASKS.md",
+  "docs/grammar-map.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0004-pipeline-syntax.md",
+  "docs/decisions/0005-seed-literals-and-delimiters.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0014-seed-prelude-option-result.md",
+]
+artifacts = [
+  "editors/tree-sitter-ling/grammar.js",
+  "editors/tree-sitter-ling/tree-sitter.json",
+  "editors/tree-sitter-ling/package.json",
+  "editors/tree-sitter-ling/package-lock.json",
+  "editors/tree-sitter-ling/src/parser.c",
+  "editors/tree-sitter-ling/src/node-types.json",
+  "editors/tree-sitter-ling/test/corpus/declarations.txt",
+  "editors/tree-sitter-ling/test/corpus/expressions.txt",
+  "editors/tree-sitter-ling/test/corpus/patterns.txt",
+  "editors/tree-sitter-ling/test/corpus/unicode.txt",
+  "editors/tree-sitter-ling/test/corpus/errors.txt",
+  "editors/tree-sitter-ling/test/corpus/future-keywords.txt",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "docs/grammar-map.md",
+  "docs/governance/support-matrix.toml",
+  "docs/status/TS-3102-IMPLEMENTATION-REPORT.md",
+]
+acceptance = [
+  "tree-sitter-cli 0.26.12 npm run verify offline: 23 of 23 corpus cases and local example passed",
+  "generated parser idempotence: 6 generated files, 0 changed SHA-256 hashes",
+  "corpus coverage: 60 generated named node types, 0 uncovered",
+  "npm dependency graph: only tree-sitter-cli 0.26.12",
+  "cargo xtask governance check-all: 5 checks; 42 documents, 26 gaps, 17 lifecycle records, 18 protocols, 56 diagnostic codes",
+  "cargo xtask schema validate-all: 3 schemas, 4 valid fixtures, 6 invalid fixtures, 1 canonical byte fixture",
+  "cargo xtask schema compatibility --from N-1 --to N: 0 verified N-1 edges, 3 NoPreviousVersion records",
+  "cargo xtask schema corrupt-inputs: 23 deterministic mutations",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 32 conformance fixtures, 51 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify: 7 features, 3 profiles, 3 hosts, 1 native target, 6 backends, 1 standard package, 18 protocols, 9 unsupported records",
+  "cargo xtask status verify: 13 tasks, all Done; 7 features with stabilization blockers",
+  "cargo xtask ci verify: 8 named gates, 19 commands, 3 workspace-test hosts",
+  "cargo xtask seed reproduce: 4 surfaces, 8 independent processes, 41866 compared output bytes",
+  "cargo test --workspace --all-features --locked --offline: 234 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "active local Markdown targets: 761 resolved across 82 files; frozen baseline and installed npm dependencies excluded",
+]
+verified_against_commit = "07398a90e2caa3155af13716d075bd30590ce0b0"
+completion_commit = "14fb7986501abda6eed178b5b7af405fcb0313e9"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "The grammar is editor tooling evidence, not a language authority, public protocol, or Semantic ID input.",
+  "TS-3102 uses no external scanner; exact offside state, dedents, continuation newlines, and nested block comments remain TS-3103 work.",
+  "Tree-sitter Unicode property matching is not claimed as pinned Unicode 17.0.0 parity; TS-3104 owns generated-range and differential evidence.",
+  "GAP-SEED-BOOLEAN-OPERATORS-001 remains open; && and || stay finite error input and TS-3105 remains BlockedSpec.",
+  "No Ling parser behavior, public diagnostic, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, source span, or Unicode 17.0.0 compiler data changed.",
+]
