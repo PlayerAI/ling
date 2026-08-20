@@ -13,3 +13,8 @@ tests/projects/**/ling.toml text eol=lf
 tests/projects/**/expect.toml text eol=lf
 tests/projects/**/expected-*.json text eol=lf
 tests/projects/**/*.lock -text
+
+# Bytecode source and reviewed text goldens must retain stable LF bytes.
+tests/bytecode/**/*.ling text eol=lf
+tests/bytecode/**/*.dis text eol=lf
+tests/bytecode/**/*.hex text eol=lf

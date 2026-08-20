@@ -1,0 +1,29 @@
+; ling.bytecode/1.0 debug disassembly (non-contract)
+strings 4
+  @s0 "Main"
+  @s1 "main"
+  @s2 "src/Main.ling"
+  @s3 "你好，零"
+packages 0
+modules 1
+  @m0 standalone @s0 "Main" capabilities=[Console.Write]
+types 4
+  @t0 Unit tag=0x00
+  @t1 Bool tag=0x01
+  @t2 Int tag=0x02
+  @t3 Text tag=0x03
+constants 1
+  @c0 Text @s3 "你好，零"
+sources 1
+  @src0 @m0 @s2 "src/Main.ling" bytes=83 sha256=c60cbb228a15db881d975263c1c1d19d52db5cd855bbf3fa18aeacdb91e204ee
+functions 1
+  fn @f0 @m0 @s1 "main" (@t0) -> @t0 effects=[Console.Write] registers=3
+    block @b0 (%r0:@t0)
+      0: %r1 = const @c0
+      1: %r2 = console.write %r1
+      2: return %r2
+entry @f0
+source-map 3
+  @f0:@b0:0 -> @src0 68..82 direct
+  @f0:@b0:1 -> @src0 54..82 direct
+  @f0:@b0:2 -> @src0 54..82 lowering-derived

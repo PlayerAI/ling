@@ -6,17 +6,22 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 
-[dev-dependencies]
-ling-ast = { path = "../ling-ast" }
-ling-diagnostics = { path = "../ling-diagnostics" }
+[dependencies]
 ling-effects = { path = "../ling-effects" }
-ling-eval = { path = "../ling-eval" }
 ling-hir = { path = "../ling-hir" }
 ling-resolve = { path = "../ling-resolve" }
 ling-semantic = { path = "../ling-semantic" }
 ling-source = { path = "../ling-source" }
-ling-syntax = { path = "../ling-syntax" }
 ling-types = { path = "../ling-types" }
+num-bigint.workspace = true
+sha2.workspace = true
+unicode-normalization.workspace = true
+
+[dev-dependencies]
+ling-ast = { path = "../ling-ast" }
+ling-diagnostics = { path = "../ling-diagnostics" }
+ling-eval = { path = "../ling-eval" }
+ling-syntax = { path = "../ling-syntax" }
 
 [lints]
 workspace = true

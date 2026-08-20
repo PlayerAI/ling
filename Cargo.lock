@@ -198,6 +198,9 @@ dependencies = [
  "ling-source",
  "ling-syntax",
  "ling-types",
+ "num-bigint",
+ "sha2",
+ "unicode-normalization",
 ]
 
 [[package]]

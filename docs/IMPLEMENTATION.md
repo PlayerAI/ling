@@ -45,7 +45,7 @@ RFC-0001 §6.6 的“受限自动 Borrow”与 SEMANTICS §29 的“v0.0.1 不�
 │   ├── ling-source/      # SourceId、UTF-8、Span、行列映射
 │   ├── ling-unicode/     # XID、NFC、Script Set、UTS #39 skeleton
 │   ├── ling-project/     # ling.toml v1、源码/module 发现、离线 path dependency graph 与内容 identity
-│   ├── ling-bytecode/    # RFC-0014 的未验证 bytecode model、显式 tag/opcode 与 hard limits
+│   ├── ling-bytecode/    # RFC-0014 model、Checked Core 最小 lowering、encoder/disassembler；decoder/verifier/VM 后续实现
 │   ├── ling-syntax/      # Token、Lexer、offside layout、Parser、CST
 │   ├── ling-ast/         # AST（保 Span、去语法噪音）
 │   ├── ling-hir/         # 名称空间、糖 Lowering、Place 分类
@@ -223,6 +223,8 @@ PRJ-1106 增加 `single-package`、`multi-module`、`path-dependency`、`cycle`�
 PRJ-1108 增加固定 seed、无外部依赖的生成式 project property suite：独立 cycle oracle 检查随机小型 module graph，canonical logical path 只验证不改写，acyclic project 在相反文件创建顺序下产生相同 graph/identity/lock，且 `ling.lock/1` model 与 canonical bytes 双向 round-trip。`manifest_bytes` fuzz target 对同一任意输入使用不同诊断 source label 重复解码，要求成功模型或失败 code/span 一致；四个审查过的 seed corpus 进入固定 nightly CI smoke。该任务不新增公开接口、Schema、诊断或语言语义。
 
 VM-1201 依据 Accepted RFC-0014 增加独立、无生产依赖的 `ling-bytecode` data-model crate。所有 table/index/digest domain 使用不同 Rust 类型，opcode/tag 由显式方法给出而不依赖 enum 内存布局；模型类型名明确标记为 `UnverifiedProgram`，不提供 encoder、decoder、verifier、lowering 或执行入口。TEST-VM-0001 同时冻结解释器的首个 VM slice 可观察结果、Runtime Fault code/category/original UTF-8 span，以及 22 个 malformed verifier 场景；VM differential 用例在 VM-1204 前以明确原因 ignored。
+
+VM-1202 在不开放执行入口的前提下增加 `ProgramSnapshot` → `LoweredProgramV1` 的失败原子 lowering、`ling.bytecode/1.0` 确定性 little-endian writer 与非契约 debug disassembler。当前纵向切片严格限于 `Unit/Bool/Int/Text`、monomorphic direct call、不可变局部绑定、`Console.write` 和 return；不支持项以保留原始 UTF-8 span 的结构化错误拒绝。source table 只接受显式 canonical logical name，并从同一不可变 `SourceFile` 的 BOM/CRLF 原始字节计算长度和 SHA-256；golden 同时冻结 Hello 的精确 bytes 与 disassembly。decoder、verifier、`VerifiedProgramV1`、VM、CLI backend、泛型 monomorphization、递归、控制流、运算、aggregate 和公开 `L-BYTECODE-*` emitter 均继续由后续任务负责。
 
 出口标准：§18.6 全过；Graph Schema 正/负兼容性测试通过；同一输入在两个独立进程中产生逐字节相同的 Graph JSON 与 Audit 文本；Audit round-trip 性质测试通过；依赖实现变化敏感性有最小调用图用例，避免无意的全图或不充分失效。
 

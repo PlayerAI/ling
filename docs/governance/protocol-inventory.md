@@ -247,16 +247,16 @@
 
 ### `PROTO-BYTECODE` — Portable bytecode and verifier format
 
-- Producer: Future checked Typed Core to bytecode compiler
+- Producer: VM-1202 ling-bytecode checked Typed Core lowerer and deterministic writer
 - Consumer: Future bytecode verifier and VM
 - Reader policy: No reader exists yet. RFC-0014 requires the future 1.0 reader to accept exactly format (1, 0), validate every bound before allocation, reject unknown executable content, and expose only independently verified programs to the VM.
-- Writer policy: No writer exists yet. RFC-0014 fixes the future 1.0 envelope, table and register instruction encoding, sorted deterministic output, checked-snapshot input, source maps, and path-free metadata.
+- Writer policy: The library-only VM-1202 writer accepts only LoweredProgramV1 produced from a checked ProgramSnapshot plus explicit immutable source snapshots. It emits the RFC-0014 1.0 envelope, sorted tables, source maps, zero reserved bytes, and path-free metadata under hard and caller-supplied limits; it does not publish executable state or a CLI artifact contract.
 - Unknown-field policy: Future ling.bytecode/1.0 rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes.
 - Migration tool: No previous format exists. A future migration must decode and verify the old version before encoding the new version; no tool is implemented.
 - Authority: `RFC-0014`
 - Sources: [`docs/RFC-0014.md`](../RFC-0014.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
-- Notes: VM-1201 implements only the explicitly unverified data model, typed index/digest domains, fixed tags/opcodes/limits, and TEST-VM-0001 reference corpus. The protocol remains Future until VM-1202 through VM-1204 add deterministic writing/lowering, independent decoding/verification, executable VerifiedProgram state, and VM evidence.
+- Notes: VM-1201 and VM-1202 implement the explicitly unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot scalar/direct-call lowering, deterministic writing, debug disassembly, and TEST-VM-0001/golden evidence. The planned-public protocol remains Future until VM-1203 and VM-1204 add independent decoding/verification, executable VerifiedProgram state, and VM evidence.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 
