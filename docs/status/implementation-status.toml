@@ -118,8 +118,8 @@ acceptance = [
   "local Markdown path targets: 77 resolved",
 ]
 verified_against_commit = "de5d256321506988f43b54ca15c9aa08e7215f7f"
-completion_commit = ""
-integration_state = "verified-uncommitted"
+completion_commit = "c147b5c02532b61e23df46f6cb25251d8c94dd7d"
+integration_state = "committed"
 completed = "2026-08-20"
 notes = [
   "No gap option was selected and no language behavior was changed.",

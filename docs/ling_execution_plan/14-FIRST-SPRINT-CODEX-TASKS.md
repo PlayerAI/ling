@@ -87,7 +87,7 @@ LSP protocol fixtures
 
 # Task C：GOV-0102 规范缺口台账
 
-> 状态：**Done**（2026-08-20；本地门禁已通过，里程碑提交元数据待回填）
+> 状态：**Done**（2026-08-20，实现提交 `c147b5c02532b61e23df46f6cb25251d8c94dd7d`）
 > 机器状态：[implementation-status.toml](../status/implementation-status.toml)
 > 验收证据：[GOV-0102-IMPLEMENTATION-REPORT.md](../status/GOV-0102-IMPLEMENTATION-REPORT.md)
 
