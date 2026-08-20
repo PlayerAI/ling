@@ -234,16 +234,16 @@ fn validate_record(
         ));
     }
 
-    if let Some((kind, status, path)) = specifications.get(&record.id)
-        && (kind != &record.kind || status != &record.status || path != &record.path)
-    {
-        errors.push(format!(
-            "GOV-LIFE-0004: {} lifecycle tuple ({}, {}, {}) differs from authority tuple ({kind}, {status}, {path})",
-            display_id(record),
-            record.kind,
-            record.status,
-            record.path
-        ));
+    if let Some((kind, status, path)) = specifications.get(&record.id) {
+        if kind != &record.kind || status != &record.status || path != &record.path {
+            errors.push(format!(
+                "GOV-LIFE-0004: {} lifecycle tuple ({}, {}, {}) differs from authority tuple ({kind}, {status}, {path})",
+                display_id(record),
+                record.kind,
+                record.status,
+                record.path
+            ));
+        }
     }
 
     validate_history(record, errors);
