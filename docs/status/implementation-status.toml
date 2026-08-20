@@ -163,8 +163,8 @@ acceptance = [
   "local Markdown path targets: 95 resolved",
 ]
 verified_against_commit = "327bdef57ee476b2330e9f51ae9241346d4affde"
-completion_commit = ""
-integration_state = "verified-uncommitted"
+completion_commit = "4876a0328d994121fb32c10b3f2a25e3ce11e5ff"
+integration_state = "committed"
 completed = "2026-08-20"
 notes = [
   "No language semantics, Ling diagnostics, Semantic IDs, Unicode data, or public runtime protocols changed.",
