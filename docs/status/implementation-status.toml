@@ -1607,3 +1607,75 @@ notes = [
   "Unicode remains 17.0.0 and regenerated compiler/Tree-sitter tables are byte-identical.",
   "PRJ-1104 package/content identity is the next Ready prerequisite; PRJ-1103 package-aware resolution must consume that identity rather than changing current Seed IDs prematurely.",
 ]
+
+[[task]]
+id = "PRJ-1104"
+title = "Content-identified local dependency graph"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1101", "PRJ-1102"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/ERROR-CODES.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "Cargo.lock",
+  "README.md",
+  "crates/ling-diagnostics/src/lib.rs",
+  "crates/ling-project/Cargo.toml",
+  "crates/ling-project/src/discovery.rs",
+  "crates/ling-project/src/lib.rs",
+  "crates/ling-project/src/package_graph.rs",
+  "crates/ling-project/tests/package_graph_fixtures.rs",
+  "docs/ERROR-CODES.md",
+  "docs/status/PRJ-1104-IMPLEMENTATION-REPORT.md",
+  "docs/governance/error-code-lock.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "tests/projects/dependency-v1/valid-basic/ling.toml",
+  "tests/projects/dependency-v1/valid-transitive/ling.toml",
+  "tests/projects/dependency-v1/package-cycle/ling.toml",
+]
+acceptance = [
+  "resolve_package_graph recursively resolves only explicit vendored local path dependencies; it performs no parent discovery, registry or network access, process or shell execution, environment lookup, source write, or lock operation",
+  "dependency directories and exact lowercase ling.toml files are matched case-sensitively and symlink-aware beneath the containing package; declared dependency keys must match loaded package names",
+  "package cycles, same-name/different-content collisions, same-content/different-version collisions, and graph resource limits fail atomically with deterministic root causes",
+  "PackageSourceId and PackageGraphId implement RFC-0002 versioned SHA-256 length framing, exclude physical/display/locator metadata, and match frozen independent content and graph vectors",
+  "all manifests and source bytes are validated and snapshotted before any Ling source parse; the exact retained source bytes feed both package identity and module discovery",
+  "L-IO-0001, L-PROJECT-0014, and L-PROJECT-0015 provide registered bilingual diagnostics with bounded typed Facts and original UTF-8 manifest spans where applicable",
+  "seven dependency-v1 fixture trees plus fourteen package-graph integration tests cover recursive resolution, frozen hashes, ordering, invariance, sensitivity, collision, cycle, failure precedence, limits, read-only sources, symlink escape, and static no-network/no-process guards",
+  "cargo test --locked --offline -p ling-project: 13 unit tests, 33 integration tests, and documentation tests passed",
+  "cargo xtask governance check-all: 45 authority documents, 26 gaps, 20 lifecycle records, 19 protocols, and 71 diagnostic allocations passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, and 69 evidence records passed",
+  "cargo xtask support verify: 7 features, 3 profiles, 3 hosts, 1 target, 6 backends, 1 standard package, 19 protocols, and 9 unsupported capabilities passed",
+  "cargo xtask ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the PRJ-1104 backlog transition",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "Unicode generator rerun was byte-idempotent and git diff --check passed",
+]
+verified_against_commit = "66a64c9b57c8bb327599a7463345c9d2fbe77a51"
+completion_commit = "66a64c9b57c8bb327599a7463345c9d2fbe77a51"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "PRJ-1104 adds the Public/Experimental package content and graph identity protocol plus recursive explicit-root local dependency resolution; it does not integrate project mode into the CLI.",
+  "Diagnostic JSON remains ling.diagnostic/0.1; L-PROJECT-0014 and L-PROJECT-0015 are monotonic additions, while host read failures continue to use L-IO-0001.",
+  "Current Seed Semantic IDs and ling.semantic/0.1 remain unchanged; PRJ-1103 must introduce a versioned package-aware Semantic Schema before including PackageIdentity.",
+  "Unicode remains 17.0.0; package technical names and digests are ASCII, module/source validation reuses the pinned tables, and original source bytes remain identity inputs.",
+  "sha2 was already locked at the workspace version; Cargo.lock changes only record ling-project's dependency edge.",
+  "PRJ-1103 is now Ready; lockfile, project CLI selection, complete cross-project fixtures, graph fuzzing, registry, Git, network, publication, and item-level visibility remain deferred.",
+]

@@ -26,7 +26,7 @@
 | 4 | `GOV-0105` | 建错误码注册表 | Seed diagnostics | 与 1/2/3 | **Done**；55 active、1 retired，重复/改义/改型/回填/未注册 code CI 拒绝 |
 | 5 | `GOV-0106` | 建 Schema 生命周期与 golden corpus | 公开协议清单 | 与 6–8 | **Done**；3 schemas、4 valid、6 invalid、1 canonical、23 corrupt mutations，N-1 明确为 `NoPreviousVersion` |
 | 6 | `GOV-0107` | 建 traceability 模板 | 规范索引 | 与 3/4 | **Done**；7 features、32 fixtures、44 evidence，链接/极性/differential/report drift 由 CI 检查 |
-| 7 | `GOV-0108` | 建 1.0 支持矩阵草案 | 缺口、协议与追踪注册表 | 与 8 | **Done**；7 features、3 profiles、3 hosts、1 target、6 backends、1 std package、18 protocols、9 unsupported，生成物 drift 由 CI 检查 |
+| 7 | `GOV-0108` | 建 1.0 支持矩阵草案 | 缺口、协议与追踪注册表 | 与 8 | **Done**；7 features、3 profiles、3 hosts、1 target、6 backends、1 std package、19 protocols、9 unsupported，生成物 drift 由 CI 检查 |
 | 8 | `GOV-0109` | Feature state 机器化 | 支持矩阵草案 | 与 7 | **Done**；9 tasks、7 features，docs/release-note/internal CLI views 与 registry drift 由 CI 检查 |
 | 9 | `GOV-0110` | 收敛 G0 CI 门禁 | 前述 G0 tasks | 否 | **Done**；8 named gates、19 commands、3 test hosts、Seed 4 surfaces/8 processes |
 | 10 | `TS-3101` | 语法→Tree-sitter 映射 | Accepted Seed 语法 | 与 G0 | **Done**；52 syntax rows、8 private helpers、8 deferred groups，均映射 compiler/corpus 边界 |
@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1102` Done；`PRJ-1104` Ready，`PRJ-1103` 等待其 PackageIdentity 前置；后续任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`、`PRJ-1102`、`PRJ-1104` Done；`PRJ-1103` Ready；后续任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -85,8 +85,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GOV-0110` | G0 | G0 CI 门禁 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:281`；见机器状态、CI contract 与实施报告 |
 | `PRJ-1101` | G1/Editor | 最小项目 manifest | M | Done | `03-G1-V0.1-LIVING.md:47`；见 `crates/ling-project/`、manifest-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1102` | G1/Editor | Module discovery | M | Done | `03-G1-V0.1-LIVING.md:79`；见 `ling-project` discovery、discovery-v1 fixtures、机器状态与实施报告 |
-| `PRJ-1103` | G1/Editor | Import 与 visibility | M | BlockedDependency | `03-G1-V0.1-LIVING.md:89`；RFC-0002 §5/§8 禁止仅以 graph-local name 构造 package-aware Semantic ID，等待 PRJ-1104 PackageIdentity |
-| `PRJ-1104` | G1/Editor | Dependency graph | L | Ready | `03-G1-V0.1-LIVING.md:97`；Accepted RFC-0002 已定义递归本地 graph、PackageIdentity 与 canonical hash，PRJ-1101/1102 已满足前置 |
+| `PRJ-1103` | G1/Editor | Import 与 visibility | M | Ready | `03-G1-V0.1-LIVING.md:89`；PRJ-1104 已提供 PackageIdentity；实现必须消费该身份并先版本化 package-aware Semantic Schema |
+| `PRJ-1104` | G1/Editor | Dependency graph | L | Done | `03-G1-V0.1-LIVING.md:97`；见 `ling-project` package graph、dependency-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1105` | G1/Editor | Lock file | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:107` |
 | `PRJ-1106` | G1/Editor | Project fixtures | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:116` |
 | `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:132` |
