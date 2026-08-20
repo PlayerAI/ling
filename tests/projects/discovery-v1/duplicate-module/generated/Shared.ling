@@ -1,0 +1,3 @@
+module Shared
+
+let generated = 2

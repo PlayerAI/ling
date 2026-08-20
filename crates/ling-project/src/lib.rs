@@ -1,6 +1,8 @@
 //! Deterministic reader for the Accepted `ling.toml` manifest version 1 protocol.
 
-use std::collections::{BTreeMap, BTreeSet};
+mod discovery;
+
+use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
 use std::ops::Range;
@@ -10,6 +12,10 @@ use serde::Deserialize;
 use serde::de::{Deserializer, MapAccess, Visitor};
 use toml::Spanned;
 use unicode_normalization::UnicodeNormalization;
+
+pub use discovery::{
+    DiscoveryFailure, ImportTarget, ModuleEdge, ModuleGraph, ModuleNode, discover_modules,
+};
 
 /// Exact project-manifest filename fixed by RFC-0002.
 pub const MANIFEST_FILE_NAME: &str = "ling.toml";
@@ -209,12 +215,55 @@ impl LocalDependency {
 }
 
 /// The validated semantic model of `ling.manifest/1`.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone)]
 pub struct Manifest {
     package: PackageMetadata,
     source: SourceLayout,
     exports: Box<[QualifiedModuleName]>,
     dependencies: BTreeMap<PackageName, LocalDependency>,
+    locations: ManifestLocations,
+}
+
+impl PartialEq for Manifest {
+    fn eq(&self, other: &Self) -> bool {
+        self.package == other.package
+            && self.source == other.source
+            && self.exports == other.exports
+            && self.dependencies == other.dependencies
+    }
+}
+
+impl Eq for Manifest {}
+
+impl fmt::Debug for Manifest {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("Manifest")
+            .field("package", &self.package)
+            .field("source", &self.source)
+            .field("exports", &self.exports)
+            .field("dependencies", &self.dependencies)
+            .finish()
+    }
+}
+
+#[derive(Clone, Debug)]
+struct ManifestLocations {
+    source_name: String,
+    source_roots: BTreeMap<LogicalPath, Range<u32>>,
+    entry: Range<u32>,
+    exports: BTreeMap<QualifiedModuleName, Range<u32>>,
+}
+
+struct ValidatedSource {
+    layout: SourceLayout,
+    root_locations: BTreeMap<LogicalPath, Range<u32>>,
+    entry_location: Range<u32>,
+}
+
+struct ValidatedExports {
+    modules: Box<[QualifiedModuleName]>,
+    locations: BTreeMap<QualifiedModuleName, Range<u32>>,
 }
 
 impl Manifest {
@@ -463,9 +512,15 @@ fn validate_raw_manifest(source_name: &str, raw: RawManifest) -> Result<Manifest
 
     Ok(Manifest {
         package,
-        source,
-        exports,
+        source: source.layout,
+        exports: exports.modules,
         dependencies,
+        locations: ManifestLocations {
+            source_name: source_name.to_owned(),
+            source_roots: source.root_locations,
+            entry: source.entry_location,
+            exports: exports.locations,
+        },
     })
 }
 
@@ -531,7 +586,7 @@ fn validate_package(source_name: &str, raw: RawPackage) -> Result<PackageMetadat
     })
 }
 
-fn validate_source(source_name: &str, raw: RawSource) -> Result<SourceLayout, ManifestError> {
+fn validate_source(source_name: &str, raw: RawSource) -> Result<ValidatedSource, ManifestError> {
     if raw.roots.get_ref().is_empty() {
         return Err(ManifestError::new(
             source_name,
@@ -584,12 +639,17 @@ fn validate_source(source_name: &str, raw: RawSource) -> Result<SourceLayout, Ma
         }
         roots_with_spans.push((root, raw_root.span()));
     }
-    let mut roots = roots_with_spans
+    roots_with_spans.sort_by(|(left, _), (right, _)| left.cmp(right));
+    let root_locations = roots_with_spans
+        .iter()
+        .map(|(root, span)| (root.clone(), bounded_span(span.clone())))
+        .collect::<BTreeMap<_, _>>();
+    let roots = roots_with_spans
         .into_iter()
         .map(|(root, _)| root)
         .collect::<Vec<_>>();
-    roots.sort();
 
+    let entry_span = bounded_span(raw.entry.span());
     let entry = validate_module_name(raw.entry.get_ref()).map_err(|reason| {
         ManifestError::new(
             source_name,
@@ -602,18 +662,25 @@ fn validate_source(source_name: &str, raw: RawSource) -> Result<SourceLayout, Ma
         )
     })?;
 
-    Ok(SourceLayout {
-        roots: roots.into_boxed_slice(),
-        entry,
+    Ok(ValidatedSource {
+        layout: SourceLayout {
+            roots: roots.into_boxed_slice(),
+            entry,
+        },
+        root_locations,
+        entry_location: entry_span,
     })
 }
 
 fn validate_exports(
     source_name: &str,
     raw: Option<RawExports>,
-) -> Result<Box<[QualifiedModuleName]>, ManifestError> {
+) -> Result<ValidatedExports, ManifestError> {
     let Some(raw_modules) = raw.and_then(|exports| exports.modules) else {
-        return Ok(Box::default());
+        return Ok(ValidatedExports {
+            modules: Box::default(),
+            locations: BTreeMap::new(),
+        });
     };
     if raw_modules.get_ref().len() > MAX_EXPORTS {
         return Err(ManifestError::new(
@@ -626,8 +693,9 @@ fn validate_exports(
         ));
     }
 
-    let mut modules = BTreeSet::new();
+    let mut modules = BTreeMap::new();
     for raw_module in raw_modules.into_inner() {
+        let span = raw_module.span();
         let module = validate_module_name(raw_module.get_ref()).map_err(|reason| {
             ManifestError::new(
                 source_name,
@@ -638,10 +706,13 @@ fn validate_exports(
                 },
             )
         })?;
-        if !modules.insert(module) {
+        if modules
+            .insert(module.clone(), bounded_span(span.clone()))
+            .is_some()
+        {
             return Err(ManifestError::new(
                 source_name,
-                raw_module.span(),
+                span,
                 ManifestErrorKind::Export {
                     reason: ValidationReason::Duplicate,
                     module: Some(diagnostic_fact(raw_module.get_ref())),
@@ -649,7 +720,15 @@ fn validate_exports(
             ));
         }
     }
-    Ok(modules.into_iter().collect::<Vec<_>>().into_boxed_slice())
+    let names = modules
+        .keys()
+        .cloned()
+        .collect::<Vec<_>>()
+        .into_boxed_slice();
+    Ok(ValidatedExports {
+        modules: names,
+        locations: modules,
+    })
 }
 
 fn validate_dependencies(

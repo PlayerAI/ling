@@ -1,0 +1,5 @@
+module Main
+
+import Middle
+
+let main () = ()

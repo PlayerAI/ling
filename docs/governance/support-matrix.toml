@@ -410,8 +410,8 @@ sources = ["docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md"]
 [[unsupported]]
 id = "UNSUP-PACKAGES"
 area = "Project/package"
-capability = "Project discovery and graph loading, lockfile, dependency resolver, package installation, or registry"
-reason = "PRJ-1101 implements the isolated ling.toml version 1 reader, but PRJ-1102 through PRJ-1105 have not implemented filesystem discovery, module/package graphs, visibility, local resolution, content identity, or the lock reader/writer; registry installation remains out of scope."
+capability = "CLI project selection, dependency-package graph loading and visibility, lockfile, package installation, or registry"
+reason = "PRJ-1101/1102 implement the isolated ling.toml version 1 reader and explicit-root deterministic source/module discovery, but PRJ-1103 through PRJ-1105 have not implemented cross-package visibility, recursive local dependency resolution, content identity, or the lock reader/writer; CLI integration and registry installation remain out of scope."
 blockers = []
 sources = ["docs/RFC-0002.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 

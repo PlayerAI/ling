@@ -1,0 +1,5 @@
+module Middle
+
+import Tail
+
+let value = 1

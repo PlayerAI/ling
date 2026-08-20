@@ -1,0 +1,5 @@
+module Game.Math
+
+import Util
+
+let answer = 42

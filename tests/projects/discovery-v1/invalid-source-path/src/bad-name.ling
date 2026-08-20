@@ -1,0 +1,3 @@
+module bad_name
+
+let value = 1

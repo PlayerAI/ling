@@ -14,7 +14,7 @@ IO = 1
 LEX = 12
 MUT = 1
 NAME = 9
-PROJECT = 7
+PROJECT = 13
 RUNTIME = 1
 SNAPSHOT = 1
 SYNTAX = 11
@@ -271,6 +271,42 @@ id = "L-PROJECT-0007"
 core_sha256 = "sha256:2cdc1e256ac36979cba548fee886177194ad2d49d5c06fb3f87c3c46e9d4381f"
 retired = false
 facts = ["dependency:string:optional", "reason:string:required", "value:string:optional"]
+
+[[code]]
+id = "L-PROJECT-0008"
+core_sha256 = "sha256:bda64e2486a8822df3fa6c85b0f0f9e25b2533fb71ad1d612e56ad540157fe77"
+retired = false
+facts = ["reason:string:required", "root:string:required"]
+
+[[code]]
+id = "L-PROJECT-0009"
+core_sha256 = "sha256:f263cbfd18db6e66f7c78e30b6afe3af92eefdb812250b1ebf7b940352d07d86"
+retired = false
+facts = ["reason:string:required", "source:string:required"]
+
+[[code]]
+id = "L-PROJECT-0010"
+core_sha256 = "sha256:7119f22823874e9f13275b3ac8c7b32c02134eaf0325ee5410f41be2247388b5"
+retired = false
+facts = ["actual_module:string:optional", "expected_module:string:required", "reason:string:required"]
+
+[[code]]
+id = "L-PROJECT-0011"
+core_sha256 = "sha256:2202e8d771b63af74455a8ef985fe8cac262ed14194c3e5d26e2fed50d335c6e"
+retired = false
+facts = ["first_source:string:required", "module:string:required", "second_source:string:required"]
+
+[[code]]
+id = "L-PROJECT-0012"
+core_sha256 = "sha256:b557965fb6facfd4c90043ef1abdf9e746c00c26e5928387630b2b3554e54683"
+retired = false
+facts = ["importer:string:optional", "module:string:required", "role:string:required"]
+
+[[code]]
+id = "L-PROJECT-0013"
+core_sha256 = "sha256:57312bd91bd47d2ae21f808927d258b9ce9a333d8ffd43c10aa82d8b2230fbad"
+retired = false
+facts = ["cycle:string:optional", "module:string:optional", "reason:string:required", "target:string:optional"]
 
 [[code]]
 id = "L-RUNTIME-0001"

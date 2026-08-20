@@ -1,0 +1,4 @@
+// emoji prefix 😀 keeps the original byte offset observable
+module Game.math
+
+let answer = 42

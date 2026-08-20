@@ -1,0 +1,14 @@
+manifest-version = 1
+
+[package]
+name = "hello"
+display-name = "零工程"
+version = "0.1.0"
+language = "0.1"
+
+[source]
+roots = ["src", "generated"]
+entry = "Main"
+
+[exports]
+modules = ["Game.Math"]

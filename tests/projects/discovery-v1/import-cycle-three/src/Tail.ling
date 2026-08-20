@@ -1,0 +1,5 @@
+module Tail
+
+import Main
+
+let value = 2

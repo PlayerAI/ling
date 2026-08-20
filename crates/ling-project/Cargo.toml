@@ -7,7 +7,10 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+ling-ast = { path = "../ling-ast" }
 ling-diagnostics = { path = "../ling-diagnostics" }
+ling-source = { path = "../ling-source" }
+ling-syntax = { path = "../ling-syntax" }
 ling-unicode = { path = "../ling-unicode" }
 serde.workspace = true
 toml.workspace = true
