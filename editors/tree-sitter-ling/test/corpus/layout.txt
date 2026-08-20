@@ -1,0 +1,180 @@
+========================================
+Relative indentation, nested dedent, and EOF closure
+========================================
+
+let main () =
+  let value =
+    1
+  value
+let answer = 42
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (unit_pattern)
+    (block
+      (let_declaration
+        (identifier_pattern
+          (identifier))
+        (block
+          (literal_expression
+            (integer_literal))))
+      (name_expression
+        (identifier))))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (literal_expression
+      (integer_literal))))
+
+========================================
+Blank and comment-only lines do not change layout
+========================================
+
+let main () =
+  // retained comment
+
+  1
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (unit_pattern)
+    (block
+      (line_comment)
+      (literal_expression
+        (integer_literal)))))
+
+========================================
+Match cases align and case bodies indent
+========================================
+
+let describe value =
+  match value with
+  // payload case
+  | Some item ->
+    item
+
+  // fallback case
+  | None ->
+    0
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (block
+      (match_expression
+        (name_expression
+          (identifier))
+        (line_comment)
+        (match_case
+          (constructor_pattern
+            (identifier)
+            (identifier_pattern
+              (identifier)))
+          (block
+            (name_expression
+              (identifier))
+            (line_comment)))
+        (match_case
+          (identifier_pattern
+            (identifier))
+          (block
+            (literal_expression
+              (integer_literal))))))))
+
+========================================
+Operator continuation and line-leading pipeline
+========================================
+
+let main () =
+  let total =
+    1 +
+      2
+    |> add 3
+  total
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (unit_pattern)
+    (block
+      (let_declaration
+        (identifier_pattern
+          (identifier))
+        (block
+          (pipeline_expression
+            (binary_expression
+              (literal_expression
+                (integer_literal))
+              (literal_expression
+                (integer_literal)))
+            (application_expression
+              (name_expression
+                (identifier))
+              (literal_expression
+                (integer_literal))))))
+      (name_expression
+        (identifier)))))
+
+========================================
+Delimiter newlines remain soft
+========================================
+
+let data =
+  { first = 1
+    second = [
+      2
+      3
+    ] }
+
+---
+
+(source_file
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (block
+      (record_expression
+        (record_field
+          (identifier)
+          (literal_expression
+            (integer_literal)))
+        (record_field
+          (identifier)
+          (list_expression
+            (literal_expression
+              (integer_literal))
+            (literal_expression
+              (integer_literal))))))))
+
+========================================
+Nested block comments are retained trivia
+========================================
+
+/* outer /* nested */ outer */
+let value = 1
+
+---
+
+(source_file
+  (block_comment)
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (literal_expression
+      (integer_literal))))

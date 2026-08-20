@@ -26,7 +26,25 @@ module.exports = grammar({
 
   word: ($) => $.identifier,
 
-  extras: ($) => [/[ \t\f]+/, $.line_comment, $.doc_comment, $.block_comment],
+  externals: ($) => [
+    $._newline,
+    $._indent,
+    $._dedent,
+    $._soft_newline,
+    $._line_leading_bar,
+    $.block_comment,
+    $._delimiter_open,
+    $._delimiter_close,
+    $._error_sentinel,
+  ],
+
+  extras: ($) => [
+    /[ \t\f]+/,
+    $.line_comment,
+    $.doc_comment,
+    $.block_comment,
+    $._soft_newline,
+  ],
 
   reserved: {
     global: ($) => [
@@ -56,11 +74,6 @@ module.exports = grammar({
 
     _bom: (_) => "\uFEFF",
 
-    _newline: (_) => token(choice("\r\n", "\n", "\r")),
-
-    _indent: (_) =>
-      token(prec(1, seq(choice("\r\n", "\n", "\r"), / +/))),
-
     _declaration: ($) =>
       choice(
         $.module_declaration,
@@ -80,9 +93,12 @@ module.exports = grammar({
     capability_block: ($) =>
       seq(
         $._indent,
+        repeat($._newline),
         "requires",
         field("capability", $.qualified_name),
         repeat(seq(",", field("capability", $.qualified_name))),
+        repeat($._newline),
+        $._dedent,
       ),
 
     import_declaration: ($) =>
@@ -134,7 +150,13 @@ module.exports = grammar({
           "body",
           choice(
             $._type_definition,
-            seq($._indent, $._type_definition),
+            seq(
+              $._indent,
+              repeat($._newline),
+              $._type_definition,
+              repeat($._newline),
+              $._dedent,
+            ),
           ),
         ),
       ),
@@ -155,10 +177,12 @@ module.exports = grammar({
     record_type: ($) =>
       seq(
         "{",
+        $._delimiter_open,
         optional($._member_separator),
         $.field_declaration,
         repeat(seq($._member_separator, $.field_declaration)),
         optional($._member_separator),
+        $._delimiter_close,
         "}",
       ),
 
@@ -171,12 +195,15 @@ module.exports = grammar({
       ),
 
     variant_type: ($) =>
-      seq(
-        $.variant_case,
-        repeat(
-          choice(
-            $.variant_case,
-            seq($._indent, $.variant_case),
+      prec.right(
+        seq(
+          $.variant_case,
+          repeat(
+            choice(
+              $._newline,
+              $.variant_case,
+              seq($._line_leading_bar, $.variant_case),
+            ),
           ),
         ),
       ),
@@ -236,10 +263,26 @@ module.exports = grammar({
 
     type_variable: ($) => seq("'", field("name", $.identifier)),
 
-    parenthesized_type: ($) => seq("(", $._type, ")"),
+    parenthesized_type: ($) =>
+      seq(
+        "(",
+        $._delimiter_open,
+        $._type,
+        $._delimiter_close,
+        ")",
+      ),
 
     tuple_type: ($) =>
-      seq("(", $._type, ",", $._type, repeat(seq(",", $._type)), ")"),
+      seq(
+        "(",
+        $._delimiter_open,
+        $._type,
+        ",",
+        $._type,
+        repeat(seq(",", $._type)),
+        $._delimiter_close,
+        ")",
+      ),
 
     _pattern: ($) => choice($.constructor_pattern, $._atomic_pattern),
 
@@ -281,25 +324,30 @@ module.exports = grammar({
         ),
       ),
 
-    unit_pattern: (_) => seq("(", ")"),
+    unit_pattern: ($) =>
+      seq("(", $._delimiter_open, $._delimiter_close, ")"),
 
     tuple_pattern: ($) =>
       seq(
         "(",
+        $._delimiter_open,
         $._pattern,
         ",",
         $._pattern,
         repeat(seq(",", $._pattern)),
+        $._delimiter_close,
         ")",
       ),
 
     record_pattern: ($) =>
       seq(
         "{",
+        $._delimiter_open,
         optional($._member_separator),
         $.record_pattern_field,
         repeat(seq($._member_separator, $.record_pattern_field)),
         optional($._member_separator),
+        $._delimiter_close,
         "}",
       ),
 
@@ -311,11 +359,16 @@ module.exports = grammar({
       ),
 
     block: ($) =>
-      prec.right(seq(
-        $._indent,
-        $._sequence_element,
-        repeat(seq($._indent, $._sequence_element)),
-      )),
+      prec.right(
+        seq(
+          repeat($._newline),
+          $._indent,
+          repeat($._newline),
+          $._sequence_element,
+          repeat(choice($._newline, $._sequence_element)),
+          $._dedent,
+        ),
+      ),
 
     _sequence_element: ($) =>
       choice($.function_definition, $.let_declaration, $._expression),
@@ -339,28 +392,33 @@ module.exports = grammar({
         field("condition", $._expression),
         "then",
         field("consequence", $._body_expression),
-        optional(choice($._indent, repeat1($._newline))),
         "else",
         field("alternative", $._body_expression),
       ),
 
     match_expression: ($) =>
-      prec.right(seq(
-        "match",
-        field("value", $._expression),
-        "with",
-        field(
-          "cases",
-          choice(
-            seq($.match_case, repeat($.match_case)),
+      prec.right(
+        seq(
+          "match",
+          field("value", $._expression),
+          "with",
+          field(
+            "cases",
             seq(
-              $._indent,
+              repeat($._newline),
+              optional($._line_leading_bar),
               $.match_case,
-              repeat(seq($._indent, $.match_case)),
+              repeat(
+                choice(
+                  $._newline,
+                  $.match_case,
+                  seq($._line_leading_bar, $.match_case),
+                ),
+              ),
             ),
           ),
         ),
-      )),
+      ),
 
     match_case: ($) =>
       seq(
@@ -386,6 +444,18 @@ module.exports = grammar({
               $.projection_expression,
               $.unary_expression,
               $._primary_expression,
+              seq(
+                $._indent,
+                choice(
+                  $.pipeline_expression,
+                  $.binary_expression,
+                  $.application_expression,
+                  $.projection_expression,
+                  $.unary_expression,
+                  $._primary_expression,
+                ),
+                $._dedent,
+              ),
             ),
           ),
         ),
@@ -398,8 +468,14 @@ module.exports = grammar({
         PREC.PIPELINE,
         seq(
           field("left", $._expression),
-          "|>",
-          field("right", $._expression),
+          choice("|>", seq($._line_leading_bar, "|>")),
+          field(
+            "right",
+            choice(
+              $._expression,
+              seq($._indent, $._expression, $._dedent),
+            ),
+          ),
         ),
       ),
 
@@ -416,7 +492,13 @@ module.exports = grammar({
             seq(
               field("left", $._expression),
               field("operator", operator),
-              field("right", $._expression),
+              field(
+                "right",
+                choice(
+                  $._expression,
+                  seq($._indent, $._expression, $._dedent),
+                ),
+              ),
             ),
           ),
         ),
@@ -488,33 +570,46 @@ module.exports = grammar({
         $.boolean_literal,
       ),
 
-    unit_expression: (_) => seq("(", ")"),
+    unit_expression: ($) =>
+      seq("(", $._delimiter_open, $._delimiter_close, ")"),
 
-    parenthesized_expression: ($) => seq("(", $._expression, ")"),
+    parenthesized_expression: ($) =>
+      seq(
+        "(",
+        $._delimiter_open,
+        $._expression,
+        $._delimiter_close,
+        ")",
+      ),
 
     tuple_expression: ($) =>
       seq(
         "(",
+        $._delimiter_open,
         $._expression,
         ",",
         $._expression,
         repeat(seq(",", $._expression)),
+        $._delimiter_close,
         ")",
       ),
 
     record_expression: ($) =>
       seq(
         "{",
+        $._delimiter_open,
         optional($._member_separator),
         $.record_field,
         repeat(seq($._member_separator, $.record_field)),
         optional($._member_separator),
+        $._delimiter_close,
         "}",
       ),
 
     record_update_expression: ($) =>
       seq(
         "{",
+        $._delimiter_open,
         optional($._member_separator),
         field("base", $.name_expression),
         "with",
@@ -522,6 +617,7 @@ module.exports = grammar({
         $.record_field,
         repeat(seq($._member_separator, $.record_field)),
         optional($._member_separator),
+        $._delimiter_close,
         "}",
       ),
 
@@ -535,6 +631,7 @@ module.exports = grammar({
     list_expression: ($) =>
       seq(
         "[",
+        $._delimiter_open,
         optional(
           seq(
             optional($._member_separator),
@@ -543,11 +640,12 @@ module.exports = grammar({
             optional($._member_separator),
           ),
         ),
+        $._delimiter_close,
         "]",
       ),
 
     _member_separator: ($) =>
-      repeat1(choice(";", $._newline, $._indent)),
+      repeat1(choice(";", $._soft_newline)),
 
     identifier: (_) =>
       token(new RustRegex("[\\p{XID_Start}_][\\p{XID_Continue}_]*")),
@@ -595,7 +693,5 @@ module.exports = grammar({
 
     line_comment: (_) => token(prec(1, seq("//", /[^\r\n]*/))),
 
-    block_comment: (_) =>
-      token(seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/")),
   },
 });

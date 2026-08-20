@@ -24,7 +24,9 @@
   ],
   "scripts": {
     "generate": "tree-sitter generate",
-    "test": "tree-sitter test",
+    "test": "tree-sitter test && npm run test:scanner && npm run test:layout",
+    "test:layout": "node test/run-layout-integration.js",
+    "test:scanner": "node test/run-scanner-tests.js",
     "parse:examples": "tree-sitter parse \"examples/*.ling\"",
     "verify": "npm run generate && npm test && npm run parse:examples"
   },
