@@ -411,9 +411,9 @@ sources = ["docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md"]
 id = "UNSUP-PACKAGES"
 area = "Project/package"
 capability = "Project manifest, lockfile, dependency resolver, package installation, or registry"
-reason = "Package identity and protocol semantics are unresolved."
-blockers = ["GAP-PACKAGE-NAMESPACE-001", "GAP-PACKAGE-PROTOCOL-001"]
-sources = ["docs/governance/gap-register.toml"]
+reason = "RFC-0002 accepts the local/offline protocol design, but PRJ-1101 through PRJ-1105 have not implemented its readers, graph, visibility, resolver, or lock writer; registry installation remains out of scope."
+blockers = []
+sources = ["docs/RFC-0002.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 
 [[unsupported]]
 id = "UNSUP-VM"

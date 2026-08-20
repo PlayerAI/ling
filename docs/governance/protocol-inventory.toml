@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 
 [[protocol]]
 id = "PROTO-CLI"
@@ -255,15 +255,15 @@ public_schema = false
 canonical = false
 producer = ["Future Ling project tooling"]
 consumer = ["Future package resolver and build planner"]
-reader_policy = "Not defined; Cargo.toml is the Rust implementation manifest and is not a Ling package protocol."
-writer_policy = "Not defined; no Ling manifest filename or schema is accepted."
-unknown_field_policy = "Not defined."
-migration_tool = "Not defined."
+reader_policy = "RFC-0002 fixes exact ling.toml and manifest-version = 1 decoding, validation, limits, and rejection behavior; no reader is implemented until PRJ-1101."
+writer_policy = "A future writer emits only the RFC-0002 version-1 model and never infers environment-dependent defaults; no writer is implemented yet."
+unknown_field_policy = "Version 1 rejects every unknown top-level key, table, and field."
+migration_tool = "No legacy Ling manifest exists; incompatible evolution requires a new manifest-version and explicit migration."
 fixtures = []
-sources = ["docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
+sources = ["docs/RFC-0002.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
 version_markers = []
-authority = ["ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["Blocked by GAP-PACKAGE-PROTOCOL-001."]
+authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
+notes = ["The protocol design is Accepted; visibility remains Planned public/Future until PRJ-1101 supplies an executable reader and fixtures."]
 
 [[protocol]]
 id = "PROTO-LOCKFILE"
@@ -277,15 +277,15 @@ public_schema = false
 canonical = false
 producer = ["Future Ling dependency resolver"]
 consumer = ["Future offline package and build tooling"]
-reader_policy = "Not defined; Cargo.lock locks Rust implementation dependencies and is not a Ling program lock protocol."
-writer_policy = "Not defined; package identity, selection, checksums, and canonical lock bytes remain unresolved."
-unknown_field_policy = "Not defined."
-migration_tool = "Not defined."
+reader_policy = "RFC-0002 defines exact ling.lock/1 validation and rejects unknown fields, noncanonical bytes, dangling identities, cycles, and incompatible formats; no reader is implemented yet."
+writer_policy = "A future PRJ-1105 writer emits RFC-0002 canonical compact JSON atomically after complete graph validation; no writer is implemented yet."
+unknown_field_policy = "ling.lock/1 rejects every unknown field."
+migration_tool = "An incompatible lock change uses a new format value and explicit migration; no legacy Ling lock exists."
 fixtures = []
-sources = ["docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
+sources = ["docs/RFC-0002.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
 version_markers = []
-authority = ["ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["Blocked by GAP-PACKAGE-PROTOCOL-001."]
+authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
+notes = ["The protocol design is Accepted; visibility remains Planned public/Future until PRJ-1105 supplies the reader, writer, and canonical corpus."]
 
 [[protocol]]
 id = "PROTO-BUILD-METADATA"

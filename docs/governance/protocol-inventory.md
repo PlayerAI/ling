@@ -1,7 +1,7 @@
 # Ling 公开接口与协议清单 / Public Protocol Inventory
 
 > 状态：由 `protocol-inventory.toml` 确定性生成
-> 更新日期：2026-08-20
+> 更新日期：2026-08-21
 > 本清单记录当前兼容边界，不新增语言语义或协议承诺。
 
 ## Summary
@@ -195,27 +195,27 @@
 
 - Producer: Future Ling dependency resolver
 - Consumer: Future offline package and build tooling
-- Reader policy: Not defined; Cargo.lock locks Rust implementation dependencies and is not a Ling program lock protocol.
-- Writer policy: Not defined; package identity, selection, checksums, and canonical lock bytes remain unresolved.
-- Unknown-field policy: Not defined.
-- Migration tool: Not defined.
-- Authority: `ROADMAP-1.0`, `GAP-REGISTER`
-- Sources: [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
+- Reader policy: RFC-0002 defines exact ling.lock/1 validation and rejects unknown fields, noncanonical bytes, dangling identities, cycles, and incompatible formats; no reader is implemented yet.
+- Writer policy: A future PRJ-1105 writer emits RFC-0002 canonical compact JSON atomically after complete graph validation; no writer is implemented yet.
+- Unknown-field policy: ling.lock/1 rejects every unknown field.
+- Migration tool: An incompatible lock change uses a new format value and explicit migration; no legacy Ling lock exists.
+- Authority: `RFC-0002`, `ROADMAP-1.0`, `GAP-REGISTER`
+- Sources: [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
-- Notes: Blocked by GAP-PACKAGE-PROTOCOL-001.
+- Notes: The protocol design is Accepted; visibility remains Planned public/Future until PRJ-1105 supplies the reader, writer, and canonical corpus.
 
 ### `PROTO-PACKAGE-MANIFEST` — Ling package/project manifest
 
 - Producer: Future Ling project tooling
 - Consumer: Future package resolver and build planner
-- Reader policy: Not defined; Cargo.toml is the Rust implementation manifest and is not a Ling package protocol.
-- Writer policy: Not defined; no Ling manifest filename or schema is accepted.
-- Unknown-field policy: Not defined.
-- Migration tool: Not defined.
-- Authority: `ROADMAP-1.0`, `GAP-REGISTER`
-- Sources: [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
+- Reader policy: RFC-0002 fixes exact ling.toml and manifest-version = 1 decoding, validation, limits, and rejection behavior; no reader is implemented until PRJ-1101.
+- Writer policy: A future writer emits only the RFC-0002 version-1 model and never infers environment-dependent defaults; no writer is implemented yet.
+- Unknown-field policy: Version 1 rejects every unknown top-level key, table, and field.
+- Migration tool: No legacy Ling manifest exists; incompatible evolution requires a new manifest-version and explicit migration.
+- Authority: `RFC-0002`, `ROADMAP-1.0`, `GAP-REGISTER`
+- Sources: [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
-- Notes: Blocked by GAP-PACKAGE-PROTOCOL-001.
+- Notes: The protocol design is Accepted; visibility remains Planned public/Future until PRJ-1101 supplies an executable reader and fixtures.
 
 ### `PROTO-BYTECODE` — Portable bytecode and verifier format
 

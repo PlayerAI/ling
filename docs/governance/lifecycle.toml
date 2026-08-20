@@ -22,6 +22,32 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "RFC-0002"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0002.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify valid, invalid, Unicode, CRLF, resource-limit, path, and unknown-field ling.toml fixtures with registered bilingual diagnostics and original UTF-8 byte spans.",
+  "Verify deterministic multi-package discovery, direct-only exported-module visibility, name/content collisions, graph cycles, symlink escape rejection, and offline operation.",
+  "Freeze independent package-content and graph hash vectors plus canonical ling.lock/1 valid, corrupt, compatibility, and parse-render byte-equality fixtures.",
+  "Verify existing file-oriented Seed commands remain unchanged when no explicit project manifest is selected.",
+]
+compatibility_impact = [
+  "Introduces Accepted version-1 manifest and lock designs without recognizing any legacy format; implementation remains Future until owning PRJ tasks provide readers, writers, diagnostics, and fixtures.",
+  "Existing Ling source, CLI behavior, diagnostics, schemas, and Semantic IDs remain unchanged by the RFC-only milestone; later package-aware Semantic IDs require a schema version transition.",
+]
+unresolved_alternatives = [
+  "Global registries, publisher identity, parent or network dependencies, version solving, full SemVer labels, item visibility, contract hashes, signatures, arbitrary build scripts, and workspaces remain deferred to separately versioned proposals.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

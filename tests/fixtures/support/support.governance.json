@@ -559,13 +559,11 @@
       "id": "UNSUP-PACKAGES",
       "area": "Project/package",
       "capability": "Project manifest, lockfile, dependency resolver, package installation, or registry",
-      "reason": "Package identity and protocol semantics are unresolved.",
-      "blockers": [
-        "GAP-PACKAGE-NAMESPACE-001",
-        "GAP-PACKAGE-PROTOCOL-001"
-      ],
+      "reason": "RFC-0002 accepts the local/offline protocol design, but PRJ-1101 through PRJ-1105 have not implemented its readers, graph, visibility, resolver, or lock writer; registry installation remains out of scope.",
+      "blockers": [],
       "sources": [
-        "docs/governance/gap-register.toml"
+        "docs/RFC-0002.md",
+        "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"
       ]
     },
     {

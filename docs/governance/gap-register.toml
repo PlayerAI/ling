@@ -7,7 +7,7 @@ title = "Package identity, namespace, visibility, dependency, and lock rules"
 release = "v0.1"
 authority = ["ROADMAP-1.0"]
 gaps = ["GAP-PACKAGE-NAMESPACE-001", "GAP-PACKAGE-PROTOCOL-001"]
-decisions = ["DEC-0007"]
+decisions = ["DEC-0007", "RFC-0002"]
 
 [[gate]]
 id = "G1-BYTECODE"
@@ -99,7 +99,7 @@ observed_markers = []
 [[gap]]
 id = "GAP-PACKAGE-NAMESPACE-001"
 title = "Package namespace and domain ownership"
-status = "Open"
+status = "Accepted"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["PRJ-1101", "PRJ-1104", "PRJ-1105"]
@@ -114,15 +114,15 @@ options = [
 irreversible_consequences = ["Published package coordinates become durable ecosystem and supply-chain identifiers."]
 required_evidence = ["positive", "negative", "migration", "cross-package", "offline"]
 owner_role = "language-governance"
-next_action = "Draft RFC-0002 with identity, collision, ownership, migration, and offline-resolution rules."
-resolution = []
+next_action = "Implement the RFC-0002 graph-local name/content identity boundary beginning with PRJ-1101."
+resolution = ["RFC-0002"]
 superseded_by = ""
 observed_markers = []
 
 [[gap]]
 id = "GAP-PACKAGE-PROTOCOL-001"
 title = "Project manifest, dependency graph, visibility, and lock protocol"
-status = "Open"
+status = "Accepted"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["PRJ-1101", "PRJ-1102", "PRJ-1103", "PRJ-1104", "PRJ-1105"]
@@ -137,8 +137,8 @@ options = [
 irreversible_consequences = ["Manifest and lock encodings become long-lived build inputs and supply-chain compatibility surfaces."]
 required_evidence = ["positive", "negative", "migration", "cross-package", "offline", "canonical"]
 owner_role = "package-design"
-next_action = "Specify the smallest local/offline project protocol before implementing PRJ-1101."
-resolution = []
+next_action = "Implement ling.toml in PRJ-1101, then discovery, visibility, resolution, and ling.lock in PRJ-1102 through PRJ-1105."
+resolution = ["RFC-0002"]
 superseded_by = ""
 observed_markers = []
 

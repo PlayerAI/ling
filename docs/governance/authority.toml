@@ -249,6 +249,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0002"
+title = "Local package identity and project protocol"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0002.md"
+covers = ["ling.toml", "package identity", "local dependencies", "module exports", "ling.lock", "offline resolution"]
+depends_on = ["DEC-0002", "DEC-0007", "DEC-0012", "DEC-0018", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

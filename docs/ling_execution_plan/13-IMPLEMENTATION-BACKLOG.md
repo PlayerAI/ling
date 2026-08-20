@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203` Done；后续任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203` Done；RFC-0002 已接受，`PRJ-1101` Ready；后续任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -83,7 +83,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GOV-0108` | G0 | 1.0 支持矩阵草案 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:240`；见机器状态、生成矩阵与实施报告 |
 | `GOV-0109` | G0 | 发布状态机器可读化 | S | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:267`；见机器状态、生成视图与实施报告 |
 | `GOV-0110` | G0 | G0 CI 门禁 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:281`；见机器状态、CI contract 与实施报告 |
-| `PRJ-1101` | G1/Editor | 最小项目 manifest | M | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:47` |
+| `PRJ-1101` | G1/Editor | 最小项目 manifest | M | Ready | `03-G1-V0.1-LIVING.md:47`；Accepted RFC-0002 已固定 `ling.toml` version 1 边界 |
 | `PRJ-1102` | G1/Editor | Module discovery | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:79` |
 | `PRJ-1103` | G1/Editor | Import 与 visibility | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:89` |
 | `PRJ-1104` | G1/Editor | Dependency graph | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:97` |
