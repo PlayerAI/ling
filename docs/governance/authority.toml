@@ -392,6 +392,19 @@ supersedes = []
 stable_basis = false
 
 [[document]]
+id = "SCHEMA-LIFECYCLE-POLICY"
+title = "Schema lifecycle and golden corpus policy"
+kind = "Governance policy"
+status = "Draft"
+version = "1"
+authority = "Registry"
+path = "docs/governance/SCHEMA-LIFECYCLE.md"
+covers = ["schema version meaning", "writer and reader ranges", "unknown and missing fields", "canonical encoding", "hash scheme boundaries", "golden and corrupt corpus requirements"]
+depends_on = ["GAP-REGISTER", "LIFECYCLE-REGISTER", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false
+
+[[document]]
 id = "SUPPORT-MATRIX"
 title = "Ling 1.0 support matrix draft"
 kind = "Governance registry"
