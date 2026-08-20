@@ -901,3 +901,80 @@ notes = [
   "No public diagnostic, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, compiler source span, or Unicode 17.0.0 data changed.",
   "TS-3104 owns pinned Unicode identifier parity; TS-3105 remains BlockedSpec on GAP-SEED-BOOLEAN-OPERATORS-001.",
 ]
+
+[[task]]
+id = "TS-3104"
+title = "Unicode identifier"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3103"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/grammar-map.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+]
+artifacts = [
+  "tools/unicode-gen/src/main.rs",
+  "tools/unicode-gen/README.md",
+  "editors/tree-sitter-ling/src/unicode-identifiers.generated.js",
+  "editors/tree-sitter-ling/src/unicode-identifiers.js",
+  "editors/tree-sitter-ling/grammar.js",
+  "editors/tree-sitter-ling/src/parser.c",
+  "editors/tree-sitter-ling/src/grammar.json",
+  "editors/tree-sitter-ling/src/node-types.json",
+  "editors/tree-sitter-ling/test/fixtures/unicode-identifiers.tsv",
+  "editors/tree-sitter-ling/test/run-unicode-differential.js",
+  "crates/ling-syntax/tests/unicode_identifier_differential.rs",
+  "editors/tree-sitter-ling/docs/ADR-0002-unicode-identifiers.md",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "docs/grammar-map.md",
+  ".github/workflows/ci.yml",
+  "tools/xtask/src/ci.rs",
+  "docs/status/TS-3104-IMPLEMENTATION-REPORT.md",
+]
+acceptance = [
+  "Unicode 17.0.0 generation: 779 XID_Start ranges and 1422 XID_Continue ranges matched the pinned DerivedCoreProperties source",
+  "shared identifier differential: 18 compiler and Tree-sitter cases passed, including NFC, supplementary planes, security-only rejection, and exact and/and_then behavior",
+  "compiler diagnostic boundary: L-LEX-0004 retained bilingual JSON messages and complete original UTF-8 byte spans",
+  "tree-sitter-cli 0.26.12 npm run verify offline: 29 of 29 corpus cases, scanner/layout integrations, 18 Unicode differential cases, and local example passed",
+  "generated Unicode and parser idempotence: 8 files, 0 changed SHA-256 hashes",
+  "compiler Unicode conformance: every Unicode scalar matched pinned 17.0.0 XID tables and NFC conformance passed",
+  "npm dependency graph: only tree-sitter-cli 0.26.12",
+  "cargo xtask governance check-all: 5 checks; 42 documents, 26 gaps, 17 lifecycle records, 18 protocols, 56 diagnostic codes",
+  "cargo xtask schema validate-all: 3 schemas, 4 valid fixtures, 6 invalid fixtures, 1 canonical byte fixture",
+  "cargo xtask schema compatibility --from N-1 --to N: 0 verified N-1 edges, 3 NoPreviousVersion records",
+  "cargo xtask schema corrupt-inputs: 23 deterministic mutations",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 32 conformance fixtures, 51 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify: 7 features, 3 profiles, 3 hosts, 1 native target, 6 backends, 1 standard package, 18 protocols, 9 unsupported records",
+  "cargo xtask ci verify: 8 named gates, 19 commands, 3 workspace-test hosts",
+  "cargo xtask seed reproduce: 4 surfaces, 8 independent processes, 41866 compared output bytes",
+  "cargo xtask status verify: 15 tasks (15 Done), 7 features (7 with stabilization blockers)",
+  "Tree-sitter named node coverage: 60 generated named node types, 0 uncovered",
+  "execution-plan SHA256SUMS: 27 entries verified",
+  "active Markdown link audit: 86 files, 787 local inline links, 0 missing targets",
+  "cargo test --workspace --all-features --locked --offline: 237 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "git diff --check: passed",
+]
+verified_against_commit = "108042a584412fbae8e3dbfba4352e47a079dbd5"
+completion_commit = "16e61caf1340611c4752196b47da2973aca6978b"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "Tree-sitter now derives identifier token ranges only from checksummed Unicode 17.0.0 repository data; host Unicode property tables are not consulted.",
+  "NFC identity, forbidden properties, Script Set, Identifier_Status/Type, mixed-script policy, and confusable diagnostics remain compiler-owned.",
+  "The LSP transport is not yet implemented; TS-3104 proves the stable bilingual diagnostic and original-byte-span boundary that LSP-2201 must adapt without allowing Tree-sitter to suppress it.",
+  "No public diagnostic code, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, compiler source span, or compiler Unicode data changed.",
+  "TS-3105 remains BlockedSpec on GAP-SEED-BOOLEAN-OPERATORS-001; whole-program grammar differential remains TS-3108.",
+]
