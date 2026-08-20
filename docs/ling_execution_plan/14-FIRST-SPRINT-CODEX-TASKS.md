@@ -56,6 +56,10 @@ LSP protocol fixtures
 
 # Task B：GOV-0101 规范权威索引
 
+> 状态：**Done**（2026-08-20；本地门禁已通过，里程碑提交元数据待回填）
+> 机器状态：[implementation-status.toml](../status/implementation-status.toml)
+> 验收证据：[GOV-0101-IMPLEMENTATION-REPORT.md](../status/GOV-0101-IMPLEMENTATION-REPORT.md)
+
 ```text
 执行 GOV-0101。
 

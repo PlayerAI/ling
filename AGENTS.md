@@ -40,7 +40,7 @@ Each change must state:
 
 - The post-Seed engineering package currently lives under `docs/ling_execution_plan/`. It is non-normative and ranks below accepted RFCs, `docs/SEMANTICS.md`, `docs/LANGUAGE.md`, conformance tests, and `docs/ROADMAP-1.0.md`.
 - Files under `docs/ling_execution_plan/baseline/` are historical planning inputs only. Do not copy them over current specifications or treat them as another authority.
-- Accepted RFC-0001 fixes the public CLI as `ling` and the source extension as `.ling`. References to `zero`, `.zero`, `zero.*`, or `zero-*` in the execution package are stale placeholders and must not enter implementation, fixtures, schemas, or editor integration.
+- `docs/SEMANTICS.md` and `docs/LANGUAGE.md` fix the public CLI as `ling` and the source extension as `.ling`; RFC-0001 records the same names but remains Draft. References to `zero`, `.zero`, `zero.*`, or `zero-*` in the execution package are stale placeholders and must not enter implementation, fixtures, schemas, or editor integration.
 - Keep the accepted diagnostic format `L-<DOMAIN>-<NUMBER>` and the single registry in `docs/ERROR-CODES.md`; do not apply alternate ranges proposed by a lower-authority plan.
 - Treat planned paths, crates, commands, manifests, schemas, backends, and editor repositories as proposals until the current repository and the required accepted RFCs confirm them. Do not create empty placeholder crates or public APIs.
 - Track execution tasks in `docs/status/implementation-status.toml`. A task may be implemented only when its dependencies are satisfied and any semantic or public-protocol decisions are Accepted.

@@ -10,7 +10,7 @@
 
 ## 1. 结论
 
-1. `v0.0.1 Seed` 已发布，其规范、实现、测试和发布证据已闭合；当前 `main` 比 tag 多两个发布记录提交，没有扩大语言语义。
+1. `v0.0.1 Seed` 已发布，其实现、测试和发布证据已闭合；RFC-0001 的源文件仍标为 Draft，该生命周期不一致由 GOV-0101 记录为治理缺口，不能把发布事实等同于 RFC Accepted。
 2. 当前真实命名是 Ling / 零、CLI `ling`、源码扩展名 `.ling`。执行计划中的 `zero`、`.zero`、`zero.*` 和 `zero-*` 是过时占位符，不得进入实现。
 3. 当前仓库已经具备 Seed 的共享检查管线、解释器、事务式 REPL、Semantic Graph、Audit Source 和 conformance runner；尚无 VM、project/package manager、增量数据库、LSP、Tree-sitter/Zed 仓库或 Native backend。
 4. `docs/ling_execution_plan/` 可以作为非规范性任务包使用，但必须先按本文差异表适配。其 `baseline/` 只能用于历史对照。
@@ -21,7 +21,7 @@
 | 材料 | 当前路径 | 结论 |
 | --- | --- | --- |
 | 仓库约束 | [AGENTS.md](../../AGENTS.md) | 已保留原规则并补充执行计划治理规则 |
-| Seed RFC | [RFC-0001.md](../RFC-0001.md) | Accepted；确定 CLI `ling` 与 `.ling` |
+| Seed RFC | [RFC-0001.md](../RFC-0001.md) | Draft；不得作为 Accepted 稳定依据；生命周期不一致见 `GAP-GOV-RFC-STATUS-001` |
 | 正式语义 | [SEMANTICS.md](../SEMANTICS.md) | 高于路线图和执行计划；§31 未决项不得由代码决定 |
 | 语言设计 | [LANGUAGE.md](../LANGUAGE.md) | 确定 G0～G6 的能力方向和 Profile 边界 |
 | 1.0 路线图 | [ROADMAP-1.0.md](../ROADMAP-1.0.md) | 非规范性工程顺序，不新增语义 |
@@ -174,7 +174,7 @@ cargo test --workspace --locked --offline
 
 | 计划假设 | 当前事实 | BASE-0001 处理 |
 | --- | --- | --- |
-| CLI 为 `zero` | RFC-0001 已确定 `ling` | 根 AGENTS 明确禁止采用过时占位符；后续计划应机械修订 |
+| CLI 为 `zero` | `SEMANTICS.md` 与 `LANGUAGE.md` 已确定 `ling`；RFC-0001 也记录该名称但仍是 Draft | 根 AGENTS 明确禁止采用过时占位符；后续计划应机械修订 |
 | baseline 中使用 `.zero`、`zero.*`、`zero-*` | 当前使用 `.ling`、`ling.*`、`ling-*` | `baseline/` 仅作历史输入，永不覆盖当前规范 |
 | 错误码采用 `L0000/P0000/...` 分区 | DEC-0001 和 `ERROR-CODES.md` 已采用 `L-<DOMAIN>-<NUMBER>` | GOV-0105 必须扩展现有注册表，不得建立第二套编码 |
 | 规范文件位于仓库根 | 当前位于 `docs/` | 所有任务 prompt 在执行前校正路径 |
@@ -224,11 +224,11 @@ BASE-0001 不执行该批量移动。当前机器状态使用真实路径 `docs/
 
 ## 10. 规范冲突与阻断项
 
-本次未发现 Accepted RFC、`SEMANTICS` 与 `LANGUAGE` 之间需要新裁决的冲突，因此没有创建虚假的新 spec-gap。
+BASE-0001 当时未识别出规范生命周期冲突。GOV-0101 随后核对源文件发现：`RFC-0001.md` 明确标为 Draft，但本盘点旧版和根 AGENTS 扩展段曾误称其为 Accepted。该问题现记录为 [GAP-GOV-RFC-STATUS-001](spec-gaps/GAP-GOV-RFC-STATUS-001.md)，不得静默提升 RFC 状态。
 
 发现的两个执行计划冲突均已被更高权威明确解决：
 
-1. `zero` 与 `ling`：RFC-0001 §2 明确选择 `ling`；
+1. `zero` 与 `ling`：`SEMANTICS.md` §31 与 `LANGUAGE.md` 的项目命名说明选择 `ling`；Draft RFC-0001 记录相同结果但不是 Accepted 依据；
 2. `L0000/P0000/...` 与 `L-<DOMAIN>-<NUMBER>`：Accepted DEC-0001 明确选择后者。
 
 后续修改低权威计划即可，不得为已解决事项重新发明 RFC。真正阻断 G1 的未决项仍包括 package identity/module/lock、bytecode/verifier observable semantics、Trait coherence/orphan/lowering、incremental/hash lifecycle、Formatter preservation 和 LSP/Semantic Transaction protocol boundaries；它们在 Accepted RFC/decision 前只能进行隔离研究或测试设计。
@@ -245,6 +245,6 @@ BASE-0001 不执行该批量移动。当前机器状态使用真实路径 `docs/
 | 不修改语言语义 | BASE diff 限定为 AGENTS、计划和 `docs/status/`；未修改 `crates/`、`tests/` 或规范语义 |
 | 测试 | 当前 worktree 的 fmt、locked/offline Clippy 与 workspace tests 通过；测试 138 passed |
 | 未确认项 | 本文 §9 |
-| 规范冲突处理 | 本文 §10；无未决的规范间冲突需要新 spec-gap |
+| 规范冲突处理 | 本文 §10；GOV-0101 后续登记 `GAP-GOV-RFC-STATUS-001`，不改变 BASE 的代码/测试结论 |
 
 下一项可执行工作应从 G0 治理任务选择。`GOV-0101`、`GOV-0102` 和 `GOV-0104` 可以在不修改语言语义的前提下准备；任何会冻结公开行为的结果仍须经过相应决议门禁。

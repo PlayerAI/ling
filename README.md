@@ -29,6 +29,7 @@ Ling 的 [`v0.0.1 Seed`](https://github.com/PlayerAI/ling/tree/v0.0.1) annotated
 cargo fetch --locked
 cargo test --workspace --all-features --locked --offline
 cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo xtask governance check-authority
 cargo run --locked --offline -- --version
 ```
 
@@ -137,7 +138,8 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 ├── tests/
 │   └── conformance/
 ├── tools/
-│   └── unicode-gen/
+│   ├── unicode-gen/
+│   └── xtask/
 └── docs/
     ├── LANGUAGE.md
     ├── SEMANTICS.md
@@ -151,6 +153,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
     ├── ERROR-CODES.md
     ├── DEPENDENCIES.md
     ├── decisions/
+    ├── governance/
     └── design-review.html
 ```
 
@@ -165,6 +168,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md)：本地质量门禁、候选 SHA、跨平台/fuzz/MSRV CI 与已发布 tag 的双语记录。
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的稳定错误码、双语模板、Facts 与兼容性边界。
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)：Rust 直接/关键传递依赖、许可证、MSRV、`unsafe` 与审查状态。
+- [`docs/governance/authority.md`](docs/governance/authority.md)：由机器清单确定性生成的规范权威、生命周期、依赖与冲突处理索引。
 - [`docs/design-review.html`](docs/design-review.html)：针对上述规范的设计评审记录；它是非规范性意见，不替代已接受的 RFC。
 
 ### 规范权威顺序
@@ -232,6 +236,7 @@ Rust 1.97.1 is the pinned development toolchain; the declared MSRV is Rust 1.85.
 cargo fetch --locked
 cargo test --workspace --all-features --locked --offline
 cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
+cargo xtask governance check-authority
 cargo run --locked --offline -- --version
 ```
 
@@ -340,7 +345,8 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 ├── tests/
 │   └── conformance/
 ├── tools/
-│   └── unicode-gen/
+│   ├── unicode-gen/
+│   └── xtask/
 └── docs/
     ├── LANGUAGE.md
     ├── SEMANTICS.md
@@ -354,6 +360,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
     ├── ERROR-CODES.md
     ├── DEPENDENCIES.md
     ├── decisions/
+    ├── governance/
     └── design-review.html
 ```
 
@@ -368,6 +375,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md): a bilingual record of local gates, the candidate SHA, platform/fuzz/MSRV CI, and the published tag.
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): stable `ling.diagnostic/0.1` codes, bilingual templates, Facts, and compatibility boundaries.
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md): direct and key transitive Rust dependencies, licenses, MSRV, `unsafe`, and review status.
+- [`docs/governance/authority.md`](docs/governance/authority.md): the deterministically generated index of specification authority, lifecycle, dependencies, and conflict handling.
 - [`docs/design-review.html`](docs/design-review.html): a non-normative design review of the specifications; it does not replace an accepted RFC.
 
 ### Authority order

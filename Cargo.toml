@@ -14,6 +14,7 @@ members = [
     "crates/ling-syntax",
     "crates/ling-types",
     "crates/ling-unicode",
+    "tools/xtask",
     "tools/unicode-gen",
 ]
 default-members = ["crates/ling-cli"]

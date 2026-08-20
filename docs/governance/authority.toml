@@ -1,0 +1,431 @@
+schema_version = 1
+updated = "2026-08-20"
+
+[[document]]
+id = "RFC-0001"
+title = "Ling foundation and v0.0.1 Seed"
+kind = "RFC"
+status = "Draft"
+version = "0.0.1-draft"
+authority = "Draft"
+path = "docs/RFC-0001.md"
+covers = ["Seed scope", "syntax", "compiler architecture", "CLI", "governance"]
+depends_on = ["SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "DEC-0001"
+title = "Diagnostic code allocation policy"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0001-error-code-policy.md"
+covers = ["diagnostic codes", "compatibility"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0002"
+title = "Source position units"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0002-source-position-units.md"
+covers = ["UTF-8 byte spans", "line and column projection"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0003"
+title = "M0 tooling"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0003-m0-tooling.md"
+covers = ["CLI parsing", "serialization", "snapshot testing"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0004"
+title = "Pipeline syntax and lowering"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0004-pipeline-syntax.md"
+covers = ["pipeline grammar", "precedence", "lowering"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0005"
+title = "Seed literals and delimiters"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0005-seed-literals-and-delimiters.md"
+covers = ["literals", "record delimiters", "list delimiters"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0006"
+title = "Seed offside and layout rules"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0006-offside-layout.md"
+covers = ["indentation", "continuation", "layout recovery"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0007"
+title = "Seed module and file boundaries"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0007-module-and-file-boundaries.md"
+covers = ["modules", "imports", "entry module"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0008"
+title = "Seed value restriction"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0008-seed-value-restriction.md"
+covers = ["generalization", "mutable values", "effects"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0009"
+title = "Seed borrow and mutation boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0009-seed-borrow-and-mutation-boundary.md"
+covers = ["borrow scope", "mutation", "aliasing"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0010"
+title = "State and capability model"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0010-state-and-capability-model.md"
+covers = ["State<T>", "capabilities", "host failures"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0011"
+title = "Seed built-ins"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0011-seed-builtins.md"
+covers = ["built-ins", "effects", "capability propagation"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0012"
+title = "Semantic identity and canonical bytes"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0012-semantic-identity-and-canonical-bytes.md"
+covers = ["Semantic ID", "canonical bytes", "dependency identity"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0013"
+title = "Main and runtime failures"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0013-main-and-runtime-failures.md"
+covers = ["entry point", "runtime failures", "exit codes"]
+depends_on = []
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0014"
+title = "Seed prelude Option and Result"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0014-seed-prelude-option-result.md"
+covers = ["Option", "Result", "prelude namespace"]
+depends_on = ["DEC-0011", "DEC-0012"]
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0015"
+title = "Seed Audit Source format and round trip"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0015-audit-source-format.md"
+covers = ["Audit Source", "canonical ordering", "round trip"]
+depends_on = ["DEC-0012"]
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0016"
+title = "Seed REPL session semantics"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0016-repl-session-semantics.md"
+covers = ["REPL sessions", "transactions", "script mode"]
+depends_on = ["DEC-0010", "DEC-0013"]
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "SEMANTICS"
+title = "Ling core semantics"
+kind = "Core specification"
+status = "Draft"
+version = "0.1"
+authority = "Semantics"
+path = "docs/SEMANTICS.md"
+covers = ["language semantics", "Semantic Graph", "execution profiles"]
+depends_on = []
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "LANGUAGE"
+title = "Ling language design"
+kind = "Design specification"
+status = "Draft"
+version = "0.1"
+authority = "Language"
+path = "docs/LANGUAGE.md"
+covers = ["language goals", "surface design", "roadmap"]
+depends_on = []
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "CONFORMANCE"
+title = "Ling conformance corpus"
+kind = "Conformance corpus"
+status = "Active"
+version = "0.0.1"
+authority = "Conformance"
+path = "tests/conformance"
+covers = ["observable Seed behavior", "positive and negative cases"]
+depends_on = ["SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "ROADMAP-1.0"
+title = "Roadmap to Ling 1.0"
+kind = "Roadmap"
+status = "Planning"
+version = "1.0-baseline"
+authority = "Roadmap"
+path = "docs/ROADMAP-1.0.md"
+covers = ["release sequence", "delivery gates", "compatibility milestones"]
+depends_on = ["SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "IMPLEMENTATION-SEED"
+title = "v0.0.1 Seed implementation plan"
+kind = "Engineering plan"
+status = "Planning"
+version = "0.2"
+authority = "Planning"
+path = "docs/IMPLEMENTATION.md"
+covers = ["Seed engineering order", "milestone gates"]
+depends_on = ["SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "NEXT-STEPS-HELLO"
+title = "AST-to-Hello-World implementation record"
+kind = "Engineering record"
+status = "Completed"
+version = "0.2"
+authority = "Planning"
+path = "docs/NEXT-STEPS.md"
+covers = ["Hello World vertical slice", "acceptance evidence"]
+depends_on = ["IMPLEMENTATION-SEED"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "NEXT-STEPS-SEED"
+title = "Hello-World-to-Seed implementation record"
+kind = "Engineering record"
+status = "Completed"
+version = "0.0.1"
+authority = "Planning"
+path = "docs/NEXT-STEPS-SEED.md"
+covers = ["Seed closure", "release gates"]
+depends_on = ["NEXT-STEPS-HELLO"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "EXECUTION-PLAN-1.0"
+title = "Ling 1.0 detailed execution plan"
+kind = "Engineering plan"
+status = "Planning"
+version = "2026-08-20"
+authority = "Planning"
+path = "docs/ling_execution_plan/README.md"
+covers = ["G0 through G6 task decomposition", "Codex workflow"]
+depends_on = ["ROADMAP-1.0"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "ERROR-CODES"
+title = "Ling diagnostic code registry"
+kind = "Compatibility registry"
+status = "Active"
+version = "ling.diagnostic/0.1"
+authority = "Registry"
+path = "docs/ERROR-CODES.md"
+covers = ["stable diagnostic codes", "bilingual messages", "payload facts"]
+depends_on = ["DEC-0001"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "TASK-STATUS"
+title = "Implementation task status registry"
+kind = "Status registry"
+status = "Active"
+version = "1"
+authority = "Registry"
+path = "docs/status/implementation-status.toml"
+covers = ["task lifecycle", "verification evidence"]
+depends_on = ["EXECUTION-PLAN-1.0"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "SEED-TRACEABILITY"
+title = "Seed specification traceability"
+kind = "Evidence"
+status = "Evidence"
+version = "0.0.1"
+authority = "Evidence"
+path = "docs/SEED-TRACEABILITY.md"
+covers = ["normative clause mapping", "test evidence"]
+depends_on = ["CONFORMANCE"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "GAP-GOV-RFC-STATUS-001"
+title = "RFC-0001 lifecycle status mismatch"
+kind = "Specification gap"
+status = "Active"
+version = "1"
+authority = "Evidence"
+path = "docs/status/spec-gaps/GAP-GOV-RFC-STATUS-001.md"
+covers = ["RFC lifecycle", "governance consistency"]
+depends_on = ["RFC-0001"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "SEED-RELEASE-REPORT"
+title = "v0.0.1 Seed release gate report"
+kind = "Evidence"
+status = "Evidence"
+version = "0.0.1"
+authority = "Evidence"
+path = "docs/SEED-RELEASE-REPORT.md"
+covers = ["release gates", "CI evidence", "published tag"]
+depends_on = ["SEED-TRACEABILITY"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "DEPENDENCIES"
+title = "Rust dependency record"
+kind = "Evidence"
+status = "Evidence"
+version = "0.0.1"
+authority = "Evidence"
+path = "docs/DEPENDENCIES.md"
+covers = ["dependency licenses", "MSRV", "offline lock set"]
+depends_on = []
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "DESIGN-REVIEW"
+title = "Ling design review"
+kind = "Review"
+status = "Active"
+version = "2026-08-17"
+authority = "Opinion"
+path = "docs/design-review.html"
+covers = ["non-normative design critique"]
+depends_on = ["SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "RUST-IMPLEMENTATION"
+title = "Ling Rust implementation"
+kind = "Implementation"
+status = "Active"
+version = "0.0.1"
+authority = "Implementation"
+path = "crates"
+covers = ["compiler", "interpreter", "CLI"]
+depends_on = ["CONFORMANCE"]
+supersedes = []
+stable_basis = false
