@@ -1679,3 +1679,85 @@ notes = [
   "sha2 was already locked at the workspace version; Cargo.lock changes only record ling-project's dependency edge.",
   "PRJ-1103 is now Ready; lockfile, project CLI selection, complete cross-project fixtures, graph fuzzing, registry, Git, network, publication, and item-level visibility remain deferred.",
 ]
+
+[[task]]
+id = "PRJ-1103"
+title = "Package-aware imports and visibility"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1102", "PRJ-1104"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/ERROR-CODES.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "Cargo.lock",
+  "README.md",
+  "crates/ling-diagnostics/src/lib.rs",
+  "crates/ling-project/src/discovery.rs",
+  "crates/ling-project/src/package_graph.rs",
+  "crates/ling-project/tests/package_graph_fixtures.rs",
+  "crates/ling-resolve/Cargo.toml",
+  "crates/ling-resolve/src/lib.rs",
+  "crates/ling-resolve/tests/project_resolution.rs",
+  "crates/ling-semantic/Cargo.toml",
+  "crates/ling-semantic/src/lib.rs",
+  "crates/ling-semantic/tests/project_snapshot.rs",
+  "crates/ling-source/src/lib.rs",
+  "docs/ERROR-CODES.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/governance/SCHEMA-LIFECYCLE.md",
+  "docs/governance/error-code-lock.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/status/PRJ-1103-IMPLEMENTATION-REPORT.md",
+  "schemas/registry.toml",
+  "schemas/semantic/0.2",
+  "tests/projects/resolution-v1",
+  "tools/xtask/src/schema.rs",
+]
+acceptance = [
+  "validated PackageGraph construction rejects missing and unexported dependency modules atomically with L-PROJECT-0016 and L-PROJECT-0017 while transitive-only dependency namespaces remain invisible",
+  "PackageGraph retains the exact identity input source snapshot with only canonical logical coordinates and path-free bounded Debug output",
+  "resolve_project requires an exact package/module HIR set, canonicalizes input order, supports package-local duplicate module names, selects only direct dependency namespaces, and resolves exported top-level definitions across files",
+  "package-aware DefinitionId values include the full PackageIdentity under ling.definition-id/v2; file and REPL v1 IDs remain unchanged",
+  "build_project emits deterministic ling.semantic/0.2 graphs with package-qualified modules, definitions, nodes, imports, and references plus path-free package graph/root metadata",
+  "read_project_json enforces exact schema/language/Unicode versions, RejectRequired fields, package coordinates, exports, matching imports for cross-module references, ID/owner/reference integrity, and namespaced-extension policy",
+  "schemas/semantic/0.2 provides schema, valid/invalid corpus, canonical CompactJsonLf bytes, isolated reader evidence, and registered v2 hash domains without claiming file-mode migration",
+  "four resolution-v1 fixture trees plus project/semantic integration tests cover valid direct imports, duplicate Main modules, exact source spans, deterministic order, missing/private distinction, transitive hiding, strict reader failures, and frozen package-aware IDs",
+  "cargo test --locked --offline -p ling-project: 13 unit and 36 integration tests passed",
+  "cargo test --locked --offline -p ling-resolve: 11 unit and 3 integration tests passed",
+  "cargo test --locked --offline -p ling-semantic: 12 unit and 5 integration tests passed",
+  "cargo xtask governance check-all: 45 authority documents, 26 gaps, 20 lifecycle records, 20 protocols, and 73 diagnostic-code records passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: 4 schemas, 5 valid, 8 invalid, 2 canonical, 4 NoPreviousVersion, and 30 mutations passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, and 69 evidence records passed",
+  "cargo xtask support verify, ci verify, seed reproduce, and status verify: passed",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "Unicode generator rerun was byte-idempotent and git diff --check passed",
+]
+verified_against_commit = "8e98d32f54301dee3f198273cfae3146bbf2846b"
+completion_commit = "8e98d32f54301dee3f198273cfae3146bbf2846b"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "PRJ-1103 completes RFC-0002 coarse exported-module visibility and package-aware checked resolution at the library boundary; project CLI selection remains deferred to PRJ-1107.",
+  "Diagnostic JSON remains ling.diagnostic/0.1; L-PROJECT-0016 and L-PROJECT-0017 are monotonic registered additions with original UTF-8 spans.",
+  "Package mode adds the isolated Public/Experimental ling.semantic/0.2 protocol and v2 Definition/Body/Program/node domains; file-mode ling.semantic/0.1, v1 IDs, Seed outputs, and ling.audit/0.1 remain byte-stable.",
+  "Unicode remains 17.0.0; package identities are path-free, and no third-party dependency version changed.",
+  "Hyphenated PackageName values have no Accepted DEC-0007 import spelling; no alias or escaping syntax was invented.",
+  "PRJ-1105 canonical lockfile work is the next project slice; project fixtures, CLI integration, graph fuzzing, registry, Git, network, publication, and item-level visibility remain deferred.",
+]

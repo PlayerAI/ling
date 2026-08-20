@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`、`PRJ-1102`、`PRJ-1104` Done；`PRJ-1103` Ready；后续任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1104` Done；`PRJ-1105` Ready，领取前按规则拆分 lockfile reader/writer 与集成边界；后续任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -85,9 +85,9 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GOV-0110` | G0 | G0 CI 门禁 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:281`；见机器状态、CI contract 与实施报告 |
 | `PRJ-1101` | G1/Editor | 最小项目 manifest | M | Done | `03-G1-V0.1-LIVING.md:47`；见 `crates/ling-project/`、manifest-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1102` | G1/Editor | Module discovery | M | Done | `03-G1-V0.1-LIVING.md:79`；见 `ling-project` discovery、discovery-v1 fixtures、机器状态与实施报告 |
-| `PRJ-1103` | G1/Editor | Import 与 visibility | M | Ready | `03-G1-V0.1-LIVING.md:89`；PRJ-1104 已提供 PackageIdentity；实现必须消费该身份并先版本化 package-aware Semantic Schema |
+| `PRJ-1103` | G1/Editor | Import 与 visibility | M | Done | `03-G1-V0.1-LIVING.md:89`；见 package-aware resolver、`ling.semantic/0.2`、resolution-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1104` | G1/Editor | Dependency graph | L | Done | `03-G1-V0.1-LIVING.md:97`；见 `ling-project` package graph、dependency-v1 fixtures、机器状态与实施报告 |
-| `PRJ-1105` | G1/Editor | Lock file | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:107` |
+| `PRJ-1105` | G1/Editor | Lock file | L | Ready | `03-G1-V0.1-LIVING.md:107`；Accepted RFC-0002 §6 已冻结 `ling.lock/1`，PRJ-1104 提供完整 graph identity；领取前按 §1 拆分 |
 | `PRJ-1106` | G1/Editor | Project fixtures | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:116` |
 | `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:132` |
 | `PRJ-1108` | G1/Editor | Project graph fuzz/property | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:140` |
