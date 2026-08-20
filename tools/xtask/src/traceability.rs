@@ -1497,7 +1497,7 @@ differential_reason = "Internal metadata"
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root, "v0.0.1").expect("repository traceability is valid");
         assert_eq!(summary.feature_count, 7);
-        assert_eq!(summary.fixture_count, 32);
-        assert!(summary.evidence_count >= 40);
+        assert_eq!(summary.fixture_count, 38);
+        assert!(summary.evidence_count >= 60);
     }
 }
