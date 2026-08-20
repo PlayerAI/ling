@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`、`TS-3102`、`TS-3103`、`TS-3104`、`TS-3105`、`TS-3106`、`TS-3107` Done；`TS-3108` In Progress，其余任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`、`TS-3102`、`TS-3103`、`TS-3104`、`TS-3105`、`TS-3106`、`TS-3107`、`TS-3108` Done；其余任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -170,7 +170,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TS-3105` | G1/Editor | Expression precedence | M | Done | `05-ZED-EXTENSION.md:211`；Accepted `DEC-0017`；见 compiler/Tree-sitter 共享 precedence corpus、机器状态与实施报告 |
 | `TS-3106` | G1/Editor | Pattern 与 Type | M | Done | `05-ZED-EXTENSION.md:217`；见共享 41-case validity corpus、compiler/conformance evidence、机器状态与实施报告 |
 | `TS-3107` | G1/Editor | Error recovery | M | Done | `05-ZED-EXTENSION.md:221`；见 10 个静态、9 个增量、64 个定种子 mutation cases、scanner tests、机器状态与实施报告 |
-| `TS-3108` | G1/Editor | Grammar differential | M | In Progress | `05-ZED-EXTENSION.md:234`；覆盖全部 42 个 compiler conformance programs、84 个定种子编辑和稳定 CST/node-type 映射；不改变 compiler 合法性 |
+| `TS-3108` | G1/Editor | Grammar differential | M | Done | `05-ZED-EXTENSION.md:234`；见 42 个全程序 compiler/Tree-sitter cases、84 个定种子编辑、43 个稳定 CST/node-type 映射、机器状态与实施报告 |
 | `ZQ-3201` | G1/Editor | `highlights.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:245` |
 | `ZQ-3202` | G1/Editor | `brackets.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:273` |
 | `ZQ-3203` | G1/Editor | `indents.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:277` |

@@ -1215,7 +1215,7 @@ notes = [
 [[task]]
 id = "TS-3108"
 title = "Grammar differential"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -1234,6 +1234,7 @@ artifacts = [
   "README.md",
   "crates/ling-syntax/tests/conformance_syntax_differential.rs",
   "docs/grammar-map.md",
+  "docs/status/TS-3108-IMPLEMENTATION-REPORT.md",
   "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
   "editors/tree-sitter-ling/README.md",
   "editors/tree-sitter-ling/docs/ADR-0001-layout-scanner.md",
@@ -1248,18 +1249,34 @@ artifacts = [
   "editors/tree-sitter-ling/test/scanner_state.c",
 ]
 acceptance = [
-  "shared syntax manifest: all 42 tests/conformance sources covered exactly once; compiler parser confirms 34 valid and 8 invalid",
-  "Tree-sitter differential: 34 valid sources clean, 7 invalid sources recover with ERROR/MISSING, and m2-invalid-number is the sole explicit tolerant-editor/compiler-rejected case",
-  "bounded edit smoke: 84 fixed-seed whole-corpus deletion/insertion edits parsed twice without timeout, crash, or nondeterministic normalized summaries",
+  "shared syntax manifest: all 42 tests/conformance sources covered exactly once; compiler parser confirmed 34 valid and 8 invalid",
+  "tree-sitter-cli 0.26.12 npm run verify: 41 of 41 grammar cases, scanner/layout integrations, 18 Unicode, 29 precedence, 41 Pattern/Type, 10 static recovery, 9 incremental edit, 64 recovery mutation, 42 whole-program differential, 84 whole-corpus edit cases, and local example passed",
+  "Tree-sitter differential: all 34 valid sources clean, 7 invalid sources recover with ERROR/MISSING, and m2-invalid-number is the sole explicit tolerant-editor/compiler-rejected case",
+  "bounded edit smoke: 84 fixed-seed whole-corpus deletion/insertion edits parsed twice without timeout, crash, unbounded output, or nondeterministic normalized summaries",
   "stable mapping: reviewed SHA-256 values lock all 42 normalized whole-program CSTs plus generated node-types.json",
   "scanner state distinguishes same-indent match-case | from pipeline |>; all five previously ambiguous valid programs parse cleanly",
+  "generated Tree-sitter idempotence: 6 generated files retained identical SHA-256 hashes",
+  "cargo xtask governance check-all: all governance registries passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, 69 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify, ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the TS-3108 backlog transition",
+  "active Markdown link audit: 91 files, 940 local inline links, 0 missing targets",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "git diff --check: passed",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "uncommitted"
-completed = ""
+verified_against_commit = "c90dc6209ab90a7b7e4c8b0056c164a13821dff0"
+completion_commit = "c90dc6209ab90a7b7e4c8b0056c164a13821dff0"
+integration_state = "committed"
+completed = "2026-08-21"
 notes = [
   "The compiler remains authoritative for syntax validity; Tree-sitter remains a tolerant editor parser.",
   "The m2-invalid-number tolerance is explicit because Tree-sitter token-shape recognition accepts 0b102 while ling-syntax emits L-LEX-0011 for the invalid base-2 digit.",
   "No Ling diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, or Unicode 17.0.0 table changed.",
+  "The TS-3101 through TS-3108 grammar tranche is complete; later editor, project, VM, and LSP work remains subject to its declared interface and RFC prerequisites.",
 ]

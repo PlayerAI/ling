@@ -47,7 +47,7 @@
 | `TS-3105` | Expression precedence | `G1` | `M` | `Done` | `TS-3104` | `cf76a4268b5ec8d5cdd939749709cc0654cff732` |
 | `TS-3106` | Pattern 与 Type | `G1` | `M` | `Done` | `TS-3105` | `7948a17a7848c32078b3893b6c9182ab7c41096b` |
 | `TS-3107` | Error recovery | `G1` | `M` | `Done` | `TS-3106` | `1debda6d69796182d2b051bd5b5b03992008a1ca` |
-| `TS-3108` | Grammar differential | `G1` | `M` | `In Progress` | `TS-3107` | `` |
+| `TS-3108` | Grammar differential | `G1` | `M` | `Done` | `TS-3107` | `c90dc6209ab90a7b7e4c8b0056c164a13821dff0` |
 
 ## Generated consumers / 生成视图
 
