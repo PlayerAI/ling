@@ -82,5 +82,47 @@ completed = "2026-08-20"
 notes = [
   "No compiler, runtime, editor, diagnostic, or language semantics changed.",
   "RFC-0001 remains Draft; GAP-GOV-RFC-STATUS-001 records the lifecycle mismatch without choosing a resolution.",
-  "RFC/decision lifecycle automation, the unified gap registry, and CI wiring remain assigned to later G0 tasks.",
+  "At GOV-0101 completion, RFC/decision lifecycle automation, the unified gap registry, and CI wiring remained assigned to later G0 tasks.",
+]
+
+[[task]]
+id = "GOV-0102"
+title = "规范缺口台账"
+state = "Done"
+release = "G0"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0101"]
+spec = [
+  "docs/SEMANTICS.md",
+  "docs/RFC-0001.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/ling_execution_plan/14-FIRST-SPRINT-CODEX-TASKS.md",
+]
+artifacts = [
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "tools/xtask/src/gaps.rs",
+  "docs/status/GOV-0102-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask governance check-gaps: 25 Open gaps, 6 G1 gates",
+  "all 11 SEMANTICS section 31 items and RFC-0002 through RFC-0013 candidate topics are indexed",
+  "cargo test -p xtask --locked --offline: 24 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --all-features --locked --offline: 162 passed",
+  "local Markdown path targets: 77 resolved",
+]
+verified_against_commit = "de5d256321506988f43b54ca15c9aa08e7215f7f"
+completion_commit = ""
+integration_state = "verified-uncommitted"
+completed = "2026-08-20"
+notes = [
+  "No gap option was selected and no language behavior was changed.",
+  "The checker maps current experimental implementation markers and rejects unregistered TODO(spec) source markers.",
+  "The CI workflow invokes both governance checks; no remote CI result is claimed for this worktree.",
 ]

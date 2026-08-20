@@ -1,10 +1,11 @@
 # GAP-GOV-RFC-STATUS-001：RFC-0001 生命周期状态不一致
 
-> 状态：Open
+> 发现时状态：Open（当前状态以机器台账为准）
 > 发现任务：GOV-0101
 > 发现日期：2026-08-20
 > 类型：Governance / specification lifecycle
 > 语言行为影响：无直接变更
+> 机器台账：[`docs/governance/gap-register.toml`](../../governance/gap-register.toml) 中同名 gap；本文件保留发现证据，不是第二份状态权威
 
 ## 触发条件
 

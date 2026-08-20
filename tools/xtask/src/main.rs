@@ -1,3 +1,4 @@
+mod gaps;
 mod governance;
 
 use std::env;
@@ -49,9 +50,40 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "governance" && command == "check-gaps" => {
+            match gaps::check_repository(&root) {
+                Ok(summary) => {
+                    println!(
+                        "gap register OK: {} gaps ({} Open), {} gates",
+                        summary.gap_count, summary.open_count, summary.gate_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "governance" && command == "render-gaps" => {
+            match gaps::render_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority"
+                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

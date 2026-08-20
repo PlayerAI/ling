@@ -353,6 +353,19 @@ supersedes = []
 stable_basis = false
 
 [[document]]
+id = "GAP-REGISTER"
+title = "Specification gap register"
+kind = "Governance registry"
+status = "Active"
+version = "1"
+authority = "Registry"
+path = "docs/governance/gap-register.toml"
+covers = ["unresolved semantics", "release blockers", "candidate RFCs", "required evidence"]
+depends_on = ["SEMANTICS", "ROADMAP-1.0", "RFC-0001"]
+supersedes = []
+stable_basis = false
+
+[[document]]
 id = "SEED-TRACEABILITY"
 title = "Seed specification traceability"
 kind = "Evidence"
@@ -366,9 +379,9 @@ supersedes = []
 stable_basis = false
 
 [[document]]
-id = "GAP-GOV-RFC-STATUS-001"
+id = "EVIDENCE-GAP-GOV-RFC-STATUS-001"
 title = "RFC-0001 lifecycle status mismatch"
-kind = "Specification gap"
+kind = "Gap discovery evidence"
 status = "Active"
 version = "1"
 authority = "Evidence"

@@ -1,0 +1,631 @@
+schema_version = 1
+updated = "2026-08-20"
+
+[[gate]]
+id = "G1-PACKAGE"
+title = "Package identity, namespace, visibility, dependency, and lock rules"
+release = "v0.1"
+authority = ["ROADMAP-1.0"]
+gaps = ["GAP-PACKAGE-NAMESPACE-001", "GAP-PACKAGE-PROTOCOL-001"]
+decisions = ["DEC-0007"]
+
+[[gate]]
+id = "G1-BYTECODE"
+title = "Bytecode version, verifier, evaluation, Fault, and compatibility"
+release = "v0.1"
+authority = ["ROADMAP-1.0"]
+gaps = ["GAP-BYTECODE-SEMANTICS-001"]
+decisions = []
+
+[[gate]]
+id = "G1-TRAIT"
+title = "Trait declarations, solving, coherence, orphan rules, and lowering"
+release = "v0.1"
+authority = ["ROADMAP-1.0"]
+gaps = ["GAP-TRAIT-COHERENCE-001"]
+decisions = []
+
+[[gate]]
+id = "G1-INCREMENTAL"
+title = "Incremental cache keys, Semantic Hash upgrades, and invalidation"
+release = "v0.1"
+authority = ["ROADMAP-1.0"]
+gaps = ["GAP-INCREMENTAL-CACHE-001", "GAP-SEMANTIC-HASH-LIFECYCLE-001"]
+decisions = ["DEC-0012"]
+
+[[gate]]
+id = "G1-FORMATTER"
+title = "Author Source preservation, normalization, and localization"
+release = "v0.1"
+authority = ["ROADMAP-1.0"]
+gaps = ["GAP-FORMATTER-AUTHOR-SOURCE-001", "GAP-AUTHOR-SOURCE-LOCALIZATION-001"]
+decisions = ["DEC-0015"]
+
+[[gate]]
+id = "G1-LSP-TRANSACTION"
+title = "LSP and Semantic Transaction Stable versus Experimental fields"
+release = "v0.1"
+authority = ["ROADMAP-1.0"]
+gaps = ["GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001", "GAP-LSP-TRANSACTION-PROTOCOL-001"]
+decisions = ["DEC-0002", "DEC-0012"]
+
+[[gap]]
+id = "GAP-GOV-RFC-STATUS-001"
+title = "RFC-0001 lifecycle status mismatch"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["GOV-0103", "PRJ-1101", "VM-1201", "TRAIT-1301", "INC-1401", "FMT-1501", "LSP-2101"]
+observable_behavior = "A release tag and prior summaries imply acceptance while RFC-0001 itself remains Draft, so work cannot audit whether an RFC-only behavior is authorized."
+authority = ["RFC-0001", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0001"]
+source_items = ["GOV-0101:RFC-0001-status"]
+options = [
+  "Complete review and explicitly accept RFC-0001 with acceptance metadata.",
+  "Keep RFC-0001 Draft and correct every Accepted claim.",
+  "Revise or split RFC-0001 before any acceptance action.",
+]
+irreversible_consequences = ["Treating a Draft as Accepted can freeze public behavior without an auditable decision."]
+required_evidence = ["positive", "negative", "migration", "governance-audit"]
+owner_role = "language-governance"
+next_action = "Record an explicit reviewed lifecycle decision; do not promote the RFC through this registry."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-PACKAGE-NAMESPACE-001"
+title = "Package namespace and domain ownership"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["PRJ-1101", "PRJ-1104", "PRJ-1105"]
+observable_behavior = "Package identities, published names, registry coordinates, and collision handling are not defined beyond Ling, the ling CLI, and the .ling extension."
+authority = ["SEMANTICS", "RFC-0001", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0002"]
+source_items = ["SEMANTICS-31.11", "RFC-0001-22:RFC-0002", "ROADMAP-5.2:package"]
+options = [
+  "Define a project-owned global namespace and domain policy.",
+  "Define decentralized source identities with display names separated from canonical identity.",
+]
+irreversible_consequences = ["Published package coordinates become durable ecosystem and supply-chain identifiers."]
+required_evidence = ["positive", "negative", "migration", "cross-package", "offline"]
+owner_role = "language-governance"
+next_action = "Draft RFC-0002 with identity, collision, ownership, migration, and offline-resolution rules."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-PACKAGE-PROTOCOL-001"
+title = "Project manifest, dependency graph, visibility, and lock protocol"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["PRJ-1101", "PRJ-1102", "PRJ-1103", "PRJ-1104", "PRJ-1105"]
+observable_behavior = "The manifest filename/schema, source-root discovery, package identity, dependency selection, visibility, and lockfile canonical bytes are not accepted."
+authority = ["ROADMAP-1.0", "DEC-0007"]
+candidate_rfcs = ["RFC-0002"]
+source_items = ["ROADMAP-5.2:package"]
+options = [
+  "Specify package identity, manifest, dependency, and lock behavior in one RFC.",
+  "Separate ecosystem namespace policy from a versioned local project/lock protocol decision.",
+]
+irreversible_consequences = ["Manifest and lock encodings become long-lived build inputs and supply-chain compatibility surfaces."]
+required_evidence = ["positive", "negative", "migration", "cross-package", "offline", "canonical"]
+owner_role = "package-design"
+next_action = "Specify the smallest local/offline project protocol before implementing PRJ-1101."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-BYTECODE-SEMANTICS-001"
+title = "Versioned bytecode and verifier observable semantics"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["VM-1201", "VM-1202", "VM-1203", "VM-1204", "VM-1208", "VM-1209", "VM-1210"]
+observable_behavior = "Bytecode versioning, decoding limits, verification rules, evaluation order, Fault mapping, and compatibility behavior are unspecified."
+authority = ["SEMANTICS", "ROADMAP-1.0"]
+candidate_rfcs = []
+source_items = ["ROADMAP-5.2:bytecode"]
+options = [
+  "Use one RFC for the semantic contract and a versioned encoding appendix.",
+  "Separate backend-independent VM behavior from an independently versioned wire encoding.",
+]
+irreversible_consequences = ["A published encoding or verifier acceptance rule becomes an executable compatibility and security boundary."]
+required_evidence = ["positive", "negative", "migration", "differential", "malformed-input", "fuzz"]
+owner_role = "vm-design"
+next_action = "Draft VM-1201 as a specification task before adding bytecode or verifier public APIs."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-TRAIT-COHERENCE-001"
+title = "Base Trait coherence, orphan rules, solving, and lowering"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["TRAIT-1301", "TRAIT-1302", "TRAIT-1303", "TRAIT-1304", "TRAIT-1305", "TRAIT-1306", "TRAIT-1307"]
+observable_behavior = "Programs cannot predict which Trait implementations are legal or selected across packages, how ambiguity terminates, or how a selected instance reaches Checked Core."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0005"]
+source_items = ["SEMANTICS-31.3", "RFC-0001-22:RFC-0005", "ROADMAP-5.2:trait"]
+options = [
+  "Adopt a deliberately restricted global coherence and orphan model with explicit dictionary lowering.",
+  "Adopt package-scoped instance ownership with a different accepted disambiguation and lowering rule.",
+]
+irreversible_consequences = ["Coherence and orphan rules determine cross-package compatibility and whether later implementations are breaking changes."]
+required_evidence = ["positive", "negative", "migration", "cross-package", "termination", "determinism"]
+owner_role = "type-system-design"
+next_action = "Draft RFC-0005 and a cross-package acceptance corpus before TRAIT-1302."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-INCREMENTAL-CACHE-001"
+title = "Incremental query keys, invalidation, persistence, and corruption recovery"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["INC-1401", "INC-1406", "INC-1407", "INC-1408", "INC-1409"]
+observable_behavior = "The normative inputs to cache keys, public/private invalidation boundaries, persistence compatibility, and safe corruption fallback are not fixed."
+authority = ["ROADMAP-1.0", "DEC-0012"]
+candidate_rfcs = []
+source_items = ["ROADMAP-5.2:incremental"]
+options = [
+  "Keep caches disposable and toolchain-version scoped until a later persistent-cache protocol is accepted.",
+  "Specify a versioned persistent query-key and invalidation protocol during v0.1.",
+]
+irreversible_consequences = ["Persisted keys and invalidation boundaries can leak stale semantics or create a compatibility promise across toolchain versions."]
+required_evidence = ["positive", "negative", "migration", "clean-equivalence", "corruption", "determinism"]
+owner_role = "compiler-architecture"
+next_action = "Record INC-1401 boundaries and draft a decision for any persistent public cache format."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-SEMANTIC-HASH-LIFECYCLE-001"
+title = "Semantic Hash algorithm, identity upgrade, and invalidation lifecycle"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1", "v1.0"]
+blocked_tasks = ["INC-1406", "INC-1409", "GOV-0106"]
+observable_behavior = "Seed uses experimental BLAKE3 identities, but algorithm upgrades, prefix/schema coupling, dependency propagation, and migration are not stable."
+authority = ["SEMANTICS", "ROADMAP-1.0", "DEC-0012"]
+candidate_rfcs = ["RFC-0004"]
+source_items = ["SEMANTICS-31.8", "RFC-0001-22:RFC-0004", "ROADMAP-5.2:incremental"]
+options = [
+  "Keep identity algorithm and canonical-byte version coupled in a versioned Semantic Schema.",
+  "Introduce an algorithm registry while separately versioning canonical-byte projections.",
+]
+irreversible_consequences = ["Changing stable Semantic IDs silently would break caches, references, provenance, transactions, and external tooling."]
+required_evidence = ["positive", "negative", "migration", "dependency-invalidation", "cross-version", "determinism"]
+owner_role = "semantic-schema-design"
+next_action = "Draft RFC-0004 migration and reader/writer rules without changing the current experimental prefix."
+resolution = []
+superseded_by = ""
+observed_markers = [
+  "experimental:crates/ling-cli/src/incident.rs",
+  "experimental:crates/ling-format/src/lib.rs",
+  "experimental:crates/ling-resolve/src/lib.rs",
+  "experimental:crates/ling-semantic/src/lib.rs",
+]
+
+[[gap]]
+id = "GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001"
+title = "Semantic Graph and Semantic Transaction protocol lifecycle"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1", "v1.0"]
+blocked_tasks = ["GOV-0106", "INC-1406", "IDE-2306", "IDE-2309"]
+observable_behavior = "Stable versus Experimental fields, reader/writer compatibility, stale transaction rejection, and schema migration are not accepted for Semantic Graph/Transaction protocols."
+authority = ["SEMANTICS", "ROADMAP-1.0", "DEC-0012", "DEC-0015"]
+candidate_rfcs = ["RFC-0004"]
+source_items = ["RFC-0001-22:RFC-0004", "ROADMAP-5.2:lsp-transaction"]
+options = [
+  "Version Graph and Transaction as coordinated protocol families with shared identity rules.",
+  "Version read-only Graph and mutation Transaction independently with explicit compatibility bridges.",
+]
+irreversible_consequences = ["Stable schema fields and transaction preconditions become external tool compatibility and safety contracts."]
+required_evidence = ["positive", "negative", "migration", "reader-writer", "stale-edit", "round-trip"]
+owner_role = "semantic-protocol-design"
+next_action = "Draft RFC-0004 with field stability, extension, migration, and transaction precondition rules."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-FORMATTER-AUTHOR-SOURCE-001"
+title = "Author Source formatter preservation and normalization boundary"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["FMT-1501", "FMT-1502", "FMT-1503", "FMT-1504", "FMT-1505", "FMT-1506", "FMT-1508"]
+observable_behavior = "Comment attachment, blank lines, parentheses, Unicode spelling, line endings, delimiters, offside blocks, and error regions lack an accepted preservation policy."
+authority = ["LANGUAGE", "ROADMAP-1.0", "DEC-0015"]
+candidate_rfcs = []
+source_items = ["ROADMAP-5.2:formatter"]
+options = [
+  "Specify a preservation-oriented formatter with narrowly defined canonical rewrites.",
+  "Specify a more canonical Author Source projection while explicitly retaining localized and comment metadata.",
+]
+irreversible_consequences = ["Formatter rewrites can destroy user-authored information or become a de facto second grammar and compatibility surface."]
+required_evidence = ["positive", "negative", "migration", "idempotence", "semantic-equivalence", "comments", "crlf"]
+owner_role = "formatter-design"
+next_action = "Complete FMT-1501 as an Accepted preservation decision before implementing Format IR."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-LSP-TRANSACTION-PROTOCOL-001"
+title = "LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["LSP-2102", "LSP-2104", "IDE-2305", "IDE-2306", "IDE-2309", "LSP-2501"]
+observable_behavior = "The adapter between UTF-8 byte spans and negotiated LSP positions is accepted, but snapshot/version preconditions and Stable versus Experimental edit fields are not."
+authority = ["ROADMAP-1.0", "DEC-0002", "DEC-0012"]
+candidate_rfcs = ["RFC-0004"]
+source_items = ["ROADMAP-5.2:lsp-transaction"]
+options = [
+  "Use versioned LSP Workspace Edits as the initial public mutation contract and defer Semantic Transaction.",
+  "Define a Semantic Transaction core first and project validated edits into LSP Workspace Edits.",
+]
+irreversible_consequences = ["An underspecified edit protocol can apply stale or mispositioned changes to user files and freeze unstable fields."]
+required_evidence = ["positive", "negative", "migration", "utf8-utf16", "stale-edit", "emoji", "crlf"]
+owner_role = "ide-protocol-design"
+next_action = "Specify snapshot identity, version preconditions, field stability, and failure responses before semantic rename/code actions."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-UNICODE-ALIAS-SYNTAX-001"
+title = "Unicode Alias syntax and localized display rules"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["TS-3104", "IDE-2306", "FMT-1501"]
+observable_behavior = "The language has no accepted source syntax, resolution identity, collision behavior, or localized display policy for Alias declarations."
+authority = ["SEMANTICS", "LANGUAGE", "RFC-0001"]
+candidate_rfcs = ["RFC-0003"]
+source_items = ["SEMANTICS-31.7", "RFC-0001-22:RFC-0003"]
+options = [
+  "Make aliases explicit declarations that resolve to one canonical semantic identity.",
+  "Keep aliases outside Author Source as tool/display metadata with no name-resolution role.",
+]
+irreversible_consequences = ["Alias identity and collision rules affect source compatibility, rename, diagnostics, imports, and Semantic IDs."]
+required_evidence = ["positive", "negative", "migration", "unicode", "confusable", "rename"]
+owner_role = "unicode-language-design"
+next_action = "Draft RFC-0003 with grammar, identity, collision, serialization, and display cases."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-AUTHOR-SOURCE-LOCALIZATION-001"
+title = "Equivalent localized Author Source keyword views"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["FMT-1501", "FMT-1508", "IDE-2306"]
+observable_behavior = "It is undecided whether multiple localized keyword views are valid Author Source and, if so, what equivalence, formatting, identity, and migration mean."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0003"]
+source_items = ["SEMANTICS-31.9", "RFC-0001-22:RFC-0003", "ROADMAP-5.2:formatter"]
+options = [
+  "Allow one normative keyword spelling in Author Source and localize only tools and diagnostics.",
+  "Allow versioned equivalent keyword views with a canonical semantic projection and preservation rules.",
+]
+irreversible_consequences = ["Localized keyword equivalence changes parsing, formatting, source identity, diffs, education, and cross-tool interoperability."]
+required_evidence = ["positive", "negative", "migration", "round-trip", "localization", "semantic-equivalence"]
+owner_role = "language-design"
+next_action = "Resolve this in RFC-0003 before formatter normalization or localized keyword parsing."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-EFFECT-STATE-MASKING-001"
+title = "State effect visibility and masking"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["EFF-2101", "EFF-2102", "EFF-2103"]
+observable_behavior = "It is undecided whether State<T> always remains in an Effect Row or locally exclusive state can be masked from a function signature."
+authority = ["SEMANTICS", "LANGUAGE", "DEC-0010"]
+candidate_rfcs = ["RFC-0006"]
+source_items = ["SEMANTICS-31.1", "RFC-0001-22:RFC-0006"]
+options = [
+  "Keep every State<T> operation visible in the inferred Effect Row.",
+  "Permit masking only under an accepted exclusivity and escape proof.",
+]
+irreversible_consequences = ["Masking changes function types, optimization legality, capability auditing, and cross-module compatibility."]
+required_evidence = ["positive", "negative", "migration", "effect-inference", "escape", "capability"]
+owner_role = "effect-system-design"
+next_action = "Define the masking judgment and proof obligations in RFC-0006."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-NUMERIC-CHECKED-FAULT-001"
+title = "Fixed-width checked arithmetic Fault visibility"
+status = "Open"
+priority = "P2"
+blocked_releases = ["v0.3"]
+blocked_tasks = ["MEM-3102", "NIR-3401", "BACK-3503"]
+observable_behavior = "For future fixed-width checked arithmetic, it is undecided whether overflow Faults appear explicitly in function signatures and effect/failure analysis."
+authority = ["SEMANTICS", "LANGUAGE"]
+candidate_rfcs = []
+source_items = ["SEMANTICS-31.2"]
+options = [
+  "Expose checked arithmetic failure in the static function signature.",
+  "Use a separately accepted numeric operation/result model without an implicit signature Fault.",
+]
+irreversible_consequences = ["Failure visibility affects type compatibility, optimization, FFI, VM/native equivalence, and error handling."]
+required_evidence = ["positive", "negative", "migration", "boundary-values", "differential"]
+owner_role = "numeric-semantics"
+next_action = "Create a numeric/failure RFC before adding fixed-width checked operators."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-EFFECT-HANDLER-001"
+title = "Effect Row polymorphism and Handler semantics"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["EFF-2101", "EFF-2102", "EFF-2103", "EFF-2104", "EFF-2105"]
+observable_behavior = "Effect polymorphism, handler matching, elimination, nesting, resumption, Capability interaction, and unhandled-effect failure are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0006"]
+source_items = ["RFC-0001-22:RFC-0006", "ROADMAP-6.2:effect-handler"]
+options = [
+  "Adopt a restricted first-order handler model with explicit Typed Core operations.",
+  "Adopt a more general resumption model only with bounded, auditable semantics.",
+]
+irreversible_consequences = ["Handler semantics determine control flow, optimization, resource safety, and VM/native equivalence."]
+required_evidence = ["positive", "negative", "migration", "nested-handler", "capability", "differential"]
+owner_role = "effect-system-design"
+next_action = "Draft RFC-0006 before extending the checker or Typed Core with handlers."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-STRUCTURED-TASK-001"
+title = "Structured Task lifecycle, cancellation, detach, and suspension"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["TASK-2201", "TASK-2202", "TASK-2203", "TASK-2204", "TASK-2205", "TASK-2206"]
+observable_behavior = "Parent/child lifetime, cancellation propagation, Fault aggregation, detach authority, suspension points, and cleanup ordering are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0008"]
+source_items = ["RFC-0001-22:RFC-0008", "ROADMAP-6.2:structured-task"]
+options = [
+  "Require lexical task scopes with mandatory join and capability-gated detach.",
+  "Permit a different structured lifecycle only with explicit ownership and cleanup guarantees.",
+]
+irreversible_consequences = ["Task lifecycle semantics determine leaks, cancellation safety, resource cleanup, and replay behavior."]
+required_evidence = ["positive", "negative", "migration", "cancellation", "resource-cleanup", "deterministic-scheduler"]
+owner_role = "concurrency-design"
+next_action = "Draft RFC-0008 and an interleaving/cancellation corpus before TASK-2201."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-ACTOR-AWAIT-REENTRY-001"
+title = "Actor turn await and reentry semantics"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["ACT-2301", "ACT-2304", "ACT-2305", "ACT-2306"]
+observable_behavior = "It is undecided whether an actor may process another message while a turn is suspended at await and what state invariants span suspension."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0009"]
+source_items = ["SEMANTICS-31.5", "RFC-0001-22:RFC-0009", "ROADMAP-6.2:actor-reentry"]
+options = [
+  "Forbid reentry until the current turn completes.",
+  "Permit explicit reentry points with accepted invariant and ordering rules.",
+]
+irreversible_consequences = ["Reentry changes state invariants, message ordering, race behavior, replay, and source-level reasoning."]
+required_evidence = ["positive", "negative", "migration", "interleaving", "state-invariant", "replay"]
+owner_role = "actor-semantics"
+next_action = "Resolve turn suspension and reentry in RFC-0009 before ACT-2304."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-ACTOR-REMOTE-DELIVERY-001"
+title = "Remote Actor identity, transport, and delivery strategy"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["REM-2601", "REM-2602", "REM-2603", "REM-2604", "REM-2605"]
+observable_behavior = "Remote identity, serialization, ordering, retry/deduplication, delivery guarantees, transport failure, security, and Capability boundaries are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0009"]
+source_items = ["SEMANTICS-31.6", "RFC-0001-22:RFC-0009", "ROADMAP-6.2:remote-actor"]
+options = [
+  "Expose at-most-once delivery with explicit application retry and deduplication.",
+  "Expose another delivery class as a type/effect only after transport-independent semantics are defined.",
+]
+irreversible_consequences = ["Delivery claims affect duplicate side effects, data loss, security, interoperability, and replay expectations."]
+required_evidence = ["positive", "negative", "migration", "partition", "duplication", "ordering", "security"]
+owner_role = "distributed-runtime-design"
+next_action = "Define delivery classes and failure observability in RFC-0009 before REM-2601."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-ACTOR-MAILBOX-SUPERVISOR-001"
+title = "Bounded mailbox, backpressure, ordering, and supervision"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["ACT-2303", "SUP-2401", "SUP-2402", "SUP-2403"]
+observable_behavior = "Mailbox capacity/result behavior, ordering, termination, restart budgets, escalation, and supervisor-visible Faults are not accepted."
+authority = ["LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0009"]
+source_items = ["RFC-0001-22:RFC-0009", "ROADMAP-6.2:mailbox-supervisor"]
+options = [
+  "Specify bounded mailboxes with explicit send outcomes and deterministic per-sender ordering.",
+  "Specify a different bounded ordering/backpressure contract with explicit nondeterminism classes.",
+]
+irreversible_consequences = ["Mailbox and supervision rules determine liveness, loss, ordering, resource bounds, and failure recovery."]
+required_evidence = ["positive", "negative", "migration", "stress", "ordering", "backpressure", "resource-limit"]
+owner_role = "actor-semantics"
+next_action = "Complete RFC-0009 with bounded mailbox and supervisor state-machine evidence."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-DETERMINISTIC-REPLAY-001"
+title = "Determinism classes and Replay protocol"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["REP-2501", "REP-2502", "REP-2503", "REP-2504", "REP-2505", "REP-2506"]
+observable_behavior = "Determinism classification, recorded effects, event order, log versioning, privacy/redaction, corruption handling, and replay divergence are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0010"]
+source_items = ["RFC-0001-22:RFC-0010", "ROADMAP-6.2:replay"]
+options = [
+  "Define a canonical versioned Effect Log as the replay contract.",
+  "Define replay through a higher-level event protocol with an explicitly limited equivalence relation.",
+]
+irreversible_consequences = ["A replay protocol freezes observable scheduling/effect boundaries and may retain sensitive data."]
+required_evidence = ["positive", "negative", "migration", "cross-process", "corruption", "privacy", "divergence"]
+owner_role = "determinism-design"
+next_action = "Draft RFC-0010 with privacy and version migration before REP-2501."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-OWNERSHIP-PUBLIC-LIFETIME-001"
+title = "Public lifetime inference boundary"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.3"]
+blocked_tasks = ["OWN-3203", "OWN-3204", "OWN-3207"]
+observable_behavior = "It is undecided whether public lifetimes may be completely inferred or must appear in public signatures and compatibility checks."
+authority = ["SEMANTICS", "LANGUAGE"]
+candidate_rfcs = ["RFC-0007"]
+source_items = ["SEMANTICS-31.4", "RFC-0001-22:RFC-0007"]
+options = [
+  "Require explicit public lifetime/region relationships at exported boundaries.",
+  "Permit inference with a stable canonical public projection and compatibility rule.",
+]
+irreversible_consequences = ["Public lifetime visibility affects API compatibility, diagnostics, separate compilation, and FFI soundness."]
+required_evidence = ["positive", "negative", "migration", "cross-package", "region-escape", "ffi"]
+owner_role = "ownership-design"
+next_action = "Resolve exported lifetime representation and compatibility in RFC-0007."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-OWNERSHIP-MODEL-001"
+title = "Value, Managed, Resource, Borrow, Region, and Drop model"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.3"]
+blocked_tasks = ["MEM-3101", "MEM-3102", "MEM-3103", "MEM-3104", "OWN-3201", "OWN-3202", "OWN-3203", "OWN-3205"]
+observable_behavior = "Future Copy/Move, borrow exclusivity, aliasing, region escape, drop order, Managed roots/finalization, and Profile boundaries are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0009"]
+candidate_rfcs = ["RFC-0007"]
+source_items = ["RFC-0001-22:RFC-0007", "ROADMAP-7.2:ownership"]
+options = [
+  "Adopt a restricted affine Resource model with explicit Checked Core lifetime/drop operations.",
+  "Adopt another accepted ownership/region calculus while preserving Seed Value semantics and profile boundaries.",
+]
+irreversible_consequences = ["Memory category and drop rules determine source compatibility, safety, ABI, concurrency, and backend legality."]
+required_evidence = ["positive", "negative", "migration", "property", "drop-order", "differential", "profile"]
+owner_role = "ownership-design"
+next_action = "Draft RFC-0007 before adding Resource or Managed language behavior."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-NATIVE-BACKEND-ABI-001"
+title = "Native backend, ABI, FFI, and target support contract"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.3"]
+blocked_tasks = ["NIR-3401", "NIR-3402", "NIR-3403", "BACK-3501", "BACK-3503", "FFI-3601", "FFI-3602", "FFI-3604"]
+observable_behavior = "Native IR validity, layout, ABI, unwinding/Fault, thread/reentry, typed FFI, Target Primitive Packages, and target tiers are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0011"]
+source_items = ["RFC-0001-22:RFC-0011", "ROADMAP-7.2:native-abi"]
+options = [
+  "Specify a minimal platform-neutral Native contract plus versioned target packages.",
+  "Specify one narrow initial ABI/target and keep all other backends Experimental behind adapters.",
+]
+irreversible_consequences = ["ABI and layout promises bind binaries, foreign code, unwinding safety, target support, and reproducible builds."]
+required_evidence = ["positive", "negative", "migration", "abi", "ffi", "sanitizer", "cross-target", "differential"]
+owner_role = "native-backend-design"
+next_action = "Draft RFC-0011 after RFC-0007 defines the memory categories exposed to Native/FFI."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-KERNEL-DEVICE-001"
+title = "Kernel subset, Device Buffer, determinism, Placement, and backend capability"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.4"]
+blocked_tasks = ["KCHK-4101", "KCHK-4102", "KCHK-4103", "KCHK-4104", "KCHK-4105", "DBUF-4401", "DBUF-4402", "DIR-4501", "PLC-4801"]
+observable_behavior = "Allowed Kernel types/control flow/effects, buffer ownership/address spaces, synchronization, numeric/reduction determinism, Placement fallback, and backend discovery are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0013"]
+source_items = ["RFC-0001-22:RFC-0013", "ROADMAP-8.2:kernel-device"]
+options = [
+  "Start with a narrow verified Kernel subset and scalar CPU reference semantics before devices.",
+  "Define a broader device-independent subset only where bounds, effects, and determinism remain statically checkable.",
+]
+irreversible_consequences = ["Kernel and numeric rules constrain portability, determinism, memory safety, device caches, and backend interoperability."]
+required_evidence = ["positive", "negative", "migration", "cpu-reference", "device-differential", "bounds", "determinism"]
+owner_role = "heterogeneous-compute-design"
+next_action = "Draft RFC-0013 and a CPU reference corpus before KCHK-4101 implementation."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
+id = "GAP-CRITICAL-PROFILE-001"
+title = "Critical minimum verifiable Core, Node, Contract, and evidence boundaries"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.5"]
+blocked_tasks = ["PROF-5101", "PROF-5102", "NODE-5301", "CTR-5401", "PROOF-5501", "MC-5601", "EVD-5801"]
+observable_behavior = "The minimum Critical Core, forbidden capabilities, Node timing/Fault semantics, Contract proof/runtime boundary, boundedness, model-checking claims, and evidence schema are not accepted."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+candidate_rfcs = ["RFC-0012"]
+source_items = ["SEMANTICS-31.10", "RFC-0001-22:RFC-0012", "ROADMAP-9.2:critical"]
+options = [
+  "Define a minimal synchronous, bounded Critical Core with independently checkable evidence.",
+  "Define staged Critical profiles only if each stage has explicit forbidden capabilities and proof limits.",
+]
+irreversible_consequences = ["Critical claims affect safety expectations, certification evidence, timing assumptions, and what the toolchain claims to prove."]
+required_evidence = ["positive", "negative", "migration", "boundedness", "independent-checker", "counterexample", "reproducible-build"]
+owner_role = "critical-profile-design"
+next_action = "Draft RFC-0012 with explicit non-claims before any Critical public API or evidence format."
+resolution = []
+superseded_by = ""
+observed_markers = []

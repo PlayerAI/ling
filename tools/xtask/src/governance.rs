@@ -74,6 +74,16 @@ pub fn render_repository(root: &Path) -> Result<String, Vec<String>> {
     finish(validate(root, &index)).map(|()| render(&index))
 }
 
+pub(crate) fn document_statuses(root: &Path) -> Result<BTreeMap<String, String>, Vec<String>> {
+    let index = load_index(root)?;
+    finish(validate(root, &index))?;
+    Ok(index
+        .document
+        .into_iter()
+        .map(|document| (document.id, document.status))
+        .collect())
+}
+
 fn load_index(root: &Path) -> Result<AuthorityIndex, Vec<String>> {
     let path = root.join(MANIFEST_PATH);
     let text = fs::read_to_string(&path).map_err(|error| {

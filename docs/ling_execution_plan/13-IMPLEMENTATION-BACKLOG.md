@@ -21,7 +21,7 @@
 | ---: | --- | --- | --- | --- | --- |
 | 0 | `BASE-0001` | 盘点 Seed 基线并接入执行计划 | Seed 文档齐全 | 否 | **Done**；见机器状态与基线盘点 |
 | 1 | `GOV-0101` | 建规范权威索引 | Seed 文档齐全 | 与 2–5 | **Done**；33 文档、16 Accepted，检查器与负例通过 |
-| 2 | `GOV-0102` | 建规范缺口台账 | 无 | 与 1/3/4 | 未决项有 blocker/owner |
+| 2 | `GOV-0102` | 建规范缺口台账 | 无 | 与 1/3/4 | **Done**；25 Open gaps、6 个 G1 门禁、marker 检查通过 |
 | 3 | `GOV-0104` | 盘点全部公开协议 | 无 | 与 1/2 | registry 初稿完整 |
 | 4 | `GOV-0105` | 建错误码注册表 | Seed diagnostics | 与 1/2/3 | 重复/改义 CI 拒绝 |
 | 5 | `GOV-0107` | 建 traceability 模板 | 规范索引 | 与 3/4 | CI 验链接存在 |
@@ -71,7 +71,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | --- | --- | --- | --- | --- | --- |
 | `BASE-0001` | G0 | 仓库基线盘点与执行计划落位 | S | Done | `14-FIRST-SPRINT-CODEX-TASKS.md` Task A |
 | `GOV-0101` | G0 | 建立规范权威索引 | S | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:53`；见机器状态与实施报告 |
-| `GOV-0102` | G0 | 规范缺口台账 | M | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:75` |
+| `GOV-0102` | G0 | 规范缺口台账 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:75`；见机器状态与实施报告 |
 | `GOV-0103` | G0 | RFC 与 decision 生命周期 | S | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:105` |
 | `GOV-0104` | G0 | 公开接口与协议总盘点 | M | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:125` |
 | `GOV-0105` | G0 | Diagnostic 错误码注册表 | M | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:159` |
