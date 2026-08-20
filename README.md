@@ -32,6 +32,7 @@ cargo clippy --workspace --all-targets --all-features --locked --offline -- -D w
 cargo xtask governance check-authority
 cargo xtask governance check-gaps
 cargo xtask governance check-lifecycle
+cargo xtask governance check-protocols
 cargo run --locked --offline -- --version
 ```
 
@@ -173,6 +174,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/governance/authority.md`](docs/governance/authority.md)：由机器清单确定性生成的规范权威、生命周期、依赖与冲突处理索引。
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md)：按版本和优先级生成的规范缺口、阻断任务与候选 RFC 台账。
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md)：RFC 与 decision 的状态机、稳定实现依据、接受证据、替代关系和模板门禁。
+- [`docs/governance/protocol-inventory.md`](docs/governance/protocol-inventory.md)：CLI、JSON、Semantic ID、Audit、内部产物及 Future 协议的版本、稳定级别、reader/writer 和迁移边界。
 - [`docs/design-review.html`](docs/design-review.html)：针对上述规范的设计评审记录；它是非规范性意见，不替代已接受的 RFC。
 
 ### 规范权威顺序
@@ -243,6 +245,7 @@ cargo clippy --workspace --all-targets --all-features --locked --offline -- -D w
 cargo xtask governance check-authority
 cargo xtask governance check-gaps
 cargo xtask governance check-lifecycle
+cargo xtask governance check-protocols
 cargo run --locked --offline -- --version
 ```
 
@@ -384,6 +387,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/governance/authority.md`](docs/governance/authority.md): the deterministically generated index of specification authority, lifecycle, dependencies, and conflict handling.
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md): the release- and priority-ordered register of specification gaps, blocked tasks, and candidate RFCs.
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md): the RFC/decision state machine, Stable implementation basis, acceptance evidence, supersession rules, and checked templates.
+- [`docs/governance/protocol-inventory.md`](docs/governance/protocol-inventory.md): versions, stability levels, reader/writer rules, and migration boundaries for CLI, JSON, Semantic ID, Audit, internal artifacts, and Future protocols.
 - [`docs/design-review.html`](docs/design-review.html): a non-normative design review of the specifications; it does not replace an accepted RFC.
 
 ### Authority order

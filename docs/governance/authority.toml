@@ -379,6 +379,19 @@ supersedes = []
 stable_basis = false
 
 [[document]]
+id = "PROTOCOL-INVENTORY"
+title = "Public interface and protocol inventory"
+kind = "Governance registry"
+status = "Active"
+version = "1"
+authority = "Registry"
+path = "docs/governance/protocol-inventory.toml"
+covers = ["public protocol versions", "stability levels", "reader and writer policies", "unknown-field behavior", "canonical encodings", "Future protocol boundaries"]
+depends_on = ["GAP-REGISTER", "LIFECYCLE-REGISTER"]
+supersedes = []
+stable_basis = false
+
+[[document]]
 id = "SEED-TRACEABILITY"
 title = "Seed specification traceability"
 kind = "Evidence"

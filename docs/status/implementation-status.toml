@@ -171,3 +171,55 @@ notes = [
   "The 17 pre-template specifications form a closed legacy-format migration set; new exemptions are rejected.",
   "The CI workflow invokes all three governance checks; no remote CI result is claimed for this worktree.",
 ]
+
+[[task]]
+id = "GOV-0104"
+title = "公开接口与协议总盘点"
+state = "Done"
+release = "G0"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0101"]
+spec = [
+  "docs/ROADMAP-1.0.md",
+  "docs/governance/authority.toml",
+  "docs/governance/gap-register.toml",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0016-repl-session-semantics.md",
+]
+artifacts = [
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "tools/xtask/src/protocols.rs",
+  "docs/status/GOV-0104-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask governance check-protocols: 18 records; 9 public, 1 Internal, 8 Future",
+  "current public stability: 3 Experimental, 6 Preview, 0 Stable",
+  "all required GOV-0104 surfaces and fields are indexed",
+  "cargo xtask governance check-authority: 36 documents, 16 Accepted",
+  "cargo xtask governance check-gaps: 25 Open gaps, 6 gates",
+  "cargo xtask governance check-lifecycle: 17 records, 16 Accepted, 17 legacy-format migrations",
+  "cargo test --package xtask --locked --offline: 43 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --all-features --locked --offline: 181 passed",
+  "local Markdown path targets: 136 resolved",
+]
+verified_against_commit = "8937824a61f140db0c3ba1cfc5f07611e64ec1e3"
+completion_commit = ""
+integration_state = "verified-uncommitted"
+completed = "2026-08-20"
+notes = [
+  "No public protocol bytes, commands, schemas, language semantics, Ling diagnostics, Semantic IDs, or Unicode data changed.",
+  "No Seed protocol is mislabeled as the ROADMAP-1.0 1.x Stable commitment.",
+  "The CI workflow invokes all four governance checks; no remote CI result is claimed for this worktree.",
+]

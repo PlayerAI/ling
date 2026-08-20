@@ -1,6 +1,7 @@
 mod gaps;
 mod governance;
 mod lifecycle;
+mod protocols;
 
 use std::env;
 use std::path::{Path, PathBuf};
@@ -113,9 +114,46 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "governance" && command == "check-protocols" => {
+            match protocols::check_repository(&root) {
+                Ok(summary) => {
+                    println!(
+                        "protocol inventory OK: {} records ({} public: {} Experimental, {} Preview, {} Stable; {} Internal; {} Future)",
+                        summary.protocol_count,
+                        summary.public_count,
+                        summary.experimental_count,
+                        summary.preview_count,
+                        summary.stable_count,
+                        summary.internal_count,
+                        summary.future_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "governance" && command == "render-protocols" => {
+            match protocols::render_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle"
+                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }
