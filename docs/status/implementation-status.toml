@@ -1073,7 +1073,7 @@ notes = [
 [[task]]
 id = "TS-3106"
 title = "Pattern 与 Type"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -1106,20 +1106,43 @@ artifacts = [
   "tests/conformance/ts3106-empty-record-pattern-error/expect.toml",
   "tests/conformance/ts3106-grouped-constructor-pattern-run/expect.toml",
   "tests/conformance/ts3106-singleton-tuple-pattern-error/expect.toml",
+  "tests/conformance/ts3106-trailing-tuple-pattern-error/expect.toml",
   "docs/grammar-map.md",
   "docs/traceability/registry.toml",
   "docs/traceability/v0.0.1.md",
+  "docs/status/TS-3106-IMPLEMENTATION-REPORT.md",
 ]
 acceptance = [
-  "shared compiler/Tree-sitter Pattern/Type validity differential: 41 cases passed",
-  "focused compiler conformance: grouped nested constructor execution and rejected singleton tuple/empty record patterns passed",
+  "Accepted/Draft authority boundary audited: only the v0.0.1 Seed Pattern/Type surface is represented; no post-Seed feature node was added",
+  "shared compiler/Tree-sitter Pattern/Type validity differential: all 41 accepted, rejected, incomplete, and unavailable-syntax cases passed",
+  "compiler parser and HIR evidence: grouped nested constructors lower without forged tuple arity; singleton/trailing-separator tuple and empty record patterns are rejected",
+  "diagnostic evidence: L-SYNTAX-0010 remains registered and bilingual at exact original UTF-8 byte spans",
+  "conformance corpus: all 42 fixtures passed, including grouped constructor execution and three TS-3106 syntax negatives",
+  "tree-sitter-cli 0.26.12 npm run verify: 37 of 37 corpus cases, scanner/layout integrations, 18 Unicode, 29 precedence, 41 Pattern/Type differential cases, and local example passed",
+  "generated Tree-sitter idempotence: 6 generated files retained identical SHA-256 hashes",
+  "cargo xtask governance check-all: all governance registries passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, 69 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify, ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the TS-3106 backlog transition",
+  "active Markdown link audit: 89 files, 912 local inline links, 0 missing targets",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "git diff --check: passed",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "uncommitted"
-completed = ""
+verified_against_commit = "7948a17a7848c32078b3893b6c9182ab7c41096b"
+completion_commit = "7948a17a7848c32078b3893b6c9182ab7c41096b"
+integration_state = "committed"
+completed = "2026-08-20"
 notes = [
-  "Implementation is constrained to the accepted v0.0.1 Seed Pattern/Type surface.",
-  "Tree-sitter remains editor-only; compiler parse, resolution, typing, and checked Typed Core remain authoritative.",
-  "TS-3107 malformed-edit recovery and TS-3108 whole-program differential remain deferred.",
+  "Accepted DEC-0005 is authoritative for nonempty records, Unit/group/tuple delimiters, the absence of singleton tuples, and Seed literal forms; DEC-0013 and DEC-0014 cover the Unit entry and Prelude constructors.",
+  "RFC-0001 and SEMANTICS remain Draft baseline sources; TS-3106 does not promote their lifecycle or invent language behavior from Tree-sitter.",
+  "Tree-sitter remains editor-only; compiler parse, resolution, typing, and checked Typed Core remain authoritative, including binding versus zero-payload-constructor classification.",
+  "No public diagnostic code, bilingual template, Facts schema, public protocol/schema, CLI contract, Semantic ID, canonical bytes, source-position unit, or dependency changed.",
+  "Unicode 17.0.0 tables, normalization, identifier security, and deterministic generated-parser behavior are unchanged.",
+  "TS-3107 malformed-edit recovery, TS-3108 whole-program differential, effect-row Author Source, Borrow syntax, and all other post-Seed features remain intentionally deferred.",
 ]

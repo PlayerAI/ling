@@ -1,0 +1,3 @@
+let first value =
+    match value with
+    | (left, right,) -> left
