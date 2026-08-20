@@ -405,6 +405,19 @@ supersedes = []
 stable_basis = false
 
 [[document]]
+id = "SCHEMA-REGISTRY"
+title = "Versioned public JSON schema registry and corpus"
+kind = "Compatibility registry"
+status = "Active"
+version = "1"
+authority = "Registry"
+path = "schemas/registry.toml"
+covers = ["public JSON schema inventory", "reader and writer versions", "valid and invalid fixtures", "canonical byte goldens", "N-1 compatibility evidence"]
+depends_on = ["SCHEMA-LIFECYCLE-POLICY", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false
+
+[[document]]
 id = "SUPPORT-MATRIX"
 title = "Ling 1.0 support matrix draft"
 kind = "Governance registry"

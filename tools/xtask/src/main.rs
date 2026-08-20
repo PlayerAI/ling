@@ -3,6 +3,7 @@ mod gaps;
 mod governance;
 mod lifecycle;
 mod protocols;
+mod schema;
 mod status;
 mod support;
 mod traceability;
@@ -293,6 +294,65 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "schema" && command == "validate-all" => {
+            match schema::validate_all(&root) {
+                Ok(summary) => {
+                    println!(
+                        "schema corpus OK: {} schemas, {} valid fixtures, {} invalid fixtures, {} canonical byte fixtures",
+                        summary.schema_count,
+                        summary.valid_fixture_count,
+                        summary.invalid_fixture_count,
+                        summary.canonical_fixture_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command, from_flag, from, to_flag, to]
+            if area == "schema"
+                && command == "compatibility"
+                && from_flag == "--from"
+                && to_flag == "--to" =>
+        {
+            match schema::compatibility(&root, from, to) {
+                Ok(summary) => {
+                    println!(
+                        "schema compatibility OK: {} verified N-1 edges, {} NoPreviousVersion records",
+                        summary.verified_edge_count, summary.no_previous_version_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "schema" && command == "corrupt-inputs" => {
+            match schema::corrupt_inputs(&root) {
+                Ok(summary) => {
+                    println!(
+                        "schema corrupt-input checks OK: {} deterministic mutations",
+                        summary.mutation_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         [area, command] if area == "status" && command == "verify" => {
             match status::check_repository(&root) {
                 Ok(summary) => {
@@ -357,7 +417,7 @@ fn main() -> ExitCode {
         }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
+                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask schema validate-all\n  cargo xtask schema compatibility --from N-1 --to N\n  cargo xtask schema corrupt-inputs\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

@@ -3,7 +3,7 @@
 > Status: **Draft engineering policy**
 > Version: `1`
 > Scope: existing implemented public machine-readable schemas
-> Machine inventory: `schemas/registry.toml` (delivered by GOV-0106 slice B)
+> Machine inventory: `schemas/registry.toml` (GOV-0106 slice B)
 
 This policy defines how Ling records and tests schema compatibility. It does not change a public wire format, accept a new language semantic, or promote any protocol to Stable. Accepted RFCs/decisions and the public protocol inventory remain authoritative when they conflict with this document.
 

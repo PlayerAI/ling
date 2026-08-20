@@ -56,10 +56,13 @@ pub struct CheckSummary {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct ProtocolRecord {
+    pub category: String,
     pub visibility: String,
     pub current_version: String,
     pub stability: String,
     pub implemented: bool,
+    pub public_schema: bool,
+    pub canonical: bool,
 }
 
 pub(crate) type ProtocolRecords = BTreeMap<String, ProtocolRecord>;
@@ -151,10 +154,13 @@ pub(crate) fn protocol_records(root: &Path) -> Result<ProtocolRecords, Vec<Strin
             (
                 protocol.id,
                 ProtocolRecord {
+                    category: protocol.category,
                     visibility: protocol.visibility,
                     current_version: protocol.current_version,
                     stability: protocol.stability,
                     implemented: protocol.implemented,
+                    public_schema: protocol.public_schema,
+                    canonical: protocol.canonical,
                 },
             )
         })

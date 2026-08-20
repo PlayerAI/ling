@@ -35,10 +35,15 @@ cargo xtask governance check-lifecycle
 cargo xtask governance check-protocols
 cargo xtask governance check-error-codes
 cargo xtask traceability verify --release v0.0.1
+cargo xtask schema validate-all
+cargo xtask schema compatibility --from N-1 --to N
+cargo xtask schema corrupt-inputs
 cargo xtask support verify
 cargo xtask status verify
 cargo run --locked --offline -- --version
 ```
+
+公开 JSON 协议的版本、reader/writer 范围、字段策略和 golden corpus 由 [`SCHEMA-LIFECYCLE.md`](docs/governance/SCHEMA-LIFECYCLE.md)、[`schemas/registry.toml`](schemas/registry.toml) 与 [`schemas/`](schemas/README.md) 共同记录。当前三个协议都是首版，因此兼容门禁明确报告 `NoPreviousVersion`，不宣称已经支持 N-1。
 
 `check`、`run`、`semantic`、`audit` 和 `repl` 复用同一条真实编译路径；`run` 和 REPL 只解释完成名称、类型、Place、Effect 和 Capability 检查的 ProgramSnapshot。`semantic` 输出确定性的 `ling.semantic/0.1` JSON，`audit` 输出可 round-trip 的 `ling.audit/0.1` 文本：
 
@@ -257,10 +262,15 @@ cargo xtask governance check-lifecycle
 cargo xtask governance check-protocols
 cargo xtask governance check-error-codes
 cargo xtask traceability verify --release v0.0.1
+cargo xtask schema validate-all
+cargo xtask schema compatibility --from N-1 --to N
+cargo xtask schema corrupt-inputs
 cargo xtask support verify
 cargo xtask status verify
 cargo run --locked --offline -- --version
 ```
+
+Public JSON protocol versions, reader/writer ranges, field policies, and golden corpora are recorded together in [`SCHEMA-LIFECYCLE.md`](docs/governance/SCHEMA-LIFECYCLE.md), [`schemas/registry.toml`](schemas/registry.toml), and [`schemas/`](schemas/README.md). All three current protocols are first versions, so the compatibility gate reports `NoPreviousVersion` explicitly and does not claim N-1 support.
 
 `check`, `run`, `semantic`, `audit`, and `repl` share one real compilation path. `run` and the REPL interpret only ProgramSnapshots that passed name, type, Place, Effect, and Capability checks. `semantic` emits deterministic `ling.semantic/0.1` JSON, while `audit` emits round-trippable `ling.audit/0.1` text:
 

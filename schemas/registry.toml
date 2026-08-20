@@ -75,7 +75,7 @@ valid_dir = "schemas/semantic/0.1/valid"
 invalid_dir = "schemas/semantic/0.1/invalid"
 canonical_dir = "schemas/semantic/0.1/canonical"
 reader_adapter = "SemanticGraphV0_1"
-writer_evidence = ["crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
+writer_evidence = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
 
 [[schema]]
 id = "SCHEMA-REPL-EVENT-JSON"

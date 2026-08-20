@@ -1493,19 +1493,25 @@ mod tests {
             (
                 "PROTO-A".to_owned(),
                 protocols::ProtocolRecord {
+                    category: "JSON".to_owned(),
                     visibility: "Public".to_owned(),
                     current_version: "1".to_owned(),
                     stability: "Preview".to_owned(),
                     implemented: true,
+                    public_schema: true,
+                    canonical: false,
                 },
             ),
             (
                 "PROTO-B".to_owned(),
                 protocols::ProtocolRecord {
+                    category: "Bytecode".to_owned(),
                     visibility: "Planned public".to_owned(),
                     current_version: String::new(),
                     stability: "Future".to_owned(),
                     implemented: false,
+                    public_schema: false,
+                    canonical: false,
                 },
             ),
         ]);

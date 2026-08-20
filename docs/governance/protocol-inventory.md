@@ -17,9 +17,9 @@
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
-| `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 5 |
-| `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 2 |
-| `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 2 |
+| `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
+| `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 5 |
+| `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 6 |
 | `PROTO-CANONICAL-BYTES` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 2 |
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 3 |
 | `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.1` | `Preview` | yes | yes | 2 |
@@ -83,8 +83,8 @@
 - Unknown-field policy: Optional Facts and Repair candidates are compatible extensions; no compatibility promise currently exists for unknown top-level fields.
 - Migration tool: None; breaking field changes require a new diagnostic schema with migration guidance, while changed code meaning requires a new code.
 - Authority: `DEC-0001`, `DEC-0002`
-- Sources: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/governance/error-code-lock.toml`](../governance/error-code-lock.toml), [`tools/xtask/src/error_codes.rs`](../../tools/xtask/src/error_codes.rs)
-- Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`tests/conformance/m2-invalid-number/expect.toml`](../../tests/conformance/m2-invalid-number/expect.toml), [`docs/governance/error-code-lock.toml`](../governance/error-code-lock.toml), [`tools/xtask/src/error_codes.rs`](../../tools/xtask/src/error_codes.rs)
+- Sources: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/governance/error-code-lock.toml`](../governance/error-code-lock.toml), [`tools/xtask/src/error_codes.rs`](../../tools/xtask/src/error_codes.rs), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/diagnostic/0.1/schema.json`](../../schemas/diagnostic/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
+- Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`tests/conformance/m2-invalid-number/expect.toml`](../../tests/conformance/m2-invalid-number/expect.toml), [`docs/governance/error-code-lock.toml`](../governance/error-code-lock.toml), [`tools/xtask/src/error_codes.rs`](../../tools/xtask/src/error_codes.rs), [`schemas/diagnostic/0.1/schema.json`](../../schemas/diagnostic/0.1/schema.json), [`schemas/diagnostic/0.1/valid`](../../schemas/diagnostic/0.1/valid), [`schemas/diagnostic/0.1/invalid`](../../schemas/diagnostic/0.1/invalid)
 - Notes: Code meaning, error/warning classification, and existing Facts types are the documented stable subset; the 0.1 container remains Preview until 1.0 gates close; The Markdown registry is the sole handwritten allocation source; the generated lock and offline checker reject drift, retired reuse, and unregistered implementation/test codes.
 
 ### `PROTO-REPL-JSON` — REPL submission event JSON
@@ -96,8 +96,8 @@
 - Unknown-field policy: No unknown-field compatibility is promised for 0.1; consumers must not infer semantics from unrecognized fields.
 - Migration tool: None; incompatible event changes require a new schema and migration notes.
 - Authority: `DEC-0016`
-- Sources: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`docs/decisions/0016-repl-session-semantics.md`](../decisions/0016-repl-session-semantics.md)
-- Fixtures: [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
+- Sources: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`docs/decisions/0016-repl-session-semantics.md`](../decisions/0016-repl-session-semantics.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/repl/0.1/schema.json`](../../schemas/repl/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
+- Fixtures: [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`schemas/repl/0.1/schema.json`](../../schemas/repl/0.1/schema.json), [`schemas/repl/0.1/valid`](../../schemas/repl/0.1/valid), [`schemas/repl/0.1/invalid`](../../schemas/repl/0.1/invalid)
 - Notes: Deterministic scripted output is tested, but byte-canonical JSON and an N-1 reader are not claimed.
 
 ### `PROTO-SEMANTIC-GRAPH-JSON` — Semantic Graph JSON
@@ -109,8 +109,8 @@
 - Unknown-field policy: Accept x-* extension fields at checked object levels and reject unknown core fields.
 - Migration tool: None; schema or identity changes require an explicit version upgrade, migration notes, and regenerated fixtures.
 - Authority: `DEC-0012`
-- Sources: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md)
-- Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
+- Sources: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
+- Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`schemas/semantic/0.1/valid`](../../schemas/semantic/0.1/valid), [`schemas/semantic/0.1/invalid`](../../schemas/semantic/0.1/invalid), [`schemas/semantic/0.1/canonical`](../../schemas/semantic/0.1/canonical)
 - Notes: GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.
 
 ### `PROTO-CANONICAL-BYTES` — Canonical bytes for semantic identities
