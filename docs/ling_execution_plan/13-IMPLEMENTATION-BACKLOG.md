@@ -72,7 +72,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `BASE-0001` | G0 | 仓库基线盘点与执行计划落位 | S | Done | `14-FIRST-SPRINT-CODEX-TASKS.md` Task A |
 | `GOV-0101` | G0 | 建立规范权威索引 | S | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:53`；见机器状态与实施报告 |
 | `GOV-0102` | G0 | 规范缺口台账 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:75`；见机器状态与实施报告 |
-| `GOV-0103` | G0 | RFC 与 decision 生命周期 | S | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:105` |
+| `GOV-0103` | G0 | RFC 与 decision 生命周期 | S | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:105`；见机器状态与实施报告 |
 | `GOV-0104` | G0 | 公开接口与协议总盘点 | M | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:125` |
 | `GOV-0105` | G0 | Diagnostic 错误码注册表 | M | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:159` |
 | `GOV-0106` | G0 | Schema 生命周期与 golden corpus | L | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:188` |

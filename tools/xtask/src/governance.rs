@@ -7,6 +7,9 @@ use serde::Deserialize;
 const MANIFEST_PATH: &str = "docs/governance/authority.toml";
 const REPORT_PATH: &str = "docs/governance/authority.md";
 
+pub(crate) type SpecificationRecord = (String, String, String);
+pub(crate) type SpecificationRecords = BTreeMap<String, SpecificationRecord>;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckSummary {
     pub document_count: usize,
@@ -81,6 +84,17 @@ pub(crate) fn document_statuses(root: &Path) -> Result<BTreeMap<String, String>,
         .document
         .into_iter()
         .map(|document| (document.id, document.status))
+        .collect())
+}
+
+pub(crate) fn specification_records(root: &Path) -> Result<SpecificationRecords, Vec<String>> {
+    let index = load_index(root)?;
+    finish(validate(root, &index))?;
+    Ok(index
+        .document
+        .into_iter()
+        .filter(|document| matches!(document.kind.as_str(), "RFC" | "Decision"))
+        .map(|document| (document.id, (document.kind, document.status, document.path)))
         .collect())
 }
 

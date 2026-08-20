@@ -48,7 +48,7 @@ status = "Accepted"
 version = "1"
 authority = "Accepted"
 path = "docs/decisions/0003-m0-tooling.md"
-covers = ["CLI parsing", "serialization", "snapshot testing"]
+covers = ["CLI parsing", "scriptable REPL baseline", "conformance runner", "dependency discipline"]
 depends_on = []
 supersedes = []
 stable_basis = true
@@ -362,6 +362,19 @@ authority = "Registry"
 path = "docs/governance/gap-register.toml"
 covers = ["unresolved semantics", "release blockers", "candidate RFCs", "required evidence"]
 depends_on = ["SEMANTICS", "ROADMAP-1.0", "RFC-0001"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "LIFECYCLE-REGISTER"
+title = "RFC and decision lifecycle registry"
+kind = "Governance registry"
+status = "Active"
+version = "1"
+authority = "Registry"
+path = "docs/governance/lifecycle.toml"
+covers = ["RFC lifecycle", "decision lifecycle", "acceptance evidence", "supersession", "Stable implementation basis"]
+depends_on = []
 supersedes = []
 stable_basis = false
 

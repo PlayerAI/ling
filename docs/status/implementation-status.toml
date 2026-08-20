@@ -126,3 +126,48 @@ notes = [
   "The checker maps current experimental implementation markers and rejects unregistered TODO(spec) source markers.",
   "The CI workflow invokes both governance checks; no remote CI result is claimed for this worktree.",
 ]
+
+[[task]]
+id = "GOV-0103"
+title = "RFC 与 decision 生命周期"
+state = "Done"
+release = "G0"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0101"]
+spec = [
+  "AGENTS.md",
+  "docs/governance/authority.toml",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+]
+artifacts = [
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/templates/RFC.md",
+  "docs/governance/templates/DECISION.md",
+  ".github/pull_request_template.md",
+  "tools/xtask/src/lifecycle.rs",
+  "docs/status/GOV-0103-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask governance check-lifecycle: 17 records, 16 Accepted, 17 legacy-format migrations",
+  "all current RFC and decision tuples match the authority index",
+  "cargo xtask governance check-authority: 35 documents, 16 Accepted",
+  "cargo xtask governance check-gaps: 25 Open gaps, 6 gates",
+  "cargo test --package xtask --locked --offline: 34 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --all-features --locked --offline: 172 passed",
+  "local Markdown path targets: 95 resolved",
+]
+verified_against_commit = "327bdef57ee476b2330e9f51ae9241346d4affde"
+completion_commit = ""
+integration_state = "verified-uncommitted"
+completed = "2026-08-20"
+notes = [
+  "No language semantics, Ling diagnostics, Semantic IDs, Unicode data, or public runtime protocols changed.",
+  "The 17 pre-template specifications form a closed legacy-format migration set; new exemptions are rejected.",
+  "The CI workflow invokes all three governance checks; no remote CI result is claimed for this worktree.",
+]

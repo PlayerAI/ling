@@ -44,6 +44,9 @@ Each change must state:
 - Keep the accepted diagnostic format `L-<DOMAIN>-<NUMBER>` and the single registry in `docs/ERROR-CODES.md`; do not apply alternate ranges proposed by a lower-authority plan.
 - Treat planned paths, crates, commands, manifests, schemas, backends, and editor repositories as proposals until the current repository and the required accepted RFCs confirm them. Do not create empty placeholder crates or public APIs.
 - Track execution tasks in `docs/status/implementation-status.toml`. A task may be implemented only when its dependencies are satisfied and any semantic or public-protocol decisions are Accepted.
+- Create RFCs and decisions from `docs/governance/templates/`, record every lifecycle transition in `docs/governance/lifecycle.toml`, and keep the generated lifecycle report current.
+- Language-semantic pull requests must cite the Accepted specification IDs and normative clauses that authorize the change. Draft/Proposed documents, gaps, roadmaps, snapshots, and implementation behavior are not authorization.
+- Experimental implementation must name its governing Draft RFC or registered specification gap; remove or update that marker when the experiment graduates.
 
 ## Task workflow
 

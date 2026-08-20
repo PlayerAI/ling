@@ -1,5 +1,6 @@
 mod gaps;
 mod governance;
+mod lifecycle;
 
 use std::env;
 use std::path::{Path, PathBuf};
@@ -81,9 +82,40 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "governance" && command == "check-lifecycle" => {
+            match lifecycle::check_repository(&root) {
+                Ok(summary) => {
+                    println!(
+                        "lifecycle registry OK: {} records ({} Accepted, {} legacy format)",
+                        summary.record_count, summary.accepted_count, summary.legacy_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "governance" && command == "render-lifecycle" => {
+            match lifecycle::render_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps"
+                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

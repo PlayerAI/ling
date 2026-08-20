@@ -24,7 +24,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `DEC-0001` | Decision | `Accepted` | `1` | `Accepted` | yes | [Diagnostic code allocation policy](../decisions/0001-error-code-policy.md) | `diagnostic codes`, `compatibility` | — | — |
 | `DEC-0002` | Decision | `Accepted` | `1` | `Accepted` | yes | [Source position units](../decisions/0002-source-position-units.md) | `UTF-8 byte spans`, `line and column projection` | — | — |
-| `DEC-0003` | Decision | `Accepted` | `1` | `Accepted` | yes | [M0 tooling](../decisions/0003-m0-tooling.md) | `CLI parsing`, `serialization`, `snapshot testing` | — | — |
+| `DEC-0003` | Decision | `Accepted` | `1` | `Accepted` | yes | [M0 tooling](../decisions/0003-m0-tooling.md) | `CLI parsing`, `scriptable REPL baseline`, `conformance runner`, `dependency discipline` | — | — |
 | `DEC-0004` | Decision | `Accepted` | `1` | `Accepted` | yes | [Pipeline syntax and lowering](../decisions/0004-pipeline-syntax.md) | `pipeline grammar`, `precedence`, `lowering` | — | — |
 | `DEC-0005` | Decision | `Accepted` | `1` | `Accepted` | yes | [Seed literals and delimiters](../decisions/0005-seed-literals-and-delimiters.md) | `literals`, `record delimiters`, `list delimiters` | — | — |
 | `DEC-0006` | Decision | `Accepted` | `1` | `Accepted` | yes | [Seed offside and layout rules](../decisions/0006-offside-layout.md) | `indentation`, `continuation`, `layout recovery` | — | — |
@@ -48,6 +48,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `NEXT-STEPS-SEED` | Engineering record | `Completed` | `0.0.1` | `Planning` | no | [Hello-World-to-Seed implementation record](../NEXT-STEPS-SEED.md) | `Seed closure`, `release gates` | `NEXT-STEPS-HELLO` | — |
 | `ERROR-CODES` | Compatibility registry | `Active` | `ling.diagnostic/0.1` | `Registry` | no | [Ling diagnostic code registry](../ERROR-CODES.md) | `stable diagnostic codes`, `bilingual messages`, `payload facts` | `DEC-0001` | — |
 | `GAP-REGISTER` | Governance registry | `Active` | `1` | `Registry` | no | [Specification gap register](../governance/gap-register.toml) | `unresolved semantics`, `release blockers`, `candidate RFCs`, `required evidence` | `SEMANTICS`, `ROADMAP-1.0`, `RFC-0001` | — |
+| `LIFECYCLE-REGISTER` | Governance registry | `Active` | `1` | `Registry` | no | [RFC and decision lifecycle registry](../governance/lifecycle.toml) | `RFC lifecycle`, `decision lifecycle`, `acceptance evidence`, `supersession`, `Stable implementation basis` | — | — |
 | `TASK-STATUS` | Status registry | `Active` | `1` | `Registry` | no | [Implementation task status registry](../status/implementation-status.toml) | `task lifecycle`, `verification evidence` | `EXECUTION-PLAN-1.0` | — |
 | `DEPENDENCIES` | Evidence | `Evidence` | `0.0.1` | `Evidence` | no | [Rust dependency record](../DEPENDENCIES.md) | `dependency licenses`, `MSRV`, `offline lock set` | — | — |
 | `EVIDENCE-GAP-GOV-RFC-STATUS-001` | Gap discovery evidence | `Active` | `1` | `Evidence` | no | [RFC-0001 lifecycle status mismatch](../status/spec-gaps/GAP-GOV-RFC-STATUS-001.md) | `RFC lifecycle`, `governance consistency` | `RFC-0001` | — |

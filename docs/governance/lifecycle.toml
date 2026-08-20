@@ -1,0 +1,278 @@
+schema_version = 1
+updated = "2026-08-20"
+
+# RFC-0001 and DEC-0001 through DEC-0016 predate the checked section
+# templates. This is a closed migration set; the checker rejects any new
+# legacy-format ID.
+
+[[record]]
+id = "RFC-0001"
+kind = "RFC"
+status = "Draft"
+path = "docs/RFC-0001.md"
+history = ["Draft"]
+opened = "2026-08-17"
+proposed = ""
+decided = ""
+stable_basis = false
+legacy_format = true
+conformance_plan = []
+compatibility_impact = []
+unresolved_alternatives = []
+superseded_by = ""
+
+[[record]]
+id = "DEC-0001"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0001-error-code-policy.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Verify domain allocation, monotonic numbering, deprecation without reuse, cross-command code identity, Facts compatibility, and Repair semantics."]
+compatibility_impact = ["Published diagnostic codes, root-cause meanings, and Facts field names and types are compatibility identifiers and cannot be silently reused."]
+unresolved_alternatives = ["Allocation for language domains beyond the accepted Seed ranges remains future governance work."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0002"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0002-source-position-units.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Verify UTF-8 byte spans, line and column projection, CRLF normalization, and Unicode-scalar diagnostic columns with source fixtures."]
+compatibility_impact = ["UTF-8 byte spans and the accepted human position projection are public source-location behavior."]
+unresolved_alternatives = ["Additional editor or protocol-specific position encodings remain outside this Seed decision."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0003"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0003-m0-tooling.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Exercise the hand-written CLI parser, scriptable REPL baseline, declared conformance runner and fixture layout, and locked offline dependency workflow."]
+compatibility_impact = ["The small parser and terminal-layer choices are implementation details; script behavior, conformance execution, and locked dependency discipline are the governed surface."]
+unresolved_alternatives = ["CLI framework reevaluation and optional line editing remain possible only when they preserve the accepted script semantics and offline constraints."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0004"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0004-pipeline-syntax.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Cover pipeline parsing, precedence, lowering, type checking, and evaluation with positive and negative conformance fixtures."]
+compatibility_impact = ["Pipeline surface syntax, precedence, and lowering are accepted Seed language behavior."]
+unresolved_alternatives = ["Additional pipeline operators or generalized placeholder syntax require a later accepted specification."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0005"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0005-seed-literals-and-delimiters.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Exercise literal lexing and parsing, separator and delimiter rules, canonical values, and invalid-literal diagnostics with conformance fixtures."]
+compatibility_impact = ["The accepted Seed literal forms and record and list delimiters are source compatibility surface."]
+unresolved_alternatives = ["Literal families and numeric types not named by the decision remain outside the Seed subset."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0006"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0006-offside-layout.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Test indentation, continuation, blank and comment lines, layout recovery, and deterministic formatter output."]
+compatibility_impact = ["Offside token insertion, indentation errors, and continuation rules are accepted source behavior."]
+unresolved_alternatives = ["Richer layout constructs and alternative formatter styles are not authorized by this Seed decision."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0007"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0007-module-and-file-boundaries.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Verify explicit and implicit Main, imports, exact path matching, duplicates, missing files, cycles, and deterministic graph traversal."]
+compatibility_impact = ["Seed module identity, file mapping, imports, aliases, visibility, and cycle rejection are language and CLI compatibility surface."]
+unresolved_alternatives = ["Package discovery, registries, and recursive module initialization require later accepted specifications."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0008"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0008-seed-value-restriction.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Use type-checking fixtures for generalization, instantiation, mutable or effectful bindings, and stable rejection diagnostics."]
+compatibility_impact = ["The accepted Seed value restriction determines which let-bound values are polymorphic."]
+unresolved_alternatives = ["Generalization for future identity-bearing values or a broader proven-Pure non-expansive rule remains outside this decision."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0009"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0009-seed-borrow-and-mutation-boundary.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Cover mutable-place classification, assignment checks, record-copy value behavior, and the absence of Borrow types or Borrow edges in HIR and graph evidence."]
+compatibility_impact = ["Seed mutation and value semantics are public behavior; Rust ownership and allocation remain non-semantic."]
+unresolved_alternatives = ["Resource, borrow, and ownership semantics require a separate accepted RFC before implementation."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0010"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0010-state-and-capability-model.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Verify canonical Effect rows, local State effects, pre-execution capability checks, unused-capability analysis, and structured host faults."]
+compatibility_impact = ["State effects, capability requirements, and their Typed Core and public projection are accepted Seed semantics."]
+unresolved_alternatives = ["Effects and capabilities beyond the implemented Seed set require later accepted specifications."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0011"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0011-seed-builtins.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Exercise every Seed built-in through resolver, type, effect, capability, evaluation, overflow, and ordering fixtures."]
+compatibility_impact = ["Accepted built-in names, types, effects, capabilities, and deterministic behavior are language compatibility surface."]
+unresolved_alternatives = ["A broader standard library and its versioning and distribution model remain future work."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0012"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0012-semantic-identity-and-canonical-bytes.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Run canonical-byte and identity invariance, change-sensitivity, cross-process determinism, path-independence, and hash-seed-independence tests."]
+compatibility_impact = ["Identity domains and schemas are explicitly versioned; their experimental stability and migration rules remain as stated by the decision."]
+unresolved_alternatives = ["Stabilization criteria and upgrade tooling for Semantic IDs and graph schemas remain registered specification gaps."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0013"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0013-main-and-runtime-failures.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = ""
+decided = "2026-08-18"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Test entry-point selection and signatures, pre-execution failures, Console behavior, runtime faults, and distinct process exit classes."]
+compatibility_impact = ["Main selection, execution ordering, structured runtime failures, Console output, and exit behavior are public Seed behavior."]
+unresolved_alternatives = ["Result-returning main remains reserved but unaccepted; additional entry-point models require later accepted specifications."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0014"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0014-seed-prelude-option-result.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = "2026-08-18"
+decided = "2026-08-19"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Verify polymorphic constructors, pattern payload typing, scope and shadow rules, graph origin and identity, and cross-process determinism."]
+compatibility_impact = ["Option, Result, their constructors, the Ling.Prelude origin, namespace rules, and identity participate in Seed compatibility."]
+unresolved_alternatives = ["A replaceable prelude, package-based standard-library discovery, and namespace separation require later accepted specifications."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0015"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0015-audit-source-format.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = "2026-08-18"
+decided = "2026-08-19"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Verify Audit model render-parse equality, canonical bytes, extension handling, malformed-input diagnostics, cross-process determinism, and evaluator isolation."]
+compatibility_impact = ["The versioned Audit grammar, model, canonical rendering, diagnostics, and CLI behavior are public protocol surface."]
+unresolved_alternatives = ["Borrow, Contract, Profile, and other future Audit model fields remain outside this decision and cannot appear as fabricated defaults."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0016"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0016-repl-session-semantics.md"
+history = ["Accepted"]
+opened = "2026-08-18"
+proposed = "2026-08-18"
+decided = "2026-08-19"
+stable_basis = true
+legacy_format = true
+conformance_plan = ["Use process fixtures for commits and rollback, redefinition generations, closures, multiline input, Unicode security, EOF and interrupt handling, output modes, and file-session equivalence."]
+compatibility_impact = ["Transactional submissions, redefinition, session identity, human and JSON output, and exit behavior are accepted REPL compatibility surface."]
+unresolved_alternatives = ["Capability escalation, type or module redefinition, persistent sessions, and broader interactive tooling remain outside the Seed decision."]
+superseded_by = ""
