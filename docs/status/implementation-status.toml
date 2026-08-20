@@ -1,6 +1,6 @@
 schema_version = 2
 feature_schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 authority = "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md"
 plan_root = "docs/ling_execution_plan"
 recommended_plan_root = "docs/execution"
@@ -1145,4 +1145,54 @@ notes = [
   "No public diagnostic code, bilingual template, Facts schema, public protocol/schema, CLI contract, Semantic ID, canonical bytes, source-position unit, or dependency changed.",
   "Unicode 17.0.0 tables, normalization, identifier security, and deterministic generated-parser behavior are unchanged.",
   "TS-3107 malformed-edit recovery, TS-3108 whole-program differential, effect-row Author Source, Borrow syntax, and all other post-Seed features remain intentionally deferred.",
+]
+
+[[task]]
+id = "TS-3107"
+title = "Error recovery"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3106"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/grammar-map.md",
+]
+artifacts = [
+  "README.md",
+  "docs/grammar-map.md",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "editors/tree-sitter-ling/README.md",
+  "editors/tree-sitter-ling/docs/ADR-0001-layout-scanner.md",
+  "editors/tree-sitter-ling/grammar.js",
+  "editors/tree-sitter-ling/package.json",
+  "editors/tree-sitter-ling/src/grammar.json",
+  "editors/tree-sitter-ling/src/node-types.json",
+  "editors/tree-sitter-ling/src/parser.c",
+  "editors/tree-sitter-ling/src/scanner.c",
+  "editors/tree-sitter-ling/test/corpus/errors.txt",
+  "editors/tree-sitter-ling/test/fixtures/recovery-cases.json",
+  "editors/tree-sitter-ling/test/run-recovery-integration.js",
+  "editors/tree-sitter-ling/test/scanner_state.c",
+]
+acceptance = [
+  "tree-sitter-cli 0.26.12: 41 of 41 corpus cases and all existing focused suites passed",
+  "recovery integration: 10 static malformed cases, 9 incremental edits, and 64 fixed-seed mutations passed with finite process/CST bounds and retained declaration canaries",
+  "scanner state: root synchronization resets layout/delimiter recovery state, preserves ordinary final newlines, and does not split Unicode-prefixed identifiers",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "uncommitted"
+completed = ""
+notes = [
+  "TS-3107 changes only the editor CST and private scanner recovery path; the compiler remains the validity and diagnostic authority.",
+  "Recovery exposes only Tree-sitter built-in ERROR/MISSING evidence and does not add a successful Ling syntax production.",
+  "No compiler diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, or Unicode 17.0.0 table changed.",
+  "TS-3108 whole-program compiler/Tree-sitter differential remains deferred.",
 ]

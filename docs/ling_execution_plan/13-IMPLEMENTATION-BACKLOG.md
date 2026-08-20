@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`、`TS-3102`、`TS-3103`、`TS-3104`、`TS-3105`、`TS-3106` Done；下一项 `TS-3107` Ready，其余任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`、`TS-3102`、`TS-3103`、`TS-3104`、`TS-3105`、`TS-3106` Done；`TS-3107` In Progress，其余任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -169,7 +169,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TS-3104` | G1/Editor | Unicode identifier | M | Done | `05-ZED-EXTENSION.md:199`；见 Unicode 17.0.0 生成范围、共享 lexer differential corpus、ADR、机器状态与实施报告 |
 | `TS-3105` | G1/Editor | Expression precedence | M | Done | `05-ZED-EXTENSION.md:211`；Accepted `DEC-0017`；见 compiler/Tree-sitter 共享 precedence corpus、机器状态与实施报告 |
 | `TS-3106` | G1/Editor | Pattern 与 Type | M | Done | `05-ZED-EXTENSION.md:217`；见共享 41-case validity corpus、compiler/conformance evidence、机器状态与实施报告 |
-| `TS-3107` | G1/Editor | Error recovery | M | Ready | `05-ZED-EXTENSION.md:221`；依赖 `TS-3106` Done；仅加固编辑中间态与有限恢复，不改变 compiler 合法性 |
+| `TS-3107` | G1/Editor | Error recovery | M | In Progress | `05-ZED-EXTENSION.md:221`；依赖 `TS-3106` Done；仅加固编辑中间态与有限恢复，不改变 compiler 合法性 |
 | `TS-3108` | G1/Editor | Grammar differential | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:234` |
 | `ZQ-3201` | G1/Editor | `highlights.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:245` |
 | `ZQ-3202` | G1/Editor | `brackets.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:273` |

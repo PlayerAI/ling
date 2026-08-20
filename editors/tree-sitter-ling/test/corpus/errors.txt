@@ -74,3 +74,55 @@ type Borrowed = &Int
 type Empty = Option<>
 
 ---
+
+========================================
+Recovery retains definitions after unclosed delimiters
+:error
+========================================
+
+type Before = Int
+let string = "unfinished
+let record = { value = 1
+let tuple = (1, 2
+type After = Text
+
+---
+
+========================================
+Recovery retains definitions after missing punctuation
+:error
+========================================
+
+type Before = Int
+let binding value
+let arrow input = match input with | Some item
+let keyword input = match input | Some item -> item
+type After = Text
+
+---
+
+========================================
+Recovery retains definitions after partial tokens
+:error
+========================================
+
+type Before = Int
+let 人
+let pipeline = before |>
+type After = Text
+
+---
+
+========================================
+Recovery retains definitions through layout edit states
+:error
+========================================
+
+type Before = Int
+let layout () =
+    let nested = 1
+  nested
+let conditional value = if value then 1
+type After = Text
+
+---

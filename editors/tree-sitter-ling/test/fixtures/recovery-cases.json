@@ -1,0 +1,42 @@
+[
+  {
+    "id": "unclosed-string",
+    "source": "type Before = Int\nlet broken = \"unfinished\ntype After = Text\n"
+  },
+  {
+    "id": "unclosed-record",
+    "source": "type Before = Int\nlet broken = { value = 1\ntype After = Text\n"
+  },
+  {
+    "id": "unclosed-tuple",
+    "source": "type Before = Int\nlet broken = (1, 2\ntype After = Text\n"
+  },
+  {
+    "id": "missing-let-equals",
+    "source": "type Before = Int\nlet broken value\ntype After = Text\n"
+  },
+  {
+    "id": "missing-match-arrow",
+    "source": "type Before = Int\nlet broken input =\n    match input with\n    | Some item\ntype After = Text\n"
+  },
+  {
+    "id": "missing-match-with",
+    "source": "type Before = Int\nlet broken input =\n    match input\n    | Some item -> item\ntype After = Text\n"
+  },
+  {
+    "id": "partial-chinese-identifier",
+    "source": "type Before = Int\nlet 人\ntype After = Text\n"
+  },
+  {
+    "id": "incomplete-pipeline",
+    "source": "type Before = Int\nlet broken = before |>\ntype After = Text\n"
+  },
+  {
+    "id": "inconsistent-indentation",
+    "source": "type Before = Int\nlet broken () =\n    let nested = 1\n  nested\ntype After = Text\n"
+  },
+  {
+    "id": "incomplete-if-edit",
+    "source": "type Before = Int\nlet broken value = if value then 1\ntype After = Text\n"
+  }
+]

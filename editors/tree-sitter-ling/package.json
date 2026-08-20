@@ -24,12 +24,13 @@
   ],
   "scripts": {
     "generate": "tree-sitter generate",
-    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types",
+    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types && npm run test:recovery",
     "test:layout": "node test/run-layout-integration.js",
     "test:scanner": "node test/run-scanner-tests.js",
     "test:unicode": "node test/run-unicode-differential.js",
     "test:precedence": "node test/run-precedence-differential.js",
     "test:pattern-types": "node test/run-pattern-type-differential.js",
+    "test:recovery": "node test/run-recovery-integration.js",
     "parse:examples": "tree-sitter parse \"examples/*.ling\"",
     "verify": "npm run generate && npm test && npm run parse:examples"
   },

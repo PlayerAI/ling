@@ -54,6 +54,7 @@ module.exports = grammar({
     $._delimiter_open,
     $._delimiter_close,
     $._error_sentinel,
+    $._root_declaration_boundary,
   ],
 
   extras: ($) => [
@@ -89,9 +90,18 @@ module.exports = grammar({
 
   rules: {
     source_file: ($) =>
-      seq(optional($._bom), repeat(choice($._newline, $._declaration))),
+      seq(optional($._bom), repeat(choice($._newline, $._root_declaration))),
 
     _bom: (_) => "\uFEFF",
+
+    // The boundary is hidden and consumes only the preceding newline. A small
+    // dynamic preference keeps synchronized declarations available in error
+    // branches without changing the shape of valid declaration nodes.
+    _root_declaration: ($) =>
+      choice(
+        $._declaration,
+        prec.dynamic(1, seq($._root_declaration_boundary, $._declaration)),
+      ),
 
     _and_keyword: (_) => token("and"),
 
@@ -111,6 +121,22 @@ module.exports = grammar({
     _reserved_and_error: ($) => seq($._and_keyword, $._error_sentinel),
 
     _stray_left_arrow_error: ($) => seq("<-", $._error_sentinel),
+
+    // Retain one complete declaration after an incomplete binding. The
+    // scanner never emits the sentinel; its alias therefore leaves a built-in
+    // `MISSING "="` marker instead of accepting the edit as valid source.
+    _missing_body_recovery: ($) =>
+      seq(
+        $._root_declaration_boundary,
+        choice(
+          $.module_declaration,
+          $.import_declaration,
+          alias($._complete_function_definition, $.function_definition),
+          alias($._complete_let_declaration, $.let_declaration),
+          $.type_declaration,
+        ),
+        alias($._error_sentinel, "="),
+      ),
 
     module_declaration: ($) =>
       seq(
@@ -144,6 +170,19 @@ module.exports = grammar({
       seq($.identifier, repeat1(seq(".", $.identifier))),
 
     let_declaration: ($) =>
+      choice(
+        $._complete_let_declaration,
+        seq(
+          "let",
+          optional("rec"),
+          optional("mutable"),
+          field("pattern", $._binding_pattern),
+          optional(seq(":", field("type", $._type))),
+          $._missing_body_recovery,
+        ),
+      ),
+
+    _complete_let_declaration: ($) =>
       seq(
         "let",
         optional("rec"),
@@ -155,6 +194,20 @@ module.exports = grammar({
       ),
 
     function_definition: ($) =>
+      choice(
+        $._complete_function_definition,
+        seq(
+          "let",
+          optional("rec"),
+          optional("mutable"),
+          field("name", $._binding_pattern),
+          repeat1(field("parameter", $._parameter_pattern)),
+          optional(seq(":", field("return_type", $._type))),
+          $._missing_body_recovery,
+        ),
+      ),
+
+    _complete_function_definition: ($) =>
       seq(
         "let",
         optional("rec"),

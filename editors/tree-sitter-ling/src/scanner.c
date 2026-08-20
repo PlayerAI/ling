@@ -16,6 +16,7 @@ enum TokenType {
   DELIMITER_OPEN,
   DELIMITER_CLOSE,
   ERROR_SENTINEL,
+  ROOT_DECLARATION_BOUNDARY,
 };
 
 enum {
@@ -41,12 +42,45 @@ static inline bool is_newline(int32_t character) {
   return character == '\n' || character == '\r';
 }
 
+static inline bool is_root_keyword_separator(int32_t character) {
+  return character == 0 || character == ' ' || character == '\t' ||
+         character == '\f' || character == '/' || is_newline(character);
+}
+
 static inline void advance(TSLexer *lexer) {
   lexer->advance(lexer, false);
 }
 
 static inline void skip(TSLexer *lexer) {
   lexer->advance(lexer, true);
+}
+
+static bool scan_ascii_word(TSLexer *lexer, const char *word) {
+  for (const char *character = word; *character != '\0'; ++character) {
+    if (lexer->lookahead != *character) {
+      return false;
+    }
+    advance(lexer);
+  }
+  return is_root_keyword_separator(lexer->lookahead);
+}
+
+static bool scan_root_declaration_start(TSLexer *lexer) {
+  if (lexer->get_column(lexer) != 0) {
+    return false;
+  }
+  switch (lexer->lookahead) {
+  case 'i':
+    return scan_ascii_word(lexer, "import");
+  case 'l':
+    return scan_ascii_word(lexer, "let");
+  case 'm':
+    return scan_ascii_word(lexer, "module");
+  case 't':
+    return scan_ascii_word(lexer, "type");
+  default:
+    return false;
+  }
 }
 
 static void skip_newline(TSLexer *lexer) {
@@ -260,11 +294,34 @@ static bool scan_layout(Scanner *scanner, TSLexer *lexer,
   const uint16_t indentation = scan_indentation(lexer);
   lexer->mark_end(lexer);
 
+  // Synchronization is intentionally conservative: the ordinary lexer still
+  // owns keywords and Unicode identifiers, while this token ends before them.
+  if (indentation == 0 && valid_symbols[ROOT_DECLARATION_BOUNDARY] &&
+      scan_root_declaration_start(lexer)) {
+    while (scanner->indents.size > 1) {
+      (void)array_pop(&scanner->indents);
+    }
+    scanner->delimiter_depth = 0;
+    lexer->result_symbol = ROOT_DECLARATION_BOUNDARY;
+    return true;
+  }
+
   if (scanner->delimiter_depth > 0) {
+    if (indentation == 0 && scan_root_declaration_start(lexer)) {
+      return false;
+    }
     if (valid_symbols[SOFT_NEWLINE]) {
       lexer->result_symbol = SOFT_NEWLINE;
       return true;
     }
+    return false;
+  }
+
+  const uint16_t current = *array_back(&scanner->indents);
+  const bool can_close_layout =
+      current > 0 && indentation < current && valid_symbols[DEDENT];
+  if (indentation == 0 && !can_close_layout &&
+      scan_root_declaration_start(lexer)) {
     return false;
   }
 
@@ -274,7 +331,6 @@ static bool scan_layout(Scanner *scanner, TSLexer *lexer,
     return true;
   }
 
-  const uint16_t current = *array_back(&scanner->indents);
   if (probe.eof) {
     if (valid_symbols[DEDENT] && current > 0) {
       return emit_dedent(scanner, lexer);
@@ -407,6 +463,10 @@ void tree_sitter_ling_external_scanner_deserialize(void *payload,
 bool tree_sitter_ling_external_scanner_scan(void *payload, TSLexer *lexer,
                                             const bool *valid_symbols) {
   Scanner *scanner = (Scanner *)payload;
+  if (valid_symbols[ROOT_DECLARATION_BOUNDARY] &&
+      is_newline(lexer->lookahead)) {
+    return scan_layout(scanner, lexer, valid_symbols);
+  }
   if (valid_symbols[ERROR_SENTINEL]) {
     return false;
   }
