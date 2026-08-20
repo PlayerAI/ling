@@ -48,7 +48,7 @@ The stateful external scanner remains limited to DEC-0006 layout and nested comm
 
 Language-specific package bindings and publication metadata remain disabled until an editor consumer requires them; the generated C parser and its private scanner are the committed integration artifacts.
 
-Until the corresponding accepted decision closes `GAP-SEED-BOOLEAN-OPERATORS-001`, `&&` and `||` remain error input.
+Accepted DEC-0017 defines `&&`, `||`, their precedence, and checked short-circuit behavior. The checked-in grammar continues to reject them until TS-3105 lands the compiler and Tree-sitter implementation together.
 
 ## 中文说明
 

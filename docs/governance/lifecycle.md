@@ -33,6 +33,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0014` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-19` | [DEC-0014](../decisions/0014-seed-prelude-option-result.md) |
 | `DEC-0015` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-19` | [DEC-0015](../decisions/0015-audit-source-format.md) |
 | `DEC-0016` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-19` | [DEC-0016](../decisions/0016-repl-session-semantics.md) |
+| `DEC-0017` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-20` | [DEC-0017](../decisions/0017-seed-boolean-operators.md) |
 
 ## Migration boundary
 

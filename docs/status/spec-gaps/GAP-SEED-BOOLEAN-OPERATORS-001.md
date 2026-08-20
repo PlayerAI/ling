@@ -39,3 +39,7 @@ Accepting the operators changes which source files parse and how mixed operator 
 - short-circuit Effect/Fault behavior;
 - compiler parser ↔ Tree-sitter differential cases;
 - source migration impact for the rejected alternative.
+
+## Resolution
+
+Accepted [`DEC-0017`](../../decisions/0017-seed-boolean-operators.md) includes `&&` and `||` in Seed, fixes `||` below `&&` below equality and above pipeline, requires `Bool` operands/results, and defines checked left-to-right short-circuit behavior. The machine gap registry records the Accepted state; TS-3105 owns the implementation and conformance evidence.

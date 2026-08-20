@@ -223,6 +223,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0017"
+title = "Seed boolean operators and expression precedence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0017-seed-boolean-operators.md"
+covers = ["boolean operators", "expression precedence", "short-circuit evaluation", "Typed Core lowering"]
+depends_on = ["DEC-0004", "DEC-0005", "DEC-0009", "DEC-0010", "SEMANTICS"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"
@@ -387,7 +400,7 @@ version = "1"
 authority = "Evidence"
 path = "docs/grammar-map.md"
 covers = ["Seed Author Source rule inventory", "compiler CST and AST mapping", "proposed Tree-sitter node mapping", "shared corpus obligations", "recovery-only helper boundary", "deferred syntax exclusions"]
-depends_on = ["DEC-0002", "DEC-0004", "DEC-0005", "DEC-0006", "DEC-0007", "DEC-0009", "DEC-0010", "DEC-0013", "DEC-0014", "RFC-0001", "SEMANTICS", "LANGUAGE", "GAP-REGISTER"]
+depends_on = ["DEC-0002", "DEC-0004", "DEC-0005", "DEC-0006", "DEC-0007", "DEC-0009", "DEC-0010", "DEC-0013", "DEC-0014", "DEC-0017", "RFC-0001", "SEMANTICS", "LANGUAGE", "GAP-REGISTER"]
 supersedes = []
 stable_basis = false
 

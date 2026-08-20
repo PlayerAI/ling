@@ -640,7 +640,16 @@ a && b
 a || b
 ```
 
-短路求值。
+两个操作数与结果均为 `Bool`。`&&` 比 `||` 结合更紧；两者均低于 equality、高于 pipeline，并按左结合建立语法树。
+
+求值严格从左到右，且左操作数只求值一次：
+
+- `false && b` 返回 `false`，不求值 `b`；
+- `true && b` 求值并返回 `b`；
+- `true || b` 返回 `true`，不求值 `b`；
+- `false || b` 求值并返回 `b`。
+
+未求值右操作数中的 Effect 与 Fault 不可观察。静态检查仍检查两个操作数，并保守地将两侧 Effect 与 Capability 要求纳入结果。完整 precedence 与 Typed Core 边界见 Accepted DEC-0017。
 
 ### 8.4 Sequence
 

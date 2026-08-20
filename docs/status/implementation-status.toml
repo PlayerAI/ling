@@ -978,3 +978,36 @@ notes = [
   "No public diagnostic code, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, compiler source span, or compiler Unicode data changed.",
   "TS-3105 remains BlockedSpec on GAP-SEED-BOOLEAN-OPERATORS-001; whole-program grammar differential remains TS-3108.",
 ]
+
+[[task]]
+id = "TS-3105"
+title = "Expression precedence"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3104"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0004-pipeline-syntax.md",
+  "docs/decisions/0005-seed-literals-and-delimiters.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0017-seed-boolean-operators.md",
+  "docs/SEMANTICS.md",
+  "docs/RFC-0001.md",
+  "docs/grammar-map.md",
+]
+artifacts = []
+acceptance = []
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "uncommitted"
+completed = ""
+notes = [
+  "Accepted DEC-0017 resolves GAP-SEED-BOOLEAN-OPERATORS-001 and fixes the complete Seed precedence order plus checked short-circuit behavior.",
+  "Compiler, Tree-sitter, type, runtime, Semantic ID, and differential evidence is still in progress and must land as one semantic/editor milestone.",
+]

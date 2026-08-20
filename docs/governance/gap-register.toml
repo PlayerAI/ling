@@ -76,7 +76,7 @@ observed_markers = []
 [[gap]]
 id = "GAP-SEED-BOOLEAN-OPERATORS-001"
 title = "Seed boolean operator syntax, precedence, and short-circuit boundary"
-status = "Open"
+status = "Accepted"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["TS-3105"]
@@ -91,8 +91,8 @@ options = [
 irreversible_consequences = ["Operator acceptance and precedence affect source parsing, evaluation order, formatter output, Tree-sitter CST compatibility, and future source migration."]
 required_evidence = ["positive", "negative", "migration", "precedence", "short-circuit", "compiler-tree-sitter-differential"]
 owner_role = "language-syntax-design"
-next_action = "Accept a syntax decision before TS-3105; TS-3102 must leave && and || as finite error input."
-resolution = []
+next_action = "Implement TS-3105 against DEC-0017 and preserve its compiler/Tree-sitter, type, short-circuit, migration, and span evidence."
+resolution = ["DEC-0017"]
 superseded_by = ""
 observed_markers = []
 

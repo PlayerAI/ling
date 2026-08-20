@@ -276,3 +276,19 @@ conformance_plan = ["Use process fixtures for commits and rollback, redefinition
 compatibility_impact = ["Transactional submissions, redefinition, session identity, human and JSON output, and exit behavior are accepted REPL compatibility surface."]
 unresolved_alternatives = ["Capability escalation, type or module redefinition, persistent sessions, and broader interactive tooling remain outside the Seed decision."]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0017"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0017-seed-boolean-operators.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-20"
+proposed = "2026-08-20"
+decided = "2026-08-20"
+stable_basis = true
+legacy_format = false
+conformance_plan = ["Verify every neighboring precedence pair, boolean associativity and parentheses, non-Bool and malformed inputs, short-circuit Effect/Fault behavior, compiler/Tree-sitter differential structure, and unchanged prior Seed grouping."]
+compatibility_impact = ["Previously rejected && and || source becomes accepted Bool syntax; existing valid source grouping, diagnostics, schemas, canonical bytes, and Semantic IDs remain unchanged."]
+unresolved_alternatives = ["Keyword operators, unary boolean negation, equal boolean precedence, non-associative comparisons, assignment chaining, and pre-check desugaring remain outside this decision."]
+superseded_by = ""
