@@ -464,8 +464,8 @@ sources = ["docs/governance/gap-register.toml"]
 [[unsupported]]
 id = "UNSUP-LSP-EDITOR"
 area = "Tooling"
-capability = "LSP, Tree-sitter grammar, Zed extension, formatter, or semantic mutation"
-reason = "No corresponding executable, editor package, or accepted transaction boundary exists."
+capability = "LSP, Zed extension, formatter, or semantic mutation"
+reason = "No corresponding LSP executable, editor integration package, formatter, or accepted semantic-mutation transaction boundary exists."
 blockers = [
   "GAP-LSP-TRANSACTION-PROTOCOL-001",
   "GAP-FORMATTER-AUTHOR-SOURCE-001",

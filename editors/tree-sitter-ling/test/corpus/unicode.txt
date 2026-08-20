@@ -1,0 +1,41 @@
+========================================
+Unicode XID identifiers
+========================================
+
+module 示例.核心
+let 问候 玩家一 = Console.print 玩家一
+let café = "NFC"
+
+---
+
+(source_file
+  (module_declaration
+    (qualified_name
+      (identifier)
+      (identifier)))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (application_expression
+      (projection_expression
+        (name_expression
+          (identifier))
+        (identifier))
+      (name_expression
+        (identifier))))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (literal_expression
+      (string_literal))))
+
+========================================
+Emoji is not an identifier start
+:error
+========================================
+
+let 😀 = 1
+
+---

@@ -1,0 +1,205 @@
+========================================
+Module, import, value, function, and alias
+========================================
+
+module Game.Core
+import Console.IO as Console
+let answer: Int = 42
+let greet name = Console.print name
+type UserId = Int
+
+---
+
+(source_file
+  (module_declaration
+    (qualified_name
+      (identifier)
+      (identifier)))
+  (import_declaration
+    (qualified_name
+      (identifier)
+      (identifier))
+    (identifier))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (named_type
+      (identifier))
+    (literal_expression
+      (integer_literal)))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (application_expression
+      (projection_expression
+        (name_expression
+          (identifier))
+        (identifier))
+      (name_expression
+        (identifier))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (named_type
+        (identifier)))))
+
+========================================
+Module capability block
+========================================
+
+module Main
+    requires Console, Clock.System
+
+let main () = Console.print "ready"
+
+---
+
+(source_file
+  (module_declaration
+    (qualified_name
+      (identifier))
+    (capability_block
+      (qualified_name
+        (identifier))
+      (qualified_name
+        (identifier)
+        (identifier))))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (unit_pattern)
+    (application_expression
+      (projection_expression
+        (name_expression
+          (identifier))
+        (identifier))
+      (literal_expression
+        (string_literal)))))
+
+========================================
+Record and variant types
+========================================
+
+type Person = { name: Text; mutable health: Int }
+type State =
+    | Alive
+    | Dead of Text
+
+---
+
+(source_file
+  (type_declaration
+    (identifier)
+    (record_type
+      (field_declaration
+        (identifier)
+        (named_type
+          (identifier)))
+      (field_declaration
+        (identifier)
+        (named_type
+          (identifier)))))
+  (type_declaration
+    (identifier)
+    (variant_type
+      (variant_case
+        (identifier))
+      (variant_case
+        (identifier)
+        (named_type
+          (identifier))))))
+
+========================================
+Generic, applied, product, tuple, and function types
+========================================
+
+type Box<'a> = { value: 'a }
+type Product = Int * Text
+type Callback = Int -> Text -> Bool
+type Grouped = (Int)
+type Pair = (Int, Text)
+type Optional = Prelude.Option<Int>
+
+---
+
+(source_file
+  (type_declaration
+    (identifier)
+    (type_parameter_list
+      (type_parameter
+        (identifier)))
+    (record_type
+      (field_declaration
+        (identifier)
+        (type_variable
+          (identifier)))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (product_type
+        (named_type
+          (identifier))
+        (named_type
+          (identifier)))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (function_type
+        (named_type
+          (identifier))
+        (function_type
+          (named_type
+            (identifier))
+          (named_type
+            (identifier))))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (parenthesized_type
+        (named_type
+          (identifier)))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (tuple_type
+        (named_type
+          (identifier))
+        (named_type
+          (identifier)))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (applied_type
+        (qualified_type
+          (identifier)
+          (identifier))
+        (type_argument_list
+          (named_type
+            (identifier)))))))
+
+========================================
+Line, documentation, and block comments
+========================================
+
+/// Main module documentation.
+module Main // module comment
+
+/* A non-nested block comment in the TS-3102 skeleton. */
+let value = 1
+
+---
+
+(source_file
+  (doc_comment)
+  (module_declaration
+    (qualified_name
+      (identifier)))
+  (line_comment)
+  (block_comment)
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (literal_expression
+      (integer_literal))))

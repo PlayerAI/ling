@@ -1,0 +1,35 @@
+========================================
+Incomplete let body
+:error
+========================================
+
+let value =
+
+---
+
+========================================
+Boolean operators remain outside Seed
+:error
+========================================
+
+let value = true && false || true
+
+---
+
+========================================
+Missing match arrow
+:error
+========================================
+
+let value = match input with | Some item item
+
+---
+
+========================================
+Unclosed string
+:error
+========================================
+
+let value = "unfinished
+
+---

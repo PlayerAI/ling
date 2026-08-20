@@ -147,6 +147,8 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 │   ├── ling-format/
 │   ├── ling-eval/
 │   └── ling-cli/
+├── editors/
+│   └── tree-sitter-ling/
 ├── tests/
 │   └── conformance/
 ├── tools/
@@ -184,6 +186,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的唯一错误码注册表，包含 phase、稳定级别、严重度、双语模板、typed Facts、retired 记录与兼容性边界；生成的 [`error-code-lock.toml`](docs/governance/error-code-lock.toml) 由 CI 检查改义、改型、复用和编号回填。
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)：Rust 直接/关键传递依赖、许可证、MSRV、`unsafe` 与审查状态。
 - [`docs/grammar-map.md`](docs/grammar-map.md)：`v0.0.1 Seed` Author Source 到 compiler CST/AST、拟议 Tree-sitter 节点与 corpus 义务的映射；明确区分 Accepted decision、Draft 基线和纯恢复 helper。
+- [`editors/tree-sitter-ling/`](editors/tree-sitter-ling/)：可独立拆分的 Tree-sitter grammar 开发镜像，包含锁定工具链、生成 parser、23 个 corpus cases、示例和已知差异；它不决定 Ling 语义或合法性。
 - [`docs/governance/authority.md`](docs/governance/authority.md)：由机器清单确定性生成的规范权威、生命周期、依赖与冲突处理索引。
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md)：按版本和优先级生成的规范缺口、阻断任务与候选 RFC 台账。
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md)：RFC 与 decision 的状态机、稳定实现依据、接受证据、替代关系和模板门禁。
@@ -376,6 +379,8 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 │   ├── ling-format/
 │   ├── ling-eval/
 │   └── ling-cli/
+├── editors/
+│   └── tree-sitter-ling/
 ├── tests/
 │   └── conformance/
 ├── tools/
@@ -413,6 +418,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): the sole `ling.diagnostic/0.1` code registry, including phase, stability, severity, bilingual templates, typed Facts, retired records, and compatibility boundaries; CI checks the generated [`error-code-lock.toml`](docs/governance/error-code-lock.toml) for changed meanings/types, reuse, and number backfilling.
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md): direct and key transitive Rust dependencies, licenses, MSRV, `unsafe`, and review status.
 - [`docs/grammar-map.md`](docs/grammar-map.md): maps `v0.0.1 Seed` Author Source to compiler CST/AST nodes, proposed Tree-sitter nodes, and corpus obligations while distinguishing Accepted decisions, the Draft baseline, and recovery-only helpers.
+- [`editors/tree-sitter-ling/`](editors/tree-sitter-ling/): a standalone-ready Tree-sitter grammar development mirror with a locked toolchain, generated parser, 23 corpus cases, an example, and explicit known differences; it does not define Ling semantics or validity.
 - [`docs/governance/authority.md`](docs/governance/authority.md): the deterministically generated index of specification authority, lifecycle, dependencies, and conflict handling.
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md): the release- and priority-ordered register of specification gaps, blocked tasks, and candidate RFCs.
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md): the RFC/decision state machine, Stable implementation basis, acceptance evidence, supersession rules, and checked templates.

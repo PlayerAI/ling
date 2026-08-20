@@ -1,0 +1,40 @@
+{
+  "name": "tree-sitter-ling",
+  "version": "0.0.1-dev",
+  "description": "Tree-sitter grammar for the Ling programming language",
+  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PlayerAI/ling.git",
+    "directory": "editors/tree-sitter-ling"
+  },
+  "keywords": [
+    "incremental",
+    "ling",
+    "parser",
+    "tree-sitter"
+  ],
+  "files": [
+    "grammar.js",
+    "tree-sitter.json",
+    "src/**",
+    "test/corpus/**",
+    "examples/**"
+  ],
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test",
+    "parse:examples": "tree-sitter parse \"examples/*.ling\"",
+    "verify": "npm run generate && npm test && npm run parse:examples"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "0.26.12"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "allowScripts": {
+    "tree-sitter-cli@0.26.12": true
+  }
+}

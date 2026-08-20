@@ -28,6 +28,16 @@ Workspace code uses `unsafe_code = "deny"`. Dependency `unsafe` is not inherited
 
 The `fuzz/` directory has its own lockfile and is excluded from the root workspace. Normal `cargo build/test --workspace --locked` therefore does not resolve fuzz-only dependencies. Fuzz jobs pin `cargo-fuzz` 0.13.2 (MIT OR Apache-2.0; upstream does not declare an MSRV).
 
+## 非 Rust 开发工具 / Non-Rust development tooling
+
+这些工具不进入 `ling` 二进制，也不参与普通 Cargo 构建。各自目录中的锁文件是版本与完整性权威；首次安装可能访问网络，锁定安装完成后的生成和测试必须离线可运行。
+
+These tools are not linked into the `ling` binary and do not participate in normal Cargo builds. Their directory-local lockfiles are authoritative for versions and integrity. Initial installation may access the network; generation and tests must run offline after the locked installation.
+
+| Package | Locked | Scope and purpose | License | Install/native boundary | Alternatives and maintenance evidence |
+| --- | --- | --- | --- | --- | --- |
+| `tree-sitter-cli` | 0.26.12 | Dev-only parser generation, C compilation, corpus tests, and example parsing for `editors/tree-sitter-ling`; exact version and SHA-512 integrity are in its `package-lock.json` | MIT | npm package has an explicitly allowlisted install script that downloads the matching upstream CLI executable; generated C is committed and the CLI is never shipped in `ling` | A global CLI, `cargo install`, or an unpinned release binary would weaken repository-local reproducibility. Current npm release, official documentation, Windows support, and package metadata inspected 2026-08-20. |
+
 ## 锁定的传递依赖 / Locked transitive dependencies
 
 下表覆盖根 workspace 锁文件中的全部非直接第三方 package。`Unsafe source` 是保守的源码存在性检查：`Yes` 表示缓存的 crate 源码中至少一个 Rust 文件包含 `unsafe` token，可能位于目标条件、测试或未启用 feature 中；它不表示该路径一定进入 `ling` 二进制。`Not declared` 表示 package manifest 未声明 `rust-version`，不是兼容性保证。
@@ -108,4 +118,4 @@ The excluded fuzz lockfile adds four indirect packages not already listed above:
 - build/test/fuzz-only native boundaries are isolated in `cc`, `libfuzzer-sys`, platform support crates, and their target-selected dependencies; `libfuzzer-sys` is never linked into `ling`.
 - This is an engineering inventory based on locked manifests and cached source for the stated versions, not legal advice or a proof of transitive code safety. Any lockfile change invalidates the inventory and requires review.
 
-The exact package versions remain authoritative in `Cargo.lock` and `fuzz/Cargo.lock`. The locked per-package license/MSRV/unsafe-presence inventory is complete for the candidate graphs; the clean candidate and same-SHA platform/fuzz/MSRV CI evidence are recorded in `SEED-RELEASE-REPORT.md`.
+The exact Rust package versions remain authoritative in `Cargo.lock` and `fuzz/Cargo.lock`; `editors/tree-sitter-ling/package-lock.json` is authoritative for its npm development tool. The locked per-package license/MSRV/unsafe-presence inventory is complete for the candidate Rust graphs; the clean candidate and same-SHA platform/fuzz/MSRV CI evidence are recorded in `SEED-RELEASE-REPORT.md`.

@@ -1,0 +1,231 @@
+========================================
+Literal, tuple, list, and record expressions
+========================================
+
+let unit = ()
+let grouped = (1)
+let tuple = (1, 2, 3)
+let values = [1; 2; 3]
+let person = { name = "Ada"; score = 10 }
+let changed = { person with score = 11 }
+
+---
+
+(source_file
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (unit_expression))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (parenthesized_expression
+      (literal_expression
+        (integer_literal))))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (tuple_expression
+      (literal_expression
+        (integer_literal))
+      (literal_expression
+        (integer_literal))
+      (literal_expression
+        (integer_literal))))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (list_expression
+      (literal_expression
+        (integer_literal))
+      (literal_expression
+        (integer_literal))
+      (literal_expression
+        (integer_literal))))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (record_expression
+      (record_field
+        (identifier)
+        (literal_expression
+          (string_literal)))
+      (record_field
+        (identifier)
+        (literal_expression
+          (integer_literal)))))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (record_update_expression
+      (name_expression
+        (identifier))
+      (record_field
+        (identifier)
+        (literal_expression
+          (integer_literal))))))
+
+========================================
+Float and escaped text literals
+========================================
+
+let ratio = 1.25e+2
+let escaped = "line\nquote: \"; scalar: \u{96F6}"
+
+---
+
+(source_file
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (literal_expression
+      (float_literal)))
+  (let_declaration
+    (identifier_pattern
+      (identifier))
+    (literal_expression
+      (string_literal
+        (escape_sequence)
+        (escape_sequence)
+        (escape_sequence)))))
+
+========================================
+Application, projection, unary, and binary expressions
+========================================
+
+let result x = Console.print (-x * 2 + 1 == 3)
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (application_expression
+      (projection_expression
+        (name_expression
+          (identifier))
+        (identifier))
+      (parenthesized_expression
+        (binary_expression
+          (binary_expression
+            (binary_expression
+              (unary_expression
+                (name_expression
+                  (identifier)))
+              (literal_expression
+                (integer_literal)))
+            (literal_expression
+              (integer_literal)))
+          (literal_expression
+            (integer_literal)))))))
+
+========================================
+Pipeline and assignment expressions
+========================================
+
+let render value = value |> normalize |> Console.print
+let update state = state.value <- 1
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (pipeline_expression
+      (pipeline_expression
+        (name_expression
+          (identifier))
+        (name_expression
+          (identifier)))
+      (projection_expression
+        (name_expression
+          (identifier))
+        (identifier))))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (assignment_expression
+      (projection_expression
+        (name_expression
+          (identifier))
+        (identifier))
+      (literal_expression
+        (integer_literal)))))
+
+========================================
+Conditional and match expressions
+========================================
+
+let choose flag = if flag then 1 else 0
+let unwrap value = match value with | Some item -> item | None -> 0
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (if_expression
+      (name_expression
+        (identifier))
+      (literal_expression
+        (integer_literal))
+      (literal_expression
+        (integer_literal))))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (match_expression
+      (name_expression
+        (identifier))
+      (match_case
+        (constructor_pattern
+          (identifier)
+          (identifier_pattern
+            (identifier)))
+        (name_expression
+          (identifier)))
+      (match_case
+        (identifier_pattern
+          (identifier))
+        (literal_expression
+          (integer_literal))))))
+
+========================================
+Indented sequence block
+========================================
+
+let main () =
+    let value = 41
+    value + 1
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (unit_pattern)
+    (block
+      (let_declaration
+        (identifier_pattern
+          (identifier))
+        (literal_expression
+          (integer_literal)))
+      (binary_expression
+        (name_expression
+          (identifier))
+        (literal_expression
+          (integer_literal))))))

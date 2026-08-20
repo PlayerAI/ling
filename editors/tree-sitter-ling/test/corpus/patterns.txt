@@ -1,0 +1,96 @@
+========================================
+Identifier, wildcard, literal, unit, and tuple patterns
+========================================
+
+let identity value = value
+let ignore _ = 0
+let main () = 0
+let first (left, right) = left
+let one 1 = true
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (name_expression
+      (identifier)))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (wildcard_pattern)
+    (literal_expression
+      (integer_literal)))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (unit_pattern)
+    (literal_expression
+      (integer_literal)))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (tuple_pattern
+      (identifier_pattern
+        (identifier))
+      (identifier_pattern
+        (identifier)))
+    (name_expression
+      (identifier)))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (literal_pattern
+      (integer_literal))
+    (literal_expression
+      (boolean_literal))))
+
+========================================
+Constructor and record patterns
+========================================
+
+let unwrap option = match option with | Some value -> value | None -> 0
+let health person = match person with | { health = value } -> value
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (match_expression
+      (name_expression
+        (identifier))
+      (match_case
+        (constructor_pattern
+          (identifier)
+          (identifier_pattern
+            (identifier)))
+        (name_expression
+          (identifier)))
+      (match_case
+        (identifier_pattern
+          (identifier))
+        (literal_expression
+          (integer_literal)))))
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (match_expression
+      (name_expression
+        (identifier))
+      (match_case
+        (record_pattern
+          (record_pattern_field
+            (identifier)
+            (identifier_pattern
+              (identifier))))
+        (name_expression
+          (identifier))))))
