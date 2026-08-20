@@ -37,7 +37,7 @@
 | 15 | `LSP-2101` | LSP 生命周期骨架 | CompilerSession/VFS | 与 Zed query | initialize/shutdown fixtures |
 | 16 | `LSP-2102` | UTF-16 position 协商 | LineIndex | 与 diagnostics | 中文/emoji/CRLF fixtures |
 | 17 | `ZEXT-3301` | grammar-only Zed 扩展 | TS skeleton | 与 LSP | 本地 Zed 识别/高亮 |
-| 18 | `VM-1202` | Core→bytecode 最小切片 | VM-1201 | 与 verifier | Hello World Core round-trip |
+| 18 | `VM-1202` | Core→bytecode 最小切片 | VM-1201 | 与 verifier | **Done**；Hello Checked Core → 精确 bytes/disassembly golden；decode round-trip 属 VM-1203 |
 | 19 | `VM-1203` | 独立 decoder/verifier | VM-1201 | 与 lowering | malformed fuzz 无 panic |
 | 20 | `PRJ-1102` | module discovery | PRJ-1101 | 与 VM | deterministic graph |
 | 21 | `INC-1402` | VFS/revision | INC-1401 | 与 VM | overlay/revision tests |
@@ -92,8 +92,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:132` |
 | `PRJ-1108` | G1/Editor | Project graph fuzz/property | M | Done | `03-G1-V0.1-LIVING.md:140`；见生成式 cycle/path/order/lock properties、manifest fuzz/CI、机器状态与实施报告 |
 | `VM-1201` | G1/Editor | bytecode RFC 与模型 | M | Done | `03-G1-V0.1-LIVING.md:150`；见 RFC-0014、`ling-bytecode` 未验证模型、TEST-VM-0001 corpus、机器状态与实施报告 |
-| `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:166` |
-| `VM-1203` | G1/Editor | 独立 decoder/verifier | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:180` |
+| `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | L | Done | `03-G1-V0.1-LIVING.md:166`；见 deterministic lowering/encoder/disassembler、Hello exact goldens、机器状态与实施报告 |
+| `VM-1203` | G1/Editor | 独立 decoder/verifier | L | Ready | `03-G1-V0.1-LIVING.md:180`；VM-1201/VM-1202 已完成，下一纵向切片 |
 | `VM-1204` | G1/Editor | VM 基础执行 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:196` |
 | `VM-1205` | G1/Editor | 函数、closure、recursion | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:205` |
 | `VM-1206` | G1/Editor | Record、ADT、match | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:209` |
@@ -378,9 +378,9 @@ spec = ["ROADMAP-1.0#G0"]
 updated = "2026-08-20"
 
 [[task]]
-id = "VM-1202"
-state = "BlockedDependency"
-depends_on = ["VM-1201"]
+id = "VM-1203"
+state = "Ready"
+depends_on = ["VM-1201", "VM-1202"]
 ```
 
 CI 验证：

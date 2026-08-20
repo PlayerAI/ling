@@ -2075,3 +2075,72 @@ notes = [
   "Unicode remains 17.0.0; source maps use original UTF-8 byte spans and exclude physical paths.",
   "VM-1202 deterministic Checked Core lowering and disassembly is the next implementation slice.",
 ]
+
+[[task]]
+id = "VM-1202"
+title = "Checked Core to deterministic bytecode minimal lowering"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["TEST-VM-0001", "VM-1201"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0014.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  ".gitattributes",
+  "Cargo.lock",
+  "README.md",
+  "crates/ling-bytecode/Cargo.toml",
+  "crates/ling-bytecode/src/disassemble.rs",
+  "crates/ling-bytecode/src/encode.rs",
+  "crates/ling-bytecode/src/lib.rs",
+  "crates/ling-bytecode/src/lower.rs",
+  "crates/ling-bytecode/tests/lowering.rs",
+  "docs/DEPENDENCIES.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/RFC-0014.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/ling_execution_plan/SHA256SUMS.txt",
+  "docs/status/VM-1202-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+  "tests/bytecode/README.md",
+  "tests/bytecode/v1/golden/hello.dis",
+  "tests/bytecode/v1/golden/hello.lbc.hex",
+  "tests/bytecode/v1/programs/direct-call.ling",
+]
+acceptance = [
+  "lower_v1 consumes only a checked ProgramSnapshot plus explicit immutable source snapshots and produces no executable or verified authority",
+  "the first slice lowers Unit, Bool, arbitrary-precision Int, Text, monomorphic direct calls, immutable local aliases, Console.write, and return while rejecting unsupported checked features atomically",
+  "encode_v1 emits the exact RFC-0014 little-endian envelope, length-framed tables/records, explicit tags/opcodes, zero reserved bytes, exact total length, and caller-bounded artifact bytes",
+  "canonical string, module, function, constant, source, Effect, Capability, and source-map ordering is independent of physical paths and unordered host state",
+  "source metadata hashes and measures exact original UTF-8 bytes including BOM and CRLF; every emitted source-map range retains valid original byte boundaries",
+  "Hello exact byte and non-contract disassembly goldens pass, including the 40-byte header, source SHA-256, executable locations, and path-free logical source name",
+  "cargo test -p ling-bytecode --all-features --locked --offline: 15 passed and 1 VM-1204 differential test explicitly ignored",
+  "cargo test --workspace --all-features --locked --offline: passed",
+  "cargo xtask governance check-all: 46 documents, 26 gaps, 21 lifecycle records, 20 protocols, and 76 diagnostic codes passed",
+  "cargo xtask support verify, ci verify, traceability verify, schema gates, seed reproduce, and pre-completion status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified and completion status: 32 tasks Done",
+  "cargo fmt --all -- --check and git diff --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+]
+verified_against_commit = "4fb3f2dc0046cfaa52da6b6db94573044d5ee183"
+completion_commit = "4fb3f2dc0046cfaa52da6b6db94573044d5ee183"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0014 now states the previously implicit one-byte Capability/Effect tag widths and block-record framing before any bytecode artifact is published; no prior byte compatibility claim exists.",
+  "PROTO-BYTECODE remains planned-public/Future and BACKEND-VM remains unavailable because no independent decoder, verifier, VerifiedProgram, VM, or CLI backend exists.",
+  "No public L-BYTECODE diagnostic emitter or code is added; the Rust lowering/encoding errors are library-only structured failures.",
+  "Diagnostic JSON, source-language behavior, CLI behavior, Semantic IDs, ABI/FFI, and all third-party package versions are unchanged; existing locked packages only gain direct ling-bytecode dependency edges.",
+  "Unicode remains 17.0.0; canonical logical paths require NFC and exact source provenance preserves BOM, CRLF, Unicode, and emoji byte spans.",
+  "Generic monomorphization, recursion, control flow, scalar operations/intrinsics, aggregates, mutation, decoding, verification, and execution remain intentionally deferred to their later VM slices.",
+]
