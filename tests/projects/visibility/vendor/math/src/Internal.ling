@@ -1,0 +1,3 @@
+module Internal
+
+let secret = 42

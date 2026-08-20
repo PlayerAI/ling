@@ -1,0 +1,6 @@
+module Main
+
+import 公共.问候 as 问候
+
+let message = 问候.message
+let main () = ()

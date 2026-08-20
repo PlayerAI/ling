@@ -1,0 +1,13 @@
+manifest-version = 1
+
+[package]
+name = "offline-app"
+version = "1.0.0"
+language = "0.1"
+
+[source]
+roots = ["src"]
+entry = "Main"
+
+[dependencies]
+cached = { path = "vendor/cached" }

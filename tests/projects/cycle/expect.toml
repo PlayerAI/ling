@@ -1,0 +1,5 @@
+outcome = "failure"
+mode = "update"
+diagnostics = "expected-diagnostics.json"
+graph = "absent"
+lock = "absent"

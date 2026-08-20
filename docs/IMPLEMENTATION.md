@@ -216,6 +216,8 @@ PRJ-1103 在不改变文件模式 `ling.semantic/0.1` 字节与 ID 的前提下�
 
 PRJ-1105 增加 RFC-0002 `ling.lock/1` 的严格 reader、canonical writer 与库级 `Update`/`Locked` 策略。writer 仅在完整本地 dependency graph 验证后创建或替换 lock；reader 拒绝未知/重复字段、非 canonical bytes、无效或悬空 identity、cycle、不可达 package 与不兼容 format。版本 1 resolution 始终离线且不执行 shell；CLI `--locked`/`--offline` 参数仍由 PRJ-1107 负责。
 
+PRJ-1106 增加 `single-package`、`multi-module`、`path-dependency`、`cycle`、`visibility`、`offline-lock` 与 `unicode-names` 七组端到端工程 fixture。每组 fixture 冻结完整 Diagnostic JSON，以及成功时的 path-free graph 测试快照和 canonical lock bytes；失败用例显式要求 graph/lock 均不发布。`expected-graph.json` 仅为测试证据，不建立新的公开 Schema；CLI 工程选择仍由 PRJ-1107 负责。
+
 出口标准：§18.6 全过；Graph Schema 正/负兼容性测试通过；同一输入在两个独立进程中产生逐字节相同的 Graph JSON 与 Audit 文本；Audit round-trip 性质测试通过；依赖实现变化敏感性有最小调用图用例，避免无意的全图或不充分失效。
 
 ### M6：Interpreter + REPL（ling-eval、ling-cli）

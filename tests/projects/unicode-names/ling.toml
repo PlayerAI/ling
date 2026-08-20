@@ -1,0 +1,14 @@
+manifest-version = 1
+
+[package]
+name = "unicode-demo"
+display-name = "零语言示例"
+version = "1.0.0"
+language = "0.1"
+
+[source]
+roots = ["src"]
+entry = "Main"
+
+[exports]
+modules = ["公共.问候"]

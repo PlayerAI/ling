@@ -1,0 +1,1 @@
+{"format":"ling.lock/1","packages":[{"content":"sha256:2f54b9f9764a2f771a81e60c11248ea01b48b6e8843a856ba49ad514fc7574d5","dependencies":[],"name":"unicode-demo","version":"1.0.0"}],"root":{"content":"sha256:2f54b9f9764a2f771a81e60c11248ea01b48b6e8843a856ba49ad514fc7574d5","name":"unicode-demo","version":"1.0.0"}}

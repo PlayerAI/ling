@@ -1,0 +1,1 @@
+{"format":"ling.lock/1","packages":[{"content":"sha256:f9136732952647c31e55a809469fc4b75fb53a280e6f263bd47b09c8ecf021de","dependencies":[],"name":"hello","version":"0.1.0"}],"root":{"content":"sha256:f9136732952647c31e55a809469fc4b75fb53a280e6f263bd47b09c8ecf021de","name":"hello","version":"0.1.0"}}

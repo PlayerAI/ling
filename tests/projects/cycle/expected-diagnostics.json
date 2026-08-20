@@ -1,0 +1,22 @@
+[
+  {
+    "code": "L-PROJECT-0014",
+    "facts": {
+      "cycle": "alpha -> beta -> alpha",
+      "dependency": "alpha",
+      "package": "beta",
+      "reason": "package_cycle"
+    },
+    "message_en": "project dependency graph is invalid",
+    "message_zh": "工程依赖图无效",
+    "primary_span": {
+      "end_byte": 174,
+      "file": "package:beta/ling.toml",
+      "start_byte": 155
+    },
+    "repairs": [],
+    "schema": "ling.diagnostic/0.1",
+    "semantic_id": null,
+    "severity": "error"
+  }
+]

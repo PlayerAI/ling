@@ -1,0 +1,3 @@
+module 公共.问候
+
+let message = "你好，Ling 👋"

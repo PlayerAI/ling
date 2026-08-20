@@ -1,0 +1,22 @@
+[
+  {
+    "code": "L-PROJECT-0017",
+    "facts": {
+      "dependency": "math",
+      "importer": "Main",
+      "module": "Internal",
+      "package": "app"
+    },
+    "message_en": "the imported dependency module is not publicly exported",
+    "message_zh": "被导入的依赖模块未公开导出",
+    "primary_span": {
+      "end_byte": 33,
+      "file": "package:app/src/Main.ling",
+      "start_byte": 13
+    },
+    "repairs": [],
+    "schema": "ling.diagnostic/0.1",
+    "semantic_id": null,
+    "severity": "error"
+  }
+]

@@ -285,12 +285,21 @@ fixtures = [
   "crates/ling-project/tests/manifest_fixtures.rs",
   "crates/ling-project/tests/discovery_fixtures.rs",
   "crates/ling-project/tests/package_graph_fixtures.rs",
+  "crates/ling-project/tests/project_fixtures.rs",
+  "tests/projects/README.md",
   "tests/projects/manifest-v1/valid-minimal/ling.toml",
   "tests/projects/manifest-v1/valid-unicode/ling.toml",
   "tests/projects/discovery-v1/valid-multi-root/ling.toml",
   "tests/projects/discovery-v1/import-cycle/ling.toml",
   "tests/projects/dependency-v1/valid-basic/ling.toml",
   "tests/projects/dependency-v1/package-cycle/ling.toml",
+  "tests/projects/single-package/ling.toml",
+  "tests/projects/multi-module/ling.toml",
+  "tests/projects/path-dependency/ling.toml",
+  "tests/projects/cycle/ling.toml",
+  "tests/projects/visibility/ling.toml",
+  "tests/projects/offline-lock/ling.toml",
+  "tests/projects/unicode-names/ling.toml",
   "tests/projects/manifest-v1/duplicate-field/ling.toml",
   "tests/projects/manifest-v1/path-traversal/ling.toml",
   "tests/projects/manifest-v1/unsupported-language/ling.toml",
@@ -308,7 +317,7 @@ sources = [
 ]
 version_markers = ["ling.manifest/1", "manifest-version = 1"]
 authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["PRJ-1101 through PRJ-1105 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, content/package-graph identities, exported-module visibility, checked package-aware resolution, and the canonical local lock protocol. Manifest writing, ambient or CLI project selection, and build integration remain later PRJ tasks."]
+notes = ["PRJ-1101 through PRJ-1106 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, content/package-graph identities, exported-module visibility, checked package-aware resolution, the canonical local lock protocol, and the complete named project fixture matrix. Manifest writing, ambient or CLI project selection, and build integration remain later PRJ tasks."]
 
 [[protocol]]
 id = "PROTO-PACKAGE-IDENTITY"
@@ -328,9 +337,13 @@ unknown_field_policy = "Closed binary projection: changing included fields, fram
 migration_tool = "None; incompatible identity evolution requires new content and graph domains and must not reuse existing v1 text identities."
 fixtures = [
   "crates/ling-project/tests/package_graph_fixtures.rs",
+  "crates/ling-project/tests/project_fixtures.rs",
   "tests/projects/dependency-v1/valid-basic/ling.toml",
   "tests/projects/dependency-v1/valid-transitive/ling.toml",
   "tests/projects/dependency-v1/package-cycle/ling.toml",
+  "tests/projects/path-dependency/expected-graph.json",
+  "tests/projects/cycle/expected-diagnostics.json",
+  "tests/projects/unicode-names/expected-graph.json",
 ]
 sources = [
   "crates/ling-project/src/package_graph.rs",
@@ -339,7 +352,7 @@ sources = [
 ]
 version_markers = ["ling.package-content/1", "ling.package-graph/1", "sha256:"]
 authority = ["RFC-0002"]
-notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2; PRJ-1105 projects them into canonical ling.lock/1 bytes. CLI project selection, registry/network sources, and publication remain deferred."]
+notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2; PRJ-1105 projects them into canonical ling.lock/1 bytes; PRJ-1106 freezes the named end-to-end project graph and failure matrix. CLI project selection, registry/network sources, and publication remain deferred."]
 
 [[protocol]]
 id = "PROTO-LOCKFILE"
@@ -362,6 +375,9 @@ fixtures = [
   "schemas/lock/1/canonical/basic.bin",
   "schemas/lock/1/invalid/whitespace.json",
   "crates/ling-project/tests/lockfile_fixtures.rs",
+  "crates/ling-project/tests/project_fixtures.rs",
+  "tests/projects/path-dependency/expected.ling.lock",
+  "tests/projects/offline-lock/ling.lock",
 ]
 sources = [
   "crates/ling-project/src/lockfile.rs",
@@ -372,7 +388,7 @@ sources = [
 ]
 version_markers = ["ling.lock/1", "sha256:"]
 authority = ["RFC-0002"]
-notes = ["PRJ-1105 implements the library reader, writer, Update/Locked policy, local-only offline guarantee, and corruption corpus. CLI --locked/--offline selection remains owned by PRJ-1107."]
+notes = ["PRJ-1105 implements the library reader, writer, Update/Locked policy, local-only offline guarantee, and corruption corpus. PRJ-1106 adds end-to-end update, failure-atomicity, and checked-in offline-lock fixtures. CLI --locked/--offline selection remains owned by PRJ-1107."]
 
 [[protocol]]
 id = "PROTO-BUILD-METADATA"

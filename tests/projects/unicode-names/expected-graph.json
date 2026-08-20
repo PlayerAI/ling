@@ -1,0 +1,77 @@
+{
+  "graph_id": "sha256:d3cc3d3d05d1adfd736f294a4a4141532486b84712ba40ca468a0802fd401dde",
+  "root": {
+    "content": "sha256:2f54b9f9764a2f771a81e60c11248ea01b48b6e8843a856ba49ad514fc7574d5",
+    "name": "unicode-demo",
+    "version": "1.0.0"
+  },
+  "packages": [
+    {
+      "identity": {
+        "content": "sha256:2f54b9f9764a2f771a81e60c11248ea01b48b6e8843a856ba49ad514fc7574d5",
+        "name": "unicode-demo",
+        "version": "1.0.0"
+      },
+      "entry": "Main",
+      "exports": [
+        "公共.问候"
+      ],
+      "modules": {
+        "dependencies": [],
+        "nodes": [
+          {
+            "name": "Main",
+            "source_root": "src",
+            "relative_path": "Main.ling",
+            "logical_path": "src/Main.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 11
+            }
+          },
+          {
+            "name": "公共.问候",
+            "source_root": "src",
+            "relative_path": "公共/问候.ling",
+            "logical_path": "src/公共/问候.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 20
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": "Main",
+            "target": {
+              "kind": "local",
+              "module": "公共.问候"
+            },
+            "source": "src/Main.ling",
+            "span": {
+              "start_byte": 13,
+              "end_byte": 43
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "module": "Main",
+          "source_root": "src",
+          "relative_path": "Main.ling",
+          "logical_path": "src/Main.ling",
+          "byte_len": 91
+        },
+        {
+          "module": "公共.问候",
+          "source_root": "src",
+          "relative_path": "公共/问候.ling",
+          "logical_path": "src/公共/问候.ling",
+          "byte_len": 57
+        }
+      ]
+    }
+  ],
+  "edges": []
+}

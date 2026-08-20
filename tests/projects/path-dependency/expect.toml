@@ -1,0 +1,5 @@
+outcome = "success"
+mode = "update"
+diagnostics = "expected-diagnostics.json"
+graph = "expected-graph.json"
+lock = "expected.ling.lock"

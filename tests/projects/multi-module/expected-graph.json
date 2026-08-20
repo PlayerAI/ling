@@ -1,0 +1,77 @@
+{
+  "graph_id": "sha256:8a5fa511b557714e0fa1d880ab2686350a6909ac421ef81e58bbdb132c075102",
+  "root": {
+    "content": "sha256:a9d686cc5db79d789bf5fbca5d2799aa13baf24b18544d62ce3e2b78937d1f56",
+    "name": "multi-app",
+    "version": "1.2.0"
+  },
+  "packages": [
+    {
+      "identity": {
+        "content": "sha256:a9d686cc5db79d789bf5fbca5d2799aa13baf24b18544d62ce3e2b78937d1f56",
+        "name": "multi-app",
+        "version": "1.2.0"
+      },
+      "entry": "Main",
+      "exports": [
+        "Support"
+      ],
+      "modules": {
+        "dependencies": [],
+        "nodes": [
+          {
+            "name": "Main",
+            "source_root": "src",
+            "relative_path": "Main.ling",
+            "logical_path": "src/Main.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 11
+            }
+          },
+          {
+            "name": "Support",
+            "source_root": "src",
+            "relative_path": "Support.ling",
+            "logical_path": "src/Support.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 14
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": "Main",
+            "target": {
+              "kind": "local",
+              "module": "Support"
+            },
+            "source": "src/Main.ling",
+            "span": {
+              "start_byte": 13,
+              "end_byte": 27
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "module": "Main",
+          "source_root": "src",
+          "relative_path": "Main.ling",
+          "logical_path": "src/Main.ling",
+          "byte_len": 46
+        },
+        {
+          "module": "Support",
+          "source_root": "src",
+          "relative_path": "Support.ling",
+          "logical_path": "src/Support.ling",
+          "byte_len": 32
+        }
+      ]
+    }
+  ],
+  "edges": []
+}

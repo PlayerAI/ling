@@ -1,0 +1,128 @@
+{
+  "graph_id": "sha256:77a9d93a00b504840dabbef20fdfe4cb30e2e27e54d6a7380813642e25b3770d",
+  "root": {
+    "content": "sha256:d1e381e7204bd3fd2502a941728994600e45f97483400dd4939286ba96c78073",
+    "name": "offline-app",
+    "version": "1.0.0"
+  },
+  "packages": [
+    {
+      "identity": {
+        "content": "sha256:0387cf0bd996a69175739bc750ddeddbe88ec0b40f5c9ac23753739f96c67819",
+        "name": "cached",
+        "version": "3.0.0"
+      },
+      "entry": "Main",
+      "exports": [
+        "Api"
+      ],
+      "modules": {
+        "dependencies": [],
+        "nodes": [
+          {
+            "name": "Api",
+            "source_root": "src",
+            "relative_path": "Api.ling",
+            "logical_path": "src/Api.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 10
+            }
+          },
+          {
+            "name": "Main",
+            "source_root": "src",
+            "relative_path": "Main.ling",
+            "logical_path": "src/Main.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 11
+            }
+          }
+        ],
+        "edges": []
+      },
+      "sources": [
+        {
+          "module": "Api",
+          "source_root": "src",
+          "relative_path": "Api.ling",
+          "logical_path": "src/Api.ling",
+          "byte_len": 28
+        },
+        {
+          "module": "Main",
+          "source_root": "src",
+          "relative_path": "Main.ling",
+          "logical_path": "src/Main.ling",
+          "byte_len": 30
+        }
+      ]
+    },
+    {
+      "identity": {
+        "content": "sha256:d1e381e7204bd3fd2502a941728994600e45f97483400dd4939286ba96c78073",
+        "name": "offline-app",
+        "version": "1.0.0"
+      },
+      "entry": "Main",
+      "exports": [],
+      "modules": {
+        "dependencies": [
+          "cached"
+        ],
+        "nodes": [
+          {
+            "name": "Main",
+            "source_root": "src",
+            "relative_path": "Main.ling",
+            "logical_path": "src/Main.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 11
+            }
+          }
+        ],
+        "edges": [
+          {
+            "from": "Main",
+            "target": {
+              "kind": "dependency",
+              "package": "cached",
+              "module": "Api"
+            },
+            "source": "src/Main.ling",
+            "span": {
+              "start_byte": 13,
+              "end_byte": 30
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "module": "Main",
+          "source_root": "src",
+          "relative_path": "Main.ling",
+          "logical_path": "src/Main.ling",
+          "byte_len": 49
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": {
+        "content": "sha256:d1e381e7204bd3fd2502a941728994600e45f97483400dd4939286ba96c78073",
+        "name": "offline-app",
+        "version": "1.0.0"
+      },
+      "dependency": "cached",
+      "to": {
+        "content": "sha256:0387cf0bd996a69175739bc750ddeddbe88ec0b40f5c9ac23753739f96c67819",
+        "name": "cached",
+        "version": "3.0.0"
+      }
+    }
+  ]
+}

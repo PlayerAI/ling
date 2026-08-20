@@ -1,0 +1,42 @@
+{
+  "graph_id": "sha256:d0df575e274b444a1697ee1be7fd7089543cec6915674d361cdba1247be17971",
+  "root": {
+    "content": "sha256:f9136732952647c31e55a809469fc4b75fb53a280e6f263bd47b09c8ecf021de",
+    "name": "hello",
+    "version": "0.1.0"
+  },
+  "packages": [
+    {
+      "identity": {
+        "content": "sha256:f9136732952647c31e55a809469fc4b75fb53a280e6f263bd47b09c8ecf021de",
+        "name": "hello",
+        "version": "0.1.0"
+      },
+      "entry": "Main",
+      "exports": [],
+      "modules": {
+        "dependencies": [],
+        "nodes": [
+          {
+            "name": "Main",
+            "source_root": "src",
+            "relative_path": "Main.ling",
+            "logical_path": "src/Main.ling",
+            "declaration_span": null
+          }
+        ],
+        "edges": []
+      },
+      "sources": [
+        {
+          "module": "Main",
+          "source_root": "src",
+          "relative_path": "Main.ling",
+          "logical_path": "src/Main.ling",
+          "byte_len": 17
+        }
+      ]
+    }
+  ],
+  "edges": []
+}

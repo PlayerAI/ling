@@ -1,0 +1,1 @@
+{"format":"ling.lock/1","packages":[{"content":"sha256:a9d686cc5db79d789bf5fbca5d2799aa13baf24b18544d62ce3e2b78937d1f56","dependencies":[],"name":"multi-app","version":"1.2.0"}],"root":{"content":"sha256:a9d686cc5db79d789bf5fbca5d2799aa13baf24b18544d62ce3e2b78937d1f56","name":"multi-app","version":"1.2.0"}}

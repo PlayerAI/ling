@@ -1,0 +1,125 @@
+{
+  "graph_id": "sha256:ac20007193def9b78cc55bc082dbc6cd27abb9ad42720091d38f540a9f3fb2e8",
+  "root": {
+    "content": "sha256:9784dc68f2c10713f5945024e5c6085e34b7735be86acc21e27d523e31a918f1",
+    "name": "app",
+    "version": "1.0.0"
+  },
+  "packages": [
+    {
+      "identity": {
+        "content": "sha256:9784dc68f2c10713f5945024e5c6085e34b7735be86acc21e27d523e31a918f1",
+        "name": "app",
+        "version": "1.0.0"
+      },
+      "entry": "Main",
+      "exports": [],
+      "modules": {
+        "dependencies": [
+          "math"
+        ],
+        "nodes": [
+          {
+            "name": "Main",
+            "source_root": "src",
+            "relative_path": "Main.ling",
+            "logical_path": "src/Main.ling",
+            "declaration_span": null
+          }
+        ],
+        "edges": [
+          {
+            "from": "Main",
+            "target": {
+              "kind": "dependency",
+              "package": "math",
+              "module": "Algebra"
+            },
+            "source": "src/Main.ling",
+            "span": {
+              "start_byte": 0,
+              "end_byte": 19
+            }
+          }
+        ]
+      },
+      "sources": [
+        {
+          "module": "Main",
+          "source_root": "src",
+          "relative_path": "Main.ling",
+          "logical_path": "src/Main.ling",
+          "byte_len": 38
+        }
+      ]
+    },
+    {
+      "identity": {
+        "content": "sha256:76c6c29d652bbd86f607a472a6091c5df95c7656d68fcc8d5c14f23517b65ba3",
+        "name": "math",
+        "version": "2.1.0"
+      },
+      "entry": "Main",
+      "exports": [
+        "Algebra"
+      ],
+      "modules": {
+        "dependencies": [],
+        "nodes": [
+          {
+            "name": "Algebra",
+            "source_root": "src",
+            "relative_path": "Algebra.ling",
+            "logical_path": "src/Algebra.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 14
+            }
+          },
+          {
+            "name": "Main",
+            "source_root": "src",
+            "relative_path": "Main.ling",
+            "logical_path": "src/Main.ling",
+            "declaration_span": {
+              "start_byte": 0,
+              "end_byte": 11
+            }
+          }
+        ],
+        "edges": []
+      },
+      "sources": [
+        {
+          "module": "Algebra",
+          "source_root": "src",
+          "relative_path": "Algebra.ling",
+          "logical_path": "src/Algebra.ling",
+          "byte_len": 32
+        },
+        {
+          "module": "Main",
+          "source_root": "src",
+          "relative_path": "Main.ling",
+          "logical_path": "src/Main.ling",
+          "byte_len": 30
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": {
+        "content": "sha256:9784dc68f2c10713f5945024e5c6085e34b7735be86acc21e27d523e31a918f1",
+        "name": "app",
+        "version": "1.0.0"
+      },
+      "dependency": "math",
+      "to": {
+        "content": "sha256:76c6c29d652bbd86f607a472a6091c5df95c7656d68fcc8d5c14f23517b65ba3",
+        "name": "math",
+        "version": "2.1.0"
+      }
+    }
+  ]
+}
