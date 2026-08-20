@@ -393,14 +393,27 @@ stable_basis = false
 
 [[document]]
 id = "SEED-TRACEABILITY"
-title = "Seed specification traceability"
+title = "v0.0.1 unified specification traceability"
 kind = "Evidence"
 status = "Evidence"
 version = "0.0.1"
 authority = "Evidence"
-path = "docs/SEED-TRACEABILITY.md"
-covers = ["normative clause mapping", "test evidence"]
-depends_on = ["CONFORMANCE"]
+path = "docs/traceability/v0.0.1.md"
+covers = ["stable feature IDs", "normative clause mapping", "Core and implementation links", "positive and negative test evidence", "differential state", "release artifacts"]
+depends_on = ["TRACEABILITY-REGISTER", "CONFORMANCE"]
+supersedes = []
+stable_basis = false
+
+[[document]]
+id = "TRACEABILITY-REGISTER"
+title = "Unified traceability registry"
+kind = "Governance registry"
+status = "Active"
+version = "1"
+authority = "Registry"
+path = "docs/traceability/registry.toml"
+covers = ["feature IDs", "fixture IDs", "requirement evidence chains", "release evidence indexes"]
+depends_on = ["CONFORMANCE", "LIFECYCLE-REGISTER", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = false
 

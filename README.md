@@ -34,6 +34,7 @@ cargo xtask governance check-gaps
 cargo xtask governance check-lifecycle
 cargo xtask governance check-protocols
 cargo xtask governance check-error-codes
+cargo xtask traceability verify --release v0.0.1
 cargo run --locked --offline -- --version
 ```
 
@@ -158,6 +159,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
     ├── DEPENDENCIES.md
     ├── decisions/
     ├── governance/
+    ├── traceability/
     └── design-review.html
 ```
 
@@ -168,7 +170,8 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md)：从当前 AST 边界推进到可运行 Hello World 的下一步实施顺序、接口边界、决议门禁和验收矩阵。
 - [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md)：从已完成的 Hello World 纵向切片推进到完整 `v0.0.1 Seed` 的里程碑、决议门禁、验收矩阵和发布条件。
 - [`docs/ROADMAP-1.0.md`](docs/ROADMAP-1.0.md)：从已发布的 `v0.0.1 Seed` 推进到 `v1.0` 的分块路线图、RFC 门禁、实施步骤、版本出口和兼容性要求。
-- [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md)：RFC §18、实现路径、正反测试证据和已关闭发布门禁的双语追踪矩阵。
+- [`docs/traceability/v0.0.1.md`](docs/traceability/v0.0.1.md)：由单一机器注册表生成的 feature/spec/Core/实现/正反测试/differential/release artifact 双语追踪矩阵；CI 校验全部链接与 32 个稳定 fixture ID。
+- [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md)：`v0.0.1` 发布时保存的历史 Seed 证据索引。
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md)：本地质量门禁、候选 SHA、跨平台/fuzz/MSRV CI 与已发布 tag 的双语记录。
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的唯一错误码注册表，包含 phase、稳定级别、严重度、双语模板、typed Facts、retired 记录与兼容性边界；生成的 [`error-code-lock.toml`](docs/governance/error-code-lock.toml) 由 CI 检查改义、改型、复用和编号回填。
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)：Rust 直接/关键传递依赖、许可证、MSRV、`unsafe` 与审查状态。
@@ -248,6 +251,7 @@ cargo xtask governance check-gaps
 cargo xtask governance check-lifecycle
 cargo xtask governance check-protocols
 cargo xtask governance check-error-codes
+cargo xtask traceability verify --release v0.0.1
 cargo run --locked --offline -- --version
 ```
 
@@ -372,6 +376,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
     ├── DEPENDENCIES.md
     ├── decisions/
     ├── governance/
+    ├── traceability/
     └── design-review.html
 ```
 
@@ -382,7 +387,8 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md): the next implementation sequence from the current AST boundary to an executable Hello World, including interface boundaries, decision gates, and acceptance cases.
 - [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md): milestones, decision gates, acceptance cases, and release conditions for progressing from the completed Hello World slice to the full `v0.0.1 Seed` scope.
 - [`docs/ROADMAP-1.0.md`](docs/ROADMAP-1.0.md): the block-by-block roadmap from the released `v0.0.1 Seed` to `v1.0`, including RFC gates, implementation steps, release exits, and compatibility requirements.
-- [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md): a bilingual mapping from RFC §18 to implementation paths, positive/negative evidence, and closed release gates.
+- [`docs/traceability/v0.0.1.md`](docs/traceability/v0.0.1.md): the bilingual feature/spec/Core/implementation/positive/negative/differential/release-artifact matrix generated from one machine registry; CI validates every link and all 32 stable fixture IDs.
+- [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md): the historical Seed evidence index preserved from the `v0.0.1` release.
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md): a bilingual record of local gates, the candidate SHA, platform/fuzz/MSRV CI, and the published tag.
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): the sole `ling.diagnostic/0.1` code registry, including phase, stability, severity, bilingual templates, typed Facts, retired records, and compatibility boundaries; CI checks the generated [`error-code-lock.toml`](docs/governance/error-code-lock.toml) for changed meanings/types, reuse, and number backfilling.
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md): direct and key transitive Rust dependencies, licenses, MSRV, `unsafe`, and review status.

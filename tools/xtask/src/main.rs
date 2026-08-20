@@ -3,6 +3,7 @@ mod gaps;
 mod governance;
 mod lifecycle;
 mod protocols;
+mod traceability;
 
 use std::env;
 use std::path::{Path, PathBuf};
@@ -186,9 +187,47 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command, release_flag, release]
+            if area == "traceability" && command == "verify" && release_flag == "--release" =>
+        {
+            match traceability::check_repository(&root, release) {
+                Ok(summary) => {
+                    println!(
+                        "traceability OK for {release}: {} features, {} conformance fixtures, {} total evidence records ({} differential paths deferred)",
+                        summary.feature_count,
+                        summary.fixture_count,
+                        summary.evidence_count,
+                        summary.deferred_differential_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command, release_flag, release]
+            if area == "traceability" && command == "render" && release_flag == "--release" =>
+        {
+            match traceability::render_repository(&root, release) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock"
+                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

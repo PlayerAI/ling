@@ -1,3 +1,6 @@
+test_id = "TEST-CONF-M2-PIPELINE-ASSIGNMENT"
+polarity = "Negative"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0004", "FTR-SEED-0007"]
 arguments = ["check", "--format", "json", "case.ling"]
 exit_code = 1
 normative_clauses = ["RFC-0001 §7.4", "DEC-0004"]

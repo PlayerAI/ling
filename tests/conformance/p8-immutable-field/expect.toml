@@ -1,3 +1,6 @@
+test_id = "TEST-CONF-P8-IMMUTABLE-FIELD"
+polarity = "Negative"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0004"]
 arguments = ["check", "--format", "json", "case.ling"]
 exit_code = 1
 normative_clauses = ["RFC-0001 §13", "NEXT-STEPS-SEED P8"]

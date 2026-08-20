@@ -1,3 +1,6 @@
+test_id = "TEST-CONF-P9-ADT-MATCH-RUN"
+polarity = "Positive"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0003", "FTR-SEED-0004"]
 arguments = ["run", "--format", "json", "case.ling"]
 exit_code = 0
 normative_clauses = ["SEMANTICS §6.6", "NEXT-STEPS-SEED P8-P9"]

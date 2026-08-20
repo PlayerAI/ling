@@ -11,6 +11,15 @@ pub(crate) type SpecificationRecord = (String, String, String);
 pub(crate) type SpecificationRecords = BTreeMap<String, SpecificationRecord>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct DocumentRecord {
+    pub kind: String,
+    pub status: String,
+    pub path: String,
+}
+
+pub(crate) type DocumentRecords = BTreeMap<String, DocumentRecord>;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckSummary {
     pub document_count: usize,
     pub accepted_count: usize,
@@ -84,6 +93,25 @@ pub(crate) fn document_statuses(root: &Path) -> Result<BTreeMap<String, String>,
         .document
         .into_iter()
         .map(|document| (document.id, document.status))
+        .collect())
+}
+
+pub(crate) fn document_records(root: &Path) -> Result<DocumentRecords, Vec<String>> {
+    let index = load_index(root)?;
+    finish(validate(root, &index))?;
+    Ok(index
+        .document
+        .into_iter()
+        .map(|document| {
+            (
+                document.id,
+                DocumentRecord {
+                    kind: document.kind,
+                    status: document.status,
+                    path: document.path,
+                },
+            )
+        })
         .collect())
 }
 

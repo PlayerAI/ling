@@ -1,3 +1,6 @@
+test_id = "TEST-CONF-P12-TEXT-FORMAT-FAULT"
+polarity = "Negative"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0002"]
 arguments = ["run", "--format", "json", "case.ling"]
 exit_code = 4
 normative_clauses = ["DEC-0011 Text.format", "DEC-0013 §退出码"]

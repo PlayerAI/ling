@@ -1,0 +1,280 @@
+schema_version = 1
+updated = "2026-08-20"
+
+[[release]]
+id = "v0.0.1"
+title_zh = "v0.0.1 Seed 统一追踪矩阵"
+title_en = "v0.0.1 Seed Unified Traceability Matrix"
+report = "docs/traceability/v0.0.1.md"
+candidate_commit = "652d19b9eaec2ab607edfe1a1e7ea742c861cf91"
+tag = "v0.0.1"
+legacy_evidence = [
+  "docs/SEED-TRACEABILITY.md",
+  "docs/SEED-RELEASE-REPORT.md",
+]
+
+[[feature]]
+id = "FTR-SEED-0001"
+title_zh = "检查后执行与入口"
+title_en = "Checked execution and entry point"
+release = "v0.0.1"
+scope = "Public"
+stability = "Experimental"
+requirements = [
+  { path = "docs/RFC-0001.md", clause = "18.1" },
+  { path = "docs/IMPLEMENTATION.md", clause = "10" },
+]
+authorities = ["RFC-0001", "DEC-0011", "DEC-0013"]
+core = [
+  { path = "crates/ling-effects/src/lib.rs", symbol = "pub struct CheckedProgram" },
+  { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct ProgramSnapshot" },
+]
+implementation = [
+  { path = "crates/ling-cli/src/lib.rs", symbol = "pub fn compile_path" },
+  { path = "crates/ling-eval/src/lib.rs", symbol = "pub fn execute_main" },
+]
+release_artifacts = ["examples/人物.ling", "crates/ling-cli/Cargo.toml"]
+differential_state = "Deferred"
+differential_reason = "RFC-0001 §14.5 defers cross-engine comparison until a second evaluator or VM exists."
+differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[feature]]
+id = "FTR-SEED-0002"
+title_zh = "检查、结构化诊断与稳定退出"
+title_en = "Checking, structured diagnostics, and stable exits"
+release = "v0.0.1"
+scope = "Public"
+stability = "Experimental"
+requirements = [
+  { path = "docs/RFC-0001.md", clause = "18.2" },
+  { path = "docs/SEMANTICS.md", clause = "26" },
+]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0001", "DEC-0002", "DEC-0013"]
+core = [
+  { path = "crates/ling-diagnostics/src/lib.rs", symbol = "pub const DIAGNOSTIC_SCHEMA" },
+  { path = "crates/ling-diagnostics/src/lib.rs", symbol = "pub struct Diagnostic" },
+]
+implementation = [
+  { path = "crates/ling-cli/src/lib.rs", symbol = "pub enum CompileFailure" },
+  { path = "crates/ling-diagnostics/src/lib.rs", symbol = "pub struct DiagnosticCode" },
+]
+release_artifacts = ["docs/ERROR-CODES.md", "docs/governance/error-code-lock.toml"]
+differential_state = "Deferred"
+differential_reason = "No second checker or execution engine exists for a semantic differential oracle."
+differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[feature]]
+id = "FTR-SEED-0003"
+title_zh = "Unicode 17 与中文标识符完整性"
+title_en = "Unicode 17 and Chinese identifier integrity"
+release = "v0.0.1"
+scope = "Public"
+stability = "Experimental"
+requirements = [
+  { path = "docs/RFC-0001.md", clause = "18.3" },
+  { path = "docs/SEMANTICS.md", clause = "3.3" },
+  { path = "docs/SEMANTICS.md", clause = "3.6" },
+]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0002"]
+core = [
+  { path = "crates/ling-source/src/lib.rs", symbol = "pub struct Span" },
+  { path = "crates/ling-unicode/src/lib.rs", symbol = "pub struct Identifier" },
+]
+implementation = [
+  { path = "crates/ling-unicode/src/lib.rs", symbol = "pub fn validate_identifier" },
+  { path = "crates/ling-source/src/lib.rs", symbol = "pub struct SourceFile" },
+]
+release_artifacts = ["examples/人物.ling", "crates/ling-unicode/src/generated.rs"]
+differential_state = "Deferred"
+differential_reason = "Unicode conformance is checked against pinned Unicode 17 data; cross-engine language differential awaits a second engine."
+differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[feature]]
+id = "FTR-SEED-0004"
+title_zh = "Seed 类型、模式与 Place"
+title_en = "Seed types, patterns, and Place"
+release = "v0.0.1"
+scope = "Public"
+stability = "Experimental"
+requirements = [
+  { path = "docs/RFC-0001.md", clause = "18.4" },
+  { path = "docs/SEMANTICS.md", clause = "6" },
+  { path = "docs/SEMANTICS.md", clause = "9" },
+  { path = "docs/SEMANTICS.md", clause = "11" },
+]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0005", "DEC-0008", "DEC-0009", "DEC-0011", "DEC-0014"]
+core = [
+  { path = "crates/ling-types/src/lib.rs", symbol = "pub struct TypedProgram" },
+  { path = "crates/ling-hir/src/lib.rs", symbol = "pub struct Place" },
+]
+implementation = [
+  { path = "crates/ling-types/src/lib.rs", symbol = "pub fn check" },
+  { path = "crates/ling-eval/src/lib.rs", symbol = "fn match_pattern" },
+]
+release_artifacts = ["examples/adt-match.ling", "examples/pipeline.ling"]
+differential_state = "Deferred"
+differential_reason = "Type and evaluator behavior currently have no independent VM implementation to compare."
+differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[feature]]
+id = "FTR-SEED-0005"
+title_zh = "Effect 与 Capability 检查"
+title_en = "Effect and Capability checking"
+release = "v0.0.1"
+scope = "Public"
+stability = "Experimental"
+requirements = [
+  { path = "docs/RFC-0001.md", clause = "18.5" },
+  { path = "docs/SEMANTICS.md", clause = "15" },
+  { path = "docs/SEMANTICS.md", clause = "16" },
+]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0010", "DEC-0011"]
+core = [
+  { path = "crates/ling-effects/src/lib.rs", symbol = "pub struct EffectRow" },
+  { path = "crates/ling-effects/src/lib.rs", symbol = "pub enum Capability" },
+]
+implementation = [
+  { path = "crates/ling-effects/src/lib.rs", symbol = "pub fn check" },
+  { path = "crates/ling-effects/src/lib.rs", symbol = "fn check_capabilities" },
+]
+release_artifacts = ["examples/人物.ling", "crates/ling-effects/Cargo.toml"]
+differential_state = "Deferred"
+differential_reason = "Only the checked reference interpreter exists; VM-1209 owns future interpreter/VM differential coverage."
+differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[feature]]
+id = "FTR-SEED-0006"
+title_zh = "Semantic Graph、Canonical ID 与 Audit"
+title_en = "Semantic Graph, canonical identity, and Audit"
+release = "v0.0.1"
+scope = "Public"
+stability = "Experimental"
+requirements = [
+  { path = "docs/RFC-0001.md", clause = "18.6" },
+  { path = "docs/SEMANTICS.md", clause = "4.4" },
+  { path = "docs/SEMANTICS.md", clause = "24" },
+]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0012", "DEC-0015"]
+core = [
+  { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct SemanticGraph" },
+  { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct BodyId" },
+  { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct ProgramId" },
+]
+implementation = [
+  { path = "crates/ling-semantic/src/lib.rs", symbol = "pub fn build" },
+  { path = "crates/ling-semantic/src/lib.rs", symbol = "pub fn read_json" },
+  { path = "crates/ling-format/src/lib.rs", symbol = "pub fn render_audit" },
+]
+release_artifacts = ["docs/governance/protocol-inventory.toml", "docs/SEED-RELEASE-REPORT.md"]
+differential_state = "Deferred"
+differential_reason = "Canonical reader round-trips and independent processes are covered, but cross-engine semantic differential requires the planned VM."
+differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[feature]]
+id = "FTR-SEED-0007"
+title_zh = "共享管线、离线构建与稳定性门禁"
+title_en = "Shared pipeline, offline build, and stability gates"
+release = "v0.0.1"
+scope = "Public"
+stability = "Experimental"
+requirements = [
+  { path = "docs/RFC-0001.md", clause = "18.7" },
+  { path = "docs/IMPLEMENTATION.md", clause = "5" },
+]
+authorities = ["RFC-0001", "DEC-0003", "DEC-0016"]
+core = [
+  { path = "crates/ling-cli/src/lib.rs", symbol = "pub struct Compiled" },
+  { path = "crates/ling-cli/src/session.rs", symbol = "pub struct Session" },
+]
+implementation = [
+  { path = "crates/ling-cli/tests/conformance.rs", symbol = "fn conformance_fixtures" },
+  { path = ".github/workflows/ci.yml", symbol = "cargo test --workspace --all-features --locked --offline" },
+]
+release_artifacts = ["Cargo.lock", "docs/DEPENDENCIES.md", ".github/workflows/ci.yml"]
+differential_state = "Deferred"
+differential_reason = "The Seed release has one evaluator; cross-engine equivalence is assigned to VM-1209."
+differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[evidence]]
+id = "EVD-POS-DIAGNOSTIC-JSON"
+kind = "Positive"
+path = "crates/ling-diagnostics/src/lib.rs"
+symbol = "json_exposes_protocol_fields_without_freezing_message_wording"
+feature_ids = ["FTR-SEED-0002"]
+
+[[evidence]]
+id = "EVD-POS-DIAGNOSTIC-SPAN-BYTES"
+kind = "Positive"
+path = "crates/ling-diagnostics/src/lib.rs"
+symbol = "json_span_offsets_remain_original_utf8_bytes"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0003"]
+
+[[evidence]]
+id = "EVD-POS-UNICODE-XID"
+kind = "Positive"
+path = "crates/ling-unicode/tests/xid_conformance.rs"
+symbol = "unicode_17_xid_start_and_continue_conformance"
+feature_ids = ["FTR-SEED-0003", "FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-UNICODE-HIDDEN-CONTROLS"
+kind = "Negative"
+path = "crates/ling-unicode/src/lib.rs"
+symbol = "rejects_generated_default_ignorables"
+feature_ids = ["FTR-SEED-0003"]
+
+[[evidence]]
+id = "EVD-POS-EFFECT-CONSOLE"
+kind = "Positive"
+path = "crates/ling-effects/src/lib.rs"
+symbol = "hello_has_console_effect_and_valid_entry"
+feature_ids = ["FTR-SEED-0005"]
+
+[[evidence]]
+id = "EVD-NEG-CAPABILITY-MISSING"
+kind = "Negative"
+path = "crates/ling-effects/src/lib.rs"
+symbol = "missing_console_capability_is_rejected"
+feature_ids = ["FTR-SEED-0005"]
+
+[[evidence]]
+id = "EVD-POS-SEMANTIC-DETERMINISM"
+kind = "Positive"
+path = "crates/ling-cli/tests/conformance.rs"
+symbol = "semantic_output_is_deterministic_and_versioned"
+feature_ids = ["FTR-SEED-0006", "FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-SEMANTIC-CANONICAL-IDS"
+kind = "Positive"
+path = "crates/ling-semantic/src/lib.rs"
+symbol = "semantic_ids_cover_canonical_inputs_and_dependency_invalidation"
+feature_ids = ["FTR-SEED-0006"]
+
+[[evidence]]
+id = "EVD-NEG-SEMANTIC-READER"
+kind = "Negative"
+path = "crates/ling-semantic/src/lib.rs"
+symbol = "semantic_reader_rejects_bad_versions_ids_kinds_and_references"
+feature_ids = ["FTR-SEED-0006"]
+
+[[evidence]]
+id = "EVD-NEG-SNAPSHOT-VERIFIER"
+kind = "Negative"
+path = "crates/ling-cli/src/lib.rs"
+symbol = "snapshot_verifier_rejects_invalid_or_changed_json"
+feature_ids = ["FTR-SEED-0006", "FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-SHARED-CHECKED-PIPELINE"
+kind = "Positive"
+path = "crates/ling-cli/src/session.rs"
+symbol = "file_and_session_use_equivalent_checked_type_effect_and_value"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-TRANSACTION-ROLLBACK"
+kind = "Negative"
+path = "crates/ling-cli/tests/conformance.rs"
+symbol = "repl_json_is_transactional_and_preserves_generations"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0007"]

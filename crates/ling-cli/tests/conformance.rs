@@ -1,3 +1,4 @@
+use std::collections::BTreeSet;
 use std::fs;
 use std::io::Write as _;
 use std::path::Path;
@@ -14,7 +15,11 @@ use std::{
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Expectation {
+    test_id: String,
+    polarity: String,
+    feature_ids: Vec<String>,
     arguments: Vec<String>,
     exit_code: i32,
     normative_clauses: Vec<String>,
@@ -42,8 +47,13 @@ fn conformance_fixtures() {
         !fixture_directories.is_empty(),
         "no conformance fixtures were discovered"
     );
+    let mut test_ids = BTreeSet::new();
     for fixture_directory in fixture_directories {
-        run_fixture(&fixture_directory);
+        let test_id = run_fixture(&fixture_directory);
+        assert!(
+            test_ids.insert(test_id.clone()),
+            "duplicate conformance test_id {test_id}"
+        );
     }
 }
 
@@ -369,12 +379,37 @@ fn seed_examples_check_run_and_emit_semantic_graphs() {
     }
 }
 
-fn run_fixture(directory: &Path) {
+fn run_fixture(directory: &Path) -> String {
     let expectation_path = directory.join("expect.toml");
     let expectation_text = fs::read_to_string(&expectation_path)
         .unwrap_or_else(|error| panic!("failed to read {}: {error}", expectation_path.display()));
     let expectation: Expectation = toml::from_str(&expectation_text)
         .unwrap_or_else(|error| panic!("failed to parse {}: {error}", expectation_path.display()));
+    assert!(
+        valid_test_id(&expectation.test_id),
+        "{} has invalid test_id {:?}; expected TEST-CONF-*",
+        expectation_path.display(),
+        expectation.test_id
+    );
+    assert!(
+        matches!(expectation.polarity.as_str(), "Positive" | "Negative"),
+        "{} has invalid polarity {:?}",
+        expectation_path.display(),
+        expectation.polarity
+    );
+    assert!(
+        !expectation.feature_ids.is_empty(),
+        "{} must map to at least one stable feature_id",
+        expectation_path.display()
+    );
+    assert!(
+        expectation
+            .feature_ids
+            .iter()
+            .all(|feature_id| valid_feature_id(feature_id)),
+        "{} contains an invalid feature_id",
+        expectation_path.display()
+    );
     assert!(
         !expectation.normative_clauses.is_empty(),
         "{} must cite at least one normative clause",
@@ -408,6 +443,39 @@ fn run_fixture(directory: &Path) {
         "wrong diagnostics for {}",
         directory.display()
     );
+    match expectation.polarity.as_str() {
+        "Positive" => assert!(
+            expectation.exit_code == 0 && expectation.diagnostic_codes.is_empty(),
+            "{} is Positive but expects a failure or diagnostic",
+            expectation_path.display()
+        ),
+        "Negative" => assert!(
+            expectation.exit_code != 0 || !expectation.diagnostic_codes.is_empty(),
+            "{} is Negative but expects neither failure nor diagnostic",
+            expectation_path.display()
+        ),
+        _ => unreachable!("polarity was validated above"),
+    }
+    expectation.test_id
+}
+
+fn valid_test_id(value: &str) -> bool {
+    valid_upper_id(value, "TEST-CONF-")
+}
+
+fn valid_feature_id(value: &str) -> bool {
+    valid_upper_id(value, "FTR-")
+}
+
+fn valid_upper_id(value: &str, prefix: &str) -> bool {
+    value.strip_prefix(prefix).is_some_and(|suffix| {
+        !suffix.is_empty()
+            && !suffix.starts_with('-')
+            && !suffix.ends_with('-')
+            && suffix
+                .bytes()
+                .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit() || byte == b'-')
+    })
 }
 
 fn diagnostic_codes(stderr: &[u8], directory: &Path) -> Vec<String> {

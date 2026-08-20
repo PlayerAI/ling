@@ -1,3 +1,6 @@
+test_id = "TEST-CONF-P7-TYPE-ERROR"
+polarity = "Negative"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0004"]
 arguments = ["check", "--format", "json", "case.ling"]
 exit_code = 1
 normative_clauses = ["DEC-0011 §Seed 内置项", "NEXT-STEPS §5"]

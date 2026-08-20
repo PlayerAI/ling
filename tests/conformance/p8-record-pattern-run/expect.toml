@@ -1,3 +1,6 @@
+test_id = "TEST-CONF-P8-RECORD-PATTERN-RUN"
+polarity = "Positive"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0004"]
 arguments = ["run", "--format", "json", "case.ling"]
 exit_code = 0
 normative_clauses = ["RFC-0001 §8.2 pattern", "NEXT-STEPS-SEED P8"]
