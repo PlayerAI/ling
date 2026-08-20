@@ -446,10 +446,10 @@
     },
     {
       "id": "PROTO-PACKAGE-MANIFEST",
-      "visibility": "Planned public",
-      "version": "",
-      "stability": "Future",
-      "implemented": false
+      "visibility": "Public",
+      "version": "ling.manifest/1",
+      "stability": "Experimental",
+      "implemented": true
     },
     {
       "id": "PROTO-REPL-JSON",
@@ -558,8 +558,8 @@
     {
       "id": "UNSUP-PACKAGES",
       "area": "Project/package",
-      "capability": "Project manifest, lockfile, dependency resolver, package installation, or registry",
-      "reason": "RFC-0002 accepts the local/offline protocol design, but PRJ-1101 through PRJ-1105 have not implemented its readers, graph, visibility, resolver, or lock writer; registry installation remains out of scope.",
+      "capability": "Project discovery and graph loading, lockfile, dependency resolver, package installation, or registry",
+      "reason": "PRJ-1101 implements the isolated ling.toml version 1 reader, but PRJ-1102 through PRJ-1105 have not implemented filesystem discovery, module/package graphs, visibility, local resolution, content identity, or the lock reader/writer; registry installation remains out of scope.",
       "blockers": [],
       "sources": [
         "docs/RFC-0002.md",

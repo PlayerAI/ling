@@ -247,23 +247,38 @@ notes = ["Blocked by GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 and related edit/snapsh
 id = "PROTO-PACKAGE-MANIFEST"
 title = "Ling package/project manifest"
 category = "Package metadata"
-visibility = "Planned public"
-current_version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+current_version = "ling.manifest/1"
+stability = "Experimental"
+implemented = true
 public_schema = false
 canonical = false
-producer = ["Future Ling project tooling"]
-consumer = ["Future package resolver and build planner"]
-reader_policy = "RFC-0002 fixes exact ling.toml and manifest-version = 1 decoding, validation, limits, and rejection behavior; no reader is implemented until PRJ-1101."
+producer = ["Ling project authors and future project tooling"]
+consumer = ["ling-project manifest reader", "future package resolver and build planner"]
+reader_policy = "ling-project accepts exact UTF-8 ling.toml inputs using TOML 1.0, requires manifest-version = 1, validates the complete RFC-0002 model and limits, preserves original byte spans, and performs no filesystem discovery or dependency resolution."
 writer_policy = "A future writer emits only the RFC-0002 version-1 model and never infers environment-dependent defaults; no writer is implemented yet."
 unknown_field_policy = "Version 1 rejects every unknown top-level key, table, and field."
 migration_tool = "No legacy Ling manifest exists; incompatible evolution requires a new manifest-version and explicit migration."
-fixtures = []
-sources = ["docs/RFC-0002.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
-version_markers = []
+fixtures = [
+  "crates/ling-project/tests/manifest_fixtures.rs",
+  "tests/projects/manifest-v1/valid-minimal/ling.toml",
+  "tests/projects/manifest-v1/valid-unicode/ling.toml",
+  "tests/projects/manifest-v1/duplicate-field/ling.toml",
+  "tests/projects/manifest-v1/path-traversal/ling.toml",
+  "tests/projects/manifest-v1/unsupported-language/ling.toml",
+  "fuzz/corpus/manifest_bytes/minimal",
+]
+sources = [
+  "crates/ling-project/src/lib.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/ERROR-CODES.md",
+  "docs/RFC-0002.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/governance/gap-register.toml",
+]
+version_markers = ["ling.manifest/1", "manifest-version = 1"]
 authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["The protocol design is Accepted; visibility remains Planned public/Future until PRJ-1101 supplies an executable reader and fixtures."]
+notes = ["PRJ-1101 implements only the isolated reader/model boundary. Manifest writing, project-root selection, source discovery, graph construction, path resolution, dependency traversal, hashing, locks, and CLI integration remain later PRJ tasks."]
 
 [[protocol]]
 id = "PROTO-LOCKFILE"

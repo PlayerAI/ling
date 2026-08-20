@@ -1472,3 +1472,71 @@ notes = [
   "No Ling diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, grammar node, generated parser, or Unicode 17.0.0 table changed.",
   "ZQ-3204 remains blocked because its required trait/impl outline surface lacks Accepted syntax and current CST nodes.",
 ]
+
+[[task]]
+id = "PRJ-1101"
+title = "Minimal project manifest"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = []
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/ERROR-CODES.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "Cargo.toml",
+  "README.md",
+  "crates/ling-project/Cargo.toml",
+  "crates/ling-project/src/lib.rs",
+  "crates/ling-project/tests/manifest_fixtures.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "crates/ling-unicode/src/lib.rs",
+  "docs/status/PRJ-1101-IMPLEMENTATION-REPORT.md",
+  "docs/governance/error-code-lock.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "fuzz/fuzz_targets/manifest_bytes.rs",
+  "tests/projects/manifest-v1/valid-minimal/ling.toml",
+  "tests/projects/manifest-v1/valid-unicode/ling.toml",
+  "tests/projects/manifest-v1/path-traversal/ling.toml",
+]
+acceptance = [
+  "ling-project exposes only the isolated ling.manifest/1 byte reader and validated typed model; filesystem discovery, graph, resolver, lock, and CLI surfaces remain absent",
+  "exact ling.toml UTF-8/TOML 1.0/version-1 structure, unknown/duplicate rejection, and byte/resource limits match Accepted RFC-0002",
+  "package/display/module/version/path validation covers ASCII identity, Unicode 17 NFC/XID/security, local relative paths, unique non-overlapping roots, sorted exports, and sorted dependencies",
+  "L-PROJECT-0001 through L-PROJECT-0007 are registered bilingual diagnostics with stable typed Facts and exact original UTF-8 byte spans",
+  "11 manifest-v1 fixture directories plus boundary, CRLF/order/comment, Unicode/emoji, limits, mutation, bounded-output, and TOML-version tests pass",
+  "manifest_bytes fuzz target and two deterministic corpus seeds build with the locked excluded fuzz workspace",
+  "cargo xtask governance check-all: authority, gaps, lifecycle, 18 protocols, and 63 diagnostic allocations passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1, support verify, ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the PRJ-1101 backlog transition",
+  "active Markdown link audit: all local inline links resolved with zero missing targets",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check and excluded fuzz formatting check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline: passed",
+  "Unicode generator rerun was byte-idempotent and git diff --check passed",
+]
+verified_against_commit = "80f46bcf3d175eeb6402bf6267085cb905a5dbcf"
+completion_commit = "80f46bcf3d175eeb6402bf6267085cb905a5dbcf"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "PRJ-1101 adds the Public/Experimental ling.manifest/1 reader without integrating it into existing file-oriented CLI behavior.",
+  "Diagnostic JSON remains ling.diagnostic/0.1; seven PROJECT codes are monotonic additions and no existing diagnostic contract changes.",
+  "Unicode remains 17.0.0; a generated White_Space table from the already pinned PropList input prevents host Unicode-version drift in display-name boundaries.",
+  "No public JSON Schema, Semantic ID, canonical package/graph identity, lockfile bytes, CLI option, or third-party dependency version changed.",
+  "PRJ-1102 deterministic module discovery is now the next Ready project task.",
+]

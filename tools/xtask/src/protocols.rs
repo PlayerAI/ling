@@ -835,11 +835,11 @@ notes = []
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("repository protocol inventory is valid");
         assert_eq!(summary.protocol_count, 18);
-        assert_eq!(summary.public_count, 9);
+        assert_eq!(summary.public_count, 10);
         assert_eq!(summary.preview_count, 6);
-        assert_eq!(summary.experimental_count, 3);
+        assert_eq!(summary.experimental_count, 4);
         assert_eq!(summary.stable_count, 0);
         assert_eq!(summary.internal_count, 1);
-        assert_eq!(summary.future_count, 8);
+        assert_eq!(summary.future_count, 7);
     }
 }
