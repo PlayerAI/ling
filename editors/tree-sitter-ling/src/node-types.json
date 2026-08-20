@@ -242,10 +242,6 @@
             "named": true
           },
           {
-            "type": "assignment_expression",
-            "named": true
-          },
-          {
             "type": "binary_expression",
             "named": true
           },
@@ -271,10 +267,6 @@
           },
           {
             "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "pipeline_expression",
             "named": true
           },
           {
@@ -316,6 +308,10 @@
             "named": false
           },
           {
+            "type": "&&",
+            "named": false
+          },
+          {
             "type": "*",
             "named": false
           },
@@ -350,6 +346,10 @@
           {
             "type": ">=",
             "named": false
+          },
+          {
+            "type": "||",
+            "named": false
           }
         ]
       },
@@ -359,10 +359,6 @@
         "types": [
           {
             "type": "application_expression",
-            "named": true
-          },
-          {
-            "type": "assignment_expression",
             "named": true
           },
           {
@@ -391,10 +387,6 @@
           },
           {
             "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "pipeline_expression",
             "named": true
           },
           {
@@ -431,7 +423,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "application_expression",
@@ -1894,10 +1886,6 @@
             "named": true
           },
           {
-            "type": "assignment_expression",
-            "named": true
-          },
-          {
             "type": "binary_expression",
             "named": true
           },
@@ -1964,10 +1952,6 @@
             "named": true
           },
           {
-            "type": "assignment_expression",
-            "named": true
-          },
-          {
             "type": "binary_expression",
             "named": true
           },
@@ -1993,10 +1977,6 @@
           },
           {
             "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "pipeline_expression",
             "named": true
           },
           {
@@ -2165,6 +2145,10 @@
           },
           {
             "type": "tuple_expression",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
             "named": true
           },
           {
@@ -2967,6 +2951,10 @@
     "named": false
   },
   {
+    "type": "&&",
+    "named": false
+  },
+  {
     "type": "'",
     "named": false
   },
@@ -3167,6 +3155,10 @@
   },
   {
     "type": "|>",
+    "named": false
+  },
+  {
+    "type": "||",
     "named": false
   },
   {

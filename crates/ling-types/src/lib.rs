@@ -1377,6 +1377,11 @@ impl Inferencer {
                 let right_type = self.infer_expression(module, right);
                 use hir::BinaryOperator as Operator;
                 match operator {
+                    Operator::BooleanAnd | Operator::BooleanOr => {
+                        self.unify(InferType::Bool, left_type, module, left.span, None);
+                        self.unify(InferType::Bool, right_type, module, right.span, None);
+                        InferType::Bool
+                    }
                     Operator::Equal | Operator::NotEqual => {
                         self.equality_constraints.push((
                             module,
@@ -3384,6 +3389,36 @@ mod tests {
                 .iter()
                 .any(|error| matches!(error.kind, TypeErrorKind::Mismatch { .. }))
         );
+    }
+
+    #[test]
+    fn boolean_operators_require_bool_operands_at_original_byte_spans() {
+        check(resolved(concat!(
+            "module Main\n\n",
+            "let conjunction = true && false\n",
+            "let disjunction = false || true\n",
+        )))
+        .expect("Bool operands type-check");
+
+        for (text, marker) in [
+            ("module Main\n\nlet 结果 = 1 && true\n", "1"),
+            ("module Main\n\nlet 结果 = false || 2\n", "2"),
+        ] {
+            let errors = check(resolved(text)).expect_err("Int operand must fail");
+            let error = errors
+                .iter()
+                .find(|error| matches!(error.kind, TypeErrorKind::Mismatch { .. }))
+                .expect("type mismatch is reported");
+            let start = u32::try_from(text.find(marker).expect("marker exists"))
+                .expect("test source offset fits u32");
+            assert_eq!(error.span.start().get(), start);
+            assert_eq!(error.span.end().get(), start + 1);
+            assert!(matches!(
+                &error.kind,
+                TypeErrorKind::Mismatch { expected, actual }
+                    if expected == "Bool" && actual == "Int"
+            ));
+        }
     }
 
     #[test]

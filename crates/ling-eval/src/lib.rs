@@ -404,11 +404,28 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 operator,
                 left,
                 right,
-            } => {
-                let left = self.eval_expression(module, left, environment)?;
-                let right = self.eval_expression(module, right, environment)?;
-                self.eval_binary(module, expression.span, *operator, left, right)
-            }
+            } => match operator {
+                hir::BinaryOperator::BooleanAnd | hir::BinaryOperator::BooleanOr => {
+                    let left_value = self.eval_expression(module, left, environment)?;
+                    let Value::Bool(left_value) = left_value else {
+                        return Err(self.fault(module, left.span, "boolean operand is not Bool"));
+                    };
+                    if (*operator == hir::BinaryOperator::BooleanAnd && !left_value)
+                        || (*operator == hir::BinaryOperator::BooleanOr && left_value)
+                    {
+                        return Ok(Value::Bool(left_value));
+                    }
+                    match self.eval_expression(module, right, environment)? {
+                        Value::Bool(value) => Ok(Value::Bool(value)),
+                        _ => Err(self.fault(module, right.span, "boolean operand is not Bool")),
+                    }
+                }
+                _ => {
+                    let left = self.eval_expression(module, left, environment)?;
+                    let right = self.eval_expression(module, right, environment)?;
+                    self.eval_binary(module, expression.span, *operator, left, right)
+                }
+            },
             hir::ExpressionKind::Unary { operator, operand } => {
                 let value = self.eval_expression(module, operand, environment)?;
                 match (operator, value) {
@@ -909,6 +926,11 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     ) -> Result<Value, RuntimeFault> {
         use hir::BinaryOperator as Operator;
         match operator {
+            Operator::BooleanAnd | Operator::BooleanOr => Err(self.fault(
+                module,
+                span,
+                "boolean operator bypassed short-circuit evaluation",
+            )),
             Operator::Equal | Operator::NotEqual => {
                 let equal = values_equal(&left, &right);
                 Ok(Value::Bool(if operator == Operator::Equal {
@@ -950,7 +972,10 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                     }
                     Operator::Divide => Ok(Value::Int(left / right)),
                     Operator::Remainder => Ok(Value::Int(left % right)),
-                    Operator::Equal | Operator::NotEqual => unreachable!("handled above"),
+                    Operator::BooleanAnd
+                    | Operator::BooleanOr
+                    | Operator::Equal
+                    | Operator::NotEqual => unreachable!("handled above"),
                 }
             }
         }
@@ -1226,6 +1251,32 @@ mod tests {
         let mut console = MemoryConsole::default();
         execute_main(&snapshot, &main, &mut console).expect("ordered program executes");
         assert_eq!(console.output(), "3\n1\n2\n4\n5\n");
+    }
+
+    #[test]
+    fn boolean_operators_evaluate_left_once_and_short_circuit_right() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let mark value =\n",
+            "    Console.write \"rhs\"\n",
+            "    value\n\n",
+            "let main () =\n",
+            "    let leftAnd = mark false && mark true\n",
+            "    let leftOr = mark true || mark false\n",
+            "    let requiredAnd = true && mark true\n",
+            "    let requiredOr = false || mark true\n",
+            "    let skippedFaultAnd = false && (1 / 0 == 0)\n",
+            "    let skippedFaultOr = true || (1 / 0 == 0)\n",
+            "    if leftAnd || leftOr && requiredAnd && requiredOr && skippedFaultAnd && skippedFaultOr then\n",
+            "        Console.write \"unexpected\"\n",
+            "    else\n",
+            "        Console.write \"ok\"\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("boolean program executes");
+        assert_eq!(console.output(), "rhs\nrhs\nrhs\nrhs\nok\n");
     }
 
     #[test]

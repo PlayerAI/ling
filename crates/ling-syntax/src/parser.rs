@@ -558,6 +558,14 @@ impl<'tokens> Parser<'tokens> {
         expression
     }
 
+    fn parse_non_assignment_expression(&mut self) -> CstNode {
+        match self.current_kind() {
+            TokenKind::If => self.parse_if_expression(),
+            TokenKind::Match => self.parse_match_expression(),
+            _ => self.parse_pipeline_expression(),
+        }
+    }
+
     fn parse_if_expression(&mut self) -> CstNode {
         let start = self.position;
         let mut children = Vec::new();
@@ -628,7 +636,7 @@ impl<'tokens> Parser<'tokens> {
         }
         let start = left.token_range().start;
         let indented = self.begin_operator_continuation("assignment right-hand side");
-        let right = self.parse_expression();
+        let right = self.parse_non_assignment_expression();
         if indented {
             self.eat_newlines(false);
             self.expect(TokenKind::Dedent, "assignment continuation");
@@ -641,12 +649,12 @@ impl<'tokens> Parser<'tokens> {
     }
 
     fn parse_pipeline_expression(&mut self) -> CstNode {
-        let mut left = self.parse_equality_expression();
+        let mut left = self.parse_boolean_or_expression();
         while let Some(operator_index) = self.pipeline_operator_index() {
             self.position = operator_index;
             self.bump(TokenKind::PipeGreater);
             let indented = self.begin_operator_continuation("pipeline right-hand side");
-            let right = self.parse_equality_expression();
+            let right = self.parse_boolean_or_expression();
             if indented {
                 self.eat_newlines(false);
                 self.expect(TokenKind::Dedent, "pipeline continuation");
@@ -659,6 +667,14 @@ impl<'tokens> Parser<'tokens> {
             );
         }
         left
+    }
+
+    fn parse_boolean_or_expression(&mut self) -> CstNode {
+        self.parse_binary(Self::parse_boolean_and_expression, &[TokenKind::PipePipe])
+    }
+
+    fn parse_boolean_and_expression(&mut self) -> CstNode {
+        self.parse_binary(Self::parse_equality_expression, &[TokenKind::AmpAmp])
     }
 
     fn parse_equality_expression(&mut self) -> CstNode {

@@ -317,6 +317,8 @@ pub enum BinaryOperator {
     Multiply,
     Divide,
     Remainder,
+    BooleanAnd,
+    BooleanOr,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -1057,6 +1059,8 @@ const fn binary_operator(value: ast::BinaryOperator) -> BinaryOperator {
         ast::BinaryOperator::Multiply => BinaryOperator::Multiply,
         ast::BinaryOperator::Divide => BinaryOperator::Divide,
         ast::BinaryOperator::Remainder => BinaryOperator::Remainder,
+        ast::BinaryOperator::BooleanAnd => BinaryOperator::BooleanAnd,
+        ast::BinaryOperator::BooleanOr => BinaryOperator::BooleanOr,
     }
 }
 

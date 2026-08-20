@@ -8,15 +8,6 @@ let value =
 ---
 
 ========================================
-Boolean operators remain outside Seed
-:error
-========================================
-
-let value = true && false || true
-
----
-
-========================================
 Missing match arrow
 :error
 ========================================
@@ -31,5 +22,33 @@ Unclosed string
 ========================================
 
 let value = "unfinished
+
+---
+
+========================================
+Missing boolean operands
+:error
+========================================
+
+let first = true &&
+let second = || false
+
+---
+
+========================================
+Reserved and is not a boolean alias
+:error
+========================================
+
+let value = true and false
+
+---
+
+========================================
+Unparenthesized assignment chain
+:error
+========================================
+
+let value = first <- second <- third
 
 ---

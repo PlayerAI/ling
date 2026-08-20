@@ -2500,6 +2500,8 @@ const fn binary_tag(operator: hir::BinaryOperator) -> u8 {
         hir::BinaryOperator::Multiply => 8,
         hir::BinaryOperator::Divide => 9,
         hir::BinaryOperator::Remainder => 10,
+        hir::BinaryOperator::BooleanAnd => 11,
+        hir::BinaryOperator::BooleanOr => 12,
     }
 }
 
@@ -2899,6 +2901,48 @@ mod tests {
             .find(|definition| definition.name == "main")
             .expect("changed main definition");
         assert_ne!(compact_main.body_id, changed_main.body_id);
+    }
+
+    #[test]
+    fn boolean_operator_tags_append_and_produce_distinct_stable_body_ids() {
+        use hir::BinaryOperator as Operator;
+
+        for (operator, expected) in [
+            (Operator::Equal, 0),
+            (Operator::NotEqual, 1),
+            (Operator::Less, 2),
+            (Operator::LessEqual, 3),
+            (Operator::Greater, 4),
+            (Operator::GreaterEqual, 5),
+            (Operator::Add, 6),
+            (Operator::Subtract, 7),
+            (Operator::Multiply, 8),
+            (Operator::Divide, 9),
+            (Operator::Remainder, 10),
+            (Operator::BooleanAnd, 11),
+            (Operator::BooleanOr, 12),
+        ] {
+            assert_eq!(binary_tag(operator), expected);
+        }
+
+        let source = concat!(
+            "module Main\n\n",
+            "let conjunction left right = left && right\n",
+            "let disjunction left right = left || right\n",
+        );
+        let first = snapshot(source);
+        let second = snapshot(source);
+        let body = |snapshot: &ProgramSnapshot, name: &str| {
+            snapshot
+                .graph()
+                .definitions
+                .iter()
+                .find(|definition| definition.name == name)
+                .map(|definition| definition.body_id.clone())
+                .expect("definition exists")
+        };
+        assert_eq!(first.program_id(), second.program_id());
+        assert_ne!(body(&first, "conjunction"), body(&first, "disjunction"));
     }
 
     #[test]

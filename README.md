@@ -117,7 +117,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 当前 Seed 实现覆盖：
 
 - UTF-8、Unicode 标识符、NFC 名称归一化和基础混淆字符诊断；
-- `let`、函数、`if`、record、ADT、穷尽 `match` 和空格函数应用；
+- `let`、函数、`if`、record、ADT、穷尽 `match`、空格函数应用和短路 `&&` / `||`；
 - `Unit`、`Bool`、`Int`、`f64`、`Text`、`Option`、`Result`；
 - 局部类型推导、默认不可变、`mutable` 和 `place <- value`；
 - `Pure` 与 `Console.Write` Effect，以及 `Console.Write` Capability；
@@ -180,13 +180,13 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md)：从当前 AST 边界推进到可运行 Hello World 的下一步实施顺序、接口边界、决议门禁和验收矩阵。
 - [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md)：从已完成的 Hello World 纵向切片推进到完整 `v0.0.1 Seed` 的里程碑、决议门禁、验收矩阵和发布条件。
 - [`docs/ROADMAP-1.0.md`](docs/ROADMAP-1.0.md)：从已发布的 `v0.0.1 Seed` 推进到 `v1.0` 的分块路线图、RFC 门禁、实施步骤、版本出口和兼容性要求。
-- [`docs/traceability/v0.0.1.md`](docs/traceability/v0.0.1.md)：由单一机器注册表生成的 feature/spec/Core/实现/正反测试/differential/release artifact 双语追踪矩阵；CI 校验全部链接与 32 个稳定 fixture ID。
+- [`docs/traceability/v0.0.1.md`](docs/traceability/v0.0.1.md)：由单一机器注册表生成的 feature/spec/Core/实现/正反测试/differential/release artifact 双语追踪矩阵；CI 校验全部链接与 38 个稳定 fixture ID。
 - [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md)：`v0.0.1` 发布时保存的历史 Seed 证据索引。
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md)：本地质量门禁、候选 SHA、跨平台/fuzz/MSRV CI 与已发布 tag 的双语记录。
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的唯一错误码注册表，包含 phase、稳定级别、严重度、双语模板、typed Facts、retired 记录与兼容性边界；生成的 [`error-code-lock.toml`](docs/governance/error-code-lock.toml) 由 CI 检查改义、改型、复用和编号回填。
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)：Rust 直接/关键传递依赖、许可证、MSRV、`unsafe` 与审查状态。
 - [`docs/grammar-map.md`](docs/grammar-map.md)：`v0.0.1 Seed` Author Source 到 compiler CST/AST、拟议 Tree-sitter 节点与 corpus 义务的映射；明确区分 Accepted decision、Draft 基线和纯恢复 helper。
-- [`editors/tree-sitter-ling/`](editors/tree-sitter-ling/)：可独立拆分的 Tree-sitter grammar 开发镜像，包含锁定工具链、生成 parser、23 个 corpus cases、示例和已知差异；它不决定 Ling 语义或合法性。
+- [`editors/tree-sitter-ling/`](editors/tree-sitter-ling/)：可独立拆分的 Tree-sitter grammar 开发镜像，包含锁定工具链、生成 parser、31 个 corpus cases、29 个共享表达式 differential cases、示例和已知差异；它不决定 Ling 语义或合法性。
 - [`docs/governance/authority.md`](docs/governance/authority.md)：由机器清单确定性生成的规范权威、生命周期、依赖与冲突处理索引。
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md)：按版本和优先级生成的规范缺口、阻断任务与候选 RFC 台账。
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md)：RFC 与 decision 的状态机、稳定实现依据、接受证据、替代关系和模板门禁。
@@ -349,7 +349,7 @@ Detailed Profile semantics and cross-Profile portability still require later RFC
 The current Seed implementation covers:
 
 - UTF-8, Unicode identifiers, NFC normalization, and basic confusable-character diagnostics;
-- `let`, functions, `if`, records, ADTs, exhaustive `match`, and space application;
+- `let`, functions, `if`, records, ADTs, exhaustive `match`, space application, and short-circuit `&&` / `||`;
 - `Unit`, `Bool`, `Int`, `f64`, `Text`, `Option`, and `Result`;
 - local type inference, default immutability, `mutable`, and `place <- value`;
 - `Pure` and `Console.Write` Effects, plus the `Console.Write` Capability;
@@ -412,13 +412,13 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/NEXT-STEPS.md`](docs/NEXT-STEPS.md): the next implementation sequence from the current AST boundary to an executable Hello World, including interface boundaries, decision gates, and acceptance cases.
 - [`docs/NEXT-STEPS-SEED.md`](docs/NEXT-STEPS-SEED.md): milestones, decision gates, acceptance cases, and release conditions for progressing from the completed Hello World slice to the full `v0.0.1 Seed` scope.
 - [`docs/ROADMAP-1.0.md`](docs/ROADMAP-1.0.md): the block-by-block roadmap from the released `v0.0.1 Seed` to `v1.0`, including RFC gates, implementation steps, release exits, and compatibility requirements.
-- [`docs/traceability/v0.0.1.md`](docs/traceability/v0.0.1.md): the bilingual feature/spec/Core/implementation/positive/negative/differential/release-artifact matrix generated from one machine registry; CI validates every link and all 32 stable fixture IDs.
+- [`docs/traceability/v0.0.1.md`](docs/traceability/v0.0.1.md): the bilingual feature/spec/Core/implementation/positive/negative/differential/release-artifact matrix generated from one machine registry; CI validates every link and all 38 stable fixture IDs.
 - [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md): the historical Seed evidence index preserved from the `v0.0.1` release.
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md): a bilingual record of local gates, the candidate SHA, platform/fuzz/MSRV CI, and the published tag.
 - [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): the sole `ling.diagnostic/0.1` code registry, including phase, stability, severity, bilingual templates, typed Facts, retired records, and compatibility boundaries; CI checks the generated [`error-code-lock.toml`](docs/governance/error-code-lock.toml) for changed meanings/types, reuse, and number backfilling.
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md): direct and key transitive Rust dependencies, licenses, MSRV, `unsafe`, and review status.
 - [`docs/grammar-map.md`](docs/grammar-map.md): maps `v0.0.1 Seed` Author Source to compiler CST/AST nodes, proposed Tree-sitter nodes, and corpus obligations while distinguishing Accepted decisions, the Draft baseline, and recovery-only helpers.
-- [`editors/tree-sitter-ling/`](editors/tree-sitter-ling/): a standalone-ready Tree-sitter grammar development mirror with a locked toolchain, generated parser, 23 corpus cases, an example, and explicit known differences; it does not define Ling semantics or validity.
+- [`editors/tree-sitter-ling/`](editors/tree-sitter-ling/): a standalone-ready Tree-sitter grammar development mirror with a locked toolchain, generated parser, 31 corpus cases, 29 shared expression differential cases, an example, and explicit known differences; it does not define Ling semantics or validity.
 - [`docs/governance/authority.md`](docs/governance/authority.md): the deterministically generated index of specification authority, lifecycle, dependencies, and conflict handling.
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md): the release- and priority-ordered register of specification gaps, blocked tasks, and candidate RFCs.
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md): the RFC/decision state machine, Stable implementation basis, acceptance evidence, supersession rules, and checked templates.

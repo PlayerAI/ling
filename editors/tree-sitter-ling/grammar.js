@@ -9,19 +9,35 @@
 const PREC = {
   ASSIGNMENT: 1,
   PIPELINE: 2,
-  EQUALITY: 3,
-  COMPARISON: 4,
-  ADDITIVE: 5,
-  MULTIPLICATIVE: 6,
-  APPLICATION: 7,
-  PROJECTION: 8,
-  UNARY: 9,
+  BOOLEAN_OR: 3,
+  BOOLEAN_AND: 4,
+  EQUALITY: 5,
+  COMPARISON: 6,
+  ADDITIVE: 7,
+  MULTIPLICATIVE: 8,
+  APPLICATION: 9,
+  PROJECTION: 10,
+  UNARY: 11,
   TYPE_FUNCTION: 1,
   TYPE_PRODUCT: 2,
   TYPE_APPLICATION: 3,
 };
 
 const { IDENTIFIER_PATTERN } = require("./src/unicode-identifiers.js");
+
+function binaryOperation($, precedence, left, operator, right) {
+  return prec.left(
+    precedence,
+    seq(
+      field("left", left),
+      field("operator", operator),
+      field(
+        "right",
+        choice(right, seq($._indent, right, $._dedent)),
+      ),
+    ),
+  );
+}
 
 module.exports = grammar({
   name: "ling",
@@ -87,11 +103,14 @@ module.exports = grammar({
         $.let_declaration,
         $.type_declaration,
         $._reserved_and_error,
+        $._stray_left_arrow_error,
       ),
 
     // Keep `and` reachable as a terminal for global keyword extraction without
     // accepting recursive binding groups before their language design exists.
     _reserved_and_error: ($) => seq($._and_keyword, $._error_sentinel),
+
+    _stray_left_arrow_error: ($) => seq("<-", $._error_sentinel),
 
     module_declaration: ($) =>
       seq(
@@ -381,20 +400,17 @@ module.exports = grammar({
       ),
 
     _sequence_element: ($) =>
-      choice($.function_definition, $.let_declaration, $._expression),
+      choice(
+        $.function_definition,
+        $.let_declaration,
+        $._expression,
+        $._stray_left_arrow_error,
+      ),
 
     _body_expression: ($) => choice($._expression, $.block),
 
     _expression: ($) =>
-      choice(
-        $.assignment_expression,
-        $.pipeline_expression,
-        $.binary_expression,
-        $.application_expression,
-        $.projection_expression,
-        $.unary_expression,
-        $._primary_expression,
-      ),
+      choice($.assignment_expression, $._pipeline_expression),
 
     if_expression: ($) =>
       seq(
@@ -443,76 +459,132 @@ module.exports = grammar({
       prec.right(
         PREC.ASSIGNMENT,
         seq(
-          field("left", $._place_expression),
+          field("left", choice($.name_expression, $.projection_expression)),
           "<-",
           field(
             "right",
             choice(
-              $.pipeline_expression,
-              $.binary_expression,
-              $.application_expression,
-              $.projection_expression,
-              $.unary_expression,
-              $._primary_expression,
-              seq(
-                $._indent,
-                choice(
-                  $.pipeline_expression,
-                  $.binary_expression,
-                  $.application_expression,
-                  $.projection_expression,
-                  $.unary_expression,
-                  $._primary_expression,
-                ),
-                $._dedent,
-              ),
+              $._pipeline_expression,
+              seq($._indent, $._pipeline_expression, $._dedent),
             ),
           ),
         ),
       ),
 
-    _place_expression: ($) => choice($.name_expression, $.projection_expression),
+    _pipeline_expression: ($) =>
+      choice($.pipeline_expression, $._boolean_or_expression),
 
     pipeline_expression: ($) =>
       prec.left(
         PREC.PIPELINE,
         seq(
-          field("left", $._expression),
+          field(
+            "left",
+            choice($.pipeline_expression, $._boolean_or_expression),
+          ),
           choice("|>", seq($._line_leading_bar, "|>")),
           field(
             "right",
             choice(
-              $._expression,
-              seq($._indent, $._expression, $._dedent),
+              $._boolean_or_expression,
+              seq($._indent, $._boolean_or_expression, $._dedent),
             ),
           ),
         ),
       ),
 
-    binary_expression: ($) =>
+    _boolean_or_expression: ($) =>
       choice(
-        ...[
-          [PREC.EQUALITY, choice("==", "!=")],
-          [PREC.COMPARISON, choice("<", "<=", ">", ">=")],
-          [PREC.ADDITIVE, choice("+", "-")],
-          [PREC.MULTIPLICATIVE, choice("*", "/", "%")],
-        ].map(([precedence, operator]) =>
-          prec.left(
-            precedence,
-            seq(
-              field("left", $._expression),
-              field("operator", operator),
-              field(
-                "right",
-                choice(
-                  $._expression,
-                  seq($._indent, $._expression, $._dedent),
-                ),
-              ),
-            ),
-          ),
-        ),
+        alias($._boolean_or_operation, $.binary_expression),
+        $._boolean_and_expression,
       ),
+
+    _boolean_or_operation: ($) =>
+      binaryOperation(
+        $,
+        PREC.BOOLEAN_OR,
+        $._boolean_or_expression,
+        "||",
+        $._boolean_and_expression,
+      ),
+
+    _boolean_and_expression: ($) =>
+      choice(
+        alias($._boolean_and_operation, $.binary_expression),
+        $._equality_expression,
+      ),
+
+    _boolean_and_operation: ($) =>
+      binaryOperation(
+        $,
+        PREC.BOOLEAN_AND,
+        $._boolean_and_expression,
+        "&&",
+        $._equality_expression,
+      ),
+
+    _equality_expression: ($) =>
+      choice(
+        alias($._equality_operation, $.binary_expression),
+        $._comparison_expression,
+      ),
+
+    _equality_operation: ($) =>
+      binaryOperation(
+        $,
+        PREC.EQUALITY,
+        $._equality_expression,
+        choice("==", "!="),
+        $._comparison_expression,
+      ),
+
+    _comparison_expression: ($) =>
+      choice(
+        alias($._comparison_operation, $.binary_expression),
+        $._additive_expression,
+      ),
+
+    _comparison_operation: ($) =>
+      binaryOperation(
+        $,
+        PREC.COMPARISON,
+        $._comparison_expression,
+        choice("<", "<=", ">", ">="),
+        $._additive_expression,
+      ),
+
+    _additive_expression: ($) =>
+      choice(
+        alias($._additive_operation, $.binary_expression),
+        $._multiplicative_expression,
+      ),
+
+    _additive_operation: ($) =>
+      binaryOperation(
+        $,
+        PREC.ADDITIVE,
+        $._additive_expression,
+        choice("+", "-"),
+        $._multiplicative_expression,
+      ),
+
+    _multiplicative_expression: ($) =>
+      choice(
+        alias($._multiplicative_operation, $.binary_expression),
+        $._application_expression,
+      ),
+
+    _multiplicative_operation: ($) =>
+      binaryOperation(
+        $,
+        PREC.MULTIPLICATIVE,
+        $._multiplicative_expression,
+        choice("*", "/", "%"),
+        $._application_expression,
+      ),
+
+    _application_expression: ($) =>
+      choice($.application_expression, $._projection_expression),
 
     application_expression: ($) =>
       prec.left(
@@ -520,19 +592,32 @@ module.exports = grammar({
         seq(
           field(
             "function",
-            choice(
-              $.application_expression,
-              $.projection_expression,
-              $.unary_expression,
-              $._primary_expression,
-            ),
+            choice($.application_expression, $._projection_expression),
           ),
           field("argument", $._application_argument),
         ),
       ),
 
-    _application_argument: ($) =>
-      choice($.projection_expression, $._primary_expression),
+    _application_argument: ($) => $._argument_projection_expression,
+
+    _argument_projection_expression: ($) =>
+      choice(
+        alias($._argument_projection_operation, $.projection_expression),
+        $._primary_expression,
+      ),
+
+    _argument_projection_operation: ($) =>
+      prec.left(
+        PREC.PROJECTION,
+        seq(
+          field("value", $._argument_projection_expression),
+          ".",
+          field("field", $.identifier),
+        ),
+      ),
+
+    _projection_expression: ($) =>
+      choice($.projection_expression, $._unary_expression),
 
     projection_expression: ($) =>
       prec.left(
@@ -540,19 +625,22 @@ module.exports = grammar({
         seq(
           field(
             "value",
-            choice($.projection_expression, $._primary_expression),
+            choice($.projection_expression, $._unary_expression),
           ),
           ".",
           field("field", $.identifier),
         ),
       ),
 
+    _unary_expression: ($) =>
+      choice($.unary_expression, $._primary_expression),
+
     unary_expression: ($) =>
       prec.right(
         PREC.UNARY,
         seq(
           field("operator", choice("+", "-")),
-          field("operand", choice($.unary_expression, $._primary_expression)),
+          field("operand", $._unary_expression),
         ),
       ),
 

@@ -24,7 +24,7 @@ requirements = [
   { path = "docs/RFC-0001.md", clause = "18.1" },
   { path = "docs/IMPLEMENTATION.md", clause = "10" },
 ]
-authorities = ["RFC-0001", "DEC-0011", "DEC-0013"]
+authorities = ["RFC-0001", "DEC-0011", "DEC-0013", "DEC-0017"]
 core = [
   { path = "crates/ling-effects/src/lib.rs", symbol = "pub struct CheckedProgram" },
   { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct ProgramSnapshot" },
@@ -49,7 +49,7 @@ requirements = [
   { path = "docs/RFC-0001.md", clause = "18.2" },
   { path = "docs/SEMANTICS.md", clause = "26" },
 ]
-authorities = ["RFC-0001", "SEMANTICS", "DEC-0001", "DEC-0002", "DEC-0013"]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0001", "DEC-0002", "DEC-0013", "DEC-0017"]
 core = [
   { path = "crates/ling-diagnostics/src/lib.rs", symbol = "pub const DIAGNOSTIC_SCHEMA" },
   { path = "crates/ling-diagnostics/src/lib.rs", symbol = "pub struct Diagnostic" },
@@ -102,7 +102,7 @@ requirements = [
   { path = "docs/SEMANTICS.md", clause = "9" },
   { path = "docs/SEMANTICS.md", clause = "11" },
 ]
-authorities = ["RFC-0001", "SEMANTICS", "DEC-0005", "DEC-0008", "DEC-0009", "DEC-0011", "DEC-0014"]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0005", "DEC-0008", "DEC-0009", "DEC-0011", "DEC-0014", "DEC-0017"]
 core = [
   { path = "crates/ling-types/src/lib.rs", symbol = "pub struct TypedProgram" },
   { path = "crates/ling-hir/src/lib.rs", symbol = "pub struct Place" },
@@ -128,7 +128,7 @@ requirements = [
   { path = "docs/SEMANTICS.md", clause = "15" },
   { path = "docs/SEMANTICS.md", clause = "16" },
 ]
-authorities = ["RFC-0001", "SEMANTICS", "DEC-0010", "DEC-0011"]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0010", "DEC-0011", "DEC-0017"]
 core = [
   { path = "crates/ling-effects/src/lib.rs", symbol = "pub struct EffectRow" },
   { path = "crates/ling-effects/src/lib.rs", symbol = "pub enum Capability" },
@@ -154,7 +154,7 @@ requirements = [
   { path = "docs/SEMANTICS.md", clause = "4.4" },
   { path = "docs/SEMANTICS.md", clause = "24" },
 ]
-authorities = ["RFC-0001", "SEMANTICS", "DEC-0012", "DEC-0015"]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0012", "DEC-0015", "DEC-0017"]
 core = [
   { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct SemanticGraph" },
   { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct BodyId" },
@@ -194,6 +194,41 @@ release_artifacts = ["Cargo.lock", "docs/DEPENDENCIES.md", ".github/workflows/ci
 differential_state = "Deferred"
 differential_reason = "The Seed release has one evaluator; cross-engine equivalence is assigned to VM-1209."
 differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[evidence]]
+id = "EVD-POS-BOOLEAN-PRECEDENCE-DIFFERENTIAL"
+kind = "Positive"
+path = "crates/ling-ast/tests/expression_precedence_differential.rs"
+symbol = "compiler_ast_matches_the_shared_precedence_corpus"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0004", "FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-BOOLEAN-SHORT-CIRCUIT"
+kind = "Positive"
+path = "crates/ling-eval/src/lib.rs"
+symbol = "boolean_operators_evaluate_left_once_and_short_circuit_right"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0005"]
+
+[[evidence]]
+id = "EVD-POS-BOOLEAN-STATIC-EFFECTS"
+kind = "Positive"
+path = "crates/ling-effects/src/lib.rs"
+symbol = "boolean_rhs_effects_are_checked_even_when_runtime_would_skip_them"
+feature_ids = ["FTR-SEED-0005"]
+
+[[evidence]]
+id = "EVD-POS-BOOLEAN-SEMANTIC-IDS"
+kind = "Positive"
+path = "crates/ling-semantic/src/lib.rs"
+symbol = "boolean_operator_tags_append_and_produce_distinct_stable_body_ids"
+feature_ids = ["FTR-SEED-0006"]
+
+[[evidence]]
+id = "EVD-NEG-BOOLEAN-TYPE-SPANS"
+kind = "Negative"
+path = "crates/ling-types/src/lib.rs"
+symbol = "boolean_operators_require_bool_operands_at_original_byte_spans"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0004"]
 
 [[evidence]]
 id = "EVD-POS-DIAGNOSTIC-JSON"

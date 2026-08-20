@@ -436,6 +436,8 @@ const fn binary_name(operator: BinaryOperator) -> &'static str {
         BinaryOperator::Multiply => "multiply",
         BinaryOperator::Divide => "divide",
         BinaryOperator::Remainder => "remainder",
+        BinaryOperator::BooleanAnd => "boolean_and",
+        BinaryOperator::BooleanOr => "boolean_or",
     }
 }
 

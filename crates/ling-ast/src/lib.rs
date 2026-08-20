@@ -239,6 +239,8 @@ pub enum BinaryOperator {
     Multiply,
     Divide,
     Remainder,
+    BooleanAnd,
+    BooleanOr,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -816,6 +818,8 @@ impl<'input> Lowerer<'input> {
                 TokenKind::Star => Some(BinaryOperator::Multiply),
                 TokenKind::Slash => Some(BinaryOperator::Divide),
                 TokenKind::Percent => Some(BinaryOperator::Remainder),
+                TokenKind::AmpAmp => Some(BinaryOperator::BooleanAnd),
+                TokenKind::PipePipe => Some(BinaryOperator::BooleanOr),
                 _ => None,
             })
             .ok_or_else(|| self.missing_token(node, "binary operator"))

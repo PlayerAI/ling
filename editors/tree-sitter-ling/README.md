@@ -41,17 +41,16 @@ The shared differential corpus is consumed by both `ling-syntax` and the Tree-si
 
 The stateful external scanner remains limited to DEC-0006 layout and nested comments. It does not duplicate Unicode tables, NFC normalization, keyword classification, or identifier-security checks. The following accuracy work remains assigned to later execution-plan tasks:
 
-- exhaustive expression precedence evidence (`TS-3105`);
 - complete pattern/type edge coverage (`TS-3106`);
 - edit-state and malformed-input recovery hardening (`TS-3107`);
 - shared compiler/Tree-sitter corpus differential testing (`TS-3108`).
 
 Language-specific package bindings and publication metadata remain disabled until an editor consumer requires them; the generated C parser and its private scanner are the committed integration artifacts.
 
-Accepted DEC-0017 defines `&&`, `||`, their precedence, and checked short-circuit behavior. The checked-in grammar continues to reject them until TS-3105 lands the compiler and Tree-sitter implementation together.
+TS-3105 implements Accepted DEC-0017 end to end. The compiler and Tree-sitter consume the same 29-case expression corpus, covering every neighboring precedence pair, reverse parentheses, associativity, signed application arguments, assignment-chain rejection, and textual non-aliases. Tree-sitter uses private precedence layers while preserving the shallow public `binary_expression` CST node; the compiler preserves distinct `BooleanAnd` and `BooleanOr` operators through checked evaluation.
 
 ## 中文说明
 
 `tree-sitter-ling` 是面向编辑器的 Ling 具体语法解析器。本目录暂作为可独立拆分的开发镜像，与编译器共享演进过程。
 
-Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围，并用编译器与 Tree-sitter 共享语料验证标识符边界和 `and` 保留字。NFC、禁止字符、混合书写系统与 Confusable 诊断仍由编译器权威判定。
+Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围；`TS-3105` 已依据 Accepted DEC-0017 实现 `&&`、`||` 与完整表达式优先级，并通过 29 个共享 compiler/Tree-sitter cases 验证。NFC、禁止字符、混合书写系统与 Confusable 诊断仍由编译器权威判定。

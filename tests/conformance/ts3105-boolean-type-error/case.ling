@@ -1,0 +1,3 @@
+module Main
+
+let 结果 = true && 1

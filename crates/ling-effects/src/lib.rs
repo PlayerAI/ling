@@ -829,6 +829,40 @@ mod tests {
     }
 
     #[test]
+    fn boolean_rhs_effects_are_checked_even_when_runtime_would_skip_them() {
+        let source = concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let writeBool () =\n",
+            "    Console.write \"rhs\"\n",
+            "    true\n\n",
+            "let main () =\n",
+            "    false && writeBool ()\n",
+            "    true || writeBool ()\n",
+            "    ()\n",
+        );
+        let checked = check(typed(source)).expect("capability is declared");
+        let main = locate_main(&checked).expect("valid main");
+        assert_eq!(
+            checked
+                .definition_effect(&main)
+                .expect("main effects")
+                .names(),
+            vec!["Console.Write"]
+        );
+
+        let without_capability = source.replace("    requires Console.Write\n", "");
+        let errors = check(typed(&without_capability))
+            .expect_err("statically visited boolean RHS requires capability");
+        assert!(errors.iter().any(|error| matches!(
+            error.kind,
+            EffectErrorKind::MissingCapability {
+                capability: "Console.Write"
+            }
+        )));
+    }
+
+    #[test]
     fn value_binding_is_not_a_main_entry() {
         let checked = check(typed("module Main\n\nlet main = ()\n")).expect("pure module checks");
         assert!(matches!(

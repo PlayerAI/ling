@@ -1,0 +1,3 @@
+module Main
+
+let value = first <- second <- third

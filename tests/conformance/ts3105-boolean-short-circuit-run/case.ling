@@ -1,0 +1,19 @@
+module Main
+    requires Console.Write
+
+let mark value =
+    Console.write "rhs"
+    value
+
+let main () =
+    let leftAnd = mark false && mark true
+    let leftOr = mark true || mark false
+    let requiredAnd = true && mark true
+    let requiredOr = false || mark true
+    let skippedFaultAnd = false && (1 / 0 == 0)
+    let skippedFaultOr = true || (1 / 0 == 0)
+
+    if leftAnd || leftOr && requiredAnd && requiredOr && skippedFaultAnd && skippedFaultOr then
+        Console.write "unexpected"
+    else
+        Console.write "ok"
