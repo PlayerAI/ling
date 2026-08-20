@@ -830,3 +830,74 @@ notes = [
   "GAP-SEED-BOOLEAN-OPERATORS-001 remains open; && and || stay finite error input and TS-3105 remains BlockedSpec.",
   "No Ling parser behavior, public diagnostic, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, source span, or Unicode 17.0.0 compiler data changed.",
 ]
+
+[[task]]
+id = "TS-3103"
+title = "Offside/缩进策略"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3102"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/grammar-map.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0004-pipeline-syntax.md",
+  "docs/decisions/0005-seed-literals-and-delimiters.md",
+  "docs/decisions/0006-offside-layout.md",
+]
+artifacts = [
+  "editors/tree-sitter-ling/grammar.js",
+  "editors/tree-sitter-ling/src/scanner.c",
+  "editors/tree-sitter-ling/src/parser.c",
+  "editors/tree-sitter-ling/src/grammar.json",
+  "editors/tree-sitter-ling/src/node-types.json",
+  "editors/tree-sitter-ling/docs/ADR-0001-layout-scanner.md",
+  "editors/tree-sitter-ling/test/corpus/layout.txt",
+  "editors/tree-sitter-ling/test/scanner_state.c",
+  "editors/tree-sitter-ling/test/run-scanner-tests.js",
+  "editors/tree-sitter-ling/test/run-layout-integration.js",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "docs/grammar-map.md",
+  "docs/status/TS-3103-IMPLEMENTATION-REPORT.md",
+]
+acceptance = [
+  "tree-sitter-cli 0.26.12 npm run verify offline: 29 of 29 corpus cases, scanner-state tests, layout integrations, and local example passed",
+  "layout integration: 9 CRLF/CR/EOF/comment/depth/delimiter/incremental scenarios passed with invalid cases rejected",
+  "shared examples: 4 of 4 parsed without ERROR or MISSING",
+  "generated parser idempotence: 6 generated files, 0 changed SHA-256 hashes",
+  "corpus coverage: 60 generated named node types, 0 uncovered",
+  "npm dependency graph: only tree-sitter-cli 0.26.12",
+  "cargo xtask governance check-all: 5 checks; 42 documents, 26 gaps, 17 lifecycle records, 18 protocols, 56 diagnostic codes",
+  "cargo xtask schema validate-all: 3 schemas, 4 valid fixtures, 6 invalid fixtures, 1 canonical byte fixture",
+  "cargo xtask schema compatibility --from N-1 --to N: 0 verified N-1 edges, 3 NoPreviousVersion records",
+  "cargo xtask schema corrupt-inputs: 23 deterministic mutations",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 32 conformance fixtures, 51 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify: 7 features, 3 profiles, 3 hosts, 1 native target, 6 backends, 1 standard package, 18 protocols, 9 unsupported records",
+  "cargo xtask status verify: 14 tasks, all Done; 7 features with stabilization blockers",
+  "cargo xtask ci verify: 8 named gates, 19 commands, 3 workspace-test hosts",
+  "cargo xtask seed reproduce: 4 surfaces, 8 independent processes, 41866 compared output bytes",
+  "cargo test --workspace --all-features --locked --offline: 234 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "active local Markdown targets: 773 resolved across 84 files; frozen baseline and installed npm dependencies excluded",
+  "git diff --check: passed",
+]
+verified_against_commit = "70e44ea72d6cfd70ed988c15cba5738c2fd9c38e"
+completion_commit = "28750bcbd458322e856cf45842b8241047a8e41b"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "The scanner implements editor CST layout only; the compiler remains the validity and bilingual-diagnostic authority.",
+  "External symbol order, zero-width delimiter markers, and serialization version 2 are private Tree-sitter implementation surfaces, not public Ling protocols.",
+  "No public diagnostic, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, compiler source span, or Unicode 17.0.0 data changed.",
+  "TS-3104 owns pinned Unicode identifier parity; TS-3105 remains BlockedSpec on GAP-SEED-BOOLEAN-OPERATORS-001.",
+]

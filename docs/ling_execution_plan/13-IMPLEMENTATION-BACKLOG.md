@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`、`TS-3102` Done，下一项 `TS-3103` Ready；`TS-3105` 受 `GAP-SEED-BOOLEAN-OPERATORS-001` 阻断，其余任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`、`TS-3102`、`TS-3103` Done，下一项 `TS-3104` Ready；`TS-3105` 受 `GAP-SEED-BOOLEAN-OPERATORS-001` 阻断，其余任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -165,8 +165,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2504` | G1/Editor | Memory/resource limits | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:403` |
 | `TS-3101` | G1/Editor | Grammar 规范映射表 | S | Done | `05-ZED-EXTENSION.md:154`；见 `docs/grammar-map.md`、机器状态与实施报告 |
 | `TS-3102` | G1/Editor | 宽度优先 grammar skeleton | M | Done | `05-ZED-EXTENSION.md:165`；见 `editors/tree-sitter-ling/`、机器状态与实施报告 |
-| `TS-3103` | G1/Editor | Offside/缩进策略 | — | Ready | `05-ZED-EXTENSION.md:187`；依赖 TS-3102，先补 corpus/scanner state tests 与 ADR |
-| `TS-3104` | G1/Editor | Unicode identifier | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:199` |
+| `TS-3103` | G1/Editor | Offside/缩进策略 | M | Done | `05-ZED-EXTENSION.md:187`；见 scanner、ADR、layout corpus、机器状态与实施报告 |
+| `TS-3104` | G1/Editor | Unicode identifier | M | Ready | `05-ZED-EXTENSION.md:199`；依赖 TS-3103，生成 Unicode 17.0.0 范围并建立 lexer differential evidence |
 | `TS-3105` | G1/Editor | Expression precedence | — | BlockedSpec | `05-ZED-EXTENSION.md:211`；`GAP-SEED-BOOLEAN-OPERATORS-001` |
 | `TS-3106` | G1/Editor | Pattern 与 Type | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:217` |
 | `TS-3107` | G1/Editor | Error recovery | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:221` |
