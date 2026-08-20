@@ -1280,3 +1280,68 @@ notes = [
   "No Ling diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, or Unicode 17.0.0 table changed.",
   "The TS-3101 through TS-3108 grammar tranche is complete; later editor, project, VM, and LSP work remains subject to its declared interface and RFC prerequisites.",
 ]
+
+[[task]]
+id = "ZQ-3201"
+title = "Syntax highlighting queries"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3108"]
+spec = [
+  "AGENTS.md",
+  "docs/SEMANTICS.md",
+  "docs/decisions/0005-seed-literals-and-delimiters.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/decisions/0014-seed-prelude-option-result.md",
+  "docs/decisions/0017-seed-boolean-operators.md",
+  "docs/grammar-map.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "README.md",
+  "docs/status/ZQ-3201-IMPLEMENTATION-REPORT.md",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "editors/tree-sitter-ling/README.md",
+  "editors/tree-sitter-ling/package.json",
+  "editors/tree-sitter-ling/queries/highlights.scm",
+  "editors/tree-sitter-ling/test/highlight/basics.ling",
+  "editors/tree-sitter-ling/test/highlight/recovery.ling",
+  "editors/tree-sitter-ling/test/highlight/unicode.ling",
+  "editors/tree-sitter-ling/test/run-highlight-tests.js",
+  "editors/tree-sitter-ling/tree-sitter.json",
+]
+acceptance = [
+  "highlights.scm exposes exactly 18 reviewed captures and uses @function @function.definition fallback ordering",
+  "standard highlight fixtures: basics 32 assertions, recovery 1 assertion, Unicode 13 assertions; all 46 passed",
+  "ASCII/Chinese function, variable, type, property, and constructor roles are structurally paired; decomposed combining and emoji-prefix recovery cases passed",
+  "keyword inventory contains exactly 16 current lexical/grammar keywords and excludes future words; built-in type inventory matches Unit, Bool, Int, f64, Text, and List",
+  "tree-sitter-cli 0.26.12 npm run verify: all 41 grammar cases, scanner/layout integrations, 18 Unicode, 29 precedence, 41 Pattern/Type, 10 static recovery, 9 incremental edit, 64 recovery mutation, 42 whole-program differential, 84 whole-corpus edit, 43 stable mapping, 3 highlight fixture, 18 capture-contract, and local-example checks passed",
+  "generated Tree-sitter artifacts remained byte-identical after regeneration",
+  "cargo xtask governance check-all: all governance registries passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, 69 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify, ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the ZQ-3201 backlog transition",
+  "active Markdown link audit: 92 files, 957 local inline links, 0 missing targets",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "git diff --check: passed",
+]
+verified_against_commit = "77aab24ff8160e1535ea15b67d5302c1a4bb3fc8"
+completion_commit = "77aab24ff8160e1535ea15b67d5302c1a4bb3fc8"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "ZQ-3201 changes only the Experimental Tree-sitter/Zed highlighting surface; compiler syntax, validity, and diagnostics remain authoritative.",
+  "Syntactically ambiguous bare names remain conservative and are intentionally deferred to resolver-backed semantic tokens.",
+  "No Ling diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, grammar node, generated parser, or Unicode 17.0.0 table changed.",
+  "ZQ-3202 bracket matching is now the next Ready editor-query task.",
+]
