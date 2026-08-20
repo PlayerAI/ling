@@ -31,6 +31,7 @@ npm test --offline
 npm run test:conformance --offline
 npm run test:highlights --offline
 npm run test:brackets --offline
+npm run test:indents --offline
 npm run parse:examples --offline
 ```
 
@@ -60,8 +61,10 @@ Three standard query fixtures under [`test/highlight/`](test/highlight/) cover e
 
 ZQ-3202 adds [`queries/brackets.scm`](queries/brackets.scm) for the four reviewed pairs `()`, `[]`, `{}`, and string quotes. Quotes opt out of rainbow coloring, and escaped quotes do not become pair endpoints because they remain `escape_sequence` nodes. Nested block comments are opaque scanner tokens, so bracket-like text inside them intentionally produces no `@open`/`@close` capture. Three fixtures and 20 positive/negative assertions cover nesting, escapes, nested comments, and an emoji-prefix recovery tree; `npm run test:brackets` also runs the query twice and bounds every parser/query process.
 
+ZQ-3203 adds [`queries/indents.scm`](queries/indents.scm) as a conservative Zed editing aid over 15 current CST node types. Declaration and match-arm ranges cover offside bodies; `if` uses separate ranges ending and starting at `else`; record, tuple, and list ranges end at their closing delimiters; and a pipeline range starts at `|>` so only a right operand continued on a later line gains a level. This preserves DEC-0006 alignment for match-case markers and line-leading pipeline operators. Four fixtures lock 38 `@indent`, 14 `@end`, and 4 `@start` captures across relative two- and four-space layouts, Chinese and decomposed identifiers, all requested delimiter forms, pipeline continuation, and emoji-prefix recovery. The query neither chooses an indentation width nor rewrites source; the compiler owns layout validity, and the future `ling fmt` command remains formatter work rather than an implemented claim.
+
 ## 中文说明
 
 `tree-sitter-ling` 是面向编辑器的 Ling 具体语法解析器。本目录暂作为可独立拆分的开发镜像，与编译器共享演进过程。
 
-Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围；`TS-3105` 已依据 Accepted DEC-0017 实现 `&&`、`||` 与完整表达式优先级，并通过 29 个共享 compiler/Tree-sitter cases 验证；`TS-3106` 已通过 41 个共享 cases 覆盖 Seed pattern/type 合法性边界；`TS-3107` 已通过 10 个静态、9 个增量和 64 个定种子 mutation cases 加固错误恢复；`TS-3108` 已覆盖全部 42 个 compiler conformance programs、84 个全语料定种子编辑和 43 个稳定 CST/node-type 映射；`ZQ-3201` 已增加 18 个受审查的 Zed 基础高亮 capture 和 3 个标准 query fixtures，覆盖 ASCII/中文结构对等、组合字符与 emoji 错误恢复；`ZQ-3202` 已通过 3 个 fixtures 和 20 个正反断言覆盖 4 类括号对、字符串转义、嵌套块注释与错误恢复。NFC、禁止字符、混合书写系统、Confusable 诊断、pattern 名称角色以及源码合法性仍由编译器权威判定。
+Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围；`TS-3105` 已依据 Accepted DEC-0017 实现 `&&`、`||` 与完整表达式优先级，并通过 29 个共享 compiler/Tree-sitter cases 验证；`TS-3106` 已通过 41 个共享 cases 覆盖 Seed pattern/type 合法性边界；`TS-3107` 已通过 10 个静态、9 个增量和 64 个定种子 mutation cases 加固错误恢复；`TS-3108` 已覆盖全部 42 个 compiler conformance programs、84 个全语料定种子编辑和 43 个稳定 CST/node-type 映射；`ZQ-3201` 已增加 18 个受审查的 Zed 基础高亮 capture 和 3 个标准 query fixtures，覆盖 ASCII/中文结构对等、组合字符与 emoji 错误恢复；`ZQ-3202` 已通过 3 个 fixtures 和 20 个正反断言覆盖 4 类括号对、字符串转义、嵌套块注释与错误恢复；`ZQ-3203` 已通过 4 个 fixtures 锁定 15 类 CST 节点上的 38 个 `@indent`、14 个 `@end` 和 4 个 `@start` capture，保持 match case 与行首 pipeline 对齐，并覆盖相对缩进、中文、组合字符和错误恢复。缩进 query 不选择空格宽度、不改写源码，也不表示尚未实现的 `ling fmt` 已可用；NFC、禁止字符、混合书写系统、Confusable 诊断、layout 合法性以及源码合法性仍由编译器权威判定。

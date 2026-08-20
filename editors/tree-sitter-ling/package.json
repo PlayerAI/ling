@@ -22,15 +22,17 @@
     "src/**",
     "test/corpus/**",
     "test/fixtures/brackets/**",
+    "test/fixtures/indents/**",
     "test/highlight/**",
     "examples/**"
   ],
   "scripts": {
     "generate": "tree-sitter generate",
-    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types && npm run test:recovery && npm run test:conformance && npm run test:highlights && npm run test:brackets",
+    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types && npm run test:recovery && npm run test:conformance && npm run test:highlights && npm run test:brackets && npm run test:indents",
     "test:brackets": "node test/run-bracket-tests.js",
     "test:conformance": "node test/run-conformance-differential.js",
     "test:highlights": "node test/run-highlight-tests.js",
+    "test:indents": "node test/run-indent-tests.js",
     "test:layout": "node test/run-layout-integration.js",
     "test:scanner": "node test/run-scanner-tests.js",
     "test:unicode": "node test/run-unicode-differential.js",

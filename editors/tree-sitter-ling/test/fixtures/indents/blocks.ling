@@ -1,0 +1,25 @@
+module Indent
+    requires Console.Write
+
+type 状态 =
+    | 就绪
+    | 等待 of Int
+
+let 选择 state =
+    match state with
+    | 就绪 ->
+        if true then
+            "ready"
+        else
+            "waiting"
+    | 等待 count ->
+        Text.format "{}" count
+
+let café flag =
+  if flag then
+    1
+  else
+    0
+
+let result =
+  café true

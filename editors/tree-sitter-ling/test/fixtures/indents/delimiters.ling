@@ -1,0 +1,53 @@
+type Pair =
+    (
+        Int,
+        Text
+    )
+
+type Point =
+    {
+        x: Int
+        y: Int
+    }
+
+let tuple =
+    (
+        1,
+        2
+    )
+
+let record =
+    {
+        x = 1
+        y = 2
+    }
+
+let updated =
+    {
+        record with
+        x = 3
+    }
+
+let values =
+    [
+        1
+        2
+    ]
+
+let swap pair =
+    match pair with
+    | (
+          left,
+          right
+      ) ->
+        (
+            right,
+            left
+        )
+
+let xCoordinate point =
+    match point with
+    | {
+          x = value
+          y = _
+      } -> value

@@ -1,0 +1,9 @@
+let normalize value = value
+
+let finish value = value
+
+let flow value =
+    value
+    |>
+        map normalize
+    |> finish

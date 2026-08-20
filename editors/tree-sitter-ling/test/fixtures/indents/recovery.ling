@@ -1,0 +1,7 @@
+let 😀name value = value
+
+let stable =
+    [
+        1
+        2
+    ]
