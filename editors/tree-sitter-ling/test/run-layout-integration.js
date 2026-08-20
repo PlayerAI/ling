@@ -79,6 +79,14 @@ assertSuccessfulParse(
 );
 
 assertSuccessfulParse(
+  "lone-cr",
+  "let main () =\r" +
+    "  let value =\r" +
+    "    1\r" +
+    "  value\r",
+);
+
+assertSuccessfulParse(
   "eof-dedents",
   "let main () =\n" +
     "  let value =\n" +
