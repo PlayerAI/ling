@@ -1150,7 +1150,7 @@ notes = [
 [[task]]
 id = "TS-3107"
 title = "Error recovery"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -1167,6 +1167,7 @@ spec = [
 artifacts = [
   "README.md",
   "docs/grammar-map.md",
+  "docs/status/TS-3107-IMPLEMENTATION-REPORT.md",
   "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
   "editors/tree-sitter-ling/README.md",
   "editors/tree-sitter-ling/docs/ADR-0001-layout-scanner.md",
@@ -1182,17 +1183,31 @@ artifacts = [
   "editors/tree-sitter-ling/test/scanner_state.c",
 ]
 acceptance = [
-  "tree-sitter-cli 0.26.12: 41 of 41 corpus cases and all existing focused suites passed",
-  "recovery integration: 10 static malformed cases, 9 incremental edits, and 64 fixed-seed mutations passed with finite process/CST bounds and retained declaration canaries",
-  "scanner state: root synchronization resets layout/delimiter recovery state, preserves ordinary final newlines, and does not split Unicode-prefixed identifiers",
+  "tree-sitter-cli 0.26.12 npm run verify: 41 of 41 corpus cases, scanner/layout integrations, 18 Unicode, 29 precedence, 41 Pattern/Type, 10 static recovery, 9 incremental edit, 64 fixed-seed mutation cases, and local example passed",
+  "recovery bounds: 500000 microsecond parser timeout, 10000 millisecond process timeout, and 200000-byte CST/diagnostic ceilings passed while both declaration canaries remained query-visible",
+  "scanner state: root synchronization resets layout/delimiter recovery state, preserves ordinary final newlines, and does not split type-prefixed Unicode identifiers",
+  "generated Tree-sitter idempotence: 6 generated files retained identical SHA-256 hashes",
+  "cargo xtask governance check-all: all governance registries passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, 69 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify, ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the TS-3107 backlog transition",
+  "active Markdown link audit: 90 files, 925 local inline links, 0 missing targets",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "git diff --check: passed",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "uncommitted"
-completed = ""
+verified_against_commit = "1debda6d69796182d2b051bd5b5b03992008a1ca"
+completion_commit = "1debda6d69796182d2b051bd5b5b03992008a1ca"
+integration_state = "committed"
+completed = "2026-08-21"
 notes = [
   "TS-3107 changes only the editor CST and private scanner recovery path; the compiler remains the validity and diagnostic authority.",
   "Recovery exposes only Tree-sitter built-in ERROR/MISSING evidence and does not add a successful Ling syntax production.",
   "No compiler diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, or Unicode 17.0.0 table changed.",
-  "TS-3108 whole-program compiler/Tree-sitter differential remains deferred.",
+  "TS-3108 whole-program compiler/Tree-sitter differential is now the next Ready task.",
 ]
