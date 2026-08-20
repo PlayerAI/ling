@@ -548,3 +548,66 @@ notes = [
   "The JSON output is an internal non-contract fixture for an unimplemented future ling command.",
   "The CI workflow invokes the status drift gate; no remote CI result is claimed before push.",
 ]
+
+[[task]]
+id = "GOV-0106"
+title = "Schema 生命周期与 golden corpus"
+state = "Done"
+release = "G0"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0104"]
+spec = [
+  "AGENTS.md",
+  "docs/governance/SCHEMA-LIFECYCLE.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0016-repl-session-semantics.md",
+]
+artifacts = [
+  "docs/governance/SCHEMA-LIFECYCLE.md",
+  "schemas/registry.toml",
+  "schemas/diagnostic/0.1/schema.json",
+  "schemas/semantic/0.1/schema.json",
+  "schemas/repl/0.1/schema.json",
+  "tools/xtask/src/schema.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "crates/ling-semantic/src/lib.rs",
+  "crates/ling-cli/tests/conformance.rs",
+  "docs/status/GOV-0106-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask schema validate-all: 3 schemas, 4 valid fixtures, 6 invalid fixtures, 1 canonical byte fixture",
+  "cargo xtask schema compatibility --from N-1 --to N: 0 verified N-1 edges, 3 NoPreviousVersion records",
+  "cargo xtask schema corrupt-inputs: 23 deterministic mutations",
+  "cargo xtask governance check-authority: 40 documents, 16 Accepted",
+  "cargo xtask governance check-protocols: 18 records; 9 public, 1 Internal, 8 Future",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 32 conformance fixtures, 47 evidence records, 7 deferred differential paths",
+  "all other governance, support, and status registries remain valid",
+  "cargo test --package xtask --locked --offline: 85 passed",
+  "cargo test --workspace --all-features --locked --offline: 228 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "active local Markdown targets: 577 resolved; frozen baseline excluded",
+]
+verified_against_commit = "262b7356d124cc2c9d1e87594b22b1a21080f843"
+completion_commit = "35ba0da126be6b2df8ee3fe2aa9fd3ca27ebbdec"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "The new schema artifacts describe existing ling.diagnostic/0.1, ling.semantic/0.1, and ling.repl/0.1 behavior without changing their markers, bytes, fields, stability, or public reader claims.",
+  "All three schemas are first versions and explicitly record NoPreviousVersion; no N-1 reader or migration support is claimed.",
+  "Ordinary JSON order remains outside Semantic ID inputs; DEC-0012 hash domains, Unicode 17.0.0, and original UTF-8 byte spans are unchanged.",
+  "The validator implements only the audited Seed JSON Schema subset, uses the real isolated Semantic Graph reader, and cannot feed evaluation.",
+  "The CI workflow invokes all three schema gates; no remote CI result is claimed before push.",
+]
