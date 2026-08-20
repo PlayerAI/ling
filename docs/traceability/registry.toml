@@ -320,3 +320,10 @@ kind = "Positive"
 path = "tools/xtask/src/seed.rs"
 symbol = "pub fn reproduce"
 feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-SEED-GRAMMAR-MAP"
+kind = "Positive"
+path = "docs/grammar-map.md"
+symbol = "## 2. Mapping conventions"
+feature_ids = ["FTR-SEED-0007"]
