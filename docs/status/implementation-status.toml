@@ -982,7 +982,7 @@ notes = [
 [[task]]
 id = "TS-3105"
 title = "Expression precedence"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -1001,13 +1001,71 @@ spec = [
   "docs/RFC-0001.md",
   "docs/grammar-map.md",
 ]
-artifacts = []
-acceptance = []
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "uncommitted"
-completed = ""
+artifacts = [
+  "crates/ling-syntax/src/parser.rs",
+  "crates/ling-syntax/tests/expression_errors.rs",
+  "crates/ling-ast/src/lib.rs",
+  "crates/ling-ast/tests/expression_precedence_differential.rs",
+  "crates/ling-hir/src/lib.rs",
+  "crates/ling-types/src/lib.rs",
+  "crates/ling-effects/src/lib.rs",
+  "crates/ling-eval/src/lib.rs",
+  "crates/ling-semantic/src/lib.rs",
+  "editors/tree-sitter-ling/grammar.js",
+  "editors/tree-sitter-ling/src/grammar.json",
+  "editors/tree-sitter-ling/src/node-types.json",
+  "editors/tree-sitter-ling/src/parser.c",
+  "editors/tree-sitter-ling/test/corpus/errors.txt",
+  "editors/tree-sitter-ling/test/fixtures/expression-precedence.tsv",
+  "editors/tree-sitter-ling/test/run-precedence-differential.js",
+  "tests/conformance/ts3105-and-alias-error/expect.toml",
+  "tests/conformance/ts3105-assignment-chain-error/expect.toml",
+  "tests/conformance/ts3105-boolean-missing-operand/expect.toml",
+  "tests/conformance/ts3105-boolean-short-circuit-run/expect.toml",
+  "tests/conformance/ts3105-boolean-type-error/expect.toml",
+  "tests/conformance/ts3105-or-alias-error/expect.toml",
+  "docs/grammar-map.md",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/status/TS-3105-IMPLEMENTATION-REPORT.md",
+]
+acceptance = [
+  "Accepted DEC-0017: complete Seed precedence, non-associative assignment, symbolic boolean operators, and checked short-circuit semantics implemented",
+  "shared compiler/Tree-sitter precedence differential: all 29 neighboring-level, parenthesized, associativity, subtraction/application, and textual-or cases passed",
+  "syntax negatives: missing &&/|| operands, unparenthesized assignment chains, reserved and, ordinary or, and original UTF-8 EOF byte spans covered",
+  "type/effect/evaluator evidence: Bool operand spans, statically checked skipped RHS effects, left-once evaluation, skipped Faults, and exact output passed",
+  "Semantic ID evidence: existing binary tags 0 through 10 retained and BooleanAnd/BooleanOr appended as 11 and 12",
+  "conformance corpus: 38 fixtures passed, including six TS-3105 positive and negative fixtures with stable registered diagnostic codes",
+  "tree-sitter-cli 0.26.12 npm run verify: 31 of 31 corpus cases, scanner/layout integrations, 18 Unicode differential cases, 29 precedence differential cases, and local example passed",
+  "generated Tree-sitter idempotence: 6 generated files retained identical SHA-256 hashes",
+  "cargo xtask governance check-all: 5 checks; 43 documents, 26 gaps, 18 lifecycle records, 18 protocols, 56 diagnostic codes",
+  "cargo xtask schema validate-all: 3 schemas, 4 valid fixtures, 6 invalid fixtures, 1 canonical byte fixture",
+  "cargo xtask schema compatibility --from N-1 --to N: 0 verified N-1 edges, 3 NoPreviousVersion records",
+  "cargo xtask schema corrupt-inputs: 23 deterministic mutations",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 38 conformance fixtures, 62 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify: 7 features, 3 profiles, 3 hosts, 1 native target, 6 backends, 1 standard package, 18 protocols, 9 unsupported records",
+  "cargo xtask ci verify: 8 named gates, 19 commands, 3 workspace-test hosts",
+  "cargo xtask seed reproduce: 4 surfaces, 8 independent processes, 41866 compared output bytes",
+  "execution-plan SHA256SUMS: 27 entries verified after the TS-3105 backlog transition",
+  "active Markdown link audit: 88 files, 851 local inline links, 0 missing targets",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "git diff --check: passed",
+]
+verified_against_commit = "10c4c5274a9d4f504d743c9d9af85fdfeced9111"
+completion_commit = "cf76a4268b5ec8d5cdd939749709cc0654cff732"
+integration_state = "committed"
+completed = "2026-08-20"
 notes = [
-  "Accepted DEC-0017 resolves GAP-SEED-BOOLEAN-OPERATORS-001 and fixes the complete Seed precedence order plus checked short-circuit behavior.",
-  "Compiler, Tree-sitter, type, runtime, Semantic ID, and differential evidence is still in progress and must land as one semantic/editor milestone.",
+  "Accepted DEC-0017 resolved GAP-SEED-BOOLEAN-OPERATORS-001 before implementation and is the authority for &&, ||, precedence, associativity, assignment chaining, and short-circuit evaluation.",
+  "The evaluator still consumes checked Typed Core; both boolean operands are statically typed and effect-checked even when runtime evaluation skips the right operand.",
+  "Existing public diagnostic codes and payload schemas are unchanged; TS-3105 reuses L-SYNTAX-0010, L-NAME-0001, and L-TYPE-0001 with bilingual messages and original UTF-8 byte spans.",
+  "The semantic schema version is unchanged; existing operator tags 0 through 10 and existing program IDs are preserved, while new boolean nodes use appended tags 11 and 12.",
+  "Tree-sitter remains an editor CST implementation and cannot override compiler validity; whole-program corpus differential remains TS-3108.",
+  "Unicode tables, normalization, security policy, and the pinned Unicode 17.0.0 version are unchanged.",
+  "TS-3106 pattern/type detail, TS-3107 malformed-edit recovery, a second execution engine, and textual boolean aliases remain intentionally unimplemented.",
 ]
