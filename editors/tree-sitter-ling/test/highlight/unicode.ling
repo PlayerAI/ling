@@ -1,0 +1,37 @@
+let add value: Int = value + 1
+    // <- function.definition
+
+let 增加 数值: Int = 数值 + 1
+    // <- function.definition
+
+let callAscii () =
+    add 1
+    // <- function
+
+let 调用中文 () =
+    增加 1
+    // <- function
+
+let ascii = 1
+    // <- variable
+
+let 中文 = 1
+    // <- variable
+
+type Person = { name: Text }
+     // <- type
+                // <- property
+
+type 人物 =
+     // <- type
+    { 姓名: Text }
+      // <- property
+
+type Choice = | Yes
+                // <- constructor
+
+type 选择 = | 是
+            // <- constructor
+
+let café input: Text = input
+    // <- function.definition

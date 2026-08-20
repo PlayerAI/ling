@@ -8,7 +8,8 @@
       "file-types": [
         "ling"
       ],
-      "injection-regex": "^ling$"
+      "injection-regex": "^ling$",
+      "highlights": "queries/highlights.scm"
     }
   ],
   "metadata": {

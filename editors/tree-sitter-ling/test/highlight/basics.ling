@@ -1,0 +1,59 @@
+/// Public documentation for the fixture.
+// <- comment.doc
+
+module Highlight
+// <- keyword
+
+import Support.Math as Math
+// <- keyword
+
+type Flag = | Enabled
+     // <- type
+          // <- operator
+            // <- punctuation.delimiter
+              // <- constructor
+
+type Truth = Bool
+             // <- type.builtin
+
+type Alias = Option<Result<Int, Text>>
+             // <- type
+                    // <- type
+                           // <- type.builtin
+                                // <- type.builtin
+
+type Point = { x: Int; y: f64 }
+             // <- punctuation.bracket
+               // <- property
+                // <- punctuation.delimiter
+                  // <- type.builtin
+                     // <- punctuation.delimiter
+                       // <- property
+                              // <- punctuation.bracket
+
+let add value: Int = value + 1
+    // <- function.definition
+        // <- variable.parameter
+                     // <- variable
+                           // <- operator
+                             // <- number
+
+let answer = add 41
+             // <- function
+
+let message = "line\n"
+              // <- string
+                   // <- string.escape
+
+let enabled = true
+              // <- boolean
+
+let pair = (answer, enabled)
+           // <- punctuation.bracket
+                  // <- punctuation.delimiter
+
+// An ordinary comment.
+// <- comment
+
+let trait = 1
+    // <- !keyword

@@ -29,6 +29,7 @@ After the first locked installation, grammar generation and tests run without ne
 npm run generate --offline
 npm test --offline
 npm run test:conformance --offline
+npm run test:highlights --offline
 npm run parse:examples --offline
 ```
 
@@ -52,8 +53,12 @@ TS-3107 hardens malformed editing states without changing compiler validity. A p
 
 TS-3108 synchronizes every `tests/conformance/*/case.ling` source through one sorted manifest consumed by the compiler and editor-parser tests. The current 42-program set contains 34 compiler-valid and 8 compiler-invalid sources. Every valid source has a clean Tree-sitter CST; seven invalid sources produce bounded recovery trees, while `m2-invalid-number` is the sole explicit tolerance because token-shape parsing accepts `0b102` and the compiler still rejects its base-2 digit with `L-LEX-0011`. The runner also parses 84 fixed-seed whole-corpus edits twice and locks all 42 normalized CSTs plus `node-types.json` with 43 reviewed SHA-256 mappings.
 
+ZQ-3201 adds the shared [`queries/highlights.scm`](queries/highlights.scm) baseline. It exposes 18 reviewed Zed-facing captures for current Seed keywords, syntactic types and constructors, callable/parameter/variable roles, record properties, literals, operators, comments, brackets, and delimiters. Function definitions use `@function @function.definition` in that order, so Zed prefers the definition-specific style and falls back to the broadly supported function style. Role distinctions stay conservative wherever only name resolution can decide them; future reserved words are not colored as implemented syntax.
+
+Three standard query fixtures under [`test/highlight/`](test/highlight/) cover every capture. They pair ASCII and Chinese functions, bindings, types, constructors, and properties; retain a decomposed combining identifier; reject cosmetic highlighting of `trait`; and execute the query over an emoji-prefix recovery tree. `npm run test:highlights` validates the exact capture and keyword inventories, clean/recovery policies, deterministic query output, and all inline Tree-sitter assertions.
+
 ## 中文说明
 
 `tree-sitter-ling` 是面向编辑器的 Ling 具体语法解析器。本目录暂作为可独立拆分的开发镜像，与编译器共享演进过程。
 
-Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围；`TS-3105` 已依据 Accepted DEC-0017 实现 `&&`、`||` 与完整表达式优先级，并通过 29 个共享 compiler/Tree-sitter cases 验证；`TS-3106` 已通过 41 个共享 cases 覆盖 Seed pattern/type 合法性边界；`TS-3107` 已通过 10 个静态、9 个增量和 64 个定种子 mutation cases 加固错误恢复；`TS-3108` 已覆盖全部 42 个 compiler conformance programs、84 个全语料定种子编辑和 43 个稳定 CST/node-type 映射。NFC、禁止字符、混合书写系统、Confusable 诊断、pattern 名称角色以及源码合法性仍由编译器权威判定。
+Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围；`TS-3105` 已依据 Accepted DEC-0017 实现 `&&`、`||` 与完整表达式优先级，并通过 29 个共享 compiler/Tree-sitter cases 验证；`TS-3106` 已通过 41 个共享 cases 覆盖 Seed pattern/type 合法性边界；`TS-3107` 已通过 10 个静态、9 个增量和 64 个定种子 mutation cases 加固错误恢复；`TS-3108` 已覆盖全部 42 个 compiler conformance programs、84 个全语料定种子编辑和 43 个稳定 CST/node-type 映射；`ZQ-3201` 已增加 18 个受审查的 Zed 基础高亮 capture 和 3 个标准 query fixtures，覆盖 ASCII/中文结构对等、组合字符与 emoji 错误恢复。NFC、禁止字符、混合书写系统、Confusable 诊断、pattern 名称角色以及源码合法性仍由编译器权威判定。

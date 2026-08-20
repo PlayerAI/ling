@@ -18,14 +18,17 @@
   "files": [
     "grammar.js",
     "tree-sitter.json",
+    "queries/**",
     "src/**",
     "test/corpus/**",
+    "test/highlight/**",
     "examples/**"
   ],
   "scripts": {
     "generate": "tree-sitter generate",
-    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types && npm run test:recovery && npm run test:conformance",
+    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types && npm run test:recovery && npm run test:conformance && npm run test:highlights",
     "test:conformance": "node test/run-conformance-differential.js",
+    "test:highlights": "node test/run-highlight-tests.js",
     "test:layout": "node test/run-layout-integration.js",
     "test:scanner": "node test/run-scanner-tests.js",
     "test:unicode": "node test/run-unicode-differential.js",
