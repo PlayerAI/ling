@@ -308,7 +308,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn json_uses_the_versioned_schema_and_stable_field_order() {
+    fn json_exposes_protocol_fields_without_freezing_message_wording() {
         let diagnostic = Diagnostic::new(
             codes::INVALID_UTF8,
             Severity::Error,
@@ -318,20 +318,78 @@ mod tests {
         .with_primary_span(DiagnosticSpan::at("main.ling", 2, 3))
         .with_fact("valid_up_to", 2_u64);
 
-        assert_eq!(
-            diagnostic.render_json().unwrap(),
-            concat!(
-                "{\"schema\":\"ling.diagnostic/0.1\",",
-                "\"code\":\"L-LEX-0001\",",
-                "\"severity\":\"error\",",
-                "\"message_zh\":\"源码不是有效的 UTF-8\",",
-                "\"message_en\":\"source is not valid UTF-8\",",
-                "\"primary_span\":{\"file\":\"main.ling\",\"start_byte\":2,\"end_byte\":3},",
-                "\"semantic_id\":null,",
-                "\"facts\":{\"valid_up_to\":2},",
-                "\"repairs\":[]}"
-            )
+        let rendered = diagnostic.render_json().unwrap();
+        let value: Value = serde_json::from_str(&rendered).unwrap();
+        assert_eq!(value["schema"], DIAGNOSTIC_SCHEMA);
+        assert_eq!(value["code"], "L-LEX-0001");
+        assert_eq!(value["severity"], "error");
+        assert!(
+            value["message_zh"]
+                .as_str()
+                .is_some_and(|text| !text.is_empty())
         );
+        assert!(
+            value["message_en"]
+                .as_str()
+                .is_some_and(|text| !text.is_empty())
+        );
+        assert_eq!(value["primary_span"]["file"], "main.ling");
+        assert_eq!(value["primary_span"]["start_byte"], 2);
+        assert_eq!(value["primary_span"]["end_byte"], 3);
+        assert_eq!(value["facts"]["valid_up_to"], 2);
+        assert_eq!(value["repairs"], serde_json::json!([]));
+    }
+
+    #[test]
+    fn json_orders_fact_maps_and_keeps_repairs_structured() {
+        let build = |reverse: bool| {
+            let diagnostic = Diagnostic::new(
+                codes::TYPE_MISMATCH,
+                Severity::Error,
+                "类型不匹配",
+                "type mismatch",
+            );
+            let repair = Repair::new("replace_type_annotation", false);
+            if reverse {
+                diagnostic
+                    .with_fact("zeta", 2_u64)
+                    .with_fact("alpha", 1_u64)
+                    .with_repair(repair.with_fact("zeta", "Int").with_fact("alpha", "Text"))
+            } else {
+                diagnostic
+                    .with_fact("alpha", 1_u64)
+                    .with_fact("zeta", 2_u64)
+                    .with_repair(repair.with_fact("alpha", "Text").with_fact("zeta", "Int"))
+            }
+        };
+
+        let forward = build(false).render_json().unwrap();
+        let reverse = build(true).render_json().unwrap();
+        assert_eq!(forward, reverse);
+
+        let value: Value = serde_json::from_str(&forward).unwrap();
+        assert_eq!(value["repairs"][0]["kind"], "replace_type_annotation");
+        assert_eq!(value["repairs"][0]["changes_semantics"], false);
+        assert_eq!(value["repairs"][0]["facts"]["alpha"], "Text");
+        assert_eq!(value["repairs"][0]["facts"]["zeta"], "Int");
+    }
+
+    #[test]
+    fn json_span_offsets_remain_original_utf8_bytes() {
+        let source = "零a";
+        let first_scalar_end = u32::try_from(source.find('a').unwrap()).unwrap();
+        assert_eq!(first_scalar_end, 3);
+
+        let diagnostic = Diagnostic::new(
+            codes::UNEXPECTED_CHARACTER,
+            Severity::Error,
+            "无法识别字符",
+            "unrecognized character",
+        )
+        .with_primary_span(DiagnosticSpan::at("main.ling", 0, first_scalar_end));
+        let value: Value = serde_json::from_str(&diagnostic.render_json().unwrap()).unwrap();
+        assert_eq!(value["primary_span"]["start_byte"], 0);
+        assert_eq!(value["primary_span"]["end_byte"], 3);
     }
 
     #[test]

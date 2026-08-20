@@ -37,6 +37,7 @@ jobs:
           cargo xtask governance check-gaps
           cargo xtask governance check-lifecycle
           cargo xtask governance check-protocols
+          cargo xtask governance check-error-codes
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Run Clippy

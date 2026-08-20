@@ -1,3 +1,4 @@
+mod error_codes;
 mod gaps;
 mod governance;
 mod lifecycle;
@@ -151,9 +152,43 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "governance" && command == "check-error-codes" => {
+            match error_codes::check_repository(&root) {
+                Ok(summary) => {
+                    println!(
+                        "diagnostic registry OK: {} active, {} retired across {} domains ({} Rust constants)",
+                        summary.active_count,
+                        summary.retired_count,
+                        summary.domain_count,
+                        summary.rust_constant_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "governance" && command == "render-error-code-lock" => {
+            match error_codes::render_lock_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols"
+                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

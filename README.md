@@ -33,6 +33,7 @@ cargo xtask governance check-authority
 cargo xtask governance check-gaps
 cargo xtask governance check-lifecycle
 cargo xtask governance check-protocols
+cargo xtask governance check-error-codes
 cargo run --locked --offline -- --version
 ```
 
@@ -169,7 +170,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/ROADMAP-1.0.md`](docs/ROADMAP-1.0.md)：从已发布的 `v0.0.1 Seed` 推进到 `v1.0` 的分块路线图、RFC 门禁、实施步骤、版本出口和兼容性要求。
 - [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md)：RFC §18、实现路径、正反测试证据和已关闭发布门禁的双语追踪矩阵。
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md)：本地质量门禁、候选 SHA、跨平台/fuzz/MSRV CI 与已发布 tag 的双语记录。
-- [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的稳定错误码、双语模板、Facts 与兼容性边界。
+- [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md)：`ling.diagnostic/0.1` 的唯一错误码注册表，包含 phase、稳定级别、严重度、双语模板、typed Facts、retired 记录与兼容性边界；生成的 [`error-code-lock.toml`](docs/governance/error-code-lock.toml) 由 CI 检查改义、改型、复用和编号回填。
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md)：Rust 直接/关键传递依赖、许可证、MSRV、`unsafe` 与审查状态。
 - [`docs/governance/authority.md`](docs/governance/authority.md)：由机器清单确定性生成的规范权威、生命周期、依赖与冲突处理索引。
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md)：按版本和优先级生成的规范缺口、阻断任务与候选 RFC 台账。
@@ -246,6 +247,7 @@ cargo xtask governance check-authority
 cargo xtask governance check-gaps
 cargo xtask governance check-lifecycle
 cargo xtask governance check-protocols
+cargo xtask governance check-error-codes
 cargo run --locked --offline -- --version
 ```
 
@@ -382,7 +384,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/ROADMAP-1.0.md`](docs/ROADMAP-1.0.md): the block-by-block roadmap from the released `v0.0.1 Seed` to `v1.0`, including RFC gates, implementation steps, release exits, and compatibility requirements.
 - [`docs/SEED-TRACEABILITY.md`](docs/SEED-TRACEABILITY.md): a bilingual mapping from RFC §18 to implementation paths, positive/negative evidence, and closed release gates.
 - [`docs/SEED-RELEASE-REPORT.md`](docs/SEED-RELEASE-REPORT.md): a bilingual record of local gates, the candidate SHA, platform/fuzz/MSRV CI, and the published tag.
-- [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): stable `ling.diagnostic/0.1` codes, bilingual templates, Facts, and compatibility boundaries.
+- [`docs/ERROR-CODES.md`](docs/ERROR-CODES.md): the sole `ling.diagnostic/0.1` code registry, including phase, stability, severity, bilingual templates, typed Facts, retired records, and compatibility boundaries; CI checks the generated [`error-code-lock.toml`](docs/governance/error-code-lock.toml) for changed meanings/types, reuse, and number backfilling.
 - [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md): direct and key transitive Rust dependencies, licenses, MSRV, `unsafe`, and review status.
 - [`docs/governance/authority.md`](docs/governance/authority.md): the deterministically generated index of specification authority, lifecycle, dependencies, and conflict handling.
 - [`docs/governance/gap-register.md`](docs/governance/gap-register.md): the release- and priority-ordered register of specification gaps, blocked tasks, and candidate RFCs.

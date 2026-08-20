@@ -29,4 +29,5 @@
 - [ ] Original UTF-8 byte spans and bilingual stable diagnostics are preserved where applicable.
 - [ ] Experimental implementation names a Draft RFC or registered specification gap.
 - [ ] New RFC/decision documents use the checked lifecycle templates and registry.
+- [ ] Public diagnostic changes update the single error-code registry and pass `cargo xtask governance check-error-codes`.
 - [ ] Normal builds and tests remain offline after dependency locking.

@@ -48,6 +48,7 @@ Each change must state:
 - Language-semantic pull requests must cite the Accepted specification IDs and normative clauses that authorize the change. Draft/Proposed documents, gaps, roadmaps, snapshots, and implementation behavior are not authorization.
 - Experimental implementation must name its governing Draft RFC or registered specification gap; remove or update that marker when the experiment graduates.
 - Register every implemented or planned public protocol in `docs/governance/protocol-inventory.toml`; do not claim `Stable` before the ROADMAP-1.0 gates, an Accepted authority, and executable fixtures are present.
+- Validate diagnostic allocations with `cargo xtask governance check-error-codes`; `docs/ERROR-CODES.md` is the only handwritten allocation source and `docs/governance/error-code-lock.toml` is generated compatibility evidence.
 
 ## Task workflow
 

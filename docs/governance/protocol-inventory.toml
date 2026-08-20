@@ -83,11 +83,11 @@ reader_policy = "The repository currently provides a writer but no public Diagno
 writer_policy = "Emit schema, stable code, severity, Chinese and English messages, optional UTF-8 byte span and Semantic ID, ordered Facts, and structured Repairs."
 unknown_field_policy = "Optional Facts and Repair candidates are compatible extensions; no compatibility promise currently exists for unknown top-level fields."
 migration_tool = "None; breaking field changes require a new diagnostic schema with migration guidance, while changed code meaning requires a new code."
-fixtures = ["crates/ling-diagnostics/src/lib.rs", "crates/ling-cli/tests/conformance.rs", "tests/conformance/m2-invalid-number/expect.toml"]
-sources = ["crates/ling-diagnostics/src/lib.rs", "docs/ERROR-CODES.md"]
+fixtures = ["crates/ling-diagnostics/src/lib.rs", "crates/ling-cli/tests/conformance.rs", "tests/conformance/m2-invalid-number/expect.toml", "docs/governance/error-code-lock.toml", "tools/xtask/src/error_codes.rs"]
+sources = ["crates/ling-diagnostics/src/lib.rs", "docs/ERROR-CODES.md", "docs/governance/error-code-lock.toml", "tools/xtask/src/error_codes.rs"]
 version_markers = ["ling.diagnostic/0.1"]
 authority = ["DEC-0001", "DEC-0002"]
-notes = ["Code meaning, error/warning classification, and existing Facts types are the documented stable subset; the 0.1 container remains Preview until 1.0 gates close."]
+notes = ["Code meaning, error/warning classification, and existing Facts types are the documented stable subset; the 0.1 container remains Preview until 1.0 gates close.", "The Markdown registry is the sole handwritten allocation source; the generated lock and offline checker reject drift, retired reuse, and unregistered implementation/test codes."]
 
 [[protocol]]
 id = "PROTO-SEMANTIC-GRAPH-JSON"

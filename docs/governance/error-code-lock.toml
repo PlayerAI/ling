@@ -1,0 +1,356 @@
+# Generated from docs/ERROR-CODES.md; do not allocate codes here.
+# Refresh with: cargo xtask governance render-error-code-lock
+schema_version = 1
+source = "docs/ERROR-CODES.md"
+registry_schema = "ling.diagnostic-registry/0.1"
+
+[high_water]
+AUDIT = 4
+CAP = 3
+ENTRY = 3
+IMPL = 1
+INTERNAL = 1
+IO = 1
+LEX = 12
+MUT = 1
+NAME = 9
+RUNTIME = 1
+SNAPSHOT = 1
+SYNTAX = 11
+TYPE = 11
+
+[[code]]
+id = "L-AUDIT-0001"
+core_sha256 = "sha256:06e084c706adce080555a040211b5b4a416756e6862980cb9c10d8725d87bfdc"
+retired = false
+facts = ["audit_schema:string:required"]
+
+[[code]]
+id = "L-AUDIT-0002"
+core_sha256 = "sha256:ed2f44ce150070864a7d1f8e76e0de5c30a47bec9f9a84bd5ca98f9d0ff027df"
+retired = false
+facts = ["audit_schema:string:required"]
+
+[[code]]
+id = "L-AUDIT-0003"
+core_sha256 = "sha256:9e064cfd2d3069fae45b5e7845247375d22e5586d10dcda19e7cb9347cd33bbd"
+retired = false
+facts = ["audit_schema:string:required"]
+
+[[code]]
+id = "L-AUDIT-0004"
+core_sha256 = "sha256:332ce264f16fd05361d2847af0f764295354f5745d5a8da886e3ae2582d0cd0c"
+retired = false
+facts = ["audit_schema:string:required"]
+
+[[code]]
+id = "L-CAP-0001"
+core_sha256 = "sha256:c4a8453c72ce92d4d24ecfa3959d5f70f5703b16c66201f212134cf991a6583e"
+retired = false
+facts = []
+
+[[code]]
+id = "L-CAP-0002"
+core_sha256 = "sha256:df021795b74cb21510b7eca24c7976c9c89310d72a6defac522295dcc1e35f69"
+retired = false
+facts = []
+
+[[code]]
+id = "L-CAP-0003"
+core_sha256 = "sha256:4f2522a8ddc102d61166119ba4cd60de8483b65a35e869bfe8534a4d42c6d17b"
+retired = false
+facts = []
+
+[[code]]
+id = "L-ENTRY-0001"
+core_sha256 = "sha256:6954047817f21cb93315952fbbf31964edae38d5ac6c806c1ca8201e34921213"
+retired = false
+facts = []
+
+[[code]]
+id = "L-ENTRY-0002"
+core_sha256 = "sha256:bbe0e192b80af50b0aadfe93c015c5d4a3068b527ab373a280d79626b355aab5"
+retired = false
+facts = []
+
+[[code]]
+id = "L-ENTRY-0003"
+core_sha256 = "sha256:674b8a0ee68c48ae105e419343617735e85f08e375528ffeb3ccf87410d3c14d"
+retired = false
+facts = []
+
+[[code]]
+id = "L-IMPL-0001"
+core_sha256 = "sha256:b2da5382be4e4923644a8e91a45d901a1c4549aa56c055f2326c547ed863a361"
+retired = true
+facts = ["command:string:required", "completed_stage:string:required", "had_bom:boolean:optional", "source_name:string:optional", "token_count:integer:optional", "unicode_version:string:optional"]
+
+[[code]]
+id = "L-INTERNAL-0001"
+core_sha256 = "sha256:7affdcb0e143707143162410e9c01813c73af9d4a2dcc85753db3dd547d064ee"
+retired = false
+facts = ["incident_id:string:required", "reproduction:string:optional", "reproduction_error:string:optional", "stage:string:required"]
+
+[[code]]
+id = "L-IO-0001"
+core_sha256 = "sha256:f366b93115a357dc5610c2234f3452ffdf2521eaf757d4b0502bd33244c4d478"
+retired = false
+facts = ["io_kind:string:required"]
+
+[[code]]
+id = "L-LEX-0001"
+core_sha256 = "sha256:8d0e48b82014b1e35e0a295e584f96d428f9d35a45d162781c3ad5ac3b358344"
+retired = false
+facts = ["valid_up_to:integer:required"]
+
+[[code]]
+id = "L-LEX-0002"
+core_sha256 = "sha256:e7bc48ee1f9584800ce0e107338210fdf38f9018c86ea791db6cd97cadbf9f5a"
+retired = false
+facts = []
+
+[[code]]
+id = "L-LEX-0003"
+core_sha256 = "sha256:770dcb3b7e396b6647e7db9229b3dbc12e335196b00ad7735c83f7a61afbc9e3"
+retired = false
+facts = ["byte_len:integer:required", "maximum_byte_len:integer:required"]
+
+[[code]]
+id = "L-LEX-0004"
+core_sha256 = "sha256:539d091974309b94edd19848c779a43e68e37351b0a401db4aec7cb7e9396e2e"
+retired = false
+facts = ["reason:string:required"]
+
+[[code]]
+id = "L-LEX-0005"
+core_sha256 = "sha256:db8d02642769db2cf8e4a87707af3c1c421a891daa632021ee24b7e198fda31c"
+retired = false
+facts = ["codepoint:string:required"]
+
+[[code]]
+id = "L-LEX-0006"
+core_sha256 = "sha256:c6b7ec3a92e0f274a8f10b0fa6174bb032f34db6a386f43ddb98a9e8a25eba04"
+retired = false
+facts = []
+
+[[code]]
+id = "L-LEX-0007"
+core_sha256 = "sha256:e7c128b797ca738be578d2432ec52ebfa891338e71e46081d7dc183fda9859ff"
+retired = false
+facts = ["maximum_depth:integer:required"]
+
+[[code]]
+id = "L-LEX-0008"
+core_sha256 = "sha256:092e673aa4dd3cd29c084995386602be3ba00a9e1137339fc00ca78c5d828659"
+retired = false
+facts = []
+
+[[code]]
+id = "L-LEX-0009"
+core_sha256 = "sha256:7ca2dff2e37699da217b06eb58e60f7696790f51307410562df50157af8e8b9c"
+retired = false
+facts = []
+
+[[code]]
+id = "L-LEX-0010"
+core_sha256 = "sha256:293c08439a9d70fd31f1d53c4ad350f04e960060bf66d12e56d0a1dbfa48db18"
+retired = false
+facts = []
+
+[[code]]
+id = "L-LEX-0011"
+core_sha256 = "sha256:79ea4981a6621ca13c512cc3fbafaf80dc742a7d9f1d6f025a922ec8ee7b8082"
+retired = false
+facts = []
+
+[[code]]
+id = "L-LEX-0012"
+core_sha256 = "sha256:98b8c9cd292bdee4c29273113dff78850800eed8e4239a97b96f2621cdc7f490"
+retired = false
+facts = []
+
+[[code]]
+id = "L-MUT-0001"
+core_sha256 = "sha256:05f682d9db2af91e5fb1172a0e4a7b00d3cf64ceef95d9b3a16dcd56efa036c2"
+retired = false
+facts = ["field:string:optional", "mutability:string:optional", "reason:string:optional"]
+
+[[code]]
+id = "L-NAME-0001"
+core_sha256 = "sha256:0f1dbb59b17248920768f6d49f02d93234aef29ab51c5721dd8f781adf5415c5"
+retired = false
+facts = []
+
+[[code]]
+id = "L-NAME-0002"
+core_sha256 = "sha256:b5599eb4393d8c15a789d5bac5b28b41d8d2bb87a5915a1e93b32309b4808567"
+retired = false
+facts = ["previous_name:string:optional"]
+
+[[code]]
+id = "L-NAME-0003"
+core_sha256 = "sha256:b27b9b5b88e8f42a52f2004186878cd5c9da391f4d73cb20e082c656912f3eb2"
+retired = false
+facts = ["actual_module:string:optional", "committed:boolean:optional", "expected_module:string:optional"]
+
+[[code]]
+id = "L-NAME-0004"
+core_sha256 = "sha256:98477e98e7417783b3f9f89747d0f5871443e40916fb58348fdb0cc19f1dfead"
+retired = false
+facts = []
+
+[[code]]
+id = "L-NAME-0005"
+core_sha256 = "sha256:3b206b8b99c9eec3ea23223cdbe18e261a9a671e5e4725dca566e0114994c9f1"
+retired = false
+facts = []
+
+[[code]]
+id = "L-NAME-0006"
+core_sha256 = "sha256:5b974e9cba549c4e428b182f4dca558e1ad8742efe2e825f4fbeec560b110ae3"
+retired = false
+facts = ["first:string:optional", "second:string:optional"]
+
+[[code]]
+id = "L-NAME-0007"
+core_sha256 = "sha256:e4049d6bec7ebb56900b5e9b6b17a0eaf9666342615fb802a5a5170a1a99e4ee"
+retired = false
+facts = []
+
+[[code]]
+id = "L-NAME-0008"
+core_sha256 = "sha256:eb6353e88868fda2f7f637624ed2aa2ff8efa0b7167d43e3dc3d964b4f54190a"
+retired = false
+facts = ["module:string:optional"]
+
+[[code]]
+id = "L-NAME-0009"
+core_sha256 = "sha256:f9bf45707fbd9f728dbbe5f956977d14b15eb058ad4e255956be159e61c818ce"
+retired = false
+facts = ["name:string:required", "scripts:string[]:required"]
+
+[[code]]
+id = "L-RUNTIME-0001"
+core_sha256 = "sha256:8cd7d078fb4b96c21dab458e16f351ca42211ff0a746997fa15575ffd6b2b493"
+retired = false
+facts = ["category:string:required", "committed:boolean:optional", "operation:string:optional"]
+
+[[code]]
+id = "L-SNAPSHOT-0001"
+core_sha256 = "sha256:74b3cd09e8384b444b6cdb0f213391de1fc4d07b33199e861ce90360104272ce"
+retired = false
+facts = ["committed:boolean:optional", "detail:string:required"]
+
+[[code]]
+id = "L-SYNTAX-0001"
+core_sha256 = "sha256:8de22c4ae417fe54220c4bf81be4521915175df208a1dbd604002528eb78a53c"
+retired = false
+facts = []
+
+[[code]]
+id = "L-SYNTAX-0002"
+core_sha256 = "sha256:786fdac35623816278ae7642b64158dffd5fd110df04df281b0e14a93afbef45"
+retired = false
+facts = ["actual_column:integer:required", "recovered_column:integer:required"]
+
+[[code]]
+id = "L-SYNTAX-0003"
+core_sha256 = "sha256:c84ffc85b788830ea86c2571e7bacfa0a3b13c23bcdf25cc5fd05f122c183b93"
+retired = false
+facts = ["maximum_depth:integer:required"]
+
+[[code]]
+id = "L-SYNTAX-0004"
+core_sha256 = "sha256:a8f12544340ee2a694bc9f2c0cda6c926a11e734cc4c9d63e02bb1f2dc0c20b1"
+retired = false
+facts = ["found:string:required"]
+
+[[code]]
+id = "L-SYNTAX-0005"
+core_sha256 = "sha256:276f9301dc4ce8fd4e47739b8c24a87a079d95494428d9492f805f955f8d21d6"
+retired = false
+facts = ["expected:string:required", "found:string:required"]
+
+[[code]]
+id = "L-SYNTAX-0006"
+core_sha256 = "sha256:566a4111e5742c453c9ec5f3b62035b37108886a28936b9957408144c1c4ed70"
+retired = false
+facts = ["expected:string:required"]
+
+[[code]]
+id = "L-SYNTAX-0010"
+core_sha256 = "sha256:f00209b5e8278c89f845918b28f7a5170f010064d4ab2b520983ec7f903d6218"
+retired = false
+facts = ["context:string:required", "expected:string:required", "found:string:required"]
+
+[[code]]
+id = "L-SYNTAX-0011"
+core_sha256 = "sha256:0c7aca016bd5c5869733033b3f0dbce07d24d76adee5d906c7986cc5384016e6"
+retired = false
+facts = ["maximum_depth:integer:required"]
+
+[[code]]
+id = "L-TYPE-0001"
+core_sha256 = "sha256:0a5040081dab859490fb7fa6ae04cf34c55caece451ea7902a49cbd90071bd01"
+retired = false
+facts = ["generalization:string:optional", "restriction_reason:string:optional"]
+
+[[code]]
+id = "L-TYPE-0002"
+core_sha256 = "sha256:d436fa7d29764693d32e5b341270fd6a8c732dd9f35e33f2b73212238b1de3a1"
+retired = false
+facts = []
+
+[[code]]
+id = "L-TYPE-0003"
+core_sha256 = "sha256:08f0b1dd68243cacfdacec7677f7f7bc24d7f7b9293bf6b2a1f921ca2e708cc6"
+retired = false
+facts = []
+
+[[code]]
+id = "L-TYPE-0004"
+core_sha256 = "sha256:9c35b9e11582d0d98ca7fc1fd564fae3594817b6515da2cdf51783b0bc1f61c7"
+retired = false
+facts = ["field:string:required"]
+
+[[code]]
+id = "L-TYPE-0005"
+core_sha256 = "sha256:a25f84cc9b87a8904a333042f1d25e1c6d18f4ef265109d5b02e1224c8172e54"
+retired = false
+facts = []
+
+[[code]]
+id = "L-TYPE-0006"
+core_sha256 = "sha256:e83f52c9309e86116781553ff3b50071bead2038496073f727870b7f50167ef2"
+retired = false
+facts = ["witness:string:required"]
+
+[[code]]
+id = "L-TYPE-0007"
+core_sha256 = "sha256:b82a861eb0e9f545c7db7a68caf7a824949a6ecde9b6949deff5eb0b5f214906"
+retired = false
+facts = ["reason:string:required"]
+
+[[code]]
+id = "L-TYPE-0008"
+core_sha256 = "sha256:06bf418a80aadd087ea466c3813f0abe0321ea35fd1010a3655dca298f3d0305"
+retired = false
+facts = ["field:string:required"]
+
+[[code]]
+id = "L-TYPE-0009"
+core_sha256 = "sha256:acb35961ddac1e34cba7bfbc18c75ee9e6b19ebe7ec1fdc9f911256d7aa1d152"
+retired = false
+facts = ["fields:string:required"]
+
+[[code]]
+id = "L-TYPE-0010"
+core_sha256 = "sha256:85b877da60ccfd33b740e0bb050ba6a3bc9ab2e5fa94bc769cf50f9eb842df14"
+retired = false
+facts = ["actual_arity:integer:required", "constructor:string:required", "expected_arity:integer:required"]
+
+[[code]]
+id = "L-TYPE-0011"
+core_sha256 = "sha256:e57d50fc18d33e1ecd778041a0556cab3653ef0637d8b286daf0f53ff159b285"
+retired = false
+facts = ["type:string:required"]
