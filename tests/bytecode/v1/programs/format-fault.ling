@@ -1,0 +1,6 @@
+module Main
+    requires Console.Write
+
+let main () =
+    let rendered = Text.format "left {} right {}" 7
+    Console.write rendered

@@ -185,6 +185,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "ling-bytecode"
+version = "0.0.1-dev"
+dependencies = [
+ "ling-ast",
+ "ling-diagnostics",
+ "ling-effects",
+ "ling-eval",
+ "ling-hir",
+ "ling-resolve",
+ "ling-semantic",
+ "ling-source",
+ "ling-syntax",
+ "ling-types",
+]
+
+[[package]]
 name = "ling-cli"
 version = "0.0.1-dev"
 dependencies = [

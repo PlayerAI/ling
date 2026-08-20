@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
     "crates/ling-ast",
+    "crates/ling-bytecode",
     "crates/ling-cli",
     "crates/ling-diagnostics",
     "crates/ling-effects",

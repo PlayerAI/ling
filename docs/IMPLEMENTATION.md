@@ -45,6 +45,7 @@ RFC-0001 §6.6 的“受限自动 Borrow”与 SEMANTICS §29 的“v0.0.1 不�
 │   ├── ling-source/      # SourceId、UTF-8、Span、行列映射
 │   ├── ling-unicode/     # XID、NFC、Script Set、UTS #39 skeleton
 │   ├── ling-project/     # ling.toml v1、源码/module 发现、离线 path dependency graph 与内容 identity
+│   ├── ling-bytecode/    # RFC-0014 的未验证 bytecode model、显式 tag/opcode 与 hard limits
 │   ├── ling-syntax/      # Token、Lexer、offside layout、Parser、CST
 │   ├── ling-ast/         # AST（保 Span、去语法噪音）
 │   ├── ling-hir/         # 名称空间、糖 Lowering、Place 分类
@@ -76,6 +77,7 @@ ling-source
 ling-unicode
 ling-diagnostics → ling-source
 ling-project     → ling-source, ling-unicode, ling-diagnostics, ling-syntax, ling-ast
+ling-bytecode
 ling-syntax      → ling-source, ling-unicode, ling-diagnostics
 ling-ast         → ling-source, ling-syntax
 ling-hir         → ling-source, ling-ast
@@ -120,7 +122,7 @@ Unicode 17.0.0 的权威输入来自 Unicode Consortium 的版本化目录：
 
 - `ling-cli` 内定义唯一常量 `CLI_NAME = "ling"`，所有帮助文本、诊断、错误消息引用该常量，禁止散落硬编码（RFC §2）；
 - Cargo package 名即 crate 名（`ling-source` 等），`[[bin]] name = "ling"`；
-- Schema/format 字符串按各自 Accepted authority 固定为 `ling.diagnostic/0.1`、`ling.semantic/0.1`、`ling.semantic/0.2`、`ling.manifest/1` 与 `ling.lock/1`，集中在所属 crate 的常量中；
+- Schema/format 字符串按各自 Accepted authority 固定为 `ling.diagnostic/0.1`、`ling.semantic/0.1`、`ling.semantic/0.2`、`ling.manifest/1`、`ling.lock/1` 与 `ling.bytecode/1.0`，集中在所属 crate 的常量中；
 - `LANGUAGE_VERSION`、`UNICODE_VERSION`、Schema ID 与哈希算法使用有类型封装，禁止在业务逻辑中散落字符串；
 - 错误码前缀 `L-`，domain 在错误码注册表分配（见 M0）；
 - 改变公开 Schema、错误码含义或 ID 编码必须更新版本、兼容性测试和迁移说明，不能只更新快照。
@@ -219,6 +221,8 @@ PRJ-1105 增加 RFC-0002 `ling.lock/1` 的严格 reader、canonical writer 与�
 PRJ-1106 增加 `single-package`、`multi-module`、`path-dependency`、`cycle`、`visibility`、`offline-lock` 与 `unicode-names` 七组端到端工程 fixture。每组 fixture 冻结完整 Diagnostic JSON，以及成功时的 path-free graph 测试快照和 canonical lock bytes；失败用例显式要求 graph/lock 均不发布。`expected-graph.json` 仅为测试证据，不建立新的公开 Schema；CLI 工程选择仍由 PRJ-1107 负责。
 
 PRJ-1108 增加固定 seed、无外部依赖的生成式 project property suite：独立 cycle oracle 检查随机小型 module graph，canonical logical path 只验证不改写，acyclic project 在相反文件创建顺序下产生相同 graph/identity/lock，且 `ling.lock/1` model 与 canonical bytes 双向 round-trip。`manifest_bytes` fuzz target 对同一任意输入使用不同诊断 source label 重复解码，要求成功模型或失败 code/span 一致；四个审查过的 seed corpus 进入固定 nightly CI smoke。该任务不新增公开接口、Schema、诊断或语言语义。
+
+VM-1201 依据 Accepted RFC-0014 增加独立、无生产依赖的 `ling-bytecode` data-model crate。所有 table/index/digest domain 使用不同 Rust 类型，opcode/tag 由显式方法给出而不依赖 enum 内存布局；模型类型名明确标记为 `UnverifiedProgram`，不提供 encoder、decoder、verifier、lowering 或执行入口。TEST-VM-0001 同时冻结解释器的首个 VM slice 可观察结果、Runtime Fault code/category/original UTF-8 span，以及 22 个 malformed verifier 场景；VM differential 用例在 VM-1204 前以明确原因 ignored。
 
 出口标准：§18.6 全过；Graph Schema 正/负兼容性测试通过；同一输入在两个独立进程中产生逐字节相同的 Graph JSON 与 Audit 文本；Audit round-trip 性质测试通过；依赖实现变化敏感性有最小调用图用例，避免无意的全图或不充分失效。
 

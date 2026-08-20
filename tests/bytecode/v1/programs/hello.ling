@@ -1,0 +1,4 @@
+module Main
+    requires Console.Write
+
+let main () = Console.write "你好，零"

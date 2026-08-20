@@ -1,0 +1,23 @@
+id	phase	mutation	required_reason
+BC-MAL-0001	envelope	wrong magic	invalid_magic
+BC-MAL-0002	envelope	unsupported major version	unsupported_version
+BC-MAL-0003	envelope	nonzero reserved header	reserved_nonzero
+BC-MAL-0004	envelope	declared length exceeds input	truncated_artifact
+BC-MAL-0005	table	string count exceeds hard maximum	resource_limit
+BC-MAL-0006	table	invalid UTF-8 string payload	invalid_utf8
+BC-MAL-0007	table	duplicate or unsorted string	invalid_table_order
+BC-MAL-0008	constant	nonminimal integer magnitude	noncanonical_integer
+BC-MAL-0009	instruction	unknown opcode	unknown_opcode
+BC-MAL-0010	instruction	operand length mismatch	invalid_instruction_length
+BC-MAL-0011	control_flow	jump target outside function	invalid_block_index
+BC-MAL-0012	register	register index outside function	invalid_register_index
+BC-MAL-0013	register	register defined twice	duplicate_register_definition
+BC-MAL-0014	register	use before dominating definition	register_not_dominated
+BC-MAL-0015	type	branch argument type mismatch	block_argument_type_mismatch
+BC-MAL-0016	type	call argument type mismatch	call_signature_mismatch
+BC-MAL-0017	effect	ConsoleWrite missing from effect closure	effect_mismatch
+BC-MAL-0018	capability	module lacks Console.Write	capability_mismatch
+BC-MAL-0019	entry	main signature is not Unit to Unit	invalid_entry
+BC-MAL-0020	source_map	missing executable location	incomplete_source_map
+BC-MAL-0021	source_map	span exceeds exact source bytes	invalid_source_span
+BC-MAL-0022	envelope	trailing bytes after source-map table	trailing_bytes

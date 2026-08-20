@@ -439,7 +439,7 @@ fixtures = []
 sources = ["docs/RFC-0014.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
 version_markers = []
 authority = ["RFC-0014"]
-notes = ["RFC-0014 accepts the design boundary, but the protocol remains Future until VM-1201 through VM-1204 implement and verify the model, writer, decoder, verifier, VM, and corpus."]
+notes = ["VM-1201 implements only the explicitly unverified data model, typed index/digest domains, fixed tags/opcodes/limits, and TEST-VM-0001 reference corpus. The protocol remains Future until VM-1202 through VM-1204 add deterministic writing/lowering, independent decoding/verification, executable VerifiedProgram state, and VM evidence."]
 
 [[protocol]]
 id = "PROTO-REPLAY"

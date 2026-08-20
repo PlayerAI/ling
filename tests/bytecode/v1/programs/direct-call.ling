@@ -1,0 +1,8 @@
+module Main
+    requires Console.Write
+
+let echo value = value
+
+let main () =
+    let message = echo "direct call"
+    Console.write message

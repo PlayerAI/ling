@@ -256,7 +256,7 @@
 - Authority: `RFC-0014`
 - Sources: [`docs/RFC-0014.md`](../RFC-0014.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
-- Notes: RFC-0014 accepts the design boundary, but the protocol remains Future until VM-1201 through VM-1204 implement and verify the model, writer, decoder, verifier, VM, and corpus.
+- Notes: VM-1201 implements only the explicitly unverified data model, typed index/digest domains, fixed tags/opcodes/limits, and TEST-VM-0001 reference corpus. The protocol remains Future until VM-1202 through VM-1204 add deterministic writing/lowering, independent decoding/verification, executable VerifiedProgram state, and VM evidence.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

@@ -1,0 +1,22 @@
+[package]
+name = "ling-bytecode"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dev-dependencies]
+ling-ast = { path = "../ling-ast" }
+ling-diagnostics = { path = "../ling-diagnostics" }
+ling-effects = { path = "../ling-effects" }
+ling-eval = { path = "../ling-eval" }
+ling-hir = { path = "../ling-hir" }
+ling-resolve = { path = "../ling-resolve" }
+ling-semantic = { path = "../ling-semantic" }
+ling-source = { path = "../ling-source" }
+ling-syntax = { path = "../ling-syntax" }
+ling-types = { path = "../ling-types" }
+
+[lints]
+workspace = true
