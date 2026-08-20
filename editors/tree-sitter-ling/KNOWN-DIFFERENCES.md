@@ -1,6 +1,6 @@
 # Tree-sitter known differences
 
-This file records deliberate differences between the Tree-sitter editor support through ZQ-3201 and the authoritative Ling compiler. None of these differences changes Ling syntax or semantics.
+This file records deliberate differences between the Tree-sitter editor support through ZQ-3202 and the authoritative Ling compiler. None of these differences changes Ling syntax or semantics.
 
 | Area | Tree-sitter behavior through TS-3108 | Authoritative behavior / owner |
 | --- | --- | --- |
@@ -15,5 +15,6 @@ This file records deliberate differences between the Tree-sitter editor support 
 | Error recovery | Ten static malformed states, nine incremental edits, and 64 fixed-seed mutations terminate within explicit process/CST bounds. A private root boundary retains surrounding declaration nodes, while built-in `ERROR`/`MISSING` remains present. Recovery may nest one retained declaration below an incomplete binding. | Recovery is editor structure only. It emits no Ling diagnostic and cannot make compiler-invalid source valid; `ling-syntax` remains the validity and bilingual-diagnostic authority. |
 | Compiler differential | A sorted shared manifest covers all 42 compiler conformance sources exactly once: 34 valid/clean, 7 invalid/recovery, and 1 invalid/explicitly tolerated. Eighty-four fixed-seed edits terminate deterministically, and hashes lock all 42 normalized CSTs plus generated node types. | This evidence applies to the current corpus and is not a semantic-equivalence claim. The compiler remains the validity, diagnostic, type, effect, and execution authority. |
 | Syntax highlighting | ZQ-3201 assigns only CST-proven roles. An identifier used as a call target is a function, but a bare name remains a variable; declared/pattern constructors are captured, while a bare constructor-looking expression is not inferred from spelling. Primitive and intrinsic names are built-ins only in unqualified type positions. ASCII and Chinese identifiers use the same structural rules. | Resolver/type information and future semantic tokens own distinctions that syntax cannot prove, including shadowed prelude constructors, local bindings, namespaces, and resolved type identities. Future reserved words are not highlighted as active syntax. |
+| Bracket matching | ZQ-3202 pairs `()`, `[]`, `{}`, and complete string quotes. String pairs exclude rainbow coloring, escaped quotes are not endpoints, and bracket-like bytes inside nested block comments produce no captures because the scanner exposes each comment as one opaque node. | The compiler remains authoritative for delimiter/string/comment validity and depth diagnostics. Zed matching is an editor aid and does not infer a missing delimiter or inspect block-comment contents. |
 
-Tree-sitter node names, TS-3108 hashes, and ZQ-3201 capture assignments remain implementation evidence, not public Ling protocol or Semantic ID inputs.
+Tree-sitter node names, TS-3108 hashes, and ZQ query assignments remain implementation evidence, not public Ling protocol or Semantic ID inputs.

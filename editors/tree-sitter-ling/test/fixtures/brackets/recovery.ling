@@ -1,0 +1,5 @@
+let 😀name value = value
+
+let stable = ()
+             // <- open
+              // <- close

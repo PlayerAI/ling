@@ -1,0 +1,5 @@
+/* outer { [ ( " nested /* inner } ] ) " */ end */
+         // <- !open
+           // <- !open
+             // <- !open
+               // <- !open

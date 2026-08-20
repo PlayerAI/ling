@@ -21,12 +21,14 @@
     "queries/**",
     "src/**",
     "test/corpus/**",
+    "test/fixtures/brackets/**",
     "test/highlight/**",
     "examples/**"
   ],
   "scripts": {
     "generate": "tree-sitter generate",
-    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types && npm run test:recovery && npm run test:conformance && npm run test:highlights",
+    "test": "tree-sitter test && npm run test:scanner && npm run test:layout && npm run test:unicode && npm run test:precedence && npm run test:pattern-types && npm run test:recovery && npm run test:conformance && npm run test:highlights && npm run test:brackets",
+    "test:brackets": "node test/run-bracket-tests.js",
     "test:conformance": "node test/run-conformance-differential.js",
     "test:highlights": "node test/run-highlight-tests.js",
     "test:layout": "node test/run-layout-integration.js",

@@ -1,0 +1,25 @@
+let unit = ()
+           // <- open
+            // <- close
+
+let tuple = (1, (2, 3))
+            // <- open
+                // <- open
+                     // <- close
+                      // <- close
+
+let values = [1; 2]
+             // <- open
+                  // <- close
+
+let point = { x = 1; y = 2 }
+            // <- open
+                             // <- close
+
+let text = "quote: \""
+           // <- open
+                    // <- !open
+                    // <- !close
+                     // <- close
+
+let 数据 = [("零", { 值 = 1 })]
