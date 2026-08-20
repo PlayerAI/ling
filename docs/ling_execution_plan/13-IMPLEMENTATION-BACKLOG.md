@@ -25,31 +25,32 @@
 | 3 | `GOV-0104` | 盘点全部公开协议 | 无 | 与 1/2 | **Done**；18 项协议边界、版本/稳定级别与 checker 已落地 |
 | 4 | `GOV-0105` | 建错误码注册表 | Seed diagnostics | 与 1/2/3 | **Done**；55 active、1 retired，重复/改义/改型/回填/未注册 code CI 拒绝 |
 | 5 | `GOV-0107` | 建 traceability 模板 | 规范索引 | 与 3/4 | **Done**；7 features、32 fixtures、44 evidence，链接/极性/differential/report drift 由 CI 检查 |
-| 6 | `GOV-0109` | Feature state 机器化 | 支持矩阵草案 | 与 7 | CLI/docs 可读取 |
-| 7 | `TS-3101` | 语法→Tree-sitter 映射 | Accepted Seed 语法 | 与 G0 | 每 rule 有规范/corpus |
-| 8 | `TS-3102` | Tree-sitter 宽度优先骨架 | TS-3101 | 与架构工作 | `tree-sitter test` |
-| 9 | `PRJ-1101` | 最小项目 manifest | 包/模块 RFC | 否 | parse + stable diagnostics |
-| 10 | `VM-1201` | bytecode RFC/模型 | VM 语义 RFC | 与 test agent | opcode/encoding/verifier contract |
-| 11 | `INC-1401` | 增量 query ADR | 编译管线接口 | 与 corpus | query/invalidations 评审通过 |
-| 12 | `LSP-2101` | LSP 生命周期骨架 | CompilerSession/VFS | 与 Zed query | initialize/shutdown fixtures |
-| 13 | `LSP-2102` | UTF-16 position 协商 | LineIndex | 与 diagnostics | 中文/emoji/CRLF fixtures |
-| 14 | `ZEXT-3301` | grammar-only Zed 扩展 | TS skeleton | 与 LSP | 本地 Zed 识别/高亮 |
-| 15 | `VM-1202` | Core→bytecode 最小切片 | VM-1201 | 与 verifier | Hello World Core round-trip |
-| 16 | `VM-1203` | 独立 decoder/verifier | VM-1201 | 与 lowering | malformed fuzz 无 panic |
-| 17 | `PRJ-1102` | module discovery | PRJ-1101 | 与 VM | deterministic graph |
-| 18 | `INC-1402` | VFS/revision | INC-1401 | 与 VM | overlay/revision tests |
-| 19 | `LSP-2201` | Diagnostic adapter | LSP lifecycle + compiler diagnostics | 与 Zed | stable code/span/related info |
-| 20 | `ZQ-3201` | 基础 highlights | TS grammar | 与 LSP | highlight fixtures |
-| 21 | `ZQ-3202` | brackets | TS grammar | 与 ZQ-3201 | pair fixtures |
-| 22 | `ZQ-3204` | outline | TS declarations | 与 query tasks | symbols visible in Zed |
-| 23 | `VM-1204` | VM 基础执行 | VM-1202/1203 | 否 | interpreter differential |
-| 24 | `LSP-2202` | push diagnostics | LSP-2201 | 与 hover | stale diagnostics handled |
-| 25 | `ZEXT-3302` | Zed Wasm extension | grammar-only stable | 与 LSP | wasm32-wasip2 build |
-| 26 | `ZEXT-3303` | 查找本地 zero | extension skeleton | 与 queries | setting/PATH behavior |
-| 27 | `ZEXT-3304` | 启动 `zero lsp --stdio` | LSP command stable | 否 | diagnostics in Zed |
-| 28 | `IDE-2301` | document symbols | semantic index | 与 IDE-2302 | protocol fixtures |
-| 29 | `IDE-2302` | hover | typed core index | 与 symbols | types/effects/capabilities |
-| 30 | `IDE-2303` | definition | resolved symbols | 与 hover | Unicode navigation |
+| 6 | `GOV-0108` | 建 1.0 支持矩阵草案 | 缺口、协议与追踪注册表 | 与 7 | **Done**；7 features、3 profiles、3 hosts、1 target、6 backends、1 std package、18 protocols、9 unsupported，生成物 drift 由 CI 检查 |
+| 7 | `GOV-0109` | Feature state 机器化 | 支持矩阵草案 | 与 8 | CLI/docs 可读取 |
+| 8 | `TS-3101` | 语法→Tree-sitter 映射 | Accepted Seed 语法 | 与 G0 | 每 rule 有规范/corpus |
+| 9 | `TS-3102` | Tree-sitter 宽度优先骨架 | TS-3101 | 与架构工作 | `tree-sitter test` |
+| 10 | `PRJ-1101` | 最小项目 manifest | 包/模块 RFC | 否 | parse + stable diagnostics |
+| 11 | `VM-1201` | bytecode RFC/模型 | VM 语义 RFC | 与 test agent | opcode/encoding/verifier contract |
+| 12 | `INC-1401` | 增量 query ADR | 编译管线接口 | 与 corpus | query/invalidations 评审通过 |
+| 13 | `LSP-2101` | LSP 生命周期骨架 | CompilerSession/VFS | 与 Zed query | initialize/shutdown fixtures |
+| 14 | `LSP-2102` | UTF-16 position 协商 | LineIndex | 与 diagnostics | 中文/emoji/CRLF fixtures |
+| 15 | `ZEXT-3301` | grammar-only Zed 扩展 | TS skeleton | 与 LSP | 本地 Zed 识别/高亮 |
+| 16 | `VM-1202` | Core→bytecode 最小切片 | VM-1201 | 与 verifier | Hello World Core round-trip |
+| 17 | `VM-1203` | 独立 decoder/verifier | VM-1201 | 与 lowering | malformed fuzz 无 panic |
+| 18 | `PRJ-1102` | module discovery | PRJ-1101 | 与 VM | deterministic graph |
+| 19 | `INC-1402` | VFS/revision | INC-1401 | 与 VM | overlay/revision tests |
+| 20 | `LSP-2201` | Diagnostic adapter | LSP lifecycle + compiler diagnostics | 与 Zed | stable code/span/related info |
+| 21 | `ZQ-3201` | 基础 highlights | TS grammar | 与 LSP | highlight fixtures |
+| 22 | `ZQ-3202` | brackets | TS grammar | 与 ZQ-3201 | pair fixtures |
+| 23 | `ZQ-3204` | outline | TS declarations | 与 query tasks | symbols visible in Zed |
+| 24 | `VM-1204` | VM 基础执行 | VM-1202/1203 | 否 | interpreter differential |
+| 25 | `LSP-2202` | push diagnostics | LSP-2201 | 与 hover | stale diagnostics handled |
+| 26 | `ZEXT-3302` | Zed Wasm extension | grammar-only stable | 与 LSP | wasm32-wasip2 build |
+| 27 | `ZEXT-3303` | 查找本地 zero | extension skeleton | 与 queries | setting/PATH behavior |
+| 28 | `ZEXT-3304` | 启动 `zero lsp --stdio` | LSP command stable | 否 | diagnostics in Zed |
+| 29 | `IDE-2301` | document symbols | semantic index | 与 IDE-2302 | protocol fixtures |
+| 30 | `IDE-2302` | hover | typed core index | 与 symbols | types/effects/capabilities |
+| 31 | `IDE-2303` | definition | resolved symbols | 与 hover | Unicode navigation |
 
 ## 3. 批次状态建议
 
@@ -77,7 +78,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GOV-0105` | G0 | Diagnostic 错误码注册表 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:159`；见机器状态与实施报告 |
 | `GOV-0106` | G0 | Schema 生命周期与 golden corpus | L | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:188` |
 | `GOV-0107` | G0 | 统一追踪矩阵 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:221`；见机器状态、生成矩阵与实施报告 |
-| `GOV-0108` | G0 | 1.0 支持矩阵草案 | M | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:240` |
+| `GOV-0108` | G0 | 1.0 支持矩阵草案 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:240`；见机器状态、生成矩阵与实施报告 |
 | `GOV-0109` | G0 | 发布状态机器可读化 | S | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:267` |
 | `GOV-0110` | G0 | G0 CI 门禁 | M | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:281` |
 | `PRJ-1101` | G1/Editor | 最小项目 manifest | M | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:47` |

@@ -332,3 +332,58 @@ notes = [
   "No Ling diagnostic, public schema, source span, language behavior, Semantic ID, Unicode 17.0.0 data, or dependency changed.",
   "The CI workflow invokes the traceability gate; no remote CI result is claimed before push.",
 ]
+
+[[task]]
+id = "GOV-0108"
+title = "1.0 支持矩阵草案"
+state = "Done"
+release = "G0"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0102", "GOV-0104", "GOV-0107"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/traceability/registry.toml",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
+  "tests/fixtures/support/version.governance.json",
+  "tests/fixtures/support/support.governance.json",
+  "tools/xtask/src/support.rs",
+  "docs/status/GOV-0108-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask support verify: 7 features, 3 profiles, 3 hosts, 1 native target, 6 backends, 1 standard package, 18 protocols, 9 explicitly unsupported records",
+  "internal version/support fixtures are deterministic, use ling.governance.* schemas, and state implemented = false",
+  "cargo xtask governance check-authority: 38 documents, 16 Accepted",
+  "all other governance and traceability registries remain valid",
+  "cargo test --package xtask --locked --offline: 72 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --all-features --locked --offline: 212 passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "implementation-status.toml: 8 task records parsed; GOV-0108 is Done",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "active local Markdown targets: 527 resolved; frozen baseline excluded",
+]
+verified_against_commit = "272583392ca70f03afbd5b899ac449afac697917"
+completion_commit = "258e2d1e46c286a9e7e937b0bb65f3d19ed5e8d3"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "No Ling language behavior, public diagnostic, public schema, CLI behavior, Semantic ID, source span, or Unicode 17.0.0 data changed.",
+  "The matrix remains Draft because ROADMAP-1.0 G0.4 RFC review has not occurred; no Profile, Native target, package system, or device backend is claimed as available.",
+  "The two JSON files are internal non-contract fixtures for unimplemented future ling commands and cannot be presented as public compatibility commitments.",
+  "The CI workflow invokes the support-matrix drift gate; no remote CI result is claimed before push.",
+]
