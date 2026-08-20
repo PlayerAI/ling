@@ -18,7 +18,7 @@ schemas/<name>/<version>/canonical/*.bin
 - Every `invalid` JSON file has an expectation sidecar naming `InvalidJson`, `SchemaViolation`, or `ReaderViolation`.
 - Only protocols already declared canonical have byte-golden files.
 - The registry explicitly uses `NoPreviousVersion`; this corpus does not claim an N-1 reader.
-- No file in this directory is evaluator input. Semantic Graph readers return isolated data only.
+- No file in this directory is evaluator input. Semantic Graph readers return isolated data only; the lock reader compares isolated package metadata with a newly validated graph.
 
 Run after locked dependencies have been fetched:
 

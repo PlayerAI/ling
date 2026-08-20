@@ -15,6 +15,7 @@ pub mod codes {
     use super::DiagnosticCode;
 
     pub const SOURCE_READ_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0001");
+    pub const PROJECT_LOCK_IO_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0002");
     pub const INVALID_UTF8: DiagnosticCode = DiagnosticCode::new("L-LEX-0001");
     pub const MISPLACED_BOM: DiagnosticCode = DiagnosticCode::new("L-LEX-0002");
     pub const SOURCE_TOO_LARGE: DiagnosticCode = DiagnosticCode::new("L-LEX-0003");
@@ -87,6 +88,8 @@ pub mod codes {
     pub const PROJECT_DEPENDENCY_MODULE_NOT_FOUND: DiagnosticCode =
         DiagnosticCode::new("L-PROJECT-0016");
     pub const PRIVATE_PROJECT_MODULE_ACCESS: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0017");
+    pub const INVALID_PROJECT_LOCK: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0018");
+    pub const PROJECT_LOCK_MISMATCH: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0019");
     pub const RUNTIME_FAULT: DiagnosticCode = DiagnosticCode::new("L-RUNTIME-0001");
     pub const AUDIT_SYNTAX: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0001");
     pub const AUDIT_VERSION: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0002");

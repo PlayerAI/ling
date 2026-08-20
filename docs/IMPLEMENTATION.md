@@ -120,7 +120,7 @@ Unicode 17.0.0 的权威输入来自 Unicode Consortium 的版本化目录：
 
 - `ling-cli` 内定义唯一常量 `CLI_NAME = "ling"`，所有帮助文本、诊断、错误消息引用该常量，禁止散落硬编码（RFC §2）；
 - Cargo package 名即 crate 名（`ling-source` 等），`[[bin]] name = "ling"`；
-- Schema 字符串按 RFC §12/§13 固定为 `ling.diagnostic/0.1`、`ling.semantic/0.1`，集中在 `ling-diagnostics` / `ling-semantic` 各一个常量中；
+- Schema/format 字符串按各自 Accepted authority 固定为 `ling.diagnostic/0.1`、`ling.semantic/0.1`、`ling.semantic/0.2`、`ling.manifest/1` 与 `ling.lock/1`，集中在所属 crate 的常量中；
 - `LANGUAGE_VERSION`、`UNICODE_VERSION`、Schema ID 与哈希算法使用有类型封装，禁止在业务逻辑中散落字符串；
 - 错误码前缀 `L-`，domain 在错误码注册表分配（见 M0）；
 - 改变公开 Schema、错误码含义或 ID 编码必须更新版本、兼容性测试和迁移说明，不能只更新快照。
@@ -213,6 +213,8 @@ Unicode 17.0.0 的权威输入来自 Unicode Consortium 的版本化目录：
 - 由 `ling-semantic` 提供规范化 Audit model，由 `ling-format` 提供 G-12 接受的 grammar、renderer 和 parser；验证 `parse_audit(render_audit(graph)) = graph`（忽略已明确定义的显示元数据），避免在两个 crate 中各自定义语义。
 
 PRJ-1103 在不改变文件模式 `ling.semantic/0.1` 字节与 ID 的前提下，增加库级 package-aware `ling.semantic/0.2` 路径。该路径消费 RFC-0002 `PackageIdentity`，记录 package/module/definition 坐标，并验证跨包 import、export visibility 与跨文件 reference；CLI 工程选择仍由 PRJ-1107 负责，`ling.audit/0.1` 不虚构 package-aware 能力。
+
+PRJ-1105 增加 RFC-0002 `ling.lock/1` 的严格 reader、canonical writer 与库级 `Update`/`Locked` 策略。writer 仅在完整本地 dependency graph 验证后创建或替换 lock；reader 拒绝未知/重复字段、非 canonical bytes、无效或悬空 identity、cycle、不可达 package 与不兼容 format。版本 1 resolution 始终离线且不执行 shell；CLI `--locked`/`--offline` 参数仍由 PRJ-1107 负责。
 
 出口标准：§18.6 全过；Graph Schema 正/负兼容性测试通过；同一输入在两个独立进程中产生逐字节相同的 Graph JSON 与 Audit 文本；Audit round-trip 性质测试通过；依赖实现变化敏感性有最小调用图用例，避免无意的全图或不充分失效。
 

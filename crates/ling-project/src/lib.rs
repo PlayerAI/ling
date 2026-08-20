@@ -1,6 +1,7 @@
 //! Deterministic `ling.toml` v1 reader, module discovery, and offline local package graph.
 
 mod discovery;
+mod lockfile;
 mod package_graph;
 
 use std::collections::BTreeMap;
@@ -17,6 +18,11 @@ use unicode_normalization::UnicodeNormalization;
 pub use discovery::{
     DiscoveryFailure, ImportTarget, ModuleEdge, ModuleGraph, ModuleNode, PackageSource,
     discover_modules,
+};
+pub use lockfile::{
+    LOCK_FILE_FORMAT, LOCK_FILE_NAME, LockFile, LockFileFailure, LockMode, LockedDependency,
+    LockedGraphFailure, LockedPackage, MAX_LOCK_FILE_BYTES, parse_lock_file,
+    resolve_package_graph_with_lock,
 };
 pub use package_graph::{
     DependencyGraphFailure, PackageDependencyEdge, PackageGraph, PackageGraphId, PackageIdentity,

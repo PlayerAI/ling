@@ -41,6 +41,10 @@ impl PackageSourceId {
     pub fn as_str(&self) -> &str {
         &self.0
     }
+
+    pub(crate) fn from_validated(value: String) -> Self {
+        Self(value)
+    }
 }
 
 impl fmt::Display for PackageSourceId {
@@ -58,6 +62,14 @@ pub struct PackageIdentity {
 }
 
 impl PackageIdentity {
+    pub(crate) fn new(name: PackageName, version: PackageVersion, source: PackageSourceId) -> Self {
+        Self {
+            name,
+            version,
+            source,
+        }
+    }
+
     #[must_use]
     pub const fn name(&self) -> &PackageName {
         &self.name

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:lock:1",
+  "title": "Ling Canonical Lockfile 1",
+  "type": "object",
+  "required": ["format", "packages", "root"],
+  "properties": {
+    "format": { "const": "ling.lock/1" },
+    "packages": { "type": "array", "items": { "$ref": "#/$defs/package" } },
+    "root": { "$ref": "#/$defs/identity" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "content": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "identity": {
+      "type": "object",
+      "required": ["content", "name", "version"],
+      "properties": {
+        "content": { "$ref": "#/$defs/content" },
+        "name": { "$ref": "#/$defs/name" },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "additionalProperties": false
+    },
+    "dependency": {
+      "type": "object",
+      "required": ["content", "name"],
+      "properties": {
+        "content": { "$ref": "#/$defs/content" },
+        "name": { "$ref": "#/$defs/name" }
+      },
+      "additionalProperties": false
+    },
+    "package": {
+      "type": "object",
+      "required": ["content", "dependencies", "name", "version"],
+      "properties": {
+        "content": { "$ref": "#/$defs/content" },
+        "dependencies": { "type": "array", "items": { "$ref": "#/$defs/dependency" } },
+        "name": { "$ref": "#/$defs/name" },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

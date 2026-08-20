@@ -114,6 +114,36 @@ reader_adapter = "SemanticGraphV0_2"
 writer_evidence = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-semantic/tests/project_snapshot.rs"]
 
 [[schema]]
+id = "SCHEMA-LOCKFILE-JSON"
+name = "lock"
+protocol_id = "PROTO-LOCKFILE"
+version = "1"
+marker = "ling.lock/1"
+version_kind = "Integer"
+stability = "Experimental"
+format = "JSON"
+canonical = true
+writer = "CurrentOnly"
+reader = "CurrentOnly"
+reader_versions = ["ling.lock/1"]
+previous_version = ""
+previous_marker = ""
+compatibility = "NoPreviousVersion"
+compatibility_dir = ""
+migration_adapter = "None"
+unknown_fields = "Reject"
+missing_fields = "RejectRequired"
+reader_defaults = []
+canonical_encoding = "CompactJsonLf"
+hash_scheme_ids = ["sha256:"]
+schema_path = "schemas/lock/1/schema.json"
+valid_dir = "schemas/lock/1/valid"
+invalid_dir = "schemas/lock/1/invalid"
+canonical_dir = "schemas/lock/1/canonical"
+reader_adapter = "LockFileV1"
+writer_evidence = ["crates/ling-project/src/lockfile.rs", "crates/ling-project/tests/lockfile_fixtures.rs"]
+
+[[schema]]
 id = "SCHEMA-REPL-EVENT-JSON"
 name = "repl"
 protocol_id = "PROTO-REPL-JSON"

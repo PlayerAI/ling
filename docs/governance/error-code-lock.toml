@@ -10,11 +10,11 @@ CAP = 3
 ENTRY = 3
 IMPL = 1
 INTERNAL = 1
-IO = 1
+IO = 2
 LEX = 12
 MUT = 1
 NAME = 9
-PROJECT = 17
+PROJECT = 19
 RUNTIME = 1
 SNAPSHOT = 1
 SYNTAX = 11
@@ -97,6 +97,12 @@ id = "L-IO-0001"
 core_sha256 = "sha256:f366b93115a357dc5610c2234f3452ffdf2521eaf757d4b0502bd33244c4d478"
 retired = false
 facts = ["io_kind:string:required"]
+
+[[code]]
+id = "L-IO-0002"
+core_sha256 = "sha256:642a56f96f07ecf31c5e6d9c02902cef24ecc3b7a1ceff47748d2e73b0b64856"
+retired = false
+facts = ["io_kind:string:required", "operation:string:required"]
 
 [[code]]
 id = "L-LEX-0001"
@@ -331,6 +337,18 @@ id = "L-PROJECT-0017"
 core_sha256 = "sha256:05aa819320f5910a0c71c7b0c8949d117cba47a92b077d06bbb5c7f2f1125380"
 retired = false
 facts = ["dependency:string:required", "importer:string:required", "module:string:required", "package:string:required"]
+
+[[code]]
+id = "L-PROJECT-0018"
+core_sha256 = "sha256:dc18c2251cafed4d62be83d96dce37a9c49e77576d8315cc2556f63ea10c01a3"
+retired = false
+facts = ["package:string:optional", "reason:string:required"]
+
+[[code]]
+id = "L-PROJECT-0019"
+core_sha256 = "sha256:d5bda971660001f1ec8cfa5fcb2a1a0bb98a8262d6c5bf4903fcb9a9e91e19e3"
+retired = false
+facts = ["reason:string:required"]
 
 [[code]]
 id = "L-RUNTIME-0001"

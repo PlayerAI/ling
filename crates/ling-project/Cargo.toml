@@ -13,12 +13,10 @@ ling-source = { path = "../ling-source" }
 ling-syntax = { path = "../ling-syntax" }
 ling-unicode = { path = "../ling-unicode" }
 serde.workspace = true
+serde_json.workspace = true
 sha2.workspace = true
 toml.workspace = true
 unicode-normalization.workspace = true
-
-[dev-dependencies]
-serde_json.workspace = true
 
 [lints]
 workspace = true

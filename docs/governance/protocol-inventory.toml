@@ -308,7 +308,7 @@ sources = [
 ]
 version_markers = ["ling.manifest/1", "manifest-version = 1"]
 authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["PRJ-1101/1102/1104 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, and content/package-graph identities; PRJ-1103 adds exported-module visibility and checked package-aware resolution. Manifest writing, ambient or CLI project selection, locks, and build integration remain later PRJ tasks."]
+notes = ["PRJ-1101 through PRJ-1105 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, content/package-graph identities, exported-module visibility, checked package-aware resolution, and the canonical local lock protocol. Manifest writing, ambient or CLI project selection, and build integration remain later PRJ tasks."]
 
 [[protocol]]
 id = "PROTO-PACKAGE-IDENTITY"
@@ -321,7 +321,7 @@ implemented = true
 public_schema = false
 canonical = true
 producer = ["ling-project local dependency resolver"]
-consumer = ["ling-project package graph", "ling-resolve and ling-semantic package-aware identity", "future lockfile writer and build planner"]
+consumer = ["ling-project package graph and lock writer", "ling-resolve and ling-semantic package-aware identity", "future build planner"]
 reader_policy = "PackageSourceId and PackageGraphId are opaque, distinct Rust types; no general byte-stream decoder is exposed. Text identities emitted by the resolver use exactly sha256: plus 64 lowercase hexadecimal digits."
 writer_policy = "Hash RFC-0002's exact unsigned-64-bit big-endian length-prefixed streams with SHA-256 under the separate ling.package-content/1 and ling.package-graph/1 domains; sort every declared collection by its specified canonical key and exclude host paths, cosmetic manifest text, dependency locators, permissions, timestamps, and unordered iteration."
 unknown_field_policy = "Closed binary projection: changing included fields, framing, ordering, normalization, or algorithms requires a new domain version and migration evidence."
@@ -339,29 +339,40 @@ sources = [
 ]
 version_markers = ["ling.package-content/1", "ling.package-graph/1", "sha256:"]
 authority = ["RFC-0002"]
-notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2. Lockfiles, CLI project selection, registry/network sources, and publication remain deferred."]
+notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2; PRJ-1105 projects them into canonical ling.lock/1 bytes. CLI project selection, registry/network sources, and publication remain deferred."]
 
 [[protocol]]
 id = "PROTO-LOCKFILE"
 title = "Ling dependency lockfile"
-category = "Package metadata"
-visibility = "Planned public"
-current_version = ""
-stability = "Future"
-implemented = false
-public_schema = false
-canonical = false
-producer = ["Future Ling dependency resolver"]
-consumer = ["Future offline package and build tooling"]
-reader_policy = "RFC-0002 defines exact ling.lock/1 validation and rejects unknown fields, noncanonical bytes, dangling identities, cycles, and incompatible formats; no reader is implemented yet."
-writer_policy = "A future PRJ-1105 writer emits RFC-0002 canonical compact JSON atomically after complete graph validation; no writer is implemented yet."
+category = "JSON"
+visibility = "Public"
+current_version = "ling.lock/1"
+stability = "Experimental"
+implemented = true
+public_schema = true
+canonical = true
+producer = ["ling-project lock writer"]
+consumer = ["Ling offline package and build tooling"]
+reader_policy = "Accept only byte-valid canonical ling.lock/1 with exact required fields, identities, ordering, reachability, and acyclic references; reject unknown fields and every incompatible format without guessing."
+writer_policy = "Emit compact UTF-8 JSON with ascending object keys, canonical package/dependency order, and exactly one trailing LF only after the complete local graph validates; unchanged locks are not rewritten."
 unknown_field_policy = "ling.lock/1 rejects every unknown field."
 migration_tool = "An incompatible lock change uses a new format value and explicit migration; no legacy Ling lock exists."
-fixtures = []
-sources = ["docs/RFC-0002.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
-version_markers = []
-authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["The protocol design is Accepted; visibility remains Planned public/Future until PRJ-1105 supplies the reader, writer, and canonical corpus."]
+fixtures = [
+  "schemas/lock/1/valid/basic.json",
+  "schemas/lock/1/canonical/basic.bin",
+  "schemas/lock/1/invalid/whitespace.json",
+  "crates/ling-project/tests/lockfile_fixtures.rs",
+]
+sources = [
+  "crates/ling-project/src/lockfile.rs",
+  "docs/RFC-0002.md",
+  "schemas/registry.toml",
+  "schemas/lock/1/schema.json",
+  "tools/xtask/src/schema.rs",
+]
+version_markers = ["ling.lock/1", "sha256:"]
+authority = ["RFC-0002"]
+notes = ["PRJ-1105 implements the library reader, writer, Update/Locked policy, local-only offline guarantee, and corruption corpus. CLI --locked/--offline selection remains owned by PRJ-1107."]
 
 [[protocol]]
 id = "PROTO-BUILD-METADATA"

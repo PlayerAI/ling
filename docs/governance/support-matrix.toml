@@ -365,10 +365,10 @@ implemented = true
 
 [[protocol]]
 id = "PROTO-LOCKFILE"
-visibility = "Planned public"
-version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+version = "ling.lock/1"
+stability = "Experimental"
+implemented = true
 
 [[protocol]]
 id = "PROTO-BUILD-METADATA"
@@ -424,8 +424,8 @@ sources = ["docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md"]
 [[unsupported]]
 id = "UNSUP-PACKAGES"
 area = "Project/package"
-capability = "CLI project selection, lockfile, package installation, or registry"
-reason = "PRJ-1101 through PRJ-1104 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, and package-aware Semantic Graph. PRJ-1105 has not implemented the lock reader/writer; CLI selection, build integration, publication, and registry installation remain out of scope."
+capability = "CLI project selection, package installation, publication, or registry"
+reason = "PRJ-1101 through PRJ-1105 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, package-aware Semantic Graph, and canonical local lock protocol. CLI selection/build integration, publication, and registry installation remain out of scope."
 blockers = []
 sources = ["docs/RFC-0002.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 

@@ -8,6 +8,7 @@ repository.workspace = true
 publish = false
 
 [dependencies]
+ling-project = { path = "../../crates/ling-project" }
 ling-semantic = { path = "../../crates/ling-semantic" }
 serde.workspace = true
 serde_json.workspace = true

@@ -557,10 +557,15 @@ fn validate_schema_record(
             display_id(&record.protocol_id)
         )),
     }
-    if record.version_kind != "MajorMinor" || !valid_major_minor(&record.version) {
+    let valid_version = match record.version_kind.as_str() {
+        "MajorMinor" => valid_major_minor(&record.version),
+        "Integer" => valid_integer_version(&record.version),
+        _ => false,
+    };
+    if !valid_version {
         errors.push(format!(
-            "GOV-SCHEMA-0011: {} must use a numeric MajorMinor version",
-            display_id(&record.id)
+            "GOV-SCHEMA-0011: {} has an invalid declared version kind or value",
+            display_id(&record.id),
         ));
     }
     if !record.marker.ends_with(&format!("/{}", record.version)) {
@@ -590,6 +595,7 @@ fn validate_schema_record(
                     (record.marker.as_str(), record.reader_adapter.as_str()),
                     ("ling.semantic/0.1", "SemanticGraphV0_1")
                         | ("ling.semantic/0.2", "SemanticGraphV0_2")
+                        | ("ling.lock/1", "LockFileV1")
                 ) => {}
         _ => errors.push(format!(
             "GOV-SCHEMA-0011: {} has an unsupported or inconsistent reader declaration",
@@ -760,17 +766,22 @@ fn validate_schema_document(record: &SchemaRecord, schema: &Value, errors: &mut 
             record.schema_path
         ));
     }
+    let marker_field = if record.marker == "ling.lock/1" {
+        "format"
+    } else {
+        "schema"
+    };
     let marker = object
         .get("properties")
         .and_then(Value::as_object)
-        .and_then(|properties| properties.get("schema"))
+        .and_then(|properties| properties.get(marker_field))
         .and_then(Value::as_object)
         .and_then(|schema| schema.get("const"))
         .and_then(Value::as_str);
     if marker != Some(record.marker.as_str()) {
         errors.push(format!(
-            "GOV-SCHEMA-0004: {} must constrain schema to {}",
-            record.schema_path, record.marker
+            "GOV-SCHEMA-0004: {} must constrain {marker_field} to {}",
+            record.schema_path, record.marker,
         ));
     }
     lint_schema(schema, schema, "$", errors);
@@ -1320,6 +1331,11 @@ fn reader_accepts(record: &SchemaRecord, input: &str) -> Result<(), String> {
         "SemanticGraphV0_2" => ling_semantic::read_project_json(input)
             .map(|_| ())
             .map_err(|error| error.to_string()),
+        "LockFileV1" => {
+            ling_project::parse_lock_file(ling_project::LOCK_FILE_NAME, input.as_bytes())
+                .map(|_| ())
+                .map_err(|error| error.to_string())
+        }
         adapter => Err(format!("unsupported reader adapter {adapter}")),
     }
 }
@@ -1618,6 +1634,12 @@ fn valid_major_minor(value: &str) -> bool {
     })
 }
 
+fn valid_integer_version(value: &str) -> bool {
+    !value.is_empty()
+        && value.bytes().all(|byte| byte.is_ascii_digit())
+        && (value == "0" || !value.starts_with('0'))
+}
+
 fn is_date(value: &str) -> bool {
     let bytes = value.as_bytes();
     bytes.len() == 10
@@ -1679,10 +1701,10 @@ mod tests {
     #[test]
     fn repository_schema_corpus_is_valid_and_current() {
         let summary = validate_all(repository_root()).expect("schema corpus is valid");
-        assert_eq!(summary.schema_count, 4);
-        assert_eq!(summary.valid_fixture_count, 5);
-        assert_eq!(summary.invalid_fixture_count, 8);
-        assert_eq!(summary.canonical_fixture_count, 2);
+        assert_eq!(summary.schema_count, 5);
+        assert_eq!(summary.valid_fixture_count, 6);
+        assert_eq!(summary.invalid_fixture_count, 19);
+        assert_eq!(summary.canonical_fixture_count, 3);
     }
 
     #[test]
@@ -1690,7 +1712,7 @@ mod tests {
         let summary = compatibility(repository_root(), "N-1", "N")
             .expect("first-version compatibility state is valid");
         assert_eq!(summary.verified_edge_count, 0);
-        assert_eq!(summary.no_previous_version_count, 4);
+        assert_eq!(summary.no_previous_version_count, 5);
     }
 
     #[test]
