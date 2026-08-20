@@ -6,6 +6,7 @@ use std::fmt;
 
 use ling_effects::CheckedProgram;
 use ling_hir as hir;
+use ling_project::PackageIdentity;
 use ling_resolve::{
     DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey, ModuleId, PRELUDE_MODULE,
     ReferenceTarget,
@@ -13,6 +14,7 @@ use ling_resolve::{
 use serde::{Deserialize, Serialize};
 
 pub const SEMANTIC_SCHEMA: &str = "ling.semantic/0.1";
+pub const PROJECT_SEMANTIC_SCHEMA: &str = "ling.semantic/0.2";
 pub const LANGUAGE_VERSION: &str = "0.0.1-dev";
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -53,6 +55,12 @@ pub struct SemanticGraph {
     pub language_version: String,
     pub unicode_version: String,
     pub program_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub package_graph_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub root_package: Option<SemanticPackageIdentity>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub packages: Vec<SemanticPackage>,
     pub entry_module: String,
     pub modules: Vec<SemanticModule>,
     pub definitions: Vec<SemanticDefinition>,
@@ -61,8 +69,24 @@ pub struct SemanticGraph {
     pub references: Vec<SemanticReference>,
 }
 
+#[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
+pub struct SemanticPackageIdentity {
+    pub name: String,
+    pub version: String,
+    pub source: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticPackage {
+    pub identity: SemanticPackageIdentity,
+    pub entry_module: String,
+    pub exports: Vec<String>,
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SemanticModule {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub package: Option<SemanticPackageIdentity>,
     pub name: String,
     pub explicit: bool,
     pub requires: Vec<String>,
@@ -72,6 +96,8 @@ pub struct SemanticModule {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SemanticImport {
     pub alias: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub package: Option<SemanticPackageIdentity>,
     pub module: String,
 }
 
@@ -79,6 +105,8 @@ pub struct SemanticImport {
 pub struct SemanticDefinition {
     pub definition_id: String,
     pub body_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub package: Option<SemanticPackageIdentity>,
     pub module: String,
     pub name: String,
     pub kind: String,
@@ -93,6 +121,8 @@ pub struct SemanticDefinition {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SemanticNode {
     pub node_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub package: Option<SemanticPackageIdentity>,
     pub module: String,
     pub kind: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -120,6 +150,8 @@ pub struct SemanticNode {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SemanticReference {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub package: Option<SemanticPackageIdentity>,
     pub module: String,
     #[serde(default = "default_reference_source_kind")]
     pub source_kind: String,
@@ -200,6 +232,56 @@ fn default_reference_source_kind() -> String {
     "expression".to_owned()
 }
 
+fn semantic_package_identity(package: &PackageIdentity) -> SemanticPackageIdentity {
+    SemanticPackageIdentity {
+        name: package.name().as_str().to_owned(),
+        version: package.version().to_string(),
+        source: package.source().as_str().to_owned(),
+    }
+}
+
+fn encode_package_identity_to_encoder(package: &PackageIdentity, encoder: &mut Encoder) {
+    encoder.string(package.name().as_str());
+    encoder.string(&package.version().to_string());
+    encoder.string(package.source().as_str());
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum IdentityMode {
+    Seed,
+    Project,
+}
+
+impl IdentityMode {
+    const fn schema(self) -> &'static str {
+        match self {
+            Self::Seed => SEMANTIC_SCHEMA,
+            Self::Project => PROJECT_SEMANTIC_SCHEMA,
+        }
+    }
+
+    const fn body_domain(self) -> &'static str {
+        match self {
+            Self::Seed => "ling.body-id/v1",
+            Self::Project => "ling.body-id/v2",
+        }
+    }
+
+    const fn program_domain(self) -> &'static str {
+        match self {
+            Self::Seed => "ling.program-id/v1",
+            Self::Project => "ling.program-id/v2",
+        }
+    }
+
+    const fn node_domain(self) -> &'static str {
+        match self {
+            Self::Seed => "ling.semantic-node-id/v1",
+            Self::Project => "ling.semantic-node-id/v2",
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct ProgramSnapshot {
     checked: CheckedProgram,
@@ -207,6 +289,43 @@ pub struct ProgramSnapshot {
     body_ids: BTreeMap<DefinitionId, BodyId>,
     program_id: ProgramId,
     json: String,
+}
+
+/// Package-aware checked snapshot using `ling.semantic/0.2` identities.
+#[derive(Clone, Debug)]
+pub struct ProjectProgramSnapshot {
+    checked: CheckedProgram,
+    graph: SemanticGraph,
+    body_ids: BTreeMap<DefinitionId, BodyId>,
+    program_id: ProgramId,
+    json: String,
+}
+
+impl ProjectProgramSnapshot {
+    #[must_use]
+    pub const fn checked(&self) -> &CheckedProgram {
+        &self.checked
+    }
+
+    #[must_use]
+    pub const fn graph(&self) -> &SemanticGraph {
+        &self.graph
+    }
+
+    #[must_use]
+    pub fn body_id(&self, definition: &DefinitionId) -> Option<&BodyId> {
+        self.body_ids.get(definition)
+    }
+
+    #[must_use]
+    pub const fn program_id(&self) -> &ProgramId {
+        &self.program_id
+    }
+
+    #[must_use]
+    pub fn json(&self) -> &str {
+        &self.json
+    }
 }
 
 impl ProgramSnapshot {
@@ -390,6 +509,37 @@ impl Error for SnapshotError {
     }
 }
 
+#[derive(Debug)]
+pub enum ProjectSnapshotError {
+    MissingProjectContext,
+    Serialization(serde_json::Error),
+}
+
+impl fmt::Display for ProjectSnapshotError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::MissingProjectContext => formatter.write_str(
+                "cannot build a package-aware semantic snapshot from a file-mode program",
+            ),
+            Self::Serialization(error) => {
+                write!(
+                    formatter,
+                    "failed to serialize project semantic snapshot: {error}"
+                )
+            }
+        }
+    }
+}
+
+impl Error for ProjectSnapshotError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::MissingProjectContext => None,
+            Self::Serialization(error) => Some(error),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SemanticReadError {
     pub kind: SemanticReadErrorKind,
@@ -468,6 +618,32 @@ pub enum SemanticReadErrorKind {
         module: String,
         alias: String,
     },
+    MissingProjectField {
+        field: String,
+    },
+    InvalidPackageIdentity {
+        value: String,
+    },
+    DuplicatePackage {
+        package: String,
+    },
+    UnknownPackage {
+        package: String,
+    },
+    UnknownPackageModule {
+        package: String,
+        module: String,
+    },
+    PrivatePackageModule {
+        package: String,
+        module: String,
+    },
+    UnimportedReference {
+        target: String,
+    },
+    PackageCoordinateMismatch {
+        entity: String,
+    },
 }
 
 impl fmt::Display for SemanticReadError {
@@ -484,7 +660,21 @@ impl Error for SemanticReadError {}
 
 /// Builds a checked snapshot using versioned canonical binary hash inputs.
 pub fn build(checked: CheckedProgram) -> Result<ProgramSnapshot, SnapshotError> {
-    SnapshotBuilder::new(checked).build()
+    SnapshotBuilder::new(checked, IdentityMode::Seed).build()
+}
+
+/// Builds a package-aware checked snapshot using `ling.semantic/0.2` identities.
+///
+/// The checked program must originate from [`ling_resolve::resolve_project`].
+/// File-mode programs continue to use [`build`] and retain their frozen 0.1
+/// bytes and identifiers.
+pub fn build_project(
+    checked: CheckedProgram,
+) -> Result<ProjectProgramSnapshot, ProjectSnapshotError> {
+    if checked.typed().resolved().project().is_none() {
+        return Err(ProjectSnapshotError::MissingProjectContext);
+    }
+    SnapshotBuilder::new(checked, IdentityMode::Project).build_project()
 }
 
 /// Parses and structurally validates a `ling.semantic/0.1` JSON document.
@@ -494,6 +684,18 @@ pub fn build(checked: CheckedProgram) -> Result<ProgramSnapshot, SnapshotError> 
 /// protocol fields. The returned graph is data only and cannot be converted
 /// into the checked snapshot required by the evaluator.
 pub fn read_json(input: &str) -> Result<SemanticGraph, SemanticReadError> {
+    read_graph(input, IdentityMode::Seed)
+}
+
+/// Parses and structurally validates a package-aware `ling.semantic/0.2` JSON document.
+///
+/// This reader is intentionally separate from [`read_json`]: neither reader
+/// guesses a protocol version from the presence of package fields.
+pub fn read_project_json(input: &str) -> Result<SemanticGraph, SemanticReadError> {
+    read_graph(input, IdentityMode::Project)
+}
+
+fn read_graph(input: &str, mode: IdentityMode) -> Result<SemanticGraph, SemanticReadError> {
     let value: serde_json::Value =
         serde_json::from_str(input).map_err(|error| SemanticReadError {
             kind: SemanticReadErrorKind::InvalidJson {
@@ -501,7 +703,7 @@ pub fn read_json(input: &str) -> Result<SemanticGraph, SemanticReadError> {
             },
             path: "$".to_owned(),
         })?;
-    validate_json_fields(&value)?;
+    validate_json_fields(&value, mode)?;
     let graph: SemanticGraph =
         serde_json::from_value(value).map_err(|error| SemanticReadError {
             kind: SemanticReadErrorKind::InvalidJson {
@@ -509,7 +711,7 @@ pub fn read_json(input: &str) -> Result<SemanticGraph, SemanticReadError> {
             },
             path: "$".to_owned(),
         })?;
-    validate_graph(&graph)?;
+    validate_graph(&graph, mode)?;
     Ok(graph)
 }
 
@@ -520,11 +722,15 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
         language_version: model.language_version.clone(),
         unicode_version: model.unicode_version.clone(),
         program_id: model.program_id.clone(),
+        package_graph_id: None,
+        root_package: None,
+        packages: Vec::new(),
         entry_module: model.entry_module.clone(),
         modules: model
             .modules
             .iter()
             .map(|module| SemanticModule {
+                package: None,
                 name: module.name.clone(),
                 explicit: module.explicit,
                 requires: module.capabilities.clone(),
@@ -541,6 +747,7 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
                     .map(|definition| SemanticDefinition {
                         definition_id: definition.definition_id.clone(),
                         body_id: definition.body_id.clone(),
+                        package: None,
                         module: module.name.clone(),
                         name: definition.name.clone(),
                         kind: definition.kind.clone(),
@@ -557,6 +764,7 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
             .flat_map(|module| {
                 module.nodes.iter().map(|node| SemanticNode {
                     node_id: node.node_id.clone(),
+                    package: None,
                     module: module.name.clone(),
                     kind: node.kind.clone(),
                     name: node.name.clone(),
@@ -578,6 +786,7 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
             .iter()
             .flat_map(|module| {
                 module.references.iter().map(|reference| SemanticReference {
+                    package: None,
                     module: module.name.clone(),
                     source_kind: reference.source_kind.clone(),
                     reference: reference.reference,
@@ -588,7 +797,7 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
             })
             .collect(),
     };
-    validate_graph(&graph)?;
+    validate_graph(&graph, IdentityMode::Seed)?;
     for (module_index, module) in model.modules.iter().enumerate() {
         for (definition_index, definition) in module.definitions.iter().enumerate() {
             if definition.implementation != "implemented" {
@@ -616,11 +825,12 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
     Ok(())
 }
 
-fn validate_json_fields(value: &serde_json::Value) -> Result<(), SemanticReadError> {
-    validate_object_fields(
-        value,
-        "$",
-        &[
+fn validate_json_fields(
+    value: &serde_json::Value,
+    mode: IdentityMode,
+) -> Result<(), SemanticReadError> {
+    let root_fields: &[&str] = match mode {
+        IdentityMode::Seed => &[
             "schema",
             "language_version",
             "unicode_version",
@@ -631,24 +841,74 @@ fn validate_json_fields(value: &serde_json::Value) -> Result<(), SemanticReadErr
             "nodes",
             "references",
         ],
-    )?;
+        IdentityMode::Project => &[
+            "schema",
+            "language_version",
+            "unicode_version",
+            "program_id",
+            "package_graph_id",
+            "root_package",
+            "packages",
+            "entry_module",
+            "modules",
+            "definitions",
+            "nodes",
+            "references",
+        ],
+    };
+    validate_object_fields(value, "$", root_fields)?;
+
+    if mode == IdentityMode::Project {
+        validate_required_fields(value, "$", root_fields)?;
+        validate_package_object(value.get("root_package"), "$.root_package")?;
+        validate_array_objects(
+            value.get("packages"),
+            "$.packages",
+            &["identity", "entry_module", "exports"],
+            |package, path| {
+                validate_required_fields(package, path, &["identity", "entry_module", "exports"])?;
+                validate_package_object(package.get("identity"), &format!("{path}.identity"))
+            },
+        )?;
+    }
+
+    let module_fields: &[&str] = match mode {
+        IdentityMode::Seed => &["name", "explicit", "requires", "imports"],
+        IdentityMode::Project => &["package", "name", "explicit", "requires", "imports"],
+    };
+    let import_fields: &[&str] = match mode {
+        IdentityMode::Seed => &["alias", "module"],
+        IdentityMode::Project => &["alias", "package", "module"],
+    };
     validate_array_objects(
         value.get("modules"),
         "$.modules",
-        &["name", "explicit", "requires", "imports"],
+        module_fields,
         |module, path| {
+            if mode == IdentityMode::Project {
+                validate_required_fields(module, path, module_fields)?;
+                validate_package_object(module.get("package"), &format!("{path}.package"))?;
+            }
             validate_array_objects(
                 module.get("imports"),
                 &format!("{path}.imports"),
-                &["alias", "module"],
-                |_, _| Ok(()),
+                import_fields,
+                |import, import_path| {
+                    if mode == IdentityMode::Project {
+                        validate_required_fields(import, import_path, import_fields)?;
+                        validate_package_object(
+                            import.get("package"),
+                            &format!("{import_path}.package"),
+                        )?;
+                    }
+                    Ok(())
+                },
             )
         },
     )?;
-    validate_array_objects(
-        value.get("definitions"),
-        "$.definitions",
-        &[
+
+    let definition_fields: &[&str] = match mode {
+        IdentityMode::Seed => &[
             "definition_id",
             "body_id",
             "module",
@@ -659,12 +919,50 @@ fn validate_json_fields(value: &serde_json::Value) -> Result<(), SemanticReadErr
             "effects",
             "capabilities",
         ],
-        |_, _| Ok(()),
-    )?;
+        IdentityMode::Project => &[
+            "definition_id",
+            "body_id",
+            "package",
+            "module",
+            "name",
+            "kind",
+            "origin",
+            "type",
+            "effects",
+            "capabilities",
+        ],
+    };
     validate_array_objects(
-        value.get("nodes"),
-        "$.nodes",
-        &[
+        value.get("definitions"),
+        "$.definitions",
+        definition_fields,
+        |definition, path| {
+            if mode == IdentityMode::Project {
+                validate_required_fields(
+                    definition,
+                    path,
+                    &[
+                        "definition_id",
+                        "body_id",
+                        "module",
+                        "name",
+                        "kind",
+                        "origin",
+                        "type",
+                        "effects",
+                        "capabilities",
+                    ],
+                )?;
+                if definition.get("package").is_some() {
+                    validate_package_object(definition.get("package"), &format!("{path}.package"))?;
+                }
+            }
+            Ok(())
+        },
+    )?;
+
+    let node_fields: &[&str] = match mode {
+        IdentityMode::Seed => &[
             "node_id",
             "module",
             "kind",
@@ -680,12 +978,49 @@ fn validate_json_fields(value: &serde_json::Value) -> Result<(), SemanticReadErr
             "identifier_scripts",
             "identifier_suspicious_mixed_script",
         ],
-        |_, _| Ok(()),
-    )?;
-    validate_array_objects(
-        value.get("references"),
-        "$.references",
-        &[
+        IdentityMode::Project => &[
+            "node_id",
+            "package",
+            "module",
+            "kind",
+            "name",
+            "owner",
+            "type",
+            "mutable",
+            "ordinal",
+            "effects",
+            "capabilities",
+            "identifier_source",
+            "identifier_skeleton",
+            "identifier_scripts",
+            "identifier_suspicious_mixed_script",
+        ],
+    };
+    validate_array_objects(value.get("nodes"), "$.nodes", node_fields, |node, path| {
+        if mode == IdentityMode::Project {
+            validate_required_fields(
+                node,
+                path,
+                &[
+                    "node_id",
+                    "module",
+                    "kind",
+                    "owner",
+                    "effects",
+                    "capabilities",
+                    "identifier_scripts",
+                    "identifier_suspicious_mixed_script",
+                ],
+            )?;
+            if node.get("package").is_some() {
+                validate_package_object(node.get("package"), &format!("{path}.package"))?;
+            }
+        }
+        Ok(())
+    })?;
+
+    let reference_fields: &[&str] = match mode {
+        IdentityMode::Seed => &[
             "module",
             "source_kind",
             "reference",
@@ -693,8 +1028,40 @@ fn validate_json_fields(value: &serde_json::Value) -> Result<(), SemanticReadErr
             "target_kind",
             "target",
         ],
-        |_, _| Ok(()),
+        IdentityMode::Project => &[
+            "package",
+            "module",
+            "source_kind",
+            "reference",
+            "source_id",
+            "target_kind",
+            "target",
+        ],
+    };
+    validate_array_objects(
+        value.get("references"),
+        "$.references",
+        reference_fields,
+        |reference, path| {
+            if mode == IdentityMode::Project {
+                validate_required_fields(reference, path, reference_fields)?;
+                validate_package_object(reference.get("package"), &format!("{path}.package"))?;
+            }
+            Ok(())
+        },
     )
+}
+
+fn validate_package_object(
+    value: Option<&serde_json::Value>,
+    path: &str,
+) -> Result<(), SemanticReadError> {
+    let Some(value) = value else {
+        return Ok(());
+    };
+    let fields = &["name", "version", "source"];
+    validate_object_fields(value, path, fields)?;
+    validate_required_fields(value, path, fields)
 }
 
 fn validate_array_objects(
@@ -738,8 +1105,27 @@ fn validate_object_fields(
     Ok(())
 }
 
-fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
-    if graph.schema != SEMANTIC_SCHEMA {
+fn validate_required_fields(
+    value: &serde_json::Value,
+    path: &str,
+    fields: &[&str],
+) -> Result<(), SemanticReadError> {
+    let serde_json::Value::Object(object) = value else {
+        return Err(SemanticReadError {
+            kind: SemanticReadErrorKind::ExpectedObject,
+            path: path.to_owned(),
+        });
+    };
+    for field in fields {
+        if !object.contains_key(*field) {
+            return Err(missing_project_field(field, &format!("{path}.{field}")));
+        }
+    }
+    Ok(())
+}
+
+fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), SemanticReadError> {
+    if graph.schema != mode.schema() {
         return Err(SemanticReadError {
             kind: SemanticReadErrorKind::InvalidSchema {
                 actual: graph.schema.clone(),
@@ -765,9 +1151,17 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
     }
     validate_id(&graph.program_id, "$.program_id")?;
 
+    let package_identities = validate_project_context(graph, mode)?;
     let mut modules = BTreeSet::new();
     for (index, module) in graph.modules.iter().enumerate() {
-        if !modules.insert(module.name.clone()) {
+        let coordinate = required_module_coordinate(
+            module.package.as_ref(),
+            &module.name,
+            &format!("$.modules[{index}].package"),
+            mode,
+            &package_identities,
+        )?;
+        if !modules.insert(coordinate) {
             return Err(SemanticReadError {
                 kind: SemanticReadErrorKind::DuplicateModule {
                     module: module.name.clone(),
@@ -776,7 +1170,11 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
             });
         }
     }
-    if !modules.contains(&graph.entry_module) {
+    let entry_package = match mode {
+        IdentityMode::Seed => None,
+        IdentityMode::Project => graph.root_package.clone(),
+    };
+    if !modules.contains(&(entry_package, graph.entry_module.clone())) {
         return Err(SemanticReadError {
             kind: SemanticReadErrorKind::MissingEntryModule {
                 module: graph.entry_module.clone(),
@@ -784,8 +1182,54 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
             path: "$.entry_module".to_owned(),
         });
     }
+    if mode == IdentityMode::Project {
+        for (package_index, package) in graph.packages.iter().enumerate() {
+            validate_package_module(
+                &modules,
+                &package.identity,
+                &package.entry_module,
+                &format!("$.packages[{package_index}].entry_module"),
+            )?;
+            let mut exports = BTreeSet::new();
+            for (export_index, export) in package.exports.iter().enumerate() {
+                if !exports.insert(export) {
+                    return Err(SemanticReadError {
+                        kind: SemanticReadErrorKind::DuplicateModule {
+                            module: export.clone(),
+                        },
+                        path: format!("$.packages[{package_index}].exports[{export_index}]"),
+                    });
+                }
+                validate_package_module(
+                    &modules,
+                    &package.identity,
+                    export,
+                    &format!("$.packages[{package_index}].exports[{export_index}]"),
+                )?;
+            }
+        }
+    }
+    let package_exports = graph
+        .packages
+        .iter()
+        .map(|package| {
+            (
+                package.identity.clone(),
+                package.exports.iter().cloned().collect::<BTreeSet<_>>(),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let mut module_imports = BTreeMap::<ModuleCoordinate, BTreeSet<ModuleCoordinate>>::new();
     for (module_index, module) in graph.modules.iter().enumerate() {
+        let module_coordinate = required_module_coordinate(
+            module.package.as_ref(),
+            &module.name,
+            &format!("$.modules[{module_index}].package"),
+            mode,
+            &package_identities,
+        )?;
         let mut aliases = BTreeSet::new();
+        let mut imported_coordinates = BTreeSet::new();
         for (import_index, import) in module.imports.iter().enumerate() {
             if !aliases.insert(import.alias.clone()) {
                 return Err(SemanticReadError {
@@ -796,15 +1240,40 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
                     path: format!("$.modules[{module_index}].imports[{import_index}].alias"),
                 });
             }
-            if !modules.contains(&import.module) {
+            let coordinate = required_module_coordinate(
+                import.package.as_ref(),
+                &import.module,
+                &format!("$.modules[{module_index}].imports[{import_index}].package"),
+                mode,
+                &package_identities,
+            )?;
+            if !modules.contains(&coordinate) {
                 return Err(SemanticReadError {
-                    kind: SemanticReadErrorKind::UnknownModule {
-                        module: import.module.clone(),
-                    },
+                    kind: unknown_module_kind(&coordinate),
                     path: format!("$.modules[{module_index}].imports[{import_index}].module"),
                 });
             }
+            if mode == IdentityMode::Project && coordinate.0 != module_coordinate.0 {
+                let target_package = coordinate
+                    .0
+                    .as_ref()
+                    .expect("project imports always have package coordinates");
+                let exported = package_exports
+                    .get(target_package)
+                    .is_some_and(|exports| exports.contains(&coordinate.1));
+                if !exported {
+                    return Err(SemanticReadError {
+                        kind: SemanticReadErrorKind::PrivatePackageModule {
+                            package: package_label(target_package),
+                            module: coordinate.1.clone(),
+                        },
+                        path: format!("$.modules[{module_index}].imports[{import_index}].module"),
+                    });
+                }
+            }
+            imported_coordinates.insert(coordinate);
         }
+        module_imports.insert(module_coordinate, imported_coordinates);
     }
 
     let mut definitions = BTreeSet::new();
@@ -827,8 +1296,25 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
                 path: format!("$.definitions[{index}].definition_id"),
             });
         }
-        definition_modules.insert(definition.definition_id.clone(), definition.module.clone());
-        if !bodies.insert(definition.body_id.clone()) {
+        let definition_coordinate = match definition.origin.as_str() {
+            "user" => required_module_coordinate(
+                definition.package.as_ref(),
+                &definition.module,
+                &format!("$.definitions[{index}].package"),
+                mode,
+                &package_identities,
+            )?,
+            _ => system_coordinate(
+                definition.package.as_ref(),
+                &definition.module,
+                &format!("$.definitions[{index}].package"),
+            )?,
+        };
+        definition_modules.insert(
+            definition.definition_id.clone(),
+            definition_coordinate.clone(),
+        );
+        if !bodies.insert(definition.body_id.clone()) && mode == IdentityMode::Seed {
             return Err(SemanticReadError {
                 kind: SemanticReadErrorKind::DuplicateId {
                     value: definition.body_id.clone(),
@@ -855,11 +1341,9 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
                 path: format!("$.definitions[{index}].origin"),
             });
         }
-        if definition.origin == "user" && !modules.contains(&definition.module) {
+        if definition.origin == "user" && !modules.contains(&definition_coordinate) {
             return Err(SemanticReadError {
-                kind: SemanticReadErrorKind::UnknownModule {
-                    module: definition.module.clone(),
-                },
+                kind: unknown_module_kind(&definition_coordinate),
                 path: format!("$.definitions[{index}].module"),
             });
         }
@@ -888,9 +1372,22 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
     let mut node_owners = BTreeMap::new();
     for (index, node) in graph.nodes.iter().enumerate() {
         validate_id(&node.node_id, &format!("$.nodes[{index}].node_id"))?;
+        let coordinate = optional_module_coordinate(
+            node.package.as_ref(),
+            &node.module,
+            &format!("$.nodes[{index}].package"),
+            mode,
+            &package_identities,
+        )?;
+        if coordinate.0.is_some() && !modules.contains(&coordinate) {
+            return Err(SemanticReadError {
+                kind: unknown_module_kind(&coordinate),
+                path: format!("$.nodes[{index}].module"),
+            });
+        }
         if definitions.contains(&node.node_id)
             || nodes
-                .insert(node.node_id.clone(), node.kind.clone())
+                .insert(node.node_id.clone(), (node.kind.clone(), coordinate))
                 .is_some()
         {
             return Err(SemanticReadError {
@@ -920,19 +1417,19 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
                 path: format!("$.nodes[{index}].owner"),
             });
         }
-        let owner_module = definition_modules.get(&node.owner).or_else(|| {
-            graph
-                .nodes
-                .iter()
-                .find(|candidate| candidate.node_id == node.owner)
-                .map(|candidate| &candidate.module)
-        });
-        if owner_module.is_some_and(|module| module != &node.module) {
+        let owner_module = definition_modules
+            .get(&node.owner)
+            .or_else(|| nodes.get(&node.owner).map(|(_, coordinate)| coordinate));
+        let node_coordinate = nodes
+            .get(&node.node_id)
+            .map(|(_, coordinate)| coordinate)
+            .expect("validated node was inserted");
+        if owner_module.is_some_and(|coordinate| coordinate != node_coordinate) {
             return Err(SemanticReadError {
-                kind: SemanticReadErrorKind::UnknownModule {
-                    module: node.module.clone(),
+                kind: SemanticReadErrorKind::PackageCoordinateMismatch {
+                    entity: node.node_id.clone(),
                 },
-                path: format!("$.nodes[{index}].module"),
+                path: format!("$.nodes[{index}].package"),
             });
         }
         let mut seen = BTreeSet::new();
@@ -952,11 +1449,16 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
 
     let mut references = BTreeSet::new();
     for (index, reference) in graph.references.iter().enumerate() {
-        if !modules.contains(&reference.module) {
+        let coordinate = required_module_coordinate(
+            reference.package.as_ref(),
+            &reference.module,
+            &format!("$.references[{index}].package"),
+            mode,
+            &package_identities,
+        )?;
+        if !modules.contains(&coordinate) {
             return Err(SemanticReadError {
-                kind: SemanticReadErrorKind::UnknownModule {
-                    module: reference.module.clone(),
-                },
+                kind: unknown_module_kind(&coordinate),
                 path: format!("$.references[{index}].module"),
             });
         }
@@ -969,7 +1471,7 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
             });
         }
         if !references.insert((
-            reference.module.clone(),
+            coordinate.clone(),
             reference.source_kind.clone(),
             reference.reference,
         )) {
@@ -985,7 +1487,12 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
         if let Some(source_id) = &reference.source_id {
             validate_id(source_id, &format!("$.references[{index}].source_id"))?;
             let expected_kind = reference.source_kind.as_str();
-            if nodes.get(source_id).map(String::as_str) != Some(expected_kind) {
+            if nodes
+                .get(source_id)
+                .is_none_or(|(kind, source_coordinate)| {
+                    kind != expected_kind || source_coordinate != &coordinate
+                })
+            {
                 return Err(SemanticReadError {
                     kind: SemanticReadErrorKind::DanglingReference {
                         target: source_id.clone(),
@@ -1005,15 +1512,31 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
                         path: format!("$.references[{index}].target"),
                     });
                 }
+                let target_coordinate = &definition_modules[&reference.target];
+                let target_is_system = target_coordinate.0.is_none();
+                let target_is_local = target_coordinate == &coordinate;
+                let target_is_imported = module_imports
+                    .get(&coordinate)
+                    .is_some_and(|imports| imports.contains(target_coordinate));
+                if !target_is_system && !target_is_local && !target_is_imported {
+                    return Err(SemanticReadError {
+                        kind: SemanticReadErrorKind::UnimportedReference {
+                            target: reference.target.clone(),
+                        },
+                        path: format!("$.references[{index}].target"),
+                    });
+                }
             }
             "binding" => {
-                let legacy_local = reference
-                    .target
-                    .strip_prefix("local:")
-                    .and_then(|value| value.parse::<u32>().ok())
-                    .is_some();
-                let resolved_node =
-                    nodes.get(&reference.target).map(String::as_str) == Some("binding");
+                let legacy_local = mode == IdentityMode::Seed
+                    && reference
+                        .target
+                        .strip_prefix("local:")
+                        .and_then(|value| value.parse::<u32>().ok())
+                        .is_some();
+                let resolved_node = nodes
+                    .get(&reference.target)
+                    .is_some_and(|(kind, _)| kind == "binding");
                 if !legacy_local && !resolved_node {
                     return Err(SemanticReadError {
                         kind: SemanticReadErrorKind::DanglingReference {
@@ -1034,6 +1557,229 @@ fn validate_graph(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
         }
     }
     Ok(())
+}
+
+type ModuleCoordinate = (Option<SemanticPackageIdentity>, String);
+
+fn validate_project_context(
+    graph: &SemanticGraph,
+    mode: IdentityMode,
+) -> Result<BTreeSet<SemanticPackageIdentity>, SemanticReadError> {
+    if mode == IdentityMode::Seed {
+        return Ok(BTreeSet::new());
+    }
+
+    let graph_id = graph
+        .package_graph_id
+        .as_deref()
+        .ok_or_else(|| missing_project_field("package_graph_id", "$.package_graph_id"))?;
+    validate_sha256_id(graph_id, "$.package_graph_id")?;
+    let root = graph
+        .root_package
+        .as_ref()
+        .ok_or_else(|| missing_project_field("root_package", "$.root_package"))?;
+    validate_package_identity(root, "$.root_package")?;
+    if graph.packages.is_empty() {
+        return Err(missing_project_field("packages", "$.packages"));
+    }
+
+    let mut identities = BTreeSet::new();
+    let mut names = BTreeSet::new();
+    for (index, package) in graph.packages.iter().enumerate() {
+        validate_package_identity(&package.identity, &format!("$.packages[{index}].identity"))?;
+        if !names.insert(package.identity.name.clone())
+            || !identities.insert(package.identity.clone())
+        {
+            return Err(SemanticReadError {
+                kind: SemanticReadErrorKind::DuplicatePackage {
+                    package: package.identity.name.clone(),
+                },
+                path: format!("$.packages[{index}].identity"),
+            });
+        }
+    }
+    if !identities.contains(root) {
+        return Err(SemanticReadError {
+            kind: SemanticReadErrorKind::UnknownPackage {
+                package: package_label(root),
+            },
+            path: "$.root_package".to_owned(),
+        });
+    }
+    Ok(identities)
+}
+
+fn missing_project_field(field: &str, path: &str) -> SemanticReadError {
+    SemanticReadError {
+        kind: SemanticReadErrorKind::MissingProjectField {
+            field: field.to_owned(),
+        },
+        path: path.to_owned(),
+    }
+}
+
+fn required_module_coordinate(
+    package: Option<&SemanticPackageIdentity>,
+    module: &str,
+    path: &str,
+    mode: IdentityMode,
+    packages: &BTreeSet<SemanticPackageIdentity>,
+) -> Result<ModuleCoordinate, SemanticReadError> {
+    if mode == IdentityMode::Project && package.is_none() {
+        return Err(missing_project_field("package", path));
+    }
+    optional_module_coordinate(package, module, path, mode, packages)
+}
+
+fn optional_module_coordinate(
+    package: Option<&SemanticPackageIdentity>,
+    module: &str,
+    path: &str,
+    mode: IdentityMode,
+    packages: &BTreeSet<SemanticPackageIdentity>,
+) -> Result<ModuleCoordinate, SemanticReadError> {
+    if mode == IdentityMode::Seed && package.is_some() {
+        return Err(SemanticReadError {
+            kind: SemanticReadErrorKind::PackageCoordinateMismatch {
+                entity: module.to_owned(),
+            },
+            path: path.to_owned(),
+        });
+    }
+    if let Some(package) = package {
+        validate_package_identity(package, path)?;
+        if !packages.contains(package) {
+            return Err(SemanticReadError {
+                kind: SemanticReadErrorKind::UnknownPackage {
+                    package: package_label(package),
+                },
+                path: path.to_owned(),
+            });
+        }
+    }
+    Ok((package.cloned(), module.to_owned()))
+}
+
+fn system_coordinate(
+    package: Option<&SemanticPackageIdentity>,
+    module: &str,
+    path: &str,
+) -> Result<ModuleCoordinate, SemanticReadError> {
+    if package.is_some() {
+        return Err(SemanticReadError {
+            kind: SemanticReadErrorKind::PackageCoordinateMismatch {
+                entity: module.to_owned(),
+            },
+            path: path.to_owned(),
+        });
+    }
+    Ok((None, module.to_owned()))
+}
+
+fn validate_package_module(
+    modules: &BTreeSet<ModuleCoordinate>,
+    package: &SemanticPackageIdentity,
+    module: &str,
+    path: &str,
+) -> Result<(), SemanticReadError> {
+    if modules.contains(&(Some(package.clone()), module.to_owned())) {
+        return Ok(());
+    }
+    Err(SemanticReadError {
+        kind: SemanticReadErrorKind::UnknownPackageModule {
+            package: package_label(package),
+            module: module.to_owned(),
+        },
+        path: path.to_owned(),
+    })
+}
+
+fn unknown_module_kind(coordinate: &ModuleCoordinate) -> SemanticReadErrorKind {
+    match &coordinate.0 {
+        Some(package) => SemanticReadErrorKind::UnknownPackageModule {
+            package: package_label(package),
+            module: coordinate.1.clone(),
+        },
+        None => SemanticReadErrorKind::UnknownModule {
+            module: coordinate.1.clone(),
+        },
+    }
+}
+
+fn package_label(package: &SemanticPackageIdentity) -> String {
+    format!("{}@{}#{}", package.name, package.version, package.source)
+}
+
+fn validate_package_identity(
+    package: &SemanticPackageIdentity,
+    path: &str,
+) -> Result<(), SemanticReadError> {
+    if !valid_package_name(&package.name)
+        || !valid_package_version(&package.version)
+        || !valid_sha256_id(&package.source)
+    {
+        return Err(SemanticReadError {
+            kind: SemanticReadErrorKind::InvalidPackageIdentity {
+                value: package_label(package),
+            },
+            path: path.to_owned(),
+        });
+    }
+    Ok(())
+}
+
+fn valid_package_name(value: &str) -> bool {
+    let bytes = value.as_bytes();
+    if !(1..=63).contains(&bytes.len()) || !bytes[0].is_ascii_lowercase() {
+        return false;
+    }
+    let mut previous_hyphen = false;
+    for byte in &bytes[1..] {
+        if *byte == b'-' {
+            if previous_hyphen {
+                return false;
+            }
+            previous_hyphen = true;
+        } else if byte.is_ascii_lowercase() || byte.is_ascii_digit() {
+            previous_hyphen = false;
+        } else {
+            return false;
+        }
+    }
+    !previous_hyphen
+}
+
+fn valid_package_version(value: &str) -> bool {
+    let components = value.split('.').collect::<Vec<_>>();
+    components.len() == 3
+        && components.iter().all(|component| {
+            !component.is_empty()
+                && (component == &"0" || !component.starts_with('0'))
+                && component.bytes().all(|byte| byte.is_ascii_digit())
+                && component.parse::<u32>().is_ok()
+        })
+}
+
+fn valid_sha256_id(value: &str) -> bool {
+    let Some(digest) = value.strip_prefix("sha256:") else {
+        return false;
+    };
+    digest.len() == 64
+        && digest
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+}
+
+fn validate_sha256_id(value: &str, path: &str) -> Result<(), SemanticReadError> {
+    if valid_sha256_id(value) {
+        return Ok(());
+    }
+    Err(SemanticReadError {
+        kind: SemanticReadErrorKind::InvalidPackageIdentity {
+            value: value.to_owned(),
+        },
+        path: path.to_owned(),
+    })
 }
 
 fn validate_id(value: &str, path: &str) -> Result<(), SemanticReadError> {
@@ -1057,11 +1803,12 @@ fn validate_id(value: &str, path: &str) -> Result<(), SemanticReadError> {
 
 struct SnapshotBuilder {
     checked: CheckedProgram,
+    mode: IdentityMode,
 }
 
 impl SnapshotBuilder {
-    const fn new(checked: CheckedProgram) -> Self {
-        Self { checked }
+    const fn new(checked: CheckedProgram, mode: IdentityMode) -> Self {
+        Self { checked, mode }
     }
 
     fn build(self) -> Result<ProgramSnapshot, SnapshotError> {
@@ -1076,6 +1823,9 @@ impl SnapshotBuilder {
             language_version: LANGUAGE_VERSION.to_owned(),
             unicode_version: ling_unicode::UNICODE_VERSION.to_string(),
             program_id: program_id.to_string(),
+            package_graph_id: None,
+            root_package: None,
+            packages: Vec::new(),
             entry_module: self
                 .checked
                 .typed()
@@ -1100,6 +1850,64 @@ impl SnapshotBuilder {
         })
     }
 
+    fn build_project(self) -> Result<ProjectProgramSnapshot, ProjectSnapshotError> {
+        let body_ids = self.body_ids();
+        let program_id = self.program_id(&body_ids);
+        let modules = self.modules();
+        let definitions = self.definitions(&body_ids);
+        let nodes = self.nodes();
+        let references = self.references();
+        let project = self
+            .checked
+            .typed()
+            .resolved()
+            .project()
+            .expect("build_project validates package context");
+        let packages = project
+            .packages()
+            .iter()
+            .map(|package| SemanticPackage {
+                identity: semantic_package_identity(package.identity()),
+                entry_module: package.entry().as_str().to_owned(),
+                exports: package
+                    .exports()
+                    .iter()
+                    .map(|module| module.as_str().to_owned())
+                    .collect(),
+            })
+            .collect();
+        let graph = SemanticGraph {
+            schema: PROJECT_SEMANTIC_SCHEMA.to_owned(),
+            language_version: LANGUAGE_VERSION.to_owned(),
+            unicode_version: ling_unicode::UNICODE_VERSION.to_string(),
+            program_id: program_id.to_string(),
+            package_graph_id: Some(project.graph_id().as_str().to_owned()),
+            root_package: Some(semantic_package_identity(project.root())),
+            packages,
+            entry_module: self
+                .checked
+                .typed()
+                .resolved()
+                .entry_module()
+                .hir
+                .module
+                .name
+                .normalized(),
+            modules,
+            definitions,
+            nodes,
+            references,
+        };
+        let json = serde_json::to_string(&graph).map_err(ProjectSnapshotError::Serialization)?;
+        Ok(ProjectProgramSnapshot {
+            checked: self.checked,
+            graph,
+            body_ids,
+            program_id,
+            json,
+        })
+    }
+
     fn body_ids(&self) -> BTreeMap<DefinitionId, BodyId> {
         self.checked
             .typed()
@@ -1107,9 +1915,9 @@ impl SnapshotBuilder {
             .definitions()
             .keys()
             .map(|definition| {
-                let mut encoder = Encoder::new("ling.body-id/v1");
+                let mut encoder = Encoder::new(self.mode.body_domain());
                 encoder.string(LANGUAGE_VERSION);
-                encoder.string(SEMANTIC_SCHEMA);
+                encoder.string(self.mode.schema());
                 self.encode_definition(definition, &mut encoder);
                 (definition.clone(), BodyId(hash(encoder.finish())))
             })
@@ -1117,10 +1925,29 @@ impl SnapshotBuilder {
     }
 
     fn program_id(&self, body_ids: &BTreeMap<DefinitionId, BodyId>) -> ProgramId {
-        let mut encoder = Encoder::new("ling.program-id/v1");
+        let mut encoder = Encoder::new(self.mode.program_domain());
         encoder.string(LANGUAGE_VERSION);
-        encoder.string(SEMANTIC_SCHEMA);
+        encoder.string(self.mode.schema());
         encoder.string(&ling_unicode::UNICODE_VERSION.to_string());
+        if self.mode == IdentityMode::Project {
+            let project = self
+                .checked
+                .typed()
+                .resolved()
+                .project()
+                .expect("project identity mode requires project metadata");
+            encoder.string(project.graph_id().as_str());
+            encode_package_identity_to_encoder(project.root(), &mut encoder);
+            encoder.u32(u32::try_from(project.packages().len()).unwrap_or(u32::MAX));
+            for package in project.packages() {
+                encode_package_identity_to_encoder(package.identity(), &mut encoder);
+                encoder.string(package.entry().as_str());
+                encoder.u32(u32::try_from(package.exports().len()).unwrap_or(u32::MAX));
+                for export in package.exports() {
+                    encoder.string(export.as_str());
+                }
+            }
+        }
         encoder.u32(u32::try_from(body_ids.len()).unwrap_or(u32::MAX));
         for (definition, body) in body_ids {
             encoder.string(definition.as_str());
@@ -1149,14 +1976,20 @@ impl SnapshotBuilder {
                     .filter_map(|(alias, target)| {
                         resolved.module(*target).map(|target| SemanticImport {
                             alias: alias.clone(),
+                            package: target.package.as_ref().map(semantic_package_identity),
                             module: target.hir.module.name.normalized(),
                         })
                     })
                     .collect::<Vec<_>>();
                 imports.sort_by(|left, right| {
-                    (&left.alias, &left.module).cmp(&(&right.alias, &right.module))
+                    (&left.alias, &left.package, &left.module).cmp(&(
+                        &right.alias,
+                        &right.package,
+                        &right.module,
+                    ))
                 });
                 SemanticModule {
+                    package: module.package.as_ref().map(semantic_package_identity),
                     name: module.hir.module.name.normalized(),
                     explicit: module.hir.module.explicit,
                     requires,
@@ -1164,7 +1997,8 @@ impl SnapshotBuilder {
                 }
             })
             .collect::<Vec<_>>();
-        modules.sort_by(|left, right| left.name.cmp(&right.name));
+        modules
+            .sort_by(|left, right| (&left.package, &left.name).cmp(&(&right.package, &right.name)));
         modules
     }
 
@@ -1190,6 +2024,7 @@ impl SnapshotBuilder {
                 SemanticDefinition {
                     definition_id: id.to_string(),
                     body_id: body_ids[id].to_string(),
+                    package: definition.package.as_ref().map(semantic_package_identity),
                     module: definition.module_name.clone(),
                     name: definition.name.clone(),
                     kind: definition_kind(definition.kind).to_owned(),
@@ -1217,6 +2052,8 @@ impl SnapshotBuilder {
                 .map(|type_id| typed.display_type(type_id));
             if definition.kind == DefinitionKind::Value {
                 nodes.push(semantic_node(
+                    self.mode,
+                    definition.package.as_ref(),
                     "binding",
                     &definition.module_name,
                     &format!("definition:{definition_id}"),
@@ -1232,6 +2069,8 @@ impl SnapshotBuilder {
             }
             if let Some(function_type) = self.checked.definition_function_type(definition_id) {
                 let function_id = semantic_node_id(
+                    self.mode,
+                    definition.package.as_ref(),
                     "function",
                     &definition.module_name,
                     &format!("definition:{definition_id}"),
@@ -1240,6 +2079,7 @@ impl SnapshotBuilder {
                 let capabilities = capabilities_for_effects(&effects);
                 nodes.push(SemanticNode {
                     node_id: function_id.clone(),
+                    package: definition.package.as_ref().map(semantic_package_identity),
                     module: definition.module_name.clone(),
                     kind: "function".to_owned(),
                     name: Some(definition.name.clone()),
@@ -1257,6 +2097,8 @@ impl SnapshotBuilder {
                 if !matches!(definition.origin, DefinitionOrigin::User { .. }) {
                     for (ordinal, parameter) in function_type.parameters().iter().enumerate() {
                         nodes.push(semantic_node(
+                            self.mode,
+                            definition.package.as_ref(),
                             "parameter",
                             &definition.module_name,
                             &format!("definition:{definition_id}:parameter:{ordinal}"),
@@ -1275,6 +2117,8 @@ impl SnapshotBuilder {
             if let Some(effects) = self.checked.definition_effect(definition_id) {
                 for effect in effects.names() {
                     nodes.push(semantic_node(
+                        self.mode,
+                        definition.package.as_ref(),
                         "effect",
                         &definition.module_name,
                         &format!("definition:{definition_id}:effect:{effect}"),
@@ -1290,6 +2134,8 @@ impl SnapshotBuilder {
                 }
                 for capability in capabilities_for_effects(&effects.names()) {
                     nodes.push(semantic_node(
+                        self.mode,
+                        definition.package.as_ref(),
                         "capability",
                         &definition.module_name,
                         &format!("definition:{definition_id}:capability:{capability}"),
@@ -1308,6 +2154,12 @@ impl SnapshotBuilder {
 
         for module in resolved.modules() {
             let module_name = module.hir.module.name.normalized();
+            let context = NodeContext {
+                mode: self.mode,
+                package: module.package.as_ref(),
+                module: module.id,
+                module_name: &module_name,
+            };
             for declaration in &module.hir.types {
                 let Some(definition_id) =
                     resolved.definition_id(module.id, &declaration.name.normalized)
@@ -1326,6 +2178,8 @@ impl SnapshotBuilder {
                                     .map(|info| typed.display_type(info.field_type))
                             });
                             nodes.push(semantic_node(
+                                self.mode,
+                                module.package.as_ref(),
                                 "field",
                                 &module_name,
                                 &format!("type:{definition_id}:field:{}", field.name.normalized),
@@ -1351,6 +2205,8 @@ impl SnapshotBuilder {
                                     .and_then(|info| info.payload.map(|id| typed.display_type(id)))
                             });
                             nodes.push(semantic_node(
+                                self.mode,
+                                module.package.as_ref(),
                                 "variant",
                                 &module_name,
                                 &format!("type:{definition_id}:variant:{}", case.name.normalized),
@@ -1375,6 +2231,8 @@ impl SnapshotBuilder {
                     continue;
                 };
                 let function_id = semantic_node_id(
+                    self.mode,
+                    module.package.as_ref(),
                     "function",
                     &module_name,
                     &format!("definition:{definition_id}"),
@@ -1383,8 +2241,7 @@ impl SnapshotBuilder {
                     add_parameter_and_pattern_nodes(
                         &mut nodes,
                         typed,
-                        module.id,
-                        &module_name,
+                        context,
                         &function_id,
                         ordinal,
                         parameter,
@@ -1393,8 +2250,7 @@ impl SnapshotBuilder {
                 add_expression_nodes(
                     &mut nodes,
                     &self.checked,
-                    module.id,
-                    &module_name,
+                    context,
                     definition_id.as_str(),
                     &definition.value,
                 );
@@ -1406,7 +2262,7 @@ impl SnapshotBuilder {
 
     fn references(&self) -> Vec<SemanticReference> {
         let resolved = self.checked.typed().resolved();
-        let source_ids = reference_source_ids(resolved);
+        let source_ids = reference_source_ids(resolved, self.mode);
         let mut references = resolved
             .references()
             .iter()
@@ -1419,22 +2275,21 @@ impl SnapshotBuilder {
                         ReferenceTarget::Binding(binding) => {
                             let binding_module = resolved
                                 .module(binding.module())
-                                .expect("resolved binding module exists")
-                                .hir
-                                .module
-                                .name
-                                .normalized();
+                                .expect("resolved binding module exists");
                             (
                                 "binding".to_owned(),
                                 semantic_node_id(
+                                    self.mode,
+                                    binding_module.package.as_ref(),
                                     "binding",
-                                    &binding_module,
+                                    &binding_module.hir.module.name.normalized(),
                                     &format!("local:{}", binding.local().get()),
                                 ),
                             )
                         }
                     };
                     SemanticReference {
+                        package: module.package.as_ref().map(semantic_package_identity),
                         module: module.hir.module.name.normalized(),
                         source_kind: "expression".to_owned(),
                         reference: key.local().get(),
@@ -1453,10 +2308,13 @@ impl SnapshotBuilder {
                     resolved
                         .module(key.module())
                         .map(|module| SemanticReference {
+                            package: module.package.as_ref().map(semantic_package_identity),
                             module: module.hir.module.name.normalized(),
                             source_kind: "pattern".to_owned(),
                             reference: key.local().get(),
                             source_id: Some(semantic_node_id(
+                                self.mode,
+                                module.package.as_ref(),
                                 "pattern",
                                 &module.hir.module.name.normalized(),
                                 &format!("local:{}", key.local().get()),
@@ -1468,6 +2326,7 @@ impl SnapshotBuilder {
         );
         references.sort_by(|left, right| {
             (
+                &left.package,
                 &left.module,
                 &left.source_kind,
                 left.reference,
@@ -1475,6 +2334,7 @@ impl SnapshotBuilder {
                 &left.target,
             )
                 .cmp(&(
+                    &right.package,
                     &right.module,
                     &right.source_kind,
                     right.reference,
@@ -1845,6 +2705,8 @@ fn identifier_metadata_from_definition(
 
 #[allow(clippy::too_many_arguments)]
 fn semantic_node(
+    mode: IdentityMode,
+    package: Option<&PackageIdentity>,
     kind: &str,
     module: &str,
     identity: &str,
@@ -1858,7 +2720,8 @@ fn semantic_node(
     metadata: IdentifierMetadata,
 ) -> SemanticNode {
     SemanticNode {
-        node_id: semantic_node_id(kind, module, identity),
+        node_id: semantic_node_id(mode, package, kind, module, identity),
+        package: package.map(semantic_package_identity),
         module: module.to_owned(),
         kind: kind.to_owned(),
         name: name.map(str::to_owned),
@@ -1875,10 +2738,25 @@ fn semantic_node(
     }
 }
 
-fn semantic_node_id(kind: &str, module: &str, identity: &str) -> String {
-    let mut encoder = Encoder::new("ling.semantic-node-id/v1");
+fn semantic_node_id(
+    mode: IdentityMode,
+    package: Option<&PackageIdentity>,
+    kind: &str,
+    module: &str,
+    identity: &str,
+) -> String {
+    let mut encoder = Encoder::new(mode.node_domain());
     encoder.string(LANGUAGE_VERSION);
-    encoder.string(SEMANTIC_SCHEMA);
+    encoder.string(mode.schema());
+    if mode == IdentityMode::Project {
+        match package {
+            Some(package) => {
+                encoder.string("package");
+                encode_package_identity_to_encoder(package, &mut encoder);
+            }
+            None => encoder.string("system"),
+        }
+    }
     encoder.string(kind);
     encoder.string(module);
     encoder.string(identity);
@@ -1893,25 +2771,36 @@ fn capabilities_for_effects(effects: &[String]) -> Vec<String> {
         .collect()
 }
 
+#[derive(Clone, Copy)]
+struct NodeContext<'a> {
+    mode: IdentityMode,
+    package: Option<&'a PackageIdentity>,
+    module: ModuleId,
+    module_name: &'a str,
+}
+
 fn add_parameter_and_pattern_nodes(
     nodes: &mut Vec<SemanticNode>,
     typed: &ling_types::TypedProgram,
-    module: ModuleId,
-    module_name: &str,
+    context: NodeContext<'_>,
     function_id: &str,
     ordinal: usize,
     pattern: &hir::Pattern,
 ) {
-    let name = pattern_binding_name(typed.resolved(), module, pattern);
-    let type_name = pattern_binding_type(typed, module, pattern);
+    let name = pattern_binding_name(typed.resolved(), context.module, pattern);
+    let type_name = pattern_binding_type(typed, context.module, pattern);
     let parameter_id = semantic_node_id(
+        context.mode,
+        context.package,
         "parameter",
-        module_name,
+        context.module_name,
         &format!("local:{}", pattern.id.get()),
     );
     nodes.push(semantic_node(
+        context.mode,
+        context.package,
         "parameter",
-        module_name,
+        context.module_name,
         &format!("local:{}", pattern.id.get()),
         name.map(|name| name.normalized.as_str()),
         function_id,
@@ -1922,31 +2811,34 @@ fn add_parameter_and_pattern_nodes(
         Vec::new(),
         name.map_or_else(IdentifierMetadata::default, identifier_metadata),
     ));
-    add_pattern_nodes(nodes, typed, module, module_name, &parameter_id, pattern);
+    add_pattern_nodes(nodes, typed, context, &parameter_id, pattern);
 }
 
 fn add_pattern_nodes(
     nodes: &mut Vec<SemanticNode>,
     typed: &ling_types::TypedProgram,
-    module: ModuleId,
-    module_name: &str,
+    context: NodeContext<'_>,
     owner: &str,
     pattern: &hir::Pattern,
 ) {
     let resolved = typed.resolved();
     let name = pattern_name(pattern);
     let pattern_id = semantic_node_id(
+        context.mode,
+        context.package,
         "pattern",
-        module_name,
+        context.module_name,
         &format!("local:{}", pattern.id.get()),
     );
     nodes.push(semantic_node(
+        context.mode,
+        context.package,
         "pattern",
-        module_name,
+        context.module_name,
         &format!("local:{}", pattern.id.get()),
         name.map(|name| name.normalized.as_str()),
         owner,
-        pattern_binding_type(typed, module, pattern),
+        pattern_binding_type(typed, context.module, pattern),
         None,
         Some(pattern.id.get()),
         Vec::new(),
@@ -1954,12 +2846,17 @@ fn add_pattern_nodes(
         name.map_or_else(IdentifierMetadata::default, identifier_metadata),
     ));
     if let hir::PatternKind::Binding { id, name } = &pattern.kind {
-        if resolved.pattern_constructor(module, pattern.id).is_none() {
-            let key = ling_resolve::BindingKey::new(module, *id);
+        if resolved
+            .pattern_constructor(context.module, pattern.id)
+            .is_none()
+        {
+            let key = ling_resolve::BindingKey::new(context.module, *id);
             let info = resolved.bindings().get(&key);
             nodes.push(semantic_node(
+                context.mode,
+                context.package,
                 "binding",
-                module_name,
+                context.module_name,
                 &format!("local:{}", id.get()),
                 Some(&name.normalized),
                 &pattern_id,
@@ -1975,24 +2872,17 @@ fn add_pattern_nodes(
     match &pattern.kind {
         hir::PatternKind::Tuple(patterns) => {
             for pattern in patterns {
-                add_pattern_nodes(nodes, typed, module, module_name, &pattern_id, pattern);
+                add_pattern_nodes(nodes, typed, context, &pattern_id, pattern);
             }
         }
         hir::PatternKind::Record(fields) => {
             for field in fields {
-                add_pattern_nodes(
-                    nodes,
-                    typed,
-                    module,
-                    module_name,
-                    &pattern_id,
-                    &field.pattern,
-                );
+                add_pattern_nodes(nodes, typed, context, &pattern_id, &field.pattern);
             }
         }
         hir::PatternKind::Constructor { arguments, .. } => {
             for argument in arguments {
-                add_pattern_nodes(nodes, typed, module, module_name, &pattern_id, argument);
+                add_pattern_nodes(nodes, typed, context, &pattern_id, argument);
             }
         }
         hir::PatternKind::Binding { .. }
@@ -2042,25 +2932,28 @@ fn pattern_binding_type(
 fn add_expression_nodes(
     nodes: &mut Vec<SemanticNode>,
     checked: &ling_effects::CheckedProgram,
-    module: ModuleId,
-    module_name: &str,
+    context: NodeContext<'_>,
     owner: &str,
     expression: &hir::Expression,
 ) {
     let typed = checked.typed();
     let expression_id = semantic_node_id(
+        context.mode,
+        context.package,
         "expression",
-        module_name,
+        context.module_name,
         &format!("local:{}", expression.id.get()),
     );
     nodes.push(semantic_node(
+        context.mode,
+        context.package,
         "expression",
-        module_name,
+        context.module_name,
         &format!("local:{}", expression.id.get()),
         Some(expression_kind(&expression.kind)),
         owner,
         typed
-            .expression_type(ExpressionKey::new(module, expression.id))
+            .expression_type(ExpressionKey::new(context.module, expression.id))
             .map(|id| typed.display_type(id)),
         None,
         Some(expression.id.get()),
@@ -2073,15 +2966,19 @@ fn add_expression_nodes(
             for element in elements {
                 match element {
                     hir::SequenceElement::Let(binding) => {
-                        let key = ling_resolve::BindingKey::new(module, binding.id);
+                        let key = ling_resolve::BindingKey::new(context.module, binding.id);
                         let binding_id = semantic_node_id(
+                            context.mode,
+                            context.package,
                             "binding",
-                            module_name,
+                            context.module_name,
                             &format!("local:{}", binding.id.get()),
                         );
                         nodes.push(semantic_node(
+                            context.mode,
+                            context.package,
                             "binding",
-                            module_name,
+                            context.module_name,
                             &format!("local:{}", binding.id.get()),
                             Some(&binding.name.normalized),
                             owner,
@@ -2096,15 +2993,19 @@ fn add_expression_nodes(
                             checked.binding_function_type(key)
                         {
                             let function_id = semantic_node_id(
+                                context.mode,
+                                context.package,
                                 "function",
-                                module_name,
+                                context.module_name,
                                 &format!("local:{}", binding.id.get()),
                             );
                             let effects = function_type.effects().names();
                             let capabilities = capabilities_for_effects(&effects);
                             nodes.push(semantic_node(
+                                context.mode,
+                                context.package,
                                 "function",
-                                module_name,
+                                context.module_name,
                                 &format!("local:{}", binding.id.get()),
                                 Some(&binding.name.normalized),
                                 &binding_id,
@@ -2117,8 +3018,10 @@ fn add_expression_nodes(
                             ));
                             for effect in effects {
                                 nodes.push(semantic_node(
+                                    context.mode,
+                                    context.package,
                                     "effect",
-                                    module_name,
+                                    context.module_name,
                                     &format!("local:{}:effect:{effect}", binding.id.get()),
                                     Some(&effect),
                                     &function_id,
@@ -2132,8 +3035,10 @@ fn add_expression_nodes(
                             }
                             for capability in capabilities {
                                 nodes.push(semantic_node(
+                                    context.mode,
+                                    context.package,
                                     "capability",
-                                    module_name,
+                                    context.module_name,
                                     &format!("local:{}:capability:{capability}", binding.id.get()),
                                     Some(&capability),
                                     &function_id,
@@ -2153,8 +3058,7 @@ fn add_expression_nodes(
                             add_parameter_and_pattern_nodes(
                                 nodes,
                                 typed,
-                                module,
-                                module_name,
+                                context,
                                 &parameter_owner,
                                 ordinal,
                                 parameter,
@@ -2163,14 +3067,13 @@ fn add_expression_nodes(
                         add_expression_nodes(
                             nodes,
                             checked,
-                            module,
-                            module_name,
+                            context,
                             &parameter_owner,
                             &binding.value,
                         );
                     }
                     hir::SequenceElement::Expression(expression) => {
-                        add_expression_nodes(nodes, checked, module, module_name, owner, expression)
+                        add_expression_nodes(nodes, checked, context, owner, expression)
                     }
                 }
             }
@@ -2185,62 +3088,56 @@ fn add_expression_nodes(
                 then_branch.as_ref(),
                 else_branch.as_ref(),
             ] {
-                add_expression_nodes(nodes, checked, module, module_name, owner, expression);
+                add_expression_nodes(nodes, checked, context, owner, expression);
             }
         }
         hir::ExpressionKind::Match { scrutinee, cases } => {
-            add_expression_nodes(nodes, checked, module, module_name, owner, scrutinee);
+            add_expression_nodes(nodes, checked, context, owner, scrutinee);
             for case in cases {
-                add_pattern_nodes(
-                    nodes,
-                    typed,
-                    module,
-                    module_name,
-                    &expression_id,
-                    &case.pattern,
-                );
+                add_pattern_nodes(nodes, typed, context, &expression_id, &case.pattern);
                 if let Some(guard) = &case.guard {
-                    add_expression_nodes(nodes, checked, module, module_name, owner, guard);
+                    add_expression_nodes(nodes, checked, context, owner, guard);
                 }
-                add_expression_nodes(nodes, checked, module, module_name, owner, &case.body);
+                add_expression_nodes(nodes, checked, context, owner, &case.body);
             }
         }
         hir::ExpressionKind::Assignment { value, .. } => {
-            add_expression_nodes(nodes, checked, module, module_name, owner, value);
+            add_expression_nodes(nodes, checked, context, owner, value);
         }
         hir::ExpressionKind::Application {
             function,
             arguments,
         } => {
-            add_expression_nodes(nodes, checked, module, module_name, owner, function);
+            add_expression_nodes(nodes, checked, context, owner, function);
             for argument in arguments {
-                add_expression_nodes(nodes, checked, module, module_name, owner, argument);
+                add_expression_nodes(nodes, checked, context, owner, argument);
             }
         }
         hir::ExpressionKind::Projection { target, .. } => {
-            add_expression_nodes(nodes, checked, module, module_name, owner, target);
+            add_expression_nodes(nodes, checked, context, owner, target);
         }
         hir::ExpressionKind::Binary { left, right, .. } => {
-            add_expression_nodes(nodes, checked, module, module_name, owner, left);
-            add_expression_nodes(nodes, checked, module, module_name, owner, right);
+            for expression in [left.as_ref(), right.as_ref()] {
+                add_expression_nodes(nodes, checked, context, owner, expression);
+            }
         }
         hir::ExpressionKind::Unary { operand, .. } => {
-            add_expression_nodes(nodes, checked, module, module_name, owner, operand);
+            add_expression_nodes(nodes, checked, context, owner, operand);
         }
         hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => {
             for element in elements {
-                add_expression_nodes(nodes, checked, module, module_name, owner, element);
+                add_expression_nodes(nodes, checked, context, owner, element);
             }
         }
         hir::ExpressionKind::Record(fields) => {
             for field in fields {
-                add_expression_nodes(nodes, checked, module, module_name, owner, &field.value);
+                add_expression_nodes(nodes, checked, context, owner, &field.value);
             }
         }
         hir::ExpressionKind::RecordUpdate { base, fields } => {
-            add_expression_nodes(nodes, checked, module, module_name, owner, base);
+            add_expression_nodes(nodes, checked, context, owner, base);
             for field in fields {
-                add_expression_nodes(nodes, checked, module, module_name, owner, &field.value);
+                add_expression_nodes(nodes, checked, context, owner, &field.value);
             }
         }
         hir::ExpressionKind::Name { .. }
@@ -2271,12 +3168,15 @@ fn expression_kind(expression: &hir::ExpressionKind) -> &'static str {
 
 fn reference_source_ids(
     resolved: &ling_resolve::ResolvedProgram,
+    mode: IdentityMode,
 ) -> BTreeMap<(ModuleId, hir::ReferenceId), String> {
     let mut sources = BTreeMap::new();
     for module in resolved.modules() {
         let module_name = module.hir.module.name.normalized();
         for definition in &module.hir.definitions {
             collect_expression_reference_sources(
+                mode,
+                module.package.as_ref(),
                 &module_name,
                 module.id,
                 &definition.value,
@@ -2288,12 +3188,16 @@ fn reference_source_ids(
 }
 
 fn collect_expression_reference_sources(
+    mode: IdentityMode,
+    package: Option<&PackageIdentity>,
     module_name: &str,
     module: ModuleId,
     expression: &hir::Expression,
     sources: &mut BTreeMap<(ModuleId, hir::ReferenceId), String>,
 ) {
     let source_id = semantic_node_id(
+        mode,
+        package,
         "expression",
         module_name,
         &format!("local:{}", expression.id.get()),
@@ -2301,13 +3205,27 @@ fn collect_expression_reference_sources(
     match &expression.kind {
         hir::ExpressionKind::Assignment { place, value } => {
             sources.insert((module, place.root_reference), source_id);
-            collect_expression_reference_sources(module_name, module, value, sources);
+            collect_expression_reference_sources(
+                mode,
+                package,
+                module_name,
+                module,
+                value,
+                sources,
+            );
         }
         hir::ExpressionKind::Projection {
             reference, target, ..
         } => {
             sources.insert((module, *reference), source_id);
-            collect_expression_reference_sources(module_name, module, target, sources);
+            collect_expression_reference_sources(
+                mode,
+                package,
+                module_name,
+                module,
+                target,
+                sources,
+            );
         }
         hir::ExpressionKind::Name { reference, .. } => {
             sources.insert((module, *reference), source_id);
@@ -2318,7 +3236,14 @@ fn collect_expression_reference_sources(
                     hir::SequenceElement::Let(binding) => &binding.value,
                     hir::SequenceElement::Expression(expression) => expression,
                 };
-                collect_expression_reference_sources(module_name, module, expression, sources);
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    expression,
+                    sources,
+                );
             }
         }
         hir::ExpressionKind::If {
@@ -2331,48 +3256,126 @@ fn collect_expression_reference_sources(
                 then_branch.as_ref(),
                 else_branch.as_ref(),
             ] {
-                collect_expression_reference_sources(module_name, module, expression, sources);
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    expression,
+                    sources,
+                );
             }
         }
         hir::ExpressionKind::Match { scrutinee, cases } => {
-            collect_expression_reference_sources(module_name, module, scrutinee, sources);
+            collect_expression_reference_sources(
+                mode,
+                package,
+                module_name,
+                module,
+                scrutinee,
+                sources,
+            );
             for case in cases {
                 if let Some(guard) = &case.guard {
-                    collect_expression_reference_sources(module_name, module, guard, sources);
+                    collect_expression_reference_sources(
+                        mode,
+                        package,
+                        module_name,
+                        module,
+                        guard,
+                        sources,
+                    );
                 }
-                collect_expression_reference_sources(module_name, module, &case.body, sources);
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    &case.body,
+                    sources,
+                );
             }
         }
         hir::ExpressionKind::Application {
             function,
             arguments,
         } => {
-            collect_expression_reference_sources(module_name, module, function, sources);
+            collect_expression_reference_sources(
+                mode,
+                package,
+                module_name,
+                module,
+                function,
+                sources,
+            );
             for argument in arguments {
-                collect_expression_reference_sources(module_name, module, argument, sources);
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    argument,
+                    sources,
+                );
             }
         }
         hir::ExpressionKind::Binary { left, right, .. } => {
-            collect_expression_reference_sources(module_name, module, left, sources);
-            collect_expression_reference_sources(module_name, module, right, sources);
+            for expression in [left.as_ref(), right.as_ref()] {
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    expression,
+                    sources,
+                );
+            }
         }
         hir::ExpressionKind::Unary { operand, .. } => {
-            collect_expression_reference_sources(module_name, module, operand, sources);
+            collect_expression_reference_sources(
+                mode,
+                package,
+                module_name,
+                module,
+                operand,
+                sources,
+            );
         }
         hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => {
             for element in elements {
-                collect_expression_reference_sources(module_name, module, element, sources);
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    element,
+                    sources,
+                );
             }
         }
         hir::ExpressionKind::Record(fields) => {
             for field in fields {
-                collect_expression_reference_sources(module_name, module, &field.value, sources);
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    &field.value,
+                    sources,
+                );
             }
         }
         hir::ExpressionKind::RecordUpdate { base, fields } => {
-            collect_expression_reference_sources(module_name, module, base, sources);
+            collect_expression_reference_sources(mode, package, module_name, module, base, sources);
             for field in fields {
-                collect_expression_reference_sources(module_name, module, &field.value, sources);
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    &field.value,
+                    sources,
+                );
             }
         }
         hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}

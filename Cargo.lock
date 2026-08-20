@@ -287,6 +287,7 @@ dependencies = [
  "ling-ast",
  "ling-diagnostics",
  "ling-hir",
+ "ling-project",
  "ling-source",
  "ling-syntax",
 ]
@@ -299,6 +300,7 @@ dependencies = [
  "ling-ast",
  "ling-effects",
  "ling-hir",
+ "ling-project",
  "ling-resolve",
  "ling-source",
  "ling-syntax",

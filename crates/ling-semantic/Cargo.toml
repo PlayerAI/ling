@@ -10,6 +10,7 @@ repository.workspace = true
 blake3.workspace = true
 ling-effects = { path = "../ling-effects" }
 ling-hir = { path = "../ling-hir" }
+ling-project = { path = "../ling-project" }
 ling-resolve = { path = "../ling-resolve" }
 ling-types = { path = "../ling-types" }
 ling-unicode = { path = "../ling-unicode" }

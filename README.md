@@ -121,7 +121,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - `Unit`、`Bool`、`Int`、`f64`、`Text`、`Option`、`Result`；
 - 局部类型推导、默认不可变、`mutable` 和 `place <- value`；
 - `Pure` 与 `Console.Write` Effect，以及 `Console.Write` Capability；
-- Accepted `ling.manifest/1` reader、显式工程根下的确定性 module discovery，以及离线递归解析 vendored path dependency 的内容/graph identity（尚未接入 CLI、跨包 visibility 或 lockfile）；
+- Accepted `ling.manifest/1` reader、显式工程根下的确定性 module discovery、离线递归解析 vendored path dependency 的内容/graph identity，以及库级跨包 import/export visibility 与 package-aware `ling.semantic/0.2`（尚未接入 CLI 或 lockfile）；
 - Semantic Graph、稳定 Diagnostic JSON、解释器、REPL、`run`、`check`、`semantic`、`audit`。
 
 第一阶段明确后置：GC Runtime、Native Backend、Ownership/Borrow Checker、Trait、Effect Handler、Task、Actor、Node、Kernel、分布式、GPU、形式证明和包管理器。设计中预留的能力不得以静默占位的方式运行。
@@ -356,7 +356,7 @@ The current Seed implementation covers:
 - `Unit`, `Bool`, `Int`, `f64`, `Text`, `Option`, and `Result`;
 - local type inference, default immutability, `mutable`, and `place <- value`;
 - `Pure` and `Console.Write` Effects, plus the `Console.Write` Capability;
-- an Accepted `ling.manifest/1` reader, deterministic module discovery under an explicit project root, and offline recursive resolution of content-identified vendored path dependencies (not yet integrated with CLI project selection, cross-package visibility, or lockfiles);
+- an Accepted `ling.manifest/1` reader, deterministic module discovery under an explicit project root, offline recursive resolution of content-identified vendored path dependencies, library-level cross-package import/export visibility, and package-aware `ling.semantic/0.2` (not yet integrated with CLI project selection or lockfiles);
 - Semantic Graph, stable Diagnostic JSON, an interpreter, a REPL, `run`, `check`, `semantic`, and `audit`.
 
 The first milestone explicitly postpones the GC runtime, native backend, Ownership/Borrow checker, Traits, Effect Handlers, Task, Actor, Node, Kernel, distribution, GPU support, formal proofs, and package management. Reserved features must not silently execute as placeholders.

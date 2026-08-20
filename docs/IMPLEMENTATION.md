@@ -79,10 +79,10 @@ ling-project     → ling-source, ling-unicode, ling-diagnostics, ling-syntax, l
 ling-syntax      → ling-source, ling-unicode, ling-diagnostics
 ling-ast         → ling-source, ling-syntax
 ling-hir         → ling-source, ling-ast
-ling-resolve     → ling-hir, ling-unicode, ling-diagnostics
+ling-resolve     → ling-hir, ling-project, ling-unicode, ling-diagnostics
 ling-types       → ling-hir, ling-resolve, ling-diagnostics
 ling-effects     → ling-hir, ling-types, ling-diagnostics
-ling-semantic    → ling-source, ling-hir, ling-resolve, ling-types, ling-effects
+ling-semantic    → ling-source, ling-hir, ling-project, ling-resolve, ling-types, ling-effects
 ling-eval        → ling-hir, ling-types, ling-effects, ling-diagnostics
 ling-format      → ling-source, ling-syntax, ling-semantic
 ling-cli         → ling-source, ling-syntax, ling-resolve, ling-types,
@@ -211,6 +211,8 @@ Unicode 17.0.0 的权威输入来自 Unicode Consortium 的版本化目录：
 - BLAKE3 输入使用带 domain separator、语言版本、Schema 版本的规范化字节编码。不得直接哈希非规范 JSON、HashMap 迭代顺序、Source Span、文件路径或 Rust `Debug` 输出；
 - JSON writer 输出确定性顺序，reader 按 Schema 规则容忍未知扩展字段；“字段顺序非语义”和“writer 输出稳定”同时成立；
 - 由 `ling-semantic` 提供规范化 Audit model，由 `ling-format` 提供 G-12 接受的 grammar、renderer 和 parser；验证 `parse_audit(render_audit(graph)) = graph`（忽略已明确定义的显示元数据），避免在两个 crate 中各自定义语义。
+
+PRJ-1103 在不改变文件模式 `ling.semantic/0.1` 字节与 ID 的前提下，增加库级 package-aware `ling.semantic/0.2` 路径。该路径消费 RFC-0002 `PackageIdentity`，记录 package/module/definition 坐标，并验证跨包 import、export visibility 与跨文件 reference；CLI 工程选择仍由 PRJ-1107 负责，`ling.audit/0.1` 不虚构 package-aware 能力。
 
 出口标准：§18.6 全过；Graph Schema 正/负兼容性测试通过；同一输入在两个独立进程中产生逐字节相同的 Graph JSON 与 Audit 文本；Audit round-trip 性质测试通过；依赖实现变化敏感性有最小调用图用例，避免无意的全图或不充分失效。
 

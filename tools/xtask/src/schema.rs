@@ -427,7 +427,7 @@ fn validate_registry(
         .collect::<BTreeSet<_>>();
 
     let mut ids = BTreeSet::new();
-    let mut names = BTreeSet::new();
+    let mut names_and_versions = BTreeSet::new();
     let mut protocol_ids = BTreeSet::new();
     let mut markers = BTreeSet::new();
     for record in &registry.schema {
@@ -437,10 +437,12 @@ fn validate_registry(
                 display_id(&record.id)
             ));
         }
-        if !valid_name(&record.name) || !names.insert(record.name.as_str()) {
+        if !valid_name(&record.name)
+            || !names_and_versions.insert((record.name.as_str(), record.version.as_str()))
+        {
             errors.push(format!(
-                "GOV-SCHEMA-0001: invalid or duplicate schema name {:?}",
-                record.name
+                "GOV-SCHEMA-0001: invalid or duplicate schema name/version {:?}/{}",
+                record.name, record.version
             ));
         }
         if !protocol_ids.insert(record.protocol_id.as_str()) {
@@ -584,7 +586,11 @@ fn validate_schema_record(
         "None" if record.reader_versions.is_empty() && record.reader_adapter == "None" => {}
         "CurrentOnly"
             if record.reader_versions == [record.marker.clone()]
-                && record.reader_adapter == "SemanticGraphV0_1" => {}
+                && matches!(
+                    (record.marker.as_str(), record.reader_adapter.as_str()),
+                    ("ling.semantic/0.1", "SemanticGraphV0_1")
+                        | ("ling.semantic/0.2", "SemanticGraphV0_2")
+                ) => {}
         _ => errors.push(format!(
             "GOV-SCHEMA-0011: {} has an unsupported or inconsistent reader declaration",
             display_id(&record.id)
@@ -1311,6 +1317,9 @@ fn reader_accepts(record: &SchemaRecord, input: &str) -> Result<(), String> {
         "SemanticGraphV0_1" => ling_semantic::read_json(input)
             .map(|_| ())
             .map_err(|error| error.to_string()),
+        "SemanticGraphV0_2" => ling_semantic::read_project_json(input)
+            .map(|_| ())
+            .map_err(|error| error.to_string()),
         adapter => Err(format!("unsupported reader adapter {adapter}")),
     }
 }
@@ -1670,10 +1679,10 @@ mod tests {
     #[test]
     fn repository_schema_corpus_is_valid_and_current() {
         let summary = validate_all(repository_root()).expect("schema corpus is valid");
-        assert_eq!(summary.schema_count, 3);
-        assert_eq!(summary.valid_fixture_count, 4);
-        assert_eq!(summary.invalid_fixture_count, 6);
-        assert_eq!(summary.canonical_fixture_count, 1);
+        assert_eq!(summary.schema_count, 4);
+        assert_eq!(summary.valid_fixture_count, 5);
+        assert_eq!(summary.invalid_fixture_count, 8);
+        assert_eq!(summary.canonical_fixture_count, 2);
     }
 
     #[test]
@@ -1681,7 +1690,7 @@ mod tests {
         let summary = compatibility(repository_root(), "N-1", "N")
             .expect("first-version compatibility state is valid");
         assert_eq!(summary.verified_edge_count, 0);
-        assert_eq!(summary.no_previous_version_count, 3);
+        assert_eq!(summary.no_previous_version_count, 4);
     }
 
     #[test]

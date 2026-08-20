@@ -5,6 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use ling_project::{PackageGraph, parse_manifest, resolve_package_graph};
 
 const FIXTURE_ROOT: &str = "../../tests/projects/dependency-v1";
+const RESOLUTION_FIXTURE_ROOT: &str = "../../tests/projects/resolution-v1";
 static TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 fn fixture(name: &str) -> PathBuf {
@@ -23,6 +24,12 @@ fn resolve_root(root: &Path) -> Result<PackageGraph, ling_project::DependencyGra
 
 fn resolve_fixture(name: &str) -> Result<PackageGraph, ling_project::DependencyGraphFailure> {
     resolve_root(&fixture(name))
+}
+
+fn resolution_fixture(name: &str) -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join(RESOLUTION_FIXTURE_ROOT)
+        .join(name)
 }
 
 fn failure_reason(name: &str) -> (String, String, String) {
@@ -95,6 +102,72 @@ fn valid_basic_graph_has_frozen_content_and_graph_hashes() {
                 .name()
         )
     );
+}
+
+#[test]
+fn resolved_packages_retain_the_exact_path_free_source_snapshot() {
+    let root = resolution_fixture("valid-cross-package");
+    let graph = resolve_root(&root).expect("fixture must resolve");
+    let app = graph.package_by_name("app").expect("app package exists");
+    let source = app.sources().first().expect("app source exists");
+    assert_eq!(source.module().as_str(), "Main");
+    assert_eq!(source.logical_path().as_str(), "src/Main.ling");
+    assert_eq!(
+        source.bytes(),
+        fs::read(root.join("src/Main.ling")).unwrap()
+    );
+
+    let debug = format!("{graph:?}");
+    assert!(debug.contains("byte_len"));
+    assert!(!debug.contains("let answer"));
+    assert!(!debug.contains(root.to_string_lossy().as_ref()));
+}
+
+#[test]
+fn dependency_imports_distinguish_missing_and_private_modules() {
+    for (fixture, code) in [
+        ("missing-dependency-module", "L-PROJECT-0016"),
+        ("private-module", "L-PROJECT-0017"),
+    ] {
+        let failure = resolve_root(&resolution_fixture(fixture)).expect_err("fixture must fail");
+        let diagnostic = failure
+            .diagnostics()
+            .expect("failure is diagnostic")
+            .first()
+            .expect("one root-cause diagnostic");
+        assert_eq!(diagnostic.code().as_str(), code, "{fixture}");
+        let value: serde_json::Value =
+            serde_json::from_str(&diagnostic.render_json().unwrap()).unwrap();
+        assert_eq!(value["facts"]["package"], "app");
+        assert_eq!(value["facts"]["dependency"], "math");
+        assert_eq!(value["facts"]["importer"], "Main");
+        let expected_module = if fixture == "private-module" {
+            "Internal"
+        } else {
+            "Missing"
+        };
+        assert_eq!(value["facts"]["module"], expected_module);
+        assert_eq!(value["primary_span"]["file"], "package:app/src/Main.ling");
+    }
+}
+
+#[test]
+fn transitive_dependency_names_are_not_visible_to_the_root_package() {
+    let failure = resolve_root(&resolution_fixture("transitive-hidden"))
+        .expect_err("a transitive-only dependency namespace must stay hidden");
+    let diagnostic = failure
+        .diagnostics()
+        .expect("failure is diagnostic")
+        .first()
+        .expect("one root-cause diagnostic");
+    assert_eq!(failure.package().map(|name| name.as_str()), Some("app"));
+    assert_eq!(diagnostic.code().as_str(), "L-PROJECT-0012");
+    let value: serde_json::Value =
+        serde_json::from_str(&diagnostic.render_json().unwrap()).unwrap();
+    assert_eq!(value["facts"]["role"], "import");
+    assert_eq!(value["facts"]["importer"], "Main");
+    assert_eq!(value["facts"]["module"], "leaf.Api");
+    assert_eq!(value["primary_span"]["file"], "package:app/src/Main.ling");
 }
 
 #[test]

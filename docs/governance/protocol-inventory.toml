@@ -112,26 +112,48 @@ authority = ["DEC-0012"]
 notes = ["GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open."]
 
 [[protocol]]
+id = "PROTO-PACKAGE-SEMANTIC-GRAPH-JSON"
+title = "Package-aware Semantic Graph JSON"
+category = "JSON"
+visibility = "Public"
+current_version = "ling.semantic/0.2"
+stability = "Experimental"
+implemented = true
+public_schema = true
+canonical = true
+producer = ["ling-semantic package snapshot writer"]
+consumer = ["ling-semantic package-aware isolated reader", "future project IDE and build integrations"]
+reader_policy = "Require the exact 0.2, language, and Unicode versions; validate package graph/root identities, package-local module coordinates, IDs, ownership, imports, and cross-package references; decoded data cannot enter evaluation."
+writer_policy = "Emit deterministic package-aware JSON only from checked Typed Core produced by the exact resolved PackageGraph; include path-free PackageIdentity coordinates and use v2 Semantic ID domains without changing file-mode 0.1 bytes."
+unknown_field_policy = "Accept x-* extension fields at checked object levels and reject unknown core fields."
+migration_tool = "None; this is a context-specific package protocol, not a silent replacement or migration claim for file-mode ling.semantic/0.1."
+fixtures = ["crates/ling-semantic/tests/project_snapshot.rs", "tests/projects/resolution-v1/valid-cross-package", "schemas/semantic/0.2/schema.json", "schemas/semantic/0.2/valid", "schemas/semantic/0.2/invalid", "schemas/semantic/0.2/canonical"]
+sources = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "docs/RFC-0002.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "schemas/registry.toml", "schemas/semantic/0.2/schema.json", "tools/xtask/src/schema.rs"]
+version_markers = ["ling.semantic/0.2"]
+authority = ["RFC-0002", "DEC-0012"]
+notes = ["File-oriented Seed commands remain on ling.semantic/0.1; PRJ-1107 must explicitly select project mode before any CLI can emit this protocol.", "No package-aware Audit Source is claimed because accepted ling.audit/0.1 has no package coordinate model."]
+
+[[protocol]]
 id = "PROTO-CANONICAL-BYTES"
 title = "Canonical bytes for semantic identities"
 category = "Canonical identity"
 visibility = "Public"
-current_version = "v1 domain encodings"
+current_version = "file-mode v1 and package-aware v2 domain encodings"
 stability = "Experimental"
 implemented = true
 public_schema = false
 canonical = true
 producer = ["ling-resolve identity encoder", "ling-semantic identity encoders"]
-consumer = ["DefinitionId, REPL DefinitionId, BodyId, ProgramId, and semantic node ID hashers"]
+consumer = ["DefinitionId, REPL DefinitionId, BodyId, ProgramId, and semantic node ID hashers in file and project modes"]
 reader_policy = "No general decoder is exposed; each identity class consumes only its own domain-separated, length-prefixed canonical input."
-writer_policy = "Use distinct v1 ASCII domains, version inputs, normalized checked semantics, explicit lengths and values, and canonical collection ordering; exclude spans, paths, comments, spelling, arena indices, and hash-map iteration."
+writer_policy = "Use distinct file-mode v1 or package-aware v2 ASCII domains, version inputs, normalized checked semantics, explicit lengths and values, and canonical collection ordering; v2 Definition/node/Program inputs include path-free package or graph identity while all modes exclude spans, host paths, comments, spelling, arena indices, and hash-map iteration."
 unknown_field_policy = "Closed binary projection: unrecognized semantic inputs cannot be appended without a domain/schema version change."
 migration_tool = "None; an encoding or normalization change requires a Semantic Schema or ID-prefix upgrade and migration explanation."
 fixtures = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs"]
 sources = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md"]
-version_markers = ["ling.definition-id/v1", "ling.repl-definition-id/v1", "ling.body-id/v1", "ling.program-id/v1", "ling.semantic-node-id/v1"]
-authority = ["DEC-0012"]
-notes = ["The domains are versioned separately in current code; no invented umbrella wire identifier is claimed."]
+version_markers = ["ling.definition-id/v1", "ling.definition-id/v2", "ling.repl-definition-id/v1", "ling.body-id/v1", "ling.body-id/v2", "ling.program-id/v1", "ling.program-id/v2", "ling.semantic-node-id/v1", "ling.semantic-node-id/v2"]
+authority = ["DEC-0012", "RFC-0002"]
+notes = ["The domains are versioned separately in current code; no invented umbrella wire identifier is claimed.", "The v2 domains are selected only for package-aware ling.semantic/0.2 snapshots; file mode remains byte-stable on v1."]
 
 [[protocol]]
 id = "PROTO-SEMANTIC-ID"
@@ -144,15 +166,15 @@ implemented = true
 public_schema = false
 canonical = true
 producer = ["ling-resolve and ling-semantic BLAKE3 hashers"]
-consumer = ["Semantic Graph", "Audit Source", "REPL events", "snapshot validation"]
+consumer = ["file-mode and package-aware Semantic Graphs", "Audit Source", "REPL events", "snapshot validation"]
 reader_policy = "Accept exactly the experimental:blake3: prefix followed by 64 lowercase hexadecimal digits in the identity positions allowed by the current schema."
-writer_policy = "Hash the appropriate v1 domain-separated canonical bytes and emit lowercase BLAKE3 hexadecimal text with the experimental prefix."
+writer_policy = "Hash the appropriate file-mode v1 or package-aware v2 domain-separated canonical bytes and emit lowercase BLAKE3 hexadecimal text with the experimental prefix."
 unknown_field_policy = "Not field-based; unknown algorithms, prefixes, lengths, or non-hex text are rejected by current readers."
 migration_tool = "None; algorithm, prefix, dependency propagation, or canonical-input changes require an explicit schema/ID upgrade and cannot silently reuse the current prefix."
-fixtures = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
-sources = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md"]
-version_markers = ["experimental:blake3:", "ling.definition-id/v1", "ling.body-id/v1", "ling.program-id/v1"]
-authority = ["DEC-0012"]
+fixtures = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-semantic/tests/project_snapshot.rs", "crates/ling-cli/tests/conformance.rs"]
+sources = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/RFC-0002.md"]
+version_markers = ["experimental:blake3:", "ling.definition-id/v1", "ling.definition-id/v2", "ling.body-id/v1", "ling.body-id/v2", "ling.program-id/v1", "ling.program-id/v2"]
+authority = ["DEC-0012", "RFC-0002"]
 notes = ["GAP-SEMANTIC-HASH-UPGRADE-001 blocks stabilization and migration policy."]
 
 [[protocol]]
@@ -286,7 +308,7 @@ sources = [
 ]
 version_markers = ["ling.manifest/1", "manifest-version = 1"]
 authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["PRJ-1101/1102/1104 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, and content/package-graph identities. Manifest writing, ambient or CLI project selection, cross-package visibility, locks, and build integration remain later PRJ tasks."]
+notes = ["PRJ-1101/1102/1104 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, and content/package-graph identities; PRJ-1103 adds exported-module visibility and checked package-aware resolution. Manifest writing, ambient or CLI project selection, locks, and build integration remain later PRJ tasks."]
 
 [[protocol]]
 id = "PROTO-PACKAGE-IDENTITY"
@@ -299,7 +321,7 @@ implemented = true
 public_schema = false
 canonical = true
 producer = ["ling-project local dependency resolver"]
-consumer = ["ling-project package graph", "future lockfile writer, build planner, and package-aware Semantic Graph"]
+consumer = ["ling-project package graph", "ling-resolve and ling-semantic package-aware identity", "future lockfile writer and build planner"]
 reader_policy = "PackageSourceId and PackageGraphId are opaque, distinct Rust types; no general byte-stream decoder is exposed. Text identities emitted by the resolver use exactly sha256: plus 64 lowercase hexadecimal digits."
 writer_policy = "Hash RFC-0002's exact unsigned-64-bit big-endian length-prefixed streams with SHA-256 under the separate ling.package-content/1 and ling.package-graph/1 domains; sort every declared collection by its specified canonical key and exclude host paths, cosmetic manifest text, dependency locators, permissions, timestamps, and unordered iteration."
 unknown_field_policy = "Closed binary projection: changing included fields, framing, ordering, normalization, or algorithms requires a new domain version and migration evidence."
@@ -317,7 +339,7 @@ sources = [
 ]
 version_markers = ["ling.package-content/1", "ling.package-graph/1", "sha256:"]
 authority = ["RFC-0002"]
-notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors. It does not implement lockfiles, CLI project selection, registry/network sources, cross-package import visibility, or package-aware Semantic IDs."]
+notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2. Lockfiles, CLI project selection, registry/network sources, and publication remain deferred."]
 
 [[protocol]]
 id = "PROTO-LOCKFILE"

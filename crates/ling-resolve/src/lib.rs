@@ -6,10 +6,14 @@ use std::fmt;
 
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_hir::{self as hir, BindingId, ExpressionId, PatternId, ReferenceId};
+use ling_project::{
+    PackageGraph, PackageGraphId, PackageIdentity, PackageName, QualifiedModuleName,
+};
 use ling_source::Span;
 
 const LANGUAGE_VERSION: &str = "0.0.1-dev";
-const SEMANTIC_SCHEMA: &str = "ling.semantic/0.1";
+const SEED_SEMANTIC_SCHEMA: &str = "ling.semantic/0.1";
+const PROJECT_SEMANTIC_SCHEMA: &str = "ling.semantic/0.2";
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct ModuleId(u32);
@@ -126,7 +130,7 @@ impl DefinitionId {
         let mut bytes = Vec::new();
         encode_part(&mut bytes, b"ling.definition-id/v1");
         encode_part(&mut bytes, LANGUAGE_VERSION.as_bytes());
-        encode_part(&mut bytes, SEMANTIC_SCHEMA.as_bytes());
+        encode_part(&mut bytes, SEED_SEMANTIC_SCHEMA.as_bytes());
         encode_part(&mut bytes, kind.as_bytes());
         encode_part(&mut bytes, module.as_bytes());
         encode_part(&mut bytes, name.as_bytes());
@@ -140,11 +144,37 @@ impl DefinitionId {
         let mut bytes = Vec::new();
         encode_part(&mut bytes, b"ling.repl-definition-id/v1");
         encode_part(&mut bytes, LANGUAGE_VERSION.as_bytes());
-        encode_part(&mut bytes, SEMANTIC_SCHEMA.as_bytes());
+        encode_part(&mut bytes, SEED_SEMANTIC_SCHEMA.as_bytes());
         encode_part(&mut bytes, kind.as_bytes());
         encode_part(&mut bytes, module.as_bytes());
         encode_part(&mut bytes, name.as_bytes());
         encode_part(&mut bytes, &generation.to_be_bytes());
+        Self(format!(
+            "experimental:blake3:{}",
+            blake3::hash(&bytes).to_hex()
+        ))
+    }
+
+    fn new_project(
+        kind: &str,
+        package: Option<&PackageIdentity>,
+        module: &str,
+        name: &str,
+    ) -> Self {
+        let mut bytes = Vec::new();
+        encode_part(&mut bytes, b"ling.definition-id/v2");
+        encode_part(&mut bytes, LANGUAGE_VERSION.as_bytes());
+        encode_part(&mut bytes, PROJECT_SEMANTIC_SCHEMA.as_bytes());
+        match package {
+            Some(package) => {
+                encode_part(&mut bytes, b"package");
+                encode_package_identity(&mut bytes, package);
+            }
+            None => encode_part(&mut bytes, b"system"),
+        }
+        encode_part(&mut bytes, kind.as_bytes());
+        encode_part(&mut bytes, module.as_bytes());
+        encode_part(&mut bytes, name.as_bytes());
         Self(format!(
             "experimental:blake3:{}",
             blake3::hash(&bytes).to_hex()
@@ -234,6 +264,7 @@ pub enum DefinitionOrigin {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DefinitionInfo {
     pub id: DefinitionId,
+    pub package: Option<PackageIdentity>,
     pub module_name: String,
     pub name: String,
     pub name_source: String,
@@ -265,9 +296,133 @@ pub enum ReferenceTarget {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ResolvedModule {
     pub id: ModuleId,
+    pub package: Option<PackageIdentity>,
     pub hir: hir::Program,
     pub imports: BTreeMap<String, ModuleId>,
 }
+
+/// Lightweight package metadata retained by a package-aware resolved program.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ResolvedProjectPackage {
+    identity: PackageIdentity,
+    entry: QualifiedModuleName,
+    exports: Box<[QualifiedModuleName]>,
+}
+
+impl ResolvedProjectPackage {
+    #[must_use]
+    pub const fn identity(&self) -> &PackageIdentity {
+        &self.identity
+    }
+
+    #[must_use]
+    pub const fn entry(&self) -> &QualifiedModuleName {
+        &self.entry
+    }
+
+    #[must_use]
+    pub fn exports(&self) -> &[QualifiedModuleName] {
+        &self.exports
+    }
+}
+
+/// Path-free package context used by package-aware semantic identity.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ResolvedProject {
+    graph_id: PackageGraphId,
+    root: PackageIdentity,
+    packages: Box<[ResolvedProjectPackage]>,
+    dependencies: BTreeMap<(PackageIdentity, PackageName), PackageIdentity>,
+}
+
+impl ResolvedProject {
+    #[must_use]
+    pub const fn graph_id(&self) -> &PackageGraphId {
+        &self.graph_id
+    }
+
+    #[must_use]
+    pub const fn root(&self) -> &PackageIdentity {
+        &self.root
+    }
+
+    #[must_use]
+    pub fn packages(&self) -> &[ResolvedProjectPackage] {
+        &self.packages
+    }
+
+    #[must_use]
+    pub fn dependency(
+        &self,
+        package: &PackageIdentity,
+        name: &PackageName,
+    ) -> Option<&PackageIdentity> {
+        self.dependencies.get(&(package.clone(), name.clone()))
+    }
+}
+
+/// HIR modules belonging to one exact package identity.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PackagePrograms {
+    identity: PackageIdentity,
+    programs: Vec<hir::Program>,
+}
+
+impl PackagePrograms {
+    #[must_use]
+    pub fn new(identity: PackageIdentity, programs: Vec<hir::Program>) -> Self {
+        Self { identity, programs }
+    }
+
+    #[must_use]
+    pub const fn identity(&self) -> &PackageIdentity {
+        &self.identity
+    }
+
+    #[must_use]
+    pub fn programs(&self) -> &[hir::Program] {
+        &self.programs
+    }
+}
+
+/// Structural mismatch between a validated package graph and supplied HIR.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ProjectInputError {
+    pub reason: &'static str,
+    pub package: Option<String>,
+    pub module: Option<String>,
+}
+
+impl fmt::Display for ProjectInputError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(formatter, "invalid project resolver input: {}", self.reason)
+    }
+}
+
+impl Error for ProjectInputError {}
+
+#[derive(Debug)]
+pub enum ProjectResolveFailure {
+    Input(ProjectInputError),
+    Resolution(Vec<ResolveError>),
+}
+
+impl fmt::Display for ProjectResolveFailure {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Input(error) => error.fmt(formatter),
+            Self::Resolution(errors) => {
+                write!(
+                    formatter,
+                    "project resolution produced {} error(s)",
+                    errors.len()
+                )
+            }
+        }
+    }
+}
+
+impl Error for ProjectResolveFailure {}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ResolvedProgram {
@@ -279,6 +434,7 @@ pub struct ResolvedProgram {
     pattern_constructors: BTreeMap<PatternKey, DefinitionId>,
     builtins: BTreeMap<Builtin, DefinitionId>,
     prelude: BTreeMap<PreludeDefinition, DefinitionId>,
+    project: Option<ResolvedProject>,
 }
 
 impl ResolvedProgram {
@@ -376,6 +532,11 @@ impl ResolvedProgram {
                 }
                 _ => None,
             })
+    }
+
+    #[must_use]
+    pub const fn project(&self) -> Option<&ResolvedProject> {
+        self.project.as_ref()
     }
 }
 
@@ -492,13 +653,155 @@ pub fn resolve(
     programs: Vec<hir::Program>,
     entry_module_name: &str,
 ) -> Result<ResolvedProgram, Vec<ResolveError>> {
-    Resolver::new(programs, entry_module_name).run()
+    Resolver::new_seed(programs, entry_module_name).run()
+}
+
+/// Resolves exact HIR modules against a validated local package graph.
+///
+/// The supplied package/module set must exactly match `graph`. This keeps
+/// parsing and HIR lowering in their owning pipeline layers while ensuring
+/// package-aware resolution cannot silently omit or inject a module.
+pub fn resolve_project(
+    graph: &PackageGraph,
+    mut packages: Vec<PackagePrograms>,
+) -> Result<ResolvedProgram, ProjectResolveFailure> {
+    let expected = graph
+        .packages()
+        .iter()
+        .map(|package| (package.identity().clone(), package))
+        .collect::<BTreeMap<_, _>>();
+    let mut supplied = BTreeMap::<PackageIdentity, Vec<hir::Program>>::new();
+    packages.sort_by(|left, right| left.identity.cmp(&right.identity));
+    for package in packages {
+        if !expected.contains_key(&package.identity) {
+            return Err(project_input_error(
+                "unexpected_package",
+                Some(package.identity.name().as_str()),
+                None,
+            ));
+        }
+        let package_name = package.identity.name().as_str().to_owned();
+        if supplied
+            .insert(package.identity, package.programs)
+            .is_some()
+        {
+            return Err(project_input_error(
+                "duplicate_package",
+                Some(&package_name),
+                None,
+            ));
+        }
+    }
+
+    let mut inputs = Vec::new();
+    for (identity, resolved_package) in &expected {
+        let Some(mut programs) = supplied.remove(identity) else {
+            return Err(project_input_error(
+                "missing_package",
+                Some(identity.name().as_str()),
+                None,
+            ));
+        };
+        programs.sort_by_key(|program| program.module.name.normalized());
+        let expected_modules = resolved_package
+            .modules()
+            .nodes()
+            .iter()
+            .map(|node| node.name().as_str().to_owned())
+            .collect::<BTreeSet<_>>();
+        let mut actual_modules = BTreeSet::new();
+        for program in programs {
+            let module = program.module.name.normalized();
+            if !actual_modules.insert(module.clone()) {
+                return Err(project_input_error(
+                    "duplicate_module",
+                    Some(identity.name().as_str()),
+                    Some(&module),
+                ));
+            }
+            if !expected_modules.contains(&module) {
+                return Err(project_input_error(
+                    "unexpected_module",
+                    Some(identity.name().as_str()),
+                    Some(&module),
+                ));
+            }
+            inputs.push(ModuleInput {
+                package: Some(identity.clone()),
+                hir: program,
+            });
+        }
+        if let Some(missing) = expected_modules.difference(&actual_modules).next() {
+            return Err(project_input_error(
+                "missing_module",
+                Some(identity.name().as_str()),
+                Some(missing),
+            ));
+        }
+    }
+
+    Resolver::new_project(inputs, ResolvedProject::from_graph(graph))
+        .run()
+        .map_err(ProjectResolveFailure::Resolution)
+}
+
+fn project_input_error(
+    reason: &'static str,
+    package: Option<&str>,
+    module: Option<&str>,
+) -> ProjectResolveFailure {
+    ProjectResolveFailure::Input(ProjectInputError {
+        reason,
+        package: package.map(str::to_owned),
+        module: module.map(str::to_owned),
+    })
+}
+
+impl ResolvedProject {
+    fn from_graph(graph: &PackageGraph) -> Self {
+        Self {
+            graph_id: graph.id().clone(),
+            root: graph.root().clone(),
+            packages: graph
+                .packages()
+                .iter()
+                .map(|package| ResolvedProjectPackage {
+                    identity: package.identity().clone(),
+                    entry: package.entry().clone(),
+                    exports: package.exports().to_vec().into_boxed_slice(),
+                })
+                .collect::<Vec<_>>()
+                .into_boxed_slice(),
+            dependencies: graph
+                .edges()
+                .iter()
+                .map(|edge| {
+                    (
+                        (edge.from().clone(), edge.dependency().clone()),
+                        edge.to().clone(),
+                    )
+                })
+                .collect(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct ModuleKey {
+    package: Option<PackageIdentity>,
+    name: String,
+}
+
+struct ModuleInput {
+    package: Option<PackageIdentity>,
+    hir: hir::Program,
 }
 
 struct Resolver {
     modules: Vec<ResolvedModule>,
-    entry_name: String,
-    module_names: BTreeMap<String, ModuleId>,
+    entry: ModuleKey,
+    project: Option<ResolvedProject>,
+    module_names: BTreeMap<ModuleKey, ModuleId>,
     definitions: BTreeMap<DefinitionId, DefinitionInfo>,
     module_definitions: BTreeMap<ModuleId, BTreeMap<String, DefinitionId>>,
     references: BTreeMap<ReferenceKey, ReferenceTarget>,
@@ -510,20 +813,70 @@ struct Resolver {
 }
 
 impl Resolver {
-    fn new(mut programs: Vec<hir::Program>, entry_name: &str) -> Self {
-        programs.sort_by_key(|program| program.module.name.normalized());
-        let modules = programs
+    fn new_seed(programs: Vec<hir::Program>, entry_name: &str) -> Self {
+        let inputs = programs
+            .into_iter()
+            .map(|hir| ModuleInput { package: None, hir })
+            .collect();
+        Self::new(
+            inputs,
+            ModuleKey {
+                package: None,
+                name: entry_name.to_owned(),
+            },
+            None,
+        )
+    }
+
+    fn new_project(inputs: Vec<ModuleInput>, project: ResolvedProject) -> Self {
+        let root = project.root.clone();
+        let entry = project
+            .packages
+            .iter()
+            .find(|package| package.identity == root)
+            .expect("validated package graph contains its root")
+            .entry
+            .as_str()
+            .to_owned();
+        Self::new(
+            inputs,
+            ModuleKey {
+                package: Some(root),
+                name: entry,
+            },
+            Some(project),
+        )
+    }
+
+    fn new(
+        mut inputs: Vec<ModuleInput>,
+        entry: ModuleKey,
+        project: Option<ResolvedProject>,
+    ) -> Self {
+        inputs.sort_by(|left, right| {
+            ModuleKey {
+                package: left.package.clone(),
+                name: left.hir.module.name.normalized(),
+            }
+            .cmp(&ModuleKey {
+                package: right.package.clone(),
+                name: right.hir.module.name.normalized(),
+            })
+        });
+        let modules = inputs
             .into_iter()
             .enumerate()
-            .map(|(index, hir)| ResolvedModule {
+            .map(|(index, input)| ResolvedModule {
                 id: ModuleId(u32::try_from(index).unwrap_or(u32::MAX)),
-                hir,
+                package: input.package,
+                hir: input.hir,
                 imports: BTreeMap::new(),
             })
             .collect();
         Self {
             modules,
-            entry_name: entry_name.to_owned(),
+            entry,
+            project,
             module_names: BTreeMap::new(),
             definitions: BTreeMap::new(),
             module_definitions: BTreeMap::new(),
@@ -545,7 +898,7 @@ impl Resolver {
         self.index_definitions();
         self.resolve_bodies();
 
-        let entry = self.module_names.get(&self.entry_name).copied();
+        let entry = self.module_names.get(&self.entry).copied();
         if entry.is_none() {
             let (source_name, span) = self.modules.first().map_or_else(
                 || (String::new(), empty_span()),
@@ -553,7 +906,7 @@ impl Resolver {
             );
             self.errors.push(ResolveError {
                 kind: ResolveErrorKind::MissingModule {
-                    module: self.entry_name.clone(),
+                    module: self.entry.name.clone(),
                 },
                 source_name,
                 span,
@@ -570,6 +923,7 @@ impl Resolver {
                 pattern_constructors: self.pattern_constructors,
                 builtins: self.builtins,
                 prelude: self.prelude,
+                project: self.project,
             })
         } else {
             self.errors.sort_by(|left, right| {
@@ -598,11 +952,12 @@ impl Resolver {
             Builtin::Sum,
         ] {
             let qualified = builtin.qualified_name();
-            let id = DefinitionId::new("builtin", "<builtin>", qualified);
+            let id = self.make_definition_id("builtin", None, "<builtin>", qualified);
             self.definitions.insert(
                 id.clone(),
                 DefinitionInfo {
                     id: id.clone(),
+                    package: None,
                     module_name: "<builtin>".to_owned(),
                     name: qualified.to_owned(),
                     name_source: qualified.to_owned(),
@@ -637,11 +992,12 @@ impl Resolver {
                     unreachable!("Prelude only contains types and constructors")
                 }
             };
-            let id = DefinitionId::new(kind_name, PRELUDE_MODULE, definition.name());
+            let id = self.make_definition_id(kind_name, None, PRELUDE_MODULE, definition.name());
             self.definitions.insert(
                 id.clone(),
                 DefinitionInfo {
                     id: id.clone(),
+                    package: None,
                     module_name: PRELUDE_MODULE.to_owned(),
                     name: definition.name().to_owned(),
                     name_source: definition.name().to_owned(),
@@ -666,10 +1022,14 @@ impl Resolver {
     }
 
     fn index_modules(&mut self) {
-        let mut skeletons = BTreeMap::<String, String>::new();
+        let mut skeletons = BTreeMap::<Option<PackageIdentity>, BTreeMap<String, String>>::new();
         for module in &self.modules {
             let name = module.hir.module.name.normalized();
-            if self.module_names.insert(name.clone(), module.id).is_some() {
+            let key = ModuleKey {
+                package: module.package.clone(),
+                name: name.clone(),
+            };
+            if self.module_names.insert(key, module.id).is_some() {
                 self.errors.push(ResolveError {
                     kind: ResolveErrorKind::DuplicateModule { module: name },
                     source_name: module.hir.source_name.clone(),
@@ -677,7 +1037,7 @@ impl Resolver {
                 });
             }
             check_qualified_name_security(
-                &mut skeletons,
+                skeletons.entry(module.package.clone()).or_default(),
                 &module.hir.module.name,
                 &module.hir.source_name,
                 &mut self.errors,
@@ -687,6 +1047,7 @@ impl Resolver {
 
     fn resolve_imports(&mut self) {
         let names = self.module_names.clone();
+        let project = self.project.clone();
         let explicit = self
             .modules
             .iter()
@@ -696,7 +1057,8 @@ impl Resolver {
             let mut skeletons = BTreeMap::<String, String>::new();
             for import in &module.hir.imports {
                 let imported_name = import.module.normalized();
-                let Some(imported_id) = names.get(&imported_name).copied() else {
+                let key = imported_module_key(project.as_ref(), module, &imported_name);
+                let Some(imported_id) = names.get(&key).copied() else {
                     self.errors.push(ResolveError {
                         kind: ResolveErrorKind::MissingModule {
                             module: imported_name,
@@ -735,6 +1097,20 @@ impl Resolver {
                     &mut self.errors,
                 );
             }
+        }
+    }
+
+    fn make_definition_id(
+        &self,
+        kind: &str,
+        package: Option<&PackageIdentity>,
+        module: &str,
+        name: &str,
+    ) -> DefinitionId {
+        if self.project.is_some() {
+            DefinitionId::new_project(kind, package, module, name)
+        } else {
+            DefinitionId::new(kind, module, name)
         }
     }
 
@@ -878,10 +1254,21 @@ impl Resolver {
             DefinitionKind::Constructor => "constructor",
             DefinitionKind::Builtin => "builtin",
         };
-        let id = session_generation.map_or_else(
-            || DefinitionId::new(kind_name, module_name, &name.normalized),
-            |generation| DefinitionId::new_repl(kind_name, module_name, &name.source, generation),
-        );
+        let id = if self.project.is_some() {
+            self.make_definition_id(
+                kind_name,
+                module.package.as_ref(),
+                module_name,
+                &name.normalized,
+            )
+        } else {
+            session_generation.map_or_else(
+                || DefinitionId::new(kind_name, module_name, &name.normalized),
+                |generation| {
+                    DefinitionId::new_repl(kind_name, module_name, &name.source, generation)
+                },
+            )
+        };
         if scope.insert(name.normalized.clone(), id.clone()).is_some() {
             self.errors.push(ResolveError {
                 kind: ResolveErrorKind::DuplicateDefinition {
@@ -896,6 +1283,7 @@ impl Resolver {
             id.clone(),
             DefinitionInfo {
                 id,
+                package: module.package.clone(),
                 module_name: module_name.to_owned(),
                 name: name.normalized.clone(),
                 name_source: name.source.clone(),
@@ -1406,9 +1794,50 @@ fn is_namespace_root(root: &str, module: &ResolvedModule) -> bool {
     matches!(root, "Console" | "Text") || module.imports.contains_key(root)
 }
 
+fn imported_module_key(
+    project: Option<&ResolvedProject>,
+    importer: &ResolvedModule,
+    imported_name: &str,
+) -> ModuleKey {
+    let Some(project) = project else {
+        return ModuleKey {
+            package: None,
+            name: imported_name.to_owned(),
+        };
+    };
+    let package = importer
+        .package
+        .as_ref()
+        .expect("package-aware resolver modules carry a package identity");
+    let mut segments = imported_name.split('.');
+    let first = segments.next().unwrap_or(imported_name);
+    let dependency = project
+        .dependencies
+        .iter()
+        .find_map(|((from, name), target)| {
+            (from == package && name.as_str() == first).then_some(target)
+        });
+    match dependency {
+        Some(target) => ModuleKey {
+            package: Some(target.clone()),
+            name: segments.collect::<Vec<_>>().join("."),
+        },
+        None => ModuleKey {
+            package: Some(package.clone()),
+            name: imported_name.to_owned(),
+        },
+    }
+}
+
 fn encode_part(output: &mut Vec<u8>, bytes: &[u8]) {
     output.extend_from_slice(&u32::try_from(bytes.len()).unwrap_or(u32::MAX).to_be_bytes());
     output.extend_from_slice(bytes);
+}
+
+fn encode_package_identity(output: &mut Vec<u8>, package: &PackageIdentity) {
+    encode_part(output, package.name().as_str().as_bytes());
+    encode_part(output, package.version().to_string().as_bytes());
+    encode_part(output, package.source().as_str().as_bytes());
 }
 
 fn empty_span() -> Span {

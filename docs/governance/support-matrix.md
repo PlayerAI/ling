@@ -8,7 +8,7 @@
 - Current compiler: `0.0.1-dev`
 - Current language: `0.0.1-dev`
 - Unicode: `17.0.0`
-- Updated: `2026-08-20`
+- Updated: `2026-08-21`
 
 This draft separates current evidence from candidate 1.0 scope. Empty current-profile lists mean the Seed implementation is unprofiled; candidate profile entries are planning input, not support claims. No Native target, VM, device backend, or Critical guarantee is currently supported.
 
@@ -73,7 +73,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-AUDIT-SOURCE` | `Public` | `ling.audit/0.1` | `Preview` | yes |
 | `PROTO-BUILD-METADATA` | `Planned public` | — | `Future` | no |
 | `PROTO-BYTECODE` | `Planned public` | — | `Future` | no |
-| `PROTO-CANONICAL-BYTES` | `Public` | `v1 domain encodings` | `Experimental` | yes |
+| `PROTO-CANONICAL-BYTES` | `Public` | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | yes |
 | `PROTO-CLI` | `Public` | `0.0.1-dev` | `Preview` | yes |
 | `PROTO-CLI-EXIT` | `Public` | `0.0.1-dev` | `Preview` | yes |
 | `PROTO-DIAGNOSTIC-JSON` | `Public` | `ling.diagnostic/0.1` | `Preview` | yes |
@@ -83,6 +83,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-LOCKFILE` | `Planned public` | — | `Future` | no |
 | `PROTO-PACKAGE-IDENTITY` | `Public` | `v1 domain encodings` | `Experimental` | yes |
 | `PROTO-PACKAGE-MANIFEST` | `Public` | `ling.manifest/1` | `Experimental` | yes |
+| `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | `Public` | `ling.semantic/0.2` | `Experimental` | yes |
 | `PROTO-REPL-JSON` | `Public` | `ling.repl/0.1` | `Preview` | yes |
 | `PROTO-REPLAY` | `Planned public` | — | `Future` | no |
 | `PROTO-SEMANTIC-GRAPH-JSON` | `Public` | `ling.semantic/0.1` | `Experimental` | yes |
@@ -98,7 +99,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `UNSUP-DEVICE` | Heterogeneous | Kernel, SIMD, GPU, TPU/NPU, Device Buffer, or Placement | No accepted Kernel/device subset, capability discovery, or backend exists. | `GAP-KERNEL-DEVICE-001` | [`docs/governance/gap-register.toml`](../governance/gap-register.toml) |
 | `UNSUP-LSP-EDITOR` | Tooling | LSP, Zed extension, formatter, or semantic mutation | No corresponding LSP executable, editor integration package, formatter, or accepted semantic-mutation transaction boundary exists. | `GAP-LSP-TRANSACTION-PROTOCOL-001`<br>`GAP-FORMATTER-AUTHOR-SOURCE-001`<br>`GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | [`docs/governance/gap-register.toml`](../governance/gap-register.toml) |
 | `UNSUP-NATIVE-FFI` | Native | Native code generation, stable ABI, FFI, or target artifacts | Ownership, target, ABI, and FFI contracts are unresolved and unimplemented. | `GAP-OWNERSHIP-MODEL-001`<br>`GAP-NATIVE-BACKEND-ABI-001` | [`docs/governance/gap-register.toml`](../governance/gap-register.toml) |
-| `UNSUP-PACKAGES` | Project/package | CLI project selection, cross-package visibility, lockfile, package installation, or registry | PRJ-1101/1102/1104 implement the isolated ling.toml version 1 reader, explicit-root deterministic source/module discovery, recursive vendored dependency resolution, and canonical content/package-graph identities. PRJ-1103 and PRJ-1105 have not yet implemented cross-package visibility or the lock reader/writer; CLI integration and registry installation remain out of scope. | — | [`docs/RFC-0002.md`](../RFC-0002.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
+| `UNSUP-PACKAGES` | Project/package | CLI project selection, lockfile, package installation, or registry | PRJ-1101 through PRJ-1104 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, and package-aware Semantic Graph. PRJ-1105 has not implemented the lock reader/writer; CLI selection, build integration, publication, and registry installation remain out of scope. | — | [`docs/RFC-0002.md`](../RFC-0002.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
 | `UNSUP-PROFILE-SELECTION` | Profile | Explore, Native, or Critical selection/enforcement | The Seed CLI has no profile option and no profile validation pass. | `GAP-CRITICAL-PROFILE-001`<br>`GAP-NATIVE-BACKEND-ABI-001` | [`docs/SEMANTICS.md`](../SEMANTICS.md)<br>[`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md) |
 | `UNSUP-SUPPORT-CLI-JSON` | CLI/protocol | ling version --format json and ling support --format json | GOV-0108 generates internal governance fixtures only; no Accepted public JSON contract or CLI command exists. | — | [`docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md`](../ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md) |
 | `UNSUP-VM` | Execution | Bytecode emission, verification, or VM execution | No accepted bytecode/verifier contract or implementation exists. | `GAP-BYTECODE-SEMANTICS-001` | [`docs/governance/gap-register.toml`](../governance/gap-register.toml) |

@@ -84,6 +84,9 @@ pub mod codes {
         DiagnosticCode::new("L-PROJECT-0014");
     pub const PROJECT_RESOURCE_LIMIT_EXCEEDED: DiagnosticCode =
         DiagnosticCode::new("L-PROJECT-0015");
+    pub const PROJECT_DEPENDENCY_MODULE_NOT_FOUND: DiagnosticCode =
+        DiagnosticCode::new("L-PROJECT-0016");
+    pub const PRIVATE_PROJECT_MODULE_ACCESS: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0017");
     pub const RUNTIME_FAULT: DiagnosticCode = DiagnosticCode::new("L-RUNTIME-0001");
     pub const AUDIT_SYNTAX: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0001");
     pub const AUDIT_VERSION: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0002");

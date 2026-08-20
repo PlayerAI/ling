@@ -10,6 +10,7 @@ repository.workspace = true
 blake3.workspace = true
 ling-diagnostics = { path = "../ling-diagnostics" }
 ling-hir = { path = "../ling-hir" }
+ling-project = { path = "../ling-project" }
 ling-source = { path = "../ling-source" }
 
 [dev-dependencies]

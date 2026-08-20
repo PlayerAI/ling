@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 policy = "docs/governance/SCHEMA-LIFECYCLE.md"
 protocol_inventory = "docs/governance/protocol-inventory.toml"
 schema_root = "schemas"
@@ -76,6 +76,42 @@ invalid_dir = "schemas/semantic/0.1/invalid"
 canonical_dir = "schemas/semantic/0.1/canonical"
 reader_adapter = "SemanticGraphV0_1"
 writer_evidence = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
+
+[[schema]]
+id = "SCHEMA-PACKAGE-SEMANTIC-GRAPH-JSON"
+name = "semantic"
+protocol_id = "PROTO-PACKAGE-SEMANTIC-GRAPH-JSON"
+version = "0.2"
+marker = "ling.semantic/0.2"
+version_kind = "MajorMinor"
+stability = "Experimental"
+format = "JSON"
+canonical = true
+writer = "CurrentOnly"
+reader = "CurrentOnly"
+reader_versions = ["ling.semantic/0.2"]
+previous_version = ""
+previous_marker = ""
+compatibility = "NoPreviousVersion"
+compatibility_dir = ""
+migration_adapter = "None"
+unknown_fields = "NamespacedExtensions"
+missing_fields = "RejectRequired"
+reader_defaults = []
+canonical_encoding = "CompactJsonLf"
+hash_scheme_ids = [
+  "experimental:blake3:",
+  "ling.body-id/v2",
+  "ling.definition-id/v2",
+  "ling.program-id/v2",
+  "ling.semantic-node-id/v2",
+]
+schema_path = "schemas/semantic/0.2/schema.json"
+valid_dir = "schemas/semantic/0.2/valid"
+invalid_dir = "schemas/semantic/0.2/invalid"
+canonical_dir = "schemas/semantic/0.2/canonical"
+reader_adapter = "SemanticGraphV0_2"
+writer_evidence = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-semantic/tests/project_snapshot.rs"]
 
 [[schema]]
 id = "SCHEMA-REPL-EVENT-JSON"

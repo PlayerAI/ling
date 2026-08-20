@@ -11,17 +11,18 @@ This policy defines how Ling records and tests schema compatibility. It does not
 
 ## 1. Scope / 范围
 
-The first corpus covers the three implemented public JSON schemas recorded by GOV-0104:
+The current corpus covers four implemented public JSON schemas recorded by the protocol inventory:
 
 | Protocol | Current marker | Reader today | Canonical today |
 | --- | --- | --- | --- |
 | Diagnostic JSON | `ling.diagnostic/0.1` | no public reader | no |
 | Semantic Graph JSON | `ling.semantic/0.1` | isolated exact-version reader | yes |
+| Package-aware Semantic Graph JSON | `ling.semantic/0.2` | isolated exact-version reader | yes |
 | REPL event JSON | `ling.repl/0.1` | no standalone reader | no |
 
-Audit Source is an implemented canonical text protocol and Semantic IDs use canonical binary projections, but neither is JSON. They retain their accepted parser/hash tests and are explicitly outside this first JSON-schema corpus. Future package, bytecode, replay, ABI, transaction, and evidence formats have no accepted schema and must not receive placeholder packages.
+Audit Source is an implemented canonical text protocol and Semantic IDs use canonical binary projections, but neither is JSON. They retain their accepted parser/hash tests and are explicitly outside this JSON-schema corpus. Future lockfile, bytecode, replay, ABI, transaction, and evidence formats have no implemented schema and must not receive placeholder packages.
 
-首批 corpus 只覆盖三个已实现的公开 JSON Schema。Audit Source 与 Semantic ID 不是 JSON；未来协议尚无 Accepted Schema，因此不得建立暗示已实现的占位包。
+当前 corpus 覆盖四个已实现的公开 JSON Schema，其中 package-aware Semantic Graph 使用独立的 `ling.semantic/0.2` reader。Audit Source 与 Semantic ID 不是 JSON；尚未实现的 lockfile、bytecode、replay、ABI、transaction 与 evidence 协议不得建立暗示已实现的占位包。
 
 ## 2. Version meaning / 版本含义
 

@@ -393,6 +393,15 @@ impl SourceFile {
         &self.original
     }
 
+    /// Consumes this validated source and returns its exact original UTF-8 bytes.
+    ///
+    /// This is useful for pipeline stages that must retain the same byte snapshot
+    /// after parsing without rereading a mutable host file.
+    #[must_use]
+    pub fn into_original_bytes(self) -> Vec<u8> {
+        self.original.into_bytes()
+    }
+
     #[must_use]
     pub fn lexical_text(&self) -> &str {
         &self.lexical

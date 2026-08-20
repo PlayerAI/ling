@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 matrix_target = "1.0-draft"
 status = "Draft"
 product = "ling"
@@ -301,9 +301,16 @@ stability = "Experimental"
 implemented = true
 
 [[protocol]]
+id = "PROTO-PACKAGE-SEMANTIC-GRAPH-JSON"
+visibility = "Public"
+version = "ling.semantic/0.2"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
 id = "PROTO-CANONICAL-BYTES"
 visibility = "Public"
-version = "v1 domain encodings"
+version = "file-mode v1 and package-aware v2 domain encodings"
 stability = "Experimental"
 implemented = true
 
@@ -417,8 +424,8 @@ sources = ["docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md"]
 [[unsupported]]
 id = "UNSUP-PACKAGES"
 area = "Project/package"
-capability = "CLI project selection, cross-package visibility, lockfile, package installation, or registry"
-reason = "PRJ-1101/1102/1104 implement the isolated ling.toml version 1 reader, explicit-root deterministic source/module discovery, recursive vendored dependency resolution, and canonical content/package-graph identities. PRJ-1103 and PRJ-1105 have not yet implemented cross-package visibility or the lock reader/writer; CLI integration and registry installation remain out of scope."
+capability = "CLI project selection, lockfile, package installation, or registry"
+reason = "PRJ-1101 through PRJ-1104 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, and package-aware Semantic Graph. PRJ-1105 has not implemented the lock reader/writer; CLI selection, build integration, publication, and registry installation remain out of scope."
 blockers = []
 sources = ["docs/RFC-0002.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 

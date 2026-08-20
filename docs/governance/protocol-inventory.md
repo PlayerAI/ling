@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 19 records: 11 current public, 1 internal, 7 Future.
-- Current public stability: 5 Experimental, 6 Preview, 0 Stable.
+- 20 records: 12 current public, 1 internal, 7 Future.
+- Current public stability: 6 Experimental, 6 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -18,11 +18,12 @@
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
+| `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.2` | `Experimental` | yes | yes | 6 |
 | `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 6 |
-| `PROTO-CANONICAL-BYTES` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 2 |
+| `PROTO-CANONICAL-BYTES` | Public | Canonical identity | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | no | yes | 2 |
 | `PROTO-PACKAGE-IDENTITY` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 4 |
-| `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 3 |
+| `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 4 |
 | `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.1` | `Preview` | yes | yes | 2 |
 | `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 13 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
@@ -88,6 +89,19 @@
 - Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`tests/conformance/m2-invalid-number/expect.toml`](../../tests/conformance/m2-invalid-number/expect.toml), [`docs/governance/error-code-lock.toml`](../governance/error-code-lock.toml), [`tools/xtask/src/error_codes.rs`](../../tools/xtask/src/error_codes.rs), [`schemas/diagnostic/0.1/schema.json`](../../schemas/diagnostic/0.1/schema.json), [`schemas/diagnostic/0.1/valid`](../../schemas/diagnostic/0.1/valid), [`schemas/diagnostic/0.1/invalid`](../../schemas/diagnostic/0.1/invalid)
 - Notes: Code meaning, error/warning classification, and existing Facts types are the documented stable subset; the 0.1 container remains Preview until 1.0 gates close; The Markdown registry is the sole handwritten allocation source; the generated lock and offline checker reject drift, retired reuse, and unregistered implementation/test codes.
 
+### `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` — Package-aware Semantic Graph JSON
+
+- Producer: ling-semantic package snapshot writer
+- Consumer: ling-semantic package-aware isolated reader; future project IDE and build integrations
+- Reader policy: Require the exact 0.2, language, and Unicode versions; validate package graph/root identities, package-local module coordinates, IDs, ownership, imports, and cross-package references; decoded data cannot enter evaluation.
+- Writer policy: Emit deterministic package-aware JSON only from checked Typed Core produced by the exact resolved PackageGraph; include path-free PackageIdentity coordinates and use v2 Semantic ID domains without changing file-mode 0.1 bytes.
+- Unknown-field policy: Accept x-* extension fields at checked object levels and reject unknown core fields.
+- Migration tool: None; this is a context-specific package protocol, not a silent replacement or migration claim for file-mode ling.semantic/0.1.
+- Authority: `RFC-0002`, `DEC-0012`
+- Sources: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.2/schema.json`](../../schemas/semantic/0.2/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
+- Fixtures: [`crates/ling-semantic/tests/project_snapshot.rs`](../../crates/ling-semantic/tests/project_snapshot.rs), [`tests/projects/resolution-v1/valid-cross-package`](../../tests/projects/resolution-v1/valid-cross-package), [`schemas/semantic/0.2/schema.json`](../../schemas/semantic/0.2/schema.json), [`schemas/semantic/0.2/valid`](../../schemas/semantic/0.2/valid), [`schemas/semantic/0.2/invalid`](../../schemas/semantic/0.2/invalid), [`schemas/semantic/0.2/canonical`](../../schemas/semantic/0.2/canonical)
+- Notes: File-oriented Seed commands remain on ling.semantic/0.1; PRJ-1107 must explicitly select project mode before any CLI can emit this protocol.; No package-aware Audit Source is claimed because accepted ling.audit/0.1 has no package coordinate model.
+
 ### `PROTO-REPL-JSON` — REPL submission event JSON
 
 - Producer: ling repl --format json
@@ -117,20 +131,20 @@
 ### `PROTO-CANONICAL-BYTES` — Canonical bytes for semantic identities
 
 - Producer: ling-resolve identity encoder; ling-semantic identity encoders
-- Consumer: DefinitionId, REPL DefinitionId, BodyId, ProgramId, and semantic node ID hashers
+- Consumer: DefinitionId, REPL DefinitionId, BodyId, ProgramId, and semantic node ID hashers in file and project modes
 - Reader policy: No general decoder is exposed; each identity class consumes only its own domain-separated, length-prefixed canonical input.
-- Writer policy: Use distinct v1 ASCII domains, version inputs, normalized checked semantics, explicit lengths and values, and canonical collection ordering; exclude spans, paths, comments, spelling, arena indices, and hash-map iteration.
+- Writer policy: Use distinct file-mode v1 or package-aware v2 ASCII domains, version inputs, normalized checked semantics, explicit lengths and values, and canonical collection ordering; v2 Definition/node/Program inputs include path-free package or graph identity while all modes exclude spans, host paths, comments, spelling, arena indices, and hash-map iteration.
 - Unknown-field policy: Closed binary projection: unrecognized semantic inputs cannot be appended without a domain/schema version change.
 - Migration tool: None; an encoding or normalization change requires a Semantic Schema or ID-prefix upgrade and migration explanation.
-- Authority: `DEC-0012`
+- Authority: `DEC-0012`, `RFC-0002`
 - Sources: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md)
 - Fixtures: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs)
-- Notes: The domains are versioned separately in current code; no invented umbrella wire identifier is claimed.
+- Notes: The domains are versioned separately in current code; no invented umbrella wire identifier is claimed.; The v2 domains are selected only for package-aware ling.semantic/0.2 snapshots; file mode remains byte-stable on v1.
 
 ### `PROTO-PACKAGE-IDENTITY` — Ling package content and dependency-graph identities
 
 - Producer: ling-project local dependency resolver
-- Consumer: ling-project package graph; future lockfile writer, build planner, and package-aware Semantic Graph
+- Consumer: ling-project package graph; ling-resolve and ling-semantic package-aware identity; future lockfile writer and build planner
 - Reader policy: PackageSourceId and PackageGraphId are opaque, distinct Rust types; no general byte-stream decoder is exposed. Text identities emitted by the resolver use exactly sha256: plus 64 lowercase hexadecimal digits.
 - Writer policy: Hash RFC-0002's exact unsigned-64-bit big-endian length-prefixed streams with SHA-256 under the separate ling.package-content/1 and ling.package-graph/1 domains; sort every declared collection by its specified canonical key and exclude host paths, cosmetic manifest text, dependency locators, permissions, timestamps, and unordered iteration.
 - Unknown-field policy: Closed binary projection: changing included fields, framing, ordering, normalization, or algorithms requires a new domain version and migration evidence.
@@ -138,19 +152,19 @@
 - Authority: `RFC-0002`
 - Sources: [`crates/ling-project/src/package_graph.rs`](../../crates/ling-project/src/package_graph.rs), [`crates/ling-project/src/discovery.rs`](../../crates/ling-project/src/discovery.rs), [`docs/RFC-0002.md`](../RFC-0002.md)
 - Fixtures: [`crates/ling-project/tests/package_graph_fixtures.rs`](../../crates/ling-project/tests/package_graph_fixtures.rs), [`tests/projects/dependency-v1/valid-basic/ling.toml`](../../tests/projects/dependency-v1/valid-basic/ling.toml), [`tests/projects/dependency-v1/valid-transitive/ling.toml`](../../tests/projects/dependency-v1/valid-transitive/ling.toml), [`tests/projects/dependency-v1/package-cycle/ling.toml`](../../tests/projects/dependency-v1/package-cycle/ling.toml)
-- Notes: PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors. It does not implement lockfiles, CLI project selection, registry/network sources, cross-package import visibility, or package-aware Semantic IDs.
+- Notes: PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2. Lockfiles, CLI project selection, registry/network sources, and publication remain deferred.
 
 ### `PROTO-SEMANTIC-ID` — Experimental semantic ID text form
 
 - Producer: ling-resolve and ling-semantic BLAKE3 hashers
-- Consumer: Semantic Graph; Audit Source; REPL events; snapshot validation
+- Consumer: file-mode and package-aware Semantic Graphs; Audit Source; REPL events; snapshot validation
 - Reader policy: Accept exactly the experimental:blake3: prefix followed by 64 lowercase hexadecimal digits in the identity positions allowed by the current schema.
-- Writer policy: Hash the appropriate v1 domain-separated canonical bytes and emit lowercase BLAKE3 hexadecimal text with the experimental prefix.
+- Writer policy: Hash the appropriate file-mode v1 or package-aware v2 domain-separated canonical bytes and emit lowercase BLAKE3 hexadecimal text with the experimental prefix.
 - Unknown-field policy: Not field-based; unknown algorithms, prefixes, lengths, or non-hex text are rejected by current readers.
 - Migration tool: None; algorithm, prefix, dependency propagation, or canonical-input changes require an explicit schema/ID upgrade and cannot silently reuse the current prefix.
-- Authority: `DEC-0012`
-- Sources: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md)
-- Fixtures: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
+- Authority: `DEC-0012`, `RFC-0002`
+- Sources: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/RFC-0002.md`](../RFC-0002.md)
+- Fixtures: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-semantic/tests/project_snapshot.rs`](../../crates/ling-semantic/tests/project_snapshot.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
 - Notes: GAP-SEMANTIC-HASH-UPGRADE-001 blocks stabilization and migration policy.
 
 ### `PROTO-AUDIT-SOURCE` — Canonical Audit Source
@@ -177,7 +191,7 @@
 - Authority: `RFC-0002`, `ROADMAP-1.0`, `GAP-REGISTER`
 - Sources: [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs), [`crates/ling-project/src/discovery.rs`](../../crates/ling-project/src/discovery.rs), [`crates/ling-project/src/package_graph.rs`](../../crates/ling-project/src/package_graph.rs), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: [`crates/ling-project/tests/manifest_fixtures.rs`](../../crates/ling-project/tests/manifest_fixtures.rs), [`crates/ling-project/tests/discovery_fixtures.rs`](../../crates/ling-project/tests/discovery_fixtures.rs), [`crates/ling-project/tests/package_graph_fixtures.rs`](../../crates/ling-project/tests/package_graph_fixtures.rs), [`tests/projects/manifest-v1/valid-minimal/ling.toml`](../../tests/projects/manifest-v1/valid-minimal/ling.toml), [`tests/projects/manifest-v1/valid-unicode/ling.toml`](../../tests/projects/manifest-v1/valid-unicode/ling.toml), [`tests/projects/discovery-v1/valid-multi-root/ling.toml`](../../tests/projects/discovery-v1/valid-multi-root/ling.toml), [`tests/projects/discovery-v1/import-cycle/ling.toml`](../../tests/projects/discovery-v1/import-cycle/ling.toml), [`tests/projects/dependency-v1/valid-basic/ling.toml`](../../tests/projects/dependency-v1/valid-basic/ling.toml), [`tests/projects/dependency-v1/package-cycle/ling.toml`](../../tests/projects/dependency-v1/package-cycle/ling.toml), [`tests/projects/manifest-v1/duplicate-field/ling.toml`](../../tests/projects/manifest-v1/duplicate-field/ling.toml), [`tests/projects/manifest-v1/path-traversal/ling.toml`](../../tests/projects/manifest-v1/path-traversal/ling.toml), [`tests/projects/manifest-v1/unsupported-language/ling.toml`](../../tests/projects/manifest-v1/unsupported-language/ling.toml), [`fuzz/corpus/manifest_bytes/minimal`](../../fuzz/corpus/manifest_bytes/minimal)
-- Notes: PRJ-1101/1102/1104 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, and content/package-graph identities. Manifest writing, ambient or CLI project selection, cross-package visibility, locks, and build integration remain later PRJ tasks.
+- Notes: PRJ-1101/1102/1104 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, and content/package-graph identities; PRJ-1103 adds exported-module visibility and checked package-aware resolution. Manifest writing, ambient or CLI project selection, locks, and build integration remain later PRJ tasks.
 
 ### `PROTO-INTERNAL-INCIDENT` — Local internal-incident reproduction report
 

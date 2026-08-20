@@ -1,0 +1,6 @@
+module Main
+
+import math.Algebra as Math
+
+let answer = Math.answer
+let main () = ()

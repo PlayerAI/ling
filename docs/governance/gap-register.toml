@@ -237,6 +237,7 @@ observed_markers = [
   "experimental:crates/ling-format/src/lib.rs",
   "experimental:crates/ling-resolve/src/lib.rs",
   "experimental:crates/ling-semantic/src/lib.rs",
+  "experimental:crates/ling-semantic/tests/project_snapshot.rs",
 ]
 
 [[gap]]

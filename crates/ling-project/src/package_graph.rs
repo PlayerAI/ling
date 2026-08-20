@@ -11,7 +11,8 @@ use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use sha2::{Digest, Sha256};
 
 use super::discovery::{
-    DiscoveryFailure, PreparedPackage, analyze_package, prepare_package, stable_io_kind,
+    DiscoveryFailure, PackageSource, PreparedPackage, analyze_package, prepare_package,
+    stable_io_kind,
 };
 use super::{
     MANIFEST_FILE_NAME, MANIFEST_VERSION, MAX_MANIFEST_BYTES, Manifest, PackageName,
@@ -97,6 +98,7 @@ pub struct ResolvedPackage {
     entry: QualifiedModuleName,
     exports: Box<[QualifiedModuleName]>,
     modules: super::ModuleGraph,
+    sources: Box<[PackageSource]>,
 }
 
 impl ResolvedPackage {
@@ -118,6 +120,19 @@ impl ResolvedPackage {
     #[must_use]
     pub const fn modules(&self) -> &super::ModuleGraph {
         &self.modules
+    }
+
+    #[must_use]
+    pub fn sources(&self) -> &[PackageSource] {
+        &self.sources
+    }
+
+    #[must_use]
+    pub fn source(&self, module: &QualifiedModuleName) -> Option<&PackageSource> {
+        self.sources
+            .binary_search_by(|source| source.module().cmp(module))
+            .ok()
+            .map(|index| &self.sources[index])
     }
 
     #[must_use]
@@ -389,7 +404,7 @@ impl PackageResolver {
         for (identity, prepared) in self.packages {
             let manifest_source_name = prepared.manifest.locations.source_name.clone();
             let package_name = identity.name.clone();
-            let modules =
+            let analyzed =
                 analyze_package(&prepared.manifest, prepared.sources).map_err(|failure| {
                     contextualize_discovery_failure(package_name, &manifest_source_name, failure)
                 })?;
@@ -397,7 +412,8 @@ impl PackageResolver {
                 identity,
                 entry: prepared.manifest.source().entry().clone(),
                 exports: prepared.manifest.exports().to_vec().into_boxed_slice(),
-                modules,
+                modules: analyzed.graph,
+                sources: analyzed.sources,
             });
         }
         let edges = self
@@ -409,6 +425,7 @@ impl PackageResolver {
                 to,
             })
             .collect::<Vec<_>>();
+        validate_cross_package_imports(&packages, &edges)?;
         let id = compute_package_graph_id(&root_identity, &edges);
         Ok(PackageGraph {
             id,
@@ -677,6 +694,81 @@ impl PackageResolver {
             actual,
         )
     }
+}
+
+fn validate_cross_package_imports(
+    packages: &[ResolvedPackage],
+    edges: &[PackageDependencyEdge],
+) -> Result<(), DependencyGraphFailure> {
+    let edge_targets = edges
+        .iter()
+        .map(|edge| {
+            (
+                (edge.from.clone(), edge.dependency.clone()),
+                edge.to.clone(),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let package_indexes = packages
+        .iter()
+        .enumerate()
+        .map(|(index, package)| (package.identity.clone(), index))
+        .collect::<BTreeMap<_, _>>();
+
+    for package in packages {
+        let mut diagnostics = Vec::new();
+        for import in package.modules.edges() {
+            let super::ImportTarget::Dependency {
+                package: dependency,
+                module,
+            } = import.target()
+            else {
+                continue;
+            };
+            let target_identity = edge_targets
+                .get(&(package.identity.clone(), dependency.clone()))
+                .expect("validated module dependency targets have package graph edges");
+            let target = &packages[package_indexes[target_identity]];
+            let (code, zh, en) = if target.modules.node(module).is_none() {
+                (
+                    codes::PROJECT_DEPENDENCY_MODULE_NOT_FOUND,
+                    "依赖包中不存在被导入的模块",
+                    "the imported module does not exist in the dependency package",
+                )
+            } else if !target.exports_module(module) {
+                (
+                    codes::PRIVATE_PROJECT_MODULE_ACCESS,
+                    "被导入的依赖模块未公开导出",
+                    "the imported dependency module is not publicly exported",
+                )
+            } else {
+                continue;
+            };
+            diagnostics.push(
+                Diagnostic::new(code, Severity::Error, zh, en)
+                    .with_primary_span(DiagnosticSpan::at(
+                        format!(
+                            "{}/{}",
+                            package_source_prefix(package.identity.name()),
+                            import.source().as_str()
+                        ),
+                        import.span().start,
+                        import.span().end,
+                    ))
+                    .with_fact("package", package.identity.name().as_str())
+                    .with_fact("importer", import.from().as_str())
+                    .with_fact("dependency", dependency.as_str())
+                    .with_fact("module", module.as_str()),
+            );
+        }
+        if !diagnostics.is_empty() {
+            return Err(diagnostics_failure(
+                package.identity.name().clone(),
+                diagnostics,
+            ));
+        }
+    }
+    Ok(())
 }
 
 struct Frame {

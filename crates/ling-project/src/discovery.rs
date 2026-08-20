@@ -96,6 +96,60 @@ pub struct ModuleNode {
     declaration_span: Option<Range<u32>>,
 }
 
+/// Exact, path-free source snapshot retained for later compiler stages.
+///
+/// The logical coordinates are part of the validated module graph. The byte
+/// payload is the same snapshot used by package-content identity and module
+/// discovery; no physical host path is retained or exposed.
+#[derive(Clone, Eq, PartialEq)]
+pub struct PackageSource {
+    module: QualifiedModuleName,
+    source_root: LogicalPath,
+    relative_path: LogicalPath,
+    logical_path: LogicalPath,
+    bytes: Box<[u8]>,
+}
+
+impl PackageSource {
+    #[must_use]
+    pub const fn module(&self) -> &QualifiedModuleName {
+        &self.module
+    }
+
+    #[must_use]
+    pub const fn source_root(&self) -> &LogicalPath {
+        &self.source_root
+    }
+
+    #[must_use]
+    pub const fn relative_path(&self) -> &LogicalPath {
+        &self.relative_path
+    }
+
+    #[must_use]
+    pub const fn logical_path(&self) -> &LogicalPath {
+        &self.logical_path
+    }
+
+    #[must_use]
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+}
+
+impl fmt::Debug for PackageSource {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("PackageSource")
+            .field("module", &self.module)
+            .field("source_root", &self.source_root)
+            .field("relative_path", &self.relative_path)
+            .field("logical_path", &self.logical_path)
+            .field("byte_len", &self.bytes.len())
+            .finish()
+    }
+}
+
 impl ModuleNode {
     #[must_use]
     pub const fn name(&self) -> &QualifiedModuleName {
@@ -219,7 +273,7 @@ pub fn discover_modules(
     manifest: &Manifest,
 ) -> Result<ModuleGraph, DiscoveryFailure> {
     let package = prepare_package(project_root, manifest)?;
-    analyze_package(manifest, package)
+    analyze_package(manifest, package).map(|analyzed| analyzed.graph)
 }
 
 pub(crate) fn prepare_package(
@@ -331,7 +385,7 @@ pub(crate) fn prepare_package(
 pub(crate) fn analyze_package(
     manifest: &Manifest,
     package: PreparedPackage,
-) -> Result<ModuleGraph, DiscoveryFailure> {
+) -> Result<AnalyzedPackage, DiscoveryFailure> {
     let mut errors = Vec::new();
     let mut parsed = Vec::with_capacity(package.modules.len());
     for module in package.modules.into_vec() {
@@ -362,10 +416,13 @@ pub(crate) fn analyze_package(
         return Err(diagnostics_failure(vec![error]));
     }
 
-    let mut nodes = parsed
-        .into_iter()
-        .map(|module| module.node)
-        .collect::<Vec<_>>();
+    parsed.sort_by(|left, right| left.node.name.cmp(&right.node.name));
+    let mut nodes = Vec::with_capacity(parsed.len());
+    let mut sources = Vec::with_capacity(parsed.len());
+    for module in parsed {
+        nodes.push(module.node);
+        sources.push(module.source);
+    }
     nodes.sort_by(|left, right| left.name.cmp(&right.name));
     edges.sort_by(|left, right| {
         (&left.from, &left.target, left.span.start, left.span.end).cmp(&(
@@ -376,18 +433,26 @@ pub(crate) fn analyze_package(
         ))
     });
 
-    Ok(ModuleGraph {
-        package: manifest.package().name().clone(),
-        entry: manifest.source().entry().clone(),
-        dependencies: manifest
-            .dependencies()
-            .keys()
-            .cloned()
-            .collect::<Vec<_>>()
-            .into_boxed_slice(),
-        nodes: nodes.into_boxed_slice(),
-        edges: edges.into_boxed_slice(),
+    Ok(AnalyzedPackage {
+        graph: ModuleGraph {
+            package: manifest.package().name().clone(),
+            entry: manifest.source().entry().clone(),
+            dependencies: manifest
+                .dependencies()
+                .keys()
+                .cloned()
+                .collect::<Vec<_>>()
+                .into_boxed_slice(),
+            nodes: nodes.into_boxed_slice(),
+            edges: edges.into_boxed_slice(),
+        },
+        sources: sources.into_boxed_slice(),
     })
+}
+
+pub(crate) struct AnalyzedPackage {
+    pub(crate) graph: ModuleGraph,
+    pub(crate) sources: Box<[PackageSource]>,
 }
 
 #[derive(Debug)]
@@ -454,6 +519,7 @@ struct Candidate {
 struct ParsedModule {
     node: ModuleNode,
     imports: Vec<RawImport>,
+    source: PackageSource,
 }
 
 #[derive(Debug)]
@@ -1054,14 +1120,26 @@ fn parse_candidate(
             "valid source could not be lowered while discovering modules: {error}"
         ))
     })?;
-    validate_program(&candidate, manifest, &program)
+    let (node, imports) = validate_program(&candidate, manifest, &program)?;
+    let retained_source = PackageSource {
+        module: candidate.module,
+        source_root: candidate.root,
+        relative_path: candidate.relative,
+        logical_path: candidate.logical,
+        bytes: source.into_original_bytes().into_boxed_slice(),
+    };
+    Ok(ParsedModule {
+        node,
+        imports,
+        source: retained_source,
+    })
 }
 
 fn validate_program(
     candidate: &Candidate,
     manifest: &Manifest,
     program: &Program,
-) -> Result<ParsedModule, CandidateFailure> {
+) -> Result<(ModuleNode, Vec<RawImport>), CandidateFailure> {
     let modules = program
         .items
         .iter()
@@ -1132,8 +1210,8 @@ fn validate_program(
         }
     }
 
-    Ok(ParsedModule {
-        node: ModuleNode {
+    Ok((
+        ModuleNode {
             name: candidate.module.clone(),
             source_root: candidate.root.clone(),
             relative_path: candidate.relative.clone(),
@@ -1141,7 +1219,7 @@ fn validate_program(
             declaration_span,
         },
         imports,
-    })
+    ))
 }
 
 fn resolve_edges(

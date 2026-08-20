@@ -612,6 +612,7 @@ impl<'input> Parser<'input> {
                     imports.push(SemanticImport {
                         alias,
                         module: self.take_string()?,
+                        package: None,
                     });
                 }
                 "definition" => definitions.push(self.definition()?),

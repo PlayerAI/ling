@@ -15,7 +15,8 @@ use toml::Spanned;
 use unicode_normalization::UnicodeNormalization;
 
 pub use discovery::{
-    DiscoveryFailure, ImportTarget, ModuleEdge, ModuleGraph, ModuleNode, discover_modules,
+    DiscoveryFailure, ImportTarget, ModuleEdge, ModuleGraph, ModuleNode, PackageSource,
+    discover_modules,
 };
 pub use package_graph::{
     DependencyGraphFailure, PackageDependencyEdge, PackageGraph, PackageGraphId, PackageIdentity,
