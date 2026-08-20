@@ -262,34 +262,29 @@
       ]
     },
     "_qualified_constructor_name": {
-      "type": "ALIAS",
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "identifier"
-          },
-          {
-            "type": "REPEAT1",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "STRING",
-                  "value": "."
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "identifier"
-                }
-              ]
-            }
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "."
+              },
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              }
+            ]
           }
-        ]
-      },
-      "named": true,
-      "value": "qualified_name"
+        }
+      ]
     },
     "let_declaration": {
       "type": "SEQ",
@@ -1128,6 +1123,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "parenthesized_pattern"
+        },
+        {
+          "type": "SYMBOL",
           "name": "tuple_pattern"
         },
         {
@@ -1182,8 +1181,13 @@
               "type": "FIELD",
               "name": "constructor",
               "content": {
-                "type": "SYMBOL",
-                "name": "_qualified_constructor_name"
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_qualified_constructor_name"
+                },
+                "named": true,
+                "value": "qualified_name"
               }
             },
             {
@@ -1235,6 +1239,31 @@
         {
           "type": "SYMBOL",
           "name": "_delimiter_open"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_delimiter_close"
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
+    "parenthesized_pattern": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_delimiter_open"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_pattern"
         },
         {
           "type": "SYMBOL",

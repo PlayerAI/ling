@@ -1,0 +1,43 @@
+# Shared TS-3106 compiler/Tree-sitter pattern and type syntax cases.
+# id<TAB>valid|invalid<TAB>complete one-line source
+binding-identifier	valid	let identity value = value
+wildcard-parameter	valid	let ignore _ = 0
+unit-parameter	valid	let main () = ()
+tuple-parameter	valid	let first (left, right) = left
+grouped-pattern	valid	let unwrap value = match value with | (item) -> item
+integer-literal-pattern	valid	let classify value = match value with | 0 -> false | _ -> true
+float-literal-pattern	valid	let classify value = match value with | 1.5 -> true | _ -> false
+text-literal-pattern	valid	let classify value = match value with | "ok" -> true | _ -> false
+boolean-literal-pattern	valid	let classify value = match value with | true -> 1 | false -> 0
+constructor-pattern	valid	let unwrap value = match value with | Some item -> item | None -> 0
+qualified-constructor-pattern	valid	let inspect value = match value with | State.Hurt amount -> amount | State.Healthy -> 0
+grouped-constructor-argument	valid	let unwrap value = match value with | Some (item) -> item | None -> 0
+tuple-constructor-argument	valid	let first value = match value with | Pair (left, right) -> left | _ -> 0
+record-pattern	valid	let name value = match value with | { name = name; health = _ } -> name
+nested-record-constructor-pattern	valid	let unwrap value = match value with | { payload = Some item } -> item
+guarded-pattern	valid	let positive value = match value with | Some item when item > 0 -> item | _ -> 0
+generic-type-declaration	valid	type Pair<'a, 'b> = ('a, 'b)
+type-variable-alias	valid	type Identity<'a> = 'a
+nested-applied-type	valid	type Output = Ling.Prelude.Result<Ling.Prelude.Option<Int>, Text>
+qualified-type	valid	type Alias = Project.Domain.Value
+function-type-right-assoc	valid	type Callback = Int -> Text -> Bool
+product-function-precedence	valid	type Input = Int * Text -> Bool
+function-product-result	valid	type Output = Int -> Text * Bool
+parenthesized-type-precedence	valid	type Override = Int * (Text -> Bool)
+product-type-left-assoc	valid	type Triple = Int * Text * Bool
+tuple-type	valid	type Pair = (Int, Text)
+generic-record-type	valid	type Box<'a> = { value: 'a }
+generic-variant-type	valid	type Choice<'a> = | Some of 'a | None
+annotated-function-type	valid	let use callback: (Int, Text) -> Result<Bool, Text> = callback
+singleton-tuple-pattern	invalid	let unwrap value = match value with | (item,) -> item
+trailing-tuple-pattern	invalid	let unwrap value = match value with | (left, right,) -> left
+empty-record-pattern	invalid	let inspect value = match value with | {} -> 0
+missing-record-field-pattern	invalid	let inspect value = match value with | { field = } -> 0
+singleton-tuple-type	invalid	type Single = (Int,)
+empty-type-arguments	invalid	type Empty = Option<>
+trailing-type-arguments	invalid	type Broken = Result<Int,>
+missing-function-result	invalid	type Missing = Int ->
+missing-type-variable	invalid	type Missing = '
+effect-row-author-syntax	invalid	type Callback = Int -> Text ! Pure
+borrow-author-syntax	invalid	type Borrowed = &Int
+empty-type-parameters	invalid	type Empty<> = Int

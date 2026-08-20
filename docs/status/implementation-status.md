@@ -45,6 +45,7 @@
 | `TS-3103` | Offside/缩进策略 | `G1` | `M` | `Done` | `TS-3102` | `28750bcbd458322e856cf45842b8241047a8e41b` |
 | `TS-3104` | Unicode identifier | `G1` | `M` | `Done` | `TS-3103` | `16e61caf1340611c4752196b47da2973aca6978b` |
 | `TS-3105` | Expression precedence | `G1` | `M` | `Done` | `TS-3104` | `cf76a4268b5ec8d5cdd939749709cc0654cff732` |
+| `TS-3106` | Pattern 与 Type | `G1` | `M` | `In Progress` | `TS-3105` | `` |
 
 ## Generated consumers / 生成视图
 

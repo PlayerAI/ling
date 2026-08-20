@@ -141,10 +141,7 @@ module.exports = grammar({
       seq($.identifier, repeat(seq(".", $.identifier))),
 
     _qualified_constructor_name: ($) =>
-      alias(
-        seq($.identifier, repeat1(seq(".", $.identifier))),
-        $.qualified_name,
-      ),
+      seq($.identifier, repeat1(seq(".", $.identifier))),
 
     let_declaration: ($) =>
       seq(
@@ -325,6 +322,7 @@ module.exports = grammar({
         $.wildcard_pattern,
         $.literal_pattern,
         $.unit_pattern,
+        $.parenthesized_pattern,
         $.tuple_pattern,
         $.record_pattern,
       ),
@@ -344,7 +342,10 @@ module.exports = grammar({
     constructor_pattern: ($) =>
       choice(
         seq(
-          field("constructor", $._qualified_constructor_name),
+          field(
+            "constructor",
+            alias($._qualified_constructor_name, $.qualified_name),
+          ),
           repeat(field("argument", $._atomic_pattern)),
         ),
         seq(
@@ -355,6 +356,15 @@ module.exports = grammar({
 
     unit_pattern: ($) =>
       seq("(", $._delimiter_open, $._delimiter_close, ")"),
+
+    parenthesized_pattern: ($) =>
+      seq(
+        "(",
+        $._delimiter_open,
+        $._pattern,
+        $._delimiter_close,
+        ")",
+      ),
 
     tuple_pattern: ($) =>
       seq(

@@ -94,3 +94,113 @@ let health person = match person with | { health = value } -> value
               (identifier))))
         (name_expression
           (identifier))))))
+
+========================================
+Qualified, grouped, tuple-payload, record, and guarded patterns
+========================================
+
+let inspect value = match value with | State.Hurt amount when amount > 0 -> amount | Some (item) -> item | Pair (left, _) -> left | { name = name; payload = Some inner } -> inner | _ -> 0
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (match_expression
+      (name_expression
+        (identifier))
+      (match_case
+        (constructor_pattern
+          (qualified_name
+            (identifier)
+            (identifier))
+          (identifier_pattern
+            (identifier)))
+        (binary_expression
+          (name_expression
+            (identifier))
+          (literal_expression
+            (integer_literal)))
+        (name_expression
+          (identifier)))
+      (match_case
+        (constructor_pattern
+          (identifier)
+          (parenthesized_pattern
+            (identifier_pattern
+              (identifier))))
+        (name_expression
+          (identifier)))
+      (match_case
+        (constructor_pattern
+          (identifier)
+          (tuple_pattern
+            (identifier_pattern
+              (identifier))
+            (wildcard_pattern)))
+        (name_expression
+          (identifier)))
+      (match_case
+        (record_pattern
+          (record_pattern_field
+            (identifier)
+            (identifier_pattern
+              (identifier)))
+          (record_pattern_field
+            (identifier)
+            (constructor_pattern
+              (identifier)
+              (identifier_pattern
+                (identifier)))))
+        (name_expression
+          (identifier)))
+      (match_case
+        (wildcard_pattern)
+        (literal_expression
+          (integer_literal))))))
+
+========================================
+All Seed literal patterns
+========================================
+
+let classify value = match value with | 0 -> 0 | 1.5 -> 1 | "ok" -> 2 | true -> 3 | false -> 4
+
+---
+
+(source_file
+  (function_definition
+    (identifier_pattern
+      (identifier))
+    (identifier_pattern
+      (identifier))
+    (match_expression
+      (name_expression
+        (identifier))
+      (match_case
+        (literal_pattern
+          (integer_literal))
+        (literal_expression
+          (integer_literal)))
+      (match_case
+        (literal_pattern
+          (float_literal))
+        (literal_expression
+          (integer_literal)))
+      (match_case
+        (literal_pattern
+          (string_literal))
+        (literal_expression
+          (integer_literal)))
+      (match_case
+        (literal_pattern
+          (boolean_literal))
+        (literal_expression
+          (integer_literal)))
+      (match_case
+        (literal_pattern
+          (boolean_literal))
+        (literal_expression
+          (integer_literal))))))

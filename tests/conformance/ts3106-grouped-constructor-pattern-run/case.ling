@@ -1,0 +1,10 @@
+module Main
+    requires Console.Write
+
+let inspect value =
+    match value with
+    | Some (Ok item) -> item
+    | _ -> 0
+
+let main () =
+    Console.write (Text.format "{}" (inspect (Some (Ok 7))))

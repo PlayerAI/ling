@@ -203,6 +203,20 @@ symbol = "compiler_ast_matches_the_shared_precedence_corpus"
 feature_ids = ["FTR-SEED-0001", "FTR-SEED-0004", "FTR-SEED-0007"]
 
 [[evidence]]
+id = "EVD-POS-PATTERN-TYPE-SYNTAX-DIFFERENTIAL"
+kind = "Positive"
+path = "crates/ling-syntax/tests/pattern_type_differential.rs"
+symbol = "compiler_matches_the_shared_pattern_and_type_syntax_corpus"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0004", "FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-GROUPED-CONSTRUCTOR-PATTERN-LOWERING"
+kind = "Positive"
+path = "crates/ling-hir/src/lib.rs"
+symbol = "lowers_grouped_nested_constructor_patterns_without_forging_tuple_arity"
+feature_ids = ["FTR-SEED-0004"]
+
+[[evidence]]
 id = "EVD-POS-BOOLEAN-SHORT-CIRCUIT"
 kind = "Positive"
 path = "crates/ling-eval/src/lib.rs"
@@ -229,6 +243,13 @@ kind = "Negative"
 path = "crates/ling-types/src/lib.rs"
 symbol = "boolean_operators_require_bool_operands_at_original_byte_spans"
 feature_ids = ["FTR-SEED-0002", "FTR-SEED-0004"]
+
+[[evidence]]
+id = "EVD-NEG-PATTERN-DELIMITER-SPANS"
+kind = "Negative"
+path = "crates/ling-syntax/tests/pattern_type_differential.rs"
+symbol = "rejected_pattern_delimiters_keep_registered_diagnostics_at_original_utf8_spans"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0004", "FTR-SEED-0007"]
 
 [[evidence]]
 id = "EVD-POS-DIAGNOSTIC-JSON"

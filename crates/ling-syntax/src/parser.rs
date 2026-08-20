@@ -458,10 +458,14 @@ impl<'tokens> Parser<'tokens> {
             | TokenKind::False => self.bump_any(),
             TokenKind::LeftParen => {
                 self.bump_any();
-                while !self.at(TokenKind::RightParen) && !self.at(TokenKind::Eof) {
-                    self.parse_pattern(context);
-                    if !self.eat(TokenKind::Comma) {
-                        break;
+                if !self.at(TokenKind::RightParen) {
+                    self.parse_pattern_terms(context);
+                    while self.eat(TokenKind::Comma) {
+                        if self.at(TokenKind::RightParen) {
+                            self.unexpected(&[TokenKind::Identifier], "tuple pattern element");
+                            break;
+                        }
+                        self.parse_pattern_terms(context);
                     }
                 }
                 self.expect(TokenKind::RightParen, context);
@@ -469,19 +473,14 @@ impl<'tokens> Parser<'tokens> {
             TokenKind::LeftBrace => {
                 self.bump_any();
                 self.eat_member_separators();
+                if self.at(TokenKind::RightBrace) {
+                    self.unexpected(&[TokenKind::Identifier], "record pattern field");
+                }
                 while !self.at(TokenKind::RightBrace) && !self.at(TokenKind::Eof) {
                     self.expect(TokenKind::Identifier, "record pattern field");
                     self.expect(TokenKind::Equals, "record pattern field");
-                    if !self.starts_pattern() {
+                    if self.parse_pattern_terms(context) == 0 {
                         self.unexpected(&[TokenKind::Identifier], "record field pattern");
-                    }
-                    while self.starts_pattern()
-                        && !matches!(
-                            self.current_kind(),
-                            TokenKind::Semicolon | TokenKind::SoftNewline | TokenKind::RightBrace
-                        )
-                    {
-                        self.parse_pattern(context);
                     }
                     self.eat_member_separators();
                 }
@@ -617,16 +616,21 @@ impl<'tokens> Parser<'tokens> {
 
     fn parse_pattern_sequence(&mut self) -> CstNode {
         let start = self.position;
-        while self.starts_pattern()
-            && !matches!(self.current_kind(), TokenKind::When | TokenKind::RightArrow)
-        {
+        self.parse_pattern_terms("match pattern");
+        CstNode::new(NodeKind::Pattern, start..self.position, Vec::new())
+    }
+
+    fn parse_pattern_terms(&mut self, context: &'static str) -> usize {
+        let mut count = 0;
+        while self.starts_pattern() {
             let before = self.position;
-            self.parse_pattern("match pattern");
+            self.parse_pattern(context);
             if self.position == before {
                 break;
             }
+            count += 1;
         }
-        CstNode::new(NodeKind::Pattern, start..self.position, Vec::new())
+        count
     }
 
     fn parse_assignment_expression(&mut self) -> CstNode {

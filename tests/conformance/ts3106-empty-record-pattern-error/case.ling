@@ -1,0 +1,3 @@
+let inspect value =
+    match value with
+    | {} -> 0

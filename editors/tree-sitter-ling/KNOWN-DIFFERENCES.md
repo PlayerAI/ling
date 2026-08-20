@@ -1,8 +1,8 @@
-# TS-3104 known differences
+# Tree-sitter known differences
 
-This file records deliberate differences between the Tree-sitter editor parser after TS-3103 and the authoritative Ling compiler. None of these differences changes Ling syntax or semantics.
+This file records deliberate differences between the Tree-sitter editor parser through TS-3106 and the authoritative Ling compiler. None of these differences changes Ling syntax or semantics.
 
-| Area | Tree-sitter behavior after TS-3103 | Authoritative behavior / owner |
+| Area | Tree-sitter behavior through TS-3106 | Authoritative behavior / owner |
 | --- | --- | --- |
 | Layout diagnostics | The serialized scanner compares relative indentation and recovers finitely, but counts a leading tab as one recovery column and falls back to the nearest lower stack entry for inconsistent dedents. It emits no diagnostic. | `ling-syntax` implements DEC-0006 and remains authoritative for registered bilingual tab, inconsistent-dedent, delimiter, comment, and depth diagnostics. |
 | Layout-sensitive shared examples | All four root examples parse without `ERROR` or `MISSING`; this is a focused editor-parser check, not compiler equivalence. | TS-3108 owns synchronized shared-corpus differential evidence before parity can be claimed. |
@@ -11,8 +11,8 @@ This file records deliberate differences between the Tree-sitter editor parser a
 | Reserved `and` | The exact spelling is globally reserved through a private non-completing grammar anchor; `and` is finite error input while `a`, `an`, and `and_then` remain identifiers. | The compiler emits `TokenKind::And`; DEC-0012 defers recursive binding groups, so no successful `and` production exists. |
 | Numeric and Text validation | The grammar recognizes the accepted literal shapes and escape forms, but it does not validate finite `f64`, Unicode scalar values, or every invalid-number recovery boundary. | `ling-syntax` diagnostics remain authoritative. TS-3107 owns malformed-input coverage. |
 | Expressions | TS-3105 implements the complete DEC-0017 precedence tower, including `&&` and `||`, through private structural layers while retaining a shallow `binary_expression` node. A shared 29-case corpus checks compiler AST and generated CST grouping; compiler tests additionally cover Bool typing, conservative RHS Effects, short-circuit evaluation, UTF-8 spans, and Semantic IDs. | Tree-sitter remains editor-only and does not type-check or execute expressions. The compiler's checked Typed Core and evaluator remain authoritative. |
-| Patterns and types | Major forms are represented. A bare identifier uses syntax-neutral `identifier_pattern`; only a qualified or payload-bearing form becomes `constructor_pattern`. | Name resolution determines binding versus zero-payload constructor. TS-3106 owns complete pattern/type edge coverage. |
+| Patterns and types | TS-3106 represents binding, wildcard, literal, Unit, grouped, tuple, qualified/nested constructor, nonempty record, and guarded patterns plus generic, qualified, applied, product, tuple, parenthesized, and right-associative function types. A shared 41-case compiler/Tree-sitter validity corpus covers accepted, rejected delimiter, incomplete, and unavailable post-Seed forms. | Name resolution still determines binding versus zero-payload constructor. Effect-row and borrow Author Source syntax remain unavailable; Tree-sitter does not infer or type-check patterns. |
 | Error recovery | Covered malformed/future cases, unclosed/over-depth block comments, and scanner-state corruption terminate finitely. | TS-3107 owns systematic incomplete-edit, delimiter, indentation, and randomized edit-state recovery. |
-| Compiler differential | TS-3104 synchronizes identifier-token cases and TS-3105 synchronizes expression grouping cases; neither claims whole-program grammar parity. | TS-3108 owns deterministic full-corpus compiler/Tree-sitter comparison. |
+| Compiler differential | TS-3104 synchronizes identifier-token cases, TS-3105 synchronizes expression grouping, and TS-3106 synchronizes focused Pattern/Type validity. These focused corpora do not claim whole-program grammar parity. | TS-3108 owns deterministic full-corpus compiler/Tree-sitter comparison. |
 
 Tree-sitter node names remain implementation evidence, not public Ling protocol or Semantic ID inputs.

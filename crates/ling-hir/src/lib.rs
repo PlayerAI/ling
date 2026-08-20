@@ -1123,4 +1123,33 @@ mod tests {
         assert_eq!(place.root.normalized, "person");
         assert_eq!(place.fields[0].normalized, "health");
     }
+
+    #[test]
+    fn lowers_grouped_nested_constructor_patterns_without_forging_tuple_arity() {
+        let program = lower_text(concat!(
+            "let inspect value = match value with ",
+            "| Some (Ok item) -> item ",
+            "| _ -> 0\n",
+        ));
+        let ExpressionKind::Match { cases, .. } = &program.definitions[0].value.kind else {
+            panic!("expected match expression");
+        };
+        let PatternKind::Constructor {
+            name, arguments, ..
+        } = &cases[0].pattern.kind
+        else {
+            panic!("expected outer constructor pattern");
+        };
+        assert_eq!(name.normalized, "Some");
+        assert_eq!(arguments.len(), 1);
+        let PatternKind::Constructor {
+            name, arguments, ..
+        } = &arguments[0].kind
+        else {
+            panic!("expected grouped inner constructor pattern");
+        };
+        assert_eq!(name.normalized, "Ok");
+        assert_eq!(arguments.len(), 1);
+        assert!(matches!(arguments[0].kind, PatternKind::Binding { .. }));
+    }
 }

@@ -1069,3 +1069,57 @@ notes = [
   "Unicode tables, normalization, security policy, and the pinned Unicode 17.0.0 version are unchanged.",
   "TS-3106 pattern/type detail, TS-3107 malformed-edit recovery, a second execution engine, and textual boolean aliases remain intentionally unimplemented.",
 ]
+
+[[task]]
+id = "TS-3106"
+title = "Pattern 与 Type"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3105"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0005-seed-literals-and-delimiters.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0014-seed-prelude-option-result.md",
+  "docs/SEMANTICS.md",
+  "docs/RFC-0001.md",
+  "docs/grammar-map.md",
+]
+artifacts = [
+  "crates/ling-syntax/src/parser.rs",
+  "crates/ling-syntax/tests/pattern_type_differential.rs",
+  "crates/ling-hir/src/lib.rs",
+  "editors/tree-sitter-ling/grammar.js",
+  "editors/tree-sitter-ling/src/grammar.json",
+  "editors/tree-sitter-ling/src/node-types.json",
+  "editors/tree-sitter-ling/src/parser.c",
+  "editors/tree-sitter-ling/test/corpus/declarations.txt",
+  "editors/tree-sitter-ling/test/corpus/errors.txt",
+  "editors/tree-sitter-ling/test/corpus/patterns.txt",
+  "editors/tree-sitter-ling/test/fixtures/pattern-types.tsv",
+  "editors/tree-sitter-ling/test/run-pattern-type-differential.js",
+  "tests/conformance/ts3106-empty-record-pattern-error/expect.toml",
+  "tests/conformance/ts3106-grouped-constructor-pattern-run/expect.toml",
+  "tests/conformance/ts3106-singleton-tuple-pattern-error/expect.toml",
+  "docs/grammar-map.md",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+]
+acceptance = [
+  "shared compiler/Tree-sitter Pattern/Type validity differential: 41 cases passed",
+  "focused compiler conformance: grouped nested constructor execution and rejected singleton tuple/empty record patterns passed",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "uncommitted"
+completed = ""
+notes = [
+  "Implementation is constrained to the accepted v0.0.1 Seed Pattern/Type surface.",
+  "Tree-sitter remains editor-only; compiler parse, resolution, typing, and checked Typed Core remain authoritative.",
+  "TS-3107 malformed-edit recovery and TS-3108 whole-program differential remain deferred.",
+]

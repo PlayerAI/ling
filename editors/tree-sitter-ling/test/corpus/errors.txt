@@ -52,3 +52,25 @@ Unparenthesized assignment chain
 let value = first <- second <- third
 
 ---
+
+========================================
+Invalid tuple and empty record patterns
+:error
+========================================
+
+let first value = match value with | (item,) -> item
+let second value = match value with | (left, right,) -> left
+let third value = match value with | {} -> 0
+
+---
+
+========================================
+Unavailable and incomplete type syntax
+:error
+========================================
+
+type Effectful = Int -> Text ! Pure
+type Borrowed = &Int
+type Empty = Option<>
+
+---

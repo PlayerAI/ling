@@ -180,6 +180,107 @@ type Optional = Prelude.Option<Int>
             (identifier)))))))
 
 ========================================
+Multiple parameters and nested applied types
+========================================
+
+type Pair<'a, 'b> = ('a, 'b)
+type Nested = Ling.Prelude.Result<Ling.Prelude.Option<Int>, Text>
+
+---
+
+(source_file
+  (type_declaration
+    (identifier)
+    (type_parameter_list
+      (type_parameter
+        (identifier))
+      (type_parameter
+        (identifier)))
+    (type_alias
+      (tuple_type
+        (type_variable
+          (identifier))
+        (type_variable
+          (identifier)))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (applied_type
+        (qualified_type
+          (identifier)
+          (identifier)
+          (identifier))
+        (type_argument_list
+          (applied_type
+            (qualified_type
+              (identifier)
+              (identifier)
+              (identifier))
+            (type_argument_list
+              (named_type
+                (identifier))))
+          (named_type
+            (identifier)))))))
+
+========================================
+Function and product type precedence
+========================================
+
+type Input = Int * Text -> Bool
+type Output = Int -> Text * Bool
+type Override = Int * (Text -> Bool)
+type Chain = Int * Text * Bool
+
+---
+
+(source_file
+  (type_declaration
+    (identifier)
+    (type_alias
+      (function_type
+        (product_type
+          (named_type
+            (identifier))
+          (named_type
+            (identifier)))
+        (named_type
+          (identifier)))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (function_type
+        (named_type
+          (identifier))
+        (product_type
+          (named_type
+            (identifier))
+          (named_type
+            (identifier))))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (product_type
+        (named_type
+          (identifier))
+        (parenthesized_type
+          (function_type
+            (named_type
+              (identifier))
+            (named_type
+              (identifier)))))))
+  (type_declaration
+    (identifier)
+    (type_alias
+      (product_type
+        (product_type
+          (named_type
+            (identifier))
+          (named_type
+            (identifier)))
+        (named_type
+          (identifier))))))
+
+========================================
 Line, documentation, and block comments
 ========================================
 
