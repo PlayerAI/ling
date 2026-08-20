@@ -32,7 +32,7 @@
 | 10 | `TS-3101` | 语法→Tree-sitter 映射 | Accepted Seed 语法 | 与 G0 | **Done**；52 syntax rows、8 private helpers、8 deferred groups，均映射 compiler/corpus 边界 |
 | 11 | `TS-3102` | Tree-sitter 宽度优先骨架 | TS-3101 | 与架构工作 | **Done**；60 named CST nodes 全部有 corpus evidence，23/23 cases 与本地示例通过，生成物幂等 |
 | 12 | `PRJ-1101` | 最小项目 manifest | 包/模块 RFC | 否 | **Done**；`ling.manifest/1` reader、7 个稳定诊断、fixtures/limits/mutation/fuzz evidence |
-| 13 | `VM-1201` | bytecode RFC/模型 | VM 语义 RFC | 与 test agent | opcode/encoding/verifier contract |
+| 13 | `VM-1201` | bytecode RFC/模型 | VM 语义 RFC | 与 test agent | **Done**；Accepted RFC-0014、未验证 data model、显式 tag/opcode/limits 与 TEST-VM-0001 corpus |
 | 14 | `INC-1401` | 增量 query ADR | 编译管线接口 | 与 corpus | query/invalidations 评审通过 |
 | 15 | `LSP-2101` | LSP 生命周期骨架 | CompilerSession/VFS | 与 Zed query | initialize/shutdown fixtures |
 | 16 | `LSP-2102` | UTF-16 position 协商 | LineIndex | 与 diagnostics | 中文/emoji/CRLF fixtures |
@@ -91,7 +91,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PRJ-1106` | G1/Editor | Project fixtures | M | Done | `03-G1-V0.1-LIVING.md:116`；见七组命名 fixture、expected diagnostics/graph/lock、机器状态与实施报告 |
 | `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:132` |
 | `PRJ-1108` | G1/Editor | Project graph fuzz/property | M | Done | `03-G1-V0.1-LIVING.md:140`；见生成式 cycle/path/order/lock properties、manifest fuzz/CI、机器状态与实施报告 |
-| `VM-1201` | G1/Editor | bytecode RFC 与模型 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:150` |
+| `VM-1201` | G1/Editor | bytecode RFC 与模型 | M | Done | `03-G1-V0.1-LIVING.md:150`；见 RFC-0014、`ling-bytecode` 未验证模型、TEST-VM-0001 corpus、机器状态与实施报告 |
 | `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:166` |
 | `VM-1203` | G1/Editor | 独立 decoder/verifier | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:180` |
 | `VM-1204` | G1/Editor | VM 基础执行 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:196` |

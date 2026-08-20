@@ -1972,3 +1972,106 @@ notes = [
   "Unicode remains 17.0.0; generated cases, fuzz seeds, and filesystem-order variants are reproducible and path-free.",
   "PRJ-1107 remains blocked on unspecified project test/build CLI behavior.",
 ]
+
+[[task]]
+id = "TEST-VM-0001"
+title = "VM failing-first corpus and differential harness baseline"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0104", "GOV-0105"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0014.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/14-FIRST-SPRINT-CODEX-TASKS.md",
+]
+artifacts = [
+  "crates/ling-bytecode/tests/differential_baseline.rs",
+  "docs/status/TEST-VM-0001-IMPLEMENTATION-REPORT.md",
+  "tests/bytecode/README.md",
+  "tests/bytecode/v1/malformed-cases.tsv",
+  "tests/bytecode/v1/programs/constants.ling",
+  "tests/bytecode/v1/programs/direct-call.ling",
+  "tests/bytecode/v1/programs/format-fault.ling",
+  "tests/bytecode/v1/programs/hello.ling",
+]
+acceptance = [
+  "the interpreter baseline consumes source through the existing parser, HIR, resolver, type, Effect/Capability, and ProgramSnapshot checks rather than an unchecked AST path",
+  "constants, direct calls, local bindings, Console.Write output, Unit return, arbitrary-precision Int, Bool, Text, and Runtime Fault observables are frozen",
+  "the Text.format failure preserves L-RUNTIME-0001, invalid_format, the exact logical source name, and the original half-open UTF-8 byte span",
+  "22 uniquely identified malformed-bytecode scenarios freeze stable phase, mutation, and verifier reason expectations",
+  "the future interpreter-to-VM differential case is explicitly ignored until VM-1204 provides verifier-gated execution",
+  "cargo test -p ling-bytecode --locked --offline: 6 passed and 1 explicitly ignored for VM-1204",
+  "cargo test --workspace --all-features --locked --offline: passed",
+]
+verified_against_commit = "5bd49583c9160cd2067a7124bc014ebc3b4bcf95"
+completion_commit = "5bd49583c9160cd2067a7124bc014ebc3b4bcf95"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The corpus was established before any executable VM exists; no ignored test claims VM behavior.",
+  "No bytecode bytes are blessed yet because encoder/decoder implementation belongs to VM-1202 and VM-1203.",
+  "The baseline preserves existing interpreter behavior and creates no new source-language semantics.",
+]
+
+[[task]]
+id = "VM-1201"
+title = "Portable bytecode RFC and unverified model"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0104", "GOV-0105", "TEST-VM-0001"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0014.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "Cargo.lock",
+  "Cargo.toml",
+  "crates/ling-bytecode/Cargo.toml",
+  "crates/ling-bytecode/src/format.rs",
+  "crates/ling-bytecode/src/lib.rs",
+  "crates/ling-bytecode/src/model.rs",
+  "crates/ling-bytecode/tests/model.rs",
+  "docs/IMPLEMENTATION.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/ling_execution_plan/SHA256SUMS.txt",
+  "docs/status/implementation-status.toml",
+  "docs/status/VM-1201-IMPLEMENTATION-REPORT.md",
+]
+acceptance = [
+  "ling-bytecode has no production dependency and models the RFC-0014 untrusted boundary without an encoder, decoder, verifier, lowering API, or execution entry point",
+  "string, package, module, type, constant, source, function, block, register, and source-map indexes use distinct Rust domains",
+  "format/language/Unicode versions, 40-byte header facts, hard limits, tags, and opcodes are explicit constants or methods independent of Rust enum layout",
+  "UnverifiedProgram construction confers no VerifiedProgram or execution authority",
+  "cargo test -p ling-bytecode --locked --offline: 6 passed and 1 explicitly ignored for VM-1204",
+  "cargo xtask governance check-all: 46 documents, 26 gaps, 21 lifecycle records, 20 protocols, and 76 diagnostic codes passed",
+  "cargo xtask support verify, ci verify, traceability verify, schema gates, seed reproduce, and pre-completion status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified and completion status: 31 tasks Done",
+  "cargo fmt --all -- --check and git diff --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo test --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+]
+verified_against_commit = "5bd49583c9160cd2067a7124bc014ebc3b4bcf95"
+completion_commit = "5bd49583c9160cd2067a7124bc014ebc3b4bcf95"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0014 is Accepted, but PROTO-BYTECODE and BACKEND-VM remain Future/Unavailable until VM-1202 through VM-1204 provide deterministic bytes, independent verification, and verifier-gated execution.",
+  "No L-BYTECODE diagnostic was allocated because this milestone has no emitter.",
+  "Diagnostic JSON, source-language behavior, CLI behavior, Semantic IDs, ABI/FFI, and third-party dependency versions are unchanged.",
+  "Unicode remains 17.0.0; source maps use original UTF-8 byte spans and exclude physical paths.",
+  "VM-1202 deterministic Checked Core lowering and disassembly is the next implementation slice.",
+]
