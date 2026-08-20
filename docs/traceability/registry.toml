@@ -299,3 +299,24 @@ kind = "Positive"
 path = "crates/ling-cli/tests/conformance.rs"
 symbol = "repl_json_writer_matches_schema_corpus"
 feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-G0-CI-CONTRACT"
+kind = "Positive"
+path = "tools/xtask/src/ci.rs"
+symbol = "pub fn verify"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-G0-GOVERNANCE-AGGREGATE"
+kind = "Positive"
+path = "tools/xtask/src/g0.rs"
+symbol = "pub fn check_governance"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-SEED-REPRODUCIBILITY"
+kind = "Positive"
+path = "tools/xtask/src/seed.rs"
+symbol = "pub fn reproduce"
+feature_ids = ["FTR-SEED-0007"]

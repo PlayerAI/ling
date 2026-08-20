@@ -366,6 +366,19 @@ supersedes = []
 stable_basis = false
 
 [[document]]
+id = "G0-CI-CONTRACT"
+title = "G0 continuous-integration gate contract"
+kind = "Automation contract"
+status = "Active"
+version = "1"
+authority = "Evidence"
+path = ".github/workflows/ci.yml"
+covers = ["always-on pull-request gates", "governance and compatibility validation", "canonical determinism", "Seed reproducibility", "multi-platform tests", "fuzz smoke", "Rust MSRV"]
+depends_on = ["GAP-REGISTER", "PROTOCOL-INVENTORY", "SCHEMA-REGISTRY", "TRACEABILITY-REGISTER", "SUPPORT-MATRIX", "TASK-STATUS"]
+supersedes = []
+stable_basis = false
+
+[[document]]
 id = "LIFECYCLE-REGISTER"
 title = "RFC and decision lifecycle registry"
 kind = "Governance registry"

@@ -29,19 +29,19 @@ Ling 的 [`v0.0.1 Seed`](https://github.com/PlayerAI/ling/tree/v0.0.1) annotated
 cargo fetch --locked
 cargo test --workspace --all-features --locked --offline
 cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
-cargo xtask governance check-authority
-cargo xtask governance check-gaps
-cargo xtask governance check-lifecycle
-cargo xtask governance check-protocols
-cargo xtask governance check-error-codes
+cargo xtask governance check-all
+cargo xtask ci verify
 cargo xtask traceability verify --release v0.0.1
 cargo xtask schema validate-all
 cargo xtask schema compatibility --from N-1 --to N
 cargo xtask schema corrupt-inputs
+cargo xtask seed reproduce
 cargo xtask support verify
 cargo xtask status verify
 cargo run --locked --offline -- --version
 ```
+
+`governance check-all` 聚合五项治理 registry 检查；`ci verify` 防止八个 G0 jobs、三平台测试、fuzz 和 MSRV 门禁漂移；`seed reproduce` 构建一次并用八个独立进程比较 check/run/Semantic/Audit 输出。
 
 公开 JSON 协议的版本、reader/writer 范围、字段策略和 golden corpus 由 [`SCHEMA-LIFECYCLE.md`](docs/governance/SCHEMA-LIFECYCLE.md)、[`schemas/registry.toml`](schemas/registry.toml) 与 [`schemas/`](schemas/README.md) 共同记录。当前三个协议都是首版，因此兼容门禁明确报告 `NoPreviousVersion`，不宣称已经支持 N-1。
 
@@ -256,19 +256,19 @@ Rust 1.97.1 is the pinned development toolchain; the declared MSRV is Rust 1.85.
 cargo fetch --locked
 cargo test --workspace --all-features --locked --offline
 cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings
-cargo xtask governance check-authority
-cargo xtask governance check-gaps
-cargo xtask governance check-lifecycle
-cargo xtask governance check-protocols
-cargo xtask governance check-error-codes
+cargo xtask governance check-all
+cargo xtask ci verify
 cargo xtask traceability verify --release v0.0.1
 cargo xtask schema validate-all
 cargo xtask schema compatibility --from N-1 --to N
 cargo xtask schema corrupt-inputs
+cargo xtask seed reproduce
 cargo xtask support verify
 cargo xtask status verify
 cargo run --locked --offline -- --version
 ```
+
+`governance check-all` aggregates the five governance-registry checks; `ci verify` prevents drift in the eight G0 jobs, three-platform tests, fuzz, and MSRV gates; and `seed reproduce` builds once and compares check/run/Semantic/Audit output across eight independent processes.
 
 Public JSON protocol versions, reader/writer ranges, field policies, and golden corpora are recorded together in [`SCHEMA-LIFECYCLE.md`](docs/governance/SCHEMA-LIFECYCLE.md), [`schemas/registry.toml`](schemas/registry.toml), and [`schemas/`](schemas/README.md). All three current protocols are first versions, so the compatibility gate reports `NoPreviousVersion` explicitly and does not claim N-1 support.
 

@@ -1,9 +1,12 @@
+mod ci;
 mod error_codes;
+mod g0;
 mod gaps;
 mod governance;
 mod lifecycle;
 mod protocols;
 mod schema;
+mod seed;
 mod status;
 mod support;
 mod traceability;
@@ -26,6 +29,43 @@ fn main() -> ExitCode {
     };
 
     match args.as_slice() {
+        [area, command] if area == "ci" && command == "verify" => match ci::verify(&root) {
+            Ok(summary) => {
+                println!(
+                    "G0 CI contract OK: {} named gates, {} commands, {} workspace-test hosts",
+                    summary.gate_count, summary.command_count, summary.host_count
+                );
+                ExitCode::SUCCESS
+            }
+            Err(errors) => {
+                for error in errors {
+                    eprintln!("{error}");
+                }
+                ExitCode::from(EXIT_VALIDATION_FAILED)
+            }
+        },
+        [area, command] if area == "governance" && command == "check-all" => {
+            match g0::check_governance(&root) {
+                Ok(summary) => {
+                    println!(
+                        "G0 governance OK: {} checks; {} documents, {} gaps, {} lifecycle records, {} protocols, {} diagnostic codes",
+                        summary.check_count,
+                        summary.document_count,
+                        summary.gap_count,
+                        summary.lifecycle_count,
+                        summary.protocol_count,
+                        summary.diagnostic_code_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         [area, command] if area == "governance" && command == "check-authority" => {
             match governance::check_repository(&root) {
                 Ok(summary) => {
@@ -353,6 +393,23 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "seed" && command == "reproduce" => {
+            match seed::reproduce(&root) {
+                Ok(summary) => {
+                    println!(
+                        "Seed reproduction OK: {} surfaces, {} independent processes, {} compared output bytes",
+                        summary.surface_count, summary.process_count, summary.compared_byte_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         [area, command] if area == "status" && command == "verify" => {
             match status::check_repository(&root) {
                 Ok(summary) => {
@@ -417,7 +474,7 @@ fn main() -> ExitCode {
         }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask schema validate-all\n  cargo xtask schema compatibility --from N-1 --to N\n  cargo xtask schema corrupt-inputs\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
+                "Usage:\n  cargo xtask ci verify\n  cargo xtask governance check-all\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask schema validate-all\n  cargo xtask schema compatibility --from N-1 --to N\n  cargo xtask schema corrupt-inputs\n  cargo xtask seed reproduce\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

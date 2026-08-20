@@ -9,6 +9,59 @@ permissions:
   contents: read
 
 jobs:
+  g0-gates:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: governance-authority
+            command: |
+              cargo xtask governance check-authority
+              cargo xtask governance check-lifecycle
+              cargo xtask governance check-all
+              cargo xtask ci verify
+          - name: gap-register
+            command: cargo xtask governance check-gaps
+          - name: protocol-schema
+            command: |
+              cargo xtask governance check-protocols
+              cargo xtask schema validate-all
+              cargo xtask schema compatibility --from N-1 --to N
+              cargo xtask schema corrupt-inputs
+          - name: error-code-registry
+            command: cargo xtask governance check-error-codes
+          - name: traceability-links
+            command: cargo xtask traceability verify --release v0.0.1
+          - name: support-matrix
+            command: |
+              cargo xtask support verify
+              cargo xtask status verify
+          - name: canonical-determinism
+            command: |
+              cargo test --package ling-semantic hello_snapshot_is_byte_deterministic --locked --offline
+              cargo test --package ling-cli --test conformance output_is_deterministic --locked --offline
+          - name: seed-reproducibility
+            command: |
+              cargo run --package unicode-gen --locked --offline
+              git diff --exit-code -- crates/ling-unicode/src/generated.rs
+              cargo xtask seed reproduce
+              cargo test --package ling-cli --test conformance seed_examples_check_run_and_emit_semantic_graphs --locked --offline
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.97.1
+      - uses: Swatinem/rust-cache@v2
+      - name: Fetch locked dependencies
+        run: cargo fetch --locked
+      # Always-on PR gates are a conservative superset of path-specific triggers.
+      - name: Run ${{ matrix.name }}
+        shell: bash
+        run: ${{ matrix.command }}
+
   test:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -27,28 +80,6 @@ jobs:
       - name: Fetch locked dependencies
         run: cargo fetch --locked
 
-      - name: Verify generated Unicode tables
-        run: |
-          cargo run -p unicode-gen --locked --offline
-          git diff --exit-code -- crates/ling-unicode/src/generated.rs
-      - name: Verify governance registries
-        run: |
-          cargo xtask governance check-authority
-          cargo xtask governance check-gaps
-          cargo xtask governance check-lifecycle
-          cargo xtask governance check-protocols
-          cargo xtask governance check-error-codes
-      - name: Verify release traceability
-        run: cargo xtask traceability verify --release v0.0.1
-      - name: Verify schema lifecycle corpus
-        run: |
-          cargo xtask schema validate-all
-          cargo xtask schema compatibility --from N-1 --to N
-          cargo xtask schema corrupt-inputs
-      - name: Verify support matrix
-        run: cargo xtask support verify
-      - name: Verify implementation status
-        run: cargo xtask status verify
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Run Clippy
