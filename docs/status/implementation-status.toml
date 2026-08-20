@@ -1,0 +1,47 @@
+schema_version = 1
+updated = "2026-08-20"
+authority = "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md"
+plan_root = "docs/ling_execution_plan"
+recommended_plan_root = "docs/execution"
+baseline_commit = "639790f4c609d137932d8432d9c5be681aa3e3c1"
+baseline_release = "v0.0.1"
+
+[[task]]
+id = "BASE-0001"
+title = "仓库基线盘点与执行计划落位"
+state = "Done"
+release = "G0"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = []
+spec = [
+  "docs/RFC-0001.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/ling_execution_plan/00-MASTER-EXECUTION-PLAN.md",
+  "docs/ling_execution_plan/14-FIRST-SPRINT-CODEX-TASKS.md",
+]
+artifacts = [
+  "AGENTS.md",
+  "docs/status/BASE-0001-REPOSITORY-INVENTORY.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --locked --offline: 138 passed",
+  "local Markdown links resolve",
+  "status TOML parses",
+  "changed paths are documentation, status, or agent guidance only",
+]
+verified_against_commit = "639790f4c609d137932d8432d9c5be681aa3e3c1"
+completion_commit = ""
+integration_state = "verified-uncommitted-worktree"
+completed = "2026-08-20"
+notes = [
+  "No language semantics were changed.",
+  "The execution package still requires zero-to-ling and path normalization.",
+  "An empty completion_commit records that this task has not been committed; it does not claim a merged commit.",
+]

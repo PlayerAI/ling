@@ -1,0 +1,26 @@
+schema_version = 1
+updated = "2026-08-20"
+
+[[task]]
+id = "GOV-0101"
+title = "建立规范权威索引"
+state = "Ready"
+release = "G0"
+size = "S"
+owner = ""
+branch = ""
+depends_on = []
+spec = ["ROADMAP-1.0:G0"]
+artifacts = []
+
+[[task]]
+id = "VM-1202"
+title = "Checked Core to bytecode minimal lowering"
+state = "BlockedDependency"
+release = "G1"
+size = "M"
+owner = ""
+branch = ""
+depends_on = ["VM-1201"]
+spec = []
+artifacts = []

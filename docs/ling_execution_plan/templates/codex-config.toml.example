@@ -1,0 +1,21 @@
+# Example only. Re-check field names against the installed Codex version.
+# Keep project-specific durable rules in AGENTS.md; use custom agents only for bounded roles.
+
+[agents]
+max_threads = 6
+
+[agents.spec_auditor]
+description = "Read-only language specification auditor. Finds conflicts and missing decisions; never invents semantics."
+config_file = ".codex/agents/spec-auditor.toml"
+
+[agents.test_designer]
+description = "Designs conformance, property, differential and fuzz cases before implementation."
+config_file = ".codex/agents/test-designer.toml"
+
+[agents.compiler_impl]
+description = "Implements one bounded compiler task in explicitly allowed paths."
+config_file = ".codex/agents/compiler-impl.toml"
+
+[agents.reviewer]
+description = "Read-only independent reviewer focused on correctness, compatibility, Unicode and determinism."
+config_file = ".codex/agents/reviewer.toml"
