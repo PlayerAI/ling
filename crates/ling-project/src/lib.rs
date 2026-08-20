@@ -1,6 +1,7 @@
-//! Deterministic reader for the Accepted `ling.toml` manifest version 1 protocol.
+//! Deterministic `ling.toml` v1 reader, module discovery, and offline local package graph.
 
 mod discovery;
+mod package_graph;
 
 use std::collections::BTreeMap;
 use std::error::Error;
@@ -15,6 +16,10 @@ use unicode_normalization::UnicodeNormalization;
 
 pub use discovery::{
     DiscoveryFailure, ImportTarget, ModuleEdge, ModuleGraph, ModuleNode, discover_modules,
+};
+pub use package_graph::{
+    DependencyGraphFailure, PackageDependencyEdge, PackageGraph, PackageGraphId, PackageIdentity,
+    PackageSourceId, ResolvedPackage, resolve_package_graph,
 };
 
 /// Exact project-manifest filename fixed by RFC-0002.
@@ -253,6 +258,13 @@ struct ManifestLocations {
     source_roots: BTreeMap<LogicalPath, Range<u32>>,
     entry: Range<u32>,
     exports: BTreeMap<QualifiedModuleName, Range<u32>>,
+    dependencies: BTreeMap<PackageName, DependencyLocation>,
+}
+
+#[derive(Clone, Debug)]
+struct DependencyLocation {
+    name: Range<u32>,
+    path: Range<u32>,
 }
 
 struct ValidatedSource {
@@ -264,6 +276,11 @@ struct ValidatedSource {
 struct ValidatedExports {
     modules: Box<[QualifiedModuleName]>,
     locations: BTreeMap<QualifiedModuleName, Range<u32>>,
+}
+
+struct ValidatedDependencies {
+    dependencies: BTreeMap<PackageName, LocalDependency>,
+    locations: BTreeMap<PackageName, DependencyLocation>,
 }
 
 impl Manifest {
@@ -458,6 +475,43 @@ pub fn parse_manifest(source_name: &str, bytes: &[u8]) -> Result<Manifest, Manif
     validate_raw_manifest(source_name, raw)
 }
 
+pub(crate) fn manifest_too_large_diagnostic(source_name: &str) -> Diagnostic {
+    ManifestError::new(
+        source_name,
+        0..0,
+        ManifestErrorKind::Bytes {
+            reason: ByteReason::TooLarge,
+            valid_up_to: None,
+        },
+    )
+    .diagnostic()
+}
+
+pub(crate) fn project_resource_limit_diagnostic(
+    source_name: &str,
+    span: Option<Range<u32>>,
+    package: &PackageName,
+    resource: &'static str,
+    maximum: usize,
+    actual: usize,
+) -> Diagnostic {
+    let mut diagnostic = Diagnostic::new(
+        codes::PROJECT_RESOURCE_LIMIT_EXCEEDED,
+        Severity::Error,
+        "工程输入超过资源上限",
+        "project input exceeds a resource limit",
+    )
+    .with_fact("actual", actual.to_string())
+    .with_fact("maximum", maximum.to_string())
+    .with_fact("package", package.as_str())
+    .with_fact("resource", resource);
+    if let Some(span) = span {
+        diagnostic =
+            diagnostic.with_primary_span(DiagnosticSpan::at(source_name, span.start, span.end));
+    }
+    diagnostic
+}
+
 fn validate_manifest_bytes(source_name: &str, bytes: &[u8]) -> Result<(), ManifestError> {
     if bytes.len() > MAX_MANIFEST_BYTES {
         return Err(ManifestError::new(
@@ -514,12 +568,13 @@ fn validate_raw_manifest(source_name: &str, raw: RawManifest) -> Result<Manifest
         package,
         source: source.layout,
         exports: exports.modules,
-        dependencies,
+        dependencies: dependencies.dependencies,
         locations: ManifestLocations {
             source_name: source_name.to_owned(),
             source_roots: source.root_locations,
             entry: source.entry_location,
             exports: exports.locations,
+            dependencies: dependencies.locations,
         },
     })
 }
@@ -734,9 +789,12 @@ fn validate_exports(
 fn validate_dependencies(
     source_name: &str,
     raw: Option<Spanned<RawDependencies>>,
-) -> Result<BTreeMap<PackageName, LocalDependency>, ManifestError> {
+) -> Result<ValidatedDependencies, ManifestError> {
     let Some(raw) = raw else {
-        return Ok(BTreeMap::new());
+        return Ok(ValidatedDependencies {
+            dependencies: BTreeMap::new(),
+            locations: BTreeMap::new(),
+        });
     };
     if raw.get_ref().entries.len() > MAX_DEPENDENCIES {
         return Err(ManifestError::new(
@@ -751,7 +809,9 @@ fn validate_dependencies(
     }
 
     let mut dependencies = BTreeMap::new();
+    let mut locations = BTreeMap::new();
     for (raw_name, raw_dependency) in raw.into_inner().entries {
+        let name_span = bounded_span(raw_name.span());
         let name = validate_package_name(raw_name.get_ref()).map_err(|reason| {
             ManifestError::new(
                 source_name,
@@ -764,6 +824,7 @@ fn validate_dependencies(
             )
         })?;
         let raw_path = raw_dependency.into_inner().path;
+        let path_span = bounded_span(raw_path.span());
         let path = validate_logical_path(raw_path.get_ref()).map_err(|reason| {
             ManifestError::new(
                 source_name,
@@ -775,9 +836,19 @@ fn validate_dependencies(
                 },
             )
         })?;
+        locations.insert(
+            name.clone(),
+            DependencyLocation {
+                name: name_span,
+                path: path_span,
+            },
+        );
         dependencies.insert(name, LocalDependency { path });
     }
-    Ok(dependencies)
+    Ok(ValidatedDependencies {
+        dependencies,
+        locations,
+    })
 }
 
 fn validate_package_name(raw: &str) -> Result<PackageName, ValidationReason> {

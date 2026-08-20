@@ -80,6 +80,10 @@ pub mod codes {
     pub const DUPLICATE_PROJECT_MODULE: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0011");
     pub const PROJECT_MODULE_NOT_FOUND: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0012");
     pub const INVALID_PROJECT_IMPORT_GRAPH: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0013");
+    pub const INVALID_PROJECT_DEPENDENCY_GRAPH: DiagnosticCode =
+        DiagnosticCode::new("L-PROJECT-0014");
+    pub const PROJECT_RESOURCE_LIMIT_EXCEEDED: DiagnosticCode =
+        DiagnosticCode::new("L-PROJECT-0015");
     pub const RUNTIME_FAULT: DiagnosticCode = DiagnosticCode::new("L-RUNTIME-0001");
     pub const AUDIT_SYNTAX: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0001");
     pub const AUDIT_VERSION: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0002");

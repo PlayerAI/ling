@@ -445,6 +445,13 @@
       "implemented": false
     },
     {
+      "id": "PROTO-PACKAGE-IDENTITY",
+      "visibility": "Public",
+      "version": "v1 domain encodings",
+      "stability": "Experimental",
+      "implemented": true
+    },
+    {
       "id": "PROTO-PACKAGE-MANIFEST",
       "visibility": "Public",
       "version": "ling.manifest/1",
@@ -558,8 +565,8 @@
     {
       "id": "UNSUP-PACKAGES",
       "area": "Project/package",
-      "capability": "CLI project selection, dependency-package graph loading and visibility, lockfile, package installation, or registry",
-      "reason": "PRJ-1101/1102 implement the isolated ling.toml version 1 reader and explicit-root deterministic source/module discovery, but PRJ-1103 through PRJ-1105 have not implemented cross-package visibility, recursive local dependency resolution, content identity, or the lock reader/writer; CLI integration and registry installation remain out of scope.",
+      "capability": "CLI project selection, cross-package visibility, lockfile, package installation, or registry",
+      "reason": "PRJ-1101/1102/1104 implement the isolated ling.toml version 1 reader, explicit-root deterministic source/module discovery, recursive vendored dependency resolution, and canonical content/package-graph identities. PRJ-1103 and PRJ-1105 have not yet implemented cross-package visibility or the lock reader/writer; CLI integration and registry installation remain out of scope.",
       "blockers": [],
       "sources": [
         "docs/RFC-0002.md",

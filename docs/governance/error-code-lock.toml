@@ -14,7 +14,7 @@ IO = 1
 LEX = 12
 MUT = 1
 NAME = 9
-PROJECT = 13
+PROJECT = 15
 RUNTIME = 1
 SNAPSHOT = 1
 SYNTAX = 11
@@ -307,6 +307,18 @@ id = "L-PROJECT-0013"
 core_sha256 = "sha256:57312bd91bd47d2ae21f808927d258b9ce9a333d8ffd43c10aa82d8b2230fbad"
 retired = false
 facts = ["cycle:string:optional", "module:string:optional", "reason:string:required", "target:string:optional"]
+
+[[code]]
+id = "L-PROJECT-0014"
+core_sha256 = "sha256:bf5e3c0653dd7316f1c6f30cefd04d5281735b9f3a1ba58cfd19e278b0224e20"
+retired = false
+facts = ["actual:string:optional", "cycle:string:optional", "dependency:string:optional", "expected:string:optional", "first_content:string:optional", "package:string:required", "reason:string:required", "second_content:string:optional"]
+
+[[code]]
+id = "L-PROJECT-0015"
+core_sha256 = "sha256:7382d64998f462f910cf37d6feb62a1885bcfce4bc93701b71464d6c166db1f1"
+retired = false
+facts = ["actual:string:required", "maximum:string:required", "package:string:required", "resource:string:required"]
 
 [[code]]
 id = "L-RUNTIME-0001"

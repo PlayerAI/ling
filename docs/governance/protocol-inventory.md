@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 18 records: 10 current public, 1 internal, 7 Future.
-- Current public stability: 4 Experimental, 6 Preview, 0 Stable.
+- 19 records: 11 current public, 1 internal, 7 Future.
+- Current public stability: 5 Experimental, 6 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -21,9 +21,10 @@
 | `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 6 |
 | `PROTO-CANONICAL-BYTES` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 2 |
+| `PROTO-PACKAGE-IDENTITY` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 4 |
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 3 |
 | `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.1` | `Preview` | yes | yes | 2 |
-| `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 10 |
+| `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 13 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
 | `PROTO-SEMANTIC-TRANSACTION` | Planned public | Transaction | — | `Future` | no | no | 0 |
 | `PROTO-BUILD-METADATA` | Planned public | Package metadata | — | `Future` | no | no | 0 |
@@ -126,6 +127,19 @@
 - Fixtures: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs)
 - Notes: The domains are versioned separately in current code; no invented umbrella wire identifier is claimed.
 
+### `PROTO-PACKAGE-IDENTITY` — Ling package content and dependency-graph identities
+
+- Producer: ling-project local dependency resolver
+- Consumer: ling-project package graph; future lockfile writer, build planner, and package-aware Semantic Graph
+- Reader policy: PackageSourceId and PackageGraphId are opaque, distinct Rust types; no general byte-stream decoder is exposed. Text identities emitted by the resolver use exactly sha256: plus 64 lowercase hexadecimal digits.
+- Writer policy: Hash RFC-0002's exact unsigned-64-bit big-endian length-prefixed streams with SHA-256 under the separate ling.package-content/1 and ling.package-graph/1 domains; sort every declared collection by its specified canonical key and exclude host paths, cosmetic manifest text, dependency locators, permissions, timestamps, and unordered iteration.
+- Unknown-field policy: Closed binary projection: changing included fields, framing, ordering, normalization, or algorithms requires a new domain version and migration evidence.
+- Migration tool: None; incompatible identity evolution requires new content and graph domains and must not reuse existing v1 text identities.
+- Authority: `RFC-0002`
+- Sources: [`crates/ling-project/src/package_graph.rs`](../../crates/ling-project/src/package_graph.rs), [`crates/ling-project/src/discovery.rs`](../../crates/ling-project/src/discovery.rs), [`docs/RFC-0002.md`](../RFC-0002.md)
+- Fixtures: [`crates/ling-project/tests/package_graph_fixtures.rs`](../../crates/ling-project/tests/package_graph_fixtures.rs), [`tests/projects/dependency-v1/valid-basic/ling.toml`](../../tests/projects/dependency-v1/valid-basic/ling.toml), [`tests/projects/dependency-v1/valid-transitive/ling.toml`](../../tests/projects/dependency-v1/valid-transitive/ling.toml), [`tests/projects/dependency-v1/package-cycle/ling.toml`](../../tests/projects/dependency-v1/package-cycle/ling.toml)
+- Notes: PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors. It does not implement lockfiles, CLI project selection, registry/network sources, cross-package import visibility, or package-aware Semantic IDs.
+
 ### `PROTO-SEMANTIC-ID` — Experimental semantic ID text form
 
 - Producer: ling-resolve and ling-semantic BLAKE3 hashers
@@ -155,15 +169,15 @@
 ### `PROTO-PACKAGE-MANIFEST` — Ling package/project manifest
 
 - Producer: Ling project authors and future project tooling
-- Consumer: ling-project manifest and module-discovery reader; future package resolver and build planner
-- Reader policy: ling-project accepts exact UTF-8 ling.toml inputs using TOML 1.0, requires manifest-version = 1, validates the complete RFC-0002 model and limits, preserves original byte spans, and discovers a deterministic module/import graph only beneath an explicitly supplied symlink-contained project root; it performs no ambient project search or dependency traversal.
+- Consumer: ling-project manifest, module-discovery, and local dependency-graph readers; future build planner
+- Reader policy: ling-project accepts exact UTF-8 ling.toml inputs using TOML 1.0, requires manifest-version = 1, validates the complete RFC-0002 model and limits, preserves original byte spans, discovers deterministic module/import graphs, and recursively resolves only explicitly declared vendored path dependencies beneath each referring package root; it performs no ambient project search.
 - Writer policy: A future writer emits only the RFC-0002 version-1 model and never infers environment-dependent defaults; no writer is implemented yet.
 - Unknown-field policy: Version 1 rejects every unknown top-level key, table, and field.
 - Migration tool: No legacy Ling manifest exists; incompatible evolution requires a new manifest-version and explicit migration.
 - Authority: `RFC-0002`, `ROADMAP-1.0`, `GAP-REGISTER`
-- Sources: [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs), [`crates/ling-project/src/discovery.rs`](../../crates/ling-project/src/discovery.rs), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
-- Fixtures: [`crates/ling-project/tests/manifest_fixtures.rs`](../../crates/ling-project/tests/manifest_fixtures.rs), [`crates/ling-project/tests/discovery_fixtures.rs`](../../crates/ling-project/tests/discovery_fixtures.rs), [`tests/projects/manifest-v1/valid-minimal/ling.toml`](../../tests/projects/manifest-v1/valid-minimal/ling.toml), [`tests/projects/manifest-v1/valid-unicode/ling.toml`](../../tests/projects/manifest-v1/valid-unicode/ling.toml), [`tests/projects/discovery-v1/valid-multi-root/ling.toml`](../../tests/projects/discovery-v1/valid-multi-root/ling.toml), [`tests/projects/discovery-v1/import-cycle/ling.toml`](../../tests/projects/discovery-v1/import-cycle/ling.toml), [`tests/projects/manifest-v1/duplicate-field/ling.toml`](../../tests/projects/manifest-v1/duplicate-field/ling.toml), [`tests/projects/manifest-v1/path-traversal/ling.toml`](../../tests/projects/manifest-v1/path-traversal/ling.toml), [`tests/projects/manifest-v1/unsupported-language/ling.toml`](../../tests/projects/manifest-v1/unsupported-language/ling.toml), [`fuzz/corpus/manifest_bytes/minimal`](../../fuzz/corpus/manifest_bytes/minimal)
-- Notes: PRJ-1101/1102 implement the isolated reader/model plus explicit-root source discovery and a deterministic module/import graph. Manifest writing, ambient or CLI project selection, dependency-package traversal and visibility, hashing, locks, and build integration remain later PRJ tasks.
+- Sources: [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs), [`crates/ling-project/src/discovery.rs`](../../crates/ling-project/src/discovery.rs), [`crates/ling-project/src/package_graph.rs`](../../crates/ling-project/src/package_graph.rs), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
+- Fixtures: [`crates/ling-project/tests/manifest_fixtures.rs`](../../crates/ling-project/tests/manifest_fixtures.rs), [`crates/ling-project/tests/discovery_fixtures.rs`](../../crates/ling-project/tests/discovery_fixtures.rs), [`crates/ling-project/tests/package_graph_fixtures.rs`](../../crates/ling-project/tests/package_graph_fixtures.rs), [`tests/projects/manifest-v1/valid-minimal/ling.toml`](../../tests/projects/manifest-v1/valid-minimal/ling.toml), [`tests/projects/manifest-v1/valid-unicode/ling.toml`](../../tests/projects/manifest-v1/valid-unicode/ling.toml), [`tests/projects/discovery-v1/valid-multi-root/ling.toml`](../../tests/projects/discovery-v1/valid-multi-root/ling.toml), [`tests/projects/discovery-v1/import-cycle/ling.toml`](../../tests/projects/discovery-v1/import-cycle/ling.toml), [`tests/projects/dependency-v1/valid-basic/ling.toml`](../../tests/projects/dependency-v1/valid-basic/ling.toml), [`tests/projects/dependency-v1/package-cycle/ling.toml`](../../tests/projects/dependency-v1/package-cycle/ling.toml), [`tests/projects/manifest-v1/duplicate-field/ling.toml`](../../tests/projects/manifest-v1/duplicate-field/ling.toml), [`tests/projects/manifest-v1/path-traversal/ling.toml`](../../tests/projects/manifest-v1/path-traversal/ling.toml), [`tests/projects/manifest-v1/unsupported-language/ling.toml`](../../tests/projects/manifest-v1/unsupported-language/ling.toml), [`fuzz/corpus/manifest_bytes/minimal`](../../fuzz/corpus/manifest_bytes/minimal)
+- Notes: PRJ-1101/1102/1104 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, and content/package-graph identities. Manifest writing, ambient or CLI project selection, cross-package visibility, locks, and build integration remain later PRJ tasks.
 
 ### `PROTO-INTERNAL-INCIDENT` — Local internal-incident reproduction report
 

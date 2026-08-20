@@ -44,7 +44,7 @@ RFC-0001 §6.6 的“受限自动 Borrow”与 SEMANTICS §29 的“v0.0.1 不�
 ├── crates/
 │   ├── ling-source/      # SourceId、UTF-8、Span、行列映射
 │   ├── ling-unicode/     # XID、NFC、Script Set、UTS #39 skeleton
-│   ├── ling-project/     # ling.toml v1 解码、源码发现与确定性 module graph
+│   ├── ling-project/     # ling.toml v1、源码/module 发现、离线 path dependency graph 与内容 identity
 │   ├── ling-syntax/      # Token、Lexer、offside layout、Parser、CST
 │   ├── ling-ast/         # AST（保 Span、去语法噪音）
 │   ├── ling-hir/         # 名称空间、糖 Lowering、Place 分类

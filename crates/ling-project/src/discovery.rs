@@ -3,7 +3,7 @@ use std::error::Error;
 use std::ffi::OsStr;
 use std::fmt;
 use std::fs;
-use std::io;
+use std::io::{self, Read};
 use std::ops::Range;
 use std::path::{Path, PathBuf};
 
@@ -14,10 +14,13 @@ use unicode_normalization::UnicodeNormalization;
 
 use super::{
     LogicalPath, MANIFEST_FILE_NAME, Manifest, PackageName, QualifiedModuleName, diagnostic_fact,
-    validate_logical_path, validate_module_name,
+    project_resource_limit_diagnostic, validate_logical_path, validate_module_name,
 };
 
 const IMPLICIT_ENTRY_MODULE: &str = "Main";
+const MAX_DISCOVERED_PATHS: usize = 262_144;
+const MAX_PACKAGE_SOURCE_FILES: usize = 65_536;
+const MAX_PACKAGE_SOURCE_BYTES: usize = 256 * 1024 * 1024;
 
 /// A deterministic, validated module graph for one manifest package.
 ///
@@ -215,6 +218,14 @@ pub fn discover_modules(
     project_root: &Path,
     manifest: &Manifest,
 ) -> Result<ModuleGraph, DiscoveryFailure> {
+    let package = prepare_package(project_root, manifest)?;
+    analyze_package(manifest, package)
+}
+
+pub(crate) fn prepare_package(
+    project_root: &Path,
+    manifest: &Manifest,
+) -> Result<PreparedPackage, DiscoveryFailure> {
     let canonical_project_root = match canonical_project_root(project_root, manifest) {
         Ok(root) => root,
         Err(error) => return Err(diagnostics_failure(vec![error])),
@@ -238,8 +249,18 @@ pub fn discover_modules(
     }
 
     let mut candidates = Vec::new();
+    let mut discovered_paths = 0;
     for root in &roots {
-        discover_root(&canonical_project_root, root, &mut candidates, &mut errors);
+        if !discover_root(
+            &canonical_project_root,
+            manifest,
+            root,
+            &mut discovered_paths,
+            &mut candidates,
+            &mut errors,
+        ) {
+            break;
+        }
     }
     if !errors.is_empty() {
         return Err(diagnostics_failure(errors));
@@ -270,9 +291,51 @@ pub fn discover_modules(
         return Err(diagnostics_failure(errors));
     }
 
-    let mut parsed = Vec::with_capacity(candidates.len());
+    if candidates.len() > MAX_PACKAGE_SOURCE_FILES {
+        let candidate = &candidates[MAX_PACKAGE_SOURCE_FILES];
+        errors.push(resource_limit_diagnostic(
+            manifest,
+            candidate.logical.as_str(),
+            "source_files",
+            MAX_PACKAGE_SOURCE_FILES,
+            candidates.len(),
+        ));
+        return Err(diagnostics_failure(errors));
+    }
+
+    let mut modules = Vec::with_capacity(candidates.len());
+    let mut source_bytes = 0;
     for candidate in candidates {
-        match parse_candidate(&candidate, manifest) {
+        match read_candidate(candidate, manifest, source_bytes) {
+            Ok(module) => {
+                source_bytes = source_bytes.saturating_add(module.bytes.len());
+                modules.push(module);
+            }
+            Err(CandidateFailure::Diagnostics(mut diagnostics)) => {
+                errors.append(&mut diagnostics);
+            }
+            Err(CandidateFailure::Internal(message)) => {
+                return Err(DiscoveryFailure::Internal(message));
+            }
+        }
+    }
+    if !errors.is_empty() {
+        return Err(diagnostics_failure(errors));
+    }
+
+    Ok(PreparedPackage {
+        modules: modules.into_boxed_slice(),
+    })
+}
+
+pub(crate) fn analyze_package(
+    manifest: &Manifest,
+    package: PreparedPackage,
+) -> Result<ModuleGraph, DiscoveryFailure> {
+    let mut errors = Vec::new();
+    let mut parsed = Vec::with_capacity(package.modules.len());
+    for module in package.modules.into_vec() {
+        match parse_candidate(module, manifest) {
             Ok(module) => parsed.push(module),
             Err(CandidateFailure::Diagnostics(mut diagnostics)) => {
                 errors.append(&mut diagnostics);
@@ -325,6 +388,35 @@ pub fn discover_modules(
         nodes: nodes.into_boxed_slice(),
         edges: edges.into_boxed_slice(),
     })
+}
+
+#[derive(Debug)]
+pub(crate) struct PreparedPackage {
+    modules: Box<[PreparedModule]>,
+}
+
+impl PreparedPackage {
+    pub(crate) fn sources(
+        &self,
+    ) -> impl ExactSizeIterator<Item = (&LogicalPath, &LogicalPath, &[u8])> {
+        self.modules.iter().map(|module| {
+            (
+                &module.candidate.root,
+                &module.candidate.relative,
+                module.bytes.as_ref(),
+            )
+        })
+    }
+
+    pub(crate) fn source_byte_len(&self) -> usize {
+        self.modules.iter().map(|module| module.bytes.len()).sum()
+    }
+}
+
+#[derive(Debug)]
+struct PreparedModule {
+    candidate: Candidate,
+    bytes: Box<[u8]>,
 }
 
 #[derive(Debug)]
@@ -553,10 +645,12 @@ fn validate_resolved_root_overlap(
 
 fn discover_root(
     canonical_project_root: &Path,
+    manifest: &Manifest,
     root: &ResolvedRoot,
+    discovered_paths: &mut usize,
     candidates: &mut Vec<Candidate>,
     errors: &mut Vec<PendingDiagnostic>,
-) {
+) -> bool {
     let mut active = BTreeSet::new();
     let mut seen = BTreeSet::new();
     let mut stack = vec![WalkFrame::Enter {
@@ -623,6 +717,18 @@ fn discover_root(
                 let mut children = Vec::new();
                 let mut non_utf8 = false;
                 for entry in entries {
+                    if *discovered_paths >= MAX_DISCOVERED_PATHS {
+                        let logical = logical_walk_path(&root.logical, &relative);
+                        errors.push(resource_limit_diagnostic(
+                            manifest,
+                            &logical,
+                            "discovered_paths",
+                            MAX_DISCOVERED_PATHS,
+                            (*discovered_paths).saturating_add(1),
+                        ));
+                        return false;
+                    }
+                    *discovered_paths = (*discovered_paths).saturating_add(1);
                     let entry = match entry {
                         Ok(entry) => entry,
                         Err(error) => {
@@ -727,6 +833,7 @@ fn discover_root(
             }
         }
     }
+    true
 }
 
 fn candidate_from_path(
@@ -819,10 +926,11 @@ fn validate_dependency_namespaces(
     }
 }
 
-fn parse_candidate(
-    candidate: &Candidate,
+fn read_candidate(
+    candidate: Candidate,
     manifest: &Manifest,
-) -> Result<ParsedModule, CandidateFailure> {
+    consumed_bytes: usize,
+) -> Result<PreparedModule, CandidateFailure> {
     let metadata = fs::metadata(&candidate.physical).map_err(|error| {
         CandidateFailure::Diagnostics(vec![io_diagnostic(
             candidate.logical.as_str(),
@@ -832,21 +940,20 @@ fn parse_candidate(
             "failed to read a source file",
         )])
     })?;
-    if metadata.len() > u64::from(u32::MAX) {
-        let diagnostic = Diagnostic::new(
-            codes::SOURCE_TOO_LARGE,
-            Severity::Error,
-            "源码文件超过当前实现支持的大小",
-            "source file exceeds the size supported by this implementation",
-        )
-        .with_fact("byte_len", metadata.len())
-        .with_fact("maximum_byte_len", u64::from(u32::MAX));
-        return Err(CandidateFailure::Diagnostics(vec![PendingDiagnostic::new(
-            candidate.logical.as_str(),
-            diagnostic,
-        )]));
+    let remaining_bytes = MAX_PACKAGE_SOURCE_BYTES.saturating_sub(consumed_bytes);
+    let declared_len = usize::try_from(metadata.len()).unwrap_or(usize::MAX);
+    if declared_len > remaining_bytes {
+        return Err(CandidateFailure::Diagnostics(vec![
+            resource_limit_diagnostic(
+                manifest,
+                candidate.logical.as_str(),
+                "source_bytes",
+                MAX_PACKAGE_SOURCE_BYTES,
+                consumed_bytes.saturating_add(declared_len),
+            ),
+        ]));
     }
-    let bytes = fs::read(&candidate.physical).map_err(|error| {
+    let file = fs::File::open(&candidate.physical).map_err(|error| {
         CandidateFailure::Diagnostics(vec![io_diagnostic(
             candidate.logical.as_str(),
             &candidate.physical,
@@ -855,10 +962,65 @@ fn parse_candidate(
             "failed to read a source file",
         )])
     })?;
+    let limit = u64::try_from(remaining_bytes)
+        .unwrap_or(u64::MAX)
+        .saturating_add(1);
+    let mut bytes = Vec::with_capacity(declared_len.min(64 * 1024));
+    file.take(limit).read_to_end(&mut bytes).map_err(|error| {
+        CandidateFailure::Diagnostics(vec![io_diagnostic(
+            candidate.logical.as_str(),
+            &candidate.physical,
+            error.kind(),
+            "读取源码文件失败",
+            "failed to read a source file",
+        )])
+    })?;
+    if bytes.len() > remaining_bytes {
+        return Err(CandidateFailure::Diagnostics(vec![
+            resource_limit_diagnostic(
+                manifest,
+                candidate.logical.as_str(),
+                "source_bytes",
+                MAX_PACKAGE_SOURCE_BYTES,
+                consumed_bytes.saturating_add(bytes.len()),
+            ),
+        ]));
+    }
+    Ok(PreparedModule {
+        candidate,
+        bytes: bytes.into_boxed_slice(),
+    })
+}
+
+fn resource_limit_diagnostic(
+    manifest: &Manifest,
+    logical_path: &str,
+    resource: &'static str,
+    maximum: usize,
+    actual: usize,
+) -> PendingDiagnostic {
+    PendingDiagnostic::new(
+        logical_path,
+        project_resource_limit_diagnostic(
+            logical_path,
+            None,
+            manifest.package().name(),
+            resource,
+            maximum,
+            actual,
+        ),
+    )
+}
+
+fn parse_candidate(
+    module: PreparedModule,
+    manifest: &Manifest,
+) -> Result<ParsedModule, CandidateFailure> {
+    let PreparedModule { candidate, bytes } = module;
     let source = SourceFile::from_bytes(
         SourceId::new(0),
         candidate.logical.as_str().to_owned(),
-        bytes,
+        bytes.into_vec(),
     )
     .map_err(|error| {
         CandidateFailure::Diagnostics(vec![PendingDiagnostic::new(
@@ -892,7 +1054,7 @@ fn parse_candidate(
             "valid source could not be lowered while discovering modules: {error}"
         ))
     })?;
-    validate_program(candidate, manifest, &program)
+    validate_program(&candidate, manifest, &program)
 }
 
 fn validate_program(
@@ -1372,7 +1534,7 @@ fn io_diagnostic(
     )
 }
 
-const fn stable_io_kind(kind: io::ErrorKind) -> &'static str {
+pub(crate) const fn stable_io_kind(kind: io::ErrorKind) -> &'static str {
     match kind {
         io::ErrorKind::NotFound => "not_found",
         io::ErrorKind::PermissionDenied => "permission_denied",

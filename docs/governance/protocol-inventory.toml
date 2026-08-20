@@ -254,18 +254,21 @@ implemented = true
 public_schema = false
 canonical = false
 producer = ["Ling project authors and future project tooling"]
-consumer = ["ling-project manifest and module-discovery reader", "future package resolver and build planner"]
-reader_policy = "ling-project accepts exact UTF-8 ling.toml inputs using TOML 1.0, requires manifest-version = 1, validates the complete RFC-0002 model and limits, preserves original byte spans, and discovers a deterministic module/import graph only beneath an explicitly supplied symlink-contained project root; it performs no ambient project search or dependency traversal."
+consumer = ["ling-project manifest, module-discovery, and local dependency-graph readers", "future build planner"]
+reader_policy = "ling-project accepts exact UTF-8 ling.toml inputs using TOML 1.0, requires manifest-version = 1, validates the complete RFC-0002 model and limits, preserves original byte spans, discovers deterministic module/import graphs, and recursively resolves only explicitly declared vendored path dependencies beneath each referring package root; it performs no ambient project search."
 writer_policy = "A future writer emits only the RFC-0002 version-1 model and never infers environment-dependent defaults; no writer is implemented yet."
 unknown_field_policy = "Version 1 rejects every unknown top-level key, table, and field."
 migration_tool = "No legacy Ling manifest exists; incompatible evolution requires a new manifest-version and explicit migration."
 fixtures = [
   "crates/ling-project/tests/manifest_fixtures.rs",
   "crates/ling-project/tests/discovery_fixtures.rs",
+  "crates/ling-project/tests/package_graph_fixtures.rs",
   "tests/projects/manifest-v1/valid-minimal/ling.toml",
   "tests/projects/manifest-v1/valid-unicode/ling.toml",
   "tests/projects/discovery-v1/valid-multi-root/ling.toml",
   "tests/projects/discovery-v1/import-cycle/ling.toml",
+  "tests/projects/dependency-v1/valid-basic/ling.toml",
+  "tests/projects/dependency-v1/package-cycle/ling.toml",
   "tests/projects/manifest-v1/duplicate-field/ling.toml",
   "tests/projects/manifest-v1/path-traversal/ling.toml",
   "tests/projects/manifest-v1/unsupported-language/ling.toml",
@@ -274,6 +277,7 @@ fixtures = [
 sources = [
   "crates/ling-project/src/lib.rs",
   "crates/ling-project/src/discovery.rs",
+  "crates/ling-project/src/package_graph.rs",
   "crates/ling-diagnostics/src/lib.rs",
   "docs/ERROR-CODES.md",
   "docs/RFC-0002.md",
@@ -282,7 +286,38 @@ sources = [
 ]
 version_markers = ["ling.manifest/1", "manifest-version = 1"]
 authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["PRJ-1101/1102 implement the isolated reader/model plus explicit-root source discovery and a deterministic module/import graph. Manifest writing, ambient or CLI project selection, dependency-package traversal and visibility, hashing, locks, and build integration remain later PRJ tasks."]
+notes = ["PRJ-1101/1102/1104 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, and content/package-graph identities. Manifest writing, ambient or CLI project selection, cross-package visibility, locks, and build integration remain later PRJ tasks."]
+
+[[protocol]]
+id = "PROTO-PACKAGE-IDENTITY"
+title = "Ling package content and dependency-graph identities"
+category = "Canonical identity"
+visibility = "Public"
+current_version = "v1 domain encodings"
+stability = "Experimental"
+implemented = true
+public_schema = false
+canonical = true
+producer = ["ling-project local dependency resolver"]
+consumer = ["ling-project package graph", "future lockfile writer, build planner, and package-aware Semantic Graph"]
+reader_policy = "PackageSourceId and PackageGraphId are opaque, distinct Rust types; no general byte-stream decoder is exposed. Text identities emitted by the resolver use exactly sha256: plus 64 lowercase hexadecimal digits."
+writer_policy = "Hash RFC-0002's exact unsigned-64-bit big-endian length-prefixed streams with SHA-256 under the separate ling.package-content/1 and ling.package-graph/1 domains; sort every declared collection by its specified canonical key and exclude host paths, cosmetic manifest text, dependency locators, permissions, timestamps, and unordered iteration."
+unknown_field_policy = "Closed binary projection: changing included fields, framing, ordering, normalization, or algorithms requires a new domain version and migration evidence."
+migration_tool = "None; incompatible identity evolution requires new content and graph domains and must not reuse existing v1 text identities."
+fixtures = [
+  "crates/ling-project/tests/package_graph_fixtures.rs",
+  "tests/projects/dependency-v1/valid-basic/ling.toml",
+  "tests/projects/dependency-v1/valid-transitive/ling.toml",
+  "tests/projects/dependency-v1/package-cycle/ling.toml",
+]
+sources = [
+  "crates/ling-project/src/package_graph.rs",
+  "crates/ling-project/src/discovery.rs",
+  "docs/RFC-0002.md",
+]
+version_markers = ["ling.package-content/1", "ling.package-graph/1", "sha256:"]
+authority = ["RFC-0002"]
+notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors. It does not implement lockfiles, CLI project selection, registry/network sources, cross-package import visibility, or package-aware Semantic IDs."]
 
 [[protocol]]
 id = "PROTO-LOCKFILE"

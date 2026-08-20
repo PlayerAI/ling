@@ -274,6 +274,7 @@ dependencies = [
  "ling-unicode",
  "serde",
  "serde_json",
+ "sha2",
  "toml",
  "unicode-normalization",
 ]
