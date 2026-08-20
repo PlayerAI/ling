@@ -23,7 +23,7 @@ LSP protocol fixtures
 
 # Task A：仓库基线盘点与执行计划落位
 
-> 状态：**Done**（2026-08-20，当前 worktree 已验证，尚未提交）  
+> 状态：**Done**（2026-08-20，实现提交 `aa8c02894bd2fdd696ab60c97423d07c0ce9614a`）  
 > 机器状态：[implementation-status.toml](../status/implementation-status.toml)  
 > 验收证据：[BASE-0001-REPOSITORY-INVENTORY.md](../status/BASE-0001-REPOSITORY-INVENTORY.md)
 

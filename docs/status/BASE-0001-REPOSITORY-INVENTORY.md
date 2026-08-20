@@ -1,7 +1,8 @@
 # BASE-0001 仓库基线盘点 / Repository Baseline Inventory
 
-> 状态：**Done（当前 worktree 已验证，尚未提交）**  
+> 状态：**Done**  
 > 完成日期：2026-08-20  
+> 实现提交：`aa8c02894bd2fdd696ab60c97423d07c0ce9614a`  
 > 盘点基线：`main@639790f4c609d137932d8432d9c5be681aa3e3c1`  
 > 已发布基线：annotated tag `v0.0.1`，peeled target `652d19b9eaec2ab607edfe1a1e7ea742c861cf91`  
 > 任务来源：[14-FIRST-SPRINT-CODEX-TASKS.md](../ling_execution_plan/14-FIRST-SPRINT-CODEX-TASKS.md) 中的 `BASE-0001`  
@@ -40,6 +41,7 @@
 | 发布 tag | annotated `v0.0.1` |
 | tag target | `652d19b9eaec2ab607edfe1a1e7ea742c861cf91` |
 | tag 后提交 | `f06ab9e`、`639790f`，均为发布证据/记录文档 |
+| BASE-0001 实现提交 | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | Workspace 版本 | `0.0.1-dev` |
 | Rust 工具链 | 默认 `1.97.1`；manifest 声明 MSRV `1.85` |
 | Rust edition | `2024` |
