@@ -1,8 +1,9 @@
 # GOV-0104 Implementation Report / 实施报告
 
-> Status: **Done; verified locally, awaiting milestone commit metadata**
+> Status: **Done; committed locally**
 > Verification date: 2026-08-20
 > Verified base: `main@8937824a61f140db0c3ba1cfc5f07611e64ec1e3`
+> Implementation commit: `508ae4db327e5815d56093f5b5b107c916732904`
 > Task source: [`02-G0-GOVERNANCE-AND-COMPATIBILITY.md`](../ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md) `GOV-0104`
 
 ## Outcome
