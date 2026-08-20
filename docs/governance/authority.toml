@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 
 [[document]]
 id = "RFC-0001"
@@ -232,6 +232,19 @@ authority = "Accepted"
 path = "docs/decisions/0017-seed-boolean-operators.md"
 covers = ["boolean operators", "expression precedence", "short-circuit evaluation", "Typed Core lowering"]
 depends_on = ["DEC-0004", "DEC-0005", "DEC-0009", "DEC-0010", "SEMANTICS"]
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "DEC-0018"
+title = "Keep RFC-0001 as a Draft design baseline"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0018-rfc-0001-lifecycle.md"
+covers = ["RFC-0001 lifecycle", "post-Seed authority", "release versus acceptance"]
+depends_on = ["RFC-0001", "EVIDENCE-GAP-GOV-RFC-STATUS-001"]
 supersedes = []
 stable_basis = true
 

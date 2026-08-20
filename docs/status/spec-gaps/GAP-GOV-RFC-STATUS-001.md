@@ -39,6 +39,10 @@
 
 需要项目维护者通过受审查的 RFC 生命周期变更或独立治理 decision 明确 RFC-0001 的状态。GOV-0101 只登记事实，不选择候选方案。
 
+## 解决结果
+
+Accepted [`DEC-0018`](../../decisions/0018-rfc-0001-lifecycle.md) 选择保留 RFC-0001 的 Draft、非 Stable 状态。已实现 Seed 的受限行为继续引用各自的 Accepted decision；任何 post-Seed 语义或公开协议必须取得独立的 Accepted RFC/decision，不从 RFC-0001 继承接受状态。机器缺口台账保留本文件作为发现证据，并以 `DEC-0018` 记录唯一 resolution。
+
 ## 暂停边界
 
 暂停任何“仅因 RFC-0001 已 Accepted”才被视为获得授权的语义或公开协议工作。治理索引、缺口登记、只读审计和不改变语言行为的工具工作可以继续。

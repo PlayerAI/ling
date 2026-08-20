@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 
 [[gate]]
 id = "G1-PACKAGE"
@@ -52,7 +52,7 @@ decisions = ["DEC-0002", "DEC-0012"]
 [[gap]]
 id = "GAP-GOV-RFC-STATUS-001"
 title = "RFC-0001 lifecycle status mismatch"
-status = "Open"
+status = "Accepted"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["GOV-0103", "PRJ-1101", "VM-1201", "TRAIT-1301", "INC-1401", "FMT-1501", "LSP-2101"]
@@ -68,8 +68,8 @@ options = [
 irreversible_consequences = ["Treating a Draft as Accepted can freeze public behavior without an auditable decision."]
 required_evidence = ["positive", "negative", "migration", "governance-audit"]
 owner_role = "language-governance"
-next_action = "Record an explicit reviewed lifecycle decision; do not promote the RFC through this registry."
-resolution = []
+next_action = "Apply DEC-0018: keep RFC-0001 Draft and require dedicated Accepted authority for post-Seed work."
+resolution = ["DEC-0018"]
 superseded_by = ""
 observed_markers = []
 

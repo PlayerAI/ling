@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 
 # RFC-0001 and DEC-0001 through DEC-0016 predate the checked section
 # templates. This is a closed migration set; the checker rejects any new
@@ -291,4 +291,28 @@ legacy_format = false
 conformance_plan = ["Verify every neighboring precedence pair, boolean associativity and parentheses, non-Bool and malformed inputs, short-circuit Effect/Fault behavior, compiler/Tree-sitter differential structure, and unchanged prior Seed grouping."]
 compatibility_impact = ["Previously rejected && and || source becomes accepted Bool syntax; existing valid source grouping, diagnostics, schemas, canonical bytes, and Semantic IDs remain unchanged."]
 unresolved_alternatives = ["Keyword operators, unary boolean negation, equal boolean precedence, non-associative comparisons, assignment chaining, and pre-check desugaring remain outside this decision."]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0018"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0018-rfc-0001-lifecycle.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify RFC-0001 remains Draft and non-Stable in source, authority, and lifecycle records, with no repository claim that the RFC itself is Accepted.",
+  "Retain negative governance coverage for Draft-as-Stable, invalid transitions, missing records, and new legacy-format exemptions.",
+  "Verify GAP-GOV-RFC-STATUS-001 resolves only through DEC-0018 while its discovery evidence remains preserved.",
+]
+compatibility_impact = [
+  "No source, runtime, CLI, diagnostic, schema, protocol, Semantic ID, canonical-byte, Unicode, or generated-artifact behavior changes; lifecycle wording migrates from ambiguous acceptance claims to explicit Draft status.",
+]
+unresolved_alternatives = [
+  "Wholesale acceptance is rejected until every broad RFC-0001 proposal has focused evidence; supersession is rejected because the Draft remains useful provenance, and dedicated Accepted RFCs are preferred for post-Seed work.",
+]
 superseded_by = ""

@@ -1,7 +1,7 @@
 # Ling 规范权威索引 / Specification Authority Index
 
 > 状态：由 `authority.toml` 确定性生成
-> 更新日期：2026-08-20
+> 更新日期：2026-08-21
 > 本索引描述现有权威关系，不新增语言语义。
 
 ## Authority order
@@ -39,6 +39,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `DEC-0015` | Decision | `Accepted` | `1` | `Accepted` | yes | [Seed Audit Source format and round trip](../decisions/0015-audit-source-format.md) | `Audit Source`, `canonical ordering`, `round trip` | `DEC-0012` | — |
 | `DEC-0016` | Decision | `Accepted` | `1` | `Accepted` | yes | [Seed REPL session semantics](../decisions/0016-repl-session-semantics.md) | `REPL sessions`, `transactions`, `script mode` | `DEC-0010`, `DEC-0013` | — |
 | `DEC-0017` | Decision | `Accepted` | `1` | `Accepted` | yes | [Seed boolean operators and expression precedence](../decisions/0017-seed-boolean-operators.md) | `boolean operators`, `expression precedence`, `short-circuit evaluation`, `Typed Core lowering` | `DEC-0004`, `DEC-0005`, `DEC-0009`, `DEC-0010`, `SEMANTICS` | — |
+| `DEC-0018` | Decision | `Accepted` | `1` | `Accepted` | yes | [Keep RFC-0001 as a Draft design baseline](../decisions/0018-rfc-0001-lifecycle.md) | `RFC-0001 lifecycle`, `post-Seed authority`, `release versus acceptance` | `RFC-0001`, `EVIDENCE-GAP-GOV-RFC-STATUS-001` | — |
 | `SEMANTICS` | Core specification | `Draft` | `0.1` | `Semantics` | no | [Ling core semantics](../SEMANTICS.md) | `language semantics`, `Semantic Graph`, `execution profiles` | — | — |
 | `LANGUAGE` | Design specification | `Draft` | `0.1` | `Language` | no | [Ling language design](../LANGUAGE.md) | `language goals`, `surface design`, `roadmap` | — | — |
 | `CONFORMANCE` | Conformance corpus | `Active` | `0.0.1` | `Conformance` | no | [Ling conformance corpus](../../tests/conformance) | `observable Seed behavior`, `positive and negative cases` | `SEMANTICS`, `LANGUAGE` | — |

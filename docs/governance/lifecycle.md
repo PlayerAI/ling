@@ -1,7 +1,7 @@
 # RFC 与 Decision 生命周期 / Lifecycle Registry
 
 > 状态：由 `lifecycle.toml` 确定性生成
-> 更新日期：2026-08-20
+> 更新日期：2026-08-21
 > 本文件定义治理状态和证据要求，不新增语言语义。
 
 ## State machine
@@ -34,6 +34,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0015` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-19` | [DEC-0015](../decisions/0015-audit-source-format.md) |
 | `DEC-0016` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-19` | [DEC-0016](../decisions/0016-repl-session-semantics.md) |
 | `DEC-0017` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-20` | [DEC-0017](../decisions/0017-seed-boolean-operators.md) |
+| `DEC-0018` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0018](../decisions/0018-rfc-0001-lifecycle.md) |
 
 ## Migration boundary
 

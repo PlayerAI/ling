@@ -1,15 +1,15 @@
 # Ling 规范缺口台账 / Specification Gap Register
 
 > 状态：由 `gap-register.toml` 确定性生成
-> 更新日期：2026-08-20
+> 更新日期：2026-08-21
 > 本台账记录未决问题及阻断关系，不替任何候选方案作出语义决议。
 
 ## Summary
 
 - Total gaps: 26
-- Open: 25
+- Open: 24
 - Proposed: 0
-- Accepted: 1
+- Accepted: 2
 - Rejected: 0
 - Superseded: 0
 
@@ -33,7 +33,6 @@
 | `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `P0` | `Open` | Equivalent localized Author Source keyword views | `FMT-1501`, `FMT-1508`, `IDE-2306` | `RFC-0003` |
 | `GAP-BYTECODE-SEMANTICS-001` | `P0` | `Open` | Versioned bytecode and verifier observable semantics | `VM-1201`, `VM-1202`, `VM-1203`, `VM-1204`, `VM-1208`, `VM-1209`, `VM-1210` | — |
 | `GAP-FORMATTER-AUTHOR-SOURCE-001` | `P0` | `Open` | Author Source formatter preservation and normalization boundary | `FMT-1501`, `FMT-1502`, `FMT-1503`, `FMT-1504`, `FMT-1505`, `FMT-1506`, `FMT-1508` | — |
-| `GAP-GOV-RFC-STATUS-001` | `P0` | `Open` | RFC-0001 lifecycle status mismatch | `GOV-0103`, `PRJ-1101`, `VM-1201`, `TRAIT-1301`, `INC-1401`, `FMT-1501`, `LSP-2101` | `RFC-0001` |
 | `GAP-INCREMENTAL-CACHE-001` | `P0` | `Open` | Incremental query keys, invalidation, persistence, and corruption recovery | `INC-1401`, `INC-1406`, `INC-1407`, `INC-1408`, `INC-1409` | — |
 | `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2104`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501` | `RFC-0004` |
 | `GAP-PACKAGE-NAMESPACE-001` | `P0` | `Open` | Package namespace and domain ownership | `PRJ-1101`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
@@ -41,6 +40,7 @@
 | `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `P0` | `Open` | Semantic Hash algorithm, identity upgrade, and invalidation lifecycle | `INC-1406`, `INC-1409`, `GOV-0106` | `RFC-0004` |
 | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | `P0` | `Open` | Semantic Graph and Semantic Transaction protocol lifecycle | `GOV-0106`, `INC-1406`, `IDE-2306`, `IDE-2309` | `RFC-0004` |
 | `GAP-TRAIT-COHERENCE-001` | `P0` | `Open` | Base Trait coherence, orphan rules, solving, and lowering | `TRAIT-1301`, `TRAIT-1302`, `TRAIT-1303`, `TRAIT-1304`, `TRAIT-1305`, `TRAIT-1306`, `TRAIT-1307` | `RFC-0005` |
+| `GAP-GOV-RFC-STATUS-001` | `P0` | `Accepted` | RFC-0001 lifecycle status mismatch | `GOV-0103`, `PRJ-1101`, `VM-1201`, `TRAIT-1301`, `INC-1401`, `FMT-1501`, `LSP-2101` | `RFC-0001` |
 | `GAP-SEED-BOOLEAN-OPERATORS-001` | `P0` | `Accepted` | Seed boolean operator syntax, precedence, and short-circuit boundary | `TS-3105` | `RFC-0001` |
 | `GAP-UNICODE-ALIAS-SYNTAX-001` | `P1` | `Open` | Unicode Alias syntax and localized display rules | `TS-3104`, `IDE-2306`, `FMT-1501` | `RFC-0003` |
 

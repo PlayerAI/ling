@@ -15,7 +15,7 @@ Language behavior follows the repository authority order. The syntax sources rel
 2. Draft specifications: [RFC-0001 §7–8](RFC-0001.md), [SEMANTICS §3, §6, §8–11, and §29](SEMANTICS.md), and [LANGUAGE §4, §5, and §19](LANGUAGE.md).
 3. Existing conformance tests and compiler behavior: [`ling-syntax`](../crates/ling-syntax/src/parser.rs), [`ling-ast`](../crates/ling-ast/src/lib.rs), and the [Seed conformance corpus](../tests/conformance/).
 
-`RFC-0001` remains Draft. Therefore a row marked **Seed baseline** describes the implemented `v0.0.1` surface but is not a Stable syntax promise. The open [`GAP-GOV-RFC-STATUS-001`](status/spec-gaps/GAP-GOV-RFC-STATUS-001.md) remains the release-level blocker. A row marked **Accepted** has a direct Accepted decision; it may still depend on Draft surrounding productions.
+`RFC-0001` remains Draft. Therefore a row marked **Seed baseline** describes the implemented `v0.0.1` surface but is not a Stable syntax promise. Accepted [`DEC-0018`](decisions/0018-rfc-0001-lifecycle.md) deliberately preserves that lifecycle boundary and resolves [`GAP-GOV-RFC-STATUS-001`](status/spec-gaps/GAP-GOV-RFC-STATUS-001.md); post-Seed work still requires its own Accepted authority. A row marked **Accepted** has a direct Accepted decision; it may still depend on Draft surrounding productions.
 
 Tree-sitter must be no more authoritative than these sources. A Tree-sitter parse may support incomplete editing states, while `ling-syntax` remains the validity oracle and preserves original UTF-8 byte spans.
 
