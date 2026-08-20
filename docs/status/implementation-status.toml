@@ -611,3 +611,78 @@ notes = [
   "The validator implements only the audited Seed JSON Schema subset, uses the real isolated Semantic Graph reader, and cannot feed evaluation.",
   "The CI workflow invokes all three schema gates; no remote CI result is claimed before push.",
 ]
+
+[[task]]
+id = "GOV-0110"
+title = "G0 CI 门禁"
+state = "Done"
+release = "G0"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = [
+  "GOV-0101",
+  "GOV-0102",
+  "GOV-0103",
+  "GOV-0104",
+  "GOV-0105",
+  "GOV-0106",
+  "GOV-0107",
+  "GOV-0108",
+  "GOV-0109",
+]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/authority.toml",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/ERROR-CODES.md",
+  "docs/governance/support-matrix.toml",
+  "docs/traceability/registry.toml",
+  "schemas/registry.toml",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "README.md",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/seed.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/status/GOV-0110-IMPLEMENTATION-REPORT.md",
+]
+acceptance = [
+  "cargo xtask ci verify: 8 named gates, 19 commands, 3 workspace-test hosts",
+  "cargo xtask governance check-all: 5 checks; 41 documents, 25 gaps, 17 lifecycle records, 18 protocols, 56 diagnostic codes",
+  "cargo xtask schema validate-all: 3 schemas, 4 valid fixtures, 6 invalid fixtures, 1 canonical byte fixture",
+  "cargo xtask schema compatibility --from N-1 --to N: 0 verified N-1 edges, 3 NoPreviousVersion records",
+  "cargo xtask schema corrupt-inputs: 23 deterministic mutations",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 32 conformance fixtures, 50 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify: 7 features, 3 profiles, 3 hosts, 1 native target, 6 backends, 1 standard package, 18 protocols, 9 unsupported records",
+  "cargo xtask seed reproduce: 4 surfaces, 8 independent processes, 41866 compared output bytes",
+  "cargo test --package xtask --locked --offline: 91 passed",
+  "cargo test --workspace --all-features --locked --offline: 234 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "active local Markdown targets: 598 resolved; frozen baseline excluded",
+]
+verified_against_commit = "76c99a28b18c70a9f8393c1e8c42d81a4928fcb0"
+completion_commit = "a7f2b03270f0e4a163cd8f927cd56475c5062daf"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "The eight G0 jobs run on every pull request as a conservative superset of the plan's path-trigger obligations.",
+  "Two independent processes exercise separately initialized Rust hash-map state while only observable bytes are compared.",
+  "No Ling semantics, public diagnostic, schema/protocol marker, CLI behavior, Semantic ID, source span, or Unicode 17.0.0 data changed.",
+  "The v0.0.1 traceability corpus is validated because no v0.1 release authority exists.",
+  "No remote GitHub Actions result is claimed before push.",
+]
