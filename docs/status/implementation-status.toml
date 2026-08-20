@@ -1407,3 +1407,68 @@ notes = [
   "No Ling diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, grammar node, generated parser, or Unicode 17.0.0 table changed.",
   "ZQ-3203 indentation queries are now the next Ready editor-query task.",
 ]
+
+[[task]]
+id = "ZQ-3203"
+title = "Automatic indentation queries"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ZQ-3202"]
+spec = [
+  "AGENTS.md",
+  "docs/SEMANTICS.md",
+  "docs/decisions/0004-pipeline-syntax.md",
+  "docs/decisions/0005-seed-literals-and-delimiters.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/grammar-map.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "README.md",
+  "docs/status/ZQ-3203-IMPLEMENTATION-REPORT.md",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "editors/tree-sitter-ling/README.md",
+  "editors/tree-sitter-ling/package.json",
+  "editors/tree-sitter-ling/queries/indents.scm",
+  "editors/tree-sitter-ling/test/fixtures/indents/blocks.ling",
+  "editors/tree-sitter-ling/test/fixtures/indents/delimiters.ling",
+  "editors/tree-sitter-ling/test/fixtures/indents/pipeline.ling",
+  "editors/tree-sitter-ling/test/fixtures/indents/recovery.ling",
+  "editors/tree-sitter-ling/test/run-indent-tests.js",
+]
+acceptance = [
+  "indents.scm exposes exactly @indent, @start, and @end over 15 reviewed current CST node types",
+  "four fixtures lock 38 @indent, 14 @end, and 4 @start captures at exact source coordinates",
+  "DEC-0006 alignment is preserved: match-case markers and line-leading pipeline operators do not gain a competing level",
+  "relative two-space and four-space layouts, Chinese and decomposed identifiers, all requested delimiter forms, pipeline continuation, and emoji-prefix recovery passed",
+  "pinned current Zed commit cb1352a29d6c99226d942328c14fae9d3c5e0ded registers and applies @start/@end with the required boundaries",
+  "tree-sitter-cli 0.26.12 npm run verify: all 41 grammar, scanner/layout, 18 Unicode, 29 precedence, 41 Pattern/Type, 10 static recovery, 9 incremental edit, 64 mutation, 42 whole-program differential, 84 whole-corpus edit, 43 stable mapping, highlight, bracket, indentation, and local-example checks passed",
+  "generated Tree-sitter artifacts remained byte-identical after regeneration",
+  "cargo xtask governance check-all: all governance registries passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, 69 evidence records, 7 deferred differential paths",
+  "cargo xtask support verify, ci verify, seed reproduce, and status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the ZQ-3203 backlog transition",
+  "active Markdown link audit: all local inline links resolved with zero missing targets",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "git diff --check: passed",
+]
+verified_against_commit = "a4377450d26374098d95a9bb38520d3e3552dfd7"
+completion_commit = "a4377450d26374098d95a9bb38520d3e3552dfd7"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "ZQ-3203 changes only the Experimental Tree-sitter/Zed indentation-query surface; compiler layout validity and diagnostics remain authoritative.",
+  "The lower-authority zero fmt spelling is not propagated; no formatter command is claimed or implemented.",
+  "No Ling diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, grammar node, generated parser, or Unicode 17.0.0 table changed.",
+  "ZQ-3204 remains blocked because its required trait/impl outline surface lacks Accepted syntax and current CST nodes.",
+]
