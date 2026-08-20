@@ -686,3 +686,69 @@ notes = [
   "The v0.0.1 traceability corpus is validated because no v0.1 release authority exists.",
   "No remote GitHub Actions result is claimed before push.",
 ]
+
+[[task]]
+id = "TS-3101"
+title = "Grammar 规范映射表"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BASE-0001"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/RFC-0001.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0004-pipeline-syntax.md",
+  "docs/decisions/0005-seed-literals-and-delimiters.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0014-seed-prelude-option-result.md",
+]
+artifacts = [
+  "docs/grammar-map.md",
+  "docs/status/spec-gaps/GAP-SEED-BOOLEAN-OPERATORS-001.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/status/TS-3101-IMPLEMENTATION-REPORT.md",
+  "README.md",
+]
+acceptance = [
+  "grammar map: 52 mapped syntax rows, 8 private helpers, 8 deferred or rejected syntax groups",
+  "all mapped rows name compiler nodes, proposed Tree-sitter nodes, existing evidence, and planned corpus obligations",
+  "cargo xtask governance check-authority: 42 documents, 16 Accepted",
+  "cargo xtask governance check-gaps: 26 Open gaps, 6 G1 gates",
+  "cargo xtask governance check-all: 5 checks; 42 documents, 26 gaps, 17 lifecycle records, 18 protocols, 56 diagnostic codes",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 32 conformance fixtures, 51 evidence records, 7 deferred differential paths",
+  "cargo test --package xtask --locked --offline: 91 passed",
+  "cargo test --workspace --all-features --locked --offline: 234 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "active local Markdown targets: 754 resolved; frozen baseline excluded",
+]
+verified_against_commit = "b18501d2669048e685e91f7e1f5ce80528676604"
+completion_commit = "4d1b643bd1a971bcd01d101cd81411557d3c3074"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "The map is Active implementation evidence, not an Accepted language specification or Stable Tree-sitter protocol.",
+  "Foundational Draft syntax is labeled Seed baseline; GAP-GOV-RFC-STATUS-001 remains open.",
+  "GAP-SEED-BOOLEAN-OPERATORS-001 blocks TS-3105 from choosing &&/|| acceptance or precedence; TS-3102 must retain finite error behavior.",
+  "No Ling parser behavior, public diagnostic, schema/protocol marker, CLI behavior, Semantic ID, canonical bytes, source span, or Unicode 17.0.0 data changed.",
+]

@@ -29,8 +29,8 @@
 | 7 | `GOV-0108` | 建 1.0 支持矩阵草案 | 缺口、协议与追踪注册表 | 与 8 | **Done**；7 features、3 profiles、3 hosts、1 target、6 backends、1 std package、18 protocols、9 unsupported，生成物 drift 由 CI 检查 |
 | 8 | `GOV-0109` | Feature state 机器化 | 支持矩阵草案 | 与 7 | **Done**；9 tasks、7 features，docs/release-note/internal CLI views 与 registry drift 由 CI 检查 |
 | 9 | `GOV-0110` | 收敛 G0 CI 门禁 | 前述 G0 tasks | 否 | **Done**；8 named gates、19 commands、3 test hosts、Seed 4 surfaces/8 processes |
-| 10 | `TS-3101` | 语法→Tree-sitter 映射 | Accepted Seed 语法 | 与 G0 | 每 rule 有规范/corpus |
-| 11 | `TS-3102` | Tree-sitter 宽度优先骨架 | TS-3101 | 与架构工作 | `tree-sitter test` |
+| 10 | `TS-3101` | 语法→Tree-sitter 映射 | Accepted Seed 语法 | 与 G0 | **Done**；52 syntax rows、8 private helpers、8 deferred groups，均映射 compiler/corpus 边界 |
+| 11 | `TS-3102` | Tree-sitter 宽度优先骨架 | TS-3101 | 与架构工作 | **Ready**；`tree-sitter generate/test`，`&&`/`||` 保持 error input |
 | 12 | `PRJ-1101` | 最小项目 manifest | 包/模块 RFC | 否 | parse + stable diagnostics |
 | 13 | `VM-1201` | bytecode RFC/模型 | VM 语义 RFC | 与 test agent | opcode/encoding/verifier contract |
 | 14 | `INC-1401` | 增量 query ADR | 编译管线接口 | 与 corpus | query/invalidations 评审通过 |
@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1 Ready after G0：先领取 `TS-3101`；其余 project/VM/incremental/formatter/trait/LSP/Zed 仍服从各自接口与 RFC 前置
+G1：`TS-3101` Done，下一项 `TS-3102` Ready；`TS-3105` 受 `GAP-SEED-BOOLEAN-OPERATORS-001` 阻断，其余任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -163,11 +163,11 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2502` | G1/Editor | Cancellation | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:388` |
 | `LSP-2503` | G1/Editor | Debounce 与优先级 | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:395` |
 | `LSP-2504` | G1/Editor | Memory/resource limits | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:403` |
-| `TS-3101` | G1/Editor | Grammar 规范映射表 | S | Ready | `05-ZED-EXTENSION.md:154` |
+| `TS-3101` | G1/Editor | Grammar 规范映射表 | S | Done | `05-ZED-EXTENSION.md:154`；见 `docs/grammar-map.md`、机器状态与实施报告 |
 | `TS-3102` | G1/Editor | 宽度优先 grammar skeleton | — | Ready | `05-ZED-EXTENSION.md:165` |
 | `TS-3103` | G1/Editor | Offside/缩进策略 | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:187` |
 | `TS-3104` | G1/Editor | Unicode identifier | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:199` |
-| `TS-3105` | G1/Editor | Expression precedence | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:211` |
+| `TS-3105` | G1/Editor | Expression precedence | — | BlockedSpec | `05-ZED-EXTENSION.md:211`；`GAP-SEED-BOOLEAN-OPERATORS-001` |
 | `TS-3106` | G1/Editor | Pattern 与 Type | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:217` |
 | `TS-3107` | G1/Editor | Error recovery | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:221` |
 | `TS-3108` | G1/Editor | Grammar differential | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:234` |
