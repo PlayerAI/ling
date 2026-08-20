@@ -76,8 +76,8 @@ acceptance = [
   "local Markdown path targets: 87 resolved",
 ]
 verified_against_commit = "98024740450fbf5b8943fe31167fc8b03dfbafce"
-completion_commit = ""
-integration_state = "verified-uncommitted"
+completion_commit = "7bba2adf9104d7d7f96c7ef50343647f649e229e"
+integration_state = "committed"
 completed = "2026-08-20"
 notes = [
   "No compiler, runtime, editor, diagnostic, or language semantics changed.",
