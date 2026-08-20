@@ -24,7 +24,7 @@
 | 2 | `GOV-0102` | 建规范缺口台账 | 无 | 与 1/3/4 | **Done**；25 Open gaps、6 个 G1 门禁、marker 检查通过 |
 | 3 | `GOV-0104` | 盘点全部公开协议 | 无 | 与 1/2 | **Done**；18 项协议边界、版本/稳定级别与 checker 已落地 |
 | 4 | `GOV-0105` | 建错误码注册表 | Seed diagnostics | 与 1/2/3 | **Done**；55 active、1 retired，重复/改义/改型/回填/未注册 code CI 拒绝 |
-| 5 | `GOV-0107` | 建 traceability 模板 | 规范索引 | 与 3/4 | CI 验链接存在 |
+| 5 | `GOV-0107` | 建 traceability 模板 | 规范索引 | 与 3/4 | **Done**；7 features、32 fixtures、44 evidence，链接/极性/differential/report drift 由 CI 检查 |
 | 6 | `GOV-0109` | Feature state 机器化 | 支持矩阵草案 | 与 7 | CLI/docs 可读取 |
 | 7 | `TS-3101` | 语法→Tree-sitter 映射 | Accepted Seed 语法 | 与 G0 | 每 rule 有规范/corpus |
 | 8 | `TS-3102` | Tree-sitter 宽度优先骨架 | TS-3101 | 与架构工作 | `tree-sitter test` |
@@ -76,7 +76,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GOV-0104` | G0 | 公开接口与协议总盘点 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:125`；见机器状态与实施报告 |
 | `GOV-0105` | G0 | Diagnostic 错误码注册表 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:159`；见机器状态与实施报告 |
 | `GOV-0106` | G0 | Schema 生命周期与 golden corpus | L | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:188` |
-| `GOV-0107` | G0 | 统一追踪矩阵 | M | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:221` |
+| `GOV-0107` | G0 | 统一追踪矩阵 | M | Done | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:221`；见机器状态、生成矩阵与实施报告 |
 | `GOV-0108` | G0 | 1.0 支持矩阵草案 | M | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:240` |
 | `GOV-0109` | G0 | 发布状态机器可读化 | S | Ready | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:267` |
 | `GOV-0110` | G0 | G0 CI 门禁 | M | Ready after G0 foundation | `02-G0-GOVERNANCE-AND-COMPATIBILITY.md:281` |

@@ -277,3 +277,58 @@ notes = [
   "No emitted diagnostic code, meaning, severity, message, Fact value/type, Repair, span, CLI behavior, language semantics, Semantic ID, or Unicode 17.0.0 data changed.",
   "The CI workflow invokes all five governance checks; no remote CI result is claimed before push.",
 ]
+
+[[task]]
+id = "GOV-0107"
+title = "统一追踪矩阵"
+state = "Done"
+release = "G0"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0102", "GOV-0104"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0001.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/SEED-TRACEABILITY.md",
+  "docs/governance/authority.toml",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "docs/traceability/registry.toml",
+  "docs/traceability/TEMPLATE.md",
+  "docs/traceability/v0.0.1.md",
+  "tools/xtask/src/traceability.rs",
+  "crates/ling-cli/tests/conformance.rs",
+  "tests/conformance/*/expect.toml",
+  "docs/status/GOV-0107-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 32 conformance fixtures, 44 evidence records, 7 explicitly deferred differential paths",
+  "all 32 conformance fixture manifests carry unique stable TEST-CONF-* IDs, explicit polarity, feature links, and normative clauses",
+  "all 7 public features have Requirement/Spec, indexed authority, Core/schema, implementation, positive, negative, differential-state, and release-artifact links",
+  "cargo xtask governance check-authority: 37 documents, 16 Accepted",
+  "all other governance registries remain valid",
+  "cargo test --package xtask --locked --offline: 65 passed",
+  "cargo test --package ling-cli --test conformance --locked --offline: 9 passed across 32 fixtures",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --all-features --locked --offline: 205 passed",
+  "implementation-status.toml: 7 task records parsed; GOV-0107 is Done",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "local Markdown targets: 314 resolved",
+]
+verified_against_commit = "5f03405f066e68004d2451bfa21d4580827d71fd"
+completion_commit = "dcfc75a78333bc7ed8e020985d5419b1c21bc789"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "RFC-0001 remains Draft; the generated matrix displays that status and does not infer acceptance from the v0.0.1 release.",
+  "All current public Seed features are conservatively Experimental, despite the historical release tag.",
+  "Cross-engine differential coverage is explicitly Deferred because no second evaluator or VM exists; canonical round-trip and independent-process tests are not mislabeled as engine differential tests.",
+  "No Ling diagnostic, public schema, source span, language behavior, Semantic ID, Unicode 17.0.0 data, or dependency changed.",
+  "The CI workflow invokes the traceability gate; no remote CI result is claimed before push.",
+]
