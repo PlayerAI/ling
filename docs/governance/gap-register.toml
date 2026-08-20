@@ -74,6 +74,29 @@ superseded_by = ""
 observed_markers = []
 
 [[gap]]
+id = "GAP-SEED-BOOLEAN-OPERATORS-001"
+title = "Seed boolean operator syntax, precedence, and short-circuit boundary"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["TS-3105"]
+observable_behavior = "Draft SEMANTICS specifies short-circuit && and ||, while RFC-0001's Seed EBNF omits them and the compiler lexer has tokens that the parser rejects; an editor grammar cannot determine acceptance or precedence."
+authority = ["RFC-0001", "SEMANTICS"]
+candidate_rfcs = ["RFC-0001"]
+source_items = ["SEMANTICS-8.3", "RFC-0001-8:expression", "TS-3101:grammar-audit"]
+options = [
+  "Accept && and || for v0.1 with explicit precedence, associativity, short-circuit Typed Core lowering, diagnostics, and differential tests.",
+  "Explicitly defer the operators beyond v0.1, retain deterministic syntax errors, and correct the semantics and execution-plan claims.",
+]
+irreversible_consequences = ["Operator acceptance and precedence affect source parsing, evaluation order, formatter output, Tree-sitter CST compatibility, and future source migration."]
+required_evidence = ["positive", "negative", "migration", "precedence", "short-circuit", "compiler-tree-sitter-differential"]
+owner_role = "language-syntax-design"
+next_action = "Accept a syntax decision before TS-3105; TS-3102 must leave && and || as finite error input."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
 id = "GAP-PACKAGE-NAMESPACE-001"
 title = "Package namespace and domain ownership"
 status = "Open"

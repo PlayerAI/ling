@@ -6,8 +6,8 @@
 
 ## Summary
 
-- Total gaps: 25
-- Open: 25
+- Total gaps: 26
+- Open: 26
 - Proposed: 0
 - Accepted: 0
 - Rejected: 0
@@ -38,6 +38,7 @@
 | `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2104`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501` | `RFC-0004` |
 | `GAP-PACKAGE-NAMESPACE-001` | `P0` | `Open` | Package namespace and domain ownership | `PRJ-1101`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
 | `GAP-PACKAGE-PROTOCOL-001` | `P0` | `Open` | Project manifest, dependency graph, visibility, and lock protocol | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
+| `GAP-SEED-BOOLEAN-OPERATORS-001` | `P0` | `Open` | Seed boolean operator syntax, precedence, and short-circuit boundary | `TS-3105` | `RFC-0001` |
 | `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `P0` | `Open` | Semantic Hash algorithm, identity upgrade, and invalidation lifecycle | `INC-1406`, `INC-1409`, `GOV-0106` | `RFC-0004` |
 | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | `P0` | `Open` | Semantic Graph and Semantic Transaction protocol lifecycle | `GOV-0106`, `INC-1406`, `IDE-2306`, `IDE-2309` | `RFC-0004` |
 | `GAP-TRAIT-COHERENCE-001` | `P0` | `Open` | Base Trait coherence, orphan rules, solving, and lowering | `TRAIT-1301`, `TRAIT-1302`, `TRAIT-1303`, `TRAIT-1304`, `TRAIT-1305`, `TRAIT-1306`, `TRAIT-1307` | `RFC-0005` |
