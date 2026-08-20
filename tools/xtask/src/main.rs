@@ -3,6 +3,7 @@ mod gaps;
 mod governance;
 mod lifecycle;
 mod protocols;
+mod support;
 mod traceability;
 
 use std::env;
@@ -225,9 +226,75 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "support" && command == "verify" => {
+            match support::check_repository(&root) {
+                Ok(summary) => {
+                    println!(
+                        "support matrix OK: {} features, {} profiles, {} hosts, {} native targets, {} backends, {} standard packages, {} protocols, {} explicit unsupported records",
+                        summary.feature_count,
+                        summary.profile_count,
+                        summary.host_count,
+                        summary.native_target_count,
+                        summary.backend_count,
+                        summary.standard_package_count,
+                        summary.protocol_count,
+                        summary.unsupported_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "support" && command == "render" => {
+            match support::render_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "support" && command == "render-version-fixture" => {
+            match support::render_version_fixture_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "support" && command == "render-support-fixture" => {
+            match support::render_support_fixture_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>"
+                "Usage:\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

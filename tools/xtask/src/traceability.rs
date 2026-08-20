@@ -21,6 +21,14 @@ pub struct CheckSummary {
     pub deferred_differential_count: usize,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct FeatureRecord {
+    pub scope: String,
+    pub stability: String,
+}
+
+pub(crate) type FeatureRecords = BTreeMap<String, FeatureRecord>;
+
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Registry {
@@ -183,6 +191,37 @@ pub fn render_repository(root: &Path, release_id: &str) -> Result<String, Vec<St
             )]
         })?;
     finish(errors).map(|()| render(&registry, &authorities, &fixtures, release))
+}
+
+pub(crate) fn feature_records(
+    root: &Path,
+    release_id: &str,
+) -> Result<FeatureRecords, Vec<String>> {
+    let authorities = governance::document_records(root)?;
+    let registry = load_registry(root)?;
+    let (fixtures, mut errors) = discover_fixtures(root);
+    errors.extend(validate(
+        root,
+        &registry,
+        &authorities,
+        &fixtures,
+        release_id,
+    ));
+    finish(errors)?;
+    Ok(registry
+        .feature
+        .into_iter()
+        .filter(|feature| feature.release == release_id)
+        .map(|feature| {
+            (
+                feature.id,
+                FeatureRecord {
+                    scope: feature.scope,
+                    stability: feature.stability,
+                },
+            )
+        })
+        .collect())
 }
 
 fn load_registry(root: &Path) -> Result<Registry, Vec<String>> {

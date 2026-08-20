@@ -392,6 +392,19 @@ supersedes = []
 stable_basis = false
 
 [[document]]
+id = "SUPPORT-MATRIX"
+title = "Ling 1.0 support matrix draft"
+kind = "Governance registry"
+status = "Draft"
+version = "1.0-draft"
+authority = "Registry"
+path = "docs/governance/support-matrix.toml"
+covers = ["feature and profile stability", "host and target tiers", "backend and device tiers", "standard package stability", "protocol versions", "explicitly unsupported scope"]
+depends_on = ["GAP-REGISTER", "PROTOCOL-INVENTORY", "TRACEABILITY-REGISTER"]
+supersedes = []
+stable_basis = false
+
+[[document]]
 id = "SEED-TRACEABILITY"
 title = "v0.0.1 unified specification traceability"
 kind = "Evidence"

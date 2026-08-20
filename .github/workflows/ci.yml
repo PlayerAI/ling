@@ -40,6 +40,8 @@ jobs:
           cargo xtask governance check-error-codes
       - name: Verify release traceability
         run: cargo xtask traceability verify --release v0.0.1
+      - name: Verify support matrix
+        run: cargo xtask support verify
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Run Clippy

@@ -681,6 +681,7 @@ name = "xtask"
 version = "0.0.1-dev"
 dependencies = [
  "serde",
+ "serde_json",
  "sha2",
  "toml",
 ]

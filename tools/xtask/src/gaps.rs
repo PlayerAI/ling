@@ -114,6 +114,13 @@ pub fn render_repository(root: &Path) -> Result<String, Vec<String>> {
     finish(validate(root, &register, &authority)).map(|()| render(&register))
 }
 
+pub(crate) fn registered_gap_ids(root: &Path) -> Result<BTreeSet<String>, Vec<String>> {
+    let authority_statuses = governance::document_statuses(root)?;
+    let register = load_register(root)?;
+    finish(validate(root, &register, &authority_statuses))?;
+    Ok(register.gap.into_iter().map(|gap| gap.id).collect())
+}
+
 fn load_register(root: &Path) -> Result<GapRegister, Vec<String>> {
     let text = fs::read_to_string(root.join(MANIFEST_PATH)).map_err(|error| {
         vec![format!(

@@ -1,0 +1,474 @@
+schema_version = 1
+updated = "2026-08-20"
+matrix_target = "1.0-draft"
+status = "Draft"
+product = "ling"
+compiler_version = "0.0.1-dev"
+language_version = "0.0.1-dev"
+unicode_version = "17.0.0"
+traceability_release = "v0.0.1"
+protocol_inventory = "docs/governance/protocol-inventory.toml"
+report = "docs/governance/support-matrix.md"
+version_fixture = "tests/fixtures/support/version.governance.json"
+support_fixture = "tests/fixtures/support/support.governance.json"
+version_fixture_schema = "ling.governance.version-fixture/1"
+support_fixture_schema = "ling.governance.support-fixture/1"
+future_cli_commands = ["ling version --format json", "ling support --format json"]
+
+[tier_policy]
+tier1 = "Release-blocking build, full conformance, published artifacts, and an explicit compatibility commitment."
+tier2 = "Build and full workspace tests run in CI, but no downloadable-artifact or long-term compatibility commitment is made."
+tier3 = "Best-effort build evidence only; failures do not block release."
+unsupported = "No implementation or compatibility claim; callers must not infer fallback."
+
+[[feature]]
+id = "FTR-SEED-0001"
+current_state = "Implemented"
+stability = "Experimental"
+current_profiles = []
+candidate_1_0_profiles = ["Explore"]
+profile_note = "The Seed interpreter is unprofiled; Explore inclusion is a draft target, not current selectable-profile support."
+evidence = ["docs/traceability/v0.0.1.md"]
+
+[[feature]]
+id = "FTR-SEED-0002"
+current_state = "Implemented"
+stability = "Experimental"
+current_profiles = []
+candidate_1_0_profiles = ["Explore"]
+profile_note = "Diagnostics work in the unprofiled Seed toolchain; profile-specific severity and restrictions are not implemented."
+evidence = ["docs/traceability/v0.0.1.md", "docs/ERROR-CODES.md"]
+
+[[feature]]
+id = "FTR-SEED-0003"
+current_state = "Implemented"
+stability = "Experimental"
+current_profiles = []
+candidate_1_0_profiles = ["Explore"]
+profile_note = "Unicode 17 rules are implemented for Seed; profile-specific identifier policies remain unimplemented."
+evidence = ["docs/traceability/v0.0.1.md", "crates/ling-unicode/src/generated.rs"]
+
+[[feature]]
+id = "FTR-SEED-0004"
+current_state = "Implemented"
+stability = "Experimental"
+current_profiles = []
+candidate_1_0_profiles = ["Explore"]
+profile_note = "The current type/Place subset is Seed-only; Native and Critical subsets require later accepted decisions."
+evidence = ["docs/traceability/v0.0.1.md"]
+
+[[feature]]
+id = "FTR-SEED-0005"
+current_state = "Implemented"
+stability = "Experimental"
+current_profiles = []
+candidate_1_0_profiles = ["Explore"]
+profile_note = "Seed Effect/Capability checking exists without a selectable Profile; later profile allowlists are unresolved."
+evidence = ["docs/traceability/v0.0.1.md"]
+
+[[feature]]
+id = "FTR-SEED-0006"
+current_state = "Implemented"
+stability = "Experimental"
+current_profiles = []
+candidate_1_0_profiles = ["Explore"]
+profile_note = "Semantic Graph, canonical identity, and Audit remain Experimental/Preview protocols and are not Stable 1.x contracts."
+evidence = ["docs/traceability/v0.0.1.md", "docs/governance/protocol-inventory.toml"]
+
+[[feature]]
+id = "FTR-SEED-0007"
+current_state = "Implemented"
+stability = "Experimental"
+current_profiles = []
+candidate_1_0_profiles = ["Explore"]
+profile_note = "The shared Seed pipeline is tested on CI hosts, but no Profile selector, VM, Native target, or Critical verifier exists."
+evidence = ["docs/traceability/v0.0.1.md", ".github/workflows/ci.yml"]
+
+[[profile]]
+id = "Explore"
+current_state = "Unavailable"
+stability = "Experimental"
+selectable = false
+candidate_for_1_0 = true
+allowed_effects = []
+memory_models = []
+runtime_models = []
+explicitly_unsupported = [
+  "profile selection or validation",
+  "VM/JIT execution",
+  "general managed runtime or GC commitment",
+]
+sources = ["docs/LANGUAGE.md", "docs/SEMANTICS.md", "docs/ROADMAP-1.0.md"]
+
+[[profile]]
+id = "Native"
+current_state = "Unavailable"
+stability = "Experimental"
+selectable = false
+candidate_for_1_0 = true
+allowed_effects = []
+memory_models = []
+runtime_models = []
+explicitly_unsupported = [
+  "profile selection or validation",
+  "AOT or Native lowering",
+  "Managed Island",
+  "FFI or stable ABI",
+]
+sources = ["docs/LANGUAGE.md", "docs/SEMANTICS.md", "docs/ROADMAP-1.0.md"]
+
+[[profile]]
+id = "Critical"
+current_state = "Unavailable"
+stability = "Experimental"
+selectable = false
+candidate_for_1_0 = true
+allowed_effects = []
+memory_models = []
+runtime_models = []
+explicitly_unsupported = [
+  "Critical subset validation",
+  "bounded-time or bounded-memory guarantee",
+  "Node, Contract, model checking, or evidence bundle",
+]
+sources = ["docs/LANGUAGE.md", "docs/SEMANTICS.md", "docs/ROADMAP-1.0.md"]
+
+[[host_platform]]
+id = "HOST-WINDOWS-LATEST"
+platform = "Windows"
+runner = "windows-latest"
+architecture = "CI runner default; not a target commitment"
+tier = "Tier2"
+stability = "Experimental"
+compiler_build = true
+workspace_tests = true
+release_artifacts = false
+last_verified_commit = "652d19b9eaec2ab607edfe1a1e7ea742c861cf91"
+evidence = [".github/workflows/ci.yml", "docs/SEED-RELEASE-REPORT.md"]
+
+[[host_platform]]
+id = "HOST-LINUX-LATEST"
+platform = "Linux"
+runner = "ubuntu-latest"
+architecture = "CI runner default; not a target commitment"
+tier = "Tier2"
+stability = "Experimental"
+compiler_build = true
+workspace_tests = true
+release_artifacts = false
+last_verified_commit = "652d19b9eaec2ab607edfe1a1e7ea742c861cf91"
+evidence = [".github/workflows/ci.yml", "docs/SEED-RELEASE-REPORT.md"]
+
+[[host_platform]]
+id = "HOST-MACOS-LATEST"
+platform = "macOS"
+runner = "macos-latest"
+architecture = "CI runner default; not a target commitment"
+tier = "Tier2"
+stability = "Experimental"
+compiler_build = true
+workspace_tests = true
+release_artifacts = false
+last_verified_commit = "652d19b9eaec2ab607edfe1a1e7ea742c861cf91"
+evidence = [".github/workflows/ci.yml", "docs/SEED-RELEASE-REPORT.md"]
+
+[[native_target]]
+id = "TARGET-NATIVE-AOT"
+target = "No committed Ling Native target"
+tier = "Unsupported"
+stability = "Experimental"
+implemented = false
+backend = ""
+blockers = ["GAP-NATIVE-BACKEND-ABI-001", "GAP-OWNERSHIP-MODEL-001"]
+sources = ["docs/SEMANTICS.md", "docs/ROADMAP-1.0.md"]
+
+[[backend]]
+id = "BACKEND-INTERPRETER"
+kind = "Reference interpreter"
+device = "Host CPU"
+tier = "Tier2"
+stability = "Experimental"
+implemented = true
+profiles = []
+blockers = []
+sources = ["crates/ling-eval/src/lib.rs", "docs/traceability/v0.0.1.md"]
+
+[[backend]]
+id = "BACKEND-VM"
+kind = "Bytecode virtual machine"
+device = "Host CPU"
+tier = "Unsupported"
+stability = "Experimental"
+implemented = false
+profiles = []
+blockers = ["GAP-BYTECODE-SEMANTICS-001"]
+sources = ["docs/ROADMAP-1.0.md"]
+
+[[backend]]
+id = "BACKEND-NATIVE"
+kind = "Native AOT"
+device = "Host CPU"
+tier = "Unsupported"
+stability = "Experimental"
+implemented = false
+profiles = []
+blockers = ["GAP-NATIVE-BACKEND-ABI-001", "GAP-OWNERSHIP-MODEL-001"]
+sources = ["docs/ROADMAP-1.0.md"]
+
+[[backend]]
+id = "BACKEND-KERNEL-CPU"
+kind = "Kernel CPU reference/SIMD"
+device = "CPU"
+tier = "Unsupported"
+stability = "Experimental"
+implemented = false
+profiles = []
+blockers = ["GAP-KERNEL-DEVICE-001"]
+sources = ["docs/ROADMAP-1.0.md"]
+
+[[backend]]
+id = "BACKEND-GPU"
+kind = "Kernel GPU"
+device = "GPU"
+tier = "Unsupported"
+stability = "Experimental"
+implemented = false
+profiles = []
+blockers = ["GAP-KERNEL-DEVICE-001"]
+sources = ["docs/ROADMAP-1.0.md"]
+
+[[backend]]
+id = "BACKEND-ACCELERATOR"
+kind = "Kernel accelerator"
+device = "TPU/NPU/other accelerator"
+tier = "Unsupported"
+stability = "Experimental"
+implemented = false
+profiles = []
+blockers = ["GAP-KERNEL-DEVICE-001"]
+sources = ["docs/ROADMAP-1.0.md"]
+
+[[standard_package]]
+id = "STD-LING-PRELUDE"
+package = "Ling.Prelude"
+version = "0.0.1-dev"
+state = "BuiltinOnly"
+stability = "Preview"
+implemented = true
+packaged = false
+profiles = []
+authorities = ["DEC-0014"]
+evidence = ["crates/ling-resolve/src/lib.rs", "tests/conformance/p8-prelude-run/expect.toml"]
+explicitly_unsupported = [
+  "manifest-based installation or version selection",
+  "package registry distribution",
+  "profile-specific standard package surface",
+]
+
+[[protocol]]
+id = "PROTO-CLI"
+visibility = "Public"
+version = "0.0.1-dev"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-CLI-EXIT"
+visibility = "Public"
+version = "0.0.1-dev"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-HUMAN-OUTPUT"
+visibility = "Public"
+version = "0.0.1-dev"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-DIAGNOSTIC-JSON"
+visibility = "Public"
+version = "ling.diagnostic/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-SEMANTIC-GRAPH-JSON"
+visibility = "Public"
+version = "ling.semantic/0.1"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
+id = "PROTO-CANONICAL-BYTES"
+visibility = "Public"
+version = "v1 domain encodings"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
+id = "PROTO-SEMANTIC-ID"
+visibility = "Public"
+version = "experimental:blake3:"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
+id = "PROTO-AUDIT-SOURCE"
+visibility = "Public"
+version = "ling.audit/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-REPL-JSON"
+visibility = "Public"
+version = "ling.repl/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-INTERNAL-INCIDENT"
+visibility = "Internal"
+version = "ling.internal-incident/0.1"
+stability = "Internal"
+implemented = true
+
+[[protocol]]
+id = "PROTO-SEMANTIC-TRANSACTION"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
+id = "PROTO-PACKAGE-MANIFEST"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
+id = "PROTO-LOCKFILE"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
+id = "PROTO-BUILD-METADATA"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
+id = "PROTO-BYTECODE"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
+id = "PROTO-REPLAY"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
+id = "PROTO-ABI"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
+id = "PROTO-EVIDENCE"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[unsupported]]
+id = "UNSUP-PROFILE-SELECTION"
+area = "Profile"
+capability = "Explore, Native, or Critical selection/enforcement"
+reason = "The Seed CLI has no profile option and no profile validation pass."
+blockers = ["GAP-CRITICAL-PROFILE-001", "GAP-NATIVE-BACKEND-ABI-001"]
+sources = ["docs/SEMANTICS.md", "docs/ROADMAP-1.0.md"]
+
+[[unsupported]]
+id = "UNSUP-SUPPORT-CLI-JSON"
+area = "CLI/protocol"
+capability = "ling version --format json and ling support --format json"
+reason = "GOV-0108 generates internal governance fixtures only; no Accepted public JSON contract or CLI command exists."
+blockers = []
+sources = ["docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md"]
+
+[[unsupported]]
+id = "UNSUP-PACKAGES"
+area = "Project/package"
+capability = "Project manifest, lockfile, dependency resolver, package installation, or registry"
+reason = "Package identity and protocol semantics are unresolved."
+blockers = ["GAP-PACKAGE-NAMESPACE-001", "GAP-PACKAGE-PROTOCOL-001"]
+sources = ["docs/governance/gap-register.toml"]
+
+[[unsupported]]
+id = "UNSUP-VM"
+area = "Execution"
+capability = "Bytecode emission, verification, or VM execution"
+reason = "No accepted bytecode/verifier contract or implementation exists."
+blockers = ["GAP-BYTECODE-SEMANTICS-001"]
+sources = ["docs/governance/gap-register.toml"]
+
+[[unsupported]]
+id = "UNSUP-NATIVE-FFI"
+area = "Native"
+capability = "Native code generation, stable ABI, FFI, or target artifacts"
+reason = "Ownership, target, ABI, and FFI contracts are unresolved and unimplemented."
+blockers = ["GAP-OWNERSHIP-MODEL-001", "GAP-NATIVE-BACKEND-ABI-001"]
+sources = ["docs/governance/gap-register.toml"]
+
+[[unsupported]]
+id = "UNSUP-CONCURRENCY-REPLAY"
+area = "Concurrency/runtime"
+capability = "Task, Actor, remote delivery, supervision, or deterministic Replay"
+reason = "The corresponding semantics and runtime protocols remain future work."
+blockers = [
+  "GAP-STRUCTURED-TASK-001",
+  "GAP-ACTOR-AWAIT-REENTRY-001",
+  "GAP-ACTOR-REMOTE-DELIVERY-001",
+  "GAP-ACTOR-MAILBOX-SUPERVISOR-001",
+  "GAP-DETERMINISTIC-REPLAY-001",
+]
+sources = ["docs/governance/gap-register.toml"]
+
+[[unsupported]]
+id = "UNSUP-DEVICE"
+area = "Heterogeneous"
+capability = "Kernel, SIMD, GPU, TPU/NPU, Device Buffer, or Placement"
+reason = "No accepted Kernel/device subset, capability discovery, or backend exists."
+blockers = ["GAP-KERNEL-DEVICE-001"]
+sources = ["docs/governance/gap-register.toml"]
+
+[[unsupported]]
+id = "UNSUP-CRITICAL"
+area = "Critical"
+capability = "Critical Core, Node timing guarantees, Contract verification, model checking, or evidence bundles"
+reason = "The minimum verifiable Critical boundary remains unresolved and unimplemented."
+blockers = ["GAP-CRITICAL-PROFILE-001"]
+sources = ["docs/governance/gap-register.toml"]
+
+[[unsupported]]
+id = "UNSUP-LSP-EDITOR"
+area = "Tooling"
+capability = "LSP, Tree-sitter grammar, Zed extension, formatter, or semantic mutation"
+reason = "No corresponding executable, editor package, or accepted transaction boundary exists."
+blockers = [
+  "GAP-LSP-TRANSACTION-PROTOCOL-001",
+  "GAP-FORMATTER-AUTHOR-SOURCE-001",
+  "GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001",
+]
+sources = ["docs/governance/gap-register.toml"]

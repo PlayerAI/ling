@@ -951,6 +951,12 @@ fn code_candidates(text: &str) -> Vec<String> {
             index += 1;
             continue;
         }
+        if index > 0
+            && (bytes[index - 1].is_ascii_alphanumeric() || matches!(bytes[index - 1], b'_' | b'-'))
+        {
+            index += 2;
+            continue;
+        }
         let start = index;
         index += 2;
         let domain_start = index;
@@ -1253,6 +1259,7 @@ mod tests {
             code_candidates("L-LEX-0001 L-TYPE-12 ignore L-*"),
             ["L-LEX-0001", "L-TYPE-12"]
         );
+        assert!(code_candidates("GAP-KERNEL-DEVICE-001").is_empty());
     }
 
     #[test]

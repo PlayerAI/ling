@@ -1,0 +1,11 @@
+{
+  "schema": "ling.governance.version-fixture/1",
+  "proposed_command": "ling version --format json",
+  "implemented": false,
+  "product": "ling",
+  "compiler_version": "0.0.1-dev",
+  "language_version": "0.0.1-dev",
+  "unicode_version": "17.0.0",
+  "support_fixture_schema": "ling.governance.support-fixture/1",
+  "matrix_status": "Draft"
+}

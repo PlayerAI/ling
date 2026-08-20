@@ -54,6 +54,16 @@ pub struct CheckSummary {
     pub future_count: usize,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct ProtocolRecord {
+    pub visibility: String,
+    pub current_version: String,
+    pub stability: String,
+    pub implemented: bool,
+}
+
+pub(crate) type ProtocolRecords = BTreeMap<String, ProtocolRecord>;
+
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct ProtocolInventory {
@@ -123,6 +133,32 @@ pub fn render_repository(root: &Path) -> Result<String, Vec<String>> {
         REQUIRED_IDS,
     ))
     .map(|()| render(&inventory))
+}
+
+pub(crate) fn protocol_records(root: &Path) -> Result<ProtocolRecords, Vec<String>> {
+    let authority_statuses = governance::document_statuses(root)?;
+    let inventory = load_inventory(root)?;
+    finish(validate(
+        root,
+        &inventory,
+        &authority_statuses,
+        REQUIRED_IDS,
+    ))?;
+    Ok(inventory
+        .protocol
+        .into_iter()
+        .map(|protocol| {
+            (
+                protocol.id,
+                ProtocolRecord {
+                    visibility: protocol.visibility,
+                    current_version: protocol.current_version,
+                    stability: protocol.stability,
+                    implemented: protocol.implemented,
+                },
+            )
+        })
+        .collect())
 }
 
 fn load_inventory(root: &Path) -> Result<ProtocolInventory, Vec<String>> {
