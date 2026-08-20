@@ -50,6 +50,20 @@ pub struct CheckSummary {
     pub unsupported_count: usize,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct StatusFeatureRecord {
+    pub current_state: String,
+    pub stability: String,
+    pub current_profiles: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct StatusInputs {
+    pub features: BTreeMap<String, StatusFeatureRecord>,
+    pub supported_targets: BTreeSet<String>,
+    pub future_cli_command: String,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SupportMatrix {
@@ -316,6 +330,40 @@ pub fn render_version_fixture_repository(root: &Path) -> Result<String, Vec<Stri
 
 pub fn render_support_fixture_repository(root: &Path) -> Result<String, Vec<String>> {
     load_and_validate(root).map(|matrix| render_support_fixture(&matrix))
+}
+
+pub(crate) fn status_inputs(root: &Path) -> Result<StatusInputs, Vec<String>> {
+    let matrix = load_and_validate(root)?;
+    let features = matrix
+        .feature
+        .iter()
+        .map(|feature| {
+            (
+                feature.id.clone(),
+                StatusFeatureRecord {
+                    current_state: feature.current_state.clone(),
+                    stability: feature.stability.clone(),
+                    current_profiles: sorted_strings(&feature.current_profiles),
+                },
+            )
+        })
+        .collect();
+    let supported_targets = matrix
+        .native_target
+        .iter()
+        .filter(|target| target.implemented && target.tier != "Unsupported")
+        .map(|target| target.id.clone())
+        .collect();
+    let future_cli_command = matrix
+        .future_cli_commands
+        .get(1)
+        .cloned()
+        .unwrap_or_default();
+    Ok(StatusInputs {
+        features,
+        supported_targets,
+        future_cli_command,
+    })
 }
 
 fn load_and_validate(root: &Path) -> Result<SupportMatrix, Vec<String>> {
@@ -1249,6 +1297,12 @@ where
 {
     let mut values = values.iter().collect::<Vec<_>>();
     values.sort_by(|left, right| id(left).cmp(id(right)));
+    values
+}
+
+fn sorted_strings(values: &[String]) -> Vec<String> {
+    let mut values = values.to_vec();
+    values.sort();
     values
 }
 

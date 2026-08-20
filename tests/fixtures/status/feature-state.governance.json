@@ -1,0 +1,139 @@
+{
+  "schema": "ling.governance.feature-state-fixture/1",
+  "proposed_command": "ling support --format json",
+  "implemented": false,
+  "public_contract": false,
+  "generated_from": "docs/status/implementation-status.toml",
+  "release": "v0.0.1",
+  "feature_schema_version": 1,
+  "features": [
+    {
+      "id": "FTR-SEED-0001",
+      "title": {
+        "zh": "检查后执行与入口",
+        "en": "Checked execution and entry point"
+      },
+      "current_state": "Implemented",
+      "stability": "Experimental",
+      "implemented": true,
+      "tested": true,
+      "documented": true,
+      "blockers": [
+        "GAP-GOV-RFC-STATUS-001"
+      ],
+      "last_verified_commit": "652d19b9eaec2ab607edfe1a1e7ea742c861cf91",
+      "supported_profiles": [],
+      "supported_targets": []
+    },
+    {
+      "id": "FTR-SEED-0002",
+      "title": {
+        "zh": "检查、结构化诊断与稳定退出",
+        "en": "Checking, structured diagnostics, and stable exits"
+      },
+      "current_state": "Implemented",
+      "stability": "Experimental",
+      "implemented": true,
+      "tested": true,
+      "documented": true,
+      "blockers": [
+        "GAP-GOV-RFC-STATUS-001"
+      ],
+      "last_verified_commit": "652d19b9eaec2ab607edfe1a1e7ea742c861cf91",
+      "supported_profiles": [],
+      "supported_targets": []
+    },
+    {
+      "id": "FTR-SEED-0003",
+      "title": {
+        "zh": "Unicode 17 与中文标识符完整性",
+        "en": "Unicode 17 and Chinese identifier integrity"
+      },
+      "current_state": "Implemented",
+      "stability": "Experimental",
+      "implemented": true,
+      "tested": true,
+      "documented": true,
+      "blockers": [
+        "GAP-GOV-RFC-STATUS-001"
+      ],
+      "last_verified_commit": "652d19b9eaec2ab607edfe1a1e7ea742c861cf91",
+      "supported_profiles": [],
+      "supported_targets": []
+    },
+    {
+      "id": "FTR-SEED-0004",
+      "title": {
+        "zh": "Seed 类型、模式与 Place",
+        "en": "Seed types, patterns, and Place"
+      },
+      "current_state": "Implemented",
+      "stability": "Experimental",
+      "implemented": true,
+      "tested": true,
+      "documented": true,
+      "blockers": [
+        "GAP-GOV-RFC-STATUS-001"
+      ],
+      "last_verified_commit": "652d19b9eaec2ab607edfe1a1e7ea742c861cf91",
+      "supported_profiles": [],
+      "supported_targets": []
+    },
+    {
+      "id": "FTR-SEED-0005",
+      "title": {
+        "zh": "Effect 与 Capability 检查",
+        "en": "Effect and Capability checking"
+      },
+      "current_state": "Implemented",
+      "stability": "Experimental",
+      "implemented": true,
+      "tested": true,
+      "documented": true,
+      "blockers": [
+        "GAP-GOV-RFC-STATUS-001"
+      ],
+      "last_verified_commit": "652d19b9eaec2ab607edfe1a1e7ea742c861cf91",
+      "supported_profiles": [],
+      "supported_targets": []
+    },
+    {
+      "id": "FTR-SEED-0006",
+      "title": {
+        "zh": "Semantic Graph、Canonical ID 与 Audit",
+        "en": "Semantic Graph, canonical identity, and Audit"
+      },
+      "current_state": "Implemented",
+      "stability": "Experimental",
+      "implemented": true,
+      "tested": true,
+      "documented": true,
+      "blockers": [
+        "GAP-GOV-RFC-STATUS-001",
+        "GAP-SEMANTIC-HASH-LIFECYCLE-001",
+        "GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001"
+      ],
+      "last_verified_commit": "652d19b9eaec2ab607edfe1a1e7ea742c861cf91",
+      "supported_profiles": [],
+      "supported_targets": []
+    },
+    {
+      "id": "FTR-SEED-0007",
+      "title": {
+        "zh": "共享管线、离线构建与稳定性门禁",
+        "en": "Shared pipeline, offline build, and stability gates"
+      },
+      "current_state": "Implemented",
+      "stability": "Experimental",
+      "implemented": true,
+      "tested": true,
+      "documented": true,
+      "blockers": [
+        "GAP-GOV-RFC-STATUS-001"
+      ],
+      "last_verified_commit": "652d19b9eaec2ab607edfe1a1e7ea742c861cf91",
+      "supported_profiles": [],
+      "supported_targets": []
+    }
+  ]
+}

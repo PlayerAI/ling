@@ -36,6 +36,7 @@ cargo xtask governance check-protocols
 cargo xtask governance check-error-codes
 cargo xtask traceability verify --release v0.0.1
 cargo xtask support verify
+cargo xtask status verify
 cargo run --locked --offline -- --version
 ```
 
@@ -181,6 +182,8 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md)：RFC 与 decision 的状态机、稳定实现依据、接受证据、替代关系和模板门禁。
 - [`docs/governance/protocol-inventory.md`](docs/governance/protocol-inventory.md)：CLI、JSON、Semantic ID、Audit、内部产物及 Future 协议的版本、稳定级别、reader/writer 和迁移边界。
 - [`docs/governance/support-matrix.md`](docs/governance/support-matrix.md)：由机器清单生成的 Ling 1.0 支持矩阵草案，明确区分当前证据、候选范围与不支持范围；JSON fixtures 是未实现 CLI 的内部非契约占位。
+- [`docs/status/implementation-status.md`](docs/status/implementation-status.md)：由任务与功能状态注册表生成的当前 implemented/tested/documented、稳定化阻断项、Profile/target 声明及完成 commit。
+- [`docs/status/release-status.md`](docs/status/release-status.md)：从同一状态注册表生成的发布说明输入片段；它不是发布公告或稳定性承诺。
 - [`docs/design-review.html`](docs/design-review.html)：针对上述规范的设计评审记录；它是非规范性意见，不替代已接受的 RFC。
 
 ### 规范权威顺序
@@ -255,6 +258,7 @@ cargo xtask governance check-protocols
 cargo xtask governance check-error-codes
 cargo xtask traceability verify --release v0.0.1
 cargo xtask support verify
+cargo xtask status verify
 cargo run --locked --offline -- --version
 ```
 
@@ -400,6 +404,8 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 - [`docs/governance/lifecycle.md`](docs/governance/lifecycle.md): the RFC/decision state machine, Stable implementation basis, acceptance evidence, supersession rules, and checked templates.
 - [`docs/governance/protocol-inventory.md`](docs/governance/protocol-inventory.md): versions, stability levels, reader/writer rules, and migration boundaries for CLI, JSON, Semantic ID, Audit, internal artifacts, and Future protocols.
 - [`docs/governance/support-matrix.md`](docs/governance/support-matrix.md): the generated Ling 1.0 support-matrix draft, separating current evidence, candidate scope, and unsupported scope; its JSON fixtures are internal non-contract placeholders for unimplemented CLI commands.
+- [`docs/status/implementation-status.md`](docs/status/implementation-status.md): generated current implemented/tested/documented state, stabilization blockers, Profile/target claims, and completion commits for tasks and features.
+- [`docs/status/release-status.md`](docs/status/release-status.md): a release-note input fragment generated from the same registry; it is not a release announcement or stability promise.
 - [`docs/design-review.html`](docs/design-review.html): a non-normative design review of the specifications; it does not replace an accepted RFC.
 
 ### Authority order

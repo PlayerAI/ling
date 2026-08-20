@@ -23,8 +23,11 @@ pub struct CheckSummary {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct FeatureRecord {
+    pub title_zh: String,
+    pub title_en: String,
     pub scope: String,
     pub stability: String,
+    pub last_verified_commit: String,
 }
 
 pub(crate) type FeatureRecords = BTreeMap<String, FeatureRecord>;
@@ -208,6 +211,16 @@ pub(crate) fn feature_records(
         release_id,
     ));
     finish(errors)?;
+    let last_verified_commit = registry
+        .release
+        .iter()
+        .find(|release| release.id == release_id)
+        .map(|release| release.candidate_commit.clone())
+        .ok_or_else(|| {
+            vec![format!(
+                "GOV-TRACE-0003: release {release_id} is not registered in {MANIFEST_PATH}"
+            )]
+        })?;
     Ok(registry
         .feature
         .into_iter()
@@ -216,8 +229,11 @@ pub(crate) fn feature_records(
             (
                 feature.id,
                 FeatureRecord {
+                    title_zh: feature.title_zh,
+                    title_en: feature.title_en,
                     scope: feature.scope,
                     stability: feature.stability,
+                    last_verified_commit: last_verified_commit.clone(),
                 },
             )
         })

@@ -341,14 +341,14 @@ stable_basis = false
 
 [[document]]
 id = "TASK-STATUS"
-title = "Implementation task status registry"
+title = "Implementation task and feature status registry"
 kind = "Status registry"
 status = "Active"
-version = "1"
+version = "2"
 authority = "Registry"
 path = "docs/status/implementation-status.toml"
-covers = ["task lifecycle", "verification evidence"]
-depends_on = ["EXECUTION-PLAN-1.0"]
+covers = ["task lifecycle", "feature state", "implementation, test, and documentation evidence", "stabilization blockers", "supported Profile and target claims", "generated status consumers"]
+depends_on = ["EXECUTION-PLAN-1.0", "GAP-REGISTER", "SUPPORT-MATRIX", "TRACEABILITY-REGISTER"]
 supersedes = []
 stable_basis = false
 
