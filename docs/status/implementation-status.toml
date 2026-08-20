@@ -1836,3 +1836,69 @@ notes = [
   "Unicode remains 17.0.0, no third-party version changed, and normal builds/tests remain locked and offline.",
   "PRJ-1106 project fixtures are now the next Ready project slice; CLI integration, graph fuzzing, registry, Git, network, publication, and future source kinds remain deferred.",
 ]
+
+[[task]]
+id = "PRJ-1106"
+title = "End-to-end project fixture matrix"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1101", "PRJ-1102", "PRJ-1103", "PRJ-1104", "PRJ-1105"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  ".gitattributes",
+  "crates/ling-project/tests/project_fixtures.rs",
+  "docs/IMPLEMENTATION.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/status/PRJ-1106-IMPLEMENTATION-REPORT.md",
+  "tests/fixtures/support/support.governance.json",
+  "tests/projects/README.md",
+  "tests/projects/single-package",
+  "tests/projects/multi-module",
+  "tests/projects/path-dependency",
+  "tests/projects/cycle",
+  "tests/projects/visibility",
+  "tests/projects/offline-lock",
+  "tests/projects/unicode-names",
+]
+acceptance = [
+  "all seven plan-mandated project fixture directories exist and are enumerated by one closed end-to-end harness",
+  "every fixture has a strict expect.toml contract and exact ordered expected-diagnostics.json; five successes freeze graph and lock bytes while two failures explicitly require graph/lock absence",
+  "single-package, multi-module, exported path dependency, package cycle, private dependency module, checked-in locked offline resolution, and Unicode module/path/display/source behavior are covered",
+  "each normal test resolves from a temporary physical root, compares path-free graph and lock bytes, and never modifies checked-in project sources",
+  "path-dependency expected.ling.lock is byte-equal to the independent schemas/lock/1 canonical golden",
+  "cycle freezes L-PROJECT-0014 with alpha -> beta -> alpha and visibility freezes L-PROJECT-0017 with exact bilingual output, Facts, and original UTF-8 spans",
+  "project fixture text is pinned to LF and lock artifacts to raw bytes so checkout conversion cannot change content identities or canonical locks",
+  "cargo test -p ling-project --all-features --locked --offline: 16 unit and 45 integration tests passed; one explicit snapshot writer ignored",
+  "cargo xtask governance check-all: 45 authority documents, 26 gaps, 20 lifecycle records, 20 protocols, and 76 diagnostic-code records passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: 5 schemas, 6 valid, 19 invalid, 3 canonical, 5 NoPreviousVersion, and 36 mutations passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, and 69 evidence records passed",
+  "cargo xtask support verify, ci verify, seed reproduce, and pre-completion status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified after the PRJ-1106 backlog transition",
+  "cargo test --workspace --all-features --locked --offline: all unit, integration, conformance, governance, and documentation tests passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "Unicode generator rerun was byte-idempotent and git diff --check passed",
+]
+verified_against_commit = "0e9c5800411a6f1acd1441068e6ce2fd58f29816"
+completion_commit = "0e9c5800411a6f1acd1441068e6ce2fd58f29816"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "PRJ-1106 adds test evidence only; no production language, graph, lock, CLI, or evaluation behavior changed.",
+  "The expected graph projection is test-only and creates no public schema or compatibility promise.",
+  "Diagnostic JSON remains ling.diagnostic/0.1 and no diagnostic allocation changed; exact existing project failures are newly frozen.",
+  "Unicode remains 17.0.0, no dependency changed, and fixture checkout bytes are now explicitly cross-platform deterministic.",
+  "PRJ-1108 graph/lock property and fuzz work is Ready against the completed library interfaces; PRJ-1107 remains blocked on unspecified project test/build CLI behavior.",
+]

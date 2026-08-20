@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1105` Done；`PRJ-1106` Ready，下一步建立完整 project fixture matrix 与 expected graph/diagnostic/lock 证据；后续任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1106` Done；`PRJ-1108` Ready，可基于已冻结的 project/graph/lock 接口开展 property 与 fuzz；`PRJ-1107` 的 project `test`/`build` CLI 行为仍需先冻结，后续任务继续服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -88,9 +88,9 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PRJ-1103` | G1/Editor | Import 与 visibility | M | Done | `03-G1-V0.1-LIVING.md:89`；见 package-aware resolver、`ling.semantic/0.2`、resolution-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1104` | G1/Editor | Dependency graph | L | Done | `03-G1-V0.1-LIVING.md:97`；见 `ling-project` package graph、dependency-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1105` | G1/Editor | Lock file | L | Done | `03-G1-V0.1-LIVING.md:107`；见 `ling-project` lockfile reader/writer、`schemas/lock/1` corpus、机器状态与实施报告 |
-| `PRJ-1106` | G1/Editor | Project fixtures | — | Ready | `03-G1-V0.1-LIVING.md:116`；PRJ-1101～PRJ-1105 已提供 manifest、module、visibility、graph 与 lock 接口 |
+| `PRJ-1106` | G1/Editor | Project fixtures | M | Done | `03-G1-V0.1-LIVING.md:116`；见七组命名 fixture、expected diagnostics/graph/lock、机器状态与实施报告 |
 | `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:132` |
-| `PRJ-1108` | G1/Editor | Project graph fuzz/property | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:140` |
+| `PRJ-1108` | G1/Editor | Project graph fuzz/property | — | Ready | `03-G1-V0.1-LIVING.md:140`；PRJ-1101～PRJ-1106 已冻结 manifest、path、graph、cycle 与 lock 测试接口 |
 | `VM-1201` | G1/Editor | bytecode RFC 与模型 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:150` |
 | `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:166` |
 | `VM-1203` | G1/Editor | 独立 decoder/verifier | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:180` |
