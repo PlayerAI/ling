@@ -1,0 +1,8 @@
+valid = true
+name = "hello"
+version = "0.1.0"
+language = "0.1"
+roots = ["src"]
+entry = "Main"
+exports = []
+dependencies = []

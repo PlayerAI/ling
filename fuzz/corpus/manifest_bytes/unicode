@@ -1,0 +1,17 @@
+manifest-version = 1
+
+[package]
+name = "game-core"
+display-name = "凌云游戏核心"
+version = "1.2.3"
+language = "0.1"
+
+[source]
+roots = ["资源", "src"]
+entry = "主程序.Main"
+
+[exports]
+modules = ["公共.人物"]
+
+[dependencies]
+math = { path = "deps/math" }

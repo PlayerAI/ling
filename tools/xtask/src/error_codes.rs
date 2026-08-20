@@ -746,9 +746,14 @@ fn validate_evolution(registry: &Registry, lock: &CompatibilityLock) -> Vec<Stri
             Some(high_water) if number <= *high_water => errors.push(format!(
                 "GOV-DIAG-0007: new code {code} does not advance {domain} high-water mark {high_water:04}"
             )),
-            None if number != 1 => errors.push(format!(
-                "GOV-DIAG-0007: first allocation in new domain {domain} must be 0001, found {number:04}"
-            )),
+            None
+                if number != 1
+                    && !current.contains_key(&format!("L-{domain}-0001")) =>
+            {
+                errors.push(format!(
+                    "GOV-DIAG-0007: first allocation in new domain {domain} must be 0001, found {number:04}"
+                ));
+            }
             _ => {}
         }
     }
@@ -1244,6 +1249,19 @@ mod tests {
     }
 
     #[test]
+    fn lock_evolution_allows_multiple_codes_in_a_new_domain() {
+        let original_row = active("L-LEX-0001");
+        let original = parse(&[&original_row]);
+        let lock = toml::from_str(&render_lock(&original)).expect("valid generated lock");
+
+        let first = active("L-PROJECT-0001");
+        let second = active("L-PROJECT-0002");
+        let evolved = parse(&[&original_row, &first, &second]);
+
+        assert!(validate_evolution(&evolved, &lock).is_empty());
+    }
+
+    #[test]
     fn lock_rendering_is_sorted_and_deterministic() {
         let first = active("L-TYPE-0001");
         let second = active("L-LEX-0001");
@@ -1292,9 +1310,9 @@ mod tests {
             .and_then(Path::parent)
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("repository diagnostic registry is valid");
-        assert_eq!(summary.active_count, 55);
+        assert_eq!(summary.active_count, 62);
         assert_eq!(summary.retired_count, 1);
-        assert_eq!(summary.domain_count, 13);
-        assert_eq!(summary.rust_constant_count, 55);
+        assert_eq!(summary.domain_count, 14);
+        assert_eq!(summary.rust_constant_count, 62);
     }
 }

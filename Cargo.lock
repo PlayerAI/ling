@@ -264,6 +264,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "ling-project"
+version = "0.0.1-dev"
+dependencies = [
+ "ling-diagnostics",
+ "ling-unicode",
+ "serde",
+ "serde_json",
+ "toml",
+ "unicode-normalization",
+]
+
+[[package]]
 name = "ling-resolve"
 version = "0.0.1-dev"
 dependencies = [

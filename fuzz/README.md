@@ -14,6 +14,7 @@ Targets:
 - `source_bytes`: arbitrary bytes through UTF-8/BOM/newline source decoding;
 - `lexer_utf8`: valid UTF-8 through Source and Lexer/Layout;
 - `parser_utf8`: valid UTF-8 through Source, Parser/CST, and valid-CST AST lowering.
+- `manifest_bytes`: arbitrary bytes through the bounded `ling.toml` version 1 reader and Diagnostic JSON rendering.
 
 Run a deterministic corpus smoke pass:
 
@@ -21,6 +22,7 @@ Run a deterministic corpus smoke pass:
 cargo +nightly-2026-08-15 fuzz run source_bytes fuzz/corpus/source_bytes -- -runs=256
 cargo +nightly-2026-08-15 fuzz run lexer_utf8 fuzz/corpus/lexer_utf8 -- -runs=256
 cargo +nightly-2026-08-15 fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256
+cargo +nightly-2026-08-15 fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256
 ```
 
 Long-running jobs must use a separate artifact directory and retain minimized

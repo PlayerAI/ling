@@ -137,6 +137,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 │   ├── ling-source/
 │   ├── ling-unicode/
 │   ├── ling-diagnostics/
+│   ├── ling-project/
 │   ├── ling-syntax/
 │   ├── ling-ast/
 │   ├── ling-hir/
@@ -150,7 +151,8 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 ├── editors/
 │   └── tree-sitter-ling/
 ├── tests/
-│   └── conformance/
+│   ├── conformance/
+│   └── projects/
 ├── tools/
 │   ├── unicode-gen/
 │   └── xtask/
@@ -369,6 +371,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 │   ├── ling-source/
 │   ├── ling-unicode/
 │   ├── ling-diagnostics/
+│   ├── ling-project/
 │   ├── ling-syntax/
 │   ├── ling-ast/
 │   ├── ling-hir/
@@ -382,7 +385,8 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 ├── editors/
 │   └── tree-sitter-ling/
 ├── tests/
-│   └── conformance/
+│   ├── conformance/
+│   └── projects/
 ├── tools/
 │   ├── unicode-gen/
 │   └── xtask/

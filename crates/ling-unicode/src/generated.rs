@@ -1140,6 +1140,20 @@ pub(crate) const VARIATION_SELECTOR: &[CodepointRange] = &[
     CodepointRange::new(0xE0100, 0xE01EF),
 ];
 
+pub(crate) const WHITE_SPACE: &[CodepointRange] = &[
+    CodepointRange::new(0x9, 0xD),
+    CodepointRange::new(0x20, 0x20),
+    CodepointRange::new(0x85, 0x85),
+    CodepointRange::new(0xA0, 0xA0),
+    CodepointRange::new(0x1680, 0x1680),
+    CodepointRange::new(0x2000, 0x200A),
+    CodepointRange::new(0x2028, 0x2028),
+    CodepointRange::new(0x2029, 0x2029),
+    CodepointRange::new(0x202F, 0x202F),
+    CodepointRange::new(0x205F, 0x205F),
+    CodepointRange::new(0x3000, 0x3000),
+];
+
 pub(crate) const SCRIPTS: &[NamedRange] = &[
     NamedRange::new(0x0, 0x1F, &["Zyyy"]),
     NamedRange::new(0x20, 0x20, &["Zyyy"]),

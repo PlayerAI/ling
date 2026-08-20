@@ -10,6 +10,7 @@ cargo-fuzz = true
 [dependencies]
 libfuzzer-sys = "0.4.13"
 ling-ast = { path = "../crates/ling-ast" }
+ling-project = { path = "../crates/ling-project" }
 ling-source = { path = "../crates/ling-source" }
 ling-syntax = { path = "../crates/ling-syntax" }
 
@@ -30,6 +31,13 @@ bench = false
 [[bin]]
 name = "parser_utf8"
 path = "fuzz_targets/parser_utf8.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "manifest_bytes"
+path = "fuzz_targets/manifest_bytes.rs"
 test = false
 doc = false
 bench = false

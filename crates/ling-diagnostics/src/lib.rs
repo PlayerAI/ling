@@ -62,6 +62,17 @@ pub mod codes {
     pub const INVALID_ENTRY_MODULE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0001");
     pub const MISSING_MAIN: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0002");
     pub const INVALID_MAIN_SIGNATURE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0003");
+    pub const INVALID_PROJECT_MANIFEST_BYTES: DiagnosticCode =
+        DiagnosticCode::new("L-PROJECT-0001");
+    pub const INVALID_PROJECT_MANIFEST_STRUCTURE: DiagnosticCode =
+        DiagnosticCode::new("L-PROJECT-0002");
+    pub const UNSUPPORTED_PROJECT_MANIFEST_VERSION: DiagnosticCode =
+        DiagnosticCode::new("L-PROJECT-0003");
+    pub const INVALID_PROJECT_PACKAGE_METADATA: DiagnosticCode =
+        DiagnosticCode::new("L-PROJECT-0004");
+    pub const INVALID_PROJECT_SOURCE_LAYOUT: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0005");
+    pub const INVALID_PROJECT_EXPORT: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0006");
+    pub const INVALID_PROJECT_DEPENDENCY: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0007");
     pub const RUNTIME_FAULT: DiagnosticCode = DiagnosticCode::new("L-RUNTIME-0001");
     pub const AUDIT_SYNTAX: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0001");
     pub const AUDIT_VERSION: DiagnosticCode = DiagnosticCode::new("L-AUDIT-0002");

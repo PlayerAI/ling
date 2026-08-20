@@ -1,0 +1,9 @@
+valid = true
+name = "game-core"
+display_name = "凌云游戏核心"
+version = "12.34.56"
+language = "0.1"
+roots = ["generated", "src"]
+entry = "主程序.Main"
+exports = ["公共.人物", "公共.数学"]
+dependencies = ["math=deps/math", "ui=deps/ui"]

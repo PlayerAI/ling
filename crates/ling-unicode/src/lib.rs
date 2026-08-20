@@ -80,6 +80,24 @@ pub fn is_identifier_continue(character: char) -> bool {
     unicode_ident::is_xid_continue(character)
 }
 
+/// Returns whether a scalar has the Unicode 17 `Bidi_Control` property.
+#[must_use]
+pub fn is_bidi_control(character: char) -> bool {
+    tables::contains(generated::BIDI_CONTROL, character)
+}
+
+/// Returns whether a scalar has the Unicode 17 `Default_Ignorable_Code_Point` property.
+#[must_use]
+pub fn is_default_ignorable(character: char) -> bool {
+    tables::contains(generated::DEFAULT_IGNORABLE_CODE_POINT, character)
+}
+
+/// Returns whether a scalar has the Unicode 17 `White_Space` property.
+#[must_use]
+pub fn is_white_space(character: char) -> bool {
+    tables::contains(generated::WHITE_SPACE, character)
+}
+
 /// A validated identifier together with its source spelling and semantic name.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Identifier {
@@ -464,6 +482,16 @@ mod tests {
         assert_eq!(unicode_normalization::UNICODE_VERSION, (17, 0, 0));
         assert_eq!(UNICODE_VERSION.to_string(), "17.0.0");
         assert_eq!(unicode_data_checksums().len(), 11);
+    }
+
+    #[test]
+    fn exposes_pinned_display_name_security_properties() {
+        assert!(is_bidi_control('\u{202e}'));
+        assert!(!is_bidi_control('中'));
+        assert!(is_default_ignorable('\u{200b}'));
+        assert!(!is_default_ignorable('文'));
+        assert!(is_white_space('\u{3000}'));
+        assert!(!is_white_space('文'));
     }
 
     #[test]

@@ -1,0 +1,10 @@
+manifest-version = 1
+
+[package]
+name = "Hello"
+version = "0.1.0"
+language = "0.1"
+
+[source]
+roots = ["src"]
+entry = "Main"

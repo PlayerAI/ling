@@ -8,6 +8,7 @@ members = [
     "crates/ling-eval",
     "crates/ling-format",
     "crates/ling-hir",
+    "crates/ling-project",
     "crates/ling-resolve",
     "crates/ling-semantic",
     "crates/ling-source",

@@ -171,6 +171,7 @@ fn load_database(root: &Path) -> Result<Database, Box<dyn Error>> {
         "Bidi_Control",
         "Join_Control",
         "Variation_Selector",
+        "White_Space",
         "Pattern_Syntax",
         "Pattern_White_Space",
         "Deprecated",
