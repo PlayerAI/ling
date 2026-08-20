@@ -1902,3 +1902,73 @@ notes = [
   "Unicode remains 17.0.0, no dependency changed, and fixture checkout bytes are now explicitly cross-platform deterministic.",
   "PRJ-1108 graph/lock property and fuzz work is Ready against the completed library interfaces; PRJ-1107 remains blocked on unspecified project test/build CLI behavior.",
 ]
+
+[[task]]
+id = "PRJ-1108"
+title = "Project graph property and manifest fuzz coverage"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1101", "PRJ-1102", "PRJ-1103", "PRJ-1104", "PRJ-1105", "PRJ-1106"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  ".gitattributes",
+  ".github/workflows/ci.yml",
+  "crates/ling-project/tests/project_properties.rs",
+  "docs/IMPLEMENTATION.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/status/PRJ-1108-IMPLEMENTATION-REPORT.md",
+  "fuzz/Cargo.lock",
+  "fuzz/README.md",
+  "fuzz/corpus/manifest_bytes/malformed",
+  "fuzz/corpus/manifest_bytes/minimal",
+  "fuzz/corpus/manifest_bytes/path-traversal",
+  "fuzz/corpus/manifest_bytes/unicode",
+  "fuzz/fuzz_targets/manifest_bytes.rs",
+  "tests/fixtures/support/support.governance.json",
+  "tools/xtask/src/ci.rs",
+]
+acceptance = [
+  "128 generated module graphs match an independent cycle oracle, including exactly 64 cyclic and 64 acyclic cases",
+  "64 generated acyclic projects created in opposite file orders produce equal package graphs, graph identities, lock models, and canonical lock bytes",
+  "128 generated canonical logical paths are preserved exactly and 1152 traversal, separator, host-prefix, URI-like, and non-NFC variants are rejected without rewriting",
+  "every generated canonical lock decodes to the same model, re-encodes to the same bytes, and matches its resolved package graph",
+  "manifest_bytes decodes arbitrary input under two diagnostic source labels and requires equal success models or equal failure codes and original byte spans",
+  "four reviewed manifest corpus seeds are preserved as opaque checkout bytes and the pinned offline Ubuntu CI fuzz gate now runs manifest_bytes for 256 iterations",
+  "cargo test -p ling-project --all-features --locked --offline: 16 unit and 48 integration tests passed; one explicit snapshot writer ignored",
+  "cargo +1.85 test -p ling-project --test project_properties --locked --offline: 3 generated properties passed",
+  "cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline: all four fuzz targets passed",
+  "Windows ASan manifest_bytes seed replay and deterministic 256-run smoke with seed 1108 passed",
+  "cargo test --workspace --all-features --locked --offline and cargo test -p xtask --locked --offline passed",
+  "cargo xtask governance check-all: 45 authority documents, 26 gaps, 20 lifecycle records, 20 protocols, and 76 diagnostic-code records passed",
+  "cargo xtask schema validate-all, compatibility, and corrupt-inputs: 5 schemas, 6 valid, 19 invalid, 3 canonical, 5 NoPreviousVersion, and 36 mutations passed",
+  "cargo xtask traceability verify --release v0.0.1: 7 features, 42 conformance fixtures, and 69 evidence records passed",
+  "cargo xtask support verify, ci verify, seed reproduce, and pre-completion status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified and completion status: 29 tasks Done",
+  "cargo fmt --all -- --check and git diff --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "Unicode generator rerun was byte-idempotent",
+]
+verified_against_commit = "29f9c4465b58c7eff23c227436563d69409b880e"
+completion_commit = "29f9c4465b58c7eff23c227436563d69409b880e"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "PRJ-1108 adds tests, fuzz invariants, CI coverage, and governance evidence only; no production language, project, lock, CLI, or evaluation behavior changed.",
+  "The path property follows RFC-0002 validation semantics and does not introduce silent normalization or rewriting.",
+  "No diagnostic allocation, public schema, protocol version, Seed/package-aware Semantic ID, workspace dependency, or third-party version changed.",
+  "Unicode remains 17.0.0; generated cases, fuzz seeds, and filesystem-order variants are reproducible and path-free.",
+  "PRJ-1107 remains blocked on unspecified project test/build CLI behavior.",
+]
