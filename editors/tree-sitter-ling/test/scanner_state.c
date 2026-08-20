@@ -241,6 +241,28 @@ static void boundary_probe_does_not_split_unicode_identifiers(void) {
   tree_sitter_ling_external_scanner_destroy(scanner);
 }
 
+static void distinguishes_match_case_bars_from_pipeline_operators(void) {
+  Scanner *scanner = new_scanner();
+  array_push(&scanner->indents, 4);
+  bool valid_symbols[ROOT_DECLARATION_BOUNDARY + 1] = {false};
+  valid_symbols[LINE_LEADING_BAR] = true;
+  valid_symbols[LINE_LEADING_PIPELINE] = true;
+
+  TestLexer match_case = test_lexer("\n    | Healthy -> 0");
+  assert(tree_sitter_ling_external_scanner_scan(
+      scanner, &match_case.lexer, valid_symbols));
+  assert(match_case.lexer.result_symbol == LINE_LEADING_BAR);
+  assert(match_case.marked_end == 5);
+
+  TestLexer pipeline = test_lexer("\n    |> add 1");
+  assert(tree_sitter_ling_external_scanner_scan(scanner, &pipeline.lexer,
+                                                valid_symbols));
+  assert(pipeline.lexer.result_symbol == LINE_LEADING_PIPELINE);
+  assert(pipeline.marked_end == 5);
+
+  tree_sitter_ling_external_scanner_destroy(scanner);
+}
+
 int main(void) {
   round_trips_complete_state();
   serializes_the_maximum_layout_depth();
@@ -250,5 +272,6 @@ int main(void) {
   root_boundary_resynchronizes_scanner_state();
   boundary_probe_preserves_normal_newlines();
   boundary_probe_does_not_split_unicode_identifiers();
+  distinguishes_match_case_bars_from_pipeline_operators();
   return 0;
 }

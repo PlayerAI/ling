@@ -1,6 +1,6 @@
 # ADR-0001: Stateful layout scanner
 
-> Engineering status: Accepted for TS-3103; amended for TS-3107
+> Engineering status: Accepted for TS-3103; amended for TS-3107 and TS-3108
 > Date: 2026-08-21
 > Scope: `tree-sitter-ling` implementation only; this ADR is not Ling language authority
 
@@ -19,13 +19,14 @@ Use one private C external scanner with these external symbols, in stable array 
 3. `_dedent`;
 4. `_soft_newline`;
 5. `_line_leading_bar`;
-6. `block_comment`;
-7. `_delimiter_open`;
-8. `_delimiter_close`;
-9. `_error_sentinel`;
-10. `_root_declaration_boundary`.
+6. `_line_leading_pipeline`;
+7. `block_comment`;
+8. `_delimiter_open`;
+9. `_delimiter_close`;
+10. `_error_sentinel`;
+11. `_root_declaration_boundary`.
 
-The state machine emits layout tokens and two zero-width delimiter-state markers. `_line_leading_bar` consumes only the preceding same-column newline and leaves `|` to the normal lexer; the grammar then distinguishes a match/variant case from `|>`. This prevents an ordinary final newline from being captured speculatively as a case or pipeline continuation. `_delimiter_open` and `_delimiter_close` occur immediately inside each grammar-owned `()`, `[]`, or `{}` pair. They update scanner depth without externalizing or consuming punctuation, so newline classification remains correct even in parser states where the closing literal is not yet valid.
+The state machine emits layout tokens and two zero-width delimiter-state markers. `_line_leading_bar` consumes only the preceding same-column newline when the next operator is exactly case-leading `|`; `_line_leading_pipeline` does the same when the next operator is `|>`. Both leave punctuation to the normal lexer. The distinct tokens let the parser choose between ending a match-case body and continuing its expression only after the scanner has inspected the second character, and they prevent an ordinary final newline from being captured speculatively. `_delimiter_open` and `_delimiter_close` occur immediately inside each grammar-owned `()`, `[]`, or `{}` pair. They update scanner depth without externalizing or consuming punctuation, so newline classification remains correct even in parser states where the closing literal is not yet valid.
 
 The same translation unit recognizes the layout-coupled `block_comment` extra so nested comments remain one CST trivia node. It does not generally scan identifiers, operators, literals, declarations, or source punctuation. The TS-3107 boundary helper conservatively recognizes only the exact ASCII root keywords `let`, `type`, `module`, and `import` when followed by trivia, a comment opener, a newline, or EOF; it therefore neither duplicates Unicode XID tables nor splits identifiers such as `type人`. The error sentinel opts out when Tree-sitter probes with every symbol valid during recovery. Blank lines can be consumed as layout trivia, while comment-leading lines are inspected without including the comment in the layout token; the comment therefore remains visible in the CST.
 
@@ -57,6 +58,7 @@ At the maximum layout depth the payload is 517 bytes, below Tree-sitter's 1,024-
 - Newlines inside parsed delimiters become `_soft_newline` without mutating layout state.
 - Tree-sitter recovery remains tolerant and is not a validity decision. Inconsistent-dedent, tab, depth, and unclosed-comment diagnostics remain compiler-owned.
 - A root-declaration boundary may close editor-only recovery state and retain one following complete declaration as a named descendant of an incomplete binding. Queries must match declaration nodes by kind rather than assume every recovery node is a direct `source_file` child.
+- Match-case and pipeline prefixes use distinct private newline tokens; scanner-state and whole-program differential tests must cover both when either grammar continuation is viable.
 - Scanner symbol order, marker placement, and serialization version are internal parser compatibility surfaces. Changing any of them requires regeneration, scanner-state tests, and an incremental-reparse test.
 
 ## Rejected alternatives

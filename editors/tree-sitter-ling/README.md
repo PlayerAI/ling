@@ -4,7 +4,7 @@
 
 The grammar is not an authority for Ling validity or semantics. Accepted RFCs and decisions, the compiler specifications, conformance tests, and `ling-syntax` remain authoritative in that order. A tolerant Tree-sitter parse never makes invalid source valid Ling.
 
-See [KNOWN-DIFFERENCES.md](KNOWN-DIFFERENCES.md) for the exact compiler/grammar differences that remain assigned to later tasks.
+See [KNOWN-DIFFERENCES.md](KNOWN-DIFFERENCES.md) for the exact deliberate compiler/editor-parser differences.
 The non-normative scanner decision is recorded in [docs/ADR-0001-layout-scanner.md](docs/ADR-0001-layout-scanner.md).
 The generated Unicode-token decision is recorded in [docs/ADR-0002-unicode-identifiers.md](docs/ADR-0002-unicode-identifiers.md).
 
@@ -28,6 +28,7 @@ After the first locked installation, grammar generation and tests run without ne
 ```sh
 npm run generate --offline
 npm test --offline
+npm run test:conformance --offline
 npm run parse:examples --offline
 ```
 
@@ -39,9 +40,7 @@ The identifier token is generated from the repository's checksummed Unicode 17.0
 
 The shared differential corpus is consumed by both `ling-syntax` and the Tree-sitter integration runner. It covers ASCII, Chinese, NFC-equivalent spellings, combining continuations, supplementary-plane boundaries, `_`, `and`/`and_then`, emoji, and XID-shaped characters rejected by compiler security rules. Those permissive editor parses remain intentional: the compiler emits `L-LEX-0004` with an original UTF-8 byte span and bilingual messages suitable for the future LSP diagnostic adapter.
 
-The stateful external scanner remains limited to DEC-0006 layout, nested comments, and private root-declaration synchronization. It does not duplicate Unicode tables, NFC normalization, general keyword classification, or identifier-security checks. The remaining accuracy work is assigned to:
-
-- shared compiler/Tree-sitter corpus differential testing (`TS-3108`).
+The stateful external scanner remains limited to DEC-0006 layout, nested comments, private root-declaration synchronization, and differentiating same-indent case-leading `|` from pipeline `|>`. It does not duplicate Unicode tables, NFC normalization, general keyword classification, or identifier-security checks.
 
 Language-specific package bindings and publication metadata remain disabled until an editor consumer requires them; the generated C parser and its private scanner are the committed integration artifacts.
 
@@ -51,8 +50,10 @@ TS-3106 covers the Seed Pattern and Type surface without inventing post-Seed nod
 
 TS-3107 hardens malformed editing states without changing compiler validity. A private scanner boundary retains surrounding root declarations after unclosed strings/records/tuples, missing `=`, `->`, or `with`, partial Chinese identifiers, incomplete pipelines, inconsistent indentation, and incomplete control flow. The permanent suite covers 41 grammar cases, 10 static recovery cases, 9 incremental edits, and 64 fixed-seed mutations; every malformed recovery parse must terminate, remain bounded, expose built-in `ERROR`/`MISSING`, and retain both canary declarations.
 
+TS-3108 synchronizes every `tests/conformance/*/case.ling` source through one sorted manifest consumed by the compiler and editor-parser tests. The current 42-program set contains 34 compiler-valid and 8 compiler-invalid sources. Every valid source has a clean Tree-sitter CST; seven invalid sources produce bounded recovery trees, while `m2-invalid-number` is the sole explicit tolerance because token-shape parsing accepts `0b102` and the compiler still rejects its base-2 digit with `L-LEX-0011`. The runner also parses 84 fixed-seed whole-corpus edits twice and locks all 42 normalized CSTs plus `node-types.json` with 43 reviewed SHA-256 mappings.
+
 ## 中文说明
 
 `tree-sitter-ling` 是面向编辑器的 Ling 具体语法解析器。本目录暂作为可独立拆分的开发镜像，与编译器共享演进过程。
 
-Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围；`TS-3105` 已依据 Accepted DEC-0017 实现 `&&`、`||` 与完整表达式优先级，并通过 29 个共享 compiler/Tree-sitter cases 验证；`TS-3106` 已通过 41 个共享 cases 覆盖 Seed pattern/type 合法性边界；`TS-3107` 已通过 10 个静态、9 个增量和 64 个定种子 mutation cases 加固错误恢复，grammar corpus 现有 41 个 cases。NFC、禁止字符、混合书写系统、Confusable 诊断、pattern 名称角色以及源码合法性仍由编译器权威判定。
+Tree-sitter 不决定 Ling 源码是否合法，也不定义语言语义。语言行为仍以 Accepted RFC/decision、编译器规范、conformance tests 和 `ling-syntax` 为准。`TS-3103` 已实现有状态 offside scanner；`TS-3104` 已从校验过哈希的 Unicode 17.0.0 数据生成精确 XID 范围；`TS-3105` 已依据 Accepted DEC-0017 实现 `&&`、`||` 与完整表达式优先级，并通过 29 个共享 compiler/Tree-sitter cases 验证；`TS-3106` 已通过 41 个共享 cases 覆盖 Seed pattern/type 合法性边界；`TS-3107` 已通过 10 个静态、9 个增量和 64 个定种子 mutation cases 加固错误恢复；`TS-3108` 已覆盖全部 42 个 compiler conformance programs、84 个全语料定种子编辑和 43 个稳定 CST/node-type 映射。NFC、禁止字符、混合书写系统、Confusable 诊断、pattern 名称角色以及源码合法性仍由编译器权威判定。

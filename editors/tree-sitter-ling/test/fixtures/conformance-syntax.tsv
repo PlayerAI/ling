@@ -1,0 +1,47 @@
+# TS-3108 compiler conformance syntax manifest.
+# Columns: tests/conformance-relative path, compiler syntax, Tree-sitter policy.
+# `tolerated` is an explicit whitelist: Tree-sitter may tokenize the complete
+# numeric spelling in m2-invalid-number, while the compiler remains authoritative
+# and rejects its invalid base-2 digit with L-LEX-0011.
+m0-source-pipeline/case.ling	valid	clean
+m2-hello-parser/case.ling	valid	clean
+m2-invalid-number/case.ling	invalid	tolerated
+m2-pipeline-assignment-parser/case.ling	valid	clean
+m2-record-match-parser/case.ling	valid	clean
+p12-builtin-redefinition/case.ling	valid	clean
+p12-char-literal-unsupported/case.ling	invalid	error
+p12-f64-equality-run/case.ling	valid	clean
+p12-function-equality/case.ling	valid	clean
+p12-higher-order-capability/case.ling	valid	clean
+p12-implicit-main-run/case.ling	valid	clean
+p12-missing-main/case.ling	valid	clean
+p12-mixed-script/case.ling	valid	clean
+p12-non-main-entry/case.ling	valid	clean
+p12-text-format-fault/case.ling	valid	clean
+p7-hello-run/case.ling	valid	clean
+p7-invalid-main/case.ling	valid	clean
+p7-missing-capability/case.ling	valid	clean
+p7-name-error/case.ling	valid	clean
+p7-type-error/case.ling	valid	clean
+p8-constructor-arity/case.ling	valid	clean
+p8-immutable-field/case.ling	valid	clean
+p8-match-nonexhaustive/case.ling	valid	clean
+p8-prelude-redefinition/case.ling	valid	clean
+p8-prelude-run/case.ling	valid	clean
+p8-record-missing/case.ling	valid	clean
+p8-record-pattern-run/case.ling	valid	clean
+p8-unreachable-case/case.ling	valid	clean
+p9-adt-match-run/case.ling	valid	clean
+p9-map-missing-capability/case.ling	valid	clean
+p9-person-run/case.ling	valid	clean
+p9-pipeline-run/case.ling	valid	clean
+ts3105-and-alias-error/case.ling	invalid	error
+ts3105-assignment-chain-error/case.ling	invalid	error
+ts3105-boolean-missing-operand/case.ling	invalid	error
+ts3105-boolean-short-circuit-run/case.ling	valid	clean
+ts3105-boolean-type-error/case.ling	valid	clean
+ts3105-or-alias-error/case.ling	valid	clean
+ts3106-empty-record-pattern-error/case.ling	invalid	error
+ts3106-grouped-constructor-pattern-run/case.ling	valid	clean
+ts3106-singleton-tuple-pattern-error/case.ling	invalid	error
+ts3106-trailing-tuple-pattern-error/case.ling	invalid	error

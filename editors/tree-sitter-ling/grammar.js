@@ -50,6 +50,7 @@ module.exports = grammar({
     $._dedent,
     $._soft_newline,
     $._line_leading_bar,
+    $._line_leading_pipeline,
     $.block_comment,
     $._delimiter_open,
     $._delimiter_close,
@@ -545,7 +546,7 @@ module.exports = grammar({
             "left",
             choice($.pipeline_expression, $._boolean_or_expression),
           ),
-          choice("|>", seq($._line_leading_bar, "|>")),
+          choice("|>", seq($._line_leading_pipeline, "|>")),
           field(
             "right",
             choice(

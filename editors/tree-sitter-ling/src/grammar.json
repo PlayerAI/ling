@@ -2049,7 +2049,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "_line_leading_bar"
+                    "name": "_line_leading_pipeline"
                   },
                   {
                     "type": "STRING",
@@ -3395,6 +3395,10 @@
     {
       "type": "SYMBOL",
       "name": "_line_leading_bar"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_line_leading_pipeline"
     },
     {
       "type": "SYMBOL",

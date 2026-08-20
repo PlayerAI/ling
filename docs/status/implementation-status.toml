@@ -1211,3 +1211,55 @@ notes = [
   "No compiler diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, or Unicode 17.0.0 table changed.",
   "TS-3108 whole-program compiler/Tree-sitter differential is now the next Ready task.",
 ]
+
+[[task]]
+id = "TS-3108"
+title = "Grammar differential"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TS-3107"]
+spec = [
+  "AGENTS.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0004-pipeline-syntax.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/grammar-map.md",
+]
+artifacts = [
+  "README.md",
+  "crates/ling-syntax/tests/conformance_syntax_differential.rs",
+  "docs/grammar-map.md",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "editors/tree-sitter-ling/README.md",
+  "editors/tree-sitter-ling/docs/ADR-0001-layout-scanner.md",
+  "editors/tree-sitter-ling/grammar.js",
+  "editors/tree-sitter-ling/package.json",
+  "editors/tree-sitter-ling/src/grammar.json",
+  "editors/tree-sitter-ling/src/parser.c",
+  "editors/tree-sitter-ling/src/scanner.c",
+  "editors/tree-sitter-ling/test/fixtures/conformance-cst-sha256.txt",
+  "editors/tree-sitter-ling/test/fixtures/conformance-syntax.tsv",
+  "editors/tree-sitter-ling/test/run-conformance-differential.js",
+  "editors/tree-sitter-ling/test/scanner_state.c",
+]
+acceptance = [
+  "shared syntax manifest: all 42 tests/conformance sources covered exactly once; compiler parser confirms 34 valid and 8 invalid",
+  "Tree-sitter differential: 34 valid sources clean, 7 invalid sources recover with ERROR/MISSING, and m2-invalid-number is the sole explicit tolerant-editor/compiler-rejected case",
+  "bounded edit smoke: 84 fixed-seed whole-corpus deletion/insertion edits parsed twice without timeout, crash, or nondeterministic normalized summaries",
+  "stable mapping: reviewed SHA-256 values lock all 42 normalized whole-program CSTs plus generated node-types.json",
+  "scanner state distinguishes same-indent match-case | from pipeline |>; all five previously ambiguous valid programs parse cleanly",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "uncommitted"
+completed = ""
+notes = [
+  "The compiler remains authoritative for syntax validity; Tree-sitter remains a tolerant editor parser.",
+  "The m2-invalid-number tolerance is explicit because Tree-sitter token-shape recognition accepts 0b102 while ling-syntax emits L-LEX-0011 for the invalid base-2 digit.",
+  "No Ling diagnostic, public schema/protocol, Semantic ID, source-span contract, dependency, or Unicode 17.0.0 table changed.",
+]

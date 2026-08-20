@@ -12,6 +12,7 @@ enum TokenType {
   DEDENT,
   SOFT_NEWLINE,
   LINE_LEADING_BAR,
+  LINE_LEADING_PIPELINE,
   BLOCK_COMMENT,
   DELIMITER_OPEN,
   DELIMITER_CLOSE,
@@ -35,6 +36,7 @@ typedef struct {
   uint16_t indentation;
   bool eof;
   bool starts_bar;
+  bool starts_pipeline;
   bool skipped_comment_line;
 } LayoutProbe;
 
@@ -213,6 +215,7 @@ static LayoutProbe probe_layout(TSLexer *lexer, uint16_t indentation) {
       .indentation = indentation,
       .eof = false,
       .starts_bar = false,
+      .starts_pipeline = false,
       .skipped_comment_line = false,
   };
   bool saw_comment = false;
@@ -258,6 +261,10 @@ static LayoutProbe probe_layout(TSLexer *lexer, uint16_t indentation) {
     }
 
     result.starts_bar = lexer->lookahead == '|';
+    if (result.starts_bar) {
+      advance(lexer);
+      result.starts_pipeline = lexer->lookahead == '>';
+    }
     return result;
   }
 }
@@ -343,8 +350,13 @@ static bool scan_layout(Scanner *scanner, TSLexer *lexer,
   }
 
   const uint16_t next = probe.indentation;
+  if (valid_symbols[LINE_LEADING_PIPELINE] && next == current &&
+      probe.starts_pipeline) {
+    lexer->result_symbol = LINE_LEADING_PIPELINE;
+    return true;
+  }
   if (valid_symbols[LINE_LEADING_BAR] && next == current &&
-      probe.starts_bar) {
+      probe.starts_bar && !probe.starts_pipeline) {
     lexer->result_symbol = LINE_LEADING_BAR;
     return true;
   }
