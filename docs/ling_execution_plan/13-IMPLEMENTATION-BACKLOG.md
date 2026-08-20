@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108` 与 `ZQ-3201` Done；`ZQ-3202` Ready；其余任务仍服从各自接口与 RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201` 与 `ZQ-3202` Done；`ZQ-3203` Ready；其余任务仍服从各自接口与 RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -172,8 +172,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TS-3107` | G1/Editor | Error recovery | M | Done | `05-ZED-EXTENSION.md:221`；见 10 个静态、9 个增量、64 个定种子 mutation cases、scanner tests、机器状态与实施报告 |
 | `TS-3108` | G1/Editor | Grammar differential | M | Done | `05-ZED-EXTENSION.md:234`；见 42 个全程序 compiler/Tree-sitter cases、84 个定种子编辑、43 个稳定 CST/node-type 映射、机器状态与实施报告 |
 | `ZQ-3201` | G1/Editor | `highlights.scm` | S | Done | `05-ZED-EXTENSION.md:245`；见 18 个 capture、46 个标准 highlight assertions、机器状态与实施报告 |
-| `ZQ-3202` | G1/Editor | `brackets.scm` | S | Ready | `05-ZED-EXTENSION.md:273`；`TS-3108` 与 `ZQ-3201` 前置已满足 |
-| `ZQ-3203` | G1/Editor | `indents.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:277` |
+| `ZQ-3202` | G1/Editor | `brackets.scm` | S | Done | `05-ZED-EXTENSION.md:273`；见 4 类括号对、20 个正反断言、机器状态与实施报告 |
+| `ZQ-3203` | G1/Editor | `indents.scm` | S | Ready | `05-ZED-EXTENSION.md:277`；Tree-sitter grammar/query 前置已满足 |
 | `ZQ-3204` | G1/Editor | `outline.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:288` |
 | `ZQ-3205` | G1/Editor | `textobjects.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:294` |
 | `ZQ-3206` | G1/Editor | `runnables.scm` | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:302` |
