@@ -494,3 +494,57 @@ last_verified_commit = "652d19b9eaec2ab607edfe1a1e7ea742c861cf91"
 supported_profiles = []
 supported_targets = []
 evidence = ["docs/traceability/v0.0.1.md", ".github/workflows/ci.yml"]
+
+[[task]]
+id = "GOV-0109"
+title = "发布状态机器可读化"
+state = "Done"
+release = "G0"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0108"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/traceability/registry.toml",
+  "docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "docs/status/implementation-status.toml",
+  "docs/status/implementation-status.md",
+  "docs/status/release-status.md",
+  "tests/fixtures/status/feature-state.governance.json",
+  "tools/xtask/src/status.rs",
+  "docs/status/GOV-0109-IMPLEMENTATION-REPORT.md",
+  ".github/workflows/ci.yml",
+]
+acceptance = [
+  "cargo xtask status verify: 9 tasks, all Done; 7 features, all with explicit stabilization blockers",
+  "feature current state, stability, implemented/tested/documented, blockers, last verified commit, supported profiles, and supported targets cross-check canonical registries",
+  "human status, release-note fragment, and internal non-contract CLI fixture are deterministic and drift-checked",
+  "cargo xtask governance check-authority: 38 documents, 16 Accepted",
+  "all other governance, traceability, and support registries remain valid",
+  "cargo test --package xtask --locked --offline: 78 passed",
+  "cargo fmt --all -- --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo test --workspace --all-features --locked --offline: 218 passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+  "execution-plan SHA256SUMS: all 27 entries passed",
+  "active local Markdown targets: 536 resolved; frozen baseline excluded",
+]
+verified_against_commit = "fbc2a9728e69994a771001bdbe3e03d86bb2c4ef"
+completion_commit = "695e40eb6310ba1dcb36580f5feb63b4301ab656"
+integration_state = "committed"
+completed = "2026-08-20"
+notes = [
+  "No Ling language behavior, public diagnostic, public schema, CLI behavior, Semantic ID, source span, or Unicode 17.0.0 data changed.",
+  "All seven features remain Experimental and retain stabilization blockers; no Profile or Native target support is claimed.",
+  "The JSON output is an internal non-contract fixture for an unimplemented future ling command.",
+  "The CI workflow invokes the status drift gate; no remote CI result is claimed before push.",
+]
