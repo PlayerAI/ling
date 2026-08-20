@@ -83,6 +83,10 @@ fn semantic_output_is_deterministic_and_versioned() {
         String::from_utf8_lossy(&second.stderr)
     );
     assert_eq!(first.stdout, second.stdout);
+    assert_eq!(
+        first.stdout,
+        include_bytes!("../../../schemas/semantic/0.1/canonical/hello.bin")
+    );
     let graph: serde_json::Value =
         serde_json::from_slice(&first.stdout).expect("semantic output is JSON");
     assert_eq!(graph["schema"], "ling.semantic/0.1");
@@ -185,6 +189,21 @@ fn repl_routes_console_to_json_events_and_returns_runtime_exit_code() {
     assert!(events[1].get("value").is_none());
     assert_eq!(events[2]["status"], "runtime_error");
     assert_eq!(events[2]["committed"], false);
+}
+
+#[test]
+fn repl_json_writer_matches_schema_corpus() {
+    let output = run_repl(&["--format", "json"], "let answer = 42\n\nanswer\n");
+    assert!(output.status.success());
+    assert!(output.stderr.is_empty());
+    let actual = json_lines(&output.stdout);
+    let expected: [serde_json::Value; 2] = [
+        include_str!("../../../schemas/repl/0.1/valid/binding.json"),
+        include_str!("../../../schemas/repl/0.1/valid/value.json"),
+    ]
+    .map(|fixture| serde_json::from_str(fixture).expect("valid REPL schema fixture"));
+
+    assert_eq!(actual, expected);
 }
 
 #[test]

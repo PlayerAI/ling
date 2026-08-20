@@ -1,2 +1,5 @@
 # Unicode inputs are integrity-checked against their exact upstream bytes.
 tools/unicode-gen/data/** -text
+
+# Canonical schema fixtures are compared byte-for-byte on every host.
+schemas/**/canonical/*.bin -text

@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:semantic:0.1",
+  "title": "Ling Semantic Graph JSON 0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "language_version",
+    "unicode_version",
+    "program_id",
+    "entry_module",
+    "modules",
+    "definitions",
+    "references"
+  ],
+  "properties": {
+    "schema": { "const": "ling.semantic/0.1" },
+    "language_version": { "type": "string" },
+    "unicode_version": { "type": "string" },
+    "program_id": { "type": "string" },
+    "entry_module": { "type": "string" },
+    "modules": { "type": "array", "items": { "$ref": "#/$defs/module" } },
+    "definitions": { "type": "array", "items": { "$ref": "#/$defs/definition" } },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "references": { "type": "array", "items": { "$ref": "#/$defs/reference" } }
+  },
+  "patternProperties": { "^x-": true },
+  "additionalProperties": false,
+  "$defs": {
+    "module": {
+      "type": "object",
+      "required": ["name", "explicit", "requires", "imports"],
+      "properties": {
+        "name": { "type": "string" },
+        "explicit": { "type": "boolean" },
+        "requires": { "type": "array", "items": { "type": "string" } },
+        "imports": { "type": "array", "items": { "$ref": "#/$defs/import" } }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    },
+    "import": {
+      "type": "object",
+      "required": ["alias", "module"],
+      "properties": {
+        "alias": { "type": "string" },
+        "module": { "type": "string" }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    },
+    "definition": {
+      "type": "object",
+      "required": ["definition_id", "body_id", "module", "name", "kind", "origin", "type", "effects", "capabilities"],
+      "properties": {
+        "definition_id": { "type": "string" },
+        "body_id": { "type": "string" },
+        "module": { "type": "string" },
+        "name": { "type": "string" },
+        "kind": { "type": "string" },
+        "origin": { "type": "string" },
+        "type": { "type": "string" },
+        "effects": { "type": "array", "items": { "type": "string" } },
+        "capabilities": { "type": "array", "items": { "type": "string" } }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "required": ["node_id", "module", "kind", "owner", "effects", "capabilities", "identifier_scripts", "identifier_suspicious_mixed_script"],
+      "properties": {
+        "node_id": { "type": "string" },
+        "module": { "type": "string" },
+        "kind": { "type": "string" },
+        "name": { "type": "string" },
+        "owner": { "type": "string" },
+        "type": { "type": "string" },
+        "mutable": { "type": "boolean" },
+        "ordinal": { "type": "integer", "minimum": 0 },
+        "effects": { "type": "array", "items": { "type": "string" } },
+        "capabilities": { "type": "array", "items": { "type": "string" } },
+        "identifier_source": { "type": "string" },
+        "identifier_skeleton": { "type": "string" },
+        "identifier_scripts": { "type": "array", "items": { "type": "string" } },
+        "identifier_suspicious_mixed_script": { "type": "boolean" }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    },
+    "reference": {
+      "type": "object",
+      "required": ["module", "reference", "target_kind", "target"],
+      "properties": {
+        "module": { "type": "string" },
+        "source_kind": { "type": "string" },
+        "reference": { "type": "integer", "minimum": 0 },
+        "source_id": { "type": "string" },
+        "target_kind": { "type": "string" },
+        "target": { "type": "string" }
+      },
+      "patternProperties": { "^x-": true },
+      "additionalProperties": false
+    }
+  }
+}

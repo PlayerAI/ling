@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:repl:0.1",
+  "title": "Ling REPL event JSON 0.1",
+  "type": "object",
+  "required": ["schema", "status", "committed", "submission"],
+  "properties": {
+    "schema": { "const": "ling.repl/0.1" },
+    "status": { "enum": ["ok", "console", "compile_error", "runtime_error", "snapshot_mismatch"] },
+    "committed": { "type": "boolean" },
+    "submission": { "type": "integer", "minimum": 1 },
+    "name": { "type": "string" },
+    "type": { "type": "string" },
+    "value": { "type": "string" },
+    "definition_id": { "type": "string" },
+    "effects": { "type": "array", "items": { "type": "string" } },
+    "capabilities": { "type": "array", "items": { "type": "string" } },
+    "diagnostics": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
+    "console": { "type": "string" }
+  },
+  "additionalProperties": false
+}

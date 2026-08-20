@@ -3053,6 +3053,22 @@ mod tests {
     }
 
     #[test]
+    fn semantic_reader_accepts_and_rejects_schema_corpus() {
+        let valid = include_str!("../../../schemas/semantic/0.1/valid/hello.json");
+        let graph = read_json(valid).expect("valid schema corpus graph");
+        assert_eq!(graph.schema, SEMANTIC_SCHEMA);
+        assert_eq!(graph.entry_module, "Main");
+
+        let invalid = include_str!("../../../schemas/semantic/0.1/invalid/invalid-program-id.json");
+        assert!(matches!(
+            read_json(invalid)
+                .expect_err("invalid corpus ID must fail")
+                .kind,
+            SemanticReadErrorKind::InvalidId { .. }
+        ));
+    }
+
+    #[test]
     fn semantic_reader_rejects_bad_versions_ids_kinds_and_references() {
         let snapshot = snapshot(
             "module Main\n    requires Console.Write\n\nlet main () = Console.write \"x\"\n",

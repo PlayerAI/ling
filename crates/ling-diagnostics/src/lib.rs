@@ -308,6 +308,25 @@ mod tests {
     use super::*;
 
     #[test]
+    fn diagnostic_writer_matches_schema_corpus() {
+        let diagnostic = Diagnostic::new(
+            codes::INVALID_NUMBER,
+            Severity::Error,
+            "数字字面量格式无效",
+            "invalid numeric literal",
+        )
+        .with_primary_span(DiagnosticSpan::at(
+            "tests/conformance/m2-invalid-number/case.ling",
+            12,
+            17,
+        ));
+        let expected =
+            include_str!("../../../schemas/diagnostic/0.1/valid/invalid-number.json").trim_end();
+
+        assert_eq!(diagnostic.render_json().unwrap(), expected);
+    }
+
+    #[test]
     fn json_exposes_protocol_fields_without_freezing_message_wording() {
         let diagnostic = Diagnostic::new(
             codes::INVALID_UTF8,

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:diagnostic:0.1",
+  "title": "Ling Diagnostic JSON 0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "code",
+    "severity",
+    "message_zh",
+    "message_en",
+    "semantic_id",
+    "facts",
+    "repairs"
+  ],
+  "properties": {
+    "schema": { "const": "ling.diagnostic/0.1" },
+    "code": { "type": "string", "minLength": 1 },
+    "severity": { "enum": ["error", "warning", "note"] },
+    "message_zh": { "type": "string", "minLength": 1 },
+    "message_en": { "type": "string", "minLength": 1 },
+    "primary_span": { "$ref": "#/$defs/span" },
+    "semantic_id": { "type": ["string", "null"] },
+    "facts": { "type": "object", "additionalProperties": true },
+    "repairs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/repair" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "span": {
+      "type": "object",
+      "required": ["file", "start_byte", "end_byte"],
+      "properties": {
+        "file": { "type": "string" },
+        "start_byte": { "type": "integer", "minimum": 0 },
+        "end_byte": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "repair": {
+      "type": "object",
+      "required": ["kind", "changes_semantics"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "changes_semantics": { "type": "boolean" },
+        "facts": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": false
+    }
+  }
+}

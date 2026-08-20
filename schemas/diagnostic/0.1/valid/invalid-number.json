@@ -1,0 +1,1 @@
+{"schema":"ling.diagnostic/0.1","code":"L-LEX-0011","severity":"error","message_zh":"数字字面量格式无效","message_en":"invalid numeric literal","primary_span":{"file":"tests/conformance/m2-invalid-number/case.ling","start_byte":12,"end_byte":17},"semantic_id":null,"facts":{},"repairs":[]}

@@ -1,0 +1,114 @@
+schema_version = 1
+updated = "2026-08-20"
+policy = "docs/governance/SCHEMA-LIFECYCLE.md"
+protocol_inventory = "docs/governance/protocol-inventory.toml"
+schema_root = "schemas"
+
+[version_policy]
+major_minor = "A marker identifies one concrete schema. Major or minor changes have no implicit compatibility; every compatible reader or migration edge requires registered executable evidence."
+integer = "An integer increment identifies a different revision and has no implicit compatibility; public formats retain their public protocol marker."
+writer = "CurrentOnly"
+n_minus_one = "NoPreviousVersion is distinct from supported N-1 reading or migration."
+semantic_identity = "Ordinary JSON member order is never a Semantic ID input; DEC-0012 domain-separated canonical bytes and explicit hash scheme IDs remain authoritative."
+
+[[schema]]
+id = "SCHEMA-DIAGNOSTIC-JSON"
+name = "diagnostic"
+protocol_id = "PROTO-DIAGNOSTIC-JSON"
+version = "0.1"
+marker = "ling.diagnostic/0.1"
+version_kind = "MajorMinor"
+stability = "Preview"
+format = "JSON"
+canonical = false
+writer = "CurrentOnly"
+reader = "None"
+reader_versions = []
+previous_version = ""
+previous_marker = ""
+compatibility = "NoPreviousVersion"
+compatibility_dir = ""
+migration_adapter = "None"
+unknown_fields = "Unspecified"
+missing_fields = "RejectRequired"
+reader_defaults = []
+canonical_encoding = "None"
+hash_scheme_ids = []
+schema_path = "schemas/diagnostic/0.1/schema.json"
+valid_dir = "schemas/diagnostic/0.1/valid"
+invalid_dir = "schemas/diagnostic/0.1/invalid"
+canonical_dir = ""
+reader_adapter = "None"
+writer_evidence = ["crates/ling-diagnostics/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
+
+[[schema]]
+id = "SCHEMA-SEMANTIC-GRAPH-JSON"
+name = "semantic"
+protocol_id = "PROTO-SEMANTIC-GRAPH-JSON"
+version = "0.1"
+marker = "ling.semantic/0.1"
+version_kind = "MajorMinor"
+stability = "Experimental"
+format = "JSON"
+canonical = true
+writer = "CurrentOnly"
+reader = "CurrentOnly"
+reader_versions = ["ling.semantic/0.1"]
+previous_version = ""
+previous_marker = ""
+compatibility = "NoPreviousVersion"
+compatibility_dir = ""
+migration_adapter = "None"
+unknown_fields = "NamespacedExtensions"
+missing_fields = "ReaderDefault"
+reader_defaults = ["references[].source_kind=expression"]
+canonical_encoding = "CompactJsonLf"
+hash_scheme_ids = [
+  "experimental:blake3:",
+  "ling.body-id/v1",
+  "ling.definition-id/v1",
+  "ling.program-id/v1",
+  "ling.semantic-node-id/v1",
+]
+schema_path = "schemas/semantic/0.1/schema.json"
+valid_dir = "schemas/semantic/0.1/valid"
+invalid_dir = "schemas/semantic/0.1/invalid"
+canonical_dir = "schemas/semantic/0.1/canonical"
+reader_adapter = "SemanticGraphV0_1"
+writer_evidence = ["crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
+
+[[schema]]
+id = "SCHEMA-REPL-EVENT-JSON"
+name = "repl"
+protocol_id = "PROTO-REPL-JSON"
+version = "0.1"
+marker = "ling.repl/0.1"
+version_kind = "MajorMinor"
+stability = "Preview"
+format = "JSON"
+canonical = false
+writer = "CurrentOnly"
+reader = "None"
+reader_versions = []
+previous_version = ""
+previous_marker = ""
+compatibility = "NoPreviousVersion"
+compatibility_dir = ""
+migration_adapter = "None"
+unknown_fields = "Unspecified"
+missing_fields = "RejectRequired"
+reader_defaults = []
+canonical_encoding = "None"
+hash_scheme_ids = []
+schema_path = "schemas/repl/0.1/schema.json"
+valid_dir = "schemas/repl/0.1/valid"
+invalid_dir = "schemas/repl/0.1/invalid"
+canonical_dir = ""
+reader_adapter = "None"
+writer_evidence = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs"]
+
+[[non_json_boundary]]
+protocol_id = "PROTO-AUDIT-SOURCE"
+format = "CanonicalText"
+reason = "Audit Source is an accepted canonical text grammar with an isolated parser; it is not representable as a JSON schema package."
+evidence = ["docs/decisions/0015-audit-source-format.md", "crates/ling-format/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
