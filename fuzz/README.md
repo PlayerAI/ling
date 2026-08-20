@@ -14,7 +14,7 @@ Targets:
 - `source_bytes`: arbitrary bytes through UTF-8/BOM/newline source decoding;
 - `lexer_utf8`: valid UTF-8 through Source and Lexer/Layout;
 - `parser_utf8`: valid UTF-8 through Source, Parser/CST, and valid-CST AST lowering.
-- `manifest_bytes`: arbitrary bytes through the bounded `ling.toml` version 1 reader and Diagnostic JSON rendering.
+- `manifest_bytes`: arbitrary bytes through two bounded `ling.toml` version 1 reads with distinct diagnostic source labels; successful semantic models, failure codes/spans, and Diagnostic JSON rendering must remain deterministic.
 
 Run a deterministic corpus smoke pass:
 

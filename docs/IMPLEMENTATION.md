@@ -218,6 +218,8 @@ PRJ-1105 增加 RFC-0002 `ling.lock/1` 的严格 reader、canonical writer 与�
 
 PRJ-1106 增加 `single-package`、`multi-module`、`path-dependency`、`cycle`、`visibility`、`offline-lock` 与 `unicode-names` 七组端到端工程 fixture。每组 fixture 冻结完整 Diagnostic JSON，以及成功时的 path-free graph 测试快照和 canonical lock bytes；失败用例显式要求 graph/lock 均不发布。`expected-graph.json` 仅为测试证据，不建立新的公开 Schema；CLI 工程选择仍由 PRJ-1107 负责。
 
+PRJ-1108 增加固定 seed、无外部依赖的生成式 project property suite：独立 cycle oracle 检查随机小型 module graph，canonical logical path 只验证不改写，acyclic project 在相反文件创建顺序下产生相同 graph/identity/lock，且 `ling.lock/1` model 与 canonical bytes 双向 round-trip。`manifest_bytes` fuzz target 对同一任意输入使用不同诊断 source label 重复解码，要求成功模型或失败 code/span 一致；四个审查过的 seed corpus 进入固定 nightly CI smoke。该任务不新增公开接口、Schema、诊断或语言语义。
+
 出口标准：§18.6 全过；Graph Schema 正/负兼容性测试通过；同一输入在两个独立进程中产生逐字节相同的 Graph JSON 与 Audit 文本；Audit round-trip 性质测试通过；依赖实现变化敏感性有最小调用图用例，避免无意的全图或不充分失效。
 
 ### M6：Interpreter + REPL（ling-eval、ling-cli）

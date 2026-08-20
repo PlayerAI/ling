@@ -425,7 +425,7 @@ sources = ["docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md"]
 id = "UNSUP-PACKAGES"
 area = "Project/package"
 capability = "CLI project selection, package installation, publication, or registry"
-reason = "PRJ-1101 through PRJ-1106 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, package-aware Semantic Graph, canonical local lock protocol, and complete named project fixture matrix. CLI selection/build integration, publication, and registry installation remain out of scope."
+reason = "PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, package-aware Semantic Graph, canonical local lock protocol, complete named project fixture matrix, and project graph/lock property and manifest fuzz coverage. CLI selection/build integration, publication, and registry installation remain out of scope."
 blockers = []
 sources = ["docs/RFC-0002.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 

@@ -4,6 +4,9 @@ tools/unicode-gen/data/** -text
 # Canonical schema fixtures are compared byte-for-byte on every host.
 schemas/**/canonical/*.bin -text
 
+# Reviewed fuzz corpus entries are opaque input bytes on every host.
+fuzz/corpus/** -text
+
 # Project identities hash original source bytes; test expectations must survive checkout.
 tests/projects/**/*.ling text eol=lf
 tests/projects/**/ling.toml text eol=lf

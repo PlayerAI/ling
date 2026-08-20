@@ -158,6 +158,7 @@ fn validate(workflow: &str, cargo_config: &str) -> Vec<String> {
         "cargo build --workspace --all-features --release --locked --offline",
         "name: fuzz corpus smoke",
         "RUSTUP_TOOLCHAIN: nightly-2026-08-15",
+        "cargo fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256",
         "name: Rust 1.85 MSRV",
         "toolchain: \"1.85\"",
         "cargo check --workspace --all-features --locked --offline",

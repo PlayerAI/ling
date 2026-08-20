@@ -121,6 +121,10 @@ jobs:
         env:
           CARGO_NET_OFFLINE: "true"
         run: cargo fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256
+      - name: Replay project manifest corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: cargo fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256
 
   msrv:
     name: Rust 1.85 MSRV
