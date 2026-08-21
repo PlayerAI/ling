@@ -204,7 +204,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TASK-2202` | G2 | Task 状态机 Lowering | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:182`, `docs/status/TASK-2202-AUTHORITY-AUDIT.md` |
 | `TASK-2203` | G2 | 结构化生命周期 Runtime | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:195`, `docs/status/TASK-2203-AUTHORITY-AUDIT.md` |
 | `TASK-2204` | G2 | 确定性测试调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:207`, `docs/status/TASK-2204-AUTHORITY-AUDIT.md` |
-| `TASK-2205` | G2 | 生产本地调度器 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:221` |
+| `TASK-2205` | G2 | 生产本地调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:221`, `docs/status/TASK-2205-AUTHORITY-AUDIT.md` |
 | `TASK-2206` | G2 | Task conformance 与压力测试 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:235` |
 | `ACT-2301` | G2 | Actor 身份与状态隔离 | M | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:250` |
 | `ACT-2302` | G2 | 消息可发送性检查 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:263` |
