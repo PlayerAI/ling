@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 64 tasks (62 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 65 tasks (63 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3685,7 +3685,7 @@ notes = [
 [[task]]
 id = "TRAIT-1306"
 title = "Trait Checked Core dictionary witnesses"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -3715,13 +3715,14 @@ acceptance = [
   "Canonical witness bytes are repeatable and encode semantic identity only; source paths, spans, map order, allocation addresses, and hash seeds are excluded.",
   "The module remains crate-private, no public Trait diagnostic/schema/Semantic ID/runtime behavior is added, and ling-types::check continues to reject Trait programs.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "bfd00305473363c03286c2e0dbd060d7d136a95d"
+completion_commit = "bfd00305473363c03286c2e0dbd060d7d136a95d"
+integration_state = "committed"
+completed = "2026-08-21"
 notes = [
   "DEC-0027 accepts the internal Checked Core dictionary witness boundary after the TRAIT-1305 solver.",
   "TRAIT-1307 remains deferred for interpreter/VM dictionary passing and differential conformance.",
+  "Verified and committed as bfd00305473363c03286c2e0dbd060d7d136a95d after targeted, full offline workspace, governance, status, formatting, and diff gates passed.",
 ]
 
 [[task]]

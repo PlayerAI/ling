@@ -1,6 +1,6 @@
 # TRAIT-1306 implementation report / TRAIT-1306 实现报告
 
-Status: **In Progress**
+Status: **Done**
 
 TRAIT-1306 adds the internal Checked Core dictionary-witness boundary in
 `crates/ling-types/src/checked_core.rs`. It consumes immutable solver selection
@@ -38,7 +38,16 @@ records the accepted scope; it does not claim public Trait execution.
 - `cargo test -p ling-types --locked --offline`: 34 tests passed, including
   identity/member-order, mismatch rejection, duplicate/unknown selection, and
   source-origin canonical-byte invariance cases.
+- `cargo test --workspace --locked --offline`: passed for the full workspace,
+  including all compiler, interpreter, VM, conformance, Unicode, and xtask
+  suites (one existing explicitly ignored fixture remained ignored).
+- `cargo xtask governance check-all`: passed with 61 documents, 28 gaps, 36
+  lifecycle records, 21 protocols, and 82 diagnostic codes.
+- `cargo xtask status verify`: passed with 65 tasks (62 Done before this
+  completion record, now 63 Done) and 7 features with stabilization blockers.
 - `cargo fmt --all -- --check`: passed.
+- `git diff --check`: passed; only the repository's existing CRLF conversion
+  warnings were reported.
 
 ## Compatibility and deferrals
 
