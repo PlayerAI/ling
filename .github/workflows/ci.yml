@@ -112,23 +112,35 @@ jobs:
       - name: Replay Source corpus
         env:
           CARGO_NET_OFFLINE: "true"
-        run: cargo fuzz run source_bytes fuzz/corpus/source_bytes -- -runs=256
+        run: cargo fuzz run source_bytes fuzz/corpus/source_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
       - name: Replay Lexer corpus
         env:
           CARGO_NET_OFFLINE: "true"
-        run: cargo fuzz run lexer_utf8 fuzz/corpus/lexer_utf8 -- -runs=256
+        run: cargo fuzz run lexer_utf8 fuzz/corpus/lexer_utf8 -- -runs=256 -timeout=120 -rss_limit_mb=2048
       - name: Replay Parser and AST corpus
         env:
           CARGO_NET_OFFLINE: "true"
-        run: cargo fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256
+        run: cargo fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256 -timeout=120 -rss_limit_mb=2048
+      - name: Replay formatter corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: cargo fuzz run formatter_utf8 fuzz/corpus/formatter_utf8 -- -runs=256 -timeout=120 -rss_limit_mb=2048
+      - name: Replay Audit schema corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: cargo fuzz run audit_schema_bytes fuzz/corpus/audit_schema_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
       - name: Replay project manifest corpus
         env:
           CARGO_NET_OFFLINE: "true"
-        run: cargo fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256
+        run: cargo fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
+      - name: Replay project lock corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: cargo fuzz run lock_bytes fuzz/corpus/lock_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
       - name: Replay bytecode decoder and verifier corpus
         env:
           CARGO_NET_OFFLINE: "true"
-        run: cargo fuzz run bytecode_bytes fuzz/corpus/bytecode_bytes -- -runs=256
+        run: cargo fuzz run bytecode_bytes fuzz/corpus/bytecode_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
 
   msrv:
     name: Rust 1.85 MSRV

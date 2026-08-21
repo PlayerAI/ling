@@ -346,7 +346,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `COMPAT-6502` | G6 | 1.0 Compiler 兼容矩阵 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:280`, `docs/status/COMPAT-6502-AUTHORITY-AUDIT.md` |
 | `COMPAT-6503` | G6 | Language Migration Tool | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:293`, `docs/status/COMPAT-6503-AUTHORITY-AUDIT.md` |
 | `COMPAT-6504` | G6 | 弃用政策 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:307`, `docs/status/COMPAT-6504-AUTHORITY-AUDIT.md` |
-| `REL-6601` | G6 | Fuzz 总覆盖盘点 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:321` |
+| `REL-6601` | G6 | Fuzz 总覆盖盘点 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:321`, `docs/status/REL-6601-AUTHORITY-AUDIT.md`, `docs/testing/FUZZ-COVERAGE.md` |
 | `REL-6602` | G6 | 故障注入 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:340` |
 | `REL-6603` | G6 | 安全审计 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:354` |
 | `REL-6604` | G6 | 性能基线 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:368` |

@@ -234,12 +234,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "ling-format"
+version = "0.0.1-dev"
+dependencies = [
+ "ling-diagnostics",
+ "ling-semantic",
+ "ling-source",
+ "ling-syntax",
+ "serde_json",
+]
+
+[[package]]
 name = "ling-fuzz"
 version = "0.0.0"
 dependencies = [
  "libfuzzer-sys",
  "ling-ast",
  "ling-bytecode",
+ "ling-format",
  "ling-project",
  "ling-source",
  "ling-syntax",
