@@ -151,7 +151,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `IDE-2305` | G1/Editor | Prepare rename | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:270`, `docs/status/IDE-2305-AUTHORITY-AUDIT.md` |
 | `IDE-2306` | G1/Editor | Rename | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:283`, `docs/status/IDE-2306-AUTHORITY-AUDIT.md` |
 | `IDE-2307` | G1/Editor | Completion v0 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:299`, `docs/status/IDE-2307-AUTHORITY-AUDIT.md` |
-| `IDE-2308` | G1/Editor | Completion resolve | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:312` |
+| `IDE-2308` | G1/Editor | Completion resolve | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:312`, `docs/status/IDE-2308-AUTHORITY-AUDIT.md` |
 | `IDE-2309` | G1/Editor | Code actions | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:316` |
 | `IDE-2310` | G1/Editor | Formatting | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:329` |
 | `IDE-2311` | G1/Editor | Workspace symbols | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:333` |
