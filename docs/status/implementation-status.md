@@ -39,6 +39,7 @@
 | `BACK-3502` | Baseline Native codegen | `G3` | `L` | `BlockedSpec` | `BACK-3501` | `` |
 | `BACK-3503` | Native runtime ABI | `G3` | `L` | `BlockedSpec` | `BACK-3502` | `` |
 | `BACK-3504` | Native optimization and verification | `G3` | `L` | `BlockedSpec` | `BACK-3503` | `` |
+| `BACK-3505` | Reproducible Native build | `G3` | `M` | `BlockedSpec` | `BACK-3504` | `` |
 | `BASE-0001` | 仓库基线盘点与执行计划落位 | `G0` | `S` | `Done` | — | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
 | `CLI-1702` | CLI output and exit behavior | `G1` | `M` | `BlockedSpec` | `CLI-1701` | `` |

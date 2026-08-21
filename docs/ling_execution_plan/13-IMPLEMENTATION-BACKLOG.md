@@ -248,7 +248,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `BACK-3502` | G3 | Baseline Codegen | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:352`, `docs/status/BACK-3502-AUTHORITY-AUDIT.md` |
 | `BACK-3503` | G3 | Runtime ABI | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:365`, `docs/status/BACK-3503-AUTHORITY-AUDIT.md` |
 | `BACK-3504` | G3 | 基础优化与验证 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:380`, `docs/status/BACK-3504-AUTHORITY-AUDIT.md` |
-| `BACK-3505` | G3 | Reproducible Native Build | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:393` |
+| `BACK-3505` | G3 | Reproducible Native Build | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:393`, `docs/status/BACK-3505-AUTHORITY-AUDIT.md` |
 | `FFI-3601` | G3 | FFI 声明模型 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:411` |
 | `FFI-3602` | G3 | C ABI 最小互操作 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:431` |
 | `FFI-3603` | G3 | Shim Generator | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:445` |
