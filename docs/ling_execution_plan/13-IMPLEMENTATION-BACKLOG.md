@@ -315,7 +315,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PROOF-5502` | G5 | 独立 Checker | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:400`, `docs/status/PROOF-5502-AUTHORITY-AUDIT.md` |
 | `PROOF-5503` | G5 | 假设注册表 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:412`, `docs/status/PROOF-5503-AUTHORITY-AUDIT.md` |
 | `MC-5601` | G5 | 有限状态投影 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:431`, `docs/status/MC-5601-AUTHORITY-AUDIT.md` |
-| `MC-5602` | G5 | 探索引擎 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:446` |
+| `MC-5602` | G5 | 探索引擎 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:446`, `docs/status/MC-5602-AUTHORITY-AUDIT.md` |
 | `MC-5603` | G5 | 报告语义 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:458` |
 | `MC-5604` | G5 | Replay Counterexample | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:471` |
 | `TIM-5701` | G5 | Timing IR 与 Path | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:477` |
