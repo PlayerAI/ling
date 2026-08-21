@@ -603,3 +603,77 @@ fn v1_2_lowering_emits_prelude_option_constructors_and_patterns() {
     decode_and_verify_v1_2(&encode_v1_2(&lowered).unwrap())
         .expect("the prelude option artifact verifies");
 }
+
+#[test]
+fn v1_2_lowering_emits_mutable_place_updates_and_branch_joins() {
+    let text = concat!(
+        "module Main\n\n",
+        "type Inner = { mutable value: Int }\n",
+        "type Counter = { mutable inner: Inner }\n\n",
+        "let mutate flag =\n",
+        "    let mutable counter = { inner = { value = 0 } }\n",
+        "    counter <- { inner = { value = 9 } }\n",
+        "    if flag then\n",
+        "        counter.inner.value <- 1\n",
+        "    else\n",
+        "        counter.inner.value <- 2\n",
+        "    counter.inner.value\n\n",
+        "let main () = ()\n",
+    );
+    let (source, snapshot) = checked_source("mutable-place.ling", text);
+    let lowered = lower_v1_2(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("checked mutable places lower to SSA updates");
+    let model = lowered.model();
+    assert!(model.functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block
+                .instructions
+                .iter()
+                .any(|instruction| matches!(instruction, Instruction::UpdateRecord { .. }))
+        })
+    }));
+    assert!(model.functions().iter().any(|function| {
+        function
+            .blocks
+            .iter()
+            .any(|block| block.parameters.len() > 1)
+    }));
+    decode_and_verify_v1_2(&encode_v1_2(&lowered).unwrap())
+        .expect("the mutable-place artifact verifies");
+}
+
+#[test]
+fn v1_2_lowering_carries_mutable_places_through_match_joins() {
+    let text = concat!(
+        "module Main\n\n",
+        "type Counter = { mutable value: Int }\n\n",
+        "let mutate flag =\n",
+        "    let mutable counter = { value = 0 }\n",
+        "    match flag with\n",
+        "    | true ->\n",
+        "        counter.value <- 1\n",
+        "    | false ->\n",
+        "        counter.value <- 2\n",
+        "    counter.value\n\n",
+        "let main () = ()\n",
+    );
+    let (source, snapshot) = checked_source("mutable-match.ling", text);
+    let lowered = lower_v1_2(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("checked mutable match lowers to SSA updates");
+    assert!(lowered.model().functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block
+                .instructions
+                .iter()
+                .any(|instruction| matches!(instruction, Instruction::UpdateRecord { .. }))
+        })
+    }));
+    assert!(lowered.model().functions().iter().any(|function| {
+        function
+            .blocks
+            .iter()
+            .any(|block| block.parameters.len() > 1)
+    }));
+    decode_and_verify_v1_2(&encode_v1_2(&lowered).unwrap())
+        .expect("the mutable match artifact verifies");
+}

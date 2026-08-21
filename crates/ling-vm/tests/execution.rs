@@ -250,6 +250,39 @@ fn vm_matches_the_checked_interpreter_for_v1_2_record_tuple_execution() {
 }
 
 #[test]
+fn vm_matches_the_checked_interpreter_for_v1_2_mutable_place_execution() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "type Inner = { mutable value: Int }\n",
+        "type Counter = { mutable inner: Inner }\n\n",
+        "let mutate flag =\n",
+        "    let mutable counter = { inner = { value = 0 } }\n",
+        "    counter <- { inner = { value = 9 } }\n",
+        "    if flag then\n",
+        "        counter.inner.value <- 1\n",
+        "    else\n",
+        "        counter.inner.value <- 2\n",
+        "    counter.inner.value\n\n",
+        "let main () =\n",
+        "    Console.write (Text.format \"{}\" (mutate true))\n",
+    );
+    let fixture = fixture("v1_2-mutable-place.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("interpreter executes mutable place assignment");
+
+    let program = verified_v1_2(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host)
+        .expect("VM executes mutable place assignment");
+    assert_eq!(vm_console.output, interpreter_console.output());
+    assert_eq!(vm_console.output, "1\n");
+}
+
+#[test]
 fn vm_bounds_source_level_top_and_local_recursion_with_explicit_frames() {
     let text = concat!(
         "module Main\n\n",

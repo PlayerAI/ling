@@ -301,6 +301,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0017"
+title = "Seed mutable-place lowering"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0017.md"
+covers = ["mutable local assignment", "mutable record-field assignment", "nested place updates", "mutation CFG joins"]
+depends_on = ["DEC-0009", "RFC-0014", "RFC-0016", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

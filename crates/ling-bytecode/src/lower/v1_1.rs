@@ -185,6 +185,12 @@ struct ClosureLowerer<'snapshot, 'source> {
     constant_indices: BTreeMap<ConstantKey, ConstantIndex>,
 }
 
+#[derive(Clone, Copy)]
+struct PatternFailure<'a> {
+    block: BlockIndex,
+    parameters: Option<&'a [(BindingKey, RegisterIndex)]>,
+}
+
 impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
     fn new(
         snapshot: &'snapshot ProgramSnapshot,
@@ -2342,6 +2348,20 @@ fn extend_nominal_substitutions(
     output
 }
 
+fn substitute_nominal_type(
+    typed: &TypedProgram,
+    definition: &DefinitionId,
+    arguments: &[TypeId],
+    value: TypeId,
+) -> Option<TypeId> {
+    let substitutions =
+        extend_nominal_substitutions(typed, definition, arguments, &BTreeMap::new());
+    match typed.arena().get(value) {
+        Type::Variable(variable) => substitutions.get(variable).copied(),
+        _ => Some(value),
+    }
+}
+
 fn collect_variable_ids(typed: &TypedProgram, value: TypeId, output: &mut Vec<u32>) {
     match typed.arena().get(value) {
         Type::Variable(variable) if !output.contains(variable) => output.push(*variable),
@@ -2580,13 +2600,15 @@ fn wire_type(
 
 fn bytecode_effects(
     row: &EffectRow,
-    module: &ling_resolve::ResolvedModule,
-    span: Span,
+    _module: &ling_resolve::ResolvedModule,
+    _span: Span,
 ) -> Result<Vec<Effect>, LoweringError> {
     row.effects()
-        .map(|effect| match effect {
-            CheckedEffect::ConsoleWrite => Ok(Effect::ConsoleWrite),
-            CheckedEffect::State { .. } => Err(unsupported_module(module, span, "State Effect")),
+        .filter_map(|effect| match effect {
+            CheckedEffect::ConsoleWrite => Some(Ok(Effect::ConsoleWrite)),
+            // Seed local State is represented by SSA place updates and does not
+            // require a host capability or a bytecode effect tag.
+            CheckedEffect::State { .. } => None,
         })
         .collect()
 }
@@ -2844,7 +2866,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 for element in elements {
                     match element {
                         hir::SequenceElement::Let(binding) => {
-                            if binding.mutable {
+                            if binding.mutable && !self.owner.aggregate_mode {
                                 return Err(unsupported_module(
                                     self.module,
                                     binding.span,
@@ -2904,6 +2926,9 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                         }
                     }
                 }
+                if self.owner.aggregate_mode {
+                    self.propagate_mutable_bindings(environment, &local);
+                }
                 result.map_or_else(|| self.emit_constant(expression, Constant::Unit), Ok)
             }
             hir::ExpressionKind::Application {
@@ -2944,6 +2969,9 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             }
             hir::ExpressionKind::Match { .. } => {
                 Err(unsupported_module(self.module, expression.span, "match"))
+            }
+            hir::ExpressionKind::Assignment { place, value } if self.owner.aggregate_mode => {
+                self.lower_assignment(expression, place, value, environment)
             }
             hir::ExpressionKind::Assignment { .. } => Err(unsupported_module(
                 self.module,
@@ -2991,12 +3019,254 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         }
     }
 
+    fn mutable_binding_keys(
+        &self,
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Vec<BindingKey> {
+        let resolved = self.owner.snapshot.checked().typed().resolved();
+        environment
+            .keys()
+            .filter(|key| {
+                resolved
+                    .bindings()
+                    .get(key)
+                    .is_some_and(|binding| binding.mutable)
+            })
+            .copied()
+            .collect()
+    }
+
+    fn propagate_mutable_bindings(
+        &self,
+        destination: &mut BTreeMap<BindingKey, RegisterIndex>,
+        source: &BTreeMap<BindingKey, RegisterIndex>,
+    ) {
+        for key in self.mutable_binding_keys(destination) {
+            if let Some(register) = source.get(&key) {
+                destination.insert(key, *register);
+            }
+        }
+    }
+
+    fn add_mutable_merge_parameters(
+        &mut self,
+        merge: BlockIndex,
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        span: Span,
+    ) -> Result<Vec<(BindingKey, RegisterIndex)>, LoweringError> {
+        let keys = self.mutable_binding_keys(environment);
+        self.add_mutable_parameters_for_keys(merge, &keys, span)
+    }
+
+    fn add_mutable_parameters_for_keys(
+        &mut self,
+        block: BlockIndex,
+        keys: &[BindingKey],
+        span: Span,
+    ) -> Result<Vec<(BindingKey, RegisterIndex)>, LoweringError> {
+        let typed = self.owner.snapshot.checked().typed();
+        let block = usize::try_from(block.get())
+            .map_err(|_| invalid_without_span("merge block index does not fit host usize"))?;
+        let mut parameters = Vec::with_capacity(keys.len());
+        for key in keys.iter().copied() {
+            let value = typed.binding_type(key).ok_or_else(|| {
+                invalid_module(self.module, span, "mutable binding type is absent")
+            })?;
+            let value_type =
+                self.type_index(&checked_type_key(typed, value, self.module, span)?)?;
+            let register = self.new_register(span)?;
+            self.blocks[block].parameters.push(BlockParameter {
+                register,
+                value_type,
+            });
+            parameters.push((key, register));
+        }
+        Ok(parameters)
+    }
+
+    fn mutable_merge_arguments(
+        &self,
+        parameters: &[(BindingKey, RegisterIndex)],
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        span: Span,
+    ) -> Result<Vec<RegisterIndex>, LoweringError> {
+        parameters
+            .iter()
+            .map(|(key, _)| {
+                environment.get(key).copied().ok_or_else(|| {
+                    invalid_module(self.module, span, "mutable binding has no branch value")
+                })
+            })
+            .collect()
+    }
+
+    fn environment_from_parameters(
+        &self,
+        base: &BTreeMap<BindingKey, RegisterIndex>,
+        parameters: &[(BindingKey, RegisterIndex)],
+    ) -> BTreeMap<BindingKey, RegisterIndex> {
+        let mut environment = base.clone();
+        for (key, register) in parameters {
+            environment.insert(*key, *register);
+        }
+        environment
+    }
+
+    fn lower_assignment(
+        &mut self,
+        expression: &hir::Expression,
+        place: &hir::Place,
+        value: &hir::Expression,
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let target = self
+            .owner
+            .snapshot
+            .checked()
+            .typed()
+            .resolved()
+            .reference(self.module.id, place.root_reference)
+            .cloned()
+            .ok_or_else(|| invalid_module(self.module, place.span, "assignment root is absent"))?;
+        let ReferenceTarget::Binding(binding) = target else {
+            return Err(invalid_module(
+                self.module,
+                place.span,
+                "assignment root is not a local binding",
+            ));
+        };
+        let binding_info = self
+            .owner
+            .snapshot
+            .checked()
+            .typed()
+            .resolved()
+            .bindings()
+            .get(&binding)
+            .ok_or_else(|| {
+                invalid_module(self.module, place.span, "assignment binding is absent")
+            })?;
+        if !binding_info.mutable {
+            return Err(invalid_module(
+                self.module,
+                place.span,
+                "checked assignment root is not mutable",
+            ));
+        }
+        let assigned = self.lower_expression(value, environment)?;
+        if place.fields.is_empty() {
+            environment.insert(binding, assigned);
+            return self.emit_constant(expression, Constant::Unit);
+        }
+        let root = environment.get(&binding).copied().ok_or_else(|| {
+            invalid_module(
+                self.module,
+                place.span,
+                "mutable assignment root has no register",
+            )
+        })?;
+        let typed = self.owner.snapshot.checked().typed();
+        let root_type = typed
+            .place_root_type(ExpressionKey::new(self.module.id, expression.id))
+            .ok_or_else(|| {
+                invalid_module(self.module, place.span, "assignment root type is absent")
+            })?;
+        let mut record_registers = vec![root];
+        let mut record_types = Vec::with_capacity(place.fields.len());
+        let mut current_type = root_type;
+        for field in &place.fields {
+            let Type::NominalRecord {
+                definition,
+                arguments,
+            } = typed.arena().get(current_type)
+            else {
+                return Err(invalid_module(
+                    self.module,
+                    field.span,
+                    "assignment path traverses a non-record value",
+                ));
+            };
+            let info = typed.records().get(definition).ok_or_else(|| {
+                invalid_module(
+                    self.module,
+                    field.span,
+                    "assignment record metadata is absent",
+                )
+            })?;
+            let (field_index, declaration) = info
+                .fields
+                .iter()
+                .enumerate()
+                .find(|(_, candidate)| candidate.name == field.normalized)
+                .ok_or_else(|| {
+                    invalid_module(self.module, field.span, "assignment field is absent")
+                })?;
+            record_types.push(current_type);
+            let field_type =
+                substitute_nominal_type(typed, definition, arguments, declaration.field_type)
+                    .ok_or_else(|| {
+                        invalid_module(self.module, field.span, "assignment field type is absent")
+                    })?;
+            let next = self.new_register(field.span)?;
+            self.push_instruction(
+                Instruction::GetField {
+                    destination: next,
+                    record: *record_registers.last().ok_or_else(|| {
+                        invalid_module(self.module, field.span, "assignment record path is empty")
+                    })?,
+                    field: u32::try_from(field_index)
+                        .map_err(|_| invalid_without_span("assignment field index overflow"))?,
+                },
+                field.span,
+            )?;
+            record_registers.push(next);
+            current_type = field_type;
+        }
+        let mut updated = assigned;
+        for (index, record_type) in record_types.iter().enumerate().rev() {
+            let destination = self.new_register(place.span)?;
+            let field_index = typed
+                .records()
+                .get(match typed.arena().get(*record_type) {
+                    Type::NominalRecord { definition, .. } => definition,
+                    _ => unreachable!("record type collected above"),
+                })
+                .and_then(|info| {
+                    info.fields
+                        .iter()
+                        .position(|field| field.name == place.fields[index].normalized)
+                })
+                .ok_or_else(|| {
+                    invalid_module(
+                        self.module,
+                        place.fields[index].span,
+                        "assignment field is absent",
+                    )
+                })?;
+            self.push_instruction(
+                Instruction::UpdateRecord {
+                    destination,
+                    base: record_registers[index],
+                    updates: vec![RecordUpdate {
+                        field: u32::try_from(field_index)
+                            .map_err(|_| invalid_without_span("assignment field index overflow"))?,
+                        value: updated,
+                    }],
+                },
+                place.fields[index].span,
+            )?;
+            updated = destination;
+        }
+        environment.insert(binding, updated);
+        self.emit_constant(expression, Constant::Unit)
+    }
+
     fn lower_match(
         &mut self,
         expression: &hir::Expression,
         scrutinee: &hir::Expression,
         cases: &[hir::MatchCase],
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
     ) -> Result<RegisterIndex, LoweringError> {
         if cases.is_empty() {
             return Err(invalid_module(
@@ -3015,7 +3285,9 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                     "match scrutinee type is absent",
                 )
             })?;
-        let scrutinee_register = self.lower_expression(scrutinee, &mut environment.clone())?;
+        let mut scrutinee_environment = environment.clone();
+        let scrutinee_register = self.lower_expression(scrutinee, &mut scrutinee_environment)?;
+        self.propagate_mutable_bindings(environment, &scrutinee_environment);
         let result_type = self.type_index(&self.expression_type_key(expression)?)?;
         let merge = self.new_block()?;
         let result_register = self.new_register(expression.span)?;
@@ -3027,8 +3299,11 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             register: result_register,
             value_type: result_type,
         });
+        let mutable_parameters =
+            self.add_mutable_merge_parameters(merge, environment, expression.span)?;
 
         let original_environment = environment.clone();
+        let mut incoming_environment = original_environment.clone();
         for (index, case) in cases.iter().enumerate() {
             let is_last = index + 1 == cases.len();
             let pattern_success = self.new_block()?;
@@ -3044,14 +3319,32 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             } else {
                 Some(self.new_block()?)
             };
-            let mut case_environment = original_environment.clone();
+            let failure_parameters = if let Some(failure) = failure {
+                Some(
+                    self.add_mutable_parameters_for_keys(
+                        failure,
+                        &mutable_parameters
+                            .iter()
+                            .map(|(key, _)| *key)
+                            .collect::<Vec<_>>(),
+                        case.span,
+                    )?,
+                )
+            } else {
+                None
+            };
+            let pattern_failure = failure.map(|block| PatternFailure {
+                block,
+                parameters: failure_parameters.as_deref(),
+            });
+            let mut case_environment = incoming_environment.clone();
             self.emit_pattern(
                 scrutinee_register,
                 scrutinee_type,
                 &case.pattern,
                 &mut case_environment,
                 pattern_success,
-                failure,
+                pattern_failure,
             )?;
 
             let body_block = if let Some(guard) = &case.guard {
@@ -3067,7 +3360,16 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                         true_target: body,
                         true_arguments: Vec::new(),
                         false_target: failure,
-                        false_arguments: Vec::new(),
+                        false_arguments: failure_parameters.as_ref().map_or_else(
+                            || Ok(Vec::new()),
+                            |parameters| {
+                                self.mutable_merge_arguments(
+                                    parameters,
+                                    &case_environment,
+                                    guard.span,
+                                )
+                            },
+                        )?,
                     },
                     guard.span,
                 )?;
@@ -3081,16 +3383,31 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             self.set_terminator(
                 Terminator::Jump {
                     target: merge,
-                    arguments: vec![value],
+                    arguments: {
+                        let mut arguments = vec![value];
+                        arguments.extend(self.mutable_merge_arguments(
+                            &mutable_parameters,
+                            &case_environment,
+                            case.body.span,
+                        )?);
+                        arguments
+                    },
                 },
                 case.body.span,
             )?;
 
             if let Some(failure) = failure {
                 self.set_current_block(failure)?;
+                incoming_environment = self.environment_from_parameters(
+                    &incoming_environment,
+                    failure_parameters.as_deref().unwrap_or_default(),
+                );
             }
         }
         self.set_current_block(merge)?;
+        for (key, register) in mutable_parameters {
+            environment.insert(key, register);
+        }
         Ok(result_register)
     }
 
@@ -3100,9 +3417,11 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         condition: &hir::Expression,
         then_branch: &hir::Expression,
         else_branch: &hir::Expression,
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
     ) -> Result<RegisterIndex, LoweringError> {
-        let condition_register = self.lower_expression(condition, &mut environment.clone())?;
+        let mut condition_environment = environment.clone();
+        let condition_register = self.lower_expression(condition, &mut condition_environment)?;
+        self.propagate_mutable_bindings(environment, &condition_environment);
         let result_type = self.type_index(&self.expression_type_key(expression)?)?;
         let merge = self.new_block()?;
         let result_register = self.new_register(expression.span)?;
@@ -3113,6 +3432,9 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             register: result_register,
             value_type: result_type,
         });
+        let mutable_parameters =
+            self.add_mutable_merge_parameters(merge, environment, expression.span)?;
+        let branch_environment = environment.clone();
         let then_block = self.new_block()?;
         let else_block = self.new_block()?;
         self.set_terminator(
@@ -3127,25 +3449,46 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         )?;
 
         self.set_current_block(then_block)?;
-        let then_value = self.lower_expression(then_branch, &mut environment.clone())?;
+        let mut then_environment = branch_environment.clone();
+        let then_value = self.lower_expression(then_branch, &mut then_environment)?;
         self.set_terminator(
             Terminator::Jump {
                 target: merge,
-                arguments: vec![then_value],
+                arguments: {
+                    let mut arguments = vec![then_value];
+                    arguments.extend(self.mutable_merge_arguments(
+                        &mutable_parameters,
+                        &then_environment,
+                        then_branch.span,
+                    )?);
+                    arguments
+                },
             },
             then_branch.span,
         )?;
 
         self.set_current_block(else_block)?;
-        let else_value = self.lower_expression(else_branch, &mut environment.clone())?;
+        let mut else_environment = branch_environment;
+        let else_value = self.lower_expression(else_branch, &mut else_environment)?;
         self.set_terminator(
             Terminator::Jump {
                 target: merge,
-                arguments: vec![else_value],
+                arguments: {
+                    let mut arguments = vec![else_value];
+                    arguments.extend(self.mutable_merge_arguments(
+                        &mutable_parameters,
+                        &else_environment,
+                        else_branch.span,
+                    )?);
+                    arguments
+                },
             },
             else_branch.span,
         )?;
         self.set_current_block(merge)?;
+        for (key, register) in mutable_parameters {
+            environment.insert(key, register);
+        }
         Ok(result_register)
     }
 
@@ -3155,13 +3498,15 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         operator: hir::BinaryOperator,
         left: &hir::Expression,
         right: &hir::Expression,
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
     ) -> Result<RegisterIndex, LoweringError> {
         if matches!(
             operator,
             hir::BinaryOperator::BooleanAnd | hir::BinaryOperator::BooleanOr
         ) {
-            let left_register = self.lower_expression(left, &mut environment.clone())?;
+            let mut left_environment = environment.clone();
+            let left_register = self.lower_expression(left, &mut left_environment)?;
+            self.propagate_mutable_bindings(environment, &left_environment);
             let merge = self.new_block()?;
             let result_register = self.new_register(expression.span)?;
             self.blocks[usize::try_from(merge.get()).map_err(|_| {
@@ -3172,6 +3517,9 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 register: result_register,
                 value_type: TypeIndex::new(1),
             });
+            let mutable_parameters =
+                self.add_mutable_merge_parameters(merge, environment, expression.span)?;
+            let branch_environment = environment.clone();
             let right_block = self.new_block()?;
             let short_block = self.new_block()?;
             let (true_target, false_target) = match operator {
@@ -3190,11 +3538,20 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 expression.span,
             )?;
             self.set_current_block(right_block)?;
-            let right_register = self.lower_expression(right, &mut environment.clone())?;
+            let mut right_environment = branch_environment.clone();
+            let right_register = self.lower_expression(right, &mut right_environment)?;
             self.set_terminator(
                 Terminator::Jump {
                     target: merge,
-                    arguments: vec![right_register],
+                    arguments: {
+                        let mut arguments = vec![right_register];
+                        arguments.extend(self.mutable_merge_arguments(
+                            &mutable_parameters,
+                            &right_environment,
+                            right.span,
+                        )?);
+                        arguments
+                    },
                 },
                 right.span,
             )?;
@@ -3206,16 +3563,27 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             self.set_terminator(
                 Terminator::Jump {
                     target: merge,
-                    arguments: vec![short_value],
+                    arguments: {
+                        let mut arguments = vec![short_value];
+                        arguments.extend(self.mutable_merge_arguments(
+                            &mutable_parameters,
+                            &branch_environment,
+                            expression.span,
+                        )?);
+                        arguments
+                    },
                 },
                 expression.span,
             )?;
             self.set_current_block(merge)?;
+            for (key, register) in mutable_parameters {
+                environment.insert(key, register);
+            }
             return Ok(result_register);
         }
 
-        let left_register = self.lower_expression(left, &mut environment.clone())?;
-        let right_register = self.lower_expression(right, &mut environment.clone())?;
+        let left_register = self.lower_expression(left, environment)?;
+        let right_register = self.lower_expression(right, environment)?;
         let typed = self.owner.snapshot.checked().typed();
         let left_type = typed
             .expression_type(ExpressionKey::new(self.module.id, left.id))
@@ -3313,9 +3681,9 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         operator: hir::UnaryOperator,
         operand: &hir::Expression,
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
     ) -> Result<RegisterIndex, LoweringError> {
-        let operand_register = self.lower_expression(operand, &mut environment.clone())?;
+        let operand_register = self.lower_expression(operand, environment)?;
         let destination = self.new_register(expression.span)?;
         let operator = match operator {
             hir::UnaryOperator::Positive => IntUnaryOperator::Positive,
@@ -3339,7 +3707,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         pattern: &hir::Pattern,
         environment: &mut BTreeMap<BindingKey, RegisterIndex>,
         success: BlockIndex,
-        failure: Option<BlockIndex>,
+        failure: Option<PatternFailure<'_>>,
     ) -> Result<(), LoweringError> {
         let typed = self.owner.snapshot.checked().typed();
         match &pattern.kind {
@@ -3405,8 +3773,13 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                         condition,
                         true_target: success,
                         true_arguments: Vec::new(),
-                        false_target: failure,
-                        false_arguments: Vec::new(),
+                        false_target: failure.block,
+                        false_arguments: failure.parameters.map_or_else(
+                            || Ok(Vec::new()),
+                            |parameters| {
+                                self.mutable_merge_arguments(parameters, environment, pattern.span)
+                            },
+                        )?,
                     },
                     pattern.span,
                 )
@@ -3568,8 +3941,17 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                                     condition,
                                     true_target: success,
                                     true_arguments: Vec::new(),
-                                    false_target: failure,
-                                    false_arguments: Vec::new(),
+                                    false_target: failure.block,
+                                    false_arguments: failure.parameters.map_or_else(
+                                        || Ok(Vec::new()),
+                                        |parameters| {
+                                            self.mutable_merge_arguments(
+                                                parameters,
+                                                environment,
+                                                pattern.span,
+                                            )
+                                        },
+                                    )?,
                                 },
                                 pattern.span,
                             )
@@ -3602,8 +3984,17 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                                     condition,
                                     true_target: payload_block,
                                     true_arguments: Vec::new(),
-                                    false_target: failure,
-                                    false_arguments: Vec::new(),
+                                    false_target: failure.block,
+                                    false_arguments: failure.parameters.map_or_else(
+                                        || Ok(Vec::new()),
+                                        |parameters| {
+                                            self.mutable_merge_arguments(
+                                                parameters,
+                                                environment,
+                                                pattern.span,
+                                            )
+                                        },
+                                    )?,
                                 },
                                 pattern.span,
                             )?;
@@ -4494,7 +4885,7 @@ fn collect_constants_v1_1(
             for element in elements {
                 match element {
                     hir::SequenceElement::Let(binding) => {
-                        if binding.mutable {
+                        if binding.mutable && !aggregate_mode {
                             return Err(unsupported_module(
                                 module,
                                 binding.span,
@@ -4642,6 +5033,10 @@ fn collect_constants_v1_1(
         }
         hir::ExpressionKind::If { .. } | hir::ExpressionKind::Match { .. } => {
             return Err(unsupported_module(module, expression.span, "control flow"));
+        }
+        hir::ExpressionKind::Assignment { value, .. } if aggregate_mode => {
+            collect_constants_v1_1(snapshot, module, value, strings, constants, aggregate_mode)?;
+            insert_constant(constants, Constant::Unit)?;
         }
         hir::ExpressionKind::Assignment { .. } => {
             return Err(unsupported_module(

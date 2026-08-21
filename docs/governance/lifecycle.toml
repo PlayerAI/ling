@@ -126,6 +126,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0017"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0017.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Lower and execute mutable local reassignment, mutable and nested record-field assignment, and independent record copies.",
+  "Lower assignments in if, checked match, and short-circuit boolean branches with deterministic block-parameter joins.",
+  "Reject immutable roots/fields, parameters, imports, top-level mutation, and mutable lexical capture with stable bilingual diagnostics.",
+  "Differentially compare checked-source interpreter and verified VM values, effects, source spans, deterministic bytes, and legacy compatibility.",
+]
+compatibility_impact = [
+  "Uses existing ling.bytecode/1.2 UpdateRecord and CFG block parameters; no opcode, wire field, protocol revision, CLI, schema, Semantic ID, ABI, or Unicode change.",
+  "Implements only assignment forms already authorized by DEC-0009, SEMANTICS, and LANGUAGE; mutable captures and borrow/resource semantics remain deferred.",
+]
+unresolved_alternatives = [
+  "A dedicated runtime place instruction and mutable closure captures remain future work requiring a separate authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"
