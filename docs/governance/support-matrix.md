@@ -89,6 +89,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-SEMANTIC-GRAPH-JSON` | `Public` | `ling.semantic/0.1` | `Experimental` | yes |
 | `PROTO-SEMANTIC-ID` | `Public` | `experimental:blake3:` | `Experimental` | yes |
 | `PROTO-SEMANTIC-TRANSACTION` | `Planned public` | — | `Future` | no |
+| `PROTO-VM-CONTROL` | `Public` | `ling.vm.control/0.1` | `Experimental` | yes |
 
 ## Explicitly unsupported
 
@@ -102,7 +103,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `UNSUP-PACKAGES` | Project/package | CLI project selection, package installation, publication, or registry | PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, package-aware Semantic Graph, canonical local lock protocol, complete named project fixture matrix, and project graph/lock property and manifest fuzz coverage. CLI selection/build integration, publication, and registry installation remain out of scope. | — | [`docs/RFC-0002.md`](../RFC-0002.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
 | `UNSUP-PROFILE-SELECTION` | Profile | Explore, Native, or Critical selection/enforcement | The Seed CLI has no profile option and no profile validation pass. | `GAP-CRITICAL-PROFILE-001`<br>`GAP-NATIVE-BACKEND-ABI-001` | [`docs/SEMANTICS.md`](../SEMANTICS.md)<br>[`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md) |
 | `UNSUP-SUPPORT-CLI-JSON` | CLI/protocol | ling version --format json and ling support --format json | GOV-0108 generates internal governance fixtures only; no Accepted public JSON contract or CLI command exists. | — | [`docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md`](../ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md) |
-| `UNSUP-VM` | Execution | CLI bytecode emission/loading and VM backend selection | VM-1201 through VM-1204 provide the Experimental RFC-0014 protocol and verifier-gated library execution engine. No Accepted CLI bytecode command, backend selector, default execution limits, or full-Seed VM lowering contract exists. | — | [`docs/RFC-0014.md`](../RFC-0014.md)<br>[`crates/ling-bytecode/src/lib.rs`](../../crates/ling-bytecode/src/lib.rs)<br>[`crates/ling-vm/src/lib.rs`](../../crates/ling-vm/src/lib.rs)<br>[`tests/bytecode/README.md`](../../tests/bytecode/README.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
+| `UNSUP-VM` | Execution | CLI bytecode emission/loading and VM backend selection | VM-1201 through VM-1210 provide Experimental versioned bytecode, verifier-gated library execution, differential/resource/cancellation evidence, and the separate ling.vm.control/0.1 host API. No Accepted CLI bytecode command, backend selector, default execution limits, or full-Seed VM lowering contract exists. | — | [`docs/RFC-0014.md`](../RFC-0014.md)<br>[`docs/RFC-0020.md`](../RFC-0020.md)<br>[`crates/ling-bytecode/src/lib.rs`](../../crates/ling-bytecode/src/lib.rs)<br>[`crates/ling-vm/src/lib.rs`](../../crates/ling-vm/src/lib.rs)<br>[`tests/bytecode/README.md`](../../tests/bytecode/README.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
 
 ## Tier policy
 

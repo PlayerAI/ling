@@ -11,8 +11,9 @@ use ling_eval::{MemoryConsole, execute_main};
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId};
 use ling_vm::{
-    ConsoleCapability, ExecutionError, ExecutionLimits, HostCapabilities, HostError,
-    HostErrorCategory, RuntimeFault, RuntimeFaultKind, RuntimeResource, execute_v1,
+    CancellationToken, ConsoleCapability, ExecutionError, ExecutionLimits, HostCapabilities,
+    HostError, HostErrorCategory, RuntimeFault, RuntimeFaultKind, RuntimeResource, execute_v1,
+    execute_v1_with_cancellation,
 };
 
 use support::wire;
@@ -109,6 +110,20 @@ struct PanickingConsole;
 impl ConsoleCapability for PanickingConsole {
     fn write_line(&mut self, _text: &str) -> Result<(), HostError> {
         panic!("injected host adapter panic")
+    }
+}
+
+struct CancellingConsole {
+    output: String,
+    token: CancellationToken,
+}
+
+impl ConsoleCapability for CancellingConsole {
+    fn write_line(&mut self, text: &str) -> Result<(), HostError> {
+        self.output.push_str(text);
+        self.output.push('\n');
+        self.token.cancel();
+        Ok(())
     }
 }
 
@@ -491,6 +506,61 @@ fn missing_capability_wins_preflight_before_limits_or_effects() {
     ));
     assert_eq!(fault.span(), expected.span);
     assert!(!fault.committed());
+}
+
+#[test]
+fn cancellation_is_checked_before_preflight_and_preserves_no_commit() {
+    let fixture = fixture("hello.ling", HELLO);
+    let program = verified(&fixture);
+    let expected = source_map_entry(&program, program.model().entry().get(), 0, 0);
+    let token = CancellationToken::new();
+    token.cancel();
+    let mut host = HostCapabilities::none();
+    let fault = runtime(
+        execute_v1_with_cancellation(&program, ExecutionLimits::new(0, 0, 0), &mut host, &token)
+            .expect_err("pre-cancelled execution must stop before preflight"),
+    );
+    assert!(matches!(fault.kind(), RuntimeFaultKind::Cancelled));
+    assert_eq!(fault.span(), expected.span);
+    assert!(!fault.committed());
+    assert_eq!(fault.to_string(), "cancelled: execution.cancelled");
+    let diagnostic = fault.to_diagnostic();
+    assert_eq!(diagnostic.code(), codes::RUNTIME_FAULT);
+    let json = diagnostic.render_json().expect("diagnostic renders");
+    assert!(json.contains("execution was cancelled"));
+    assert!(json.contains("\"category\":\"cancelled\""));
+}
+
+#[test]
+fn cancellation_after_console_effect_reports_committed_source_mapped_fault() {
+    let fixture = fixture("hello.ling", HELLO);
+    let program = verified(&fixture);
+    let entry = program.model().entry().get();
+    let console_ordinal = program.model().functions()[entry as usize].blocks[0]
+        .instructions
+        .iter()
+        .position(|instruction| matches!(instruction, Instruction::ConsoleWrite { .. }))
+        .expect("hello fixture contains a Console.write instruction");
+    let expected = source_map_entry(
+        &program,
+        entry,
+        0,
+        u32::try_from(console_ordinal + 1).expect("next executable ordinal fits u32"),
+    );
+    let token = CancellationToken::new();
+    let mut console = CancellingConsole {
+        output: String::new(),
+        token: token.clone(),
+    };
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1_with_cancellation(&program, generous_limits(), &mut host, &token)
+            .expect_err("host-requested cancellation must stop at the next checkpoint"),
+    );
+    assert!(matches!(fault.kind(), RuntimeFaultKind::Cancelled));
+    assert_eq!(fault.span(), expected.span);
+    assert!(fault.committed());
+    assert_eq!(console.output, "你好，零\n");
 }
 
 #[test]

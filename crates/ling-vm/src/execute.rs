@@ -7,6 +7,7 @@ use ling_bytecode::{
 };
 use num_bigint::{BigInt, Sign};
 
+use crate::cancel::CancellationToken;
 use crate::fault::{
     ExecutionError, InternalExecutionError, RuntimeFault, RuntimeFaultKind, RuntimeResource,
 };
@@ -56,29 +57,56 @@ pub fn execute_v1(
     limits: ExecutionLimits,
     host: &mut HostCapabilities<'_>,
 ) -> Result<(), ExecutionError> {
-    Engine::new(program.model(), limits, host).execute()
+    execute_v1_inner(program, limits, host, None)
 }
 
-struct Engine<'program, 'host_ref, 'capability> {
+/// Executes the verified entry point with a host-owned cancellation request.
+///
+/// Cancellation is checked before capability preflight and immediately before
+/// every instruction or terminator. A request is cooperative: the currently
+/// executing host operation is allowed to finish, and effects committed before
+/// the next checkpoint remain committed.
+pub fn execute_v1_with_cancellation(
+    program: &VerifiedProgramV1,
+    limits: ExecutionLimits,
+    host: &mut HostCapabilities<'_>,
+    cancellation: &CancellationToken,
+) -> Result<(), ExecutionError> {
+    execute_v1_inner(program, limits, host, Some(cancellation))
+}
+
+fn execute_v1_inner(
+    program: &VerifiedProgramV1,
+    limits: ExecutionLimits,
+    host: &mut HostCapabilities<'_>,
+    cancellation: Option<&CancellationToken>,
+) -> Result<(), ExecutionError> {
+    Engine::new(program.model(), limits, host, cancellation).execute()
+}
+
+struct Engine<'program, 'host_ref, 'capability, 'cancel> {
     model: &'program UnverifiedProgram,
     limits: ExecutionLimits,
     host: &'host_ref mut HostCapabilities<'capability>,
+    cancellation: Option<&'cancel CancellationToken>,
     heap: Heap,
     frames: Vec<Frame>,
     steps: u64,
     committed: bool,
 }
 
-impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> {
+impl<'program, 'host_ref, 'capability, 'cancel> Engine<'program, 'host_ref, 'capability, 'cancel> {
     fn new(
         model: &'program UnverifiedProgram,
         limits: ExecutionLimits,
         host: &'host_ref mut HostCapabilities<'capability>,
+        cancellation: Option<&'cancel CancellationToken>,
     ) -> Self {
         Self {
             model,
             limits,
             host,
+            cancellation,
             heap: Heap::new(limits.heap_byte_limit),
             frames: Vec::new(),
             steps: 0,
@@ -89,6 +117,7 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
     fn execute(mut self) -> Result<(), ExecutionError> {
         let entry = self.model.entry().get();
         let entry_location = Location::new(entry, 0, 0);
+        self.check_cancellation(entry_location)?;
         let entry_function = self.function(entry)?;
         if entry_function.effects.contains(&Effect::ConsoleWrite) && self.host.console.is_none() {
             return Err(self.runtime_error(
@@ -114,6 +143,7 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
             if cursor.instruction < block.instructions.len() {
                 let ordinal = to_u32(cursor.instruction)?;
                 let location = Location::new(cursor.function, cursor.block, ordinal);
+                self.check_cancellation(location)?;
                 self.charge_step(location)?;
                 let instruction = &block.instructions[cursor.instruction];
                 self.current_frame_mut()?.instruction = cursor.instruction.saturating_add(1);
@@ -121,6 +151,7 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
             } else {
                 let ordinal = to_u32(block.instructions.len())?;
                 let location = Location::new(cursor.function, cursor.block, ordinal);
+                self.check_cancellation(location)?;
                 self.charge_step(location)?;
                 if self.execute_terminator(&block.terminator, location)? {
                     return Ok(());
@@ -830,6 +861,17 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
         }
         self.steps = self.steps.saturating_add(1);
         Ok(())
+    }
+
+    fn check_cancellation(&self, location: Location) -> Result<(), ExecutionError> {
+        if self
+            .cancellation
+            .is_some_and(CancellationToken::is_cancelled)
+        {
+            Err(self.runtime_error(RuntimeFaultKind::Cancelled, location))
+        } else {
+            Ok(())
+        }
     }
 
     fn ensure_frame_slot(&self, location: Location) -> Result<(), ExecutionError> {

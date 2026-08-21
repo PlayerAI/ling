@@ -340,6 +340,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0020"
+title = "Seed VM Robustness, Cancellation, and Resource Evidence"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0020.md"
+covers = ["cooperative VM cancellation", "Runtime Fault cancellation projection", "bytecode fuzz determinism", "resource-limit evidence"]
+depends_on = ["DEC-0013", "RFC-0014", "RFC-0018", "RFC-0019", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

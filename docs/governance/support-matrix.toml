@@ -385,6 +385,13 @@ stability = "Experimental"
 implemented = true
 
 [[protocol]]
+id = "PROTO-VM-CONTROL"
+visibility = "Public"
+version = "ling.vm.control/0.1"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
 id = "PROTO-REPLAY"
 visibility = "Planned public"
 version = ""
@@ -433,9 +440,9 @@ sources = ["docs/RFC-0002.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 id = "UNSUP-VM"
 area = "Execution"
 capability = "CLI bytecode emission/loading and VM backend selection"
-reason = "VM-1201 through VM-1204 provide the Experimental RFC-0014 protocol and verifier-gated library execution engine. No Accepted CLI bytecode command, backend selector, default execution limits, or full-Seed VM lowering contract exists."
+reason = "VM-1201 through VM-1210 provide Experimental versioned bytecode, verifier-gated library execution, differential/resource/cancellation evidence, and the separate ling.vm.control/0.1 host API. No Accepted CLI bytecode command, backend selector, default execution limits, or full-Seed VM lowering contract exists."
 blockers = []
-sources = ["docs/RFC-0014.md", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "tests/bytecode/README.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+sources = ["docs/RFC-0014.md", "docs/RFC-0020.md", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "tests/bytecode/README.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 
 [[unsupported]]
 id = "UNSUP-NATIVE-FFI"

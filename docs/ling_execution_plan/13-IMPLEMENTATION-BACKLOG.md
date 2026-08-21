@@ -100,7 +100,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `VM-1207` | G1/Editor | Mutable place 与基础 borrow | L | Done | RFC-0017；见 v1.2 SSA place lowering、CFG join、interpreter/VM differential evidence、机器状态与实施报告 |
 | `VM-1208` | G1/Editor | Effect/Capability/Fault | L | Done | RFC-0018；见现有 Effect/Capability 元数据闭包、执行前 capability preflight、稳定 Runtime Fault/source-map 证据及 host panic containment 测试 |
 | `VM-1209` | G1/Editor | Interpreter ↔ VM differential | L | Done | RFC-0019；见 `crates/ling-vm/tests/differential.rs` 的事件、Unit、Fault projection、ProgramId 与 round-trip evidence 及机器状态报告 |
-| `VM-1210` | G1/Editor | Fuzz 与资源限制 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:246` |
+| `VM-1210` | G1/Editor | Fuzz 与资源限制 | L | Done | RFC-0020；见 `crates/ling-vm` cancellation/resource tests、bytecode fuzz target、机器状态与实施报告 |
 | `TRAIT-1301` | G1/Editor | Trait RFC 收口 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:260` |
 | `TRAIT-1302` | G1/Editor | AST/HIR 表示 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:277` |
 | `TRAIT-1303` | G1/Editor | Constraint collection | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:285` |

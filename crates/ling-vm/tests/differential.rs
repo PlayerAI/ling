@@ -232,6 +232,7 @@ fn vm_fault(error: &VmRuntimeFault) -> FaultProjection {
             },
         ),
         VmFaultKind::OutOfMemory { operation } => ("out_of_memory", *operation),
+        VmFaultKind::Cancelled => ("cancelled", "execution.cancelled"),
     };
     FaultProjection {
         category: category.to_owned(),

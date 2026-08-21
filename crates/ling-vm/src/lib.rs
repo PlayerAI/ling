@@ -4,12 +4,14 @@
 //! parser, HIR, checker, filesystem, environment, or ambient host-capability
 //! access.
 
+mod cancel;
 mod execute;
 mod fault;
 mod host;
 mod value;
 
-pub use execute::{ExecutionLimits, execute_v1};
+pub use cancel::CancellationToken;
+pub use execute::{ExecutionLimits, execute_v1, execute_v1_with_cancellation};
 pub use fault::{
     ExecutionError, InternalExecutionError, RuntimeFault, RuntimeFaultKind, RuntimeResource,
 };

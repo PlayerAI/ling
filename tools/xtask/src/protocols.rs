@@ -25,6 +25,7 @@ const REQUIRED_IDS: &[&str] = &[
     "PROTO-LOCKFILE",
     "PROTO-BUILD-METADATA",
     "PROTO-BYTECODE",
+    "PROTO-VM-CONTROL",
     "PROTO-REPLAY",
     "PROTO-ABI",
     "PROTO-EVIDENCE",
@@ -39,6 +40,7 @@ const CATEGORIES: &[&str] = &[
     "Transaction",
     "Package metadata",
     "Bytecode",
+    "Runtime control",
     "Replay",
     "ABI",
     "Evidence",
@@ -835,10 +837,10 @@ notes = []
             .and_then(Path::parent)
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("repository protocol inventory is valid");
-        assert_eq!(summary.protocol_count, 20);
-        assert_eq!(summary.public_count, 14);
+        assert_eq!(summary.protocol_count, 21);
+        assert_eq!(summary.public_count, 15);
         assert_eq!(summary.preview_count, 6);
-        assert_eq!(summary.experimental_count, 8);
+        assert_eq!(summary.experimental_count, 9);
         assert_eq!(summary.stable_count, 0);
         assert_eq!(summary.internal_count, 1);
         assert_eq!(summary.future_count, 5);

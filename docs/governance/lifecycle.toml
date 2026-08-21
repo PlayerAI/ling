@@ -203,6 +203,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0020"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0020.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Cancel before entry with missing Capability and zero limits; require a source-mapped uncommitted cancelled Fault.",
+  "Have a host adapter cancel after one successful Console.write; require the first event, committed state, and no later event.",
+  "Run the existing step/frame/heap and malformed decoder corpora together with deterministic valid-seed mutations and bounded diagnostic rendering.",
+  "Build the excluded fuzz workspace with the locked offline dependency set; execute sanitizer corpus smoke only on the pinned CI host when the local Windows ASan runtime is unavailable.",
+]
+compatibility_impact = [
+  "Adds only the Experimental ling.vm.control/0.1 host API and the cancelled Runtime Fault projection under L-RUNTIME-0001; source, bytecode, CLI, schemas, Semantic IDs, ABI, and Unicode behavior remain unchanged.",
+  "Cancellation is cooperative and preserves committed host effects; execute_v1 remains the existing non-cancellable entry point.",
+]
+unresolved_alternatives = [
+  "Preemptive interruption, rollback, wall-clock deadlines, scheduler integration, common heap accounting, and structured Task or LSP cancellation require separate accepted specifications.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

@@ -15,7 +15,7 @@ title = "Bytecode version, verifier, evaluation, Fault, and compatibility"
 release = "v0.1"
 authority = ["ROADMAP-1.0"]
 gaps = ["GAP-BYTECODE-SEMANTICS-001"]
-decisions = ["RFC-0014", "RFC-0015", "RFC-0016", "RFC-0017", "RFC-0018", "RFC-0019"]
+decisions = ["RFC-0014", "RFC-0015", "RFC-0016", "RFC-0017", "RFC-0018", "RFC-0019", "RFC-0020"]
 
 [[gate]]
 id = "G1-TRAIT"
@@ -151,7 +151,7 @@ blocked_releases = ["v0.1"]
 blocked_tasks = ["VM-1210"]
 observable_behavior = "Bytecode versioning, decoding limits, verification rules, evaluation order, Fault mapping, and compatibility behavior are unspecified."
 authority = ["SEMANTICS", "ROADMAP-1.0"]
-candidate_rfcs = ["RFC-0014", "RFC-0015", "RFC-0016", "RFC-0017", "RFC-0018", "RFC-0019"]
+candidate_rfcs = ["RFC-0014", "RFC-0015", "RFC-0016", "RFC-0017", "RFC-0018", "RFC-0019", "RFC-0020"]
 source_items = ["ROADMAP-5.2:bytecode"]
 options = [
   "Use one RFC for the semantic contract and a versioned encoding appendix.",
@@ -160,8 +160,8 @@ options = [
 irreversible_consequences = ["A published encoding or verifier acceptance rule becomes an executable compatibility and security boundary."]
 required_evidence = ["positive", "negative", "migration", "differential", "malformed-input", "fuzz"]
 owner_role = "vm-design"
-next_action = "Implement VM-1209 under Accepted RFC-0019 with bounded Interpreter–VM differential evidence; keep VM-1210 separately gated on fuzzing, cancellation, and resource-limit evidence."
-resolution = ["RFC-0014", "RFC-0015", "RFC-0016", "RFC-0017", "RFC-0018", "RFC-0019"]
+next_action = "Maintain VM-1210 robustness, cancellation, and resource-limit evidence under Accepted RFC-0020; structured Task/LSP cancellation remains separately gated."
+resolution = ["RFC-0014", "RFC-0015", "RFC-0016", "RFC-0017", "RFC-0018", "RFC-0019", "RFC-0020"]
 superseded_by = ""
 observed_markers = []
 

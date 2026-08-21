@@ -44,6 +44,7 @@ pub enum RuntimeFaultKind {
     OutOfMemory {
         operation: &'static str,
     },
+    Cancelled,
 }
 
 impl RuntimeFaultKind {
@@ -55,6 +56,7 @@ impl RuntimeFaultKind {
             Self::CapabilityUnavailable { .. } => "capability_unavailable",
             Self::ResourceLimit { .. } => "resource_limit",
             Self::OutOfMemory { .. } => "out_of_memory",
+            Self::Cancelled => "cancelled",
         }
     }
 
@@ -66,6 +68,7 @@ impl RuntimeFaultKind {
             Self::InvalidFormatPlaceholderCount { .. } => "Text.format",
             Self::CapabilityUnavailable { capability } => capability,
             Self::ResourceLimit { resource } => resource.operation(),
+            Self::Cancelled => "execution.cancelled",
         }
     }
 }
@@ -144,6 +147,10 @@ impl RuntimeFault {
             RuntimeFaultKind::OutOfMemory { operation } => (
                 format!("运行时内存上限阻止了操作“{operation}”"),
                 format!("runtime memory ceiling prevented operation `{operation}`"),
+            ),
+            RuntimeFaultKind::Cancelled => (
+                "运行时执行已取消".to_owned(),
+                "runtime execution was cancelled".to_owned(),
             ),
         };
         Diagnostic::new(
