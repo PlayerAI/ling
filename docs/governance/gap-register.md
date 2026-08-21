@@ -6,8 +6,8 @@
 
 ## Summary
 
-- Total gaps: 27
-- Open: 22
+- Total gaps: 28
+- Open: 23
 - Proposed: 0
 - Accepted: 5
 - Rejected: 0
@@ -21,7 +21,7 @@
 | `G1-FORMATTER` — Author Source preservation, normalization, and localization | `v0.1` | `ROADMAP-1.0` | `GAP-FORMATTER-AUTHOR-SOURCE-001`, `GAP-FORMATTER-CLI-PROTOCOL-001`, `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `DEC-0015`, `DEC-0023` |
 | `G1-INCREMENTAL` — Incremental cache keys, Semantic Hash upgrades, and invalidation | `v0.1` | `ROADMAP-1.0` | `GAP-INCREMENTAL-CACHE-001`, `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `DEC-0012`, `DEC-0019`, `DEC-0021`, `DEC-0022` |
 | `G1-LSP-TRANSACTION` — LSP and Semantic Transaction Stable versus Experimental fields | `v0.1` | `ROADMAP-1.0` | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`, `GAP-LSP-TRANSACTION-PROTOCOL-001` | `DEC-0002`, `DEC-0012` |
-| `G1-PACKAGE` — Package identity, namespace, visibility, dependency, and lock rules | `v0.1` | `ROADMAP-1.0` | `GAP-PACKAGE-NAMESPACE-001`, `GAP-PACKAGE-PROTOCOL-001` | `DEC-0007`, `RFC-0002` |
+| `G1-PACKAGE` — Package identity, namespace, visibility, dependency, and lock rules | `v0.1` | `ROADMAP-1.0` | `GAP-PACKAGE-NAMESPACE-001`, `GAP-PACKAGE-PROTOCOL-001`, `GAP-PROJECT-CLI-INTERFACE-001` | `DEC-0007`, `RFC-0002` |
 | `G1-TRAIT` — Trait declarations, solving, coherence, orphan rules, and lowering | `v0.1` | `ROADMAP-1.0` | `GAP-TRAIT-COHERENCE-001` | — |
 
 ## Gaps by earliest blocked release
@@ -35,6 +35,7 @@
 | `GAP-FORMATTER-CLI-PROTOCOL-001` | `P0` | `Open` | Formatter CLI input, exit, and report contract | `FMT-1507` | — |
 | `GAP-INCREMENTAL-CACHE-001` | `P0` | `Open` | Incremental query keys, invalidation, persistence, and corruption recovery | `INC-1409` | — |
 | `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2104`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501`, `FMT-1507` | `RFC-0004` |
+| `GAP-PROJECT-CLI-INTERFACE-001` | `P0` | `Open` | Project workspace selection and build/test CLI contract | `PRJ-1107` | — |
 | `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `P0` | `Open` | Semantic Hash algorithm, identity upgrade, and invalidation lifecycle | `INC-1406`, `INC-1409`, `GOV-0106` | `RFC-0004` |
 | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | `P0` | `Open` | Semantic Graph and Semantic Transaction protocol lifecycle | `GOV-0106`, `INC-1406`, `IDE-2306`, `IDE-2309`, `FMT-1507` | `RFC-0004` |
 | `GAP-TRAIT-COHERENCE-001` | `P0` | `Open` | Base Trait coherence, orphan rules, solving, and lowering | `TRAIT-1301`, `TRAIT-1302`, `TRAIT-1303`, `TRAIT-1304`, `TRAIT-1305`, `TRAIT-1306`, `TRAIT-1307` | `RFC-0005` |

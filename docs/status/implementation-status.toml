@@ -3547,6 +3547,49 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 27 specification gaps and 58 tasks (57 Done plus the intentionally BlockedSpec FMT-1507 task).",
+  "Registry count self-tests now expect 28 specification gaps and 59 tasks (57 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
+]
+
+[[task]]
+id = "PRJ-1107"
+title = "Project API and CLI integration"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1106"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/PRJ-1107-AUTHORITY-AUDIT.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "An accepted project CLI decision defines manifest-path precedence, project check/run/test/build behavior, lock/offline selection, process exits, and JSON output.",
+  "The implementation reuses the RFC-0002 library graph and does not duplicate package resolution or add a placeholder CompilerHost API.",
+  "No stale `zero` command, unregistered protocol, diagnostic allocation, build artifact claim, or project test convention is introduced while the decision is absent.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "PRJ-1107 is blocked by GAP-PROJECT-CLI-INTERFACE-001; RFC-0002 explicitly leaves CLI integration to this task and no accepted command/build/test contract exists.",
+  "The current file-oriented `ling` CLI and accepted `ling.manifest/1`, `ling.semantic/0.2`, and `ling.lock/1` library protocols remain unchanged.",
 ]
