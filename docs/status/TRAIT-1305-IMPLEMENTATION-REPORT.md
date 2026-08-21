@@ -1,6 +1,6 @@
 # TRAIT-1305 Implementation Report
 
-Status: **In Progress**
+Status: **Done**
 
 ## Outcome
 
@@ -49,12 +49,17 @@ Executed offline with the locked dependency set:
 - `cargo test -p ling-types solver::tests::rejects_active_cycles_and_the_bounded_depth_limit --locked --offline`
 - `cargo fmt --all -- --check`
 - `git diff --check`
-- governance and status gates are rerun before the completion milestone.
+- `cargo test --workspace --locked --offline`
+- `cargo xtask governance check-all`
+- `cargo xtask status verify`
+- `cargo test -p xtask --all-targets --locked --offline`
+- `cargo fmt --all -- --check`
+- `git diff --check`
 
 The targeted solver suite covers unique selection, unsatisfied concrete and
 variable receivers, ambiguity, invalid receiver arity, active cycles, and the
-64-level depth boundary. Full workspace verification remains a completion
-gate.
+64-level depth boundary. The full workspace and governance suites pass with the
+locked offline dependency set.
 
 ## Compatibility and determinism
 

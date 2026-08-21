@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 64 tasks (61 Done, one In Progress TRAIT task, and the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 64 tasks (62 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3641,7 +3641,7 @@ notes = [
 [[task]]
 id = "TRAIT-1305"
 title = "Trait solver v0"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -3672,13 +3672,14 @@ acceptance = [
   "Selection preserves Trait/impl/member identity, ordered source origin, and deterministic candidate/error order; it cannot resolve ambiguity by ordering.",
   "No dictionary witness, public diagnostic, schema, Semantic ID, CLI/LSP, ABI, bytecode, runtime, or Unicode 17.0.0 behavior changes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "530de657bfc63018090426f2e6e47eeeaf710f2c"
+completion_commit = "530de657bfc63018090426f2e6e47eeeaf710f2c"
+integration_state = "committed"
+completed = "2026-08-21"
 notes = [
   "DEC-0026 accepts the crate-private first-slice solver contract after the TRAIT-1304 coherence index.",
   "TRAIT-1306 and TRAIT-1307 remain deferred for Checked Core dictionary witnesses and interpreter/VM lowering.",
+  "Verified and committed as 530de657bfc63018090426f2e6e47eeeaf710f2c after the full offline workspace, governance, status, formatting, and diff gates passed.",
 ]
 
 [[task]]
@@ -3720,7 +3721,7 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "DEC-0025 accepts the internal package-aware coherence/index boundary without expanding Trait support in the v0.0.1 matrix.",
-  "TRAIT-1305 through TRAIT-1307 remain deferred for solving, dictionary lowering, and runtime integration.",
+  "TRAIT-1306 and TRAIT-1307 remain deferred for dictionary lowering and runtime integration.",
   "Verified and committed as 94a8daec579b1c730e51ff37bd3cde63dfd9d046 after the full offline workspace, governance, status, formatting, and diff gates passed.",
 ]
 
