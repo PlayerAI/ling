@@ -3179,5 +3179,59 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "The benchmark intentionally measures the current file-mode compiler boundary; package-graph scale and memory/IO profiles require their owning public query surfaces.",
-  "The next execution-plan target is FMT-1501 formatter preservation authority, which requires an Accepted decision before implementation.",
+  "FMT-1501 is now closed by Accepted DEC-0023; the next execution-plan target is FMT-1502 Format IR.",
+]
+
+[[task]]
+id = "FMT-1501"
+title = "Author Source formatter preservation decision"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1410"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/FMT-1501-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+]
+acceptance = [
+  "Accepted DEC-0023 authorizes only the Author Source preservation and safety boundary; it does not implement a formatter, CLI/LSP command, range protocol, JSON schema, or public stability claim.",
+  "The boundary preserves identifier/literal/comment/documentation/error-region spelling and bytes, keeps comment and blank-line attachment order, emits four-space indentation and one final LF, and does not silently translate or NFC-rewrite localized text.",
+  "Parentheses and delimiters may change only when the authoritative compiler CST proves syntax preservation; optional trailing commas are preserved and new style rules remain deferred.",
+  "Complete valid sources must be idempotent and checked-equivalent through the existing compiler pipeline; incomplete/invalid sources receive unchanged bytes or complete-span-only edits without a second parser or fabricated tokens.",
+  "Author Source remains separate from DEC-0015 Audit Source; no current syntax, diagnostics, schemas, Semantic IDs, CLI/LSP behavior, ABI, or Unicode 17.0.0 behavior changes.",
+  "cargo xtask governance check-all, cargo test -p xtask --all-targets --locked --offline, cargo fmt --all -- --check, and git diff --check: passed.",
+]
+verified_against_commit = "fa2560fc09772ed98f8af97a71164ee1f465495f"
+completion_commit = "fa2560fc09772ed98f8af97a71164ee1f465495f"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The formatter gap remains Open only for executable Format IR, comment/error recovery, style, and CLI/LSP work; FMT-1502 is the next task and must consume compiler CST data.",
+  "The accepted decision deliberately leaves trailing-comma policy, aggressive parenthesis removal, localized keyword views, and editor transactions to later authority/evidence.",
 ]
