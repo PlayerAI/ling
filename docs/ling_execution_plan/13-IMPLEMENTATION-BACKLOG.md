@@ -293,7 +293,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PROF-5102` | G5 | 禁止能力检查 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:108`, `docs/status/PROF-5102-AUTHORITY-AUDIT.md` |
 | `PROF-5103` | G5 | Profile Composition | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:122`, `docs/status/PROF-5103-AUTHORITY-AUDIT.md` |
 | `PROF-5104` | G5 | Profile Audit 与 LSP | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:126`, `docs/status/PROF-5104-AUTHORITY-AUDIT.md` |
-| `BND-5201` | G5 | Bound 类型与表达式 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:140` |
+| `BND-5201` | G5 | Bound 类型与表达式 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:140`, `docs/status/BND-5201-AUTHORITY-AUDIT.md` |
 | `BND-5202` | G5 | 循环和递归检查 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:156` |
 | `BND-5203` | G5 | 内存预算 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:169` |
 | `BND-5204` | G5 | 资源预算诊断 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:184` |
