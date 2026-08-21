@@ -48,6 +48,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0021"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0021-deterministic-parallel-scheduling.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compare multiple scheduling seeds over canonical multi-file parse results, syntax errors, cache publication, and query traces.",
+  "Verify source insertion-order independence, immutable cache hits, clean/incremental equivalence, Unicode names, CRLF, and malformed UTF-8 boundaries.",
+  "Keep dependent workspace parallelism, persistence, corruption recovery, and public cancellation explicitly outside this decision.",
+]
+compatibility_impact = [
+  "Adds only bounded internal worker execution with canonical publication; source behavior, diagnostics, schemas, Semantic IDs, Unicode 17.0.0, and public protocols are unchanged.",
+  "No migration or persistent artifact is introduced; normal builds remain offline and locked.",
+]
+unresolved_alternatives = [
+  "Workspace-wide dependent query parallelism and persistent cache serialization require separate evidence and accepted authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0002"
 kind = "RFC"
 status = "Accepted"

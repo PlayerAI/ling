@@ -262,6 +262,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0021"
+title = "Deterministic parallel internal query scheduling"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0021-deterministic-parallel-scheduling.md"
+covers = ["bounded parallel query jobs", "canonical publication", "deterministic scheduling evidence"]
+depends_on = ["DEC-0019", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0002"
 title = "Local package identity and project protocol"
 kind = "RFC"

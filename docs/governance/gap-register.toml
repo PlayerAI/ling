@@ -31,7 +31,7 @@ title = "Incremental cache keys, Semantic Hash upgrades, and invalidation"
 release = "v0.1"
 authority = ["ROADMAP-1.0"]
 gaps = ["GAP-INCREMENTAL-CACHE-001", "GAP-SEMANTIC-HASH-LIFECYCLE-001"]
-decisions = ["DEC-0012"]
+decisions = ["DEC-0012", "DEC-0019", "DEC-0021"]
 
 [[gate]]
 id = "G1-FORMATTER"
@@ -194,7 +194,7 @@ title = "Incremental query keys, invalidation, persistence, and corruption recov
 status = "Open"
 priority = "P0"
 blocked_releases = ["v0.1"]
-blocked_tasks = ["INC-1406", "INC-1407", "INC-1408", "INC-1409"]
+blocked_tasks = ["INC-1409"]
 observable_behavior = "The normative inputs to cache keys, public/private invalidation boundaries, persistence compatibility, and safe corruption fallback are not fixed."
 authority = ["ROADMAP-1.0", "DEC-0012"]
 candidate_rfcs = []
@@ -206,7 +206,7 @@ options = [
 irreversible_consequences = ["Persisted keys and invalidation boundaries can leak stale semantics or create a compatibility promise across toolchain versions."]
 required_evidence = ["positive", "negative", "migration", "clean-equivalence", "corruption", "determinism"]
 owner_role = "compiler-architecture"
-next_action = "Use the INC-1402 VFS/revision boundary for later query work, then draft a separate decision for any persistent public cache format."
+next_action = "Use DEC-0019 and DEC-0021 for the disposable in-memory query boundary; draft a separate accepted decision for persistent cache format and corruption recovery before INC-1409."
 resolution = []
 superseded_by = ""
 observed_markers = []

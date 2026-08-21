@@ -9,6 +9,7 @@ use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
 use std::sync::Arc;
+use std::thread;
 
 use ling_ast::{LowerError, Program, lower};
 use ling_effects::{self, CheckedProgram, EffectError};
@@ -899,16 +900,93 @@ impl CompilerDb {
 
     /// Parses all visible files in canonical logical-name order.
     pub fn parse_all(&mut self) -> Result<Vec<(SourceId, Arc<ParsedSource>)>, QueryError> {
+        self.parse_all_with_schedule_seed(0)
+    }
+
+    fn parse_all_with_schedule_seed(
+        &mut self,
+        schedule_seed: u64,
+    ) -> Result<Vec<(SourceId, Arc<ParsedSource>)>, QueryError> {
         let files = self
             .vfs
             .snapshots()
             .into_iter()
             .map(|snapshot| snapshot.id())
             .collect::<Vec<_>>();
-        files
+        let mut keys = vec![None; files.len()];
+        let mut snapshots = vec![None; files.len()];
+        let mut parsed = vec![None; files.len()];
+        let mut misses = Vec::new();
+
+        for (index, file) in files.iter().copied().enumerate() {
+            let (key, snapshot, source) = self.source(file)?;
+            keys[index] = Some(key);
+            snapshots[index] = Some(snapshot);
+            if let Some(cached) = self
+                .parses
+                .get(keys[index].as_ref().expect("query key"))
+                .cloned()
+            {
+                parsed[index] = Some(cached);
+            } else {
+                misses.push((index, source));
+            }
+        }
+
+        let order = schedule_order(misses.len(), schedule_seed);
+        let worker_count = thread::available_parallelism()
+            .map_or(1, std::num::NonZeroUsize::get)
+            .min(order.len().max(1));
+        let chunk_size = order.len().div_ceil(worker_count).max(1);
+        let mut computed = Vec::new();
+        let misses_ref = &misses;
+        thread::scope(|scope| {
+            let handles = order.chunks(chunk_size).map(|chunk| {
+                let misses = misses_ref;
+                scope.spawn(move || {
+                    chunk
+                        .iter()
+                        .map(|position| {
+                            let (index, source) = &misses[*position];
+                            (*index, Arc::new(parse(source)))
+                        })
+                        .collect::<Vec<_>>()
+                })
+            });
+            for handle in handles {
+                computed.extend(handle.join().expect("parallel parse worker must not panic"));
+            }
+        });
+
+        for (index, result) in computed {
+            parsed[index] = Some(result);
+        }
+
+        for (index, file) in files.iter().copied().enumerate() {
+            let key = keys[index].take().expect("query key was collected");
+            let snapshot = snapshots[index]
+                .as_ref()
+                .expect("source snapshot was collected");
+            let result = parsed[index].take().expect("parse result was collected");
+            let outcome = if misses.iter().any(|(miss, _)| *miss == index) {
+                self.parses.insert(key, result.clone());
+                QueryOutcome::Miss
+            } else {
+                QueryOutcome::Hit
+            };
+            self.record(QueryKind::Parse, snapshot, outcome);
+            parsed[index] = Some(result);
+            debug_assert_eq!(file, snapshot.id());
+        }
+
+        Ok(files
             .into_iter()
-            .map(|file| self.parse(file).map(|parsed| (file, parsed)))
-            .collect()
+            .zip(
+                parsed
+                    .into_iter()
+                    .map(|result| result.expect("parse result was published")),
+            )
+            .collect())
     }
 
     /// Returns test-only query evidence accumulated since the last clear.
@@ -1552,6 +1630,24 @@ fn push_key_part(output: &mut String, value: &str) {
     output.push(';');
 }
 
+fn schedule_order(length: usize, seed: u64) -> Vec<usize> {
+    let mut order = (0..length).collect::<Vec<_>>();
+    for index in (1..length).rev() {
+        let mixed = splitmix64(seed.wrapping_add(index as u64));
+        let swap = (mixed % (index as u64 + 1)) as usize;
+        order.swap(index, swap);
+    }
+    order
+}
+
+fn splitmix64(mut value: u64) -> u64 {
+    value = value.wrapping_add(0x9E37_79B9_7F4A_7C15);
+    let mut mixed = value;
+    mixed = (mixed ^ (mixed >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    mixed = (mixed ^ (mixed >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    mixed ^ (mixed >> 31)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1809,6 +1905,40 @@ mod tests {
             parsed.into_iter().map(|(id, _)| id).collect::<Vec<_>>(),
             [a, z]
         );
+    }
+
+    #[test]
+    fn parallel_parse_scheduling_is_deterministic_across_task_seeds() {
+        let mut expected = None;
+        for seed in [0, 1, 7, 17, 0xDEAD_BEEF] {
+            let mut db = CompilerDb::new();
+            for (name, source) in [
+                ("z/Main.ling", b"let main () = ()\n".as_slice()),
+                ("a/Lib.ling", b"let answer = 42\n".as_slice()),
+                ("m/中文.ling", "let 人物 = 1\n".as_bytes()),
+                ("b/Bad.ling", b"let =\n".as_slice()),
+            ] {
+                db.set_disk_snapshot(name, source.to_vec()).unwrap();
+            }
+            let parsed = db.parse_all_with_schedule_seed(seed).unwrap();
+            let observation = (
+                parsed
+                    .into_iter()
+                    .map(|(file, parsed)| {
+                        (
+                            db.vfs.snapshot(file).unwrap().logical_name().to_owned(),
+                            (*parsed).clone(),
+                        )
+                    })
+                    .collect::<Vec<_>>(),
+                db.trace().to_vec(),
+            );
+            if let Some(expected) = &expected {
+                assert_eq!(expected, &observation);
+            } else {
+                expected = Some(observation);
+            }
+        }
     }
 
     #[test]
