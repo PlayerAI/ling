@@ -3278,5 +3278,50 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "Invalid or incomplete parses are projected losslessly with is_valid() == false; recovery policy and edits remain FMT-1505 work.",
-  "FMT-1503 is the next execution-plan target and must consume this IR without changing the Accepted DEC-0023 preservation boundary.",
+  "FMT-1503 is now closed over this IR; FMT-1504 comment attachment is the next execution-plan target.",
+]
+
+[[task]]
+id = "FMT-1503"
+title = "Core syntax formatting"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1502"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+]
+artifacts = [
+  "crates/ling-format/src/lib.rs",
+  "crates/ling-format/src/author.rs",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/FMT-1503-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "format_core consumes compiler-owned FormatDocument tokens and never reparses source to infer formatting structure; regex and Tree-sitter are not authorities.",
+  "Valid core syntax receives deterministic spacing, LF output, four-space Indent/Dedent layout, and preserved delimiter SoftNewline behavior across the Seed corpus.",
+  "Exact identifier, literal, Unicode, comment, BOM, blank-line, and trailing-comma content is preserved; existing parentheses are not invented or removed.",
+  "Candidate output is reparsed by the existing compiler parser; invalid/incomplete input and rejected candidates publish the original source unchanged.",
+  "Targeted, clippy, full workspace tests, formatting, and diff checks passed; no language semantics, diagnostics, Semantic IDs, Audit bytes, or public protocol changed.",
+]
+verified_against_commit = "05fe7fb9827b5e33afd094e99a0908c69d0af972"
+completion_commit = "05fe7fb9827b5e33afd094e99a0908c69d0af972"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The formatter is an opt-in library operation only; comment attachment, incomplete recovery, property evidence, CLI/LSP, and Audit separation remain subsequent tasks.",
+  "FMT-1504 is the next execution-plan target and must consume the same compiler-owned formatter path.",
 ]
