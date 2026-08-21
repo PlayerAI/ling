@@ -47,6 +47,7 @@
 | `CLI-1704` | Project test command | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
 | `CLI-1705` | Semantic query and patch commands | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
 | `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `CLI-1702` | `` |
+| `CPU-4201` | Scalar Reference Backend | `G4` | `L` | `BlockedSpec` | `KCHK-4105` | `` |
 | `DAP-3601` | Debugger stdio adapter | `G3+` | `L` | `BlockedSpec` | `DIFF-3702` | `` |
 | `DAP-3602` | Zed debugger registration | `G3+` | `M` | `BlockedSpec` | `DAP-3601` | `` |
 | `DAP-3603` | Staged debugger capabilities | `G3+` | `L` | `BlockedSpec` | `DAP-3602` | `` |
