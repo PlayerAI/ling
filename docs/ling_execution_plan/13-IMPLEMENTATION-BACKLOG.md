@@ -213,7 +213,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ACT-2305` | G2 | Actor Runtime | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:300`, `docs/status/ACT-2305-AUTHORITY-AUDIT.md` |
 | `ACT-2306` | G2 | Actor 性质与压力测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:313`, `docs/status/ACT-2306-AUTHORITY-AUDIT.md` |
 | `SUP-2401` | G2 | Supervisor 模型 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:326`, `docs/status/SUP-2401-AUTHORITY-AUDIT.md` |
-| `SUP-2402` | G2 | 重启预算与熔断 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:340` |
+| `SUP-2402` | G2 | 重启预算与熔断 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:340`, `docs/status/SUP-2402-AUTHORITY-AUDIT.md` |
 | `SUP-2403` | G2 | 监督测试 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:355` |
 | `REP-2501` | G2 | Determinism Class | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:369` |
 | `REP-2502` | G2 | Replay Log Schema | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:384` |
