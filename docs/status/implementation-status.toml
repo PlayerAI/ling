@@ -3629,8 +3629,8 @@ acceptance = [
   "The RFC lifecycle and authority registries record Open -> Draft -> Proposed -> Accepted with stable_basis true, and GAP-TRAIT-COHERENCE-001 resolves to RFC-0005.",
   "The design milestone adds no Trait implementation, diagnostic allocation, protocol schema, or placeholder API; TRAIT-1302 through TRAIT-1307 remain the implementation/evidence work.",
 ]
-verified_against_commit = ""
-completion_commit = ""
+verified_against_commit = "ccab6ea91e05ed477457cc1ed870d76faaa46e3c"
+completion_commit = "ccab6ea91e05ed477457cc1ed870d76faaa46e3c"
 integration_state = "committed"
 completed = "2026-08-21"
 notes = [
