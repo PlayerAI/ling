@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 61 tasks (59 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 62 tasks (60 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3641,7 +3641,7 @@ notes = [
 [[task]]
 id = "TRAIT-1303"
 title = "Trait constraint collection"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -3671,13 +3671,14 @@ acceptance = [
   "No impl candidate is selected and no unresolved obligation reaches executable Typed Core; the existing UnsupportedTypeSyntax boundary rejects Trait-bearing programs until later TRAIT stages.",
   "No diagnostic allocation, schema, Semantic ID, CLI/LSP, ABI, or Unicode 17.0.0 behavior changes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "1dfc52ee4439c43f284fbf384869436a408344d3"
+completion_commit = "1dfc52ee4439c43f284fbf384869436a408344d3"
+integration_state = "committed"
+completed = "2026-08-21"
 notes = [
   "DEC-0024 accepts the internal collection/interface boundary without expanding Trait support in the v0.0.1 matrix.",
   "TRAIT-1304 through TRAIT-1307 remain deferred for coherence, solving, dictionary lowering, and runtime integration.",
+  "Verified and committed as 1dfc52ee4439c43f284fbf384869436a408344d3 after the full offline workspace, governance, status, formatting, and diff gates passed.",
 ]
 
 [[task]]
