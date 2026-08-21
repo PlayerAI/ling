@@ -4268,7 +4268,7 @@ notes = [
 [[task]]
 id = "LSP-2101-LIFECYCLE"
 title = "LSP lifecycle Preview slice"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "S"
 owner = "Codex"
@@ -4307,13 +4307,14 @@ acceptance = [
   "Focused protocol tests cover position-encoding fallback/order, Unicode workspace metadata, malformed frames/messages, pre-init/post-shutdown requests, early exit, and framed transcripts.",
   "No document synchronization, diagnostic publication, Semantic Graph/Transaction, edit, cancellation, snapshot, filesystem, or network behavior is claimed.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "in-progress"
-completed = ""
+verified_against_commit = "38d95fb7b91c2035bd2b1b4ebf864c1693050925"
+completion_commit = "38d95fb7b91c2035bd2b1b4ebf864c1693050925"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "This independent slice closes the missing lifecycle authority/implementation boundary without marking the broader LSP-2101 parent Done; the parent still depends on the unresolved CLI-1701 command model and later editor integration.",
   "The protocol inventory remains Preview/current-writer-only and the Semantic Graph/Transaction and Workspace Edit gaps remain open.",
+  "Verified and committed as 38d95fb7b91c2035bd2b1b4ebf864c1693050925 after the full offline workspace, governance, status, support, schema, traceability, formatting, clippy, and diff gates passed.",
 ]
 
 [[task]]

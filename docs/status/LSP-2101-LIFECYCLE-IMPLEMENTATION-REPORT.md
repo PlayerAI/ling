@@ -1,8 +1,9 @@
 # LSP-2101-LIFECYCLE implementation report
 
-> Status: In Progress / 实施中
+> Status: Done / 已完成
 > Task: `LSP-2101-LIFECYCLE`
 > Authority: Accepted `RFC-0004` and `DEC-0029`
+> Verified commit: `38d95fb7b91c2035bd2b1b4ebf864c1693050925`
 
 ## Scope
 
@@ -42,3 +43,11 @@ The slice changes no `.ling` syntax, compiler semantics, diagnostics, Semantic
 IDs, bytecode, runtime, ABI, or Unicode tables. Headers are CRLF-only, frames
 and workspace counts are bounded, response keys are serialized deterministically,
 request IDs are preserved, and URI values never become host paths or identity.
+
+## Verification
+
+The implementation commit passed `cargo test --workspace --all-targets --locked
+--offline`, workspace clippy with `-D warnings`, `cargo fmt --all -- --check`,
+and the governance, support, schema, traceability, status, and diff checks. The
+parent `LSP-2101` remains `BlockedSpec`; this report closes only the independently
+authorized lifecycle/transport slice.

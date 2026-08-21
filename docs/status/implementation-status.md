@@ -154,7 +154,7 @@
 | `KCHK-4104` | Alias and parallel-write conflicts | `G4` | `L` | `BlockedSpec` | `KCHK-4103` | `` |
 | `KCHK-4105` | Kernel Core and verifier | `G4` | `L` | `BlockedSpec` | `KCHK-4104` | `` |
 | `LSP-2101` | LSP lifecycle skeleton | `G1` | `S` | `BlockedSpec` | `CLI-1701` | `` |
-| `LSP-2101-LIFECYCLE` | LSP lifecycle Preview slice | `G1` | `S` | `In Progress` | — | `` |
+| `LSP-2101-LIFECYCLE` | LSP lifecycle Preview slice | `G1` | `S` | `Done` | — | `38d95fb7b91c2035bd2b1b4ebf864c1693050925` |
 | `LSP-2102` | LSP position-encoding negotiation | `G1` | `S` | `BlockedSpec` | `LSP-2101` | `` |
 | `LSP-2102-SOURCE-MAP` | LSP SourceMap position projection | `G1` | `S` | `Done` | — | `9e917250bff5bb3ebba1ef02a5f2f6b66ab700de` |
 | `LSP-2103` | LSP open-document overlay | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
