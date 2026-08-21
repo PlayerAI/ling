@@ -122,7 +122,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `INC-1410` | G1/Editor | 增量性能基线 | M | Done | `cargo xtask performance baseline`；见 `tools/xtask/src/performance.rs` 与 `docs/status/INC-1410-PERFORMANCE-BASELINE.json`；门禁采用趋势比较，不冻结绝对时延 |
 | `FMT-1501` | G1/Editor | Formatter preservation decision | M | Done | Accepted DEC-0023；见 `docs/decisions/0023-author-source-formatter-preservation.md` 与实施报告；Format IR remains FMT-1502 |
 | `FMT-1502` | G1/Editor | Format IR | M | Done | DEC-0023；见 `crates/ling-format/src/format_ir.rs` 的 compiler-CST 投影、原始/词法双 span、精确 token spelling、无效源码保留与实施报告；不含渲染器、CLI/LSP 或第二 parser |
-| `FMT-1503` | G1/Editor | 核心语法格式化 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:404` |
+| `FMT-1503` | G1/Editor | 核心语法格式化 | M | Done | DEC-0002、DEC-0006、DEC-0023；见 `crates/ling-format/src/author.rs` 的 compiler-IR 核心格式化、四空格布局、LF/spacing、编译器重解析回退、Seed 语法覆盖与实施报告；comment attachment、incomplete recovery、CLI/LSP deferred |
 | `FMT-1504` | G1/Editor | Comment attachment | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:408` |
 | `FMT-1505` | G1/Editor | 不完整源码 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:412` |
 | `FMT-1506` | G1/Editor | 性质测试 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:416` |
