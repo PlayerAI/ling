@@ -57,6 +57,11 @@ fn run(arguments: Vec<OsString>) -> u8 {
 }
 
 fn execute(options: Options) -> u8 {
+    if options.command == Command::Lsp {
+        debug_assert!(options.stdio);
+        return execute_lsp();
+    }
+
     if options.command == Command::Repl {
         return execute_repl(options.format, options.capabilities);
     }
@@ -153,6 +158,17 @@ fn execute(options: Options) -> u8 {
         }
         Command::Repl => unreachable!("handled before compilation"),
         Command::Format => unreachable!("handled before compilation"),
+        Command::Lsp => unreachable!("handled before compilation"),
+    }
+}
+
+fn execute_lsp() -> u8 {
+    match ling_lsp::run_stdio(std::io::stdin().lock(), std::io::stdout().lock()) {
+        Ok(result) => result.exit_code(),
+        Err(error) => {
+            eprintln!("LSP 传输失败：{error}\nLSP transport failed: {error}");
+            EXIT_RUNTIME_FAULT
+        }
     }
 }
 
@@ -1033,7 +1049,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
     )
 }
 
@@ -1045,6 +1061,7 @@ enum Command {
     Semantic,
     Audit,
     Format,
+    Lsp,
 }
 
 impl Command {
@@ -1056,6 +1073,7 @@ impl Command {
             "semantic" => Some(Self::Semantic),
             "audit" => Some(Self::Audit),
             "fmt" => Some(Self::Format),
+            "lsp" => Some(Self::Lsp),
             _ => None,
         }
     }
@@ -1070,6 +1088,7 @@ impl std::fmt::Display for Command {
             Self::Semantic => "semantic",
             Self::Audit => "audit",
             Self::Format => "fmt",
+            Self::Lsp => "lsp",
         };
         formatter.write_str(name)
     }
@@ -1099,6 +1118,7 @@ struct Options {
     capabilities: Vec<String>,
     check: bool,
     stdin_name: Option<String>,
+    stdio: bool,
 }
 
 impl Options {
@@ -1108,11 +1128,18 @@ impl Options {
         let mut capabilities = Vec::new();
         let mut check = false;
         let mut stdin_name = None;
+        let mut stdio = false;
         let mut index = 0;
 
         while index < arguments.len() {
             let argument = &arguments[index];
             if argument == "--format" {
+                if command == Command::Lsp {
+                    return Err(
+                        "`lsp --stdio` does not accept `--format`; stdout is protocol-only"
+                            .to_owned(),
+                    );
+                }
                 let value = arguments
                     .get(index + 1)
                     .ok_or_else(|| "`--format` requires `human` or `json`".to_owned())?;
@@ -1174,6 +1201,18 @@ impl Options {
                 continue;
             }
 
+            if argument == "--stdio" {
+                if command != Command::Lsp {
+                    return Err("`--stdio` is only valid with `lsp`".to_owned());
+                }
+                if stdio {
+                    return Err("only one `--stdio` may be provided".to_owned());
+                }
+                stdio = true;
+                index += 1;
+                continue;
+            }
+
             if argument.to_string_lossy().starts_with('-') && argument != "-" {
                 return Err(format!("unknown option `{}`", argument.to_string_lossy()));
             }
@@ -1183,11 +1222,17 @@ impl Options {
             index += 1;
         }
 
-        if command == Command::Repl && path.is_some() {
-            return Err("`repl` does not accept a source file".to_owned());
+        if matches!(command, Command::Repl | Command::Lsp) && path.is_some() {
+            return Err(format!("`{command}` does not accept a source file"));
         }
-        if command != Command::Repl && path.is_none() {
+        if command != Command::Repl && command != Command::Lsp && path.is_none() {
             return Err(format!("`{command}` requires a source file"));
+        }
+        if command == Command::Lsp && !stdio {
+            return Err("`lsp` requires `--stdio`".to_owned());
+        }
+        if command != Command::Lsp && stdio {
+            return Err("`--stdio` is only valid with `lsp`".to_owned());
         }
         if command == Command::Format {
             let is_stdin = path.as_deref().is_some_and(|value| value == Path::new("-"));
@@ -1217,6 +1262,7 @@ impl Options {
             capabilities,
             check,
             stdin_name,
+            stdio,
         })
     }
 }
@@ -1304,6 +1350,21 @@ mod tests {
         );
         assert!(!valid_stdin_name("../main.ling"));
         assert!(!valid_stdin_name("main.txt"));
+    }
+
+    #[test]
+    fn parses_only_the_stdio_lsp_launcher() {
+        let options = Options::parse(Command::Lsp, &["--stdio".into()]).unwrap();
+        assert!(options.stdio);
+        assert_eq!(options.path, None);
+        assert_eq!(
+            Options::parse(Command::Lsp, &[]).unwrap_err(),
+            "`lsp` requires `--stdio`"
+        );
+        assert_eq!(
+            Options::parse(Command::Lsp, &["--format".into(), "human".into()]).unwrap_err(),
+            "`lsp --stdio` does not accept `--format`; stdout is protocol-only"
+        );
     }
 
     #[test]

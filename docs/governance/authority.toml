@@ -405,6 +405,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0004"
+title = "LSP lifecycle and transport"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0004.md"
+covers = ["ling lsp --stdio", "JSON-RPC framing", "LSP lifecycle state machine", "position-encoding negotiation", "workspace-folder validation"]
+depends_on = ["DEC-0002", "DEC-0029", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0014"
 title = "Portable verified bytecode and VM contract"
 kind = "RFC"

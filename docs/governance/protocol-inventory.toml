@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-21"
+updated = "2026-08-22"
 
 [[protocol]]
 id = "PROTO-CLI"
@@ -13,15 +13,37 @@ public_schema = false
 canonical = false
 producer = ["ling executable"]
 consumer = ["humans", "shell scripts", "editor and build integrations"]
-reader_policy = "The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, --format human|json, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2."
-writer_policy = "Help and version output describe only implemented commands; commands route through the shared checked compiler pipeline, and no placeholder command is advertised."
+reader_policy = "The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2."
+writer_policy = "Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, lsp --stdio routes to the framed lifecycle server, and no placeholder command is advertised."
 unknown_field_policy = "Not field-based: unknown commands, options, formats, and capabilities are rejected."
 migration_tool = "None; incompatible command or option changes require an accepted specification and release migration notes."
 fixtures = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs"]
 sources = ["Cargo.toml", "crates/ling-cli/src/main.rs"]
 version_markers = ["0.0.1-dev"]
-authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016"]
-notes = ["The compiler package version is the current CLI version; no independent CLI schema identifier exists."]
+authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "RFC-0004"]
+notes = ["The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds only the explicitly gated Preview `ling lsp --stdio` launcher."]
+
+[[protocol]]
+id = "PROTO-LSP-LIFECYCLE"
+title = "Ling LSP lifecycle and stdio transport"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.lifecycle/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp lifecycle server"]
+consumer = ["LSP clients", "editor and integration test harnesses"]
+reader_policy = "Accept one JSON-RPC 2.0 object per CRLF Content-Length frame; reject malformed framing, invalid IDs, batches, unsupported lifecycle state, and invalid initialize metadata without guessing or converting URIs to host paths."
+writer_policy = "Emit only framed compact UTF-8 JSON-RPC responses for initialize and shutdown; preserve request IDs, flush each response, and write no unframed protocol bytes or human text to stdout."
+unknown_field_policy = "Unknown JSON-RPC object fields and ASCII transport headers are ignored for this Preview; unknown methods are rejected only when they are requests, and future incompatible fields require a new protocol version."
+migration_tool = "None; `ling.lsp.lifecycle/0.1` is current-writer-only and a future Stable/editor contract requires an accepted migration specification."
+fixtures = ["crates/ling-lsp/tests/lifecycle.rs", "crates/ling-cli/tests/lsp.rs", "tests/protocols/lsp-lifecycle/README.md"]
+sources = ["docs/RFC-0004.md", "crates/ling-lsp/src/lib.rs", "crates/ling-cli/src/main.rs"]
+version_markers = ["ling.lsp.lifecycle/0.1", "ling lsp --stdio"]
+authority = ["RFC-0004", "DEC-0029"]
+notes = ["Preview lifecycle only: initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity. Document synchronization, diagnostics, edits, snapshots, cancellation, and Semantic Transactions remain deferred."]
 
 [[protocol]]
 id = "PROTO-CLI-EXIT"
@@ -35,14 +57,14 @@ public_schema = false
 canonical = true
 producer = ["ling process"]
 consumer = ["shells", "CI jobs", "editor and build integrations"]
-reader_policy = "Interpret 0 as success, 1 as compile/check failure, 2 as invalid usage, 4 as runtime or host fault, 5 as internal compiler error, and 6 as semantic snapshot mismatch; 3 is reserved and unreachable in Seed."
-writer_policy = "Human versus JSON rendering never changes the exit class; run and scripted REPL preserve the accepted compile/runtime distinction."
+reader_policy = "Interpret 0 as success, 1 as compile/check failure or an early LSP exit, 2 as invalid usage, 4 as runtime, host, or LSP transport fault, 5 as internal compiler error, and 6 as semantic snapshot mismatch; 3 is reserved and unreachable in Seed."
+writer_policy = "Human versus JSON rendering never changes the exit class; run and scripted REPL preserve the accepted compile/runtime distinction, while the LSP lifecycle preserves shutdown-before-exit status."
 unknown_field_policy = "Not field-based: unassigned exit values have no compatibility meaning."
 migration_tool = "None; changing an assigned meaning requires an accepted decision and explicit compatibility guidance."
 fixtures = ["crates/ling-cli/tests/conformance.rs", "tests/conformance/p7-hello-run/expect.toml", "tests/conformance/p12-text-format-fault/expect.toml"]
 sources = ["Cargo.toml", "crates/ling-cli/src/main.rs"]
 version_markers = ["0.0.1-dev"]
-authority = ["DEC-0013", "DEC-0016"]
+authority = ["DEC-0013", "DEC-0016", "RFC-0004"]
 notes = ["Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior."]
 
 [[protocol]]

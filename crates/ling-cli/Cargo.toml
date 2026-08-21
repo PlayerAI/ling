@@ -18,6 +18,7 @@ ling-effects = { path = "../ling-effects" }
 ling-eval = { path = "../ling-eval" }
 ling-format = { path = "../ling-format" }
 ling-hir = { path = "../ling-hir" }
+ling-lsp = { path = "../ling-lsp" }
 ling-resolve = { path = "../ling-resolve" }
 ling-semantic = { path = "../ling-semantic" }
 ling-source = { path = "../ling-source" }

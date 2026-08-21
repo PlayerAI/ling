@@ -4266,6 +4266,57 @@ notes = [
 ]
 
 [[task]]
+id = "LSP-2101-LIFECYCLE"
+title = "LSP lifecycle Preview slice"
+state = "In Progress"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = []
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0004.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-lsp/Cargo.toml",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/lifecycle.rs",
+  "crates/ling-cli/tests/lsp.rs",
+  "tests/protocols/lsp-lifecycle/README.md",
+  "docs/RFC-0004.md",
+  "docs/status/LSP-2101-LIFECYCLE-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "RFC-0004 is Accepted and limits this slice to ling lsp --stdio transport, lifecycle, capability negotiation, and workspace-folder validation.",
+  "The server implements strict CRLF Content-Length framing, bounded JSON-RPC parsing, deterministic bilingual errors, initialize/initialized/shutdown/exit state transitions, and stdout protocol purity.",
+  "Focused protocol tests cover position-encoding fallback/order, Unicode workspace metadata, malformed frames/messages, pre-init/post-shutdown requests, early exit, and framed transcripts.",
+  "No document synchronization, diagnostic publication, Semantic Graph/Transaction, edit, cancellation, snapshot, filesystem, or network behavior is claimed.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "in-progress"
+completed = ""
+notes = [
+  "This independent slice closes the missing lifecycle authority/implementation boundary without marking the broader LSP-2101 parent Done; the parent still depends on the unresolved CLI-1701 command model and later editor integration.",
+  "The protocol inventory remains Preview/current-writer-only and the Semantic Graph/Transaction and Workspace Edit gaps remain open.",
+]
+
+[[task]]
 id = "LSP-2102"
 title = "LSP position-encoding negotiation"
 state = "BlockedSpec"

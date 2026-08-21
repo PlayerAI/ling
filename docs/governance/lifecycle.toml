@@ -797,3 +797,28 @@ unresolved_alternatives = [
   "Exact declaration punctuation, constraint spelling, blanket-impl scope, recursive progress measure, dictionary witness schema, associated types/default methods, and final bilingual diagnostic allocation remain unresolved.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0004"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0004.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Exercise framed initialize/initialized/shutdown/exit transcripts, position-encoding fallback, workspace-folder limits, and state-incompatible requests.",
+  "Reject malformed Content-Length headers, truncated/oversized bodies, invalid UTF-8/JSON, batches, invalid IDs, and post-shutdown requests with deterministic protocol behavior.",
+  "Run the ling lsp --stdio subprocess and prove stdout contains only CRLF-framed JSON-RPC while human errors stay on stderr.",
+]
+compatibility_impact = [
+  "Adds only the Preview ling.lsp.lifecycle/0.1 transport and lifecycle command; no source, compiler, diagnostics, Semantic IDs, bytecode, ABI, or Unicode behavior changes.",
+  "The protocol is current-writer-only and does not claim document synchronization, edits, cancellation, snapshots, or Stable 1.0 editor support.",
+]
+unresolved_alternatives = [
+  "URI-to-path resolution, document synchronization, Workspace Edits, Semantic Transactions, snapshot/version guards, cancellation, and stable migration remain future specifications.",
+]
+superseded_by = ""

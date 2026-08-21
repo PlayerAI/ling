@@ -222,6 +222,7 @@ dependencies = [
  "ling-eval",
  "ling-format",
  "ling-hir",
+ "ling-lsp",
  "ling-resolve",
  "ling-semantic",
  "ling-source",
@@ -312,6 +313,14 @@ dependencies = [
  "ling-ast",
  "ling-source",
  "ling-syntax",
+]
+
+[[package]]
+name = "ling-lsp"
+version = "0.0.1-dev"
+dependencies = [
+ "ling-source",
+ "serde_json",
 ]
 
 [[package]]

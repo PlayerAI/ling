@@ -454,6 +454,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-LIFECYCLE",
+      "visibility": "Public",
+      "version": "ling.lsp.lifecycle/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-PACKAGE-IDENTITY",
       "visibility": "Public",
       "version": "v1 domain encodings",
@@ -561,8 +568,8 @@
     {
       "id": "UNSUP-LSP-EDITOR",
       "area": "Tooling",
-      "capability": "LSP, Zed extension, or semantic mutation",
-      "reason": "No corresponding LSP executable, editor integration package, or accepted semantic-mutation transaction boundary exists; the formatter CLI is Preview-only and does not provide editor transactions.",
+      "capability": "LSP document features, Zed extension, or semantic mutation",
+      "reason": "RFC-0004 implements only the Preview ling lsp --stdio lifecycle and transport. Document synchronization, diagnostics, editor features, semantic mutation, and transaction boundaries remain unresolved; the formatter CLI is Preview-only and does not provide editor transactions.",
       "blockers": [
         "GAP-LSP-TRANSACTION-PROTOCOL-001",
         "GAP-FORMATTER-AUTHOR-SOURCE-001",

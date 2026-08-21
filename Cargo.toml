@@ -11,6 +11,7 @@ members = [
     "crates/ling-eval",
     "crates/ling-format",
     "crates/ling-hir",
+    "crates/ling-lsp",
     "crates/ling-project",
     "crates/ling-resolve",
     "crates/ling-semantic",

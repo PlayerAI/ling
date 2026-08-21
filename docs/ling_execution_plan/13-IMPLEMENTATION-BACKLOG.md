@@ -136,6 +136,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CLI-1705` | G1/Editor | `query/patch` | — | BlockedSpec | `03-G1-V0.1-LIVING.md:478`, `docs/status/CLI-1705-AUTHORITY-AUDIT.md` |
 | `CLI-1706` | G1/Editor | Shell completion 与 help fixtures | — | BlockedSpec | `03-G1-V0.1-LIVING.md:482`, `docs/status/CLI-1706-AUTHORITY-AUDIT.md` |
 | `LSP-2101` | G1/Editor | 初始化与生命周期 | S | BlockedSpec | `04-LSP-IMPLEMENTATION.md:137`, `docs/status/LSP-2101-AUTHORITY-AUDIT.md` |
+| `LSP-2101-LIFECYCLE` | G1/Editor | LSP lifecycle Preview slice | S | In Progress | `RFC-0004`; see `crates/ling-lsp`, `tests/protocols/lsp-lifecycle`, and `docs/status/LSP-2101-LIFECYCLE-IMPLEMENTATION-REPORT.md`; document, diagnostic, edit, and transaction surfaces remain deferred |
 | `LSP-2102` | G1/Editor | Position encoding negotiation | S | BlockedSpec | `04-LSP-IMPLEMENTATION.md:145`, `docs/status/LSP-2102-AUTHORITY-AUDIT.md` |
 | `LSP-2102-SOURCE-MAP` | G1/Editor | SourceMap position projection | S | Done | `DEC-0029`; see `crates/ling-source/src/position.rs` and `docs/status/LSP-2102-SOURCE-MAP-IMPLEMENTATION-REPORT.md`; parent LSP lifecycle remains BlockedSpec |
 | `LSP-2103` | G1/Editor | Open document overlay | M | BlockedSpec | `04-LSP-IMPLEMENTATION.md:151`, `docs/status/LSP-2103-AUTHORITY-AUDIT.md` |

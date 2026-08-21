@@ -1,13 +1,13 @@
 # Ling 公开接口与协议清单 / Public Protocol Inventory
 
 > 状态：由 `protocol-inventory.toml` 确定性生成
-> 更新日期：2026-08-21
+> 更新日期：2026-08-22
 > 本清单记录当前兼容边界，不新增语言语义或协议承诺。
 
 ## Summary
 
-- 22 records: 16 current public, 1 internal, 5 Future.
-- Current public stability: 9 Experimental, 7 Preview, 0 Stable.
+- 23 records: 17 current public, 1 internal, 5 Future.
+- Current public stability: 9 Experimental, 8 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -16,6 +16,7 @@
 | --- | --- | --- | --- | --- | --- | --- | ---: |
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
+| `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
 | `PROTO-FORMAT-CLI` | Public | JSON | `ling.format/0.1` | `Preview` | yes | no | 5 |
@@ -43,27 +44,40 @@
 
 - Producer: ling executable
 - Consumer: humans; shell scripts; editor and build integrations
-- Reader policy: The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, --format human|json, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2.
-- Writer policy: Help and version output describe only implemented commands; commands route through the shared checked compiler pipeline, and no placeholder command is advertised.
+- Reader policy: The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2.
+- Writer policy: Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, lsp --stdio routes to the framed lifecycle server, and no placeholder command is advertised.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
-- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`
+- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `RFC-0004`
 - Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
-- Notes: The compiler package version is the current CLI version; no independent CLI schema identifier exists.
+- Notes: The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds only the explicitly gated Preview `ling lsp --stdio` launcher.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 
 - Producer: ling process
 - Consumer: shells; CI jobs; editor and build integrations
-- Reader policy: Interpret 0 as success, 1 as compile/check failure, 2 as invalid usage, 4 as runtime or host fault, 5 as internal compiler error, and 6 as semantic snapshot mismatch; 3 is reserved and unreachable in Seed.
-- Writer policy: Human versus JSON rendering never changes the exit class; run and scripted REPL preserve the accepted compile/runtime distinction.
+- Reader policy: Interpret 0 as success, 1 as compile/check failure or an early LSP exit, 2 as invalid usage, 4 as runtime, host, or LSP transport fault, 5 as internal compiler error, and 6 as semantic snapshot mismatch; 3 is reserved and unreachable in Seed.
+- Writer policy: Human versus JSON rendering never changes the exit class; run and scripted REPL preserve the accepted compile/runtime distinction, while the LSP lifecycle preserves shutdown-before-exit status.
 - Unknown-field policy: Not field-based: unassigned exit values have no compatibility meaning.
 - Migration tool: None; changing an assigned meaning requires an accepted decision and explicit compatibility guidance.
-- Authority: `DEC-0013`, `DEC-0016`
+- Authority: `DEC-0013`, `DEC-0016`, `RFC-0004`
 - Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`tests/conformance/p7-hello-run/expect.toml`](../../tests/conformance/p7-hello-run/expect.toml), [`tests/conformance/p12-text-format-fault/expect.toml`](../../tests/conformance/p12-text-format-fault/expect.toml)
 - Notes: Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior.
+
+### `PROTO-LSP-LIFECYCLE` — Ling LSP lifecycle and stdio transport
+
+- Producer: ling lsp --stdio; ling-lsp lifecycle server
+- Consumer: LSP clients; editor and integration test harnesses
+- Reader policy: Accept one JSON-RPC 2.0 object per CRLF Content-Length frame; reject malformed framing, invalid IDs, batches, unsupported lifecycle state, and invalid initialize metadata without guessing or converting URIs to host paths.
+- Writer policy: Emit only framed compact UTF-8 JSON-RPC responses for initialize and shutdown; preserve request IDs, flush each response, and write no unframed protocol bytes or human text to stdout.
+- Unknown-field policy: Unknown JSON-RPC object fields and ASCII transport headers are ignored for this Preview; unknown methods are rejected only when they are requests, and future incompatible fields require a new protocol version.
+- Migration tool: None; `ling.lsp.lifecycle/0.1` is current-writer-only and a future Stable/editor contract requires an accepted migration specification.
+- Authority: `RFC-0004`, `DEC-0029`
+- Sources: [`docs/RFC-0004.md`](../RFC-0004.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
+- Fixtures: [`crates/ling-lsp/tests/lifecycle.rs`](../../crates/ling-lsp/tests/lifecycle.rs), [`crates/ling-cli/tests/lsp.rs`](../../crates/ling-cli/tests/lsp.rs), [`tests/protocols/lsp-lifecycle/README.md`](../../tests/protocols/lsp-lifecycle/README.md)
+- Notes: Preview lifecycle only: initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity. Document synchronization, diagnostics, edits, snapshots, cancellation, and Semantic Transactions remain deferred.
 
 ### `PROTO-HUMAN-OUTPUT` — Human-readable CLI and diagnostic output
 
