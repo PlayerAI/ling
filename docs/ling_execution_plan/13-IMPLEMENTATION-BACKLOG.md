@@ -343,7 +343,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PKG-6403` | G6 | Registry 最小实现或推迟策略 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:239`, `docs/status/PKG-6403-AUTHORITY-AUDIT.md` |
 | `PKG-6404` | G6 | 供应链攻击测试 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:248`, `docs/status/PKG-6404-AUTHORITY-AUDIT.md` |
 | `COMPAT-6501` | G6 | 历史 Corpus | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:265`, `docs/status/COMPAT-6501-AUTHORITY-AUDIT.md` |
-| `COMPAT-6502` | G6 | 1.0 Compiler 兼容矩阵 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:280` |
+| `COMPAT-6502` | G6 | 1.0 Compiler 兼容矩阵 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:280`, `docs/status/COMPAT-6502-AUTHORITY-AUDIT.md` |
 | `COMPAT-6503` | G6 | `zero migrate` | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:293` |
 | `COMPAT-6504` | G6 | 弃用政策 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:307` |
 | `REL-6601` | G6 | Fuzz 总覆盖盘点 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:321` |
