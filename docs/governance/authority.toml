@@ -314,6 +314,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0025"
+title = "Trait coherence index boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0025-trait-coherence-index-boundary.md"
+covers = ["package-aware Trait coherence indexing", "orphan and overlap validation", "deterministic non-semantic candidate order"]
+depends_on = ["RFC-0005", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0002"
 title = "Local package identity and project protocol"
 kind = "RFC"

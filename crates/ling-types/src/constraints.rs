@@ -9,7 +9,7 @@ use ling_hir as hir;
 use ling_resolve::{BindingKey, DefinitionId, ModuleId, ResolvedProgram};
 use ling_source::Span;
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub(crate) enum ConstraintType {
     Named(String),
     Variable(String),
@@ -304,6 +304,20 @@ fn parse_obligation(
         return Err("obligation contains trailing or unsupported type syntax");
     }
     Ok((trait_name, arguments))
+}
+
+pub(crate) fn parse_type_expression(
+    syntax: &hir::TypeSyntax,
+) -> Result<ConstraintType, &'static str> {
+    let mut parser = TypeParser {
+        atoms: &syntax.atoms,
+        position: 0,
+    };
+    let value = parser.type_primary()?;
+    if parser.position != parser.atoms.len() {
+        return Err("type expression contains trailing or unsupported syntax");
+    }
+    Ok(value)
 }
 
 struct TypeParser<'a> {

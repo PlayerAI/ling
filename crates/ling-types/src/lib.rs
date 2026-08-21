@@ -13,6 +13,7 @@ use ling_resolve::{
 use ling_source::Span;
 use num_bigint::BigInt;
 
+mod coherence;
 mod constraints;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -463,6 +464,14 @@ pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> 
                 restriction_reason: None,
             }))
         }
+    }
+    if let Err(coherence_errors) = coherence::build_index(&resolved) {
+        trait_errors.extend(coherence_errors.into_iter().map(|error| TypeError {
+            kind: TypeErrorKind::UnsupportedTypeSyntax,
+            source_name: error.source_name,
+            span: error.span,
+            restriction_reason: None,
+        }));
     }
     if !trait_errors.is_empty() {
         trait_errors.sort_by(|left, right| {

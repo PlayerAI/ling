@@ -22,6 +22,30 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0025"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0025-trait-coherence-index-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Index ordered Trait and impl declarations with package ownership, canonical receivers, member order, and original spans.",
+  "Reject foreign/foreign orphan impls, duplicate or overlapping receivers, generic receivers, missing members, and duplicate members deterministically.",
+  "Compare cross-package results across supplied/module orders and keep the index outside executable Typed Core.",
+]
+compatibility_impact = [
+  "Adds an internal coherence index only; diagnostics, schemas, Semantic IDs, CLI/LSP and package protocols, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Solver selection, recursion limits, public diagnostics, dictionary witnesses, Semantic Graph projection, runtime lowering, and generic/blanket impls are deferred to later TRAIT tasks.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0024"
 kind = "Decision"
 status = "Accepted"

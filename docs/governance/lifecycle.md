@@ -49,6 +49,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0022` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0022](../decisions/0022-disposable-persistent-query-cache.md) |
 | `DEC-0023` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0023](../decisions/0023-author-source-formatter-preservation.md) |
 | `DEC-0024` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0024](../decisions/0024-trait-obligation-collection-boundary.md) |
+| `DEC-0025` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0025](../decisions/0025-trait-coherence-index-boundary.md) |
 
 ## Migration boundary
 
