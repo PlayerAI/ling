@@ -18,6 +18,8 @@ pub enum Item {
     Import(ImportDeclaration),
     Let(LetDeclaration),
     Type(TypeDeclaration),
+    Trait(TraitDeclaration),
+    Impl(ImplDeclaration),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -56,9 +58,34 @@ pub struct LetDeclaration {
     pub recursive: bool,
     pub mutable: bool,
     pub binding: Pattern,
+    pub type_parameters: Vec<Name>,
+    pub constraints: Vec<TypeExpression>,
     pub parameters: Vec<Pattern>,
     pub annotation: Option<TypeExpression>,
     pub value: Expression,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TraitDeclaration {
+    pub span: Span,
+    pub name: Name,
+    pub parameters: Vec<Name>,
+    pub members: Vec<TraitMember>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TraitMember {
+    pub span: Span,
+    pub name: Name,
+    pub signature: TypeExpression,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ImplDeclaration {
+    pub span: Span,
+    pub trait_name: QualifiedName,
+    pub receiver: TypeExpression,
+    pub members: Vec<LetDeclaration>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -331,6 +358,8 @@ impl<'input> Lowerer<'input> {
             NodeKind::ImportDeclaration => self.import_declaration(node).map(Item::Import),
             NodeKind::LetDeclaration => self.let_declaration(node).map(Item::Let),
             NodeKind::TypeDeclaration => self.type_declaration(node).map(Item::Type),
+            NodeKind::TraitDeclaration => self.trait_declaration(node).map(Item::Trait),
+            NodeKind::ImplDeclaration => self.impl_declaration(node).map(Item::Impl),
             kind => Err(self.unexpected(node, kind)),
         }
     }
@@ -400,12 +429,35 @@ impl<'input> Lowerer<'input> {
             .last()
             .copied()
             .ok_or_else(|| self.missing_child(node, "let value"))?;
+        let type_parameters = remaining
+            .iter()
+            .find(|child| child.kind() == NodeKind::TypeParameterList)
+            .map(|child| {
+                self.significant_tokens(child)
+                    .filter(|token| token.kind() == TokenKind::Identifier)
+                    .map(|token| self.name(token))
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .transpose()?
+            .unwrap_or_default();
+        let constraints = remaining
+            .iter()
+            .find(|child| child.kind() == NodeKind::ConstraintBlock)
+            .map(|child| {
+                child
+                    .children()
+                    .iter()
+                    .map(|constraint| self.type_expression(constraint))
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .transpose()?
+            .unwrap_or_default();
         let annotation_index = remaining
             .iter()
             .position(|child| child.kind() == NodeKind::TypeExpression);
-        let parameter_end = annotation_index.unwrap_or(remaining.len().saturating_sub(1));
-        let parameters = remaining[..parameter_end]
+        let parameters = remaining
             .iter()
+            .filter(|child| child.kind() == NodeKind::Pattern)
             .map(|child| self.pattern(child))
             .collect::<Result<Vec<_>, _>>()?;
         let annotation = annotation_index
@@ -416,9 +468,110 @@ impl<'input> Lowerer<'input> {
             recursive,
             mutable,
             binding,
+            type_parameters,
+            constraints,
             parameters,
             annotation,
             value: self.expression(value_node)?,
+        })
+    }
+
+    fn trait_declaration(&self, node: &CstNode) -> Result<TraitDeclaration, LowerError> {
+        self.expect_kind(node, NodeKind::TraitDeclaration)?;
+        let body_start = node
+            .children()
+            .iter()
+            .position(|child| child.kind() == NodeKind::TraitMember)
+            .unwrap_or(node.children().len());
+        let header = self.tokens_before(
+            node,
+            node.children()
+                .get(body_start)
+                .map_or(node.token_range().end, |child| child.token_range().start),
+        );
+        let identifiers = header
+            .iter()
+            .filter(|token| token.kind() == TokenKind::Identifier)
+            .collect::<Vec<_>>();
+        let name = identifiers
+            .first()
+            .copied()
+            .ok_or_else(|| self.missing_token(node, "Trait name"))
+            .and_then(|token| self.name(token))?;
+        let parameters = node
+            .children()
+            .iter()
+            .find(|child| child.kind() == NodeKind::TypeParameterList)
+            .map(|child| {
+                self.significant_tokens(child)
+                    .filter(|token| token.kind() == TokenKind::Identifier)
+                    .map(|token| self.name(token))
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .transpose()?
+            .unwrap_or_default();
+        let members = node
+            .children()
+            .iter()
+            .filter(|child| child.kind() == NodeKind::TraitMember)
+            .map(|child| self.trait_member(child))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(TraitDeclaration {
+            span: self.node_span(node)?,
+            name,
+            parameters,
+            members,
+        })
+    }
+
+    fn trait_member(&self, node: &CstNode) -> Result<TraitMember, LowerError> {
+        self.expect_kind(node, NodeKind::TraitMember)?;
+        let signature = node
+            .children()
+            .first()
+            .ok_or_else(|| self.missing_child(node, "Trait member signature"))?;
+        let name = self
+            .tokens_before(node, signature.token_range().start)
+            .into_iter()
+            .find(|token| token.kind() == TokenKind::Identifier)
+            .ok_or_else(|| self.missing_token(node, "Trait member name"))
+            .and_then(|token| self.name(token))?;
+        Ok(TraitMember {
+            span: self.node_span(node)?,
+            name,
+            signature: self.type_expression(signature)?,
+        })
+    }
+
+    fn impl_declaration(&self, node: &CstNode) -> Result<ImplDeclaration, LowerError> {
+        self.expect_kind(node, NodeKind::ImplDeclaration)?;
+        let headers = node
+            .children()
+            .iter()
+            .filter(|child| child.kind() != NodeKind::ImplMember)
+            .collect::<Vec<_>>();
+        if headers.len() != 2 {
+            return Err(self.missing_child(node, "impl header"));
+        }
+        let trait_name = headers[0];
+        let receiver = headers[1];
+        let members = node
+            .children()
+            .iter()
+            .filter(|child| child.kind() == NodeKind::ImplMember)
+            .map(|child| {
+                let declaration = child
+                    .children()
+                    .first()
+                    .ok_or_else(|| self.missing_child(child, "impl member"))?;
+                self.let_declaration(declaration)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(ImplDeclaration {
+            span: self.node_span(node)?,
+            trait_name: self.qualified_name(trait_name)?,
+            receiver: self.type_expression(receiver)?,
+            members,
         })
     }
 
@@ -1105,6 +1258,59 @@ mod tests {
             lower(&source, &parsed).unwrap_err().kind(),
             &LowerErrorKind::InvalidCst
         );
+    }
+
+    #[test]
+    fn lowers_trait_impl_and_generic_constraint_items() {
+        let program = lower_text(
+            r#"trait Renderable<'a> =
+    render: 'a -> Text
+
+impl Renderable Item =
+    let render item = item.name
+
+let show<'a> requires { Renderable<'a> } value =
+    value
+
+let phantom<'a> requires { Renderable<'a> } =
+    0
+"#,
+        );
+
+        let Item::Trait(trait_declaration) = &program.items[0] else {
+            panic!("expected trait declaration");
+        };
+        assert!(trait_declaration.span.start() < trait_declaration.span.end());
+        assert_eq!(trait_declaration.name.normalized, "Renderable");
+        assert_eq!(trait_declaration.parameters[0].normalized, "a");
+        assert_eq!(trait_declaration.members[0].name.normalized, "render");
+
+        let Item::Impl(impl_declaration) = &program.items[1] else {
+            panic!("expected impl declaration");
+        };
+        assert!(impl_declaration.span.start() < impl_declaration.span.end());
+        assert_eq!(
+            impl_declaration.trait_name.segments[0].normalized,
+            "Renderable"
+        );
+        let [PatternAtom::Name(member_name)] = impl_declaration.members[0].binding.atoms.as_slice()
+        else {
+            panic!("expected impl member binding");
+        };
+        assert_eq!(member_name.normalized, "render");
+
+        let Item::Let(generic) = &program.items[2] else {
+            panic!("expected constrained generic declaration");
+        };
+        assert_eq!(generic.type_parameters[0].normalized, "a");
+        assert_eq!(generic.constraints.len(), 1);
+        assert_eq!(generic.parameters.len(), 1);
+
+        let Item::Let(no_parameters) = &program.items[3] else {
+            panic!("expected generic declaration without value parameters");
+        };
+        assert_eq!(no_parameters.type_parameters.len(), 1);
+        assert!(no_parameters.parameters.is_empty());
     }
 
     #[test]

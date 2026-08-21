@@ -250,6 +250,8 @@ impl Session {
             imports: Vec::new(),
             definitions,
             types,
+            traits: Vec::new(),
+            impls: Vec::new(),
         };
         let compiled = compile_programs(vec![program], REPL_MODULE).map_err(|failure| {
             map_compile_failure(submission, failure, &wrapper.mapping, &source_name)

@@ -1206,7 +1206,9 @@ fn validate_program(
                     span: span_range(import.span),
                 });
             }
-            Item::Let(_) | Item::Type(_) => body_started = true,
+            Item::Let(_) | Item::Type(_) | Item::Trait(_) | Item::Impl(_) => {
+                body_started = true;
+            }
         }
     }
 

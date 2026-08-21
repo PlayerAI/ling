@@ -145,6 +145,8 @@ impl<'tokens> Parser<'tokens> {
                 TokenKind::Import => self.parse_import_declaration(),
                 TokenKind::Let => self.parse_let_declaration(),
                 TokenKind::Type => self.parse_type_declaration(),
+                TokenKind::Trait => self.parse_trait_declaration(),
+                TokenKind::Impl => self.parse_impl_declaration(),
                 _ => {
                     self.unexpected(
                         &[
@@ -152,6 +154,8 @@ impl<'tokens> Parser<'tokens> {
                             TokenKind::Import,
                             TokenKind::Let,
                             TokenKind::Type,
+                            TokenKind::Trait,
+                            TokenKind::Impl,
                         ],
                         "program",
                     );
@@ -233,6 +237,13 @@ impl<'tokens> Parser<'tokens> {
         self.eat(TokenKind::Mutable);
         children.push(self.parse_pattern("binding pattern"));
 
+        if self.at(TokenKind::Less) {
+            children.push(self.parse_type_parameter_list());
+        }
+        if self.at(TokenKind::Requires) {
+            children.push(self.parse_constraint_block());
+        }
+
         while self.starts_pattern() && !self.at(TokenKind::Equals) && !self.at(TokenKind::Colon) {
             children.push(self.parse_pattern("parameter pattern"));
         }
@@ -242,6 +253,112 @@ impl<'tokens> Parser<'tokens> {
         self.expect(TokenKind::Equals, "let declaration");
         children.push(self.parse_body_expression("let body"));
         CstNode::new(NodeKind::LetDeclaration, start..self.position, children)
+    }
+
+    fn parse_type_parameter_list(&mut self) -> CstNode {
+        let start = self.position;
+        self.expect(TokenKind::Less, "type parameter list");
+        self.expect(TokenKind::Apostrophe, "type parameter");
+        self.expect(TokenKind::Identifier, "type parameter");
+        while self.eat(TokenKind::Comma) {
+            self.expect(TokenKind::Apostrophe, "type parameter");
+            self.expect(TokenKind::Identifier, "type parameter");
+        }
+        self.expect(TokenKind::Greater, "type parameter list");
+        CstNode::new(
+            NodeKind::TypeParameterList,
+            start..self.position,
+            Vec::new(),
+        )
+    }
+
+    fn parse_constraint_block(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect(TokenKind::Requires, "Trait constraint block");
+        self.expect(TokenKind::LeftBrace, "Trait constraint block");
+        self.eat_member_separators();
+        while !self.at(TokenKind::RightBrace) && !self.at(TokenKind::Eof) {
+            children.push(self.parse_type_expression(&[
+                TokenKind::Comma,
+                TokenKind::Semicolon,
+                TokenKind::SoftNewline,
+                TokenKind::RightBrace,
+            ]));
+            let comma = self.eat(TokenKind::Comma);
+            let layout_separator = self.eat_member_separators();
+            if !comma && !layout_separator && !self.at(TokenKind::RightBrace) {
+                self.unexpected(
+                    &[
+                        TokenKind::Comma,
+                        TokenKind::Semicolon,
+                        TokenKind::SoftNewline,
+                    ],
+                    "Trait constraint separator",
+                );
+                self.recover_to(TokenKind::RightBrace);
+            }
+        }
+        self.expect(TokenKind::RightBrace, "Trait constraint block");
+        CstNode::new(NodeKind::ConstraintBlock, start..self.position, children)
+    }
+
+    fn parse_trait_declaration(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect(TokenKind::Trait, "Trait declaration");
+        self.expect(TokenKind::Identifier, "Trait name");
+        if self.at(TokenKind::Less) {
+            children.push(self.parse_type_parameter_list());
+        }
+        self.expect(TokenKind::Equals, "Trait declaration");
+        if !self.eat_newlines(false) {
+            self.unexpected(&[TokenKind::Newline], "Trait declaration body");
+        }
+        self.expect(TokenKind::Indent, "Trait declaration body");
+        while !self.at(TokenKind::Dedent) && !self.at(TokenKind::Eof) {
+            let member_start = self.position;
+            self.expect(TokenKind::Identifier, "Trait member name");
+            self.expect(TokenKind::Colon, "Trait member signature");
+            let signature = self.parse_type_expression(&[
+                TokenKind::Newline,
+                TokenKind::SoftNewline,
+                TokenKind::Dedent,
+            ]);
+            children.push(CstNode::new(
+                NodeKind::TraitMember,
+                member_start..self.position,
+                vec![signature],
+            ));
+            self.eat_newlines(false);
+        }
+        self.expect(TokenKind::Dedent, "Trait declaration body");
+        CstNode::new(NodeKind::TraitDeclaration, start..self.position, children)
+    }
+
+    fn parse_impl_declaration(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect(TokenKind::Impl, "impl declaration");
+        children.push(self.parse_qualified_name("Trait name"));
+        children.push(self.parse_type_expression(&[TokenKind::Equals]));
+        self.expect(TokenKind::Equals, "impl declaration");
+        if !self.eat_newlines(false) {
+            self.unexpected(&[TokenKind::Newline], "impl declaration body");
+        }
+        self.expect(TokenKind::Indent, "impl declaration body");
+        while !self.at(TokenKind::Dedent) && !self.at(TokenKind::Eof) {
+            let member_start = self.position;
+            let member = self.parse_let_declaration();
+            children.push(CstNode::new(
+                NodeKind::ImplMember,
+                member_start..self.position,
+                vec![member],
+            ));
+            self.eat_newlines(false);
+        }
+        self.expect(TokenKind::Dedent, "impl declaration body");
+        CstNode::new(NodeKind::ImplDeclaration, start..self.position, children)
     }
 
     fn parse_type_declaration(&mut self) -> CstNode {
@@ -1235,6 +1352,62 @@ mod tests {
             "{:?}",
             parsed.parse_errors()
         );
+    }
+
+    #[test]
+    fn parses_trait_and_impl_declarations_with_spans_and_members() {
+        let parsed = parse_text(
+            r#"trait Renderable<'a> =
+    render: 'a -> Text
+    measure: 'a -> Int
+
+impl Renderable Item =
+    let render item = item.name
+    let measure item = 1
+"#,
+        );
+
+        assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+        let children = parsed.tree().root().children();
+        assert_eq!(children.len(), 2);
+        assert_eq!(children[0].kind(), NodeKind::TraitDeclaration);
+        let trait_range = children[0].token_range();
+        assert!(trait_range.start < trait_range.end);
+        assert_eq!(children[0].children().len(), 3);
+        assert_eq!(
+            children[0].children()[0].kind(),
+            NodeKind::TypeParameterList
+        );
+        assert_eq!(children[0].children()[1].kind(), NodeKind::TraitMember);
+        assert_eq!(children[1].kind(), NodeKind::ImplDeclaration);
+        let impl_range = children[1].token_range();
+        assert!(impl_range.start < impl_range.end);
+        assert_eq!(children[1].children().len(), 4);
+        assert!(
+            children[1]
+                .children()
+                .iter()
+                .skip(2)
+                .all(|child| child.kind() == NodeKind::ImplMember)
+        );
+    }
+
+    #[test]
+    fn parses_requires_constraints_after_generic_parameters() {
+        let parsed = parse_text(
+            "let render<'a> requires { Renderable<'a>,\n Bounded<'a> } value =\n    value\n",
+        );
+
+        assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+        let declaration = &parsed.tree().root().children()[0];
+        assert_eq!(declaration.kind(), NodeKind::LetDeclaration);
+        assert_eq!(declaration.children().len(), 5);
+        assert_eq!(
+            declaration.children()[1].kind(),
+            NodeKind::TypeParameterList
+        );
+        assert_eq!(declaration.children()[2].kind(), NodeKind::ConstraintBlock);
+        assert_eq!(declaration.children()[2].children().len(), 2);
     }
 
     #[test]

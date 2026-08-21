@@ -54,6 +54,8 @@ pub struct Program {
     pub imports: Vec<Import>,
     pub definitions: Vec<Definition>,
     pub types: Vec<TypeDeclaration>,
+    pub traits: Vec<TraitDeclaration>,
+    pub impls: Vec<ImplDeclaration>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -104,11 +106,36 @@ pub struct Definition {
     pub name: Name,
     pub recursive: bool,
     pub mutable: bool,
+    pub type_parameters: Vec<Name>,
+    pub constraints: Vec<TypeSyntax>,
     pub parameters: Vec<Pattern>,
     pub annotation: Option<TypeSyntax>,
     pub value: Expression,
     /// REPL-only generation used to isolate session identity from file identity.
     pub session_generation: Option<u64>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TraitDeclaration {
+    pub span: Span,
+    pub name: Name,
+    pub parameters: Vec<Name>,
+    pub members: Vec<TraitMember>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TraitMember {
+    pub span: Span,
+    pub name: Name,
+    pub signature: TypeSyntax,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ImplDeclaration {
+    pub span: Span,
+    pub trait_name: QualifiedName,
+    pub receiver: TypeSyntax,
+    pub members: Vec<Definition>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -118,6 +145,8 @@ pub struct LocalBinding {
     pub name: Name,
     pub recursive: bool,
     pub mutable: bool,
+    pub type_parameters: Vec<Name>,
+    pub constraints: Vec<TypeSyntax>,
     pub parameters: Vec<Pattern>,
     pub annotation: Option<TypeSyntax>,
     pub value: Expression,
@@ -418,6 +447,8 @@ impl Lowerer {
         let mut imports = Vec::new();
         let mut definitions = Vec::new();
         let mut types = Vec::new();
+        let mut traits = Vec::new();
+        let mut impls = Vec::new();
         let mut saw_declaration = false;
 
         for (index, item) in program.items.iter().enumerate() {
@@ -464,6 +495,14 @@ impl Lowerer {
                     saw_declaration = true;
                     types.push(self.type_declaration(declaration));
                 }
+                ast::Item::Trait(declaration) => {
+                    saw_declaration = true;
+                    traits.push(self.trait_declaration(declaration));
+                }
+                ast::Item::Impl(declaration) => {
+                    saw_declaration = true;
+                    impls.push(self.impl_declaration(declaration)?);
+                }
             }
         }
 
@@ -491,6 +530,8 @@ impl Lowerer {
             imports,
             definitions,
             types,
+            traits,
+            impls,
         })
     }
 
@@ -506,6 +547,8 @@ impl Lowerer {
             name: name(binding),
             recursive: declaration.recursive,
             mutable: declaration.mutable,
+            type_parameters: declaration.type_parameters.iter().map(name).collect(),
+            constraints: declaration.constraints.iter().map(type_syntax).collect(),
             parameters: declaration
                 .parameters
                 .iter()
@@ -531,6 +574,8 @@ impl Lowerer {
             name: name(binding),
             recursive: declaration.recursive,
             mutable: declaration.mutable,
+            type_parameters: declaration.type_parameters.iter().map(name).collect(),
+            constraints: declaration.constraints.iter().map(type_syntax).collect(),
             parameters: declaration
                 .parameters
                 .iter()
@@ -572,6 +617,39 @@ impl Lowerer {
             parameters: declaration.parameters.iter().map(name).collect(),
             definition,
         }
+    }
+
+    fn trait_declaration(&self, declaration: &ast::TraitDeclaration) -> TraitDeclaration {
+        TraitDeclaration {
+            span: declaration.span,
+            name: name(&declaration.name),
+            parameters: declaration.parameters.iter().map(name).collect(),
+            members: declaration
+                .members
+                .iter()
+                .map(|member| TraitMember {
+                    span: member.span,
+                    name: name(&member.name),
+                    signature: type_syntax(&member.signature),
+                })
+                .collect(),
+        }
+    }
+
+    fn impl_declaration(
+        &mut self,
+        declaration: &ast::ImplDeclaration,
+    ) -> Result<ImplDeclaration, LowerError> {
+        Ok(ImplDeclaration {
+            span: declaration.span,
+            trait_name: qualified_name(&declaration.trait_name),
+            receiver: type_syntax(&declaration.receiver),
+            members: declaration
+                .members
+                .iter()
+                .map(|member| self.definition(member))
+                .collect::<Result<Vec<_>, _>>()?,
+        })
     }
 
     fn pattern(&mut self, pattern: &ast::Pattern) -> Result<Pattern, LowerError> {
@@ -1151,5 +1229,40 @@ mod tests {
         assert_eq!(name.normalized, "Ok");
         assert_eq!(arguments.len(), 1);
         assert!(matches!(arguments[0].kind, PatternKind::Binding { .. }));
+    }
+
+    #[test]
+    fn lowers_trait_impl_and_generic_constraint_items() {
+        let program = lower_text(
+            r#"trait Renderable<'a> =
+    render: 'a -> Text
+
+impl Renderable Item =
+    let render item = item.name
+
+let show<'a> requires { Renderable<'a> } value =
+    value
+
+let phantom<'a> requires { Renderable<'a> } =
+    0
+"#,
+        );
+
+        assert_eq!(program.traits.len(), 1);
+        assert!(program.traits[0].span.start() < program.traits[0].span.end());
+        assert_eq!(program.traits[0].name.normalized, "Renderable");
+        assert_eq!(program.traits[0].parameters[0].normalized, "a");
+        assert_eq!(program.traits[0].members[0].name.normalized, "render");
+
+        assert_eq!(program.impls.len(), 1);
+        assert!(program.impls[0].span.start() < program.impls[0].span.end());
+        assert_eq!(program.impls[0].trait_name.normalized(), "Renderable");
+        assert_eq!(program.impls[0].members[0].name.normalized, "render");
+
+        assert_eq!(program.definitions[0].type_parameters[0].normalized, "a");
+        assert_eq!(program.definitions[0].constraints.len(), 1);
+        assert_eq!(program.definitions[0].parameters.len(), 1);
+        assert_eq!(program.definitions[1].type_parameters.len(), 1);
+        assert!(program.definitions[1].parameters.is_empty());
     }
 }

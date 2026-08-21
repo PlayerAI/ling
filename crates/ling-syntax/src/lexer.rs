@@ -737,6 +737,8 @@ fn keyword(identifier: &str) -> TokenKind {
         "import" => TokenKind::Import,
         "as" => TokenKind::As,
         "requires" => TokenKind::Requires,
+        "trait" => TokenKind::Trait,
+        "impl" => TokenKind::Impl,
         _ => TokenKind::Identifier,
     }
 }

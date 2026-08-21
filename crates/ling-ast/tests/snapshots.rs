@@ -177,6 +177,41 @@ fn render_item(output: &mut String, item: &Item, depth: usize) {
                 }
             }
         }
+        Item::Trait(declaration) => {
+            line_with(
+                output,
+                depth,
+                "trait",
+                declaration.span,
+                &declaration.name.normalized,
+            );
+            for parameter in &declaration.parameters {
+                render_name(output, parameter, depth + 1, "type_parameter");
+            }
+            for member in &declaration.members {
+                line_with(
+                    output,
+                    depth + 1,
+                    "member",
+                    member.span,
+                    &member.name.normalized,
+                );
+                render_type_expression(output, &member.signature, depth + 2);
+            }
+        }
+        Item::Impl(declaration) => {
+            line_with(
+                output,
+                depth,
+                "impl",
+                declaration.span,
+                &qualified_text(&declaration.trait_name),
+            );
+            render_type_expression(output, &declaration.receiver, depth + 1);
+            for member in &declaration.members {
+                render_let(output, member, depth + 1);
+            }
+        }
     }
 }
 
@@ -189,6 +224,12 @@ fn render_let(output: &mut String, declaration: &LetDeclaration, depth: usize) {
     };
     line_with(output, depth, "let", declaration.span, flags);
     render_pattern(output, &declaration.binding, depth + 1, "binding");
+    for parameter in &declaration.type_parameters {
+        render_name(output, parameter, depth + 1, "type_parameter");
+    }
+    for constraint in &declaration.constraints {
+        render_type_expression(output, constraint, depth + 1);
+    }
     for parameter in &declaration.parameters {
         render_pattern(output, parameter, depth + 1, "parameter");
     }
