@@ -3179,7 +3179,7 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "The benchmark intentionally measures the current file-mode compiler boundary; package-graph scale and memory/IO profiles require their owning public query surfaces.",
-  "FMT-1501 is now closed by Accepted DEC-0023; the next execution-plan target is FMT-1502 Format IR.",
+  "FMT-1501 and FMT-1502 are now closed; the next execution-plan target is FMT-1503 core syntax formatting.",
 ]
 
 [[task]]
@@ -3232,6 +3232,51 @@ completion_commit = "fa2560fc09772ed98f8af97a71164ee1f465495f"
 integration_state = "committed"
 completed = "2026-08-21"
 notes = [
-  "The formatter gap remains Open only for executable Format IR, comment/error recovery, style, and CLI/LSP work; FMT-1502 is the next task and must consume compiler CST data.",
+  "The formatter gap remains Open for comment/error recovery, style, property evidence, and CLI/LSP work; FMT-1502 now provides the compiler-CST Format IR consumed by later tasks.",
   "The accepted decision deliberately leaves trailing-comma policy, aggressive parenthesis removal, localized keyword views, and editor transactions to later authority/evidence.",
+]
+
+[[task]]
+id = "FMT-1502"
+title = "Compiler-CST Format IR"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1501"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0006-offside-layout.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+]
+artifacts = [
+  "Cargo.lock",
+  "crates/ling-format/Cargo.toml",
+  "crates/ling-format/src/lib.rs",
+  "crates/ling-format/src/format_ir.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/FMT-1502-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "build_format_ir consumes ParsedSource's compiler CST directly and introduces no regex, Tree-sitter, or second parser authority.",
+  "FormatDocument preserves exact original UTF-8 text, BOM state, lexical text, validity, and deterministic source identity.",
+  "FormatNode preserves compiler NodeKind, token ranges, original spans, child order, and empty recovery ranges without fabricated spans.",
+  "FormatToken preserves TokenKind, lexical/original spans, exact original spelling, trivia, and layout classification.",
+  "Source identity, source-span bounds, lexical-span bounds, CST ranges, targeted tests, clippy, formatting, and diff checks passed; no language semantics or public wire protocol changed.",
+]
+verified_against_commit = "4d006e0c410c1c59f5717df43b8fac843ed960ec"
+completion_commit = "4d006e0c410c1c59f5717df43b8fac843ed960ec"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "Invalid or incomplete parses are projected losslessly with is_valid() == false; recovery policy and edits remain FMT-1505 work.",
+  "FMT-1503 is the next execution-plan target and must consume this IR without changing the Accepted DEC-0023 preservation boundary.",
 ]
