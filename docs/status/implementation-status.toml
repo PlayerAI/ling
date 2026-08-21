@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 101 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, and LSP-2502 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 102 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, and LSP-2503 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -4998,6 +4998,49 @@ completed = ""
 notes = [
   "LSP-2502 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2501, and DEC-0019's explicit separation of compiler/LSP cancellation; RFC-0020 applies only to VM host control.",
   "No LSP transport, request scheduler, compiler cancellation token, partial-result cache, Workspace Edit publisher, or cancellation protocol inventory entry exists.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2503"
+title = "LSP debounce and priority scheduling"
+state = "BlockedSpec"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2103", "LSP-2104", "LSP-2202", "LSP-2501", "LSP-2502"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/LSP-2503-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing event triggers, debounce/coalescing, logical versus wall-clock timing, priority/fairness, budgets, revision supersession, cancellation, publication, diagnostics, and protocol lifecycle contracts.",
+  "The audit distinguishes DEC-0019/DEC-0021 internal deterministic query scheduling from the missing LSP event, queue, freshness, and result-publication protocol.",
+  "The audit covers edit bursts, timer coalescing, priority inversion/starvation, new-revision cancellation, stale results, concurrent requests, workspace/index throttling, diagnostics clear/replace, Unicode/CRLF/BOM, deterministic scheduling, and migration fixtures.",
+  "No debounce timer, priority queue, scheduler policy, stale-result publisher, cancellation integration, diagnostic allocation, protocol schema, or placeholder LSP service is added while the authority is absent.",
+  "The future implementation must coalesce revisions explicitly, prioritize interactive work without starvation, cancel superseded analysis, publish only current snapshot results, and keep scheduling timing out of Ling semantics.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "LSP-2503 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2202, LSP-2501, LSP-2502, and the missing LSP event/scheduling contract; DEC-0021 is internal only.",
+  "ling-db provides internal deterministic query scheduling and ling-diagnostics provides checked diagnostic facts, but no LSP debounce, priority, stale replacement, or publication protocol exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
