@@ -1,7 +1,7 @@
 use ling_bytecode::{
     CaptureOperand, CompareOperator, Constant, Effect, Instruction, IntBinaryOperator,
     IntUnaryOperator, IntegerSign, Intrinsic, RegisterIndex, Terminator, UnverifiedProgram,
-    VerifiedProgramV1,
+    ValueType, VerifiedProgramV1,
 };
 use num_bigint::{BigInt, Sign};
 
@@ -213,6 +213,160 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
                 callee,
                 arguments,
             } => self.execute_call_closure(*destination, *callee, arguments, location),
+            Instruction::MakeTuple {
+                destination,
+                elements,
+                ..
+            } => {
+                let values = self.collect_registers(elements, location, "make_tuple")?;
+                let count = u64::try_from(values.len())
+                    .map_err(|_| internal("tuple element count does not fit u64"))?;
+                let bytes = count
+                    .checked_mul(16)
+                    .and_then(|bytes| bytes.checked_add(16))
+                    .ok_or_else(|| self.out_of_memory("make_tuple", location))?;
+                self.ensure_heap(bytes, "make_tuple", location)?;
+                let tuple = self
+                    .heap
+                    .tuple(values)
+                    .map_err(|()| self.out_of_memory("make_tuple", location))?;
+                self.write_current(*destination, tuple)
+            }
+            Instruction::GetTuple {
+                destination,
+                tuple,
+                element,
+            } => {
+                let tuple_value = self.read_current(*tuple)?;
+                let tuple = tuple_value
+                    .as_tuple()
+                    .ok_or_else(|| internal("verified GetTuple operand is not a tuple"))?;
+                let value = tuple
+                    .value()
+                    .get(to_usize(*element)?)
+                    .cloned()
+                    .ok_or_else(|| internal("verified GetTuple index is absent"))?;
+                self.write_current(*destination, value)
+            }
+            Instruction::MakeRecord {
+                destination,
+                record,
+                fields,
+            } => {
+                let values = self.collect_registers(fields, location, "make_record")?;
+                let count = u64::try_from(values.len())
+                    .map_err(|_| internal("record field count does not fit u64"))?;
+                let bytes = count
+                    .checked_mul(16)
+                    .and_then(|bytes| bytes.checked_add(24))
+                    .ok_or_else(|| self.out_of_memory("make_record", location))?;
+                self.ensure_heap(bytes, "make_record", location)?;
+                let record = self
+                    .heap
+                    .record(record.get(), values)
+                    .map_err(|()| self.out_of_memory("make_record", location))?;
+                self.write_current(*destination, record)
+            }
+            Instruction::GetField {
+                destination,
+                record,
+                field,
+            } => {
+                let record_value = self.read_current(*record)?;
+                let record = record_value
+                    .as_record()
+                    .ok_or_else(|| internal("verified GetField operand is not a record"))?;
+                let value = record
+                    .value()
+                    .fields()
+                    .get(to_usize(*field)?)
+                    .cloned()
+                    .ok_or_else(|| internal("verified GetField index is absent"))?;
+                self.write_current(*destination, value)
+            }
+            Instruction::UpdateRecord {
+                destination,
+                base,
+                updates,
+            } => {
+                let base_value = self.read_current(*base)?;
+                let base_record = base_value
+                    .as_record()
+                    .ok_or_else(|| internal("verified UpdateRecord base is not a record"))?;
+                let type_index = base_record.value().type_index();
+                let mut fields = base_record.value().fields().to_vec();
+                for update in updates {
+                    let field = fields
+                        .get_mut(to_usize(update.field)?)
+                        .ok_or_else(|| internal("verified UpdateRecord field is absent"))?;
+                    *field = self.read_current(update.value)?;
+                }
+                let count = u64::try_from(fields.len())
+                    .map_err(|_| internal("record field count does not fit u64"))?;
+                let bytes = count
+                    .checked_mul(16)
+                    .and_then(|bytes| bytes.checked_add(24))
+                    .ok_or_else(|| self.out_of_memory("update_record", location))?;
+                self.ensure_heap(bytes, "update_record", location)?;
+                let record = self
+                    .heap
+                    .record(type_index, fields)
+                    .map_err(|()| self.out_of_memory("update_record", location))?;
+                self.write_current(*destination, record)
+            }
+            Instruction::MakeVariant {
+                destination,
+                variant,
+                case,
+                payload,
+            } => {
+                let payload_value = payload
+                    .map(|register| self.read_current(register))
+                    .transpose()?;
+                let bytes = 32_u64 + u64::from(payload_value.is_some()) * 16;
+                self.ensure_heap(bytes, "make_variant", location)?;
+                let variant = self
+                    .heap
+                    .variant(variant.get(), *case, payload_value)
+                    .map_err(|()| self.out_of_memory("make_variant", location))?;
+                self.write_current(*destination, variant)
+            }
+            Instruction::VariantIs {
+                variant,
+                case,
+                destination,
+            } => {
+                let variant_value = self.read_current(*variant)?;
+                let variant = variant_value
+                    .as_variant()
+                    .ok_or_else(|| internal("verified VariantIs operand is not a variant"))?;
+                let cases = self.variant_cases(variant.value().type_index())?;
+                if to_usize(*case)? >= cases.len() {
+                    return Err(internal("verified VariantIs case is absent").into());
+                }
+                self.write_current(*destination, Value::Bool(variant.value().case() == *case))
+            }
+            Instruction::GetVariantPayload {
+                destination,
+                variant,
+                case,
+            } => {
+                let variant_value = self.read_current(*variant)?;
+                let variant = variant_value.as_variant().ok_or_else(|| {
+                    internal("verified GetVariantPayload operand is not a variant")
+                })?;
+                if variant.value().case() != *case {
+                    return Err(
+                        internal("verified GetVariantPayload case does not match tag").into(),
+                    );
+                }
+                let payload = variant
+                    .value()
+                    .payload()
+                    .cloned()
+                    .ok_or_else(|| internal("verified GetVariantPayload has no payload"))?;
+                self.write_current(*destination, payload)
+            }
             Instruction::Intrinsic {
                 destination,
                 intrinsic,
@@ -648,6 +802,16 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
                     .text(owned)
                     .map_err(|()| self.out_of_memory("constant_text", location))
             }
+        }
+    }
+
+    fn variant_cases(
+        &self,
+        type_index: u32,
+    ) -> Result<&[ling_bytecode::VariantCase], ExecutionError> {
+        match self.model.types().get(to_usize(type_index)?) {
+            Some(ValueType::Variant { cases, .. }) => Ok(cases),
+            _ => Err(internal("verified variant type is absent").into()),
         }
     }
 

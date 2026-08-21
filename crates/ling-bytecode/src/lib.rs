@@ -18,32 +18,36 @@ mod path;
 mod verify;
 
 pub use decode::{
-    DecodedProgramV1, decode_v1, decode_v1_1, decode_v1_1_with_limit, decode_v1_with_limit,
+    DecodedProgramV1, decode_v1, decode_v1_1, decode_v1_1_with_limit, decode_v1_2,
+    decode_v1_2_with_limit, decode_v1_with_limit,
 };
-pub use disassemble::{disassemble_v1, disassemble_v1_1};
+pub use disassemble::{disassemble_v1, disassemble_v1_1, disassemble_v1_2};
 pub use encode::{
-    EncodingError, EncodingErrorKind, encode_v1, encode_v1_1, encode_v1_1_with_limit,
-    encode_v1_with_limit, encode_verified_v1, encode_verified_v1_with_limit,
+    EncodingError, EncodingErrorKind, encode_v1, encode_v1_1, encode_v1_1_with_limit, encode_v1_2,
+    encode_v1_2_with_limit, encode_v1_with_limit, encode_verified_v1,
+    encode_verified_v1_with_limit,
 };
 pub use error::{BytecodeError, BytecodePhase, BytecodeReason};
 pub use format::{
-    BYTECODE_MAGIC, BYTECODE_PROTOCOL, BYTECODE_PROTOCOL_1_0, BYTECODE_PROTOCOL_1_1, DecodeLimits,
-    FORMAT_VERSION, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FormatVersion, HEADER_BYTES,
-    LANGUAGE_VERSION, NO_INDEX, UNICODE_VERSION, UnicodeVersion,
+    BYTECODE_MAGIC, BYTECODE_PROTOCOL, BYTECODE_PROTOCOL_1_0, BYTECODE_PROTOCOL_1_1,
+    BYTECODE_PROTOCOL_1_2, DecodeLimits, FORMAT_VERSION, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1,
+    FORMAT_VERSION_1_2, FormatVersion, HEADER_BYTES, LANGUAGE_VERSION, NO_INDEX, UNICODE_VERSION,
+    UnicodeVersion,
 };
 pub use lower::{
-    LoweredProgramV1, LoweredProgramV1_1, LoweringError, LoweringErrorKind, LoweringSource,
-    lower_v1, lower_v1_1,
+    LoweredProgramV1, LoweredProgramV1_1, LoweredProgramV1_2, LoweringError, LoweringErrorKind,
+    LoweringSource, lower_v1, lower_v1_1, lower_v1_2,
 };
 pub use model::{
     Block, BlockIndex, BlockParameter, Capability, CaptureOperand, CompareOperator, Constant,
     ConstantIndex, Effect, Function, FunctionIndex, FunctionKind, Instruction, IntBinaryOperator,
     IntUnaryOperator, IntegerSign, Intrinsic, Module, ModuleIndex, Package, PackageContentDigest,
-    PackageIndex, PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
-    SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex,
-    UnverifiedProgram, ValueType,
+    PackageIndex, PackageReference, ProgramParts, RecordField, RecordUpdate, RegisterIndex, Source,
+    SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator,
+    TypeIndex, UnverifiedProgram, ValueType, VariantCase,
 };
 pub use verify::{
     VerifiedProgramV1, decode_and_verify_v1, decode_and_verify_v1_1,
-    decode_and_verify_v1_1_with_limit, decode_and_verify_v1_with_limit, verify_v1,
+    decode_and_verify_v1_1_with_limit, decode_and_verify_v1_2, decode_and_verify_v1_2_with_limit,
+    decode_and_verify_v1_with_limit, verify_v1,
 };

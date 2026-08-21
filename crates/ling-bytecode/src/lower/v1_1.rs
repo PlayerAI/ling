@@ -2,7 +2,7 @@ use super::*;
 
 use ling_effects::{CheckedFunctionType, EffectRow};
 
-use crate::{CaptureOperand, Intrinsic};
+use crate::{CaptureOperand, Intrinsic, RecordField, RecordUpdate, VariantCase};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LoweredProgramV1_1 {
@@ -25,6 +25,13 @@ pub fn lower_v1_1(
     sources: &[LoweringSource<'_>],
 ) -> Result<LoweredProgramV1_1, LoweringError> {
     ClosureLowerer::new(snapshot, sources)?.run()
+}
+
+pub(crate) fn lower_v1_2_model(
+    snapshot: &ProgramSnapshot,
+    sources: &[LoweringSource<'_>],
+) -> Result<UnverifiedProgram, LoweringError> {
+    ClosureLowerer::new_with_mode(snapshot, sources, true)?.run_model()
 }
 
 #[derive(Clone)]
@@ -61,6 +68,32 @@ enum TypeKey {
         result: Box<TypeKey>,
         effects: Vec<Effect>,
     },
+    Tuple(Vec<TypeKey>),
+    Record {
+        module: String,
+        name: String,
+        arguments: Vec<TypeKey>,
+        fields: Vec<RecordFieldKey>,
+    },
+    Variant {
+        module: String,
+        name: String,
+        arguments: Vec<TypeKey>,
+        cases: Vec<VariantCaseKey>,
+    },
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct RecordFieldKey {
+    name: String,
+    mutable: bool,
+    value_type: TypeKey,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct VariantCaseKey {
+    name: String,
+    payload: Option<TypeKey>,
 }
 
 impl TypeKey {
@@ -127,6 +160,7 @@ enum OrderedPlan {
 struct ClosureLowerer<'snapshot, 'source> {
     snapshot: &'snapshot ProgramSnapshot,
     limits: DecodeLimits,
+    aggregate_mode: bool,
     modules: Vec<&'snapshot ling_resolve::ResolvedModule>,
     module_indices: BTreeMap<ModuleId, ModuleIndex>,
     source_plans: Vec<SourcePlan<'source>>,
@@ -156,7 +190,19 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         snapshot: &'snapshot ProgramSnapshot,
         sources: &'source [LoweringSource<'source>],
     ) -> Result<Self, LoweringError> {
-        let limits = DecodeLimits::rfc_0015();
+        Self::new_with_mode(snapshot, sources, false)
+    }
+
+    fn new_with_mode(
+        snapshot: &'snapshot ProgramSnapshot,
+        sources: &'source [LoweringSource<'source>],
+        aggregate_mode: bool,
+    ) -> Result<Self, LoweringError> {
+        let limits = if aggregate_mode {
+            DecodeLimits::rfc_0016()
+        } else {
+            DecodeLimits::rfc_0015()
+        };
         check_limit("sources", sources.len(), limits.sources())?;
         let checked = snapshot.checked();
         let resolved = checked.typed().resolved();
@@ -170,12 +216,16 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 .as_bytes()
                 .cmp(right.hir.module.name.normalized().as_bytes())
         });
-        check_limit("modules", modules.len(), limits.modules())?;
+        let module_count = modules.len() + usize::from(aggregate_mode);
+        check_limit("modules", module_count, limits.modules())?;
         let module_indices = modules
             .iter()
             .enumerate()
             .map(|(index, module)| {
-                Ok((module.id, ModuleIndex::new(to_u32(index, "module index")?)))
+                Ok((
+                    module.id,
+                    ModuleIndex::new(to_u32(index + usize::from(aggregate_mode), "module index")?),
+                ))
             })
             .collect::<Result<BTreeMap<_, _>, LoweringError>>()?;
 
@@ -212,7 +262,6 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 );
             }
         }
-
         let mut locals = BTreeMap::new();
         let mut local_bindings = BTreeMap::new();
         let mut builtins = BTreeMap::new();
@@ -251,7 +300,8 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             )?;
         }
 
-        let mut resolver = SignatureResolver::new(snapshot, &named, &locals, &local_bindings);
+        let mut resolver =
+            SignatureResolver::new(snapshot, &named, &locals, &local_bindings, aggregate_mode);
         let mut named_signatures = BTreeMap::new();
         for id in named.keys() {
             named_signatures.insert(id.clone(), resolver.named(id)?);
@@ -361,30 +411,28 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             }
         }
 
-        let mut type_builder = TypeTableBuilder::default();
-        for signature in named_signatures.values() {
-            type_builder.add_signature(signature)?;
-        }
-        for signature in local_signatures.values() {
-            type_builder.add_signature(signature)?;
-        }
-        for signature in builtin_signatures.values() {
-            type_builder.add_signature(signature)?;
-        }
-        for plans in captures.values() {
-            for capture in plans {
-                type_builder.insert(capture.value_type.clone());
-            }
-        }
-        let (types, type_indices) = type_builder.finish()?;
-        check_limit("types", types.len(), limits.types())?;
-
         let mut string_set = BTreeSet::new();
         for module in &modules {
             string_set.insert(module.hir.module.name.normalized());
             for definition in &module.hir.definitions {
                 string_set.insert(definition.name.normalized.clone());
                 collect_text_strings(&definition.value, &mut string_set);
+            }
+            for declaration in &module.hir.types {
+                string_set.insert(declaration.name.normalized.clone());
+                match &declaration.definition {
+                    hir::TypeDefinition::Record(fields) => {
+                        for field in fields {
+                            string_set.insert(field.name.normalized.clone());
+                        }
+                    }
+                    hir::TypeDefinition::Variant(cases) => {
+                        for case in cases {
+                            string_set.insert(case.name.normalized.clone());
+                        }
+                    }
+                    hir::TypeDefinition::Alias(_) => {}
+                }
             }
         }
         for plan in locals.values() {
@@ -395,6 +443,12 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         }
         for source in &source_plans {
             string_set.insert(source.logical_name.to_owned());
+        }
+        if aggregate_mode {
+            string_set.insert(ling_resolve::PRELUDE_MODULE.to_owned());
+            for value in ["Option", "Some", "None", "Result", "Ok", "Error"] {
+                string_set.insert(value.to_owned());
+            }
         }
         check_limit("strings", string_set.len(), limits.string_entries())?;
         for value in &string_set {
@@ -416,6 +470,47 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             })
             .collect::<Result<BTreeMap<_, _>, LoweringError>>()?;
 
+        let mut module_name_indices = modules
+            .iter()
+            .map(|module| {
+                Ok((
+                    module.hir.module.name.normalized(),
+                    module_indices[&module.id],
+                ))
+            })
+            .collect::<Result<BTreeMap<_, _>, LoweringError>>()?;
+        if aggregate_mode {
+            module_name_indices
+                .insert(ling_resolve::PRELUDE_MODULE.to_owned(), ModuleIndex::new(0));
+        }
+        let mut type_builder = TypeTableBuilder::default();
+        for signature in named_signatures.values() {
+            type_builder.add_signature(signature)?;
+        }
+        for signature in local_signatures.values() {
+            type_builder.add_signature(signature)?;
+        }
+        for signature in builtin_signatures.values() {
+            type_builder.add_signature(signature)?;
+        }
+        for plans in captures.values() {
+            for capture in plans {
+                type_builder.insert(capture.value_type.clone());
+            }
+        }
+        if aggregate_mode {
+            for plan in named.values() {
+                collect_type_shapes(
+                    snapshot,
+                    plan.module,
+                    &plan.definition.value,
+                    &mut type_builder,
+                )?;
+            }
+        }
+        let (types, type_indices) = type_builder.finish(&string_indices, &module_name_indices)?;
+        check_limit("types", types.len(), limits.types())?;
+
         let mut constant_set = BTreeMap::new();
         for plan in named.values() {
             collect_constants_v1_1(
@@ -424,6 +519,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 &plan.definition.value,
                 &string_indices,
                 &mut constant_set,
+                aggregate_mode,
             )?;
         }
         check_limit("constants", constant_set.len(), limits.constants())?;
@@ -445,6 +541,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         Ok(Self {
             snapshot,
             limits,
+            aggregate_mode,
             modules,
             module_indices,
             source_plans,
@@ -471,6 +568,10 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
     }
 
     fn run(self) -> Result<LoweredProgramV1_1, LoweringError> {
+        Ok(LoweredProgramV1_1::new(self.run_model()?))
+    }
+
+    fn run_model(self) -> Result<UnverifiedProgram, LoweringError> {
         let entry = ling_effects::locate_main(self.snapshot.checked()).map_err(|error| {
             let reason = match error.kind {
                 EntryErrorKind::EntryModuleMustBeMain { .. } => "entry_module_not_main",
@@ -490,17 +591,29 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             invalid_without_span("validated main is absent from the function table")
         })?;
 
-        let modules = self
-            .modules
-            .iter()
-            .map(|module| {
-                Ok(Module {
-                    package: PackageReference::Standalone,
-                    name: string_index(&self.string_indices, &module.hir.module.name.normalized())?,
-                    capabilities: capabilities(self.snapshot, module)?,
+        let mut modules = Vec::with_capacity(self.modules.len() + usize::from(self.aggregate_mode));
+        if self.aggregate_mode {
+            modules.push(Module {
+                package: PackageReference::Standalone,
+                name: string_index(&self.string_indices, ling_resolve::PRELUDE_MODULE)?,
+                capabilities: Vec::new(),
+            });
+        }
+        modules.extend(
+            self.modules
+                .iter()
+                .map(|module| {
+                    Ok(Module {
+                        package: PackageReference::Standalone,
+                        name: string_index(
+                            &self.string_indices,
+                            &module.hir.module.name.normalized(),
+                        )?,
+                        capabilities: capabilities(self.snapshot, module)?,
+                    })
                 })
-            })
-            .collect::<Result<Vec<_>, LoweringError>>()?;
+                .collect::<Result<Vec<_>, LoweringError>>()?,
+        );
         let sources = self
             .source_plans
             .iter()
@@ -528,25 +641,24 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             source_map.append(&mut entries);
             functions.push(function);
         }
+        source_map.sort_by_key(|entry| (entry.function, entry.block, entry.ordinal));
         check_limit(
             "executable_locations",
             source_map.len(),
             self.limits.executable_locations(),
         )?;
 
-        Ok(LoweredProgramV1_1::new(UnverifiedProgram::from_parts(
-            ProgramParts {
-                strings: self.strings,
-                packages: Vec::new(),
-                modules,
-                types: self.types,
-                constants: self.constants,
-                sources,
-                functions,
-                entry,
-                source_map,
-            },
-        )))
+        Ok(UnverifiedProgram::from_parts(ProgramParts {
+            strings: self.strings,
+            packages: Vec::new(),
+            modules,
+            types: self.types,
+            constants: self.constants,
+            sources,
+            functions,
+            entry,
+            source_map,
+        }))
     }
 
     fn lower_named(
@@ -1468,6 +1580,7 @@ fn collect_free_bindings(
 
 struct SignatureResolver<'a> {
     snapshot: &'a ProgramSnapshot,
+    aggregate_mode: bool,
     named: &'a BTreeMap<DefinitionId, NamedPlan<'a>>,
     locals: &'a BTreeMap<BindingKey, LocalPlan<'a>>,
     local_bindings: &'a BTreeMap<BindingKey, &'a hir::LocalBinding>,
@@ -1484,9 +1597,11 @@ impl<'a> SignatureResolver<'a> {
         named: &'a BTreeMap<DefinitionId, NamedPlan<'a>>,
         locals: &'a BTreeMap<BindingKey, LocalPlan<'a>>,
         local_bindings: &'a BTreeMap<BindingKey, &'a hir::LocalBinding>,
+        aggregate_mode: bool,
     ) -> Self {
         Self {
             snapshot,
+            aggregate_mode,
             named,
             locals,
             local_bindings,
@@ -1738,9 +1853,93 @@ impl<'a> SignatureResolver<'a> {
                 "nested function type without Effect provenance",
             )),
             Type::Float64 => Err(source_or_global_unsupported(module, span, "Float64")),
+            Type::Tuple(elements) if self.aggregate_mode => Ok(TypeKey::Tuple(
+                elements
+                    .iter()
+                    .map(|element| self.plain_type(*element, module, span))
+                    .collect::<Result<Vec<_>, _>>()?,
+            )),
             Type::Tuple(_) => Err(source_or_global_unsupported(module, span, "tuple")),
             Type::List(_) => Err(source_or_global_unsupported(module, span, "list")),
+            Type::NominalRecord {
+                definition,
+                arguments,
+            } if self.aggregate_mode => {
+                let info = self
+                    .snapshot
+                    .checked()
+                    .typed()
+                    .records()
+                    .get(definition)
+                    .ok_or_else(|| invalid_without_span("record metadata is absent"))?;
+                let identity = self
+                    .snapshot
+                    .checked()
+                    .typed()
+                    .resolved()
+                    .definition(definition)
+                    .ok_or_else(|| invalid_without_span("record definition is absent"))?;
+                Ok(TypeKey::Record {
+                    module: identity.module_name.clone(),
+                    name: info.name.clone(),
+                    arguments: arguments
+                        .iter()
+                        .map(|argument| self.plain_type(*argument, module, span))
+                        .collect::<Result<Vec<_>, _>>()?,
+                    fields: info
+                        .fields
+                        .iter()
+                        .map(|field| {
+                            Ok(RecordFieldKey {
+                                name: field.name.clone(),
+                                mutable: field.mutable,
+                                value_type: self.plain_type(field.field_type, module, span)?,
+                            })
+                        })
+                        .collect::<Result<Vec<_>, LoweringError>>()?,
+                })
+            }
             Type::NominalRecord { .. } => Err(source_or_global_unsupported(module, span, "record")),
+            Type::NominalVariant {
+                definition,
+                arguments,
+            } if self.aggregate_mode => {
+                let info = self
+                    .snapshot
+                    .checked()
+                    .typed()
+                    .variants()
+                    .get(definition)
+                    .ok_or_else(|| invalid_without_span("variant metadata is absent"))?;
+                let identity = self
+                    .snapshot
+                    .checked()
+                    .typed()
+                    .resolved()
+                    .definition(definition)
+                    .ok_or_else(|| invalid_without_span("variant definition is absent"))?;
+                Ok(TypeKey::Variant {
+                    module: identity.module_name.clone(),
+                    name: info.name.clone(),
+                    arguments: arguments
+                        .iter()
+                        .map(|argument| self.plain_type(*argument, module, span))
+                        .collect::<Result<Vec<_>, _>>()?,
+                    cases: info
+                        .cases
+                        .iter()
+                        .map(|case| {
+                            Ok(VariantCaseKey {
+                                name: case.name.clone(),
+                                payload: case
+                                    .payload
+                                    .map(|payload| self.plain_type(payload, module, span))
+                                    .transpose()?,
+                            })
+                        })
+                        .collect::<Result<Vec<_>, LoweringError>>()?,
+                })
+            }
             Type::NominalVariant { .. } => {
                 Err(source_or_global_unsupported(module, span, "variant"))
             }
@@ -1955,6 +2154,250 @@ impl<'a> SignatureResolver<'a> {
     }
 }
 
+fn checked_type_key(
+    typed: &TypedProgram,
+    value: TypeId,
+    module: &ling_resolve::ResolvedModule,
+    span: Span,
+) -> Result<TypeKey, LoweringError> {
+    checked_type_key_with_substitution(typed, value, module, span, &BTreeMap::new())
+}
+
+fn checked_type_key_with_substitution(
+    typed: &TypedProgram,
+    value: TypeId,
+    module: &ling_resolve::ResolvedModule,
+    span: Span,
+    substitutions: &BTreeMap<u32, TypeId>,
+) -> Result<TypeKey, LoweringError> {
+    match typed.arena().get(value) {
+        Type::Unit => Ok(TypeKey::Unit),
+        Type::Bool => Ok(TypeKey::Bool),
+        Type::Int => Ok(TypeKey::Int),
+        Type::Text => Ok(TypeKey::Text),
+        Type::Tuple(elements) => Ok(TypeKey::Tuple(
+            elements
+                .iter()
+                .map(|element| {
+                    checked_type_key_with_substitution(typed, *element, module, span, substitutions)
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+        )),
+        Type::NominalRecord {
+            definition,
+            arguments,
+        } => {
+            let info = typed
+                .records()
+                .get(definition)
+                .ok_or_else(|| invalid_module(module, span, "record metadata is absent"))?;
+            let identity = typed
+                .resolved()
+                .definition(definition)
+                .ok_or_else(|| invalid_module(module, span, "record definition is absent"))?;
+            let substitutions =
+                extend_nominal_substitutions(typed, definition, arguments, substitutions);
+            Ok(TypeKey::Record {
+                module: identity.module_name.clone(),
+                name: info.name.clone(),
+                arguments: arguments
+                    .iter()
+                    .map(|argument| {
+                        checked_type_key_with_substitution(
+                            typed,
+                            *argument,
+                            module,
+                            span,
+                            &substitutions,
+                        )
+                    })
+                    .collect::<Result<Vec<_>, _>>()?,
+                fields: info
+                    .fields
+                    .iter()
+                    .map(|field| {
+                        Ok(RecordFieldKey {
+                            name: field.name.clone(),
+                            mutable: field.mutable,
+                            value_type: checked_type_key_with_substitution(
+                                typed,
+                                field.field_type,
+                                module,
+                                span,
+                                &substitutions,
+                            )?,
+                        })
+                    })
+                    .collect::<Result<Vec<_>, LoweringError>>()?,
+            })
+        }
+        Type::NominalVariant {
+            definition,
+            arguments,
+        } => {
+            let info = typed
+                .variants()
+                .get(definition)
+                .ok_or_else(|| invalid_module(module, span, "variant metadata is absent"))?;
+            let identity = typed
+                .resolved()
+                .definition(definition)
+                .ok_or_else(|| invalid_module(module, span, "variant definition is absent"))?;
+            let substitutions =
+                extend_nominal_substitutions(typed, definition, arguments, substitutions);
+            Ok(TypeKey::Variant {
+                module: identity.module_name.clone(),
+                name: info.name.clone(),
+                arguments: arguments
+                    .iter()
+                    .map(|argument| {
+                        checked_type_key_with_substitution(
+                            typed,
+                            *argument,
+                            module,
+                            span,
+                            &substitutions,
+                        )
+                    })
+                    .collect::<Result<Vec<_>, _>>()?,
+                cases: info
+                    .cases
+                    .iter()
+                    .map(|case| {
+                        Ok(VariantCaseKey {
+                            name: case.name.clone(),
+                            payload: case
+                                .payload
+                                .map(|payload| {
+                                    checked_type_key_with_substitution(
+                                        typed,
+                                        payload,
+                                        module,
+                                        span,
+                                        &substitutions,
+                                    )
+                                })
+                                .transpose()?,
+                        })
+                    })
+                    .collect::<Result<Vec<_>, LoweringError>>()?,
+            })
+        }
+        Type::Function { .. } => Err(invalid_module(
+            module,
+            span,
+            "nested function type lacks Effect provenance",
+        )),
+        Type::Float64 => Err(unsupported_module(module, span, "Float64")),
+        Type::List(_) => Err(unsupported_module(module, span, "list")),
+        Type::Variable(variable) => substitutions
+            .get(variable)
+            .copied()
+            .ok_or_else(|| unsupported_module(module, span, "polymorphic function"))
+            .and_then(|resolved| {
+                checked_type_key_with_substitution(typed, resolved, module, span, substitutions)
+            }),
+        Type::Error => Err(invalid_module(
+            module,
+            span,
+            "checked type retains an error node",
+        )),
+    }
+}
+
+fn extend_nominal_substitutions(
+    typed: &TypedProgram,
+    definition: &DefinitionId,
+    arguments: &[TypeId],
+    substitutions: &BTreeMap<u32, TypeId>,
+) -> BTreeMap<u32, TypeId> {
+    let mut output = substitutions.clone();
+    if let Some(info) = typed.variants().get(definition) {
+        if let Some(case) = info.cases.first() {
+            if let Some(constructor_type) = typed.definition_type(&case.definition) {
+                let result = match typed.arena().get(constructor_type) {
+                    Type::Function { result, .. } => *result,
+                    _ => constructor_type,
+                };
+                if let Type::NominalVariant {
+                    arguments: generic_arguments,
+                    ..
+                } = typed.arena().get(result)
+                {
+                    for (generic, actual) in generic_arguments.iter().zip(arguments) {
+                        collect_type_substitutions(typed, *generic, *actual, &mut output);
+                    }
+                }
+            }
+        }
+    } else if let Some(info) = typed.records().get(definition) {
+        let mut variables = Vec::new();
+        for field in &info.fields {
+            collect_variable_ids(typed, field.field_type, &mut variables);
+        }
+        for (variable, actual) in variables.into_iter().zip(arguments) {
+            output.entry(variable).or_insert(*actual);
+        }
+    }
+    output
+}
+
+fn collect_variable_ids(typed: &TypedProgram, value: TypeId, output: &mut Vec<u32>) {
+    match typed.arena().get(value) {
+        Type::Variable(variable) if !output.contains(variable) => output.push(*variable),
+        Type::Tuple(elements) => {
+            for element in elements {
+                collect_variable_ids(typed, *element, output);
+            }
+        }
+        Type::NominalRecord { arguments, .. } | Type::NominalVariant { arguments, .. } => {
+            for argument in arguments {
+                collect_variable_ids(typed, *argument, output);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn collect_type_substitutions(
+    typed: &TypedProgram,
+    generic: TypeId,
+    actual: TypeId,
+    output: &mut BTreeMap<u32, TypeId>,
+) {
+    match (typed.arena().get(generic), typed.arena().get(actual)) {
+        (Type::Variable(variable), _) => {
+            output.insert(*variable, actual);
+        }
+        (Type::Tuple(generic), Type::Tuple(actual)) => {
+            for (generic, actual) in generic.iter().zip(actual) {
+                collect_type_substitutions(typed, *generic, *actual, output);
+            }
+        }
+        (
+            Type::NominalRecord {
+                arguments: generic, ..
+            },
+            Type::NominalRecord {
+                arguments: actual, ..
+            },
+        )
+        | (
+            Type::NominalVariant {
+                arguments: generic, ..
+            },
+            Type::NominalVariant {
+                arguments: actual, ..
+            },
+        ) => {
+            for (generic, actual) in generic.iter().zip(actual) {
+                collect_type_substitutions(typed, *generic, *actual, output);
+            }
+        }
+        _ => {}
+    }
+}
+
 #[derive(Default)]
 struct TypeTableBuilder {
     values: BTreeSet<TypeKey>,
@@ -1962,15 +2405,47 @@ struct TypeTableBuilder {
 
 impl TypeTableBuilder {
     fn insert(&mut self, value: TypeKey) {
-        if let TypeKey::Function {
-            parameters, result, ..
-        } = &value
-        {
-            for parameter in parameters {
-                self.insert(parameter.clone());
+        match &value {
+            TypeKey::Unit | TypeKey::Bool | TypeKey::Int | TypeKey::Text => {}
+            TypeKey::Tuple(elements) => {
+                for element in elements {
+                    self.insert(element.clone());
+                }
+                self.values.insert(value);
             }
-            self.insert((**result).clone());
-            self.values.insert(value);
+            TypeKey::Record {
+                arguments, fields, ..
+            } => {
+                for argument in arguments {
+                    self.insert(argument.clone());
+                }
+                for field in fields {
+                    self.insert(field.value_type.clone());
+                }
+                self.values.insert(value);
+            }
+            TypeKey::Variant {
+                arguments, cases, ..
+            } => {
+                for argument in arguments {
+                    self.insert(argument.clone());
+                }
+                for case in cases {
+                    if let Some(payload) = &case.payload {
+                        self.insert(payload.clone());
+                    }
+                }
+                self.values.insert(value);
+            }
+            TypeKey::Function {
+                parameters, result, ..
+            } => {
+                for parameter in parameters {
+                    self.insert(parameter.clone());
+                }
+                self.insert((**result).clone());
+                self.values.insert(value);
+            }
         }
     }
 
@@ -1985,7 +2460,11 @@ impl TypeTableBuilder {
         Ok(())
     }
 
-    fn finish(self) -> Result<(Vec<ValueType>, BTreeMap<TypeKey, TypeIndex>), LoweringError> {
+    fn finish(
+        self,
+        strings: &BTreeMap<String, StringIndex>,
+        modules: &BTreeMap<String, ModuleIndex>,
+    ) -> Result<(Vec<ValueType>, BTreeMap<TypeKey, TypeIndex>), LoweringError> {
         let mut types = vec![
             ValueType::Unit,
             ValueType::Bool,
@@ -2002,7 +2481,9 @@ impl TypeTableBuilder {
         while !remaining.is_empty() {
             let mut ready = remaining
                 .iter()
-                .filter_map(|value| wire_type(value, &indices).map(|wire| (value.clone(), wire)))
+                .filter_map(|value| {
+                    wire_type(value, &indices, strings, modules).map(|wire| (value.clone(), wire))
+                })
                 .collect::<Vec<_>>();
             ready.sort_by(|left, right| left.1.cmp(&right.1));
             let Some((key, wire)) = ready.into_iter().next() else {
@@ -2019,23 +2500,82 @@ impl TypeTableBuilder {
     }
 }
 
-fn wire_type(value: &TypeKey, indices: &BTreeMap<TypeKey, TypeIndex>) -> Option<ValueType> {
-    let TypeKey::Function {
-        parameters,
-        result,
-        effects,
-    } = value
-    else {
-        return None;
-    };
-    Some(ValueType::Function {
-        parameters: parameters
-            .iter()
-            .map(|value| indices.get(value).copied())
-            .collect::<Option<Vec<_>>>()?,
-        result: indices.get(result.as_ref()).copied()?,
-        effects: effects.clone(),
-    })
+fn wire_type(
+    value: &TypeKey,
+    indices: &BTreeMap<TypeKey, TypeIndex>,
+    strings: &BTreeMap<String, StringIndex>,
+    modules: &BTreeMap<String, ModuleIndex>,
+) -> Option<ValueType> {
+    match value {
+        TypeKey::Unit | TypeKey::Bool | TypeKey::Int | TypeKey::Text => None,
+        TypeKey::Function {
+            parameters,
+            result,
+            effects,
+        } => Some(ValueType::Function {
+            parameters: parameters
+                .iter()
+                .map(|value| indices.get(value).copied())
+                .collect::<Option<Vec<_>>>()?,
+            result: indices.get(result.as_ref()).copied()?,
+            effects: effects.clone(),
+        }),
+        TypeKey::Tuple(elements) => Some(ValueType::Tuple {
+            elements: elements
+                .iter()
+                .map(|element| indices.get(element).copied())
+                .collect::<Option<Vec<_>>>()?,
+        }),
+        TypeKey::Record {
+            module,
+            name,
+            arguments,
+            fields,
+        } => Some(ValueType::Record {
+            module: *modules.get(module)?,
+            name: *strings.get(name)?,
+            arguments: arguments
+                .iter()
+                .map(|argument| indices.get(argument).copied())
+                .collect::<Option<Vec<_>>>()?,
+            fields: fields
+                .iter()
+                .map(|field| {
+                    Some(RecordField {
+                        name: *strings.get(&field.name)?,
+                        value_type: indices.get(&field.value_type).copied()?,
+                        mutable: field.mutable,
+                    })
+                })
+                .collect::<Option<Vec<_>>>()?,
+        }),
+        TypeKey::Variant {
+            module,
+            name,
+            arguments,
+            cases,
+        } => Some(ValueType::Variant {
+            module: *modules.get(module)?,
+            name: *strings.get(name)?,
+            arguments: arguments
+                .iter()
+                .map(|argument| indices.get(argument).copied())
+                .collect::<Option<Vec<_>>>()?,
+            cases: cases
+                .iter()
+                .map(|case| {
+                    let payload = match &case.payload {
+                        Some(payload) => Some(indices.get(payload).copied()?),
+                        None => None,
+                    };
+                    Some(VariantCase {
+                        name: *strings.get(&case.name)?,
+                        payload,
+                    })
+                })
+                .collect::<Option<Vec<_>>>()?,
+        }),
+    }
 }
 
 fn bytecode_effects(
@@ -2118,13 +2658,29 @@ fn invalid_without_span(invariant: &str) -> LoweringError {
 // Function emission and constant collection are kept below the planning/type phase
 // so no bytecode is published until every index and capture has been validated.
 
+struct BlockBuilder {
+    parameters: Vec<BlockParameter>,
+    instructions: Vec<Instruction>,
+    terminator: Option<Terminator>,
+}
+
+impl BlockBuilder {
+    fn new() -> Self {
+        Self {
+            parameters: Vec::new(),
+            instructions: Vec::new(),
+            terminator: None,
+        }
+    }
+}
+
 struct FunctionEmitter<'a, 'snapshot, 'source> {
     owner: &'a ClosureLowerer<'snapshot, 'source>,
     module: &'snapshot ling_resolve::ResolvedModule,
     function_index: FunctionIndex,
     next_register: u32,
-    parameters: Vec<BlockParameter>,
-    instructions: Vec<Instruction>,
+    blocks: Vec<BlockBuilder>,
+    current_block: usize,
     source_map: Vec<SourceMapEntry>,
 }
 
@@ -2139,8 +2695,8 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             module,
             function_index,
             next_register: 0,
-            parameters: Vec::new(),
-            instructions: Vec::new(),
+            blocks: vec![BlockBuilder::new()],
+            current_block: 0,
             source_map: Vec::new(),
         }
     }
@@ -2166,7 +2722,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         for capture in captures {
             let value_type = self.type_index(&capture.value_type)?;
             let register = self.new_register(body.span)?;
-            self.parameters.push(BlockParameter {
+            self.blocks[0].parameters.push(BlockParameter {
                 register,
                 value_type,
             });
@@ -2176,7 +2732,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         for (pattern, value) in patterns.iter().zip(&signature.parameters) {
             let value_type = self.type_index(value)?;
             let register = self.new_register(pattern.span)?;
-            self.parameters.push(BlockParameter {
+            self.blocks[0].parameters.push(BlockParameter {
                 register,
                 value_type,
             });
@@ -2203,8 +2759,20 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             }
         }
         let result = self.lower_expression(body, &mut environment)?;
-        let ordinal = to_u32(self.instructions.len(), "terminator ordinal")?;
+        if self.blocks[self.current_block].terminator.is_some() {
+            return Err(invalid_module(
+                self.module,
+                body.span,
+                "function body continues after a terminated block",
+            ));
+        }
+        let ordinal = to_u32(
+            self.blocks[self.current_block].instructions.len(),
+            "terminator ordinal",
+        )?;
         self.push_source_map(body.span, ordinal, SourceOrigin::LoweringDerived)?;
+        self.blocks[self.current_block].terminator = Some(Terminator::Return { value: result });
+        let blocks = self.finish_blocks()?;
         let function = Function {
             kind,
             module: self.owner.module_indices[&self.module.id],
@@ -2214,11 +2782,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             result_type: self.type_index(&signature.result)?,
             effects: signature.effects.clone(),
             register_count: self.next_register,
-            blocks: vec![Block {
-                parameters: std::mem::take(&mut self.parameters),
-                instructions: std::mem::take(&mut self.instructions),
-                terminator: Terminator::Return { value: result },
-            }],
+            blocks,
         };
         Ok((function, self.source_map))
     }
@@ -2233,7 +2797,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         for value in &signature.parameters {
             let value_type = self.type_index(value)?;
             let register = self.new_register(plan.span)?;
-            self.parameters.push(BlockParameter {
+            self.blocks[0].parameters.push(BlockParameter {
                 register,
                 value_type,
             });
@@ -2245,8 +2809,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             builtin_instruction(plan.builtin, destination, &arguments)?,
             plan.span,
         )?;
-        let ordinal = to_u32(self.instructions.len(), "terminator ordinal")?;
+        let ordinal = to_u32(
+            self.blocks[self.current_block].instructions.len(),
+            "terminator ordinal",
+        )?;
         self.push_source_map(plan.span, ordinal, SourceOrigin::LoweringDerived)?;
+        self.blocks[self.current_block].terminator =
+            Some(Terminator::Return { value: destination });
+        let blocks = self.finish_blocks()?;
         let function = Function {
             kind: FunctionKind::ClosureBody,
             module: self.owner.module_indices[&self.module.id],
@@ -2256,11 +2826,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             result_type: self.type_index(&signature.result)?,
             effects: signature.effects.clone(),
             register_count: self.next_register,
-            blocks: vec![Block {
-                parameters: std::mem::take(&mut self.parameters),
-                instructions: std::mem::take(&mut self.instructions),
-                terminator: Terminator::Return { value: destination },
-            }],
+            blocks,
         };
         Ok((function, self.source_map))
     }
@@ -2344,10 +2910,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 function,
                 arguments,
             } => self.lower_application(expression, function, arguments, environment),
-            hir::ExpressionKind::Name { reference, .. }
-            | hir::ExpressionKind::Projection { reference, .. } => {
+            hir::ExpressionKind::Name { reference, .. } => {
                 self.lower_reference(expression, *reference, environment)
             }
+            hir::ExpressionKind::Projection {
+                reference,
+                target,
+                field,
+            } => self.lower_projection(expression, *reference, target, field, environment),
             hir::ExpressionKind::Literal(literal) => {
                 let constant = literal_constant_v1_1(
                     self.owner.snapshot,
@@ -2359,8 +2929,18 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 self.emit_constant(expression, constant)
             }
             hir::ExpressionKind::Unit => self.emit_constant(expression, Constant::Unit),
+            hir::ExpressionKind::If {
+                condition,
+                then_branch,
+                else_branch,
+            } if self.owner.aggregate_mode => {
+                self.lower_if(expression, condition, then_branch, else_branch, environment)
+            }
             hir::ExpressionKind::If { .. } => {
                 Err(unsupported_module(self.module, expression.span, "if"))
+            }
+            hir::ExpressionKind::Match { scrutinee, cases } if self.owner.aggregate_mode => {
+                self.lower_match(expression, scrutinee, cases, environment)
             }
             hir::ExpressionKind::Match { .. } => {
                 Err(unsupported_module(self.module, expression.span, "match"))
@@ -2370,16 +2950,35 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 expression.span,
                 "mutable assignment",
             )),
+            hir::ExpressionKind::Binary {
+                operator,
+                left,
+                right,
+            } if self.owner.aggregate_mode => {
+                self.lower_binary(expression, *operator, left, right, environment)
+            }
             hir::ExpressionKind::Binary { .. } => Err(unsupported_module(
                 self.module,
                 expression.span,
                 "scalar operators",
             )),
+            hir::ExpressionKind::Unary { operator, operand } if self.owner.aggregate_mode => {
+                self.lower_unary(expression, *operator, operand, environment)
+            }
             hir::ExpressionKind::Unary { .. } => Err(unsupported_module(
                 self.module,
                 expression.span,
                 "integer unary operators",
             )),
+            hir::ExpressionKind::Tuple(elements) if self.owner.aggregate_mode => {
+                self.lower_tuple(expression, elements, environment)
+            }
+            hir::ExpressionKind::Record(fields) if self.owner.aggregate_mode => {
+                self.lower_record(expression, fields, environment)
+            }
+            hir::ExpressionKind::RecordUpdate { base, fields } if self.owner.aggregate_mode => {
+                self.lower_record_update(expression, base, fields, environment)
+            }
             hir::ExpressionKind::Tuple(_) => {
                 Err(unsupported_module(self.module, expression.span, "tuple"))
             }
@@ -2390,6 +2989,820 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 Err(unsupported_module(self.module, expression.span, "list"))
             }
         }
+    }
+
+    fn lower_match(
+        &mut self,
+        expression: &hir::Expression,
+        scrutinee: &hir::Expression,
+        cases: &[hir::MatchCase],
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        if cases.is_empty() {
+            return Err(invalid_module(
+                self.module,
+                expression.span,
+                "checked match has no cases",
+            ));
+        }
+        let typed = self.owner.snapshot.checked().typed();
+        let scrutinee_type = typed
+            .expression_type(ExpressionKey::new(self.module.id, scrutinee.id))
+            .ok_or_else(|| {
+                invalid_module(
+                    self.module,
+                    scrutinee.span,
+                    "match scrutinee type is absent",
+                )
+            })?;
+        let scrutinee_register = self.lower_expression(scrutinee, &mut environment.clone())?;
+        let result_type = self.type_index(&self.expression_type_key(expression)?)?;
+        let merge = self.new_block()?;
+        let result_register = self.new_register(expression.span)?;
+        self.blocks[usize::try_from(merge.get()).map_err(|_| {
+            invalid_without_span("match merge block index does not fit host usize")
+        })?]
+        .parameters
+        .push(BlockParameter {
+            register: result_register,
+            value_type: result_type,
+        });
+
+        let original_environment = environment.clone();
+        for (index, case) in cases.iter().enumerate() {
+            let is_last = index + 1 == cases.len();
+            let pattern_success = self.new_block()?;
+            let failure = if is_last {
+                if case.guard.is_some() {
+                    return Err(unsupported_module(
+                        self.module,
+                        case.span,
+                        "guarded final match case without fallback",
+                    ));
+                }
+                None
+            } else {
+                Some(self.new_block()?)
+            };
+            let mut case_environment = original_environment.clone();
+            self.emit_pattern(
+                scrutinee_register,
+                scrutinee_type,
+                &case.pattern,
+                &mut case_environment,
+                pattern_success,
+                failure,
+            )?;
+
+            let body_block = if let Some(guard) = &case.guard {
+                let failure = failure.ok_or_else(|| {
+                    invalid_module(self.module, case.span, "guard has no failure successor")
+                })?;
+                self.set_current_block(pattern_success)?;
+                let condition = self.lower_expression(guard, &mut case_environment)?;
+                let body = self.new_block()?;
+                self.set_terminator(
+                    Terminator::Branch {
+                        condition,
+                        true_target: body,
+                        true_arguments: Vec::new(),
+                        false_target: failure,
+                        false_arguments: Vec::new(),
+                    },
+                    guard.span,
+                )?;
+                body
+            } else {
+                pattern_success
+            };
+
+            self.set_current_block(body_block)?;
+            let value = self.lower_expression(&case.body, &mut case_environment)?;
+            self.set_terminator(
+                Terminator::Jump {
+                    target: merge,
+                    arguments: vec![value],
+                },
+                case.body.span,
+            )?;
+
+            if let Some(failure) = failure {
+                self.set_current_block(failure)?;
+            }
+        }
+        self.set_current_block(merge)?;
+        Ok(result_register)
+    }
+
+    fn lower_if(
+        &mut self,
+        expression: &hir::Expression,
+        condition: &hir::Expression,
+        then_branch: &hir::Expression,
+        else_branch: &hir::Expression,
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let condition_register = self.lower_expression(condition, &mut environment.clone())?;
+        let result_type = self.type_index(&self.expression_type_key(expression)?)?;
+        let merge = self.new_block()?;
+        let result_register = self.new_register(expression.span)?;
+        self.blocks[usize::try_from(merge.get())
+            .map_err(|_| invalid_without_span("if merge block index does not fit host usize"))?]
+        .parameters
+        .push(BlockParameter {
+            register: result_register,
+            value_type: result_type,
+        });
+        let then_block = self.new_block()?;
+        let else_block = self.new_block()?;
+        self.set_terminator(
+            Terminator::Branch {
+                condition: condition_register,
+                true_target: then_block,
+                true_arguments: Vec::new(),
+                false_target: else_block,
+                false_arguments: Vec::new(),
+            },
+            condition.span,
+        )?;
+
+        self.set_current_block(then_block)?;
+        let then_value = self.lower_expression(then_branch, &mut environment.clone())?;
+        self.set_terminator(
+            Terminator::Jump {
+                target: merge,
+                arguments: vec![then_value],
+            },
+            then_branch.span,
+        )?;
+
+        self.set_current_block(else_block)?;
+        let else_value = self.lower_expression(else_branch, &mut environment.clone())?;
+        self.set_terminator(
+            Terminator::Jump {
+                target: merge,
+                arguments: vec![else_value],
+            },
+            else_branch.span,
+        )?;
+        self.set_current_block(merge)?;
+        Ok(result_register)
+    }
+
+    fn lower_binary(
+        &mut self,
+        expression: &hir::Expression,
+        operator: hir::BinaryOperator,
+        left: &hir::Expression,
+        right: &hir::Expression,
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        if matches!(
+            operator,
+            hir::BinaryOperator::BooleanAnd | hir::BinaryOperator::BooleanOr
+        ) {
+            let left_register = self.lower_expression(left, &mut environment.clone())?;
+            let merge = self.new_block()?;
+            let result_register = self.new_register(expression.span)?;
+            self.blocks[usize::try_from(merge.get()).map_err(|_| {
+                invalid_without_span("boolean merge block index does not fit host usize")
+            })?]
+            .parameters
+            .push(BlockParameter {
+                register: result_register,
+                value_type: TypeIndex::new(1),
+            });
+            let right_block = self.new_block()?;
+            let short_block = self.new_block()?;
+            let (true_target, false_target) = match operator {
+                hir::BinaryOperator::BooleanAnd => (right_block, short_block),
+                hir::BinaryOperator::BooleanOr => (short_block, right_block),
+                _ => unreachable!("boolean operator checked above"),
+            };
+            self.set_terminator(
+                Terminator::Branch {
+                    condition: left_register,
+                    true_target,
+                    true_arguments: Vec::new(),
+                    false_target,
+                    false_arguments: Vec::new(),
+                },
+                expression.span,
+            )?;
+            self.set_current_block(right_block)?;
+            let right_register = self.lower_expression(right, &mut environment.clone())?;
+            self.set_terminator(
+                Terminator::Jump {
+                    target: merge,
+                    arguments: vec![right_register],
+                },
+                right.span,
+            )?;
+            self.set_current_block(short_block)?;
+            let short_value = self.emit_constant_span(
+                expression.span,
+                Constant::Bool(matches!(operator, hir::BinaryOperator::BooleanOr)),
+            )?;
+            self.set_terminator(
+                Terminator::Jump {
+                    target: merge,
+                    arguments: vec![short_value],
+                },
+                expression.span,
+            )?;
+            self.set_current_block(merge)?;
+            return Ok(result_register);
+        }
+
+        let left_register = self.lower_expression(left, &mut environment.clone())?;
+        let right_register = self.lower_expression(right, &mut environment.clone())?;
+        let typed = self.owner.snapshot.checked().typed();
+        let left_type = typed
+            .expression_type(ExpressionKey::new(self.module.id, left.id))
+            .ok_or_else(|| invalid_module(self.module, left.span, "binary left type is absent"))?;
+        let destination = self.new_register(expression.span)?;
+        let instruction = match operator {
+            hir::BinaryOperator::Add => Instruction::IntBinary {
+                destination,
+                operator: IntBinaryOperator::Add,
+                left: left_register,
+                right: right_register,
+            },
+            hir::BinaryOperator::Subtract => Instruction::IntBinary {
+                destination,
+                operator: IntBinaryOperator::Subtract,
+                left: left_register,
+                right: right_register,
+            },
+            hir::BinaryOperator::Multiply => Instruction::IntBinary {
+                destination,
+                operator: IntBinaryOperator::Multiply,
+                left: left_register,
+                right: right_register,
+            },
+            hir::BinaryOperator::Divide => Instruction::IntBinary {
+                destination,
+                operator: IntBinaryOperator::Divide,
+                left: left_register,
+                right: right_register,
+            },
+            hir::BinaryOperator::Remainder => Instruction::IntBinary {
+                destination,
+                operator: IntBinaryOperator::Remainder,
+                left: left_register,
+                right: right_register,
+            },
+            hir::BinaryOperator::Equal | hir::BinaryOperator::NotEqual => {
+                let operator = match (typed.arena().get(left_type), operator) {
+                    (Type::Bool, hir::BinaryOperator::Equal) => CompareOperator::BoolEqual,
+                    (Type::Bool, hir::BinaryOperator::NotEqual) => CompareOperator::BoolNotEqual,
+                    (Type::Int, hir::BinaryOperator::Equal) => CompareOperator::IntEqual,
+                    (Type::Int, hir::BinaryOperator::NotEqual) => CompareOperator::IntNotEqual,
+                    (Type::Text, hir::BinaryOperator::Equal) => CompareOperator::TextEqual,
+                    (Type::Text, hir::BinaryOperator::NotEqual) => CompareOperator::TextNotEqual,
+                    _ => {
+                        return Err(invalid_module(
+                            self.module,
+                            expression.span,
+                            "equality operands are not supported by bytecode",
+                        ));
+                    }
+                };
+                Instruction::Compare {
+                    destination,
+                    operator,
+                    left: left_register,
+                    right: right_register,
+                }
+            }
+            hir::BinaryOperator::Less
+            | hir::BinaryOperator::LessEqual
+            | hir::BinaryOperator::Greater
+            | hir::BinaryOperator::GreaterEqual => {
+                let operator = match operator {
+                    hir::BinaryOperator::Less => CompareOperator::IntLess,
+                    hir::BinaryOperator::LessEqual => CompareOperator::IntLessEqual,
+                    hir::BinaryOperator::Greater => CompareOperator::IntGreater,
+                    hir::BinaryOperator::GreaterEqual => CompareOperator::IntGreaterEqual,
+                    _ => unreachable!("comparison operator checked above"),
+                };
+                if !matches!(typed.arena().get(left_type), Type::Int) {
+                    return Err(invalid_module(
+                        self.module,
+                        expression.span,
+                        "ordered comparison operands are not Int",
+                    ));
+                }
+                Instruction::Compare {
+                    destination,
+                    operator,
+                    left: left_register,
+                    right: right_register,
+                }
+            }
+            hir::BinaryOperator::BooleanAnd | hir::BinaryOperator::BooleanOr => {
+                unreachable!("boolean operators handled above")
+            }
+        };
+        self.push_instruction(instruction, expression.span)?;
+        Ok(destination)
+    }
+
+    fn lower_unary(
+        &mut self,
+        expression: &hir::Expression,
+        operator: hir::UnaryOperator,
+        operand: &hir::Expression,
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let operand_register = self.lower_expression(operand, &mut environment.clone())?;
+        let destination = self.new_register(expression.span)?;
+        let operator = match operator {
+            hir::UnaryOperator::Positive => IntUnaryOperator::Positive,
+            hir::UnaryOperator::Negative => IntUnaryOperator::Negative,
+        };
+        self.push_instruction(
+            Instruction::IntUnary {
+                destination,
+                operator,
+                operand: operand_register,
+            },
+            expression.span,
+        )?;
+        Ok(destination)
+    }
+
+    fn emit_pattern(
+        &mut self,
+        value: RegisterIndex,
+        value_type: TypeId,
+        pattern: &hir::Pattern,
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        success: BlockIndex,
+        failure: Option<BlockIndex>,
+    ) -> Result<(), LoweringError> {
+        let typed = self.owner.snapshot.checked().typed();
+        match &pattern.kind {
+            hir::PatternKind::Binding { id, .. } => {
+                environment.insert(BindingKey::new(self.module.id, *id), value);
+                self.set_terminator(
+                    Terminator::Jump {
+                        target: success,
+                        arguments: Vec::new(),
+                    },
+                    pattern.span,
+                )
+            }
+            hir::PatternKind::Wildcard | hir::PatternKind::Unit => self.set_terminator(
+                Terminator::Jump {
+                    target: success,
+                    arguments: Vec::new(),
+                },
+                pattern.span,
+            ),
+            hir::PatternKind::Literal(literal) => {
+                let Some(failure) = failure else {
+                    return self.set_terminator(
+                        Terminator::Jump {
+                            target: success,
+                            arguments: Vec::new(),
+                        },
+                        pattern.span,
+                    );
+                };
+                let constant = pattern_constant(
+                    self.owner.snapshot,
+                    self.module,
+                    pattern,
+                    literal,
+                    &self.owner.string_indices,
+                )?;
+                let constant_register = self.emit_constant_span(pattern.span, constant)?;
+                let operator = match (typed.arena().get(value_type), literal) {
+                    (Type::Bool, hir::Literal::Boolean(_)) => CompareOperator::BoolEqual,
+                    (Type::Int, hir::Literal::Integer { .. }) => CompareOperator::IntEqual,
+                    (Type::Text, hir::Literal::Text(_)) => CompareOperator::TextEqual,
+                    _ => {
+                        return Err(invalid_module(
+                            self.module,
+                            pattern.span,
+                            "literal pattern type is not comparable by bytecode",
+                        ));
+                    }
+                };
+                let condition = self.new_register(pattern.span)?;
+                self.push_instruction(
+                    Instruction::Compare {
+                        destination: condition,
+                        operator,
+                        left: value,
+                        right: constant_register,
+                    },
+                    pattern.span,
+                )?;
+                self.set_terminator(
+                    Terminator::Branch {
+                        condition,
+                        true_target: success,
+                        true_arguments: Vec::new(),
+                        false_target: failure,
+                        false_arguments: Vec::new(),
+                    },
+                    pattern.span,
+                )
+            }
+            hir::PatternKind::Tuple(patterns) => {
+                let Type::Tuple(types) = typed.arena().get(value_type) else {
+                    return Err(invalid_module(
+                        self.module,
+                        pattern.span,
+                        "tuple pattern value is not a tuple",
+                    ));
+                };
+                if patterns.len() != types.len() {
+                    return Err(invalid_module(
+                        self.module,
+                        pattern.span,
+                        "tuple pattern arity disagrees with checked type",
+                    ));
+                }
+                for (index, (child, child_type)) in patterns.iter().zip(types).enumerate() {
+                    let next = if index + 1 == patterns.len() {
+                        success
+                    } else {
+                        self.new_block()?
+                    };
+                    let child_register = self.new_register(child.span)?;
+                    self.push_instruction(
+                        Instruction::GetTuple {
+                            destination: child_register,
+                            tuple: value,
+                            element: u32::try_from(index).map_err(|_| {
+                                invalid_without_span("tuple element index overflow")
+                            })?,
+                        },
+                        child.span,
+                    )?;
+                    self.emit_pattern(
+                        child_register,
+                        *child_type,
+                        child,
+                        environment,
+                        next,
+                        failure,
+                    )?;
+                    if index + 1 != patterns.len() {
+                        self.set_current_block(next)?;
+                    }
+                }
+                Ok(())
+            }
+            hir::PatternKind::Record(fields) => {
+                let Type::NominalRecord { definition, .. } = typed.arena().get(value_type) else {
+                    return Err(invalid_module(
+                        self.module,
+                        pattern.span,
+                        "record pattern value is not a nominal record",
+                    ));
+                };
+                let info = typed.records().get(definition).ok_or_else(|| {
+                    invalid_module(self.module, pattern.span, "record metadata is absent")
+                })?;
+                for (index, field) in fields.iter().enumerate() {
+                    let (field_index, declaration) = info
+                        .fields
+                        .iter()
+                        .enumerate()
+                        .find(|(_, candidate)| candidate.name == field.name.normalized)
+                        .ok_or_else(|| {
+                            invalid_module(self.module, field.span, "record field is absent")
+                        })?;
+                    let next = if index + 1 == fields.len() {
+                        success
+                    } else {
+                        self.new_block()?
+                    };
+                    let child_register = self.new_register(field.pattern.span)?;
+                    self.push_instruction(
+                        Instruction::GetField {
+                            destination: child_register,
+                            record: value,
+                            field: u32::try_from(field_index)
+                                .map_err(|_| invalid_without_span("record field index overflow"))?,
+                        },
+                        field.span,
+                    )?;
+                    self.emit_pattern(
+                        child_register,
+                        declaration.field_type,
+                        &field.pattern,
+                        environment,
+                        next,
+                        failure,
+                    )?;
+                    if index + 1 != fields.len() {
+                        self.set_current_block(next)?;
+                    }
+                }
+                if fields.is_empty() {
+                    self.set_terminator(
+                        Terminator::Jump {
+                            target: success,
+                            arguments: Vec::new(),
+                        },
+                        pattern.span,
+                    )?;
+                }
+                Ok(())
+            }
+            hir::PatternKind::Constructor { arguments, .. } => {
+                let constructor = typed
+                    .resolved()
+                    .pattern_constructor(self.module.id, pattern.id)
+                    .cloned()
+                    .ok_or_else(|| {
+                        invalid_module(
+                            self.module,
+                            pattern.span,
+                            "constructor pattern is unresolved",
+                        )
+                    })?;
+                let Type::NominalVariant { definition, .. } = typed.arena().get(value_type) else {
+                    return Err(invalid_module(
+                        self.module,
+                        pattern.span,
+                        "constructor pattern value is not a nominal variant",
+                    ));
+                };
+                let info = typed.variants().get(definition).ok_or_else(|| {
+                    invalid_module(self.module, pattern.span, "variant metadata is absent")
+                })?;
+                let (case_index, case) = info
+                    .cases
+                    .iter()
+                    .enumerate()
+                    .find(|(_, candidate)| candidate.definition == constructor)
+                    .ok_or_else(|| {
+                        invalid_module(
+                            self.module,
+                            pattern.span,
+                            "variant constructor case is absent",
+                        )
+                    })?;
+                match (case.payload, arguments.as_slice()) {
+                    (None, []) => {
+                        if let Some(failure) = failure {
+                            let condition = self.new_register(pattern.span)?;
+                            self.push_instruction(
+                                Instruction::VariantIs {
+                                    destination: condition,
+                                    variant: value,
+                                    case: u32::try_from(case_index).map_err(|_| {
+                                        invalid_without_span("variant case index overflow")
+                                    })?,
+                                },
+                                pattern.span,
+                            )?;
+                            self.set_terminator(
+                                Terminator::Branch {
+                                    condition,
+                                    true_target: success,
+                                    true_arguments: Vec::new(),
+                                    false_target: failure,
+                                    false_arguments: Vec::new(),
+                                },
+                                pattern.span,
+                            )
+                        } else {
+                            self.set_terminator(
+                                Terminator::Jump {
+                                    target: success,
+                                    arguments: Vec::new(),
+                                },
+                                pattern.span,
+                            )
+                        }
+                    }
+                    (Some(payload_type), [payload_pattern]) => {
+                        let payload_block = if let Some(failure) = failure {
+                            let condition = self.new_register(pattern.span)?;
+                            self.push_instruction(
+                                Instruction::VariantIs {
+                                    destination: condition,
+                                    variant: value,
+                                    case: u32::try_from(case_index).map_err(|_| {
+                                        invalid_without_span("variant case index overflow")
+                                    })?,
+                                },
+                                pattern.span,
+                            )?;
+                            let payload_block = self.new_block()?;
+                            self.set_terminator(
+                                Terminator::Branch {
+                                    condition,
+                                    true_target: payload_block,
+                                    true_arguments: Vec::new(),
+                                    false_target: failure,
+                                    false_arguments: Vec::new(),
+                                },
+                                pattern.span,
+                            )?;
+                            payload_block
+                        } else {
+                            let payload_block = self.new_block()?;
+                            self.set_terminator(
+                                Terminator::Jump {
+                                    target: payload_block,
+                                    arguments: Vec::new(),
+                                },
+                                pattern.span,
+                            )?;
+                            payload_block
+                        };
+                        self.set_current_block(payload_block)?;
+                        let payload_register = self.new_register(payload_pattern.span)?;
+                        self.push_instruction(
+                            Instruction::GetVariantPayload {
+                                destination: payload_register,
+                                variant: value,
+                                case: u32::try_from(case_index).map_err(|_| {
+                                    invalid_without_span("variant case index overflow")
+                                })?,
+                            },
+                            payload_pattern.span,
+                        )?;
+                        self.emit_pattern(
+                            payload_register,
+                            payload_type,
+                            payload_pattern,
+                            environment,
+                            success,
+                            failure,
+                        )
+                    }
+                    _ => Err(invalid_module(
+                        self.module,
+                        pattern.span,
+                        "constructor pattern arity disagrees with checked type",
+                    )),
+                }
+            }
+        }
+    }
+
+    fn lower_projection(
+        &mut self,
+        expression: &hir::Expression,
+        reference: hir::ReferenceId,
+        target: &hir::Expression,
+        field: &hir::Name,
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let typed = self.owner.snapshot.checked().typed();
+        let target_type = typed
+            .expression_type(ExpressionKey::new(self.module.id, target.id))
+            .ok_or_else(|| {
+                invalid_module(self.module, target.span, "projection target type is absent")
+            })?;
+        if let Type::NominalRecord { definition, .. } = typed.arena().get(target_type) {
+            let info = typed.records().get(definition).ok_or_else(|| {
+                invalid_module(self.module, expression.span, "record metadata is absent")
+            })?;
+            let (field_index, _) = info
+                .fields
+                .iter()
+                .enumerate()
+                .find(|(_, candidate)| candidate.name == field.normalized)
+                .ok_or_else(|| {
+                    invalid_module(self.module, expression.span, "record field is absent")
+                })?;
+            let base = self.lower_expression(target, environment)?;
+            let destination = self.new_register(expression.span)?;
+            self.push_instruction(
+                Instruction::GetField {
+                    destination,
+                    record: base,
+                    field: u32::try_from(field_index)
+                        .map_err(|_| invalid_without_span("record field index overflow"))?,
+                },
+                expression.span,
+            )?;
+            Ok(destination)
+        } else {
+            self.lower_reference(expression, reference, environment)
+        }
+    }
+
+    fn lower_tuple(
+        &mut self,
+        expression: &hir::Expression,
+        elements: &[hir::Expression],
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let mut registers = Vec::with_capacity(elements.len());
+        for element in elements {
+            registers.push(self.lower_expression(element, environment)?);
+        }
+        let value = self.expression_type_key(expression)?;
+        let destination = self.new_register(expression.span)?;
+        self.push_instruction(
+            Instruction::MakeTuple {
+                destination,
+                tuple: self.type_index(&value)?,
+                elements: registers,
+            },
+            expression.span,
+        )?;
+        Ok(destination)
+    }
+
+    fn lower_record(
+        &mut self,
+        expression: &hir::Expression,
+        fields: &[hir::RecordField],
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let typed = self.owner.snapshot.checked().typed();
+        let value_type = typed
+            .expression_type(ExpressionKey::new(self.module.id, expression.id))
+            .ok_or_else(|| invalid_module(self.module, expression.span, "record type is absent"))?;
+        let Type::NominalRecord { definition, .. } = typed.arena().get(value_type) else {
+            return Err(invalid_module(
+                self.module,
+                expression.span,
+                "record literal is not nominal",
+            ));
+        };
+        let info = typed.records().get(definition).ok_or_else(|| {
+            invalid_module(self.module, expression.span, "record metadata is absent")
+        })?;
+        let mut values = Vec::with_capacity(info.fields.len());
+        for declared in &info.fields {
+            let field = fields
+                .iter()
+                .find(|field| field.name.normalized == declared.name)
+                .ok_or_else(|| {
+                    invalid_module(self.module, expression.span, "record field is absent")
+                })?;
+            values.push(self.lower_expression(&field.value, environment)?);
+        }
+        let destination = self.new_register(expression.span)?;
+        self.push_instruction(
+            Instruction::MakeRecord {
+                destination,
+                record: self.type_index(&self.expression_type_key(expression)?)?,
+                fields: values,
+            },
+            expression.span,
+        )?;
+        Ok(destination)
+    }
+
+    fn lower_record_update(
+        &mut self,
+        expression: &hir::Expression,
+        base: &hir::Expression,
+        fields: &[hir::RecordField],
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let typed = self.owner.snapshot.checked().typed();
+        let base_type = typed
+            .expression_type(ExpressionKey::new(self.module.id, base.id))
+            .ok_or_else(|| invalid_module(self.module, base.span, "record base type is absent"))?;
+        let Type::NominalRecord { definition, .. } = typed.arena().get(base_type) else {
+            return Err(invalid_module(
+                self.module,
+                expression.span,
+                "record update base is not nominal",
+            ));
+        };
+        let info = typed.records().get(definition).ok_or_else(|| {
+            invalid_module(self.module, expression.span, "record metadata is absent")
+        })?;
+        let base_register = self.lower_expression(base, environment)?;
+        let mut updates = Vec::with_capacity(fields.len());
+        for field in fields {
+            let index = info
+                .fields
+                .iter()
+                .position(|declared| declared.name == field.name.normalized)
+                .ok_or_else(|| invalid_module(self.module, field.span, "record field is absent"))?;
+            updates.push(RecordUpdate {
+                field: u32::try_from(index)
+                    .map_err(|_| invalid_without_span("record field index overflow"))?,
+                value: self.lower_expression(&field.value, environment)?,
+            });
+        }
+        let destination = self.new_register(expression.span)?;
+        self.push_instruction(
+            Instruction::UpdateRecord {
+                destination,
+                base: base_register,
+                updates,
+            },
+            expression.span,
+        )?;
+        Ok(destination)
     }
 
     fn lower_application(
@@ -2425,6 +3838,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 })?;
             match info.origin {
                 DefinitionOrigin::User { .. } => {
+                    if self.owner.aggregate_mode && info.kind == DefinitionKind::Constructor {
+                        return self.lower_constructor_application(
+                            expression,
+                            definition,
+                            arguments,
+                            environment,
+                        );
+                    }
                     let plan = &self.owner.named[definition];
                     let signature = &self.owner.named_signatures[definition];
                     if !plan.definition.parameters.is_empty()
@@ -2460,6 +3881,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                         return Ok(destination);
                     }
                 }
+                DefinitionOrigin::Prelude(_) if self.owner.aggregate_mode => {
+                    return self.lower_constructor_application(
+                        expression,
+                        definition,
+                        arguments,
+                        environment,
+                    );
+                }
                 DefinitionOrigin::Builtin(_) | DefinitionOrigin::Prelude(_) => {}
             }
         }
@@ -2487,6 +3916,82 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             output.push(self.lower_expression(argument, environment)?);
         }
         Ok(output)
+    }
+
+    fn lower_constructor_application(
+        &mut self,
+        expression: &hir::Expression,
+        definition: &DefinitionId,
+        arguments: &[hir::Expression],
+        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+    ) -> Result<RegisterIndex, LoweringError> {
+        let typed = self.owner.snapshot.checked().typed();
+        let (variant_definition, case_index, payload_type) = typed
+            .variants()
+            .iter()
+            .find_map(|(variant_definition, info)| {
+                info.cases.iter().enumerate().find_map(|(index, case)| {
+                    (case.definition == *definition).then_some((
+                        variant_definition.clone(),
+                        index,
+                        case.payload,
+                    ))
+                })
+            })
+            .ok_or_else(|| {
+                invalid_module(
+                    self.module,
+                    expression.span,
+                    "constructor variant is absent",
+                )
+            })?;
+        match (payload_type, arguments) {
+            (None, []) => {}
+            (Some(_), [payload]) => {
+                let register = self.lower_expression(payload, environment)?;
+                let destination = self.new_register(expression.span)?;
+                let variant_type = self.expression_type_key(expression)?;
+                self.push_instruction(
+                    Instruction::MakeVariant {
+                        destination,
+                        variant: self.type_index(&variant_type)?,
+                        case: u32::try_from(case_index)
+                            .map_err(|_| invalid_without_span("variant case index overflow"))?,
+                        payload: Some(register),
+                    },
+                    expression.span,
+                )?;
+                return Ok(destination);
+            }
+            (None, _) => {
+                return Err(invalid_module(
+                    self.module,
+                    expression.span,
+                    "nullary constructor received a payload",
+                ));
+            }
+            (Some(_), _) => {
+                return Err(invalid_module(
+                    self.module,
+                    expression.span,
+                    "constructor payload arity disagrees with checked type",
+                ));
+            }
+        }
+        let _variant_definition = variant_definition;
+        let destination = self.new_register(expression.span)?;
+        let variant_type = self.expression_type_key(expression)?;
+        self.push_instruction(
+            Instruction::MakeVariant {
+                destination,
+                variant: self.type_index(&variant_type)?,
+                case: u32::try_from(case_index)
+                    .map_err(|_| invalid_without_span("variant case index overflow"))?,
+                payload: None,
+            },
+            expression.span,
+        )?;
+        Ok(destination)
     }
 
     fn lower_reference(
@@ -2535,6 +4040,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                             "referenced definition is absent",
                         )
                     })?;
+                if self.owner.aggregate_mode && info.kind == DefinitionKind::Constructor {
+                    return self.lower_constructor_application(
+                        expression,
+                        &definition,
+                        &[],
+                        &mut environment.clone(),
+                    );
+                }
                 let destination = self.new_register(expression.span)?;
                 match info.origin {
                     DefinitionOrigin::User { .. } => {
@@ -2576,6 +4089,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                             builtin.qualified_name(),
                         ));
                     }
+                    DefinitionOrigin::Prelude(_) if self.owner.aggregate_mode => {
+                        return self.lower_constructor_application(
+                            expression,
+                            &definition,
+                            &[],
+                            &mut environment.clone(),
+                        );
+                    }
                     DefinitionOrigin::Prelude(_) => {
                         return Err(unsupported_module(
                             self.module,
@@ -2594,6 +4115,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         value: Constant,
     ) -> Result<RegisterIndex, LoweringError> {
+        self.emit_constant_span(expression.span, value)
+    }
+
+    fn emit_constant_span(
+        &mut self,
+        span: Span,
+        value: Constant,
+    ) -> Result<RegisterIndex, LoweringError> {
         let key = constant_key(&value)?;
         let constant = self
             .owner
@@ -2601,19 +4130,15 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             .get(&key)
             .copied()
             .ok_or_else(|| {
-                invalid_module(
-                    self.module,
-                    expression.span,
-                    "constant is absent from canonical table",
-                )
+                invalid_module(self.module, span, "constant is absent from canonical table")
             })?;
-        let destination = self.new_register(expression.span)?;
+        let destination = self.new_register(span)?;
         self.push_instruction(
             Instruction::Const {
                 destination,
                 constant,
             },
-            expression.span,
+            span,
         )?;
         Ok(destination)
     }
@@ -2629,6 +4154,25 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 invalid_module(self.module, expression.span, "expression type is absent")
             })?;
         ensure_supported_shape(
+            self.owner.snapshot.checked().typed(),
+            value,
+            self.module,
+            expression.span,
+            self.owner.aggregate_mode,
+        )
+    }
+
+    fn expression_type_key(&self, expression: &hir::Expression) -> Result<TypeKey, LoweringError> {
+        let value = self
+            .owner
+            .snapshot
+            .checked()
+            .typed()
+            .expression_type(ExpressionKey::new(self.module.id, expression.id))
+            .ok_or_else(|| {
+                invalid_module(self.module, expression.span, "expression type is absent")
+            })?;
+        checked_type_key(
             self.owner.snapshot.checked().typed(),
             value,
             self.module,
@@ -2661,13 +4205,74 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         Ok(register)
     }
 
+    fn new_block(&mut self) -> Result<BlockIndex, LoweringError> {
+        let index = to_u32(self.blocks.len(), "block index")?;
+        self.blocks.push(BlockBuilder::new());
+        Ok(BlockIndex::new(index))
+    }
+
+    fn set_current_block(&mut self, block: BlockIndex) -> Result<(), LoweringError> {
+        let index = usize::try_from(block.get())
+            .map_err(|_| invalid_without_span("block index does not fit host usize"))?;
+        if index >= self.blocks.len() {
+            return Err(invalid_without_span("current block index is absent"));
+        }
+        self.current_block = index;
+        Ok(())
+    }
+
+    fn set_terminator(&mut self, terminator: Terminator, span: Span) -> Result<(), LoweringError> {
+        if self.blocks[self.current_block].terminator.is_some() {
+            return Err(invalid_module(
+                self.module,
+                span,
+                "block already has a terminator",
+            ));
+        }
+        let ordinal = to_u32(
+            self.blocks[self.current_block].instructions.len(),
+            "terminator ordinal",
+        )?;
+        self.push_source_map(span, ordinal, SourceOrigin::LoweringDerived)?;
+        self.blocks[self.current_block].terminator = Some(terminator);
+        Ok(())
+    }
+
+    fn finish_blocks(&mut self) -> Result<Vec<Block>, LoweringError> {
+        self.blocks
+            .drain(..)
+            .map(|block| {
+                let terminator = block.terminator.ok_or_else(|| {
+                    invalid_without_span("reachable lowering block has no terminator")
+                })?;
+                Ok(Block {
+                    parameters: block.parameters,
+                    instructions: block.instructions,
+                    terminator,
+                })
+            })
+            .collect()
+    }
+
     fn push_instruction(
         &mut self,
         instruction: Instruction,
         span: Span,
     ) -> Result<(), LoweringError> {
-        let ordinal = to_u32(self.instructions.len(), "instruction ordinal")?;
-        self.instructions.push(instruction);
+        if self.blocks[self.current_block].terminator.is_some() {
+            return Err(invalid_module(
+                self.module,
+                span,
+                "instruction emitted after block terminator",
+            ));
+        }
+        let ordinal = to_u32(
+            self.blocks[self.current_block].instructions.len(),
+            "instruction ordinal",
+        )?;
+        self.blocks[self.current_block]
+            .instructions
+            .push(instruction);
         self.push_source_map(span, ordinal, SourceOrigin::Direct)
     }
 
@@ -2704,7 +4309,10 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         }
         self.source_map.push(SourceMapEntry {
             function: self.function_index,
-            block: BlockIndex::new(0),
+            block: BlockIndex::new(
+                u32::try_from(self.current_block)
+                    .map_err(|_| invalid_without_span("source-map block index overflow"))?,
+            ),
             ordinal,
             source: self.owner.source_indices[&span.source()],
             span: SourceSpan::new(start as u64, end as u64),
@@ -2763,19 +4371,123 @@ fn builtin_instruction(
     }
 }
 
+fn collect_type_shapes(
+    snapshot: &ProgramSnapshot,
+    module: &ling_resolve::ResolvedModule,
+    expression: &hir::Expression,
+    builder: &mut TypeTableBuilder,
+) -> Result<(), LoweringError> {
+    let typed = snapshot.checked().typed();
+    let value = typed
+        .expression_type(ExpressionKey::new(module.id, expression.id))
+        .ok_or_else(|| invalid_module(module, expression.span, "expression type is absent"))?;
+    if !matches!(typed.arena().get(value), Type::Function { .. }) {
+        builder.insert(checked_type_key(typed, value, module, expression.span)?);
+    }
+    match &expression.kind {
+        hir::ExpressionKind::Sequence(elements) => {
+            for element in elements {
+                match element {
+                    hir::SequenceElement::Let(binding) => {
+                        collect_type_shapes(snapshot, module, &binding.value, builder)?
+                    }
+                    hir::SequenceElement::Expression(value) => {
+                        collect_type_shapes(snapshot, module, value, builder)?;
+                    }
+                }
+            }
+        }
+        hir::ExpressionKind::If {
+            condition,
+            then_branch,
+            else_branch,
+        } => {
+            collect_type_shapes(snapshot, module, condition, builder)?;
+            collect_type_shapes(snapshot, module, then_branch, builder)?;
+            collect_type_shapes(snapshot, module, else_branch, builder)?;
+        }
+        hir::ExpressionKind::Match { scrutinee, cases } => {
+            collect_type_shapes(snapshot, module, scrutinee, builder)?;
+            for case in cases {
+                if let Some(guard) = &case.guard {
+                    collect_type_shapes(snapshot, module, guard, builder)?;
+                }
+                collect_type_shapes(snapshot, module, &case.body, builder)?;
+            }
+        }
+        hir::ExpressionKind::Assignment { value, .. } => {
+            collect_type_shapes(snapshot, module, value, builder)?;
+        }
+        hir::ExpressionKind::Application {
+            function,
+            arguments,
+        } => {
+            let is_constructor = matches!(
+                simple_reference_target(snapshot, module.id, function)?,
+                Some(ReferenceTarget::Definition(ref definition))
+                    if typed
+                        .resolved()
+                        .definition(definition)
+                        .is_some_and(|info| info.kind == DefinitionKind::Constructor)
+            );
+            if !is_constructor {
+                collect_type_shapes(snapshot, module, function, builder)?;
+            }
+            for argument in arguments {
+                collect_type_shapes(snapshot, module, argument, builder)?;
+            }
+        }
+        hir::ExpressionKind::Projection { .. } => {}
+        hir::ExpressionKind::Binary { left, right, .. } => {
+            collect_type_shapes(snapshot, module, left, builder)?;
+            collect_type_shapes(snapshot, module, right, builder)?;
+        }
+        hir::ExpressionKind::Unary { operand, .. } => {
+            collect_type_shapes(snapshot, module, operand, builder)?;
+        }
+        hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => {
+            for element in elements {
+                collect_type_shapes(snapshot, module, element, builder)?;
+            }
+        }
+        hir::ExpressionKind::Record(fields) => {
+            for field in fields {
+                collect_type_shapes(snapshot, module, &field.value, builder)?;
+            }
+        }
+        hir::ExpressionKind::RecordUpdate { base, fields } => {
+            collect_type_shapes(snapshot, module, base, builder)?;
+            for field in fields {
+                collect_type_shapes(snapshot, module, &field.value, builder)?;
+            }
+        }
+        hir::ExpressionKind::Name { .. }
+        | hir::ExpressionKind::Literal(_)
+        | hir::ExpressionKind::Unit => {}
+    }
+    Ok(())
+}
+
 fn collect_constants_v1_1(
     snapshot: &ProgramSnapshot,
     module: &ling_resolve::ResolvedModule,
     expression: &hir::Expression,
     strings: &BTreeMap<String, StringIndex>,
     constants: &mut BTreeMap<ConstantKey, Constant>,
+    aggregate_mode: bool,
 ) -> Result<(), LoweringError> {
     let value = snapshot
         .checked()
         .typed()
         .expression_type(ExpressionKey::new(module.id, expression.id))
         .ok_or_else(|| invalid_module(module, expression.span, "expression type is absent"))?;
-    ensure_supported_shape(snapshot.checked().typed(), value, module, expression.span)?;
+    ensure_supported_shape(
+        snapshot.checked().typed(),
+        value,
+        module,
+        expression.span,
+        aggregate_mode,
+    )?;
     match &expression.kind {
         hir::ExpressionKind::Sequence(elements) => {
             let mut final_expression = false;
@@ -2802,11 +4514,19 @@ fn collect_constants_v1_1(
                             &binding.value,
                             strings,
                             constants,
+                            aggregate_mode,
                         )?;
                         final_expression = false;
                     }
                     hir::SequenceElement::Expression(value) => {
-                        collect_constants_v1_1(snapshot, module, value, strings, constants)?;
+                        collect_constants_v1_1(
+                            snapshot,
+                            module,
+                            value,
+                            strings,
+                            constants,
+                            aggregate_mode,
+                        )?;
                         final_expression = true;
                     }
                 }
@@ -2819,9 +4539,36 @@ fn collect_constants_v1_1(
             function,
             arguments,
         } => {
-            collect_constants_v1_1(snapshot, module, function, strings, constants)?;
+            let is_constructor = aggregate_mode
+                && matches!(
+                    simple_reference_target(snapshot, module.id, function)?,
+                    Some(ReferenceTarget::Definition(ref definition))
+                        if snapshot
+                            .checked()
+                            .typed()
+                            .resolved()
+                            .definition(definition)
+                            .is_some_and(|info| info.kind == DefinitionKind::Constructor)
+                );
+            if !is_constructor {
+                collect_constants_v1_1(
+                    snapshot,
+                    module,
+                    function,
+                    strings,
+                    constants,
+                    aggregate_mode,
+                )?;
+            }
             for value in arguments {
-                collect_constants_v1_1(snapshot, module, value, strings, constants)?;
+                collect_constants_v1_1(
+                    snapshot,
+                    module,
+                    value,
+                    strings,
+                    constants,
+                    aggregate_mode,
+                )?;
             }
         }
         hir::ExpressionKind::Name { .. } | hir::ExpressionKind::Projection { .. } => {}
@@ -2832,11 +4579,69 @@ fn collect_constants_v1_1(
             )?;
         }
         hir::ExpressionKind::Unit => insert_constant(constants, Constant::Unit)?,
-        hir::ExpressionKind::If { .. } => {
-            return Err(unsupported_module(module, expression.span, "if"));
+        hir::ExpressionKind::If {
+            condition,
+            then_branch,
+            else_branch,
+        } if aggregate_mode => {
+            collect_constants_v1_1(
+                snapshot,
+                module,
+                condition,
+                strings,
+                constants,
+                aggregate_mode,
+            )?;
+            collect_constants_v1_1(
+                snapshot,
+                module,
+                then_branch,
+                strings,
+                constants,
+                aggregate_mode,
+            )?;
+            collect_constants_v1_1(
+                snapshot,
+                module,
+                else_branch,
+                strings,
+                constants,
+                aggregate_mode,
+            )?;
         }
-        hir::ExpressionKind::Match { .. } => {
-            return Err(unsupported_module(module, expression.span, "match"));
+        hir::ExpressionKind::Match { scrutinee, cases } if aggregate_mode => {
+            collect_constants_v1_1(
+                snapshot,
+                module,
+                scrutinee,
+                strings,
+                constants,
+                aggregate_mode,
+            )?;
+            for case in cases {
+                collect_pattern_constants(snapshot, module, &case.pattern, strings, constants)?;
+                if let Some(guard) = &case.guard {
+                    collect_constants_v1_1(
+                        snapshot,
+                        module,
+                        guard,
+                        strings,
+                        constants,
+                        aggregate_mode,
+                    )?;
+                }
+                collect_constants_v1_1(
+                    snapshot,
+                    module,
+                    &case.body,
+                    strings,
+                    constants,
+                    aggregate_mode,
+                )?;
+            }
+        }
+        hir::ExpressionKind::If { .. } | hir::ExpressionKind::Match { .. } => {
+            return Err(unsupported_module(module, expression.span, "control flow"));
         }
         hir::ExpressionKind::Assignment { .. } => {
             return Err(unsupported_module(
@@ -2845,19 +4650,63 @@ fn collect_constants_v1_1(
                 "mutable assignment",
             ));
         }
-        hir::ExpressionKind::Binary { .. } => {
+        hir::ExpressionKind::Binary { left, right, .. } if aggregate_mode => {
+            collect_constants_v1_1(snapshot, module, left, strings, constants, aggregate_mode)?;
+            collect_constants_v1_1(snapshot, module, right, strings, constants, aggregate_mode)?;
+        }
+        hir::ExpressionKind::Unary { operand, .. } if aggregate_mode => {
+            collect_constants_v1_1(
+                snapshot,
+                module,
+                operand,
+                strings,
+                constants,
+                aggregate_mode,
+            )?;
+        }
+        hir::ExpressionKind::Binary { .. } | hir::ExpressionKind::Unary { .. } => {
             return Err(unsupported_module(
                 module,
                 expression.span,
                 "scalar operators",
             ));
         }
-        hir::ExpressionKind::Unary { .. } => {
-            return Err(unsupported_module(
-                module,
-                expression.span,
-                "integer unary operators",
-            ));
+        hir::ExpressionKind::Tuple(elements) if aggregate_mode => {
+            for element in elements {
+                collect_constants_v1_1(
+                    snapshot,
+                    module,
+                    element,
+                    strings,
+                    constants,
+                    aggregate_mode,
+                )?;
+            }
+        }
+        hir::ExpressionKind::Record(fields) if aggregate_mode => {
+            for field in fields {
+                collect_constants_v1_1(
+                    snapshot,
+                    module,
+                    &field.value,
+                    strings,
+                    constants,
+                    aggregate_mode,
+                )?;
+            }
+        }
+        hir::ExpressionKind::RecordUpdate { base, fields } if aggregate_mode => {
+            collect_constants_v1_1(snapshot, module, base, strings, constants, aggregate_mode)?;
+            for field in fields {
+                collect_constants_v1_1(
+                    snapshot,
+                    module,
+                    &field.value,
+                    strings,
+                    constants,
+                    aggregate_mode,
+                )?;
+            }
         }
         hir::ExpressionKind::Tuple(_) => {
             return Err(unsupported_module(module, expression.span, "tuple"));
@@ -2872,24 +4721,103 @@ fn collect_constants_v1_1(
     Ok(())
 }
 
+fn collect_pattern_constants(
+    snapshot: &ProgramSnapshot,
+    module: &ling_resolve::ResolvedModule,
+    pattern: &hir::Pattern,
+    strings: &BTreeMap<String, StringIndex>,
+    constants: &mut BTreeMap<ConstantKey, Constant>,
+) -> Result<(), LoweringError> {
+    match &pattern.kind {
+        hir::PatternKind::Literal(literal) => {
+            insert_constant(
+                constants,
+                pattern_constant(snapshot, module, pattern, literal, strings)?,
+            )?;
+        }
+        hir::PatternKind::Tuple(patterns) => {
+            for pattern in patterns {
+                collect_pattern_constants(snapshot, module, pattern, strings, constants)?;
+            }
+        }
+        hir::PatternKind::Record(fields) => {
+            for field in fields {
+                collect_pattern_constants(snapshot, module, &field.pattern, strings, constants)?;
+            }
+        }
+        hir::PatternKind::Constructor { arguments, .. } => {
+            for argument in arguments {
+                collect_pattern_constants(snapshot, module, argument, strings, constants)?;
+            }
+        }
+        hir::PatternKind::Binding { .. } | hir::PatternKind::Wildcard | hir::PatternKind::Unit => {}
+    }
+    Ok(())
+}
+
 fn ensure_supported_shape(
     typed: &TypedProgram,
     value: TypeId,
     module: &ling_resolve::ResolvedModule,
     span: Span,
+    aggregate_mode: bool,
 ) -> Result<(), LoweringError> {
     match typed.arena().get(value) {
         Type::Unit | Type::Bool | Type::Int | Type::Text => Ok(()),
         Type::Function { parameters, result } => {
             for value in parameters {
-                ensure_supported_shape(typed, *value, module, span)?;
+                ensure_supported_shape(typed, *value, module, span, aggregate_mode)?;
             }
-            ensure_supported_shape(typed, *result, module, span)
+            ensure_supported_shape(typed, *result, module, span, aggregate_mode)
         }
         Type::Float64 => Err(unsupported_module(module, span, "Float64")),
+        Type::Tuple(elements) if aggregate_mode => {
+            for element in elements {
+                ensure_supported_shape(typed, *element, module, span, aggregate_mode)?;
+            }
+            Ok(())
+        }
         Type::Tuple(_) => Err(unsupported_module(module, span, "tuple")),
         Type::List(_) => Err(unsupported_module(module, span, "list")),
+        Type::NominalRecord {
+            definition,
+            arguments,
+        } if aggregate_mode => {
+            for argument in arguments {
+                ensure_supported_shape(typed, *argument, module, span, aggregate_mode)?;
+            }
+            let info = typed
+                .records()
+                .get(definition)
+                .ok_or_else(|| invalid_without_span("record metadata is absent"))?;
+            for field in &info.fields {
+                if !matches!(typed.arena().get(field.field_type), Type::Variable(_)) {
+                    ensure_supported_shape(typed, field.field_type, module, span, aggregate_mode)?;
+                }
+            }
+            Ok(())
+        }
         Type::NominalRecord { .. } => Err(unsupported_module(module, span, "record")),
+        Type::NominalVariant {
+            definition,
+            arguments,
+        } if aggregate_mode => {
+            for argument in arguments {
+                ensure_supported_shape(typed, *argument, module, span, aggregate_mode)?;
+            }
+            let info = typed
+                .variants()
+                .get(definition)
+                .ok_or_else(|| invalid_without_span("variant metadata is absent"))?;
+            for case in &info.cases {
+                if let Some(payload) = case.payload {
+                    if !matches!(typed.arena().get(payload), Type::Variable(_)) {
+                        ensure_supported_shape(typed, payload, module, span, aggregate_mode)?;
+                    }
+                }
+            }
+            Ok(())
+        }
         Type::NominalVariant { .. } => Err(unsupported_module(module, span, "variant")),
         Type::Variable(_) => Err(unsupported_module(module, span, "polymorphic function")),
         Type::Error => Err(invalid_module(
@@ -2916,16 +4844,49 @@ fn literal_constant_v1_1(
                 .ok_or_else(|| {
                     invalid_module(module, expression.span, "typed integer is absent")
                 })?;
-            let (sign, magnitude) = value.to_bytes_be();
-            let sign = match sign {
-                Sign::NoSign => IntegerSign::Zero,
-                Sign::Plus => IntegerSign::Positive,
-                Sign::Minus => IntegerSign::Negative,
-            };
-            Ok(Constant::Int { sign, magnitude })
+            Ok(integer_constant(value.clone()))
         }
         hir::Literal::Float(_) => Err(unsupported_module(module, expression.span, "Float64")),
         hir::Literal::Text(value) => Ok(Constant::Text(string_index(strings, value)?)),
         hir::Literal::Boolean(value) => Ok(Constant::Bool(*value)),
     }
+}
+
+fn pattern_constant(
+    _snapshot: &ProgramSnapshot,
+    module: &ling_resolve::ResolvedModule,
+    pattern: &hir::Pattern,
+    literal: &hir::Literal,
+    strings: &BTreeMap<String, StringIndex>,
+) -> Result<Constant, LoweringError> {
+    match literal {
+        hir::Literal::Integer { radix, digits } => {
+            let value = BigInt::parse_bytes(digits.as_bytes(), *radix).ok_or_else(|| {
+                invalid_module(module, pattern.span, "integer pattern literal is invalid")
+            })?;
+            Ok(integer_constant(value))
+        }
+        hir::Literal::Float(_) => Err(unsupported_module(module, pattern.span, "Float64")),
+        hir::Literal::Text(value) => Ok(Constant::Text(string_index(strings, value)?)),
+        hir::Literal::Boolean(value) => Ok(Constant::Bool(*value)),
+    }
+}
+
+fn integer_constant(value: BigInt) -> Constant {
+    let (sign, magnitude) = value.to_bytes_be();
+    let magnitude = if sign == Sign::NoSign {
+        Vec::new()
+    } else {
+        let first = magnitude
+            .iter()
+            .position(|byte| *byte != 0)
+            .unwrap_or(magnitude.len());
+        magnitude[first..].to_vec()
+    };
+    let sign = match sign {
+        Sign::NoSign => IntegerSign::Zero,
+        Sign::Plus => IntegerSign::Positive,
+        Sign::Minus => IntegerSign::Negative,
+    };
+    Constant::Int { sign, magnitude }
 }

@@ -2,7 +2,8 @@ mod support;
 
 use ling_bytecode::{
     Instruction, LoweringSource, SourceMapEntry, VerifiedProgramV1, decode_and_verify_v1,
-    decode_and_verify_v1_1, encode_v1, encode_v1_1, lower_v1, lower_v1_1,
+    decode_and_verify_v1_1, decode_and_verify_v1_2, encode_v1, encode_v1_1, encode_v1_2, lower_v1,
+    lower_v1_1, lower_v1_2,
 };
 use ling_diagnostics::codes;
 use ling_effects::locate_main;
@@ -56,6 +57,16 @@ fn verified_v1_1(fixture: &Fixture) -> VerifiedProgramV1 {
     .expect("fixture lowers to bytecode 1.1");
     let bytes = encode_v1_1(&lowered).expect("fixture encodes");
     decode_and_verify_v1_1(&bytes).expect("fixture independently verifies")
+}
+
+fn verified_v1_2(fixture: &Fixture) -> VerifiedProgramV1 {
+    let lowered = lower_v1_2(
+        &fixture.snapshot,
+        &[LoweringSource::new(&fixture.source, "src/Main.ling")],
+    )
+    .expect("fixture lowers to bytecode 1.2");
+    let bytes = encode_v1_2(&lowered).expect("fixture encodes");
+    decode_and_verify_v1_2(&bytes).expect("fixture independently verifies")
 }
 
 fn generous_limits() -> ExecutionLimits {
@@ -179,6 +190,63 @@ fn vm_matches_the_checked_interpreter_for_source_level_closure_lowering() {
     execute_v1(&program, generous_limits(), &mut host).expect("VM executes closure source");
     assert_eq!(vm_console.output, interpreter_console.output());
     assert_eq!(vm_console.output, "hello\n");
+}
+
+#[test]
+fn vm_matches_the_checked_interpreter_for_v1_2_variant_match_execution() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "type State =\n",
+        "    | Idle\n",
+        "    | Ready of Int\n\n",
+        "let classify state =\n",
+        "    match state with\n",
+        "    | Ready value -> value\n",
+        "    | Idle -> 0\n\n",
+        "let main () =\n",
+        "    Console.write (Text.format \"{}\" (classify (Ready 7)))\n",
+    );
+    let fixture = fixture("v1_2-variant-match.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("interpreter executes aggregate match");
+
+    let program = verified_v1_2(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host).expect("VM executes aggregate match");
+    assert_eq!(vm_console.output, interpreter_console.output());
+    assert_eq!(vm_console.output, "7\n");
+}
+
+#[test]
+fn vm_matches_the_checked_interpreter_for_v1_2_record_tuple_execution() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "type Point = { x: Int; y: Int }\n\n",
+        "let total point =\n",
+        "    let changed = { point with x = point.x + 1 }\n",
+        "    match (changed.x, changed.y) with\n",
+        "    | (x, y) -> x + y\n\n",
+        "let main () =\n",
+        "    Console.write (Text.format \"{}\" (total { x = 1; y = 2 }))\n",
+    );
+    let fixture = fixture("v1_2-record-tuple.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("interpreter executes record and tuple aggregate");
+
+    let program = verified_v1_2(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host)
+        .expect("VM executes record and tuple aggregate");
+    assert_eq!(vm_console.output, interpreter_console.output());
+    assert_eq!(vm_console.output, "4\n");
 }
 
 #[test]

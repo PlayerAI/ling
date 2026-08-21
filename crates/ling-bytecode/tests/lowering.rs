@@ -1,7 +1,8 @@
 use ling_bytecode::{
     CaptureOperand, Constant, EncodingErrorKind, FunctionKind, Instruction, LoweringErrorKind,
-    LoweringSource, decode_and_verify_v1_1, disassemble_v1, disassemble_v1_1, encode_v1,
-    encode_v1_1, encode_v1_with_limit, lower_v1, lower_v1_1,
+    LoweringSource, decode_and_verify_v1_1, decode_and_verify_v1_2, disassemble_v1,
+    disassemble_v1_1, disassemble_v1_2, encode_v1, encode_v1_1, encode_v1_2, encode_v1_with_limit,
+    lower_v1, lower_v1_1, lower_v1_2,
 };
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId};
@@ -437,4 +438,168 @@ fn v1_1_lowering_emits_higher_order_function_parameters() {
     }));
     decode_and_verify_v1_1(&encode_v1_1(&lowered).unwrap())
         .expect("higher-order artifact verifies");
+}
+
+#[test]
+fn v1_2_lowering_emits_nominal_aggregates_and_round_trips() {
+    let text = concat!(
+        "module Main\n\n",
+        "type Point = { x: Int; y: Int }\n",
+        "type State =\n",
+        "    | Idle\n",
+        "    | Ready of Int\n\n",
+        "let point = { y = 2; x = 1 }\n",
+        "let projected = point.x\n",
+        "let pair = (1, 2)\n",
+        "let changed = { point with x = 3 }\n",
+        "let state = Ready 5\n",
+        "let main () = ()\n",
+    );
+    let (source, snapshot) = checked_source("aggregates.ling", text);
+    let lowered = lower_v1_2(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("checked nominal aggregates lower to bytecode 1.2");
+    let model = lowered.model();
+    assert!(
+        model
+            .types()
+            .iter()
+            .any(|value| { matches!(value, ling_bytecode::ValueType::Record { .. }) })
+    );
+    assert!(
+        model
+            .types()
+            .iter()
+            .any(|value| { matches!(value, ling_bytecode::ValueType::Variant { .. }) })
+    );
+    assert!(
+        model
+            .types()
+            .iter()
+            .any(|value| { matches!(value, ling_bytecode::ValueType::Tuple { .. }) })
+    );
+    assert!(model.functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block.instructions.iter().any(|instruction| {
+                matches!(
+                    instruction,
+                    Instruction::MakeRecord { .. }
+                        | Instruction::UpdateRecord { .. }
+                        | Instruction::MakeVariant { .. }
+                )
+            })
+        })
+    }));
+
+    let bytes = encode_v1_2(&lowered).expect("the aggregate artifact encodes");
+    let verified = decode_and_verify_v1_2(&bytes).expect("the aggregate artifact verifies");
+    assert_eq!(verified.version().minor(), 2);
+    assert_eq!(encode_v1_2(&lowered).unwrap(), bytes);
+    let disassembly = disassemble_v1_2(&lowered);
+    assert!(disassembly.contains("make-record"));
+    assert!(disassembly.contains("make-variant"));
+}
+
+#[test]
+fn v1_2_lowering_emits_checked_variant_match_control_flow() {
+    let text = concat!(
+        "module Main\n\n",
+        "type State =\n",
+        "    | Idle\n",
+        "    | Ready of Int\n\n",
+        "let classify state =\n",
+        "    match state with\n",
+        "    | Ready value -> value\n",
+        "    | Idle -> 0\n\n",
+        "let main () = ()\n",
+    );
+    let (source, snapshot) = checked_source("variant-match.ling", text);
+    let lowered = lower_v1_2(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("checked variant matches lower to control flow");
+    assert!(lowered.model().functions().iter().any(|function| {
+        function.blocks.len() > 1
+            && function
+                .blocks
+                .iter()
+                .any(|block| matches!(block.terminator, ling_bytecode::Terminator::Branch { .. }))
+    }));
+    let bytes = encode_v1_2(&lowered).expect("the match artifact encodes");
+    decode_and_verify_v1_2(&bytes).expect("the match artifact verifies");
+}
+
+#[test]
+fn v1_2_lowering_emits_guards_and_scalar_control_flow() {
+    let text = concat!(
+        "module Main\n\n",
+        "let classify value =\n",
+        "    match value with\n",
+        "    | true when true -> if 1 < 2 then 1 else 0\n",
+        "    | _ -> 0\n\n",
+        "let main () = ()\n",
+    );
+    let (source, snapshot) = checked_source("guards.ling", text);
+    let lowered = lower_v1_2(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("checked guards and scalar control flow lower");
+    assert!(lowered.model().functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block
+                .instructions
+                .iter()
+                .any(|instruction| matches!(instruction, Instruction::Compare { .. }))
+        })
+    }));
+    decode_and_verify_v1_2(&encode_v1_2(&lowered).unwrap()).expect("the guarded artifact verifies");
+}
+
+#[test]
+fn v1_2_lowering_emits_nested_tuple_payload_patterns() {
+    let text = concat!(
+        "module Main\n\n",
+        "type PairBox =\n",
+        "    | Pair of Int * Int\n",
+        "    | Empty\n\n",
+        "let sumPair value =\n",
+        "    match value with\n",
+        "    | Pair (left, right) -> left + right\n",
+        "    | Empty -> 0\n\n",
+        "let main () = ()\n",
+    );
+    let (source, snapshot) = checked_source("nested-match.ling", text);
+    let lowered = lower_v1_2(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("nested tuple payload patterns lower");
+    assert!(lowered.model().functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block.instructions.iter().any(|instruction| {
+                matches!(
+                    instruction,
+                    Instruction::GetVariantPayload { .. } | Instruction::GetTuple { .. }
+                )
+            })
+        })
+    }));
+    decode_and_verify_v1_2(&encode_v1_2(&lowered).unwrap())
+        .expect("the nested pattern artifact verifies");
+}
+
+#[test]
+fn v1_2_lowering_emits_prelude_option_constructors_and_patterns() {
+    let text = concat!(
+        "module Main\n\n",
+        "let value =\n",
+        "    match (Some 1) with\n",
+        "    | Some value -> value\n",
+        "    | None -> 0\n",
+        "\nlet main () = ()\n",
+    );
+    let (source, snapshot) = checked_source("prelude-option.ling", text);
+    let lowered = lower_v1_2(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("prelude option constructors lower");
+    assert!(lowered.model().modules().iter().any(|module| {
+        lowered
+            .model()
+            .strings()
+            .get(module.name.get() as usize)
+            .is_some_and(|name| name == ling_resolve::PRELUDE_MODULE)
+    }));
+    decode_and_verify_v1_2(&encode_v1_2(&lowered).unwrap())
+        .expect("the prelude option artifact verifies");
 }

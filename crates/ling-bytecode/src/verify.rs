@@ -7,10 +7,10 @@ use crate::decode::{DecodedOffsets, DecodedProgramV1};
 use crate::path::validate_logical_name;
 use crate::{
     Block, BytecodeError, BytecodePhase, BytecodeReason, Capability, CaptureOperand, Constant,
-    DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FormatVersion, Function,
-    FunctionKind, Instruction, IntegerSign, Intrinsic, PackageReference, RegisterIndex, Terminator,
-    TypeIndex, UnverifiedProgram, ValueType, decode_v1, decode_v1_1, decode_v1_1_with_limit,
-    decode_v1_with_limit,
+    DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FORMAT_VERSION_1_2,
+    FormatVersion, Function, FunctionKind, Instruction, IntegerSign, Intrinsic, PackageReference,
+    RegisterIndex, Terminator, TypeIndex, UnverifiedProgram, ValueType, decode_v1, decode_v1_1,
+    decode_v1_1_with_limit, decode_v1_2, decode_v1_2_with_limit, decode_v1_with_limit,
 };
 
 /// Immutable bytecode state that has passed every RFC-0014 verifier phase.
@@ -65,6 +65,19 @@ pub fn decode_and_verify_v1_1_with_limit(
     artifact_byte_limit: u64,
 ) -> Result<VerifiedProgramV1, BytecodeError> {
     verify_v1(decode_v1_1_with_limit(bytes, artifact_byte_limit)?)
+}
+
+/// Decodes and independently verifies bytecode 1.0, 1.1, or 1.2.
+pub fn decode_and_verify_v1_2(bytes: &[u8]) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_2(bytes)?)
+}
+
+/// Decodes and verifies any supported 1.x revision under an RFC-0016 limit.
+pub fn decode_and_verify_v1_2_with_limit(
+    bytes: &[u8],
+    artifact_byte_limit: u64,
+) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_2_with_limit(bytes, artifact_byte_limit)?)
 }
 
 struct Verifier<'a> {
@@ -262,36 +275,122 @@ impl<'a> Verifier<'a> {
                 [to_u32(mismatch)],
             ));
         }
-        if self.version == FORMAT_VERSION_1_1 {
+        if self.version >= FORMAT_VERSION_1_1 {
             for (index, value) in self.model.types().iter().enumerate().skip(4) {
                 let record_offset = offset(&self.offsets.types, index, self.offsets.type_count);
-                let ValueType::Function {
-                    parameters,
-                    result,
-                    effects,
-                } = value
-                else {
-                    return Err(self.table_error(
-                        BytecodeReason::InvalidTableOrder,
-                        record_offset,
-                        [to_u32(index)],
-                    ));
-                };
-                if parameters.is_empty()
-                    || effects.windows(2).any(|pair| pair[0] >= pair[1])
-                    || parameters
-                        .iter()
-                        .chain(std::iter::once(result))
-                        .any(|value| to_usize(value.get()) >= index)
-                {
-                    return Err(error(
-                        BytecodePhase::Type,
-                        BytecodeReason::InvalidTypeIndex,
-                        record_offset,
-                        [to_u32(index)],
-                    ));
+                match value {
+                    ValueType::Function {
+                        parameters,
+                        result,
+                        effects,
+                    } => {
+                        if parameters.is_empty()
+                            || effects.windows(2).any(|pair| pair[0] >= pair[1])
+                            || parameters
+                                .iter()
+                                .chain(std::iter::once(result))
+                                .any(|value| to_usize(value.get()) >= index)
+                        {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::InvalidTypeIndex,
+                                record_offset,
+                                [to_u32(index)],
+                            ));
+                        }
+                    }
+                    ValueType::Tuple { elements } if self.version >= FORMAT_VERSION_1_2 => {
+                        if elements.iter().any(|value| to_usize(value.get()) >= index) {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::InvalidTypeIndex,
+                                record_offset,
+                                [to_u32(index)],
+                            ));
+                        }
+                    }
+                    ValueType::Record {
+                        module,
+                        name,
+                        arguments,
+                        fields,
+                    } if self.version >= FORMAT_VERSION_1_2 => {
+                        self.ensure_index(
+                            module.get(),
+                            self.model.modules().len(),
+                            BytecodePhase::Type,
+                            BytecodeReason::InvalidModuleIndex,
+                            record_offset,
+                            [to_u32(index), module.get()],
+                        )?;
+                        self.ensure_type_name(*name, record_offset, index)?;
+                        self.verify_type_references(arguments, index, record_offset)?;
+                        let mut names = BTreeSet::new();
+                        for field in fields {
+                            self.ensure_type_name(field.name, record_offset, index)?;
+                            if !names.insert(field.name) {
+                                return Err(error(
+                                    BytecodePhase::Type,
+                                    BytecodeReason::InvalidTableOrder,
+                                    record_offset,
+                                    [to_u32(index), field.name.get()],
+                                ));
+                            }
+                            self.verify_type_references(
+                                std::slice::from_ref(&field.value_type),
+                                index,
+                                record_offset,
+                            )?;
+                        }
+                    }
+                    ValueType::Variant {
+                        module,
+                        name,
+                        arguments,
+                        cases,
+                    } if self.version >= FORMAT_VERSION_1_2 => {
+                        self.ensure_index(
+                            module.get(),
+                            self.model.modules().len(),
+                            BytecodePhase::Type,
+                            BytecodeReason::InvalidModuleIndex,
+                            record_offset,
+                            [to_u32(index), module.get()],
+                        )?;
+                        self.ensure_type_name(*name, record_offset, index)?;
+                        self.verify_type_references(arguments, index, record_offset)?;
+                        let mut names = BTreeSet::new();
+                        for case in cases {
+                            self.ensure_type_name(case.name, record_offset, index)?;
+                            if !names.insert(case.name) {
+                                return Err(error(
+                                    BytecodePhase::Type,
+                                    BytecodeReason::InvalidTableOrder,
+                                    record_offset,
+                                    [to_u32(index), case.name.get()],
+                                ));
+                            }
+                            if let Some(payload) = case.payload {
+                                self.verify_type_references(
+                                    std::slice::from_ref(&payload),
+                                    index,
+                                    record_offset,
+                                )?;
+                            }
+                        }
+                    }
+                    _ => {
+                        return Err(self.table_error(
+                            BytecodeReason::InvalidTableOrder,
+                            record_offset,
+                            [to_u32(index)],
+                        ));
+                    }
                 }
-                if index > 4 && &self.model.types()[index - 1] >= value {
+                if self.version < FORMAT_VERSION_1_2
+                    && index > 4
+                    && self.model.types()[index - 1] >= *value
+                {
                     return Err(self.table_error(
                         BytecodeReason::InvalidTableOrder,
                         record_offset,
@@ -299,6 +398,70 @@ impl<'a> Verifier<'a> {
                     ));
                 }
             }
+            if self.version >= FORMAT_VERSION_1_2 {
+                self.verify_v1_2_type_order()?;
+            }
+        }
+        Ok(())
+    }
+
+    fn verify_v1_2_type_order(&self) -> Result<(), BytecodeError> {
+        let mut emitted = BTreeSet::new();
+        emitted.extend(0..4);
+        for index in 4..self.model.types().len() {
+            let expected = (index..self.model.types().len())
+                .filter(|candidate| {
+                    type_dependencies(&self.model.types()[*candidate])
+                        .iter()
+                        .all(|dependency| emitted.contains(dependency))
+                })
+                .min_by(|left, right| self.model.types()[*left].cmp(&self.model.types()[*right]));
+            if expected != Some(index) {
+                return Err(self.table_error(
+                    BytecodeReason::InvalidTableOrder,
+                    offset(&self.offsets.types, index, self.offsets.type_count),
+                    [to_u32(expected.unwrap_or(index)), to_u32(index)],
+                ));
+            }
+            emitted.insert(index);
+        }
+        Ok(())
+    }
+
+    fn verify_type_references(
+        &self,
+        references: &[TypeIndex],
+        index: usize,
+        record_offset: u64,
+    ) -> Result<(), BytecodeError> {
+        if references
+            .iter()
+            .any(|value| to_usize(value.get()) >= index)
+        {
+            return Err(error(
+                BytecodePhase::Type,
+                BytecodeReason::InvalidTypeIndex,
+                record_offset,
+                [to_u32(index)],
+            ));
+        }
+        Ok(())
+    }
+
+    fn ensure_type_name(
+        &self,
+        name: crate::StringIndex,
+        record_offset: u64,
+        index: usize,
+    ) -> Result<(), BytecodeError> {
+        let value = self.string_at_with_phase(name.get(), record_offset, BytecodePhase::Type)?;
+        if !is_valid_identifier(value) {
+            return Err(error(
+                BytecodePhase::Type,
+                BytecodeReason::InvalidName,
+                record_offset,
+                [to_u32(index), name.get()],
+            ));
         }
         Ok(())
     }
@@ -736,6 +899,99 @@ impl<'a> Verifier<'a> {
             Instruction::Intrinsic { arguments, .. } => self.ensure_registers(
                 function,
                 arguments,
+                instruction_offset,
+                function_index,
+                block_index,
+            ),
+            Instruction::MakeTuple {
+                tuple, elements, ..
+            } => {
+                self.ensure_index(
+                    tuple.get(),
+                    self.model.types().len(),
+                    BytecodePhase::Type,
+                    BytecodeReason::InvalidTypeIndex,
+                    instruction_offset,
+                    [to_u32(function_index), tuple.get()],
+                )?;
+                self.ensure_registers(
+                    function,
+                    elements,
+                    instruction_offset,
+                    function_index,
+                    block_index,
+                )
+            }
+            Instruction::MakeRecord { record, fields, .. } => {
+                self.ensure_index(
+                    record.get(),
+                    self.model.types().len(),
+                    BytecodePhase::Type,
+                    BytecodeReason::InvalidTypeIndex,
+                    instruction_offset,
+                    [to_u32(function_index), record.get()],
+                )?;
+                self.ensure_registers(
+                    function,
+                    fields,
+                    instruction_offset,
+                    function_index,
+                    block_index,
+                )
+            }
+            Instruction::GetTuple { tuple, .. } | Instruction::GetField { record: tuple, .. } => {
+                self.ensure_register(
+                    function,
+                    *tuple,
+                    instruction_offset,
+                    function_index,
+                    block_index,
+                )
+            }
+            Instruction::UpdateRecord { base, updates, .. } => {
+                self.ensure_register(
+                    function,
+                    *base,
+                    instruction_offset,
+                    function_index,
+                    block_index,
+                )?;
+                for update in updates {
+                    self.ensure_register(
+                        function,
+                        update.value,
+                        instruction_offset,
+                        function_index,
+                        block_index,
+                    )?;
+                }
+                Ok(())
+            }
+            Instruction::MakeVariant {
+                variant, payload, ..
+            } => {
+                self.ensure_index(
+                    variant.get(),
+                    self.model.types().len(),
+                    BytecodePhase::Type,
+                    BytecodeReason::InvalidTypeIndex,
+                    instruction_offset,
+                    [to_u32(function_index), variant.get()],
+                )?;
+                payload.map_or(Ok(()), |payload| {
+                    self.ensure_register(
+                        function,
+                        payload,
+                        instruction_offset,
+                        function_index,
+                        block_index,
+                    )
+                })
+            }
+            Instruction::VariantIs { variant, .. }
+            | Instruction::GetVariantPayload { variant, .. } => self.ensure_register(
+                function,
+                *variant,
                 instruction_offset,
                 function_index,
                 block_index,
@@ -1246,6 +1502,315 @@ impl<'a> Verifier<'a> {
                 }
                 Ok(())
             }
+            Instruction::MakeTuple {
+                destination,
+                tuple,
+                elements,
+            } => {
+                if definitions[to_usize(destination.get())].value_type != *tuple {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), tuple.get()],
+                    ));
+                }
+                let ValueType::Tuple {
+                    elements: ref expected,
+                } = self.model.types()[to_usize(tuple.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), tuple.get()],
+                    ));
+                };
+                if expected.len() != elements.len() {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::CallSignatureMismatch,
+                        instruction_offset,
+                        [to_u32(function_index), to_u32(elements.len())],
+                    ));
+                }
+                for (register, expected) in elements.iter().zip(expected) {
+                    check(*register, *expected, BytecodeReason::CallSignatureMismatch)?;
+                }
+                Ok(())
+            }
+            Instruction::GetTuple {
+                destination,
+                tuple,
+                element,
+            } => {
+                let tuple_type = definitions[to_usize(tuple.get())].value_type;
+                let ValueType::Tuple { ref elements } =
+                    self.model.types()[to_usize(tuple_type.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), tuple_type.get()],
+                    ));
+                };
+                let Some(expected) = elements.get(to_usize(*element)).copied() else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        instruction_offset,
+                        [to_u32(function_index), *element],
+                    ));
+                };
+                if definitions[to_usize(destination.get())].value_type != expected {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), destination.get()],
+                    ));
+                }
+                check(*tuple, tuple_type, BytecodeReason::InvalidRegisterType)
+            }
+            Instruction::MakeRecord {
+                destination,
+                record,
+                fields,
+            } => {
+                if definitions[to_usize(destination.get())].value_type != *record {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), record.get()],
+                    ));
+                }
+                let ValueType::Record {
+                    fields: ref expected,
+                    ..
+                } = self.model.types()[to_usize(record.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), record.get()],
+                    ));
+                };
+                if expected.len() != fields.len() {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::CallSignatureMismatch,
+                        instruction_offset,
+                        [to_u32(function_index), to_u32(fields.len())],
+                    ));
+                }
+                for (register, expected) in fields.iter().zip(expected) {
+                    check(
+                        *register,
+                        expected.value_type,
+                        BytecodeReason::CallSignatureMismatch,
+                    )?;
+                }
+                Ok(())
+            }
+            Instruction::GetField {
+                destination,
+                record,
+                field,
+            } => {
+                let record_type = definitions[to_usize(record.get())].value_type;
+                let ValueType::Record { ref fields, .. } =
+                    self.model.types()[to_usize(record_type.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), record_type.get()],
+                    ));
+                };
+                let Some(expected) = fields.get(to_usize(*field)).map(|field| field.value_type)
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        instruction_offset,
+                        [to_u32(function_index), *field],
+                    ));
+                };
+                if definitions[to_usize(destination.get())].value_type != expected {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), destination.get()],
+                    ));
+                }
+                check(*record, record_type, BytecodeReason::InvalidRegisterType)
+            }
+            Instruction::UpdateRecord {
+                destination,
+                base,
+                updates,
+            } => {
+                let record_type = definitions[to_usize(base.get())].value_type;
+                let ValueType::Record { ref fields, .. } =
+                    self.model.types()[to_usize(record_type.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), record_type.get()],
+                    ));
+                };
+                let mut seen = BTreeSet::new();
+                for update in updates {
+                    let Some(field) = fields.get(to_usize(update.field)) else {
+                        return Err(error(
+                            BytecodePhase::Type,
+                            BytecodeReason::InvalidTypeIndex,
+                            instruction_offset,
+                            [to_u32(function_index), update.field],
+                        ));
+                    };
+                    if !seen.insert(update.field) {
+                        return Err(error(
+                            BytecodePhase::Type,
+                            BytecodeReason::CallSignatureMismatch,
+                            instruction_offset,
+                            [to_u32(function_index), update.field],
+                        ));
+                    }
+                    check(
+                        update.value,
+                        field.value_type,
+                        BytecodeReason::CallSignatureMismatch,
+                    )?;
+                }
+                if definitions[to_usize(destination.get())].value_type != record_type {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), destination.get()],
+                    ));
+                }
+                check(*base, record_type, BytecodeReason::InvalidRegisterType)
+            }
+            Instruction::MakeVariant {
+                destination,
+                variant,
+                case,
+                payload,
+            } => {
+                if definitions[to_usize(destination.get())].value_type != *variant {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), variant.get()],
+                    ));
+                }
+                let ValueType::Variant { ref cases, .. } =
+                    self.model.types()[to_usize(variant.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), variant.get()],
+                    ));
+                };
+                let Some(case_info) = cases.get(to_usize(*case)) else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        instruction_offset,
+                        [to_u32(function_index), *case],
+                    ));
+                };
+                match (case_info.payload, payload) {
+                    (Some(expected), Some(register)) => {
+                        check(*register, expected, BytecodeReason::CallSignatureMismatch)?;
+                    }
+                    (None, None) => {}
+                    _ => {
+                        return Err(error(
+                            BytecodePhase::Type,
+                            BytecodeReason::CallSignatureMismatch,
+                            instruction_offset,
+                            [to_u32(function_index), *case],
+                        ));
+                    }
+                }
+                Ok(())
+            }
+            Instruction::VariantIs {
+                destination,
+                variant,
+                case,
+            } => {
+                let variant_type = definitions[to_usize(variant.get())].value_type;
+                let ValueType::Variant { ref cases, .. } =
+                    self.model.types()[to_usize(variant_type.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), variant_type.get()],
+                    ));
+                };
+                if to_usize(*case) >= cases.len()
+                    || definitions[to_usize(destination.get())].value_type != TypeIndex::new(1)
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        instruction_offset,
+                        [to_u32(function_index), *case],
+                    ));
+                }
+                check(*variant, variant_type, BytecodeReason::InvalidRegisterType)
+            }
+            Instruction::GetVariantPayload {
+                destination,
+                variant,
+                case,
+            } => {
+                let variant_type = definitions[to_usize(variant.get())].value_type;
+                let ValueType::Variant { ref cases, .. } =
+                    self.model.types()[to_usize(variant_type.get())]
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), variant_type.get()],
+                    ));
+                };
+                let Some(expected) = cases.get(to_usize(*case)).and_then(|case| case.payload)
+                else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        instruction_offset,
+                        [to_u32(function_index), *case],
+                    ));
+                };
+                if definitions[to_usize(destination.get())].value_type != expected {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), destination.get()],
+                    ));
+                }
+                check(*variant, variant_type, BytecodeReason::InvalidRegisterType)
+            }
             Instruction::ConsoleWrite { text, .. } => check(
                 *text,
                 TypeIndex::new(3),
@@ -1412,7 +1977,15 @@ impl<'a> Verifier<'a> {
                         | Instruction::IntBinary { .. }
                         | Instruction::Compare { .. }
                         | Instruction::MakeClosure { .. }
-                        | Instruction::Intrinsic { .. } => {}
+                        | Instruction::Intrinsic { .. }
+                        | Instruction::MakeTuple { .. }
+                        | Instruction::GetTuple { .. }
+                        | Instruction::MakeRecord { .. }
+                        | Instruction::GetField { .. }
+                        | Instruction::UpdateRecord { .. }
+                        | Instruction::MakeVariant { .. }
+                        | Instruction::VariantIs { .. }
+                        | Instruction::GetVariantPayload { .. } => {}
                     }
                 }
             }
@@ -1663,6 +2236,44 @@ impl<'a> Verifier<'a> {
             Instruction::Intrinsic { intrinsic, .. } => {
                 Some(scalar_type_index(intrinsic_result(*intrinsic)))
             }
+            Instruction::MakeTuple { tuple, .. } => Some(*tuple),
+            Instruction::GetTuple { tuple, element, .. } => {
+                let tuple_type = definitions.get(to_usize(tuple.get()))?.as_ref()?.value_type;
+                match self.model.types().get(to_usize(tuple_type.get()))? {
+                    ValueType::Tuple { elements } => elements.get(to_usize(*element)).copied(),
+                    _ => None,
+                }
+            }
+            Instruction::MakeRecord { record, .. } => Some(*record),
+            Instruction::GetField { record, field, .. } => {
+                let record_type = definitions
+                    .get(to_usize(record.get()))?
+                    .as_ref()?
+                    .value_type;
+                match self.model.types().get(to_usize(record_type.get()))? {
+                    ValueType::Record { fields, .. } => {
+                        fields.get(to_usize(*field)).map(|f| f.value_type)
+                    }
+                    _ => None,
+                }
+            }
+            Instruction::UpdateRecord { base, .. } => {
+                Some(definitions.get(to_usize(base.get()))?.as_ref()?.value_type)
+            }
+            Instruction::MakeVariant { variant, .. } => Some(*variant),
+            Instruction::VariantIs { .. } => Some(TypeIndex::new(1)),
+            Instruction::GetVariantPayload { variant, case, .. } => {
+                let variant_type = definitions
+                    .get(to_usize(variant.get()))?
+                    .as_ref()?
+                    .value_type;
+                match self.model.types().get(to_usize(variant_type.get()))? {
+                    ValueType::Variant { cases, .. } => {
+                        cases.get(to_usize(*case)).and_then(|case| case.payload)
+                    }
+                    _ => None,
+                }
+            }
             Instruction::ConsoleWrite { .. } => Some(TypeIndex::new(0)),
         }
     }
@@ -1674,7 +2285,13 @@ impl<'a> Verifier<'a> {
                 result,
                 effects,
             } => Some((parameters, *result, effects)),
-            ValueType::Unit | ValueType::Bool | ValueType::Int | ValueType::Text => None,
+            ValueType::Unit
+            | ValueType::Bool
+            | ValueType::Int
+            | ValueType::Text
+            | ValueType::Tuple { .. }
+            | ValueType::Record { .. }
+            | ValueType::Variant { .. } => None,
         }
     }
 
@@ -2065,6 +2682,36 @@ fn to_u32(value: usize) -> u32 {
     u32::try_from(value).unwrap_or(u32::MAX)
 }
 
+fn type_dependencies(value: &ValueType) -> Vec<usize> {
+    match value {
+        ValueType::Unit | ValueType::Bool | ValueType::Int | ValueType::Text => Vec::new(),
+        ValueType::Function {
+            parameters, result, ..
+        } => parameters
+            .iter()
+            .chain(std::iter::once(result))
+            .map(|index| to_usize(index.get()))
+            .collect(),
+        ValueType::Tuple { elements } => {
+            elements.iter().map(|index| to_usize(index.get())).collect()
+        }
+        ValueType::Record {
+            arguments, fields, ..
+        } => arguments
+            .iter()
+            .chain(fields.iter().map(|field| &field.value_type))
+            .map(|index| to_usize(index.get()))
+            .collect(),
+        ValueType::Variant {
+            arguments, cases, ..
+        } => arguments
+            .iter()
+            .chain(cases.iter().filter_map(|case| case.payload.as_ref()))
+            .map(|index| to_usize(index.get()))
+            .collect(),
+    }
+}
+
 fn to_usize(value: u32) -> usize {
     usize::try_from(value).unwrap_or(usize::MAX)
 }
@@ -2152,7 +2799,10 @@ fn scalar_type_index(value: ValueType) -> TypeIndex {
         ValueType::Bool => TypeIndex::new(1),
         ValueType::Int => TypeIndex::new(2),
         ValueType::Text => TypeIndex::new(3),
-        ValueType::Function { .. } => unreachable!("function types are not scalar"),
+        ValueType::Function { .. }
+        | ValueType::Tuple { .. }
+        | ValueType::Record { .. }
+        | ValueType::Variant { .. } => unreachable!("aggregate/function types are not scalar"),
     }
 }
 
@@ -2206,6 +2856,14 @@ fn instruction_destination(instruction: &Instruction) -> RegisterIndex {
         | Instruction::Call { destination, .. }
         | Instruction::MakeClosure { destination, .. }
         | Instruction::CallClosure { destination, .. }
+        | Instruction::MakeTuple { destination, .. }
+        | Instruction::GetTuple { destination, .. }
+        | Instruction::MakeRecord { destination, .. }
+        | Instruction::GetField { destination, .. }
+        | Instruction::UpdateRecord { destination, .. }
+        | Instruction::MakeVariant { destination, .. }
+        | Instruction::VariantIs { destination, .. }
+        | Instruction::GetVariantPayload { destination, .. }
         | Instruction::Intrinsic { destination, .. }
         | Instruction::ConsoleWrite { destination, .. } => *destination,
     }

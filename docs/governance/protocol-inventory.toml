@@ -424,24 +424,25 @@ id = "PROTO-BYTECODE"
 title = "Portable bytecode and verifier format"
 category = "Bytecode"
 visibility = "Public"
-current_version = "ling.bytecode/1.1"
+current_version = "ling.bytecode/1.2"
 stability = "Experimental"
 implemented = true
 public_schema = false
 canonical = false
-producer = ["VM-1202 ling-bytecode checked Typed Core lowerer and deterministic writer", "VM-1203 canonical VerifiedProgramV1 re-encoder", "VM-1205 closure/recursion lowerer and ling.bytecode/1.1 writer"]
-consumer = ["VM-1203 bounded independent decoder/verifier", "VM-1204 verifier-gated ling-vm executor", "VM-1205 closure/partial-application VM execution"]
-reader_policy = "The 1.1 reader accepts valid format (1, 0) and (1, 1) artifacts, dispatches on the exact version before decoding version-specific tables or instructions, validates hard and caller artifact bounds before allocation, rejects unknown executable content, and produces only untrusted decoded models. The independent verifier is the sole constructor of VerifiedProgramV1, and ling-vm accepts only that verified state plus explicit limits and injected host Capabilities."
-writer_policy = "The library-only writers accept checked-source lowering output or independently verified models. The 1.0 writer emits the RFC-0014 envelope; the 1.1 writer emits the backward-compatible RFC-0015 closure/recursion envelope with structural function types, canonical captures, complete source maps, zero reserved bytes, and path-free metadata under hard and caller-supplied limits. No CLI artifact contract is published."
-unknown_field_policy = "Each revision rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes. A 1.0 reader rejects 1.1; a 1.1 reader accepts only the explicitly supported 1.0 and 1.1 records."
+producer = ["VM-1202 ling-bytecode checked Typed Core lowerer and deterministic writer", "VM-1203 canonical VerifiedProgramV1 re-encoder", "VM-1205 closure/recursion lowerer and ling.bytecode/1.1 writer", "VM-1206 aggregate/match lowerer and ling.bytecode/1.2 writer"]
+consumer = ["VM-1203 bounded independent decoder/verifier", "VM-1204 verifier-gated ling-vm executor", "VM-1205 closure/partial-application VM execution", "VM-1206 aggregate/match VM execution"]
+reader_policy = "The 1.2 reader accepts valid format (1, 0), (1, 1), and (1, 2) artifacts, dispatches on the exact version before decoding version-specific tables or instructions, validates hard and caller artifact bounds before allocation, rejects unknown executable content, and produces only untrusted decoded models. The independent verifier is the sole constructor of VerifiedProgramV1, and ling-vm accepts only that verified state plus explicit limits and injected host Capabilities."
+writer_policy = "The library-only writers accept checked-source lowering output or independently verified models. The 1.0 writer emits RFC-0014; the 1.1 writer emits RFC-0015 closure/recursion; the 1.2 writer emits RFC-0016 aggregate/match records and instructions with canonical type, field, case, update, and source-map order, zero reserved bytes, and path-free metadata under hard and caller-supplied limits. No CLI artifact contract is published."
+unknown_field_policy = "Each revision rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes. A reader rejects every newer revision and accepts only the explicitly supported earlier records."
 migration_tool = "No previous format exists. A future migration must decode and verify the old version before encoding the new version; no tool is implemented."
 fixtures = ["tests/bytecode/v1/golden/hello.lbc.hex", "tests/bytecode/v1/golden/hello.dis", "tests/bytecode/v1/malformed-cases.tsv", "crates/ling-bytecode/tests/decode_verify.rs", "crates/ling-bytecode/tests/lowering.rs", "crates/ling-vm/tests/execution.rs"]
-sources = ["docs/RFC-0014.md", "docs/RFC-0015.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "tests/bytecode/README.md"]
-version_markers = ["ling.bytecode/1.0", "ling.bytecode/1.1"]
-authority = ["RFC-0014", "RFC-0015"]
+sources = ["docs/RFC-0014.md", "docs/RFC-0015.md", "docs/RFC-0016.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "tests/bytecode/README.md"]
+version_markers = ["ling.bytecode/1.0", "ling.bytecode/1.1", "ling.bytecode/1.2"]
+authority = ["RFC-0014", "RFC-0015", "RFC-0016"]
 notes = [
   "VM-1201 through VM-1204 implement the unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot minimal lowering, deterministic writing, debug disassembly, bounded independent decoding, failure-atomic verification, canonical VerifiedProgramV1 re-encoding, verifier-gated execution, registered bilingual diagnostics, and valid/corrupt/fuzz/differential evidence. The protocol is Experimental, is not a DEC-0012 semantic canonical-byte format, and has no CLI artifact command, default backend, or N-1 compatibility claim.",
   "Accepted RFC-0015 is implemented by VM-1205 as the backward-compatible ling.bytecode/1.1 closure/recursion extension. Both 1.0 and 1.1 remain Experimental; no Stable, CLI artifact, default-backend, or general N-1 release promise is implied.",
+  "Accepted RFC-0016 is implemented by VM-1206 as the backward-compatible ling.bytecode/1.2 aggregate and checked-match extension. All revisions remain Experimental; no Stable, CLI artifact, default-backend, or general N-1 release promise is implied.",
 ]
 
 [[protocol]]

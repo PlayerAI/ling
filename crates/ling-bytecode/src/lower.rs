@@ -5,25 +5,28 @@ use std::fmt;
 use ling_effects::{Effect as CheckedEffect, EntryErrorKind};
 use ling_hir as hir;
 use ling_resolve::{
-    BindingKey, Builtin, DefinitionId, DefinitionOrigin, ExpressionKey, ModuleId, ReferenceTarget,
+    BindingKey, Builtin, DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey, ModuleId,
+    ReferenceTarget,
 };
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId, Span};
 use ling_types::{Type, TypeId, TypedProgram};
-use num_bigint::Sign;
+use num_bigint::{BigInt, Sign};
 use sha2::{Digest, Sha256};
 
 use crate::{
-    Block, BlockIndex, BlockParameter, Capability, Constant, ConstantIndex, DecodeLimits, Effect,
-    Function, FunctionIndex, FunctionKind, Instruction, IntegerSign, Module, ModuleIndex,
-    PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
-    SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex,
-    UnverifiedProgram, ValueType,
+    Block, BlockIndex, BlockParameter, Capability, CompareOperator, Constant, ConstantIndex,
+    DecodeLimits, Effect, Function, FunctionIndex, FunctionKind, Instruction, IntBinaryOperator,
+    IntUnaryOperator, IntegerSign, Module, ModuleIndex, PackageReference, ProgramParts,
+    RegisterIndex, Source, SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan,
+    StringIndex, Terminator, TypeIndex, UnverifiedProgram, ValueType,
 };
 
 mod v1_1;
+mod v1_2;
 
 pub use v1_1::{LoweredProgramV1_1, lower_v1_1};
+pub use v1_2::{LoweredProgramV1_2, lower_v1_2};
 
 /// Exact original source bytes and the logical name permitted in bytecode.
 ///

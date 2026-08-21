@@ -46,6 +46,53 @@ impl Heap {
             .map(Value::Closure)
     }
 
+    pub(crate) fn tuple(&self, elements: Vec<Value>) -> Result<Value, ()> {
+        const TUPLE_BASE_BYTES: u64 = 16;
+        const VALUE_BYTES: u64 = 16;
+        let count = u64::try_from(elements.len()).map_err(|_| ())?;
+        let bytes = count
+            .checked_mul(VALUE_BYTES)
+            .and_then(|bytes| bytes.checked_add(TUPLE_BASE_BYTES))
+            .ok_or(())?;
+        self.allocate(elements, bytes).map(Value::Tuple)
+    }
+
+    pub(crate) fn record(&self, type_index: u32, fields: Vec<Value>) -> Result<Value, ()> {
+        const RECORD_BASE_BYTES: u64 = 24;
+        const VALUE_BYTES: u64 = 16;
+        let count = u64::try_from(fields.len()).map_err(|_| ())?;
+        let bytes = count
+            .checked_mul(VALUE_BYTES)
+            .and_then(|bytes| bytes.checked_add(RECORD_BASE_BYTES))
+            .ok_or(())?;
+        self.allocate(Record { type_index, fields }, bytes)
+            .map(Value::Record)
+    }
+
+    pub(crate) fn variant(
+        &self,
+        type_index: u32,
+        case: u32,
+        payload: Option<Value>,
+    ) -> Result<Value, ()> {
+        const VARIANT_BASE_BYTES: u64 = 32;
+        const VALUE_BYTES: u64 = 16;
+        let count = u64::from(payload.is_some());
+        let bytes = count
+            .checked_mul(VALUE_BYTES)
+            .and_then(|bytes| bytes.checked_add(VARIANT_BASE_BYTES))
+            .ok_or(())?;
+        self.allocate(
+            Variant {
+                type_index,
+                case,
+                payload,
+            },
+            bytes,
+        )
+        .map(Value::Variant)
+    }
+
     fn allocate<T>(&self, value: T, bytes: u64) -> Result<Rc<Allocation<T>>, ()> {
         let next = self.used.get().checked_add(bytes).ok_or(())?;
         if next > self.limit {
@@ -69,6 +116,41 @@ pub(crate) enum BoundValue {
 pub(crate) struct Closure {
     function: u32,
     bound: Vec<BoundValue>,
+}
+
+pub(crate) struct Record {
+    type_index: u32,
+    fields: Vec<Value>,
+}
+
+impl Record {
+    pub(crate) const fn type_index(&self) -> u32 {
+        self.type_index
+    }
+
+    pub(crate) fn fields(&self) -> &[Value] {
+        &self.fields
+    }
+}
+
+pub(crate) struct Variant {
+    type_index: u32,
+    case: u32,
+    payload: Option<Value>,
+}
+
+impl Variant {
+    pub(crate) const fn type_index(&self) -> u32 {
+        self.type_index
+    }
+
+    pub(crate) const fn case(&self) -> u32 {
+        self.case
+    }
+
+    pub(crate) fn payload(&self) -> Option<&Value> {
+        self.payload.as_ref()
+    }
 }
 
 impl Closure {
@@ -106,34 +188,100 @@ pub(crate) enum Value {
     Int(Rc<Allocation<BigInt>>),
     Text(Rc<Allocation<String>>),
     Closure(Rc<Allocation<Closure>>),
+    Tuple(Rc<Allocation<Vec<Value>>>),
+    Record(Rc<Allocation<Record>>),
+    Variant(Rc<Allocation<Variant>>),
 }
 
 impl Value {
     pub(crate) const fn as_bool(&self) -> Option<bool> {
         match self {
             Self::Bool(value) => Some(*value),
-            Self::Unit | Self::Int(_) | Self::Text(_) | Self::Closure(_) => None,
+            Self::Unit
+            | Self::Int(_)
+            | Self::Text(_)
+            | Self::Closure(_)
+            | Self::Tuple(_)
+            | Self::Record(_)
+            | Self::Variant(_) => None,
         }
     }
 
     pub(crate) fn as_int(&self) -> Option<&BigInt> {
         match self {
             Self::Int(value) => Some(value.value()),
-            Self::Unit | Self::Bool(_) | Self::Text(_) | Self::Closure(_) => None,
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Text(_)
+            | Self::Closure(_)
+            | Self::Tuple(_)
+            | Self::Record(_)
+            | Self::Variant(_) => None,
         }
     }
 
     pub(crate) fn as_text(&self) -> Option<&str> {
         match self {
             Self::Text(value) => Some(value.value()),
-            Self::Unit | Self::Bool(_) | Self::Int(_) | Self::Closure(_) => None,
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Closure(_)
+            | Self::Tuple(_)
+            | Self::Record(_)
+            | Self::Variant(_) => None,
         }
     }
 
     pub(crate) fn as_closure(&self) -> Option<&Rc<Allocation<Closure>>> {
         match self {
             Self::Closure(value) => Some(value),
-            Self::Unit | Self::Bool(_) | Self::Int(_) | Self::Text(_) => None,
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Text(_)
+            | Self::Tuple(_)
+            | Self::Record(_)
+            | Self::Variant(_) => None,
+        }
+    }
+
+    pub(crate) fn as_tuple(&self) -> Option<&Rc<Allocation<Vec<Value>>>> {
+        match self {
+            Self::Tuple(value) => Some(value),
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Text(_)
+            | Self::Closure(_)
+            | Self::Record(_)
+            | Self::Variant(_) => None,
+        }
+    }
+
+    pub(crate) fn as_record(&self) -> Option<&Rc<Allocation<Record>>> {
+        match self {
+            Self::Record(value) => Some(value),
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Text(_)
+            | Self::Closure(_)
+            | Self::Tuple(_)
+            | Self::Variant(_) => None,
+        }
+    }
+
+    pub(crate) fn as_variant(&self) -> Option<&Rc<Allocation<Variant>>> {
+        match self {
+            Self::Variant(value) => Some(value),
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Text(_)
+            | Self::Closure(_)
+            | Self::Tuple(_)
+            | Self::Record(_) => None,
         }
     }
 

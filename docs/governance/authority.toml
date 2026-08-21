@@ -288,6 +288,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0016"
+title = "Aggregate values and checked pattern matching in bytecode"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0016.md"
+covers = ["tuple types", "nominal records", "nominal variants", "immutable record update", "field projection", "checked match lowering"]
+depends_on = ["DEC-0009", "DEC-0012", "DEC-0013", "DEC-0014", "RFC-0014", "RFC-0015", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

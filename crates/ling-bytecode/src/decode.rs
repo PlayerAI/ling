@@ -1,12 +1,13 @@
 use crate::{
     BYTECODE_MAGIC, Block, BlockIndex, BlockParameter, BytecodeError, BytecodePhase,
     BytecodeReason, Capability, CaptureOperand, CompareOperator, Constant, ConstantIndex,
-    DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FormatVersion, Function,
-    FunctionIndex, FunctionKind, HEADER_BYTES, Instruction, IntBinaryOperator, IntUnaryOperator,
-    IntegerSign, Intrinsic, LANGUAGE_VERSION, Module, ModuleIndex, NO_INDEX, Package,
-    PackageContentDigest, PackageIndex, PackageReference, ProgramParts, RegisterIndex, Source,
-    SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator,
-    TypeIndex, UNICODE_VERSION, UnverifiedProgram, ValueType,
+    DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FORMAT_VERSION_1_2,
+    FormatVersion, Function, FunctionIndex, FunctionKind, HEADER_BYTES, Instruction,
+    IntBinaryOperator, IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module,
+    ModuleIndex, NO_INDEX, Package, PackageContentDigest, PackageIndex, PackageReference,
+    ProgramParts, RecordField, RegisterIndex, Source, SourceDigest, SourceIndex, SourceMapEntry,
+    SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex, UNICODE_VERSION,
+    UnverifiedProgram, ValueType, VariantCase,
 };
 
 /// Untrusted result of decoding one syntactically framed version-1.0 artifact.
@@ -80,7 +81,7 @@ pub fn decode_v1_with_limit(
     bytes: &[u8],
     artifact_byte_limit: u64,
 ) -> Result<DecodedProgramV1, BytecodeError> {
-    decode_with_limit(bytes, artifact_byte_limit, false)
+    decode_with_limit(bytes, artifact_byte_limit, 0)
 }
 
 /// Decodes either bytecode 1.0 or 1.1 under RFC-0015 hard limits.
@@ -93,18 +94,31 @@ pub fn decode_v1_1_with_limit(
     bytes: &[u8],
     artifact_byte_limit: u64,
 ) -> Result<DecodedProgramV1, BytecodeError> {
-    decode_with_limit(bytes, artifact_byte_limit, true)
+    decode_with_limit(bytes, artifact_byte_limit, 1)
+}
+
+/// Decodes bytecode 1.0, 1.1, or 1.2 under RFC-0016 hard limits.
+pub fn decode_v1_2(bytes: &[u8]) -> Result<DecodedProgramV1, BytecodeError> {
+    decode_v1_2_with_limit(bytes, DecodeLimits::rfc_0016().artifact_bytes())
+}
+
+/// Decodes any supported 1.x revision under a caller-capped RFC-0016 limit.
+pub fn decode_v1_2_with_limit(
+    bytes: &[u8],
+    artifact_byte_limit: u64,
+) -> Result<DecodedProgramV1, BytecodeError> {
+    decode_with_limit(bytes, artifact_byte_limit, 2)
 }
 
 fn decode_with_limit(
     bytes: &[u8],
     artifact_byte_limit: u64,
-    accept_1_1: bool,
+    maximum_minor: u16,
 ) -> Result<DecodedProgramV1, BytecodeError> {
-    let maximum_limits = if accept_1_1 {
-        DecodeLimits::rfc_0015()
-    } else {
-        DecodeLimits::rfc_0014()
+    let maximum_limits = match maximum_minor {
+        0 => DecodeLimits::rfc_0014(),
+        1 => DecodeLimits::rfc_0015(),
+        _ => DecodeLimits::rfc_0016(),
     };
     let limits = maximum_limits;
     let effective_limit = artifact_byte_limit.min(limits.artifact_bytes());
@@ -120,11 +134,13 @@ fn decode_with_limit(
     }
 
     let mut reader = Reader::root(bytes);
-    let version = decode_header(&mut reader, actual, accept_1_1)?;
+    let version = decode_header(&mut reader, actual, maximum_minor)?;
     let limits = if version == FORMAT_VERSION_1_0 {
         DecodeLimits::rfc_0014()
-    } else {
+    } else if version == FORMAT_VERSION_1_1 {
         DecodeLimits::rfc_0015()
+    } else {
+        DecodeLimits::rfc_0016()
     };
 
     let (strings, string_offsets) = decode_strings(&mut reader, limits)?;
@@ -177,7 +193,7 @@ fn decode_with_limit(
 fn decode_header(
     reader: &mut Reader<'_>,
     actual_length: u64,
-    accept_1_1: bool,
+    maximum_minor: u16,
 ) -> Result<FormatVersion, BytecodeError> {
     let magic = reader.fixed::<8>(BytecodePhase::Envelope)?;
     if magic != BYTECODE_MAGIC {
@@ -204,7 +220,7 @@ fn decode_header(
         reader.u16(BytecodePhase::Envelope)?,
     );
     let supported_format =
-        format == FORMAT_VERSION_1_0 || (accept_1_1 && format == FORMAT_VERSION_1_1);
+        format.major() == 1 && format.minor() <= maximum_minor && format.minor() <= 2;
     if !supported_format {
         let offset = if format.major() == 1 { 14 } else { 12 };
         return Err(BytecodeError::new(
@@ -472,7 +488,7 @@ fn decode_types(
             1 => ValueType::Bool,
             2 => ValueType::Int,
             3 => ValueType::Text,
-            0x10 if version == FORMAT_VERSION_1_1 => {
+            0x10 if version >= FORMAT_VERSION_1_1 => {
                 record.zeroes(3, BytecodePhase::Type)?;
                 let parameters = decode_type_indexes(
                     &mut record,
@@ -486,6 +502,124 @@ fn decode_types(
                     parameters,
                     result,
                     effects,
+                }
+            }
+            0x11 if version >= FORMAT_VERSION_1_2 => {
+                record.zeroes(3, BytecodePhase::Type)?;
+                let elements = decode_type_indexes(
+                    &mut record,
+                    limits,
+                    "tuple_elements",
+                    limits.arguments_per_operation(),
+                )?;
+                ValueType::Tuple { elements }
+            }
+            0x12 if version >= FORMAT_VERSION_1_2 => {
+                record.zeroes(3, BytecodePhase::Type)?;
+                let module = ModuleIndex::new(record.u32(BytecodePhase::Type)?);
+                let name = StringIndex::new(record.u32(BytecodePhase::Type)?);
+                let arguments = decode_type_indexes(
+                    &mut record,
+                    limits,
+                    "nominal_type_arguments",
+                    limits.arguments_per_operation(),
+                )?;
+                let count_offset = record.offset();
+                let count = record.bounded_count(
+                    BytecodePhase::Type,
+                    "record_fields",
+                    limits.arguments_per_operation(),
+                    12,
+                    BytecodeReason::InvalidRecordLength,
+                )?;
+                let mut fields = allocate_vec(
+                    count,
+                    "record_fields",
+                    limits.arguments_per_operation(),
+                    count_offset,
+                )?;
+                for _ in 0..count {
+                    let field_name = StringIndex::new(record.u32(BytecodePhase::Type)?);
+                    let value_type = TypeIndex::new(record.u32(BytecodePhase::Type)?);
+                    let flags = record.u8(BytecodePhase::Type)?;
+                    if flags & !1 != 0 {
+                        return Err(invalid_tag(
+                            BytecodePhase::Type,
+                            record.offset().saturating_sub(1),
+                        ));
+                    }
+                    record.zeroes(3, BytecodePhase::Type)?;
+                    fields.push(RecordField {
+                        name: field_name,
+                        value_type,
+                        mutable: flags & 1 != 0,
+                    });
+                }
+                ValueType::Record {
+                    module,
+                    name,
+                    arguments,
+                    fields,
+                }
+            }
+            0x13 if version >= FORMAT_VERSION_1_2 => {
+                record.zeroes(3, BytecodePhase::Type)?;
+                let module = ModuleIndex::new(record.u32(BytecodePhase::Type)?);
+                let name = StringIndex::new(record.u32(BytecodePhase::Type)?);
+                let arguments = decode_type_indexes(
+                    &mut record,
+                    limits,
+                    "nominal_type_arguments",
+                    limits.arguments_per_operation(),
+                )?;
+                let count_offset = record.offset();
+                let count = record.bounded_count(
+                    BytecodePhase::Type,
+                    "variant_cases",
+                    limits.arguments_per_operation(),
+                    12,
+                    BytecodeReason::InvalidRecordLength,
+                )?;
+                let mut cases = allocate_vec(
+                    count,
+                    "variant_cases",
+                    limits.arguments_per_operation(),
+                    count_offset,
+                )?;
+                for _ in 0..count {
+                    let case_name = StringIndex::new(record.u32(BytecodePhase::Type)?);
+                    let has_payload = record.u8(BytecodePhase::Type)?;
+                    if has_payload > 1 {
+                        return Err(invalid_tag(
+                            BytecodePhase::Type,
+                            record.offset().saturating_sub(1),
+                        ));
+                    }
+                    record.zeroes(3, BytecodePhase::Type)?;
+                    let payload_index = record.u32(BytecodePhase::Type)?;
+                    let payload = if has_payload == 1 {
+                        Some(TypeIndex::new(payload_index))
+                    } else {
+                        if payload_index != NO_INDEX {
+                            return Err(BytecodeError::new(
+                                BytecodePhase::Type,
+                                BytecodeReason::InvalidTypeIndex,
+                                record.offset().saturating_sub(4),
+                                4,
+                            ));
+                        }
+                        None
+                    };
+                    cases.push(VariantCase {
+                        name: case_name,
+                        payload,
+                    });
+                }
+                ValueType::Variant {
+                    module,
+                    name,
+                    arguments,
+                    cases,
                 }
             }
             _ => {
@@ -658,7 +792,7 @@ fn decode_functions(
             BytecodePhase::Instruction,
             BytecodeReason::InvalidRecordLength,
         )?;
-        let (kind, capture_count) = if version == FORMAT_VERSION_1_1 {
+        let (kind, capture_count) = if version >= FORMAT_VERSION_1_1 {
             let kind_offset = record.offset();
             let kind = match record.u8(BytecodePhase::Instruction)? {
                 0 => FunctionKind::Named,
@@ -930,7 +1064,7 @@ fn decode_instruction(
                 arguments: decode_registers(reader, limits)?,
             })
         }
-        0x12 if version == FORMAT_VERSION_1_1 => {
+        0x12 if version >= FORMAT_VERSION_1_1 => {
             let destination = RegisterIndex::new(reader.u32(BytecodePhase::Register)?);
             let function = FunctionIndex::new(reader.u32(BytecodePhase::Instruction)?);
             let count_offset = reader.offset();
@@ -973,10 +1107,57 @@ fn decode_instruction(
                 captures,
             })
         }
-        0x13 if version == FORMAT_VERSION_1_1 => Ok(Instruction::CallClosure {
+        0x13 if version >= FORMAT_VERSION_1_1 => Ok(Instruction::CallClosure {
             destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
             callee: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
             arguments: decode_registers(reader, limits)?,
+        }),
+        0x14 if version >= FORMAT_VERSION_1_2 => Ok(Instruction::MakeTuple {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            tuple: TypeIndex::new(reader.u32(BytecodePhase::Type)?),
+            elements: decode_registers(reader, limits)?,
+        }),
+        0x15 if version >= FORMAT_VERSION_1_2 => Ok(Instruction::GetTuple {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            tuple: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            element: reader.u32(BytecodePhase::Type)?,
+        }),
+        0x16 if version >= FORMAT_VERSION_1_2 => Ok(Instruction::MakeRecord {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            record: TypeIndex::new(reader.u32(BytecodePhase::Type)?),
+            fields: decode_registers(reader, limits)?,
+        }),
+        0x17 if version >= FORMAT_VERSION_1_2 => Ok(Instruction::GetField {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            record: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            field: reader.u32(BytecodePhase::Type)?,
+        }),
+        0x18 if version >= FORMAT_VERSION_1_2 => Ok(Instruction::UpdateRecord {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            base: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            updates: decode_record_updates(reader, limits)?,
+        }),
+        0x19 if version >= FORMAT_VERSION_1_2 => {
+            let destination = RegisterIndex::new(reader.u32(BytecodePhase::Register)?);
+            let variant = TypeIndex::new(reader.u32(BytecodePhase::Type)?);
+            let case = reader.u32(BytecodePhase::Type)?;
+            let payload = RegisterIndex::new(reader.u32(BytecodePhase::Register)?);
+            Ok(Instruction::MakeVariant {
+                destination,
+                variant,
+                case,
+                payload: (payload.get() != NO_INDEX).then_some(payload),
+            })
+        }
+        0x1a if version >= FORMAT_VERSION_1_2 => Ok(Instruction::VariantIs {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            variant: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            case: reader.u32(BytecodePhase::Type)?,
+        }),
+        0x1b if version >= FORMAT_VERSION_1_2 => Ok(Instruction::GetVariantPayload {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            variant: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            case: reader.u32(BytecodePhase::Type)?,
         }),
         0x20 => Ok(Instruction::ConsoleWrite {
             destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
@@ -989,6 +1170,33 @@ fn decode_instruction(
             1,
         )),
     }
+}
+
+fn decode_record_updates(
+    reader: &mut Reader<'_>,
+    limits: DecodeLimits,
+) -> Result<Vec<crate::RecordUpdate>, BytecodeError> {
+    let count_offset = reader.offset();
+    let count = reader.bounded_count(
+        BytecodePhase::Register,
+        "record_updates",
+        limits.arguments_per_operation(),
+        8,
+        BytecodeReason::InvalidInstructionLength,
+    )?;
+    let mut updates = allocate_vec(
+        count,
+        "record_updates",
+        limits.arguments_per_operation(),
+        count_offset,
+    )?;
+    for _ in 0..count {
+        updates.push(crate::RecordUpdate {
+            field: reader.u32(BytecodePhase::Type)?,
+            value: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+        });
+    }
+    Ok(updates)
 }
 
 fn decode_terminator(

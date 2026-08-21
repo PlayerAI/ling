@@ -135,6 +135,21 @@ pub enum ValueType {
         result: TypeIndex,
         effects: Vec<Effect>,
     },
+    Tuple {
+        elements: Vec<TypeIndex>,
+    },
+    Record {
+        module: ModuleIndex,
+        name: StringIndex,
+        arguments: Vec<TypeIndex>,
+        fields: Vec<RecordField>,
+    },
+    Variant {
+        module: ModuleIndex,
+        name: StringIndex,
+        arguments: Vec<TypeIndex>,
+        cases: Vec<VariantCase>,
+    },
 }
 
 impl ValueType {
@@ -147,8 +162,33 @@ impl ValueType {
             Self::Int => 0x02,
             Self::Text => 0x03,
             Self::Function { .. } => 0x10,
+            Self::Tuple { .. } => 0x11,
+            Self::Record { .. } => 0x12,
+            Self::Variant { .. } => 0x13,
         }
     }
+}
+
+/// One nominal record field in a version-1.2 aggregate type.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct RecordField {
+    pub name: StringIndex,
+    pub value_type: TypeIndex,
+    pub mutable: bool,
+}
+
+/// One nominal variant case in a version-1.2 aggregate type.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct VariantCase {
+    pub name: StringIndex,
+    pub payload: Option<TypeIndex>,
+}
+
+/// One immutable record field replacement in `UpdateRecord`.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct RecordUpdate {
+    pub field: u32,
+    pub value: RegisterIndex,
 }
 
 /// Function-table role encoded explicitly by bytecode version 1.1.
@@ -391,6 +431,47 @@ pub enum Instruction {
         callee: RegisterIndex,
         arguments: Vec<RegisterIndex>,
     },
+    MakeTuple {
+        destination: RegisterIndex,
+        tuple: TypeIndex,
+        elements: Vec<RegisterIndex>,
+    },
+    GetTuple {
+        destination: RegisterIndex,
+        tuple: RegisterIndex,
+        element: u32,
+    },
+    MakeRecord {
+        destination: RegisterIndex,
+        record: TypeIndex,
+        fields: Vec<RegisterIndex>,
+    },
+    GetField {
+        destination: RegisterIndex,
+        record: RegisterIndex,
+        field: u32,
+    },
+    UpdateRecord {
+        destination: RegisterIndex,
+        base: RegisterIndex,
+        updates: Vec<RecordUpdate>,
+    },
+    MakeVariant {
+        destination: RegisterIndex,
+        variant: TypeIndex,
+        case: u32,
+        payload: Option<RegisterIndex>,
+    },
+    VariantIs {
+        destination: RegisterIndex,
+        variant: RegisterIndex,
+        case: u32,
+    },
+    GetVariantPayload {
+        destination: RegisterIndex,
+        variant: RegisterIndex,
+        case: u32,
+    },
     Intrinsic {
         destination: RegisterIndex,
         intrinsic: Intrinsic,
@@ -415,6 +496,14 @@ impl Instruction {
             Self::Intrinsic { .. } => 0x11,
             Self::MakeClosure { .. } => 0x12,
             Self::CallClosure { .. } => 0x13,
+            Self::MakeTuple { .. } => 0x14,
+            Self::GetTuple { .. } => 0x15,
+            Self::MakeRecord { .. } => 0x16,
+            Self::GetField { .. } => 0x17,
+            Self::UpdateRecord { .. } => 0x18,
+            Self::MakeVariant { .. } => 0x19,
+            Self::VariantIs { .. } => 0x1a,
+            Self::GetVariantPayload { .. } => 0x1b,
             Self::ConsoleWrite { .. } => 0x20,
         }
     }

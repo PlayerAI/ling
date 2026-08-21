@@ -100,6 +100,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0016"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0016.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Freeze independent ling.bytecode/1.2 bytes and disassembly for tuples, nominal records, nullary and payload variants, immutable update, projections, and exhaustive checked matches.",
+  "Verify malformed aggregate types, nominal identities, field/case indexes, payload presence, update lists, source maps, and 1.0/1.1 compatibility with registered bilingual diagnostics and bounded failure.",
+  "Differentially compare checked-source interpreter and verified VM aggregate results, Console events, Runtime Faults, and original UTF-8 spans.",
+  "Verify deterministic aggregate/type/instruction order, arbitrary-byte safety, valid-model mutation coverage, and no host-layout or path leakage.",
+]
+compatibility_impact = [
+  "Adds the backward-compatible ling.bytecode/1.2 aggregate and checked-match design while preserving every valid 1.0 and 1.1 artifact.",
+  "Adds no source syntax, CLI command, stable ABI, JSON schema, Semantic ID, canonical semantic-byte, or Unicode-version change.",
+]
+unresolved_alternatives = [
+  "Mutable-place assignment, borrow/resource semantics, aggregate equality or serialization, lists, recursive wire types, polymorphic constructor values, and native aggregate layout remain separately governed future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

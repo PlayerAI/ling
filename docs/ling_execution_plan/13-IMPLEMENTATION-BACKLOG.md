@@ -96,7 +96,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `VM-1203` | G1/Editor | 独立 decoder/verifier | L | Done | `03-G1-V0.1-LIVING.md:180`；见 bounded decoder、独立 verifier、双语诊断、malformed/fuzz evidence、机器状态与实施报告 |
 | `VM-1204` | G1/Editor | VM 基础执行 | L | Done | `03-G1-V0.1-LIVING.md:196`；见 verifier-gated `ling-vm`、显式 value/host Capability/budget/source-map Fault、differential evidence、机器状态与实施报告 |
 | `VM-1205` | G1/Editor | 函数、closure、recursion | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:205` |
-| `VM-1206` | G1/Editor | Record、ADT、match | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:209` |
+| `VM-1206` | G1/Editor | Record、ADT、match | L | Done | RFC-0016；见 `ling-bytecode` v1.2 lowering/verifier/round-trip tests、`ling-vm` aggregate differential tests、`docs/status/VM-1206-IMPLEMENTATION-REPORT.md` |
 | `VM-1207` | G1/Editor | Mutable place 与基础 borrow | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:218` |
 | `VM-1208` | G1/Editor | Effect/Capability/Fault | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:225` |
 | `VM-1209` | G1/Editor | Interpreter ↔ VM differential | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:233` |

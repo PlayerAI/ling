@@ -2371,5 +2371,63 @@ notes = [
   "RFC-0015 is Accepted and is the sole new semantic/protocol authority used by this implementation; no unresolved semantic conflict was resolved through code.",
   "PROTO-BYTECODE and the support matrix now identify ling.bytecode/1.1 while retaining the Experimental status and the unchanged 1.0 golden artifact.",
   "No diagnostic allocation, JSON schema, Semantic ID, canonical semantic bytes, CLI contract, ABI/FFI layout, evaluator behavior, or Unicode 17.0.0 table changed.",
-  "VM-1206 and VM-1207 remain deferred until their aggregate/match and mutable-place bytecode authorities are Accepted; VM-1208 through VM-1210 retain the broader Effect/Fault, differential, fuzz, cancellation, and resource-model scope.",
+  "VM-1206 is complete under Accepted RFC-0016; VM-1207 remains gated on mutable-place/borrow authority, while VM-1208 through VM-1210 retain the broader Effect/Fault, differential, fuzz, cancellation, and resource-model scope.",
+]
+
+[[task]]
+id = "VM-1206"
+title = "Nominal aggregates, immutable record update, and checked match lowering"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["VM-1204", "VM-1205"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0015.md",
+  "docs/RFC-0016.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "crates/ling-bytecode/src/decode.rs",
+  "crates/ling-bytecode/src/disassemble.rs",
+  "crates/ling-bytecode/src/encode.rs",
+  "crates/ling-bytecode/src/format.rs",
+  "crates/ling-bytecode/src/lib.rs",
+  "crates/ling-bytecode/src/lower.rs",
+  "crates/ling-bytecode/src/lower/v1_1.rs",
+  "crates/ling-bytecode/src/lower/v1_2.rs",
+  "crates/ling-bytecode/src/model.rs",
+  "crates/ling-bytecode/src/verify.rs",
+  "crates/ling-bytecode/tests/lowering.rs",
+  "crates/ling-vm/src/execute.rs",
+  "crates/ling-vm/src/value.rs",
+  "crates/ling-vm/tests/execution.rs",
+  "docs/RFC-0016.md",
+  "docs/status/VM-1206-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0016 defines the ling.bytecode/1.2 aggregate model, wire revision, verifier rules, deterministic CFG, and abstract runtime representation.",
+  "v1.2 lowering emits nominal tuple/record/variant constructors, projections, immutable record updates, exhaustive nested patterns, guards, scalar conditions, and explicit Ling.Prelude identities.",
+  "The independent verifier validates aggregate type references, nominal shapes, constructor payloads, field/case bounds, block arguments, dependency-first type order, CFG reachability/dominance, and complete source maps.",
+  "The VM executes aggregate construction, projection, immutable update, variant tests, payload extraction, branches, and joins without exposing Rust layout or allocation identity.",
+  "cargo test -p ling-bytecode --locked --offline: passed (19 tests, including VM-1206 lowering and round-trip coverage).",
+  "cargo test -p ling-vm --test execution --locked --offline: passed, including v1.2 variant-match and record/tuple interpreter differential tests.",
+  "cargo fmt --all and git diff --check: passed.",
+]
+verified_against_commit = "pending"
+completion_commit = "pending"
+integration_state = "working-tree"
+completed = "2026-08-21"
+notes = [
+  "RFC-0016 is Accepted and is the sole new aggregate/match semantic and public-protocol authority used by this implementation.",
+  "Diagnostic allocation and JSON framing are unchanged; v1.2 adds no new public diagnostic code.",
+  "Unicode remains 17.0.0; source maps retain original UTF-8 byte spans and deterministic logical paths.",
+  "VM-1207 through VM-1210 remain deferred as documented in the implementation report.",
 ]

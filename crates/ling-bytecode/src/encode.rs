@@ -3,9 +3,10 @@ use std::fmt;
 
 use crate::{
     BYTECODE_MAGIC, Block, CaptureOperand, Constant, DecodeLimits, FORMAT_VERSION_1_0,
-    FORMAT_VERSION_1_1, FormatVersion, Function, FunctionKind, HEADER_BYTES, Instruction,
-    LANGUAGE_VERSION, LoweredProgramV1, LoweredProgramV1_1, NO_INDEX, PackageReference,
-    SourceMapEntry, Terminator, UNICODE_VERSION, UnverifiedProgram, ValueType, VerifiedProgramV1,
+    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FormatVersion, Function, FunctionKind, HEADER_BYTES,
+    Instruction, LANGUAGE_VERSION, LoweredProgramV1, LoweredProgramV1_1, NO_INDEX,
+    PackageReference, SourceMapEntry, Terminator, UNICODE_VERSION, UnverifiedProgram, ValueType,
+    VerifiedProgramV1,
 };
 
 /// Failure categories for deterministic bytecode writing.
@@ -114,6 +115,27 @@ pub fn encode_v1_1_with_limit(
     Ok(bytes)
 }
 
+/// Encodes canonical bytecode 1.2 using the RFC-0016 hard artifact limit.
+pub fn encode_v1_2(program: &crate::LoweredProgramV1_2) -> Result<Vec<u8>, EncodingError> {
+    encode_v1_2_with_limit(program, DecodeLimits::rfc_0016().artifact_bytes())
+}
+
+/// Encodes canonical bytecode 1.2 under a caller-supplied RFC-0016 limit.
+pub fn encode_v1_2_with_limit(
+    program: &crate::LoweredProgramV1_2,
+    artifact_byte_limit: u64,
+) -> Result<Vec<u8>, EncodingError> {
+    let hard_limit = DecodeLimits::rfc_0016().artifact_bytes();
+    let bytes = encode_model(program.model(), FORMAT_VERSION_1_2, hard_limit)?;
+    let actual =
+        u64::try_from(bytes.len()).map_err(|_| EncodingError::resource(u64::MAX, hard_limit))?;
+    let effective_limit = artifact_byte_limit.min(hard_limit);
+    if actual > effective_limit {
+        return Err(EncodingError::resource(actual, effective_limit));
+    }
+    Ok(bytes)
+}
+
 /// Re-encodes a verified program using the canonical version-1.0 writer.
 pub fn encode_verified_v1(program: &VerifiedProgramV1) -> Result<Vec<u8>, EncodingError> {
     encode_verified_v1_with_limit(program, DecodeLimits::rfc_0014().artifact_bytes())
@@ -124,7 +146,9 @@ pub fn encode_verified_v1_with_limit(
     program: &VerifiedProgramV1,
     artifact_byte_limit: u64,
 ) -> Result<Vec<u8>, EncodingError> {
-    let limits = if program.version() == FORMAT_VERSION_1_1 {
+    let limits = if program.version() == FORMAT_VERSION_1_2 {
+        DecodeLimits::rfc_0016()
+    } else if program.version() == FORMAT_VERSION_1_1 {
         DecodeLimits::rfc_0015()
     } else {
         DecodeLimits::rfc_0014()
@@ -145,7 +169,10 @@ pub(crate) fn encode_model(
     version: FormatVersion,
     hard_limit: u64,
 ) -> Result<Vec<u8>, EncodingError> {
-    if version != FORMAT_VERSION_1_0 && version != FORMAT_VERSION_1_1 {
+    if version != FORMAT_VERSION_1_0
+        && version != FORMAT_VERSION_1_1
+        && version != FORMAT_VERSION_1_2
+    {
         return Err(EncodingError::invariant(
             "unsupported bytecode writer version",
         ));
@@ -222,7 +249,7 @@ fn encode_type(
             parameters,
             result,
             effects,
-        } if version == FORMAT_VERSION_1_1 => {
+        } if version >= FORMAT_VERSION_1_1 => {
             writer.bytes(&[0; 3])?;
             writer.length(parameters.len(), "function type parameter count")?;
             for parameter in parameters {
@@ -238,6 +265,61 @@ fn encode_type(
         ValueType::Function { .. } => Err(EncodingError::invariant(
             "bytecode 1.0 cannot encode a function value type",
         )),
+        ValueType::Tuple { elements } if version >= FORMAT_VERSION_1_2 => {
+            writer.bytes(&[0; 3])?;
+            writer.length(elements.len(), "tuple element count")?;
+            for element in elements {
+                writer.u32(element.get())?;
+            }
+            Ok(())
+        }
+        ValueType::Record {
+            module,
+            name,
+            arguments,
+            fields,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.bytes(&[0; 3])?;
+            writer.u32(module.get())?;
+            writer.u32(name.get())?;
+            writer.length(arguments.len(), "nominal type argument count")?;
+            for argument in arguments {
+                writer.u32(argument.get())?;
+            }
+            writer.length(fields.len(), "record field count")?;
+            for field in fields {
+                writer.u32(field.name.get())?;
+                writer.u32(field.value_type.get())?;
+                writer.u8(u8::from(field.mutable))?;
+                writer.bytes(&[0; 3])?;
+            }
+            Ok(())
+        }
+        ValueType::Variant {
+            module,
+            name,
+            arguments,
+            cases,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.bytes(&[0; 3])?;
+            writer.u32(module.get())?;
+            writer.u32(name.get())?;
+            writer.length(arguments.len(), "nominal type argument count")?;
+            for argument in arguments {
+                writer.u32(argument.get())?;
+            }
+            writer.length(cases.len(), "variant case count")?;
+            for case in cases {
+                writer.u32(case.name.get())?;
+                writer.u8(u8::from(case.payload.is_some()))?;
+                writer.bytes(&[0; 3])?;
+                writer.u32(case.payload.map_or(NO_INDEX, |index| index.get()))?;
+            }
+            Ok(())
+        }
+        ValueType::Tuple { .. } | ValueType::Record { .. } | ValueType::Variant { .. } => Err(
+            EncodingError::invariant("bytecode 1.0/1.1 cannot encode aggregate value types"),
+        ),
     }
 }
 
@@ -269,7 +351,7 @@ fn encode_function(
     function: &Function,
     version: FormatVersion,
 ) -> Result<(), EncodingError> {
-    if version == FORMAT_VERSION_1_1 {
+    if version >= FORMAT_VERSION_1_1 {
         writer.u8(function.kind.tag())?;
         writer.bytes(&[0; 3])?;
     } else if function.kind != FunctionKind::Named || function.capture_count != 0 {
@@ -279,7 +361,7 @@ fn encode_function(
     }
     writer.u32(function.module.get())?;
     writer.u32(function.name.get())?;
-    if version == FORMAT_VERSION_1_1 {
+    if version >= FORMAT_VERSION_1_1 {
         writer.u32(function.capture_count)?;
     }
     writer.length(function.parameter_types.len(), "parameter type count")?;
@@ -378,7 +460,7 @@ fn encode_instruction(
             destination,
             function,
             captures,
-        } if version == FORMAT_VERSION_1_1 => {
+        } if version >= FORMAT_VERSION_1_1 => {
             writer.u32(destination.get())?;
             writer.u32(function.get())?;
             writer.length(captures.len(), "closure capture count")?;
@@ -396,7 +478,7 @@ fn encode_instruction(
             destination,
             callee,
             arguments,
-        } if version == FORMAT_VERSION_1_1 => {
+        } if version >= FORMAT_VERSION_1_1 => {
             writer.u32(destination.get())?;
             writer.u32(callee.get())?;
             writer.registers(arguments)
@@ -414,6 +496,95 @@ fn encode_instruction(
             writer.bytes(&[0; 3])?;
             writer.registers(arguments)
         }
+        Instruction::MakeTuple {
+            destination,
+            tuple,
+            elements,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(tuple.get())?;
+            writer.registers(elements)
+        }
+        Instruction::GetTuple {
+            destination,
+            tuple,
+            element,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(tuple.get())?;
+            writer.u32(*element)
+        }
+        Instruction::MakeRecord {
+            destination,
+            record,
+            fields,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(record.get())?;
+            writer.registers(fields)
+        }
+        Instruction::GetField {
+            destination,
+            record,
+            field,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(record.get())?;
+            writer.u32(*field)
+        }
+        Instruction::UpdateRecord {
+            destination,
+            base,
+            updates,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(base.get())?;
+            writer.length(updates.len(), "record update count")?;
+            for update in updates {
+                writer.u32(update.field)?;
+                writer.u32(update.value.get())?;
+            }
+            Ok(())
+        }
+        Instruction::MakeVariant {
+            destination,
+            variant,
+            case,
+            payload,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(variant.get())?;
+            writer.u32(*case)?;
+            writer.u32(payload.map_or(NO_INDEX, |value| value.get()))
+        }
+        Instruction::VariantIs {
+            destination,
+            variant,
+            case,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(variant.get())?;
+            writer.u32(*case)
+        }
+        Instruction::GetVariantPayload {
+            destination,
+            variant,
+            case,
+        } if version >= FORMAT_VERSION_1_2 => {
+            writer.u32(destination.get())?;
+            writer.u32(variant.get())?;
+            writer.u32(*case)
+        }
+        Instruction::MakeTuple { .. }
+        | Instruction::GetTuple { .. }
+        | Instruction::MakeRecord { .. }
+        | Instruction::GetField { .. }
+        | Instruction::UpdateRecord { .. }
+        | Instruction::MakeVariant { .. }
+        | Instruction::VariantIs { .. }
+        | Instruction::GetVariantPayload { .. } => Err(EncodingError::invariant(
+            "bytecode 1.0/1.1 cannot encode aggregate instructions",
+        )),
         Instruction::ConsoleWrite { destination, text } => {
             writer.u32(destination.get())?;
             writer.u32(text.get())

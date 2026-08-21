@@ -386,7 +386,7 @@
     {
       "id": "PROTO-BYTECODE",
       "visibility": "Public",
-      "version": "ling.bytecode/1.1",
+      "version": "ling.bytecode/1.2",
       "stability": "Experimental",
       "implemented": true
     },

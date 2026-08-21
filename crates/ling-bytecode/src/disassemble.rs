@@ -2,7 +2,8 @@ use std::fmt::Write;
 
 use crate::{
     CaptureOperand, Constant, FunctionKind, Instruction, IntegerSign, LoweredProgramV1,
-    LoweredProgramV1_1, PackageReference, SourceOrigin, Terminator, UnverifiedProgram, ValueType,
+    LoweredProgramV1_1, LoweredProgramV1_2, PackageReference, SourceOrigin, Terminator,
+    UnverifiedProgram, ValueType,
 };
 
 /// Renders a deterministic human-readable debug view; this text is not a wire protocol.
@@ -15,6 +16,12 @@ pub fn disassemble_v1(program: &LoweredProgramV1) -> String {
 #[must_use]
 pub fn disassemble_v1_1(program: &LoweredProgramV1_1) -> String {
     disassemble_model(program.model(), "1.1", true)
+}
+
+/// Renders a deterministic version-1.2 debug view; this text is not a wire protocol.
+#[must_use]
+pub fn disassemble_v1_2(program: &LoweredProgramV1_2) -> String {
+    disassemble_model(program.model(), "1.2", true)
 }
 
 fn disassemble_model(
@@ -205,6 +212,64 @@ fn type_text(value: &ValueType) -> String {
             result.get(),
             effect_list(effects)
         ),
+        ValueType::Tuple { elements } => format!(
+            "Tuple ({})",
+            elements
+                .iter()
+                .map(|element| format!("@t{}", element.get()))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        ValueType::Record {
+            module,
+            name,
+            arguments,
+            fields,
+        } => format!(
+            "Record @m{} @s{} args=({}) fields=({})",
+            module.get(),
+            name.get(),
+            arguments
+                .iter()
+                .map(|argument| format!("@t{}", argument.get()))
+                .collect::<Vec<_>>()
+                .join(", "),
+            fields
+                .iter()
+                .map(|field| format!(
+                    "@s{}:@t{}{}",
+                    field.name.get(),
+                    field.value_type.get(),
+                    if field.mutable { " mut" } else { "" }
+                ))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        ValueType::Variant {
+            module,
+            name,
+            arguments,
+            cases,
+        } => format!(
+            "Variant @m{} @s{} args=({}) cases=({})",
+            module.get(),
+            name.get(),
+            arguments
+                .iter()
+                .map(|argument| format!("@t{}", argument.get()))
+                .collect::<Vec<_>>()
+                .join(", "),
+            cases
+                .iter()
+                .map(|case| format!(
+                    "@s{}{}",
+                    case.name.get(),
+                    case.payload
+                        .map_or(String::new(), |payload| format!(":@t{}", payload.get()))
+                ))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
     }
 }
 
@@ -335,6 +400,92 @@ fn instruction_text(value: &Instruction) -> String {
             destination.get(),
             callee.get(),
             register_list(arguments)
+        ),
+        Instruction::MakeTuple {
+            destination,
+            tuple,
+            elements,
+        } => format!(
+            "%r{} = make-tuple @t{} ({})",
+            destination.get(),
+            tuple.get(),
+            register_list(elements)
+        ),
+        Instruction::GetTuple {
+            destination,
+            tuple,
+            element,
+        } => format!(
+            "%r{} = get-tuple %r{}[{}]",
+            destination.get(),
+            tuple.get(),
+            element
+        ),
+        Instruction::MakeRecord {
+            destination,
+            record,
+            fields,
+        } => format!(
+            "%r{} = make-record @t{} ({})",
+            destination.get(),
+            record.get(),
+            register_list(fields)
+        ),
+        Instruction::GetField {
+            destination,
+            record,
+            field,
+        } => format!(
+            "%r{} = get-field %r{}[{}]",
+            destination.get(),
+            record.get(),
+            field
+        ),
+        Instruction::UpdateRecord {
+            destination,
+            base,
+            updates,
+        } => format!(
+            "%r{} = update-record %r{} ({})",
+            destination.get(),
+            base.get(),
+            updates
+                .iter()
+                .map(|update| format!("{}:%r{}", update.field, update.value.get()))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        Instruction::MakeVariant {
+            destination,
+            variant,
+            case,
+            payload,
+        } => format!(
+            "%r{} = make-variant @t{} {} {}",
+            destination.get(),
+            variant.get(),
+            case,
+            payload.map_or_else(|| "()".to_owned(), |value| format!("%r{}", value.get()))
+        ),
+        Instruction::VariantIs {
+            destination,
+            variant,
+            case,
+        } => format!(
+            "%r{} = variant-is %r{} {}",
+            destination.get(),
+            variant.get(),
+            case
+        ),
+        Instruction::GetVariantPayload {
+            destination,
+            variant,
+            case,
+        } => format!(
+            "%r{} = get-variant-payload %r{} {}",
+            destination.get(),
+            variant.get(),
+            case
         ),
         Instruction::Intrinsic {
             destination,

@@ -4,6 +4,8 @@ pub const BYTECODE_PROTOCOL: &str = BYTECODE_PROTOCOL_1_0;
 pub const BYTECODE_PROTOCOL_1_0: &str = "ling.bytecode/1.0";
 /// Exact bytecode-1.1 protocol label assigned by RFC-0015.
 pub const BYTECODE_PROTOCOL_1_1: &str = "ling.bytecode/1.1";
+/// Exact bytecode-1.2 protocol label assigned by RFC-0016.
+pub const BYTECODE_PROTOCOL_1_2: &str = "ling.bytecode/1.2";
 /// Exact eight-byte bytecode magic.
 pub const BYTECODE_MAGIC: [u8; 8] = *b"LINGBC\0\0";
 /// Exact encoded header width.
@@ -44,6 +46,8 @@ pub const FORMAT_VERSION: FormatVersion = FORMAT_VERSION_1_0;
 pub const FORMAT_VERSION_1_0: FormatVersion = FormatVersion::new(1, 0);
 /// Exact version-1.1 format tuple accepted by RFC-0015.
 pub const FORMAT_VERSION_1_1: FormatVersion = FormatVersion::new(1, 1);
+/// Exact version-1.2 format tuple accepted by RFC-0016.
+pub const FORMAT_VERSION_1_2: FormatVersion = FormatVersion::new(1, 2);
 /// Language compatibility version encoded by RFC-0014.
 pub const LANGUAGE_VERSION: FormatVersion = FormatVersion::new(0, 1);
 
@@ -134,6 +138,12 @@ impl DecodeLimits {
             types: 262_144,
             ..Self::rfc_0014()
         }
+    }
+
+    /// Returns the RFC-0016 hard-limit set for bytecode 1.2.
+    #[must_use]
+    pub const fn rfc_0016() -> Self {
+        Self::rfc_0015()
     }
 
     /// Returns the maximum artifact byte length.
