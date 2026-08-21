@@ -217,7 +217,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `SUP-2403` | G2 | 监督测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:355`, `docs/status/SUP-2403-AUTHORITY-AUDIT.md` |
 | `REP-2501` | G2 | Determinism Class | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:369`, `docs/status/REP-2501-AUTHORITY-AUDIT.md` |
 | `REP-2502` | G2 | Replay Log Schema | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:384`, `docs/status/REP-2502-AUTHORITY-AUDIT.md` |
-| `REP-2503` | G2 | Effect Recorder | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:401` |
+| `REP-2503` | G2 | Effect Recorder | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:401`, `docs/status/REP-2503-AUTHORITY-AUDIT.md` |
 | `REP-2504` | G2 | Replay Player | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:414` |
 | `REP-2505` | G2 | 隐私、裁剪与损坏 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:429` |
 | `REP-2506` | G2 | 跨进程重放验收 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:440` |
