@@ -8,10 +8,12 @@ repository.workspace = true
 
 [dependencies]
 ling-ast = { path = "../ling-ast" }
+ling-effects = { path = "../ling-effects" }
 ling-hir = { path = "../ling-hir" }
 ling-resolve = { path = "../ling-resolve" }
 ling-source = { path = "../ling-source" }
 ling-syntax = { path = "../ling-syntax" }
+ling-types = { path = "../ling-types" }
 
 [lints]
 workspace = true

@@ -11,13 +11,15 @@ use std::fmt;
 use std::sync::Arc;
 
 use ling_ast::{LowerError, Program, lower};
+use ling_effects::{self, CheckedProgram, EffectError};
 use ling_hir::{self, LowerError as HirLowerError};
-use ling_resolve::{ResolveError, ResolvedModule, resolve};
+use ling_resolve::{ResolveError, ResolvedModule, ResolvedProgram, resolve};
 use ling_source::{
     ChangeEvent, FileOrigin, FileSnapshot, InputChange, LexicalOffset, Revision, SourceError,
     SourceId, VfsError, VirtualFileSystem, WorkspaceInput,
 };
 use ling_syntax::{LexedSource, ParsedSource, lex, parse};
+use ling_types::{self, TypeError};
 
 const LANGUAGE_VERSION: (u16, u16, u16) = (0, 1, 0);
 const UNICODE_VERSION: (u8, u8, u8) = (17, 0, 0);
@@ -34,6 +36,7 @@ pub enum QueryKind {
     Hir,
     ModuleGraph,
     Resolve,
+    TypeEffect,
 }
 
 /// Whether a query result was reused or computed during the current request.
@@ -212,6 +215,63 @@ impl ModuleGraph {
     }
 }
 
+/// A stable type/effect summary for one resolved module.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TypeEffectDefinition {
+    name: String,
+    type_display: String,
+    effects: Box<[String]>,
+}
+
+impl TypeEffectDefinition {
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    #[must_use]
+    pub fn type_display(&self) -> &str {
+        &self.type_display
+    }
+
+    #[must_use]
+    pub fn effects(&self) -> &[String] {
+        &self.effects
+    }
+}
+
+/// Immutable type/effect information projected to one module.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TypeEffectModule {
+    name: String,
+    definitions: Box<[TypeEffectDefinition]>,
+    capabilities: Box<[String]>,
+}
+
+impl TypeEffectModule {
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    #[must_use]
+    pub fn definitions(&self) -> &[TypeEffectDefinition] {
+        &self.definitions
+    }
+
+    #[must_use]
+    pub fn definition(&self, name: &str) -> Option<&TypeEffectDefinition> {
+        self.definitions
+            .iter()
+            .find(|definition| definition.name == name)
+    }
+
+    #[must_use]
+    pub fn capabilities(&self) -> &[String] {
+        &self.capabilities
+    }
+}
+
 /// Errors raised while materializing a query result.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum QueryError {
@@ -235,6 +295,12 @@ pub enum QueryError {
     },
     Resolution {
         errors: Box<[ResolveError]>,
+    },
+    TypeChecking {
+        errors: Box<[TypeError]>,
+    },
+    EffectChecking {
+        errors: Box<[EffectError]>,
     },
 }
 
@@ -270,6 +336,20 @@ impl fmt::Display for QueryError {
                 write!(
                     formatter,
                     "module resolution produced {} error(s)",
+                    errors.len()
+                )
+            }
+            Self::TypeChecking { errors } => {
+                write!(
+                    formatter,
+                    "type checking produced {} error(s)",
+                    errors.len()
+                )
+            }
+            Self::EffectChecking { errors } => {
+                write!(
+                    formatter,
+                    "effect checking produced {} error(s)",
                     errors.len()
                 )
             }
@@ -350,6 +430,40 @@ struct ModuleResolveKey {
     imported_surfaces: Box<[SurfaceKey]>,
 }
 
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct ModuleInterfaceKey {
+    file: SourceId,
+    logical_name: String,
+    name: String,
+    imports: Box<[String]>,
+    requires: Box<[String]>,
+    definitions: Box<[String]>,
+    types: Box<[String]>,
+    body_revision: Option<Revision>,
+    workspace_revisions: [Option<Revision>; 4],
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct WorkspaceResolveKey {
+    graph: ModuleGraphKey,
+    entry: String,
+    sources: Box<[QueryKey]>,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct TypeEffectKey {
+    graph: ModuleGraphKey,
+    file: SourceId,
+    source: QueryKey,
+    imported_interfaces: Box<[ModuleInterfaceKey]>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+enum TypeEffectFailure {
+    Type(Box<[TypeError]>),
+    Effect(Box<[EffectError]>),
+}
+
 /// Internal, deterministic compiler query database.
 #[derive(Debug, Default)]
 pub struct CompilerDb {
@@ -363,6 +477,9 @@ pub struct CompilerDb {
     hirs: BTreeMap<QueryKey, Result<Arc<ling_hir::Program>, HirLowerError>>,
     module_graphs: BTreeMap<ModuleGraphKey, Arc<ModuleGraph>>,
     resolved_modules: BTreeMap<ModuleResolveKey, Result<Arc<ResolvedModule>, Box<[ResolveError]>>>,
+    resolved_programs:
+        BTreeMap<WorkspaceResolveKey, Result<Arc<ResolvedProgram>, Box<[ResolveError]>>>,
+    type_effects: BTreeMap<TypeEffectKey, Result<Arc<TypeEffectModule>, TypeEffectFailure>>,
     trace: Vec<QueryEvent>,
 }
 
@@ -381,6 +498,8 @@ impl CompilerDb {
             hirs: BTreeMap::new(),
             module_graphs: BTreeMap::new(),
             resolved_modules: BTreeMap::new(),
+            resolved_programs: BTreeMap::new(),
+            type_effects: BTreeMap::new(),
             trace: Vec::new(),
         }
     }
@@ -555,33 +674,71 @@ impl CompilerDb {
             return cached.map_err(|errors| QueryError::Resolution { errors });
         }
 
-        let files = graph
-            .nodes()
+        let result = self
+            .resolved_workspace(&graph_key, &graph, &node.name)?
+            .modules()
             .iter()
-            .map(ModuleNode::file)
-            .collect::<Vec<_>>();
-        let mut programs = Vec::with_capacity(files.len());
-        for module_file in files {
-            programs.push((*self.hir(module_file)?).clone());
-        }
-        let result = match resolve(programs, &node.name) {
-            Ok(program) => program
-                .modules()
-                .iter()
-                .find(|module| module.hir.module.name.normalized() == node.name)
-                .cloned()
-                .map(Arc::new)
-                .ok_or(QueryError::ResolvedModuleMissing { file }),
-            Err(errors) => {
-                let errors = errors.into_boxed_slice();
-                self.resolved_modules.insert(key, Err(errors.clone()));
-                return Err(QueryError::Resolution { errors });
-            }
-        };
+            .find(|module| module.hir.module.name.normalized() == node.name)
+            .cloned()
+            .map(Arc::new)
+            .ok_or(QueryError::ResolvedModuleMissing { file });
         if let Ok(module) = &result {
             self.resolved_modules.insert(key, Ok(module.clone()));
         }
         result
+    }
+
+    /// Type-checks and effect-checks one module against the current resolved
+    /// workspace, returning only that module's immutable public projection.
+    /// Imported interface keys intentionally omit implementation bodies, while
+    /// the requested module retains its complete source key.
+    pub fn type_effect(&mut self, file: SourceId) -> Result<Arc<TypeEffectModule>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let (source_key, snapshot, _) = self.source(file)?;
+        let interfaces = self.module_interface_keys(&graph)?;
+        let imported_interfaces = imported_interface_keys(&graph, &interfaces, &node.name);
+        let key = TypeEffectKey {
+            graph: graph_key.clone(),
+            file,
+            source: source_key,
+            imported_interfaces: imported_interfaces.into_boxed_slice(),
+        };
+        if let Some(cached) = self.type_effects.get(&key).cloned() {
+            self.record(QueryKind::TypeEffect, &snapshot, QueryOutcome::Hit);
+            return cached.map_err(type_effect_failure);
+        }
+
+        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
+        let typed = match ling_types::check((*resolved).clone()) {
+            Ok(typed) => typed,
+            Err(errors) => {
+                let errors = errors.into_boxed_slice();
+                self.type_effects
+                    .insert(key, Err(TypeEffectFailure::Type(errors.clone())));
+                self.record(QueryKind::TypeEffect, &snapshot, QueryOutcome::Miss);
+                return Err(QueryError::TypeChecking { errors });
+            }
+        };
+        let checked = match ling_effects::check(typed) {
+            Ok(checked) => checked,
+            Err(errors) => {
+                let errors = errors.into_boxed_slice();
+                self.type_effects
+                    .insert(key, Err(TypeEffectFailure::Effect(errors.clone())));
+                self.record(QueryKind::TypeEffect, &snapshot, QueryOutcome::Miss);
+                return Err(QueryError::EffectChecking { errors });
+            }
+        };
+        let module = project_type_effect(&checked, &node.name)
+            .ok_or(QueryError::ResolvedModuleMissing { file })?;
+        let module = Arc::new(module);
+        self.type_effects.insert(key, Ok(module.clone()));
+        self.record(QueryKind::TypeEffect, &snapshot, QueryOutcome::Miss);
+        Ok(module)
     }
 
     /// Parses all visible files in canonical logical-name order.
@@ -606,6 +763,100 @@ impl CompilerDb {
 
     pub fn clear_trace(&mut self) {
         self.trace.clear();
+    }
+
+    fn resolved_workspace(
+        &mut self,
+        graph_key: &ModuleGraphKey,
+        graph: &ModuleGraph,
+        entry: &str,
+    ) -> Result<Arc<ResolvedProgram>, QueryError> {
+        let mut sources = Vec::with_capacity(graph.nodes().len());
+        for node in graph.nodes() {
+            let (key, _, _) = self.source(node.file)?;
+            sources.push(key);
+        }
+        let key = WorkspaceResolveKey {
+            graph: graph_key.clone(),
+            entry: entry.to_owned(),
+            sources: sources.into_boxed_slice(),
+        };
+        if let Some(cached) = self.resolved_programs.get(&key).cloned() {
+            return cached.map_err(|errors| QueryError::Resolution { errors });
+        }
+        let mut programs = Vec::with_capacity(graph.nodes().len());
+        for node in graph.nodes() {
+            programs.push((*self.hir(node.file)?).clone());
+        }
+        let result = match resolve(programs, entry) {
+            Ok(program) => Ok(Arc::new(program)),
+            Err(errors) => Err(errors.into_boxed_slice()),
+        };
+        self.resolved_programs.insert(key, result.clone());
+        result.map_err(|errors| QueryError::Resolution { errors })
+    }
+
+    fn module_interface_keys(
+        &mut self,
+        graph: &ModuleGraph,
+    ) -> Result<Vec<ModuleInterfaceKey>, QueryError> {
+        let mut interfaces = Vec::with_capacity(graph.nodes().len());
+        for node in graph.nodes() {
+            let hir = self.hir(node.file)?;
+            let snapshot = self.source_bytes(node.file)?;
+            let query_key = QueryKey::new(&self.vfs, &snapshot);
+            let mut imports = hir
+                .imports
+                .iter()
+                .map(|import| {
+                    let mut value = String::new();
+                    push_key_part(&mut value, &import.module.normalized());
+                    push_key_part(&mut value, &import.alias.normalized);
+                    value
+                })
+                .collect::<Vec<_>>();
+            imports.sort();
+            imports.dedup();
+            let mut requires = hir
+                .module
+                .requires
+                .iter()
+                .map(|requirement| requirement.normalized())
+                .collect::<Vec<_>>();
+            requires.sort();
+            requires.dedup();
+            let mut definitions = hir
+                .definitions
+                .iter()
+                .map(definition_interface)
+                .collect::<Vec<_>>();
+            definitions.sort();
+            definitions.dedup();
+            let mut types = hir.types.iter().map(type_interface).collect::<Vec<_>>();
+            types.sort();
+            types.dedup();
+            let body_revision = hir
+                .definitions
+                .iter()
+                .any(|definition| {
+                    definition.annotation.is_none()
+                        || expression_has_effect_surface(&definition.value)
+                })
+                .then_some(query_key.source_revision);
+            interfaces.push(ModuleInterfaceKey {
+                file: node.file,
+                logical_name: snapshot.logical_name().to_owned(),
+                name: node.name.clone(),
+                imports: imports.into_boxed_slice(),
+                requires: requires.into_boxed_slice(),
+                definitions: definitions.into_boxed_slice(),
+                types: types.into_boxed_slice(),
+                body_revision,
+                workspace_revisions: query_key.workspace_revisions,
+            });
+        }
+        interfaces.sort();
+        Ok(interfaces)
     }
 
     fn module_graph_query(&mut self) -> Result<(ModuleGraphKey, Arc<ModuleGraph>), QueryError> {
@@ -722,6 +973,290 @@ impl CompilerDb {
             outcome,
         });
     }
+}
+
+fn type_effect_failure(failure: TypeEffectFailure) -> QueryError {
+    match failure {
+        TypeEffectFailure::Type(errors) => QueryError::TypeChecking { errors },
+        TypeEffectFailure::Effect(errors) => QueryError::EffectChecking { errors },
+    }
+}
+
+fn imported_interface_keys(
+    graph: &ModuleGraph,
+    interfaces: &[ModuleInterfaceKey],
+    target: &str,
+) -> Vec<ModuleInterfaceKey> {
+    let mut pending = graph
+        .node_by_name(target)
+        .map(|node| {
+            node.imports()
+                .iter()
+                .cloned()
+                .collect::<std::collections::BTreeSet<_>>()
+        })
+        .unwrap_or_default();
+    let mut visited = std::collections::BTreeSet::new();
+    let mut output = Vec::new();
+    while let Some(name) = pending.iter().next().cloned() {
+        pending.remove(&name);
+        if !visited.insert(name.clone()) {
+            continue;
+        }
+        if let Some(interface) = interfaces.iter().find(|interface| interface.name == name) {
+            output.push(interface.clone());
+        }
+        if let Some(node) = graph.node_by_name(&name) {
+            pending.extend(node.imports().iter().cloned());
+        }
+    }
+    output.sort();
+    output
+}
+
+fn project_type_effect(checked: &CheckedProgram, name: &str) -> Option<TypeEffectModule> {
+    let resolved = checked.typed().resolved();
+    let module = resolved
+        .modules()
+        .iter()
+        .find(|module| module.hir.module.name.normalized() == name)?;
+    let mut definitions = Vec::with_capacity(module.hir.definitions.len());
+    for definition in &module.hir.definitions {
+        let id = resolved.definition_id(module.id, &definition.name.normalized)?;
+        let type_id = checked.typed().definition_type(id)?;
+        let effects = checked
+            .definition_effect(id)
+            .map_or_else(Vec::new, |row| row.canonical_names());
+        definitions.push(TypeEffectDefinition {
+            name: definition.name.normalized.clone(),
+            type_display: checked.typed().display_type(type_id),
+            effects: effects.into_boxed_slice(),
+        });
+    }
+    definitions.sort_by(|left, right| left.name.cmp(&right.name));
+    let capabilities = checked
+        .module_capabilities(module.id)
+        .into_iter()
+        .flatten()
+        .map(|capability| capability.name().to_owned())
+        .collect::<Vec<_>>()
+        .into_boxed_slice();
+    Some(TypeEffectModule {
+        name: name.to_owned(),
+        definitions: definitions.into_boxed_slice(),
+        capabilities,
+    })
+}
+
+fn definition_interface(definition: &ling_hir::Definition) -> String {
+    let mut output = String::from("definition");
+    push_key_part(&mut output, &definition.name.normalized);
+    push_key_part(
+        &mut output,
+        if definition.mutable {
+            "mutable"
+        } else {
+            "immutable"
+        },
+    );
+    push_key_part(
+        &mut output,
+        if definition.recursive {
+            "recursive"
+        } else {
+            "nonrecursive"
+        },
+    );
+    for parameter in &definition.parameters {
+        pattern_interface(parameter, &mut output);
+    }
+    match &definition.annotation {
+        Some(annotation) => {
+            push_key_part(&mut output, "annotation");
+            type_syntax_interface(annotation, &mut output);
+        }
+        None => push_key_part(&mut output, "inferred"),
+    }
+    output
+}
+
+fn type_interface(declaration: &ling_hir::TypeDeclaration) -> String {
+    let mut output = String::from("type");
+    push_key_part(&mut output, &declaration.name.normalized);
+    for parameter in &declaration.parameters {
+        push_key_part(&mut output, &parameter.normalized);
+    }
+    match &declaration.definition {
+        ling_hir::TypeDefinition::Record(fields) => {
+            push_key_part(&mut output, "record");
+            for field in fields {
+                push_key_part(&mut output, &field.name.normalized);
+                push_key_part(
+                    &mut output,
+                    if field.mutable {
+                        "mutable"
+                    } else {
+                        "immutable"
+                    },
+                );
+                type_syntax_interface(&field.field_type, &mut output);
+            }
+        }
+        ling_hir::TypeDefinition::Variant(cases) => {
+            push_key_part(&mut output, "variant");
+            for case in cases {
+                push_key_part(&mut output, &case.name.normalized);
+                match &case.payload {
+                    Some(payload) => type_syntax_interface(payload, &mut output),
+                    None => push_key_part(&mut output, "unit"),
+                }
+            }
+        }
+        ling_hir::TypeDefinition::Alias(alias) => {
+            push_key_part(&mut output, "alias");
+            type_syntax_interface(alias, &mut output);
+        }
+    }
+    output
+}
+
+fn pattern_interface(pattern: &ling_hir::Pattern, output: &mut String) {
+    match &pattern.kind {
+        ling_hir::PatternKind::Binding { name, .. } => {
+            push_key_part(output, "binding");
+            push_key_part(output, &name.normalized);
+        }
+        ling_hir::PatternKind::Wildcard => push_key_part(output, "wildcard"),
+        ling_hir::PatternKind::Unit => push_key_part(output, "unit"),
+        ling_hir::PatternKind::Literal(literal) => {
+            push_key_part(output, "literal");
+            literal_interface(literal, output);
+        }
+        ling_hir::PatternKind::Tuple(patterns) => {
+            push_key_part(output, "tuple");
+            for pattern in patterns {
+                pattern_interface(pattern, output);
+            }
+        }
+        ling_hir::PatternKind::Record(fields) => {
+            push_key_part(output, "record");
+            for field in fields {
+                push_key_part(output, &field.name.normalized);
+                pattern_interface(&field.pattern, output);
+            }
+        }
+        ling_hir::PatternKind::Constructor {
+            qualifier,
+            name,
+            arguments,
+        } => {
+            push_key_part(output, "constructor");
+            if let Some(qualifier) = qualifier {
+                push_key_part(output, &qualifier.normalized);
+            }
+            push_key_part(output, &name.normalized);
+            for argument in arguments {
+                pattern_interface(argument, output);
+            }
+        }
+    }
+}
+
+fn literal_interface(literal: &ling_hir::Literal, output: &mut String) {
+    let kind = match literal {
+        ling_hir::Literal::Integer { .. } => "integer",
+        ling_hir::Literal::Float(_) => "float",
+        ling_hir::Literal::Text(_) => "text",
+        ling_hir::Literal::Boolean(_) => "boolean",
+    };
+    push_key_part(output, kind);
+}
+
+fn type_syntax_interface(syntax: &ling_hir::TypeSyntax, output: &mut String) {
+    for atom in &syntax.atoms {
+        match atom {
+            ling_hir::TypeAtom::Name(name) => {
+                push_key_part(output, "name");
+                push_key_part(output, &name.normalized);
+            }
+            ling_hir::TypeAtom::Variable(name) => {
+                push_key_part(output, "variable");
+                push_key_part(output, &name.normalized);
+            }
+            ling_hir::TypeAtom::Arrow => push_key_part(output, "arrow"),
+            ling_hir::TypeAtom::Product => push_key_part(output, "product"),
+            ling_hir::TypeAtom::LeftParen => push_key_part(output, "left-paren"),
+            ling_hir::TypeAtom::RightParen => push_key_part(output, "right-paren"),
+            ling_hir::TypeAtom::LeftAngle => push_key_part(output, "left-angle"),
+            ling_hir::TypeAtom::RightAngle => push_key_part(output, "right-angle"),
+            ling_hir::TypeAtom::Comma => push_key_part(output, "comma"),
+            ling_hir::TypeAtom::Dot => push_key_part(output, "dot"),
+        }
+    }
+}
+
+fn expression_has_effect_surface(expression: &ling_hir::Expression) -> bool {
+    use ling_hir::{ExpressionKind, SequenceElement};
+
+    match &expression.kind {
+        ExpressionKind::Sequence(elements) => elements.iter().any(|element| match element {
+            SequenceElement::Let(binding) => expression_has_effect_surface(&binding.value),
+            SequenceElement::Expression(expression) => expression_has_effect_surface(expression),
+        }),
+        ExpressionKind::If {
+            condition,
+            then_branch,
+            else_branch,
+        } => {
+            expression_has_effect_surface(condition)
+                || expression_has_effect_surface(then_branch)
+                || expression_has_effect_surface(else_branch)
+        }
+        ExpressionKind::Match { scrutinee, cases } => {
+            expression_has_effect_surface(scrutinee)
+                || cases.iter().any(|case| {
+                    case.guard
+                        .as_ref()
+                        .is_some_and(expression_has_effect_surface)
+                        || expression_has_effect_surface(&case.body)
+                })
+        }
+        ExpressionKind::Assignment { .. } => true,
+        ExpressionKind::Application {
+            function,
+            arguments,
+        } => {
+            expression_has_effect_surface(function)
+                || arguments.iter().any(expression_has_effect_surface)
+        }
+        ExpressionKind::Projection { field, target, .. } => {
+            field.normalized == "write" || expression_has_effect_surface(target)
+        }
+        ExpressionKind::Binary { left, right, .. } => {
+            expression_has_effect_surface(left) || expression_has_effect_surface(right)
+        }
+        ExpressionKind::Unary { operand, .. } => expression_has_effect_surface(operand),
+        ExpressionKind::Tuple(elements) | ExpressionKind::List(elements) => {
+            elements.iter().any(expression_has_effect_surface)
+        }
+        ExpressionKind::Record(fields) => fields
+            .iter()
+            .any(|field| expression_has_effect_surface(&field.value)),
+        ExpressionKind::RecordUpdate { base, fields } => {
+            expression_has_effect_surface(base)
+                || fields
+                    .iter()
+                    .any(|field| expression_has_effect_surface(&field.value))
+        }
+        ExpressionKind::Name { .. } | ExpressionKind::Literal(_) | ExpressionKind::Unit => false,
+    }
+}
+
+fn push_key_part(output: &mut String, value: &str) {
+    output.push_str(&value.len().to_string());
+    output.push(':');
+    output.push_str(value);
+    output.push(';');
 }
 
 #[cfg(test)]
@@ -976,5 +1511,100 @@ mod tests {
             db.resolve_module(main),
             Err(QueryError::Resolution { .. })
         ));
+    }
+
+    #[test]
+    fn type_effect_queries_project_types_and_reuse_private_imported_bodies() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "src/Main.ling",
+                b"module Main\n\nimport Lib\n\nlet main () = Lib.answer\n".to_vec(),
+            )
+            .unwrap(),
+        );
+        let lib = file(
+            db.set_disk_snapshot(
+                "src/Lib.ling",
+                b"module Lib\n\nlet answer: Int = 42\n".to_vec(),
+            )
+            .unwrap(),
+        );
+
+        let first_main = db.type_effect(main).unwrap();
+        assert_eq!(first_main.name(), "Main");
+        assert_eq!(
+            first_main.definition("main").unwrap().type_display(),
+            "Unit -> Int"
+        );
+        assert!(first_main.capabilities().is_empty());
+        let first_lib = db.type_effect(lib).unwrap();
+
+        db.set_disk_snapshot(
+            "src/Lib.ling",
+            b"module Lib\n\nlet answer: Int = 7\n".to_vec(),
+        )
+        .unwrap();
+        assert!(Arc::ptr_eq(&first_main, &db.type_effect(main).unwrap()));
+        assert!(!Arc::ptr_eq(&first_lib, &db.type_effect(lib).unwrap()));
+
+        db.set_disk_snapshot(
+            "src/Lib.ling",
+            b"module Lib\n\nlet answer: Text = \"seven\"\n".to_vec(),
+        )
+        .unwrap();
+        let changed_main = db.type_effect(main).unwrap();
+        assert!(!Arc::ptr_eq(&first_main, &changed_main));
+        assert_eq!(
+            changed_main.definition("main").unwrap().type_display(),
+            "Unit -> Text"
+        );
+    }
+
+    #[test]
+    fn type_effect_queries_cache_structured_effect_failures() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "Main.ling",
+                b"module Main\n\nlet main () = Console.write \"x\"\n".to_vec(),
+            )
+            .unwrap(),
+        );
+        let first = db.type_effect(main).unwrap_err();
+        assert!(matches!(first, QueryError::EffectChecking { .. }));
+        let second = db.type_effect(main).unwrap_err();
+        assert_eq!(first, second);
+        assert!(db.trace().iter().any(|event| {
+            event.kind() == QueryKind::TypeEffect && event.outcome() == QueryOutcome::Hit
+        }));
+    }
+
+    #[test]
+    fn inferred_public_type_changes_invalidate_importers() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "Main.ling",
+                b"module Main\n\nimport Lib\n\nlet main () = Lib.answer\n".to_vec(),
+            )
+            .unwrap(),
+        );
+        file(
+            db.set_disk_snapshot("Lib.ling", b"module Lib\n\nlet answer = 42\n".to_vec())
+                .unwrap(),
+        );
+        let first = db.type_effect(main).unwrap();
+        db.set_disk_snapshot(
+            "Lib.ling",
+            b"module Lib\n\nlet answer = \"text\"\n".to_vec(),
+        )
+        .unwrap();
+        let changed = db.type_effect(main).unwrap();
+        assert!(!Arc::ptr_eq(&first, &changed));
+        assert_eq!(
+            changed.definition("main").unwrap().type_display(),
+            "Unit -> Text"
+        );
     }
 }

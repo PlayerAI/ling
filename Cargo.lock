@@ -232,10 +232,12 @@ name = "ling-db"
 version = "0.0.1-dev"
 dependencies = [
  "ling-ast",
+ "ling-effects",
  "ling-hir",
  "ling-resolve",
  "ling-source",
  "ling-syntax",
+ "ling-types",
 ]
 
 [[package]]

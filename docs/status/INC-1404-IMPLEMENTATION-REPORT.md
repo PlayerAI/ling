@@ -60,7 +60,7 @@ topology, and imported-surface inputs.
 
 - No syntax or semantics, diagnostic allocation, schema, Semantic ID, source
   span, CLI/LSP field, public protocol, or Unicode table changed.
-- Type/effect queries (INC-1405), semantic queries (INC-1406), clean versus
+- Semantic queries (INC-1406), clean versus
   incremental equivalence across the full query pipeline (INC-1407), persistent
   cache and migration work, parallel scheduling, compiler-facing cancellation,
   and LSP adapters remain deferred according to the execution plan.
@@ -71,4 +71,4 @@ topology, and imported-surface inputs.
 
 The implementation commit and machine-readable completion evidence are recorded
 in `docs/status/implementation-status.toml`. INC-1405, the type/effect query
-boundary, is the next executable target after this milestone.
+boundary, is complete; INC-1406 semantic queries is the next executable target.
