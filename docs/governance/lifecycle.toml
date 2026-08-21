@@ -120,6 +120,29 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0029"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0029-lsp-position-encoding-projection.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Round-trip original-byte offsets and zero-based UTF-8, UTF-16, and UTF-32 positions across BOM, CRLF, Chinese, emoji, combining-mark, empty-line, and final-line fixtures.",
+  "Reject offsets inside UTF-8 scalars, normalized CRLF bytes, and UTF-16 surrogate pairs without clamping; verify deterministic negotiation and UTF-16 fallback.",
+]
+compatibility_impact = [
+  "Adds only an internal ling-source position projection API; compiler byte spans, diagnostics, Semantic IDs, schemas, CLI, LSP lifecycle, Workspace Edits, and Unicode data remain unchanged.",
+]
+unresolved_alternatives = [
+  "LSP JSON-RPC lifecycle, document versions, stale edits, diagnostics publication, and Semantic Transaction fields require a later accepted protocol decision.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0024"
 kind = "Decision"
 status = "Accepted"

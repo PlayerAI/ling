@@ -1,7 +1,12 @@
 //! UTF-8 source storage, newline normalization, and byte-accurate span mapping.
 
+mod position;
 mod vfs;
 
+pub use position::{
+    LspPosition, PositionEncoding, PositionError, SUPPORTED_POSITION_ENCODINGS,
+    negotiate_position_encoding,
+};
 pub use vfs::{
     ChangeEvent, FileOrigin, FileSnapshot, InputChange, Revision, VfsError, VirtualFileSystem,
     WorkspaceInput, WorkspaceSnapshot,

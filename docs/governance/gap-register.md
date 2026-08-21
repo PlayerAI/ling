@@ -20,7 +20,7 @@
 | `G1-BYTECODE` — Bytecode version, verifier, evaluation, Fault, and compatibility | `v0.1` | `ROADMAP-1.0` | `GAP-BYTECODE-SEMANTICS-001` | `RFC-0014`, `RFC-0015`, `RFC-0016`, `RFC-0017`, `RFC-0018`, `RFC-0019`, `RFC-0020` |
 | `G1-FORMATTER` — Author Source preservation, normalization, and localization | `v0.1` | `ROADMAP-1.0` | `GAP-FORMATTER-AUTHOR-SOURCE-001`, `GAP-FORMATTER-CLI-PROTOCOL-001`, `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `DEC-0015`, `DEC-0023`, `DEC-0028` |
 | `G1-INCREMENTAL` — Incremental cache keys, Semantic Hash upgrades, and invalidation | `v0.1` | `ROADMAP-1.0` | `GAP-INCREMENTAL-CACHE-001`, `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `DEC-0012`, `DEC-0019`, `DEC-0021`, `DEC-0022` |
-| `G1-LSP-TRANSACTION` — LSP and Semantic Transaction Stable versus Experimental fields | `v0.1` | `ROADMAP-1.0` | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`, `GAP-LSP-TRANSACTION-PROTOCOL-001` | `DEC-0002`, `DEC-0012` |
+| `G1-LSP-TRANSACTION` — LSP and Semantic Transaction Stable versus Experimental fields | `v0.1` | `ROADMAP-1.0` | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`, `GAP-LSP-TRANSACTION-PROTOCOL-001` | `DEC-0002`, `DEC-0012`, `DEC-0029` |
 | `G1-PACKAGE` — Package identity, namespace, visibility, dependency, and lock rules | `v0.1` | `ROADMAP-1.0` | `GAP-PACKAGE-NAMESPACE-001`, `GAP-PACKAGE-PROTOCOL-001`, `GAP-PROJECT-CLI-INTERFACE-001` | `DEC-0007`, `RFC-0002` |
 | `G1-TRAIT` — Trait declarations, solving, coherence, orphan rules, and lowering | `v0.1` | `ROADMAP-1.0` | `GAP-TRAIT-COHERENCE-001` | `RFC-0005` |
 

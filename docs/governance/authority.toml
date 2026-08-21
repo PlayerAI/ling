@@ -340,6 +340,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0029"
+title = "LSP position-encoding projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0029-lsp-position-encoding-projection.md"
+covers = ["LSP position encodings", "SourceMap byte/position projection", "position negotiation fallback"]
+depends_on = ["DEC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0024"
 title = "Trait obligation collection boundary"
 kind = "Decision"
