@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 90 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, and IDE-2306 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 91 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, and IDE-2307 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -4510,6 +4510,51 @@ completed = ""
 notes = [
   "IDE-2306 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-UNICODE-ALIAS-SYNTAX-001, GAP-AUTHOR-SOURCE-LOCALIZATION-001, LSP-2102/LSP-2104, and IDE-2305; DEC-0012 makes rename-induced DefinitionId changes explicit.",
   "Current VFS, resolver, semantic, and project code has no public atomic edit, identity migration, alias/localization, dependency/generated mutability, or stale-version contract.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "IDE-2307"
+title = "IDE completion v0"
+state = "BlockedSpec"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2304", "LSP-2101", "LSP-2102"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/IDE-2307-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing completion request/context, candidate visibility and ranking, insertion-text, position/version, Semantic ID/provenance, capability, and protocol lifecycle contracts.",
+  "The audit covers expression/member/type/pattern/variant/import/module/keyword contexts, scope and type/effect/capability ranking, aliases, Unicode/CRLF/BOM, shadowing/visibility, stale results, resource limits, deterministic ties, migration, and no-AI behavior.",
+  "No completion handler, candidate ranking, insertion-text API, capability disclosure, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
+  "The future implementation must use checked data, preserve source-span/ID truth, rank deterministically without AI, disclose capabilities explicitly, and label experimental fields.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "IDE-2307 is BlockedSpec by the absent completion protocol and context/ranking decision, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-UNICODE-ALIAS-SYNTAX-001, GAP-AUTHOR-SOURCE-LOCALIZATION-001, LSP-2101/LSP-2102, and IDE-2304.",
+  "Current resolver/type/effect/source code has internal candidate inputs but no approved visibility, presentation, insertion, capability, snapshot, or deterministic ranking contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
