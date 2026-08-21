@@ -290,7 +290,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PLC-4804` | G4 | `zero explain placement` | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:480`, `docs/status/PLC-4804-AUTHORITY-AUDIT.md` |
 | `PLC-4805` | G4 | 设备二进制缓存 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:495`, `docs/status/PLC-4805-AUTHORITY-AUDIT.md` |
 | `PROF-5101` | G5 | 机器可读 Profile | M | BlockedSpec | `09-G5-V0.5-CRITICAL.md:77`, `docs/status/PROF-5101-AUTHORITY-AUDIT.md` |
-| `PROF-5102` | G5 | 禁止能力检查 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:108` |
+| `PROF-5102` | G5 | 禁止能力检查 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:108`, `docs/status/PROF-5102-AUTHORITY-AUDIT.md` |
 | `PROF-5103` | G5 | Profile Composition | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:122` |
 | `PROF-5104` | G5 | Profile Audit 与 LSP | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:126` |
 | `BND-5201` | G5 | Bound 类型与表达式 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:140` |
