@@ -3009,7 +3009,7 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "The equivalence harness is intentionally test-only and compares existing type/effect, semantic, formatter, and interpreter contracts; it does not add a scheduler or persistence layer.",
-  "INC-1408 deterministic parallel scheduling is complete under Accepted DEC-0021; INC-1409 remains deferred until a persistent-cache and corruption-recovery decision is accepted.",
+  "INC-1408 deterministic parallel scheduling is complete under Accepted DEC-0021; INC-1409 now covers the bounded disposable line-index cache slice under Accepted DEC-0022, while broader persistent query graphs remain open.",
 ]
 
 [[task]]
@@ -3066,5 +3066,69 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "The scheduler is private internal infrastructure; canonical publication prevents worker timing, host parallelism, and map order from entering observable query results or traces.",
-  "INC-1409 persistent cache and corruption recovery is the next target and requires a separate accepted protocol before implementation.",
+  "INC-1409 completes the separately authorized disposable line-index cache and corruption-safe envelope; dependent-query persistence and migrations remain outside DEC-0022.",
+]
+
+[[task]]
+id = "INC-1409"
+title = "Disposable persistent query cache slice"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1408"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0022-disposable-persistent-query-cache.md",
+  "docs/governance/gap-register.toml",
+  "crates/ling-cache/Cargo.toml",
+  "crates/ling-cache/src/lib.rs",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+]
+artifacts = [
+  "Cargo.toml",
+  "Cargo.lock",
+  "crates/ling-cache/Cargo.toml",
+  "crates/ling-cache/src/lib.rs",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0022-disposable-persistent-query-cache.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1409-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+]
+acceptance = [
+  "Accepted DEC-0022 authorizes only an explicit opt-in disposable internal cache envelope; source semantics, diagnostics, schemas, Semantic IDs, CLI/LSP fields, public protocols, and Unicode 17.0.0 remain unchanged.",
+  "ling-cache constructs deterministic length-delimited keys containing compiler/toolchain, language, Unicode, schema, profile, target, query, logical-name, exact source-byte, and workspace-input dimensions, without host-path semantics.",
+  "The v1 envelope bounds key and payload sizes, binds the canonical key, verifies a BLAKE3 checksum, and publishes through create-new temporary write, sync, and rename; equal keys retain an immutable entry.",
+  "Missing, unreadable, truncated, malformed, unknown-version, checksum-mismatched, foreign-key, and over-limit entries are safe misses; no unchecked AST, HIR, Typed Core, bytecode, or diagnostic object is deserialized.",
+  "ling-db persists only a validated line-index payload, reconstructs it against the current SourceFile and source identity, and recomputes on source, profile, target, or corruption changes with clean-equivalent results.",
+  "cargo fmt --all -- --check, cargo clippy -p ling-cache -p ling-db --all-targets --locked --offline -- -D warnings, cargo test -p ling-cache --all-targets --locked --offline, cargo test -p ling-db --all-targets --locked --offline, cargo test --workspace --all-targets --locked --offline, cargo xtask governance check-all, and git diff --check: passed.",
+]
+verified_against_commit = "897d9c0a5480ff93417a17a1b3e642bd8967c55f"
+completion_commit = "897d9c0a5480ff93417a17a1b3e642bd8967c55f"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The persistent artifact is private and disposable; DEC-0022 deliberately defers persistent dependent-query graphs, migrations, eviction, locking, compression, encryption, and shared cache roots.",
+  "The next execution-plan target is INC-1410 incremental performance baseline; the incremental-cache gap remains open for the deferred broader scope.",
 ]
