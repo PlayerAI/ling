@@ -275,6 +275,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0015"
+title = "First-class functions, lexical closures, and recursion in bytecode"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0015.md"
+covers = ["bytecode function types", "lexical closure capture", "partial application", "indirect calls", "recursion", "VM frame limits"]
+depends_on = ["DEC-0008", "DEC-0009", "DEC-0010", "DEC-0011", "DEC-0012", "DEC-0013", "DEC-0016", "RFC-0014", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

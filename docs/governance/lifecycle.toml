@@ -74,6 +74,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0015"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0015.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Freeze independent ling.bytecode/1.1 bytes and disassembly for structural function types, captureless and captured closures, partial application, self capture, and complete indirect calls.",
+  "Verify malformed function-type, closure-construction, self-capture, indirect-call, Effect, Capability, source-map, and resource-limit cases with registered bilingual diagnostics and bounded failure.",
+  "Differentially compare checked-source interpreter and verified VM results, Console events, structured Runtime Faults, and original UTF-8 byte spans for closure and recursion programs.",
+  "Verify deterministic capture and artifact ordering, 1.0-to-1.1 reader compatibility, 1.0 reader rejection of 1.1, arbitrary-byte safety, and valid-model mutation coverage.",
+]
+compatibility_impact = [
+  "Adds the backward-compatible ling.bytecode/1.1 design while preserving every valid 1.0 artifact and requiring version-specific decoding and verification.",
+  "Adds no source syntax, CLI command, stable ABI, JSON schema, Semantic ID, canonical semantic-byte, Unicode-version, or default-backend change.",
+]
+unresolved_alternatives = [
+  "Mutable and aggregate captures, mutually recursive local groups, polymorphic bytecode values, tail-call guarantees, common logical heap accounting, and native closure layout remain separately governed future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

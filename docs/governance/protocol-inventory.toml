@@ -436,10 +436,13 @@ writer_policy = "The library-only writer accepts LoweredProgramV1 produced from 
 unknown_field_policy = "ling.bytecode/1.0 rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes."
 migration_tool = "No previous format exists. A future migration must decode and verify the old version before encoding the new version; no tool is implemented."
 fixtures = ["tests/bytecode/v1/golden/hello.lbc.hex", "tests/bytecode/v1/golden/hello.dis", "tests/bytecode/v1/malformed-cases.tsv"]
-sources = ["docs/RFC-0014.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "tests/bytecode/README.md"]
+sources = ["docs/RFC-0014.md", "docs/RFC-0015.md", "docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "tests/bytecode/README.md"]
 version_markers = ["ling.bytecode/1.0"]
-authority = ["RFC-0014"]
-notes = ["VM-1201 through VM-1204 implement the unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot minimal lowering, deterministic writing, debug disassembly, bounded independent decoding, failure-atomic verification, canonical VerifiedProgramV1 re-encoding, verifier-gated execution, registered bilingual diagnostics, and valid/corrupt/fuzz/differential evidence. The protocol is Experimental, is not a DEC-0012 semantic canonical-byte format, and has no CLI artifact command, default backend, or N-1 compatibility claim."]
+authority = ["RFC-0014", "RFC-0015"]
+notes = [
+  "VM-1201 through VM-1204 implement the unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot minimal lowering, deterministic writing, debug disassembly, bounded independent decoding, failure-atomic verification, canonical VerifiedProgramV1 re-encoding, verifier-gated execution, registered bilingual diagnostics, and valid/corrupt/fuzz/differential evidence. The protocol is Experimental, is not a DEC-0012 semantic canonical-byte format, and has no CLI artifact command, default backend, or N-1 compatibility claim.",
+  "Accepted RFC-0015 defines the backward-compatible ling.bytecode/1.1 closure/recursion extension, but current_version and version_markers remain 1.0 until VM-1205 implements and verifies the 1.1 reader, writer, lowering, VM, and compatibility evidence.",
+]
 
 [[protocol]]
 id = "PROTO-REPLAY"
