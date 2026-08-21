@@ -12,6 +12,8 @@ use std::ops::Range;
 use ling_source::{LexicalSpan, SourceFile, SourceId, Span};
 use ling_syntax::{CstNode, NodeKind, ParsedSource, Token, TokenKind};
 
+use crate::comments::{CommentAttachment, attach_comments};
+
 /// Schema identifier for the in-process Format IR projection.
 pub const FORMAT_IR_SCHEMA: &str = "ling.format-ir/0.1";
 
@@ -28,6 +30,7 @@ pub struct FormatDocument {
     had_bom: bool,
     tokens: Box<[FormatToken]>,
     root: FormatNode,
+    comment_attachments: Box<[CommentAttachment]>,
     valid: bool,
 }
 
@@ -67,6 +70,12 @@ impl FormatDocument {
     #[must_use]
     pub const fn root(&self) -> &FormatNode {
         &self.root
+    }
+
+    /// Returns deterministic comment-to-CST associations in source order.
+    #[must_use]
+    pub fn comment_attachments(&self) -> &[CommentAttachment] {
+        &self.comment_attachments
     }
 
     /// Returns whether parsing completed without lexical or syntax errors.
@@ -284,6 +293,7 @@ pub fn build_format_ir(
         .collect::<Result<Vec<_>, _>>()?
         .into_boxed_slice();
     let root = project_node(tree.root(), &tokens)?;
+    let comment_attachments = attach_comments(&tokens, &root);
     Ok(FormatDocument {
         source_id: source.id(),
         original_text: source.original_text().to_owned(),
@@ -291,6 +301,7 @@ pub fn build_format_ir(
         had_bom: source.had_bom(),
         tokens,
         root,
+        comment_attachments,
         valid: parsed.is_valid(),
     })
 }

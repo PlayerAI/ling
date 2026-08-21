@@ -2,8 +2,9 @@
 //!
 //! The renderer consumes the compiler token stream projected by `format_ir`.
 //! It does not inspect text with a second parser, infer semantic structure, or
-//! move comments between CST regions.  Comment attachment and incomplete-source
-//! recovery remain separate execution-plan tasks.
+//! move comments between CST regions.  Comment attachment metadata is consumed
+//! as a preservation guard; incomplete-source recovery remains a separate
+//! execution-plan task.
 
 use ling_source::SourceFile;
 use ling_syntax::{TokenKind, parse};
@@ -27,11 +28,34 @@ pub fn format_core(document: &FormatDocument) -> String {
         return document.original_text().to_owned();
     }
     let candidate = Renderer::new(document.had_bom()).render(document);
-    if parses_valid_source(document.source_id(), &candidate) {
+    if comments_are_preserved(document, &candidate)
+        && parses_valid_source(document.source_id(), &candidate)
+    {
         candidate
     } else {
         document.original_text().to_owned()
     }
+}
+
+fn comments_are_preserved(document: &FormatDocument, candidate: &str) -> bool {
+    let mut cursor = 0;
+    for attachment in document.comment_attachments() {
+        for token in document.tokens()[attachment.comment_token_range()]
+            .iter()
+            .filter(|token| {
+                matches!(
+                    token.kind(),
+                    TokenKind::LineComment | TokenKind::DocComment | TokenKind::BlockComment
+                )
+            })
+        {
+            let Some(relative) = candidate[cursor..].find(token.text()) else {
+                return false;
+            };
+            cursor += relative + token.text().len();
+        }
+    }
+    true
 }
 
 fn parses_valid_source(source_id: ling_source::SourceId, candidate: &str) -> bool {

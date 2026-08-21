@@ -31,7 +31,7 @@
 | ID | Priority | Status | Title | Blocked tasks | Candidate RFCs |
 | --- | --- | --- | --- | --- | --- |
 | `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `P0` | `Open` | Equivalent localized Author Source keyword views | `FMT-1501`, `FMT-1508`, `IDE-2306` | `RFC-0003` |
-| `GAP-FORMATTER-AUTHOR-SOURCE-001` | `P0` | `Open` | Author Source formatter preservation and normalization boundary | `FMT-1504`, `FMT-1505`, `FMT-1506`, `FMT-1508` | — |
+| `GAP-FORMATTER-AUTHOR-SOURCE-001` | `P0` | `Open` | Author Source formatter preservation and normalization boundary | `FMT-1505`, `FMT-1506`, `FMT-1508` | — |
 | `GAP-INCREMENTAL-CACHE-001` | `P0` | `Open` | Incremental query keys, invalidation, persistence, and corruption recovery | `INC-1409` | — |
 | `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2104`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501` | `RFC-0004` |
 | `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `P0` | `Open` | Semantic Hash algorithm, identity upgrade, and invalidation lifecycle | `INC-1406`, `INC-1409`, `GOV-0106` | `RFC-0004` |
