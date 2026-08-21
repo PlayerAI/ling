@@ -226,7 +226,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REM-2603` | G2 | Delivery 语义 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:482`, `docs/status/REM-2603-AUTHORITY-AUDIT.md` |
 | `REM-2604` | G2 | 最小参考传输 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:497`, `docs/status/REM-2604-AUTHORITY-AUDIT.md` |
 | `REM-2605` | G2 | 安全与资源限制 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:506`, `docs/status/REM-2605-AUTHORITY-AUDIT.md` |
-| `MEM-3101` | G3 | 类型分类模型 | M | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:67` |
+| `MEM-3101` | G3 | 类型分类模型 | M | BlockedSpec | `07-G3-V0.3-NATIVE.md:67`, `docs/status/MEM-3101-AUTHORITY-AUDIT.md` |
 | `MEM-3102` | G3 | Value 布局与 Copy/Move | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:88` |
 | `MEM-3103` | G3 | Resource 定义与 Drop 契约 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:99` |
 | `MEM-3104` | G3 | Managed 类型和 Island 边界 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:111` |

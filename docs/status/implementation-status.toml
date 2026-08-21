@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 134 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, and REM-2605 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 135 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, and MEM-3101 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -6522,6 +6522,55 @@ notes = [
   "REM-2605 is BlockedSpec by REM-2604, absent RFC-C206/RFC-0009, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved resource-limit, authentication/authorization, Capability-revocation, replay-protection, schema, and security contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Actor or Remote runtime, frame codec, decoder, network Effect, authentication provider, Capability revocation hook, replay window, rate limiter, mailbox ingress quota, or remote resource accounting; local Capability checks are not network security semantics.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, RemoteRef, envelope, delivery, transport, security, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "MEM-3101"
+title = "Type classification model"
+state = "BlockedSpec"
+release = "G3"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = []
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0008-seed-value-restriction.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/MEM-3101-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing Value/Managed/Resource invariants, defaults and derived kinds for all Seed and future type forms, generic kind constraints, composition, opaque/foreign handling, and Profile boundaries.",
+  "The audit records the missing Copy/Move/Clone, identity/aliasing/lifetime, equality/hash/serialization, Semantic Graph/Audit Source, Checked Core, ownership/region/drop, suspension/Actor, ABI/layout, and FFI contracts while preserving Seed Value semantics.",
+  "The audit covers kind mismatch/composition, generic inference and public signatures, identity/serialization changes, cleanup on return/Error/Fault/cancel/termination, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
+  "No memory-kind type, constraint, layout/identity classification, graph field, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N301 authority is absent.",
+  "The future implementation must preserve Seed Value semantics, consume accepted types and checked Core only, avoid Rust-layout leakage, and publish kind, copy/move, identity, Profile, and interpreter/VM/Native evidence before exposing v0.3 memory behavior.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "MEM-3101 is BlockedSpec by absent RFC-N301/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved Value/Managed/Resource, kind, ownership, identity, serialization, and profile contracts.",
+  "Current Seed syntax/types/effects/evaluator/bytecode/VM implement value semantics only; no Managed/Resource type, memory-kind lattice, generic kind constraint, ownership/region checker, native layout, or kind projection exists. Rust allocation/layout/order remain non-semantic.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory kinds, ownership, Managed, Resource, Native ABI, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
