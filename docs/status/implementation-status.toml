@@ -2601,3 +2601,72 @@ notes = [
   "PROTO-BYTECODE remains Experimental and gains evidence only; no Stable, CLI artifact, default-backend, or general N-1 compatibility claim is made.",
   "Diagnostics, schemas, Semantic IDs, canonical semantic bytes, CLI/ABI/FFI contracts, and Unicode 17.0.0 tables are unchanged; VM-1210 retains fuzzing, cancellation, and additional resource-model scope.",
 ]
+
+[[task]]
+id = "VM-1210"
+title = "VM robustness, cancellation, and resource evidence"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["VM-1209"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "crates/ling-vm/src/cancel.rs",
+  "crates/ling-vm/src/execute.rs",
+  "crates/ling-vm/src/fault.rs",
+  "crates/ling-vm/src/lib.rs",
+  "crates/ling-vm/tests/differential.rs",
+  "crates/ling-vm/tests/execution.rs",
+  "fuzz/fuzz_targets/bytecode_bytes.rs",
+  "docs/RFC-0020.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
+  "tests/fixtures/support/support.governance.json",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "tools/xtask/src/protocols.rs",
+  "tools/xtask/src/support.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/VM-1210-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0020 authorizes only the Experimental ling.vm.control/0.1 host API, deterministic cancellation Fault projection, bounded fuzz mutations, and resource evidence; no unresolved language semantics were implemented.",
+  "CancellationToken is monotonic and clone-shared; execute_v1_with_cancellation checks before Capability preflight and before each instruction/terminator, while execute_v1 remains non-cancellable.",
+  "Pre-cancelled execution wins over missing Capability and zero limits with an uncommitted source-mapped cancelled Fault; cancellation after Console.write preserves the first event and committed=true without a later operation.",
+  "Runtime cancellation reuses L-RUNTIME-0001 with category cancelled, operation execution.cancelled, bilingual messages, original UTF-8 byte spans, and stable JSON facts.",
+  "The bytecode fuzz target checks arbitrary bytes and at most 128 deterministic mutations of the valid Hello artifact through decode/verify twice with diagnostics below 4096 bytes.",
+  "cargo test -p ling-vm --test execution --locked --offline: passed (21 tests).",
+  "cargo test -p ling-vm --test differential --locked --offline: passed.",
+  "cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline: passed.",
+  "cargo fmt --all -- --check, cargo clippy -p ling-bytecode -p ling-vm --all-targets --locked --offline -- -D warnings, cargo test --workspace --locked --offline, git diff --check, cargo xtask governance check-all, cargo xtask traceability verify --release v0.0.1, cargo xtask support verify, and cargo xtask status verify: passed.",
+]
+verified_against_commit = "611ab0db31d34219243d74a8ea53898a99296a04"
+completion_commit = "611ab0db31d34219243d74a8ea53898a99296a04"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0020 is Accepted and is the sole new VM-1210 authority; the accepted gap remains release-blocked until later bytecode stabilization despite this task's evidence being complete.",
+  "PROTO-BYTECODE remains Experimental; PROTO-VM-CONTROL is separately registered as Experimental and does not create a wire, CLI, default-backend, or Stable compatibility claim.",
+  "Diagnostics, schemas, Semantic IDs, canonical semantic bytes, CLI/ABI/FFI contracts, and Unicode 17.0.0 tables are unchanged. Structured Task/LSP cancellation, preemption, rollback, deadlines, and scheduler/heap/replay models are intentionally deferred.",
+]
