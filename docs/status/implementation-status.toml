@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 77 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, and LSP-2103 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 78 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, and LSP-2104 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3968,6 +3968,47 @@ completed = ""
 notes = [
   "LSP-2103 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and LSP-2101/LSP-2102; DEC-0019's VFS overlay is an internal compiler boundary only.",
   "The current VFS behavior remains deterministic and unchanged; no public URI/version or editor overlay protocol is claimed.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2104"
+title = "LSP incremental text changes"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2102", "LSP-2103"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/LSP-2104-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit distinguishes accepted compiler snapshot/incremental-query equivalence from the missing LSP change schema, range conversion, version, and atomic-application contract.",
+  "The audit covers full/incremental sync, batch order, stale/duplicate versions, invalid boundaries, Unicode/CRLF/BOM, cancellation, and full-replacement equivalence fixtures.",
+  "No incremental-change API, LSP range type, version field, diagnostic allocation, Semantic ID change, or placeholder server is added while the authority is absent.",
+  "The future implementation must reject invalid/stale batches before publication and preserve compiler byte-span authority.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "LSP-2104 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001 and LSP-2102/LSP-2103; DEC-0019's clean/incremental equivalence is an internal query guarantee, not an LSP wire contract.",
+  "The current VFS accepts complete snapshots and remains unchanged; no range patching or public LSP sync behavior is claimed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 

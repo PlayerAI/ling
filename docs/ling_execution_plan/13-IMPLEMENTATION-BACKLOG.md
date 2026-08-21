@@ -137,7 +137,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2101` | G1/Editor | 初始化与生命周期 | S | BlockedSpec | `04-LSP-IMPLEMENTATION.md:137`, `docs/status/LSP-2101-AUTHORITY-AUDIT.md` |
 | `LSP-2102` | G1/Editor | Position encoding negotiation | S | BlockedSpec | `04-LSP-IMPLEMENTATION.md:145`, `docs/status/LSP-2102-AUTHORITY-AUDIT.md` |
 | `LSP-2103` | G1/Editor | Open document overlay | M | BlockedSpec | `04-LSP-IMPLEMENTATION.md:151`, `docs/status/LSP-2103-AUTHORITY-AUDIT.md` |
-| `LSP-2104` | G1/Editor | 增量文本变更 | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:170` |
+| `LSP-2104` | G1/Editor | 增量文本变更 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:170`, `docs/status/LSP-2104-AUTHORITY-AUDIT.md` |
 | `LSP-2105` | G1/Editor | Workspace reload | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:182` |
 | `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:188` |
 | `LSP-2202` | G1/Editor | Push diagnostics v0 | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:204` |
