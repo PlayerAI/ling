@@ -59,6 +59,7 @@
 | `COMPAT-6501` | Historical Corpus | `G6` | `L` | `BlockedSpec` | `PKG-6404` | `` |
 | `COMPAT-6502` | 1.0 Compiler Compatibility Matrix | `G6` | `L` | `BlockedSpec` | `COMPAT-6501` | `` |
 | `COMPAT-6503` | Language Migration Tool | `G6` | `L` | `BlockedSpec` | `COMPAT-6502` | `` |
+| `COMPAT-6504` | Deprecation Policy | `G6` | `L` | `BlockedSpec` | `COMPAT-6503` | `` |
 | `CPU-4201` | Scalar Reference Backend | `G4` | `L` | `BlockedSpec` | `KCHK-4105` | `` |
 | `CPU-4202` | Reference Trace | `G4` | `M` | `BlockedSpec` | `CPU-4201` | `` |
 | `CPU-4203` | Kernel Corpus | `G4` | `M` | `BlockedSpec` | `CPU-4202` | `` |
