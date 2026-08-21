@@ -2909,5 +2909,53 @@ completed = "2026-08-21"
 notes = [
   "The query result is a module-local projection; it does not expose stale unrelated modules from the workspace checker and does not create a public checked-snapshot protocol.",
   "Interface keys use explicit declaration shapes and conservative source-revision retention for inferred public definitions or effect-bearing bodies; this keeps private annotated pure-body reuse safe without inventing type semantics.",
-  "INC-1406 semantic queries is the next target; full clean/incremental equivalence remains INC-1407 and persistent cache, parallel scheduling, and compiler-facing cancellation remain open gap work.",
+  "INC-1406 semantic queries is complete; INC-1407 full clean/incremental equivalence is the next executable target. Persistent cache, parallel scheduling, and compiler-facing cancellation remain open gap work.",
+]
+
+[[task]]
+id = "INC-1406"
+title = "Semantic queries"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1405"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-semantic/Cargo.toml",
+]
+artifacts = [
+  "Cargo.toml",
+  "Cargo.lock",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1405-IMPLEMENTATION-REPORT.md",
+  "docs/status/INC-1406-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The internal ling-db boundary exposes a cached canonical ProgramSnapshot and a module-local semantic fragment over checked Typed Core results; the fragment includes canonical imports, requirements, definition/body IDs, types, effects, node IDs, and reference identities.",
+  "Semantic snapshot JSON is emitted only by the existing ling-semantic canonical writer and round-trips through its reader; no query layer identity algorithm or schema is invented.",
+  "Full workspace cache keys include the graph, entry, and all current HIR source keys; fragment identity keys omit the full program ID so unaffected dependents can reuse equal definition/body identity content after imported-body changes.",
+  "Presentation-only edits preserve semantic program/definition/body identities covered by the existing contract, while changed semantic node structure or import aliases produce a distinct fragment key.",
+  "No language semantics, diagnostics, schemas, Semantic ID algorithms, CLI/LSP fields, public protocol, persistence format, or parallel scheduler was added.",
+  "cargo test -p ling-db --locked --offline, cargo clippy -p ling-db --all-targets --locked --offline -- -D warnings, cargo test --workspace --locked --offline, cargo fmt --all -- --check, and git diff --check: passed.",
+]
+verified_against_commit = "4a3cbbd8e91da023e9bf9c56e606e23cbbcb7a83"
+completion_commit = "4a3cbbd8e91da023e9bf9c56e606e23cbbcb7a83"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "ProgramSnapshot remains the full canonical writer result; SemanticModuleFragment is a deliberately narrower identity projection and does not claim a new wire schema.",
+  "Imported body edits can change the workspace program ID while leaving an unaffected module fragment Arc-reusable; comment/presentation edits follow the existing semantic identity contract and may still alter node-fragment identity when structure changes.",
+  "INC-1407 full clean/incremental equivalence is the next target; deterministic parallel scheduling and persistent/cancellation decisions remain deferred under the incremental-cache gap.",
 ]

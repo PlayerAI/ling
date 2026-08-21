@@ -45,6 +45,7 @@
 | `INC-1403` | Parse queries | `G1` | `M` | `Done` | `INC-1402` | `a73e5c7150cce3fb86da5d48508158e7e1637f40` |
 | `INC-1404` | Resolve and module queries | `G1` | `M` | `Done` | `INC-1403` | `eb6061ea3c815d3f4f57f2eb36f63ef90eb599b5` |
 | `INC-1405` | Type and effect queries | `G1` | `M` | `Done` | `INC-1404` | `f9f2512d653f95955e7861953a8e12c3d38e31cc` |
+| `INC-1406` | Semantic queries | `G1` | `M` | `Done` | `INC-1405` | `4a3cbbd8e91da023e9bf9c56e606e23cbbcb7a83` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |
 | `PRJ-1102` | Deterministic module discovery | `G1` | `M` | `Done` | `PRJ-1101` | `f76f4953070b9ae555fce24c7dcc2fbf08a36f7a` |
 | `PRJ-1103` | Package-aware imports and visibility | `G1` | `M` | `Done` | `PRJ-1102`, `PRJ-1104` | `8e98d32f54301dee3f198273cfae3146bbf2846b` |
