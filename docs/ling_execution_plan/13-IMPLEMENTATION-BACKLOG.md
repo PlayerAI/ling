@@ -283,7 +283,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GPU-4604` | G4 | 差分和硬件矩阵 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:378`, `docs/status/GPU-4604-AUTHORITY-AUDIT.md` |
 | `GPU-4605` | G4 | 错误归一化 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:394`, `docs/status/GPU-4605-AUTHORITY-AUDIT.md` |
 | `ACC-4701` | G4 | Accelerator Plugin Interface | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:412`, `docs/status/ACC-4701-AUTHORITY-AUDIT.md` |
-| `ACC-4702` | G4 | Experimental 适配器 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:425` |
+| `ACC-4702` | G4 | Experimental 适配器 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:425`, `docs/status/ACC-4702-AUTHORITY-AUDIT.md` |
 | `PLC-4801` | G4 | Placement 约束模型 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:431` |
 | `PLC-4802` | G4 | 静态候选与运行时选择 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:448` |
 | `PLC-4803` | G4 | Cost Model v0 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:466` |
