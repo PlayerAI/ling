@@ -872,7 +872,7 @@ mod tests {
             let span = failure.diagnostic().primary_span().unwrap();
             assert_eq!(span.file(), LOCK_FILE_NAME);
             assert!(span.start_byte() <= span.end_byte());
-            assert!(span.end_byte() <= u32::try_from(bytes.len()).unwrap());
+            assert!(span.end_byte() <= u64::try_from(bytes.len()).unwrap());
         }
     }
 }

@@ -158,8 +158,8 @@ impl fmt::Display for Severity {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct DiagnosticSpan {
     file: String,
-    start_byte: u32,
-    end_byte: u32,
+    start_byte: u64,
+    end_byte: u64,
 }
 
 impl DiagnosticSpan {
@@ -167,13 +167,24 @@ impl DiagnosticSpan {
     pub fn new(file: impl Into<String>, span: Span) -> Self {
         Self {
             file: file.into(),
-            start_byte: span.start().get(),
-            end_byte: span.end().get(),
+            start_byte: u64::from(span.start().get()),
+            end_byte: u64::from(span.end().get()),
         }
     }
 
     #[must_use]
     pub fn at(file: impl Into<String>, start_byte: u32, end_byte: u32) -> Self {
+        Self {
+            file: file.into(),
+            start_byte: u64::from(start_byte),
+            end_byte: u64::from(end_byte),
+        }
+    }
+
+    /// Creates a diagnostic span for a protocol whose byte-offset domain is
+    /// wider than the in-memory compiler `Span` domain.
+    #[must_use]
+    pub fn at_u64(file: impl Into<String>, start_byte: u64, end_byte: u64) -> Self {
         Self {
             file: file.into(),
             start_byte,
@@ -187,12 +198,12 @@ impl DiagnosticSpan {
     }
 
     #[must_use]
-    pub const fn start_byte(&self) -> u32 {
+    pub const fn start_byte(&self) -> u64 {
         self.start_byte
     }
 
     #[must_use]
-    pub const fn end_byte(&self) -> u32 {
+    pub const fn end_byte(&self) -> u64 {
         self.end_byte
     }
 }
@@ -444,6 +455,26 @@ mod tests {
         let value: Value = serde_json::from_str(&diagnostic.render_json().unwrap()).unwrap();
         assert_eq!(value["primary_span"]["start_byte"], 0);
         assert_eq!(value["primary_span"]["end_byte"], 3);
+    }
+
+    #[test]
+    fn json_preserves_protocol_spans_beyond_the_compiler_u32_domain() {
+        let start = u64::from(u32::MAX) + 1;
+        let end = start + 9;
+        let diagnostic = Diagnostic::new(
+            codes::RUNTIME_FAULT,
+            Severity::Error,
+            "运行时错误",
+            "runtime fault",
+        )
+        .with_primary_span(DiagnosticSpan::at_u64("large-source.ling", start, end));
+
+        let span = diagnostic.primary_span().expect("primary span is present");
+        assert_eq!(span.start_byte(), start);
+        assert_eq!(span.end_byte(), end);
+        let value: Value = serde_json::from_str(&diagnostic.render_json().unwrap()).unwrap();
+        assert_eq!(value["primary_span"]["start_byte"], start);
+        assert_eq!(value["primary_span"]["end_byte"], end);
     }
 
     #[test]

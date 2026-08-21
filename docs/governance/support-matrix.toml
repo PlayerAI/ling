@@ -81,7 +81,7 @@ current_state = "Implemented"
 stability = "Experimental"
 current_profiles = []
 candidate_1_0_profiles = ["Explore"]
-profile_note = "The shared Seed pipeline is tested on CI hosts, but no Profile selector, VM, Native target, or Critical verifier exists."
+profile_note = "The shared Seed pipeline and library-level base VM are tested on CI hosts, but no Profile selector, CLI VM backend, Native target, or Critical verifier exists."
 evidence = ["docs/traceability/v0.0.1.md", ".github/workflows/ci.yml"]
 
 [[profile]]
@@ -95,7 +95,7 @@ memory_models = []
 runtime_models = []
 explicitly_unsupported = [
   "profile selection or validation",
-  "VM/JIT execution",
+  "selectable/default VM or JIT execution",
   "general managed runtime or GC commitment",
 ]
 sources = ["docs/LANGUAGE.md", "docs/SEMANTICS.md", "docs/ROADMAP-1.0.md"]
@@ -197,12 +197,12 @@ sources = ["crates/ling-eval/src/lib.rs", "docs/traceability/v0.0.1.md"]
 id = "BACKEND-VM"
 kind = "Bytecode virtual machine"
 device = "Host CPU"
-tier = "Unsupported"
+tier = "Tier2"
 stability = "Experimental"
-implemented = false
+implemented = true
 profiles = []
 blockers = []
-sources = ["docs/RFC-0014.md", "crates/ling-bytecode/src/lib.rs", "docs/ROADMAP-1.0.md"]
+sources = ["docs/RFC-0014.md", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "crates/ling-vm/tests/execution.rs", "docs/ROADMAP-1.0.md"]
 
 [[backend]]
 id = "BACKEND-NATIVE"
@@ -379,10 +379,10 @@ implemented = false
 
 [[protocol]]
 id = "PROTO-BYTECODE"
-visibility = "Planned public"
-version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+version = "ling.bytecode/1.0"
+stability = "Experimental"
+implemented = true
 
 [[protocol]]
 id = "PROTO-REPLAY"
@@ -432,10 +432,10 @@ sources = ["docs/RFC-0002.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 [[unsupported]]
 id = "UNSUP-VM"
 area = "Execution"
-capability = "Bytecode VM execution"
-reason = "VM-1201 through VM-1203 provide the RFC-0014 model, deterministic writer, bounded decoder, independent verifier, and VerifiedProgramV1 boundary. VM-1204 has not yet added an execution engine or public backend selection."
+capability = "CLI bytecode emission/loading and VM backend selection"
+reason = "VM-1201 through VM-1204 provide the Experimental RFC-0014 protocol and verifier-gated library execution engine. No Accepted CLI bytecode command, backend selector, default execution limits, or full-Seed VM lowering contract exists."
 blockers = []
-sources = ["docs/RFC-0014.md", "crates/ling-bytecode/src/lib.rs", "tests/bytecode/README.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+sources = ["docs/RFC-0014.md", "crates/ling-bytecode/src/lib.rs", "crates/ling-vm/src/lib.rs", "tests/bytecode/README.md", "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 
 [[unsupported]]
 id = "UNSUP-NATIVE-FFI"

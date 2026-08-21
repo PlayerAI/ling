@@ -1117,7 +1117,7 @@ fn contextualize_discovery_failure(
                     } else {
                         format!("{prefix}/{}", span.file())
                     };
-                    diagnostic.with_primary_span(DiagnosticSpan::at(
+                    diagnostic.with_primary_span(DiagnosticSpan::at_u64(
                         file,
                         span.start_byte(),
                         span.end_byte(),

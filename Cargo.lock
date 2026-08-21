@@ -367,6 +367,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "ling-vm"
+version = "0.0.1-dev"
+dependencies = [
+ "ling-ast",
+ "ling-bytecode",
+ "ling-diagnostics",
+ "ling-effects",
+ "ling-eval",
+ "ling-hir",
+ "ling-resolve",
+ "ling-semantic",
+ "ling-source",
+ "ling-syntax",
+ "ling-types",
+ "num-bigint",
+]
+
+[[package]]
 name = "log"
 version = "0.4.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"

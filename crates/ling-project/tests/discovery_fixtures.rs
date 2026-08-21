@@ -141,10 +141,10 @@ fn declaration_mismatch_span_uses_original_utf8_bytes() {
         .position(|window| window == b"module")
         .expect("module token");
 
-    assert_eq!(span.start_byte(), u32::try_from(expected_start).unwrap());
+    assert_eq!(span.start_byte(), u64::try_from(expected_start).unwrap());
     assert_eq!(
         span.end_byte(),
-        u32::try_from(expected_start + "module Game.math".len()).unwrap()
+        u64::try_from(expected_start + "module Game.math".len()).unwrap()
     );
     assert_eq!(
         &source[span.start_byte() as usize..span.end_byte() as usize],

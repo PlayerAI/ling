@@ -17,8 +17,8 @@ Ling 的 [`v0.0.1 Seed`](https://github.com/PlayerAI/ling/tree/v0.0.1) annotated
 | 语言名称 | 中文名：零；英文名：Ling |
 | CLI | `ling` |
 | 源文件扩展名 | `.ling` |
-| 当前里程碑 | `v0.0.1 Seed` 已发布；正在按 G1 执行计划实现 `v0.1 Living`，当前切片为 VM-1202 |
-| 实现状态 | Unicode 17、Seed 前端、module/import、generic nominal types、注入式 Prelude、pattern exhaustiveness、Effect/Capability、Semantic/Audit、解释器、事务式 REPL、共享 CLI compiler，以及首个 Checked Core→bytecode lowering/encoder/disassembler 切片已落地 |
+| 当前里程碑 | `v0.0.1 Seed` 已发布；正在按 G1 执行计划实现 `v0.1 Living`，VM-1204 verifier-gated 基础 VM 已完成，下一 VM 扩展受 VM-1205 的规范门禁约束 |
+| 实现状态 | Unicode 17、Seed 前端、module/import、generic nominal types、注入式 Prelude、pattern exhaustiveness、Effect/Capability、Semantic/Audit、解释器、事务式 REPL、共享 CLI compiler，以及 `ling.bytecode/1.0` lowering/encoder/decoder/verifier 和库级基础 VM 已落地 |
 | 稳定性 | 设计可能变化，接受的 RFC 才能冻结语义 |
 
 ### 构建与验证
@@ -122,7 +122,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - 局部类型推导、默认不可变、`mutable` 和 `place <- value`；
 - `Pure` 与 `Console.Write` Effect，以及 `Console.Write` Capability；
 - Accepted `ling.manifest/1` reader、显式工程根下的确定性 module discovery、离线递归解析 vendored path dependency 的内容/graph identity、canonical `ling.lock/1` reader/writer 与 Update/Locked 策略，以及库级跨包 import/export visibility 与 package-aware `ling.semantic/0.2`（尚未接入 CLI 工程选择）；
-- Accepted RFC-0014、`ling.bytecode/1.0` 未验证模型、显式 opcode/tag 和资源上限，以及支持 `Unit/Bool/Int/Text`、直接调用、不可变局部绑定、`Console.write` 与 return 的 Checked Core lowering、确定性 encoder、bounded decoder、独立 verifier、`VerifiedProgramV1` 边界和非契约 debug disassembler；VM 与 CLI backend 尚未实现；
+- Accepted RFC-0014、`ling.bytecode/1.0` 未验证模型、显式 opcode/tag 和资源上限，以及支持版本 1.0 scalar opcode、直接调用、控制流、`Console.write` 与 return 的 Checked Core 最小 lowering、确定性 encoder、bounded decoder、独立 verifier、`VerifiedProgramV1` 边界、非契约 debug disassembler 和 verifier-gated 库级 VM；VM 具有显式 value representation、host Capability adapter、step/frame/heap hooks、source-mapped Runtime Fault 和解释器 differential 证据，但 CLI backend 选择尚未实现；
 - Semantic Graph、稳定 Diagnostic JSON、解释器、REPL、`run`、`check`、`semantic`、`audit`。
 
 第一阶段明确后置：GC Runtime、Native Backend、Ownership/Borrow Checker、Trait、Effect Handler、Task、Actor、Node、Kernel、分布式、GPU、形式证明和包管理器。设计中预留的能力不得以静默占位的方式运行。
@@ -141,6 +141,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 │   ├── ling-diagnostics/
 │   ├── ling-project/
 │   ├── ling-bytecode/
+│   ├── ling-vm/
 │   ├── ling-syntax/
 │   ├── ling-ast/
 │   ├── ling-hir/
@@ -254,8 +255,8 @@ The annotated [`v0.0.1 Seed`](https://github.com/PlayerAI/ling/tree/v0.0.1) tag 
 | Language name | Chinese: 零; English: Ling |
 | CLI | `ling` |
 | Source extension | `.ling` |
-| Current milestone | `v0.0.1 Seed` is released; the G1 execution plan is advancing toward `v0.1 Living`, currently at VM-1202 |
-| Implementation | Unicode 17, the Seed frontend, modules/imports, generic nominal types, injected Prelude, pattern exhaustiveness, Effects/Capabilities, Semantic/Audit, interpreter, transactional REPL, shared CLI compiler, and the first Checked Core-to-bytecode lowering/encoder/disassembler slice are implemented |
+| Current milestone | `v0.0.1 Seed` is released; the G1 execution plan is advancing toward `v0.1 Living`; the verifier-gated VM-1204 base VM is complete, and the next VM expansion is gated by VM-1205 specifications |
+| Implementation | Unicode 17, the Seed frontend, modules/imports, generic nominal types, injected Prelude, pattern exhaustiveness, Effects/Capabilities, Semantic/Audit, interpreter, transactional REPL, shared CLI compiler, and the `ling.bytecode/1.0` lowering/encoder/decoder/verifier plus library-level base VM are implemented |
 | Stability | The design may change; accepted RFCs are the mechanism for freezing semantics |
 
 ### Build and verification
@@ -359,7 +360,7 @@ The current Seed implementation covers:
 - local type inference, default immutability, `mutable`, and `place <- value`;
 - `Pure` and `Console.Write` Effects, plus the `Console.Write` Capability;
 - an Accepted `ling.manifest/1` reader, deterministic module discovery under an explicit project root, offline recursive resolution of content-identified vendored path dependencies, a canonical `ling.lock/1` reader/writer with Update/Locked policy, library-level cross-package import/export visibility, and package-aware `ling.semantic/0.2` (not yet integrated with CLI project selection);
-- Accepted RFC-0014, an unverified `ling.bytecode/1.0` model with explicit opcode/tag and resource limits, and Checked Core lowering for `Unit/Bool/Int/Text`, direct calls, immutable local bindings, `Console.write`, and return, together with a deterministic encoder, bounded decoder, independent verifier, `VerifiedProgramV1` boundary, and non-contract debug disassembler; no VM or CLI backend exists yet;
+- Accepted RFC-0014, an unverified `ling.bytecode/1.0` model with explicit opcode/tag and resource limits, minimal Checked Core lowering, a deterministic encoder, bounded decoder, independent verifier, `VerifiedProgramV1` boundary, non-contract debug disassembler, and a verifier-gated library VM for every version-1.0 scalar opcode, direct calls, control flow, `Console.write`, and return; the VM has an explicit value representation, injected host-Capability adapter, step/frame/heap hooks, source-mapped Runtime Faults, and interpreter differential evidence, while CLI backend selection remains unavailable;
 - Semantic Graph, stable Diagnostic JSON, an interpreter, a REPL, `run`, `check`, `semantic`, and `audit`.
 
 The first milestone explicitly postpones the GC runtime, native backend, Ownership/Borrow checker, Traits, Effect Handlers, Task, Actor, Node, Kernel, distribution, GPU support, formal proofs, and package management. Reserved features must not silently execute as placeholders.
@@ -378,6 +379,7 @@ The first milestone explicitly postpones the GC runtime, native backend, Ownersh
 │   ├── ling-diagnostics/
 │   ├── ling-project/
 │   ├── ling-bytecode/
+│   ├── ling-vm/
 │   ├── ling-syntax/
 │   ├── ling-ast/
 │   ├── ling-hir/

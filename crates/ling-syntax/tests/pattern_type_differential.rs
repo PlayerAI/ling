@@ -83,8 +83,8 @@ fn rejected_pattern_delimiters_keep_registered_diagnostics_at_original_utf8_span
                 .expect("fixture contains its rejected delimiter"),
         )
         .expect("small fixture byte offset fits u32");
-        assert_eq!(span.start_byte(), expected_start, "{case}");
-        assert_eq!(span.end_byte(), expected_start + 1, "{case}");
+        assert_eq!(span.start_byte(), u64::from(expected_start), "{case}");
+        assert_eq!(span.end_byte(), u64::from(expected_start + 1), "{case}");
 
         let json = diagnostic
             .render_json()

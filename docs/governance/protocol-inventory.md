@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 20 records: 13 current public, 1 internal, 6 Future.
-- Current public stability: 7 Experimental, 6 Preview, 0 Stable.
+- 20 records: 14 current public, 1 internal, 5 Future.
+- Current public stability: 8 Experimental, 6 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -27,10 +27,10 @@
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 4 |
 | `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.1` | `Preview` | yes | yes | 2 |
 | `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 26 |
+| `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.0` | `Experimental` | no | no | 3 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
 | `PROTO-SEMANTIC-TRANSACTION` | Planned public | Transaction | — | `Future` | no | no | 0 |
 | `PROTO-BUILD-METADATA` | Planned public | Package metadata | — | `Future` | no | no | 0 |
-| `PROTO-BYTECODE` | Planned public | Bytecode | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
 | `PROTO-ABI` | Planned public | ABI | — | `Future` | no | no | 0 |
 | `PROTO-EVIDENCE` | Planned public | Evidence | — | `Future` | no | no | 0 |
@@ -206,6 +206,19 @@
 - Fixtures: [`crates/ling-project/tests/manifest_fixtures.rs`](../../crates/ling-project/tests/manifest_fixtures.rs), [`crates/ling-project/tests/discovery_fixtures.rs`](../../crates/ling-project/tests/discovery_fixtures.rs), [`crates/ling-project/tests/package_graph_fixtures.rs`](../../crates/ling-project/tests/package_graph_fixtures.rs), [`crates/ling-project/tests/project_fixtures.rs`](../../crates/ling-project/tests/project_fixtures.rs), [`crates/ling-project/tests/project_properties.rs`](../../crates/ling-project/tests/project_properties.rs), [`tests/projects/README.md`](../../tests/projects/README.md), [`tests/projects/manifest-v1/valid-minimal/ling.toml`](../../tests/projects/manifest-v1/valid-minimal/ling.toml), [`tests/projects/manifest-v1/valid-unicode/ling.toml`](../../tests/projects/manifest-v1/valid-unicode/ling.toml), [`tests/projects/discovery-v1/valid-multi-root/ling.toml`](../../tests/projects/discovery-v1/valid-multi-root/ling.toml), [`tests/projects/discovery-v1/import-cycle/ling.toml`](../../tests/projects/discovery-v1/import-cycle/ling.toml), [`tests/projects/dependency-v1/valid-basic/ling.toml`](../../tests/projects/dependency-v1/valid-basic/ling.toml), [`tests/projects/dependency-v1/package-cycle/ling.toml`](../../tests/projects/dependency-v1/package-cycle/ling.toml), [`tests/projects/single-package/ling.toml`](../../tests/projects/single-package/ling.toml), [`tests/projects/multi-module/ling.toml`](../../tests/projects/multi-module/ling.toml), [`tests/projects/path-dependency/ling.toml`](../../tests/projects/path-dependency/ling.toml), [`tests/projects/cycle/ling.toml`](../../tests/projects/cycle/ling.toml), [`tests/projects/visibility/ling.toml`](../../tests/projects/visibility/ling.toml), [`tests/projects/offline-lock/ling.toml`](../../tests/projects/offline-lock/ling.toml), [`tests/projects/unicode-names/ling.toml`](../../tests/projects/unicode-names/ling.toml), [`tests/projects/manifest-v1/duplicate-field/ling.toml`](../../tests/projects/manifest-v1/duplicate-field/ling.toml), [`tests/projects/manifest-v1/path-traversal/ling.toml`](../../tests/projects/manifest-v1/path-traversal/ling.toml), [`tests/projects/manifest-v1/unsupported-language/ling.toml`](../../tests/projects/manifest-v1/unsupported-language/ling.toml), [`fuzz/corpus/manifest_bytes/malformed`](../../fuzz/corpus/manifest_bytes/malformed), [`fuzz/corpus/manifest_bytes/minimal`](../../fuzz/corpus/manifest_bytes/minimal), [`fuzz/corpus/manifest_bytes/path-traversal`](../../fuzz/corpus/manifest_bytes/path-traversal), [`fuzz/corpus/manifest_bytes/unicode`](../../fuzz/corpus/manifest_bytes/unicode)
 - Notes: PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, content/package-graph identities, exported-module visibility, checked package-aware resolution, the canonical local lock protocol, the complete named project fixture matrix, generated path/cycle/order properties, and deterministic manifest fuzz coverage. Manifest writing, ambient or CLI project selection, and build integration remain later PRJ tasks.
 
+### `PROTO-BYTECODE` — Portable bytecode and verifier format
+
+- Producer: VM-1202 ling-bytecode checked Typed Core lowerer and deterministic writer; VM-1203 canonical VerifiedProgramV1 re-encoder
+- Consumer: VM-1203 bounded independent decoder/verifier; VM-1204 verifier-gated ling-vm executor
+- Reader policy: The reader accepts exactly format (1, 0), validates hard and caller artifact bounds before allocation, rejects unknown executable content, and produces only untrusted DecodedProgramV1. The independent verifier is the sole constructor of VerifiedProgramV1, and ling-vm accepts only that verified state plus explicit limits and injected host Capabilities.
+- Writer policy: The library-only writer accepts LoweredProgramV1 produced from a checked ProgramSnapshot or independently verified VerifiedProgramV1. It emits the RFC-0014 1.0 envelope, sorted tables, complete source maps, zero reserved bytes, and path-free metadata under hard and caller-supplied limits; it does not publish a CLI artifact contract.
+- Unknown-field policy: ling.bytecode/1.0 rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes.
+- Migration tool: No previous format exists. A future migration must decode and verify the old version before encoding the new version; no tool is implemented.
+- Authority: `RFC-0014`
+- Sources: [`docs/RFC-0014.md`](../RFC-0014.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml), [`crates/ling-bytecode/src/lib.rs`](../../crates/ling-bytecode/src/lib.rs), [`crates/ling-vm/src/lib.rs`](../../crates/ling-vm/src/lib.rs), [`tests/bytecode/README.md`](../../tests/bytecode/README.md)
+- Fixtures: [`tests/bytecode/v1/golden/hello.lbc.hex`](../../tests/bytecode/v1/golden/hello.lbc.hex), [`tests/bytecode/v1/golden/hello.dis`](../../tests/bytecode/v1/golden/hello.dis), [`tests/bytecode/v1/malformed-cases.tsv`](../../tests/bytecode/v1/malformed-cases.tsv)
+- Notes: VM-1201 through VM-1204 implement the unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot minimal lowering, deterministic writing, debug disassembly, bounded independent decoding, failure-atomic verification, canonical VerifiedProgramV1 re-encoding, verifier-gated execution, registered bilingual diagnostics, and valid/corrupt/fuzz/differential evidence. The protocol is Experimental, is not a DEC-0012 semantic canonical-byte format, and has no CLI artifact command, default backend, or N-1 compatibility claim.
+
 ### `PROTO-INTERNAL-INCIDENT` — Local internal-incident reproduction report
 
 - Producer: ling-cli internal incident capture
@@ -244,19 +257,6 @@
 - Sources: [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
 - Notes: No build metadata is exposed as a Ling compatibility surface in v0.0.1.
-
-### `PROTO-BYTECODE` — Portable bytecode and verifier format
-
-- Producer: VM-1202 ling-bytecode checked Typed Core lowerer and deterministic writer; VM-1203 canonical VerifiedProgramV1 re-encoder
-- Consumer: VM-1203 bounded independent decoder/verifier; Future VM-1204 execution backend
-- Reader policy: The VM-1203 reader accepts exactly format (1, 0), validates hard and caller artifact bounds before allocation, rejects unknown executable content, and produces only untrusted DecodedProgramV1. The independent verifier is the sole constructor of VerifiedProgramV1; no VM consumer exists before VM-1204.
-- Writer policy: The library-only writer accepts LoweredProgramV1 produced from a checked ProgramSnapshot or independently verified VerifiedProgramV1. It emits the RFC-0014 1.0 envelope, sorted tables, complete source maps, zero reserved bytes, and path-free metadata under hard and caller-supplied limits; it does not publish a CLI artifact contract.
-- Unknown-field policy: Future ling.bytecode/1.0 rejects unknown tags, opcodes, flags, fields, nonzero reserved bytes, incompatible versions, and trailing bytes.
-- Migration tool: No previous format exists. A future migration must decode and verify the old version before encoding the new version; no tool is implemented.
-- Authority: `RFC-0014`
-- Sources: [`docs/RFC-0014.md`](../RFC-0014.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
-- Fixtures: —
-- Notes: VM-1201 through VM-1203 implement the unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot scalar/direct-call lowering, deterministic writing, debug disassembly, bounded independent decoding, failure-atomic verification, canonical VerifiedProgramV1 re-encoding, registered bilingual diagnostics, and valid/corrupt/fuzz evidence. The planned-public protocol remains Future until VM-1204 adds verifier-gated execution and VM differential evidence.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

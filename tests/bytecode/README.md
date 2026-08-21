@@ -10,8 +10,9 @@ Current evidence is staged by trust boundary:
 - `v1/golden/hello.dis` freezes the matching non-contract debug disassembly;
 - `crates/ling-bytecode/tests/decode_verify.rs` independently decodes, verifies, mutates, and exact-round-trips the valid artifacts without using VM execution;
 - `fuzz/corpus/bytecode_bytes/` supplies reviewable exact valid/corrupt binary seeds to the bounded decoder/verifier fuzz target;
-- the VM half of the differential test remains explicitly ignored with a VM-1204 reason.
+- `crates/ling-vm/tests/execution.rs` executes only independently verified state and covers every version-1.0 scalar operator, direct and recursive calls, both branch directions, jump/return, Capability preflight, source-mapped Runtime Faults, host commit state, and deterministic execution limits;
+- the supported VM-1202 lowering slice is compared directly with the checked interpreter for exact logical Console output.
 
-No file here is executable merely because it is called bytecode. VM-1203 permits only the independent verifier to construct `VerifiedProgramV1`; VM-1204 will enable the differential half only through that state.
+No file here is executable merely because it is called bytecode. VM-1203 permits only the independent verifier to construct `VerifiedProgramV1`; VM-1204 accepts only that state plus explicit limits and injected host Capabilities. No CLI bytecode command or backend selector is implied.
 
 The corpus preserves original UTF-8 bytes with repository-enforced LF checkout for reviewed text fixtures. Separate tests exercise BOM/CRLF provenance. Physical checkout paths, Rust `Debug` output, allocation details, and hash-map order are never expected values.

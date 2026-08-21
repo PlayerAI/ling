@@ -24,14 +24,14 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `FTR-SEED-0004` | `Implemented` | `Experimental` | — | `Explore` | The current type/Place subset is Seed-only; Native and Critical subsets require later accepted decisions. | [`docs/traceability/v0.0.1.md`](../traceability/v0.0.1.md) |
 | `FTR-SEED-0005` | `Implemented` | `Experimental` | — | `Explore` | Seed Effect/Capability checking exists without a selectable Profile; later profile allowlists are unresolved. | [`docs/traceability/v0.0.1.md`](../traceability/v0.0.1.md) |
 | `FTR-SEED-0006` | `Implemented` | `Experimental` | — | `Explore` | Semantic Graph, canonical identity, and Audit remain Experimental/Preview protocols and are not Stable 1.x contracts. | [`docs/traceability/v0.0.1.md`](../traceability/v0.0.1.md)<br>[`docs/governance/protocol-inventory.toml`](../governance/protocol-inventory.toml) |
-| `FTR-SEED-0007` | `Implemented` | `Experimental` | — | `Explore` | The shared Seed pipeline is tested on CI hosts, but no Profile selector, VM, Native target, or Critical verifier exists. | [`docs/traceability/v0.0.1.md`](../traceability/v0.0.1.md)<br>[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) |
+| `FTR-SEED-0007` | `Implemented` | `Experimental` | — | `Explore` | The shared Seed pipeline and library-level base VM are tested on CI hosts, but no Profile selector, CLI VM backend, Native target, or Critical verifier exists. | [`docs/traceability/v0.0.1.md`](../traceability/v0.0.1.md)<br>[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) |
 
 ## Profiles
 
 | Profile | Current state | Stability | Selectable | 1.0 candidate | Allowed Effects | Memory models | Runtime models | Explicitly unsupported |
 | --- | --- | --- | ---: | ---: | --- | --- | --- | --- |
 | `Critical` | `Unavailable` | `Experimental` | no | yes | — | — | — | Critical subset validation<br>bounded-time or bounded-memory guarantee<br>Node, Contract, model checking, or evidence bundle |
-| `Explore` | `Unavailable` | `Experimental` | no | yes | — | — | — | profile selection or validation<br>VM/JIT execution<br>general managed runtime or GC commitment |
+| `Explore` | `Unavailable` | `Experimental` | no | yes | — | — | — | profile selection or validation<br>selectable/default VM or JIT execution<br>general managed runtime or GC commitment |
 | `Native` | `Unavailable` | `Experimental` | no | yes | — | — | — | profile selection or validation<br>AOT or Native lowering<br>Managed Island<br>FFI or stable ABI |
 
 ## Host platform tiers
@@ -57,7 +57,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `BACKEND-INTERPRETER` | Reference interpreter | Host CPU | `Tier2` | `Experimental` | yes | — | — |
 | `BACKEND-KERNEL-CPU` | Kernel CPU reference/SIMD | CPU | `Unsupported` | `Experimental` | no | — | `GAP-KERNEL-DEVICE-001` |
 | `BACKEND-NATIVE` | Native AOT | Host CPU | `Unsupported` | `Experimental` | no | — | `GAP-NATIVE-BACKEND-ABI-001`<br>`GAP-OWNERSHIP-MODEL-001` |
-| `BACKEND-VM` | Bytecode virtual machine | Host CPU | `Unsupported` | `Experimental` | no | — | — |
+| `BACKEND-VM` | Bytecode virtual machine | Host CPU | `Tier2` | `Experimental` | yes | — | — |
 
 ## Standard package stability
 
@@ -72,7 +72,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-ABI` | `Planned public` | — | `Future` | no |
 | `PROTO-AUDIT-SOURCE` | `Public` | `ling.audit/0.1` | `Preview` | yes |
 | `PROTO-BUILD-METADATA` | `Planned public` | — | `Future` | no |
-| `PROTO-BYTECODE` | `Planned public` | — | `Future` | no |
+| `PROTO-BYTECODE` | `Public` | `ling.bytecode/1.0` | `Experimental` | yes |
 | `PROTO-CANONICAL-BYTES` | `Public` | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | yes |
 | `PROTO-CLI` | `Public` | `0.0.1-dev` | `Preview` | yes |
 | `PROTO-CLI-EXIT` | `Public` | `0.0.1-dev` | `Preview` | yes |
@@ -102,7 +102,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `UNSUP-PACKAGES` | Project/package | CLI project selection, package installation, publication, or registry | PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, package-aware Semantic Graph, canonical local lock protocol, complete named project fixture matrix, and project graph/lock property and manifest fuzz coverage. CLI selection/build integration, publication, and registry installation remain out of scope. | — | [`docs/RFC-0002.md`](../RFC-0002.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
 | `UNSUP-PROFILE-SELECTION` | Profile | Explore, Native, or Critical selection/enforcement | The Seed CLI has no profile option and no profile validation pass. | `GAP-CRITICAL-PROFILE-001`<br>`GAP-NATIVE-BACKEND-ABI-001` | [`docs/SEMANTICS.md`](../SEMANTICS.md)<br>[`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md) |
 | `UNSUP-SUPPORT-CLI-JSON` | CLI/protocol | ling version --format json and ling support --format json | GOV-0108 generates internal governance fixtures only; no Accepted public JSON contract or CLI command exists. | — | [`docs/ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md`](../ling_execution_plan/02-G0-GOVERNANCE-AND-COMPATIBILITY.md) |
-| `UNSUP-VM` | Execution | Bytecode VM execution | VM-1201 through VM-1203 provide the RFC-0014 model, deterministic writer, bounded decoder, independent verifier, and VerifiedProgramV1 boundary. VM-1204 has not yet added an execution engine or public backend selection. | — | [`docs/RFC-0014.md`](../RFC-0014.md)<br>[`crates/ling-bytecode/src/lib.rs`](../../crates/ling-bytecode/src/lib.rs)<br>[`tests/bytecode/README.md`](../../tests/bytecode/README.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
+| `UNSUP-VM` | Execution | CLI bytecode emission/loading and VM backend selection | VM-1201 through VM-1204 provide the Experimental RFC-0014 protocol and verifier-gated library execution engine. No Accepted CLI bytecode command, backend selector, default execution limits, or full-Seed VM lowering contract exists. | — | [`docs/RFC-0014.md`](../RFC-0014.md)<br>[`crates/ling-bytecode/src/lib.rs`](../../crates/ling-bytecode/src/lib.rs)<br>[`crates/ling-vm/src/lib.rs`](../../crates/ling-vm/src/lib.rs)<br>[`tests/bytecode/README.md`](../../tests/bytecode/README.md)<br>[`docs/ling_execution_plan/03-G1-V0.1-LIVING.md`](../ling_execution_plan/03-G1-V0.1-LIVING.md) |
 
 ## Tier policy
 

@@ -98,7 +98,7 @@ fn compiler_lexer_matches_the_shared_tree_sitter_identifier_corpus() {
                 assert_eq!(span.start_byte(), 0, "{}", case.id);
                 assert_eq!(
                     span.end_byte(),
-                    u32::try_from(case.spelling.len()).expect("small fixture spelling"),
+                    u64::try_from(case.spelling.len()).expect("small fixture spelling"),
                     "{}",
                     case.id
                 );

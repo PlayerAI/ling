@@ -606,8 +606,14 @@ fn remap_diagnostic(
     if span.file() != source_name {
         return diagnostic;
     }
-    let start = mapping.map_offset(span.start_byte());
-    let end = mapping.map_offset(span.end_byte()).max(start);
+    let (Ok(start), Ok(end)) = (
+        u32::try_from(span.start_byte()),
+        u32::try_from(span.end_byte()),
+    ) else {
+        return diagnostic;
+    };
+    let start = mapping.map_offset(start);
+    let end = mapping.map_offset(end).max(start);
     diagnostic.with_primary_span(DiagnosticSpan::at(source_name, start, end))
 }
 

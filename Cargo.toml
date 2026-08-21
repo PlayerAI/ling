@@ -16,6 +16,7 @@ members = [
     "crates/ling-syntax",
     "crates/ling-types",
     "crates/ling-unicode",
+    "crates/ling-vm",
     "tools/xtask",
     "tools/unicode-gen",
 ]

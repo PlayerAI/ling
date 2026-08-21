@@ -113,9 +113,3 @@ fn malformed_verifier_plan_has_unique_stable_cases() {
     }
     assert_eq!(ids.len(), 22);
 }
-
-#[test]
-#[ignore = "VM-1204 verifier-gated execution is not implemented"]
-fn interpreter_to_vm_differential_waits_for_vm_1204() {
-    panic!("enable only after the VM accepts VerifiedProgramV1 and matches this corpus");
-}

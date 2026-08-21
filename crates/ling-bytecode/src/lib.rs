@@ -2,8 +2,9 @@
 //!
 //! VM-1202 adds deterministic checked lowering, writing, and debug
 //! disassembly. VM-1203 adds bounded decoding and an independent verifier as
-//! the sole constructor of executable-authority state. VM execution remains
-//! unavailable until VM-1204.
+//! the sole constructor of executable-authority state. VM-1204 execution is
+//! implemented separately in `ling-vm`, which accepts only that verified
+//! state.
 
 mod decode;
 mod disassemble;

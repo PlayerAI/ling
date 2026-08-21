@@ -45,7 +45,8 @@ RFC-0001 §6.6 的“受限自动 Borrow”与 SEMANTICS §29 的“v0.0.1 不�
 │   ├── ling-source/      # SourceId、UTF-8、Span、行列映射
 │   ├── ling-unicode/     # XID、NFC、Script Set、UTS #39 skeleton
 │   ├── ling-project/     # ling.toml v1、源码/module 发现、离线 path dependency graph 与内容 identity
-│   ├── ling-bytecode/    # RFC-0014 model、Checked Core 最小 lowering、encoder、bounded decoder 与独立 verifier；VM 后续实现
+│   ├── ling-bytecode/    # RFC-0014 model、Checked Core 最小 lowering、encoder、bounded decoder 与独立 verifier
+│   ├── ling-vm/          # verifier-gated VM、显式 value、host Capability adapter 与执行预算
 │   ├── ling-syntax/      # Token、Lexer、offside layout、Parser、CST
 │   ├── ling-ast/         # AST（保 Span、去语法噪音）
 │   ├── ling-hir/         # 名称空间、糖 Lowering、Place 分类
@@ -78,6 +79,7 @@ ling-unicode
 ling-diagnostics → ling-source
 ling-project     → ling-source, ling-unicode, ling-diagnostics, ling-syntax, ling-ast
 ling-bytecode    → ling-source, ling-unicode, ling-diagnostics, ling-hir, ling-resolve, ling-types, ling-effects, ling-semantic
+ling-vm          → ling-bytecode, ling-diagnostics, num-bigint
 ling-syntax      → ling-source, ling-unicode, ling-diagnostics
 ling-ast         → ling-source, ling-syntax
 ling-hir         → ling-source, ling-ast
@@ -227,6 +229,8 @@ VM-1201 依据 Accepted RFC-0014 增加独立、无生产依赖的 `ling-bytecod
 VM-1202 在不开放执行入口的前提下增加 `ProgramSnapshot` → `LoweredProgramV1` 的失败原子 lowering、`ling.bytecode/1.0` 确定性 little-endian writer 与非契约 debug disassembler。当前纵向切片严格限于 `Unit/Bool/Int/Text`、monomorphic direct call、不可变局部绑定、`Console.write` 和 return；不支持项以保留原始 UTF-8 span 的结构化错误拒绝。source table 只接受显式 canonical logical name，并从同一不可变 `SourceFile` 的 BOM/CRLF 原始字节计算长度和 SHA-256；golden 同时冻结 Hello 的精确 bytes 与 disassembly。decoder、verifier、`VerifiedProgramV1`、VM、CLI backend、泛型 monomorphization、递归、控制流、运算、aggregate 和公开 `L-BYTECODE-*` emitter 均继续由后续任务负责。
 
 VM-1203 依据 Accepted RFC-0014 增加与 writer 独立的 bounded `ling.bytecode/1.0` decoder，以及唯一能够构造 `VerifiedProgramV1` 的失败原子 verifier。decoder 在 slicing、count arithmetic 与 allocation 前执行 header、record、hard/caller limit 检查；verifier 按 table canonicality、index/signature、CFG/reachability/dominance/SSA/type、transitive Effect、module Capability、entry 和完整 source-map 阶段拒绝不可信模型。六个已注册的双语 `L-BYTECODE-*` code 提供稳定 phase/reason/index/resource Facts；22 个 malformed vectors、独立 branch/loop fixture、精确 Hello encode-decode-encode round-trip、512 个 deterministic arbitrary-byte cases 与 pinned fuzz corpus 构成无 panic/有界输出证据。该任务不增加 VM、执行入口、CLI backend 或新的 Source 语义；`ling.bytecode/1.0` 仍按 RFC-0014 在 VM-1204 前保持 Future。
+
+VM-1204 依据 Accepted RFC-0014 §6–§7 增加独立 `ling-vm` crate。公开执行入口只接受 `VerifiedProgramV1`、显式 `ExecutionLimits` 与注入的 `HostCapabilities`；版本 1.0 的 scalar 指令、direct call、block control flow、`Console.write` 和 return 按存储顺序执行。VM 使用显式 `Unit/Bool/Int/Text` value representation 和迭代 frame stack，执行每条 instruction/terminator 前计 step，并在 entry 前使用 verifier 已证明的 transitive Effect closure 完成 Capability preflight。step/frame exhaustion、实现内存上限、除零、非法 format 与 host failure 映射为保留原始 `u64` UTF-8 byte span 和 committed 状态的双语 `L-RUNTIME-0001`；已验证状态中的不可能不变量保持独立 internal error 边界。测试覆盖全部版本 1.0 scalar operator、两个 branch 方向、jump、direct/recursive call、资源上限、host failure，以及当前 VM-1202 lowering 范围内的 interpreter/VM Console differential。该 crate 不建立 CLI backend/default limit，不扩展 VM-1202 source lowering，也不提前实现 closure、aggregate、mutation 或未来 opcode。
 
 出口标准：§18.6 全过；Graph Schema 正/负兼容性测试通过；同一输入在两个独立进程中产生逐字节相同的 Graph JSON 与 Audit 文本；Audit round-trip 性质测试通过；依赖实现变化敏感性有最小调用图用例，避免无意的全图或不充分失效。
 
