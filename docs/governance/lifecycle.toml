@@ -73,6 +73,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0022"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0022-disposable-persistent-query-cache.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Round-trip line-index entries with CRLF, BOM, Unicode, source-edit, profile, and target cases and compare clean results.",
+  "Treat missing, unreadable, truncated, malformed, foreign-key, checksum-mismatched, unknown-version, and over-limit entries as bounded misses without unchecked deserialization.",
+  "Repeat publication across process-like database lifetimes and compare cache IDs, payloads, traces, and clean/incremental behavior without host-path dependence.",
+  "Reject future envelope versions until a separately accepted migration exists.",
+]
+compatibility_impact = [
+  "Adds only an explicitly opt-in internal disposable cache artifact and the ling-cache crate; source behavior, diagnostics, schemas, Semantic IDs, Unicode 17.0.0, and public protocols are unchanged.",
+  "Cache absence, corruption, and write failure remain equivalent to a cache miss; the versioned envelope is not a cross-release compatibility promise.",
+]
+unresolved_alternatives = [
+  "Persistent checked-query graphs, migrations, multi-process locking, eviction, compression, encryption, and public cache management require separate authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0002"
 kind = "RFC"
 status = "Accepted"

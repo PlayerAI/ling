@@ -205,6 +205,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "ling-cache"
+version = "0.0.1-dev"
+dependencies = [
+ "blake3",
+]
+
+[[package]]
 name = "ling-cli"
 version = "0.0.1-dev"
 dependencies = [
@@ -232,6 +239,7 @@ name = "ling-db"
 version = "0.0.1-dev"
 dependencies = [
  "ling-ast",
+ "ling-cache",
  "ling-effects",
  "ling-eval",
  "ling-format",

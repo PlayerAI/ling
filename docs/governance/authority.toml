@@ -275,6 +275,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0022"
+title = "Disposable persistent query-cache envelope"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0022-disposable-persistent-query-cache.md"
+covers = ["persistent cache key dimensions", "bounded cache envelope", "corruption-safe misses", "checked line-index reconstruction"]
+depends_on = ["DEC-0012", "DEC-0019", "DEC-0021", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0002"
 title = "Local package identity and project protocol"
 kind = "RFC"

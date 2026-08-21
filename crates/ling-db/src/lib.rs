@@ -8,10 +8,12 @@
 use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::thread;
 
 use ling_ast::{LowerError, Program, lower};
+use ling_cache::{CacheKey, CacheStore};
 use ling_effects::{self, CheckedProgram, EffectError};
 use ling_hir::{self, LowerError as HirLowerError};
 use ling_resolve::{ResolveError, ResolvedModule, ResolvedProgram, resolve};
@@ -136,6 +138,60 @@ impl LineIndex {
                 .partition_point(|line_start| *line_start <= offset)
                 .saturating_sub(1),
         )
+    }
+
+    fn cache_payload(&self) -> Vec<u8> {
+        let mut bytes = Vec::with_capacity(15 + self.starts.len() * 4);
+        bytes.extend_from_slice(b"LIDX\0");
+        bytes.extend_from_slice(&1_u16.to_le_bytes());
+        bytes.extend_from_slice(
+            &u32::try_from(self.starts.len())
+                .expect("line count is bounded by the source length")
+                .to_le_bytes(),
+        );
+        bytes.extend_from_slice(&self.lexical_len.get().to_le_bytes());
+        for start in &self.starts {
+            bytes.extend_from_slice(&start.get().to_le_bytes());
+        }
+        bytes
+    }
+
+    fn from_cache(source: &ling_source::SourceFile, bytes: &[u8]) -> Option<Self> {
+        const HEADER: usize = 5 + 2 + 4 + 4;
+        if bytes.len() < HEADER || &bytes[..5] != b"LIDX\0" {
+            return None;
+        }
+        let version = u16::from_le_bytes(bytes.get(5..7)?.try_into().ok()?);
+        let count = usize::try_from(u32::from_le_bytes(bytes.get(7..11)?.try_into().ok()?)).ok()?;
+        let lexical_len =
+            LexicalOffset::new(u32::from_le_bytes(bytes.get(11..15)?.try_into().ok()?));
+        if version != 1
+            || count == 0
+            || bytes.len() != HEADER.checked_add(count.checked_mul(4)?)?
+            || lexical_len != source.source_map().lexical_len()
+        {
+            return None;
+        }
+        let mut starts = Vec::with_capacity(count);
+        let mut cursor = HEADER;
+        for _ in 0..count {
+            let end = cursor.checked_add(4)?;
+            starts.push(LexicalOffset::new(u32::from_le_bytes(
+                bytes.get(cursor..end)?.try_into().ok()?,
+            )));
+            cursor = end;
+        }
+        if starts.first().copied() != Some(LexicalOffset::new(0))
+            || starts.windows(2).any(|pair| pair[0] >= pair[1])
+            || starts.iter().any(|start| *start > lexical_len)
+        {
+            return None;
+        }
+        Some(Self {
+            source: source.id(),
+            starts: starts.into_boxed_slice(),
+            lexical_len,
+        })
     }
 }
 
@@ -565,6 +621,7 @@ enum TypeEffectFailure {
 #[derive(Debug, Default)]
 pub struct CompilerDb {
     vfs: VirtualFileSystem,
+    persistent_cache: Option<CacheStore>,
     source_bytes: BTreeMap<QueryKey, Arc<FileSnapshot>>,
     sources: BTreeMap<QueryKey, Result<Arc<ling_source::SourceFile>, SourceError>>,
     line_indexes: BTreeMap<QueryKey, Arc<LineIndex>>,
@@ -589,6 +646,7 @@ impl CompilerDb {
     pub const fn new() -> Self {
         Self {
             vfs: VirtualFileSystem::new(),
+            persistent_cache: None,
             source_bytes: BTreeMap::new(),
             sources: BTreeMap::new(),
             line_indexes: BTreeMap::new(),
@@ -605,6 +663,16 @@ impl CompilerDb {
             semantic_fragments: BTreeMap::new(),
             trace: Vec::new(),
         }
+    }
+
+    /// Creates a database with an explicit disposable persistent-cache root.
+    /// Cache reads are safe misses on corruption and never deserialize
+    /// unchecked compiler values.
+    #[must_use]
+    pub fn with_persistent_cache(root: impl Into<PathBuf>) -> Self {
+        let mut database = Self::new();
+        database.persistent_cache = Some(CacheStore::new(root));
+        database
     }
 
     #[must_use]
@@ -664,8 +732,23 @@ impl CompilerDb {
             self.record(QueryKind::LineIndex, &snapshot, QueryOutcome::Hit);
             return Ok(cached);
         }
+        let persistent_key = self.persistent_cache_key("line_index", &snapshot);
+        if let Some(cache) = self.persistent_cache.clone() {
+            if let Some(cached) = cache
+                .load(&persistent_key)
+                .and_then(|payload| LineIndex::from_cache(&source, &payload))
+            {
+                let cached = Arc::new(cached);
+                self.line_indexes.insert(key, cached.clone());
+                self.record(QueryKind::LineIndex, &snapshot, QueryOutcome::Hit);
+                return Ok(cached);
+            }
+        }
         let index = Arc::new(LineIndex::from_source(&source));
         self.line_indexes.insert(key, index.clone());
+        if let Some(cache) = self.persistent_cache.clone() {
+            let _ = cache.store(&persistent_key, &index.cache_payload());
+        }
         self.record(QueryKind::LineIndex, &snapshot, QueryOutcome::Miss);
         Ok(index)
     }
@@ -1237,6 +1320,31 @@ impl CompilerDb {
         result
             .map(|source| (key, snapshot, source))
             .map_err(|error| QueryError::InvalidSource { file, error })
+    }
+
+    fn persistent_cache_key(&self, query: &str, snapshot: &FileSnapshot) -> CacheKey {
+        let package = self.workspace_cache_dimension(WorkspaceInput::PackageManifest);
+        let config = self.workspace_cache_dimension(WorkspaceInput::Config);
+        let profile = self.workspace_cache_dimension(WorkspaceInput::Profile);
+        let target = self.workspace_cache_dimension(WorkspaceInput::Target);
+        CacheKey::new(
+            env!("CARGO_PKG_VERSION"),
+            [LANGUAGE_VERSION.0, LANGUAGE_VERSION.1, LANGUAGE_VERSION.2],
+            [UNICODE_VERSION.0, UNICODE_VERSION.1, UNICODE_VERSION.2],
+            QUERY_SCHEMA_VERSION,
+            format!("profile={profile};package={package};config={config}"),
+            format!("target={target}"),
+            query,
+            snapshot.logical_name(),
+            snapshot.bytes(),
+        )
+    }
+
+    fn workspace_cache_dimension(&self, kind: WorkspaceInput) -> String {
+        self.vfs
+            .workspace_input(kind)
+            .map(|input| ling_cache::bytes_digest(input.bytes()))
+            .unwrap_or_else(|| "none".to_owned())
     }
 
     fn record(&mut self, kind: QueryKind, snapshot: &FileSnapshot, outcome: QueryOutcome) {
@@ -1887,6 +1995,134 @@ mod tests {
         assert_eq!(index.line_start(2), Some(LexicalOffset::new(14)));
         assert_eq!(index.line_for(LexicalOffset::new(8)), Some(1));
         assert_eq!(index.line_for(LexicalOffset::new(99)), None);
+    }
+
+    fn persistent_cache_test_root(label: &str) -> PathBuf {
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        std::env::temp_dir().join(format!(
+            "ling-db-cache-{label}-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        ))
+    }
+
+    fn last_query_outcome(db: &CompilerDb, kind: QueryKind) -> QueryOutcome {
+        db.trace()
+            .iter()
+            .rev()
+            .find(|event| event.kind() == kind)
+            .expect("query trace contains the requested kind")
+            .outcome()
+    }
+
+    #[test]
+    fn persistent_line_index_cache_reuses_checked_result_and_invalidates_source() {
+        let root = persistent_cache_test_root("reuse");
+        let bytes = "\u{feff}第一行\r\n第二行\n".as_bytes().to_vec();
+        {
+            let mut db = CompilerDb::with_persistent_cache(&root);
+            let file = file(db.set_disk_snapshot("lines.ling", bytes.clone()).unwrap());
+            let index = db.line_index(file).unwrap();
+            assert_eq!(index.line_count(), 3);
+            assert_eq!(
+                last_query_outcome(&db, QueryKind::LineIndex),
+                QueryOutcome::Miss
+            );
+        }
+        {
+            let mut db = CompilerDb::with_persistent_cache(&root);
+            let file = file(db.set_disk_snapshot("lines.ling", bytes).unwrap());
+            let reused = db.line_index(file).unwrap();
+            assert_eq!(reused.source(), file);
+            assert_eq!(reused.line_count(), 3);
+            assert_eq!(
+                last_query_outcome(&db, QueryKind::LineIndex),
+                QueryOutcome::Hit
+            );
+
+            db.clear_trace();
+            db.set_disk_snapshot("lines.ling", b"only one line\n".to_vec())
+                .unwrap();
+            let changed = db.line_index(file).unwrap();
+            assert_eq!(changed.line_count(), 2);
+            assert_eq!(
+                last_query_outcome(&db, QueryKind::LineIndex),
+                QueryOutcome::Miss
+            );
+        }
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn persistent_line_index_cache_treats_corruption_as_a_safe_miss() {
+        let root = persistent_cache_test_root("corruption");
+        let bytes = b"first\nsecond\n".to_vec();
+        {
+            let mut db = CompilerDb::with_persistent_cache(&root);
+            let file = file(db.set_disk_snapshot("lines.ling", bytes.clone()).unwrap());
+            let _ = db.line_index(file).unwrap();
+        }
+        let cache_file = std::fs::read_dir(&root)
+            .unwrap()
+            .map(|entry| entry.unwrap().path())
+            .find(|path| path.extension().and_then(|value| value.to_str()) == Some("lcache"))
+            .expect("line-index cache file is published");
+        let mut encoded = std::fs::read(&cache_file).unwrap();
+        let last = encoded.last_mut().expect("cache envelope has a checksum");
+        *last ^= 0xFF;
+        std::fs::write(&cache_file, encoded).unwrap();
+
+        let mut db = CompilerDb::with_persistent_cache(&root);
+        let file = file(db.set_disk_snapshot("lines.ling", bytes).unwrap());
+        let index = db.line_index(file).unwrap();
+        assert_eq!(index.line_count(), 3);
+        assert_eq!(
+            last_query_outcome(&db, QueryKind::LineIndex),
+            QueryOutcome::Miss
+        );
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn persistent_line_index_cache_key_includes_profile_and_target_inputs() {
+        let root = persistent_cache_test_root("dimensions");
+        let bytes = b"one\ntwo\n".to_vec();
+        {
+            let mut db = CompilerDb::with_persistent_cache(&root);
+            db.set_workspace_input(WorkspaceInput::Profile, b"debug".to_vec())
+                .unwrap();
+            db.set_workspace_input(WorkspaceInput::Target, b"host".to_vec())
+                .unwrap();
+            let file = file(db.set_disk_snapshot("lines.ling", bytes.clone()).unwrap());
+            let _ = db.line_index(file).unwrap();
+        }
+        {
+            let mut db = CompilerDb::with_persistent_cache(&root);
+            db.set_workspace_input(WorkspaceInput::Profile, b"release".to_vec())
+                .unwrap();
+            db.set_workspace_input(WorkspaceInput::Target, b"host".to_vec())
+                .unwrap();
+            let file = file(db.set_disk_snapshot("lines.ling", bytes.clone()).unwrap());
+            let _ = db.line_index(file).unwrap();
+            assert_eq!(
+                last_query_outcome(&db, QueryKind::LineIndex),
+                QueryOutcome::Miss
+            );
+        }
+        {
+            let mut db = CompilerDb::with_persistent_cache(&root);
+            db.set_workspace_input(WorkspaceInput::Profile, b"debug".to_vec())
+                .unwrap();
+            db.set_workspace_input(WorkspaceInput::Target, b"wasm32".to_vec())
+                .unwrap();
+            let file = file(db.set_disk_snapshot("lines.ling", bytes).unwrap());
+            let _ = db.line_index(file).unwrap();
+            assert_eq!(
+                last_query_outcome(&db, QueryKind::LineIndex),
+                QueryOutcome::Miss
+            );
+        }
+        let _ = std::fs::remove_dir_all(root);
     }
 
     #[test]

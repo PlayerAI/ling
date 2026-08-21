@@ -45,6 +45,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0018` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0018](../decisions/0018-rfc-0001-lifecycle.md) |
 | `DEC-0019` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0019](../decisions/0019-incremental-query-boundary.md) |
 | `DEC-0021` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0021](../decisions/0021-deterministic-parallel-scheduling.md) |
+| `DEC-0022` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0022](../decisions/0022-disposable-persistent-query-cache.md) |
 
 ## Migration boundary
 

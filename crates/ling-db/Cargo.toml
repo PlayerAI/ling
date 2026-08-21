@@ -7,6 +7,7 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+ling-cache = { path = "../ling-cache" }
 ling-ast = { path = "../ling-ast" }
 ling-effects = { path = "../ling-effects" }
 ling-hir = { path = "../ling-hir" }
