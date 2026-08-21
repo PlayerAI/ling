@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 72 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, and CLI-1704 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 73 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, and CLI-1705 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3765,6 +3765,47 @@ completed = ""
 notes = [
   "CLI-1704 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001 and CLI-1701; DEC-0003's Rust/conformance runner is implementation evidence, not a user test protocol.",
   "The current CLI remains limited to the accepted commands and does not invent source-level test annotations or `zero` names.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "CLI-1705"
+title = "Semantic query and patch commands"
+state = "BlockedSpec"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701", "PRJ-1107"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/CLI-1705-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the Experimental Semantic Graph boundary and Future Semantic Transaction inventory and identifies missing query, patch, stale-base, preserve, authorization, and atomicity contracts.",
+  "The audit covers deterministic query projection, transaction lifecycle, project/lock/CLI behavior, and required safety/differential fixtures.",
+  "No query/patch command, mutation API, transaction decoder, capability surface, protocol field, diagnostic allocation, or placeholder semantic authority is added while the contracts are absent.",
+  "The future implementation must keep queries read-only by default, reject stale bases, and commit patches atomically through the approved semantic pipeline.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "CLI-1705 is BlockedSpec by GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-PROJECT-CLI-INTERFACE-001, and CLI-1701; PROTO-SEMANTIC-TRANSACTION remains Future.",
+  "The current `ling semantic` and `ling audit` commands remain file-oriented read-only projections; no patch behavior or public query language is claimed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
