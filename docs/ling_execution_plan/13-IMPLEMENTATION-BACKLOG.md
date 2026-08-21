@@ -115,7 +115,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `INC-1403` | G1/Editor | Parse queries | M | Done | DEC-0019；见 `crates/ling-db/src/lib.rs` 的 source_bytes、line_index、tokens、parse、ast 查询、确定性缓存与 clean/incremental 等价测试及实施报告 |
 | `INC-1404` | G1/Editor | Resolve/module queries | M | Done | DEC-0019；见 `crates/ling-db/src/lib.rs` 的 HIR、模块图与 resolve 查询、公共导出失效及私有实现复用测试，以及实施报告 |
 | `INC-1405` | G1/Editor | Type/effect queries | M | Done | DEC-0019；见 `crates/ling-db/src/lib.rs` 的模块级 type/effect 投影、public interface/body 失效边界、结构化错误与 clean/incremental 复用测试，以及实施报告 |
-| `INC-1406` | G1/Editor | Semantic queries | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:360` |
+| `INC-1406` | G1/Editor | Semantic queries | M | Done | DEC-0019；见 `crates/ling-db/src/lib.rs` 的 canonical semantic snapshot、module fragment、Program/Body ID 失效边界与 JSON round-trip 测试，以及实施报告 |
 | `INC-1407` | G1/Editor | Clean ↔ incremental equivalence | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:368` |
 | `INC-1408` | G1/Editor | Deterministic parallel scheduling | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:379` |
 | `INC-1409` | G1/Editor | Persistent cache（若 RFC 接受） | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:383` |

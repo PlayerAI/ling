@@ -235,6 +235,7 @@ dependencies = [
  "ling-effects",
  "ling-hir",
  "ling-resolve",
+ "ling-semantic",
  "ling-source",
  "ling-syntax",
  "ling-types",

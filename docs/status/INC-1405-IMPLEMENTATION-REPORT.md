@@ -63,7 +63,7 @@ unchanged dependents without changing language semantics.
 - No language syntax or semantics, diagnostic allocation, schema, Semantic ID,
   source span, CLI/LSP field, public protocol, persistence format, or Unicode
   table changed.
-- Semantic queries (INC-1406), full clean versus incremental equivalence
+- Full clean versus incremental equivalence
   (INC-1407), deterministic parallel scheduling, persistent cache decisions,
   compiler-facing cancellation, and LSP adapters remain deferred.
 - No third-party dependency was added; `ling-db` reuses the existing
@@ -72,5 +72,6 @@ unchanged dependents without changing language semantics.
 ## Validation and next target
 
 The implementation commit and machine-readable completion evidence are recorded
-in `docs/status/implementation-status.toml`. INC-1406 semantic queries is the
-next executable target.
+in `docs/status/implementation-status.toml`. INC-1406 semantic queries is
+complete; INC-1407 full clean versus incremental equivalence is the next
+executable target.

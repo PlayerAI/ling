@@ -14,6 +14,7 @@ use ling_ast::{LowerError, Program, lower};
 use ling_effects::{self, CheckedProgram, EffectError};
 use ling_hir::{self, LowerError as HirLowerError};
 use ling_resolve::{ResolveError, ResolvedModule, ResolvedProgram, resolve};
+use ling_semantic::{self, ProgramSnapshot};
 use ling_source::{
     ChangeEvent, FileOrigin, FileSnapshot, InputChange, LexicalOffset, Revision, SourceError,
     SourceId, VfsError, VirtualFileSystem, WorkspaceInput,
@@ -37,6 +38,7 @@ pub enum QueryKind {
     ModuleGraph,
     Resolve,
     TypeEffect,
+    Semantic,
 }
 
 /// Whether a query result was reused or computed during the current request.
@@ -272,6 +274,94 @@ impl TypeEffectModule {
     }
 }
 
+/// A definition fragment from a canonical semantic graph.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SemanticDefinitionFragment {
+    name: String,
+    definition_id: String,
+    body_id: String,
+    type_name: String,
+    effects: Box<[String]>,
+}
+
+impl SemanticDefinitionFragment {
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    #[must_use]
+    pub fn definition_id(&self) -> &str {
+        &self.definition_id
+    }
+
+    #[must_use]
+    pub fn body_id(&self) -> &str {
+        &self.body_id
+    }
+
+    #[must_use]
+    pub fn type_name(&self) -> &str {
+        &self.type_name
+    }
+
+    #[must_use]
+    pub fn effects(&self) -> &[String] {
+        &self.effects
+    }
+}
+
+/// A module-local semantic graph fragment. The full canonical writer remains
+/// available through [`CompilerDb::semantic_snapshot`].
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SemanticModuleFragment {
+    module: String,
+    requires: Box<[String]>,
+    imports: Box<[String]>,
+    definitions: Box<[SemanticDefinitionFragment]>,
+    node_ids: Box<[String]>,
+    references: Box<[String]>,
+}
+
+impl SemanticModuleFragment {
+    #[must_use]
+    pub fn module(&self) -> &str {
+        &self.module
+    }
+
+    #[must_use]
+    pub fn requires(&self) -> &[String] {
+        &self.requires
+    }
+
+    #[must_use]
+    pub fn imports(&self) -> &[String] {
+        &self.imports
+    }
+
+    #[must_use]
+    pub fn definitions(&self) -> &[SemanticDefinitionFragment] {
+        &self.definitions
+    }
+
+    #[must_use]
+    pub fn definition(&self, name: &str) -> Option<&SemanticDefinitionFragment> {
+        self.definitions
+            .iter()
+            .find(|definition| definition.name == name)
+    }
+
+    #[must_use]
+    pub fn node_ids(&self) -> &[String] {
+        &self.node_ids
+    }
+
+    #[must_use]
+    pub fn references(&self) -> &[String] {
+        &self.references
+    }
+}
+
 /// Errors raised while materializing a query result.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum QueryError {
@@ -301,6 +391,9 @@ pub enum QueryError {
     },
     EffectChecking {
         errors: Box<[EffectError]>,
+    },
+    SemanticSnapshot {
+        message: String,
     },
 }
 
@@ -352,6 +445,9 @@ impl fmt::Display for QueryError {
                     "effect checking produced {} error(s)",
                     errors.len()
                 )
+            }
+            Self::SemanticSnapshot { message } => {
+                write!(formatter, "semantic snapshot failed: {message}")
             }
         }
     }
@@ -479,7 +575,10 @@ pub struct CompilerDb {
     resolved_modules: BTreeMap<ModuleResolveKey, Result<Arc<ResolvedModule>, Box<[ResolveError]>>>,
     resolved_programs:
         BTreeMap<WorkspaceResolveKey, Result<Arc<ResolvedProgram>, Box<[ResolveError]>>>,
+    checked_programs: BTreeMap<WorkspaceResolveKey, Result<Arc<CheckedProgram>, TypeEffectFailure>>,
     type_effects: BTreeMap<TypeEffectKey, Result<Arc<TypeEffectModule>, TypeEffectFailure>>,
+    semantic_snapshots: BTreeMap<WorkspaceResolveKey, Result<Arc<ProgramSnapshot>, String>>,
+    semantic_fragments: BTreeMap<String, Arc<SemanticModuleFragment>>,
     trace: Vec<QueryEvent>,
 }
 
@@ -499,7 +598,10 @@ impl CompilerDb {
             module_graphs: BTreeMap::new(),
             resolved_modules: BTreeMap::new(),
             resolved_programs: BTreeMap::new(),
+            checked_programs: BTreeMap::new(),
             type_effects: BTreeMap::new(),
+            semantic_snapshots: BTreeMap::new(),
+            semantic_fragments: BTreeMap::new(),
             trace: Vec::new(),
         }
     }
@@ -712,26 +814,26 @@ impl CompilerDb {
             return cached.map_err(type_effect_failure);
         }
 
-        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
-        let typed = match ling_types::check((*resolved).clone()) {
-            Ok(typed) => typed,
-            Err(errors) => {
-                let errors = errors.into_boxed_slice();
-                self.type_effects
-                    .insert(key, Err(TypeEffectFailure::Type(errors.clone())));
-                self.record(QueryKind::TypeEffect, &snapshot, QueryOutcome::Miss);
-                return Err(QueryError::TypeChecking { errors });
-            }
-        };
-        let checked = match ling_effects::check(typed) {
+        let checked = match self.checked_workspace(&graph_key, &graph, &node.name) {
             Ok(checked) => checked,
-            Err(errors) => {
-                let errors = errors.into_boxed_slice();
-                self.type_effects
-                    .insert(key, Err(TypeEffectFailure::Effect(errors.clone())));
+            Err(error @ QueryError::TypeChecking { .. })
+            | Err(error @ QueryError::EffectChecking { .. }) => {
+                self.type_effects.insert(
+                    key,
+                    Err(match &error {
+                        QueryError::TypeChecking { errors } => {
+                            TypeEffectFailure::Type(errors.clone())
+                        }
+                        QueryError::EffectChecking { errors } => {
+                            TypeEffectFailure::Effect(errors.clone())
+                        }
+                        _ => unreachable!("checked workspace returned a checking error"),
+                    }),
+                );
                 self.record(QueryKind::TypeEffect, &snapshot, QueryOutcome::Miss);
-                return Err(QueryError::EffectChecking { errors });
+                return Err(error);
             }
+            Err(error) => return Err(error),
         };
         let module = project_type_effect(&checked, &node.name)
             .ok_or(QueryError::ResolvedModuleMissing { file })?;
@@ -739,6 +841,60 @@ impl CompilerDb {
         self.type_effects.insert(key, Ok(module.clone()));
         self.record(QueryKind::TypeEffect, &snapshot, QueryOutcome::Miss);
         Ok(module)
+    }
+
+    /// Builds and caches the canonical file-mode semantic snapshot for the
+    /// workspace entry represented by `file`.
+    pub fn semantic_snapshot(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<ProgramSnapshot>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let (_, snapshot, _) = self.source(file)?;
+        let key = self.workspace_resolve_key(&graph_key, &graph, &node.name)?;
+        if let Some(cached) = self.semantic_snapshots.get(&key).cloned() {
+            self.record(QueryKind::Semantic, &snapshot, QueryOutcome::Hit);
+            return cached.map_err(|message| QueryError::SemanticSnapshot { message });
+        }
+        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+        let result = ling_semantic::build((*checked).clone())
+            .map(Arc::new)
+            .map_err(|error| error.to_string());
+        self.semantic_snapshots.insert(key, result.clone());
+        self.record(QueryKind::Semantic, &snapshot, QueryOutcome::Miss);
+        result.map_err(|message| QueryError::SemanticSnapshot { message })
+    }
+
+    /// Returns a canonical semantic definition/reference fragment for one
+    /// module. The fragment cache is identity-based, so presentation-only
+    /// edits and unrelated module body changes can reuse an identical fragment
+    /// even though a full workspace program ID may change.
+    pub fn semantic_fragment(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<SemanticModuleFragment>, QueryError> {
+        let snapshot = self.semantic_snapshot(file)?;
+        let name = self
+            .module_graph_query()?
+            .1
+            .node(file)
+            .map(|node| node.name().to_owned())
+            .ok_or(QueryError::UnknownFile { file })?;
+        let (fragment, key) = project_semantic_fragment(&snapshot, &name)
+            .ok_or(QueryError::ResolvedModuleMissing { file })?;
+        let (_, source, _) = self.source(file)?;
+        if let Some(cached) = self.semantic_fragments.get(&key).cloned() {
+            self.record(QueryKind::Semantic, &source, QueryOutcome::Hit);
+            return Ok(cached);
+        }
+        let fragment = Arc::new(fragment);
+        self.semantic_fragments.insert(key, fragment.clone());
+        self.record(QueryKind::Semantic, &source, QueryOutcome::Miss);
+        Ok(fragment)
     }
 
     /// Parses all visible files in canonical logical-name order.
@@ -771,16 +927,7 @@ impl CompilerDb {
         graph: &ModuleGraph,
         entry: &str,
     ) -> Result<Arc<ResolvedProgram>, QueryError> {
-        let mut sources = Vec::with_capacity(graph.nodes().len());
-        for node in graph.nodes() {
-            let (key, _, _) = self.source(node.file)?;
-            sources.push(key);
-        }
-        let key = WorkspaceResolveKey {
-            graph: graph_key.clone(),
-            entry: entry.to_owned(),
-            sources: sources.into_boxed_slice(),
-        };
+        let key = self.workspace_resolve_key(graph_key, graph, entry)?;
         if let Some(cached) = self.resolved_programs.get(&key).cloned() {
             return cached.map_err(|errors| QueryError::Resolution { errors });
         }
@@ -794,6 +941,55 @@ impl CompilerDb {
         };
         self.resolved_programs.insert(key, result.clone());
         result.map_err(|errors| QueryError::Resolution { errors })
+    }
+
+    fn workspace_resolve_key(
+        &mut self,
+        graph_key: &ModuleGraphKey,
+        graph: &ModuleGraph,
+        entry: &str,
+    ) -> Result<WorkspaceResolveKey, QueryError> {
+        let mut sources = Vec::with_capacity(graph.nodes().len());
+        for node in graph.nodes() {
+            let (key, _, _) = self.source(node.file)?;
+            sources.push(key);
+        }
+        Ok(WorkspaceResolveKey {
+            graph: graph_key.clone(),
+            entry: entry.to_owned(),
+            sources: sources.into_boxed_slice(),
+        })
+    }
+
+    fn checked_workspace(
+        &mut self,
+        graph_key: &ModuleGraphKey,
+        graph: &ModuleGraph,
+        entry: &str,
+    ) -> Result<Arc<CheckedProgram>, QueryError> {
+        let key = self.workspace_resolve_key(graph_key, graph, entry)?;
+        if let Some(cached) = self.checked_programs.get(&key).cloned() {
+            return cached.map_err(type_effect_failure);
+        }
+        let resolved = self.resolved_workspace(graph_key, graph, entry)?;
+        let typed = match ling_types::check((*resolved).clone()) {
+            Ok(typed) => typed,
+            Err(errors) => {
+                let failure = TypeEffectFailure::Type(errors.into_boxed_slice());
+                self.checked_programs.insert(key, Err(failure.clone()));
+                return Err(type_effect_failure(failure));
+            }
+        };
+        let checked = match ling_effects::check(typed) {
+            Ok(checked) => Arc::new(checked),
+            Err(errors) => {
+                let failure = TypeEffectFailure::Effect(errors.into_boxed_slice());
+                self.checked_programs.insert(key, Err(failure.clone()));
+                return Err(type_effect_failure(failure));
+            }
+        };
+        self.checked_programs.insert(key, Ok(checked.clone()));
+        Ok(checked)
     }
 
     fn module_interface_keys(
@@ -1046,6 +1242,103 @@ fn project_type_effect(checked: &CheckedProgram, name: &str) -> Option<TypeEffec
         definitions: definitions.into_boxed_slice(),
         capabilities,
     })
+}
+
+fn project_semantic_fragment(
+    snapshot: &ProgramSnapshot,
+    name: &str,
+) -> Option<(SemanticModuleFragment, String)> {
+    let graph = snapshot.graph();
+    let module = graph.modules.iter().find(|module| module.name == name)?;
+    let mut requires = module.requires.clone();
+    requires.sort();
+    requires.dedup();
+    let mut imports = module
+        .imports
+        .iter()
+        .map(|import| {
+            let mut value = String::new();
+            push_key_part(&mut value, &import.alias);
+            push_key_part(&mut value, &import.module);
+            value
+        })
+        .collect::<Vec<_>>();
+    imports.sort();
+    imports.dedup();
+
+    let mut definitions = graph
+        .definitions
+        .iter()
+        .filter(|definition| definition.module == name)
+        .map(|definition| SemanticDefinitionFragment {
+            name: definition.name.clone(),
+            definition_id: definition.definition_id.clone(),
+            body_id: definition.body_id.clone(),
+            type_name: definition.type_name.clone(),
+            effects: definition.effects.clone().into_boxed_slice(),
+        })
+        .collect::<Vec<_>>();
+    definitions.sort_by(|left, right| {
+        left.name
+            .cmp(&right.name)
+            .then_with(|| left.definition_id.cmp(&right.definition_id))
+    });
+    let mut node_ids = graph
+        .nodes
+        .iter()
+        .filter(|node| node.module == name)
+        .map(|node| node.node_id.clone())
+        .collect::<Vec<_>>();
+    node_ids.sort();
+    node_ids.dedup();
+    let mut references = graph
+        .references
+        .iter()
+        .filter(|reference| reference.module == name)
+        .map(|reference| {
+            let mut value = String::new();
+            push_key_part(&mut value, &reference.source_kind);
+            push_key_part(&mut value, &reference.reference.to_string());
+            push_key_part(&mut value, &reference.target_kind);
+            push_key_part(&mut value, &reference.target);
+            value
+        })
+        .collect::<Vec<_>>();
+    references.sort();
+    references.dedup();
+
+    let fragment = SemanticModuleFragment {
+        module: name.to_owned(),
+        requires: requires.into_boxed_slice(),
+        imports: imports.clone().into_boxed_slice(),
+        definitions: definitions.into_boxed_slice(),
+        node_ids: node_ids.into_boxed_slice(),
+        references: references.clone().into_boxed_slice(),
+    };
+    let mut key = String::new();
+    push_key_part(&mut key, &fragment.module);
+    for require in &fragment.requires {
+        push_key_part(&mut key, require);
+    }
+    for import in imports {
+        push_key_part(&mut key, &import);
+    }
+    for definition in &fragment.definitions {
+        push_key_part(&mut key, &definition.name);
+        push_key_part(&mut key, &definition.definition_id);
+        push_key_part(&mut key, &definition.body_id);
+        push_key_part(&mut key, &definition.type_name);
+        for effect in &definition.effects {
+            push_key_part(&mut key, effect);
+        }
+    }
+    for node_id in &fragment.node_ids {
+        push_key_part(&mut key, node_id);
+    }
+    for reference in references {
+        push_key_part(&mut key, &reference);
+    }
+    Some((fragment, key))
 }
 
 fn definition_interface(definition: &ling_hir::Definition) -> String {
@@ -1606,5 +1899,82 @@ mod tests {
             changed.definition("main").unwrap().type_display(),
             "Unit -> Text"
         );
+    }
+
+    #[test]
+    fn semantic_queries_publish_canonical_snapshots_and_identity_fragments() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "src/Main.ling",
+                b"module Main\n\nlet callee value = value + 1\nlet caller value = callee value\n"
+                    .to_vec(),
+            )
+            .unwrap(),
+        );
+        let first_snapshot = db.semantic_snapshot(main).unwrap();
+        assert!(!first_snapshot.program_id().to_string().is_empty());
+        assert_eq!(
+            ling_semantic::read_json(first_snapshot.json()).unwrap(),
+            *first_snapshot.graph()
+        );
+        assert!(Arc::ptr_eq(
+            &first_snapshot,
+            &db.semantic_snapshot(main).unwrap()
+        ));
+        let first_fragment = db.semantic_fragment(main).unwrap();
+        assert_eq!(first_fragment.module(), "Main");
+        assert_eq!(first_fragment.definitions().len(), 2);
+        assert!(first_fragment.definition("callee").is_some());
+        assert!(Arc::ptr_eq(
+            &first_fragment,
+            &db.semantic_fragment(main).unwrap()
+        ));
+
+        db.set_disk_snapshot(
+            "src/Main.ling",
+            b"module Main\n\n// presentation-only\nlet callee value =\n    value + 1\nlet caller value = callee value\n"
+                .to_vec(),
+        )
+        .unwrap();
+        let comment_snapshot = db.semantic_snapshot(main).unwrap();
+        assert_eq!(first_snapshot.program_id(), comment_snapshot.program_id());
+        let comment_fragment = db.semantic_fragment(main).unwrap();
+        assert!(!Arc::ptr_eq(&first_fragment, &comment_fragment));
+        assert_eq!(
+            first_fragment.definition("callee").unwrap().body_id(),
+            comment_fragment.definition("callee").unwrap().body_id()
+        );
+    }
+
+    #[test]
+    fn semantic_fragments_reuse_dependents_when_an_imported_body_changes() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "Main.ling",
+                b"module Main\n\nimport Lib\n\nlet main () = Lib.answer\n".to_vec(),
+            )
+            .unwrap(),
+        );
+        file(
+            db.set_disk_snapshot("Lib.ling", b"module Lib\n\nlet answer: Int = 42\n".to_vec())
+                .unwrap(),
+        );
+        let first_snapshot = db.semantic_snapshot(main).unwrap();
+        let first_fragment = db.semantic_fragment(main).unwrap();
+        let first_body = first_fragment.definition("main").unwrap().body_id();
+
+        db.set_disk_snapshot("Lib.ling", b"module Lib\n\nlet answer: Int = 7\n".to_vec())
+            .unwrap();
+        let changed_snapshot = db.semantic_snapshot(main).unwrap();
+        let changed_fragment = db.semantic_fragment(main).unwrap();
+        assert!(!Arc::ptr_eq(&first_snapshot, &changed_snapshot));
+        assert!(Arc::ptr_eq(&first_fragment, &changed_fragment));
+        assert_eq!(
+            first_body,
+            changed_fragment.definition("main").unwrap().body_id()
+        );
+        assert_ne!(first_snapshot.program_id(), changed_snapshot.program_id());
     }
 }
