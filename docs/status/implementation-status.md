@@ -162,6 +162,7 @@
 | `NODE-5304` | Virtual-Time Reference Runtime | `G5` | `M` | `BlockedSpec` | `NODE-5303` | `` |
 | `NODE-5305` | Native Node Runtime | `G5` | `L` | `BlockedSpec` | `NODE-5304` | `` |
 | `NODE-5306` | Node and Actor Boundary | `G5` | `M` | `BlockedSpec` | `NODE-5305` | `` |
+| `NODE-5307` | Node Conformance | `G5` | `M` | `BlockedSpec` | `NODE-5306` | `` |
 | `OWN-3201` | Place and Move analysis | `G3` | `L` | `BlockedSpec` | `MEM-3104` | `` |
 | `OWN-3202` | Borrow exclusivity | `G3` | `L` | `BlockedSpec` | `OWN-3201` | `` |
 | `OWN-3203` | Region inference | `G3` | `L` | `BlockedSpec` | `OWN-3202` | `` |
