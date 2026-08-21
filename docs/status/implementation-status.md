@@ -66,6 +66,7 @@
 | `INC-1410` | Incremental performance baseline | `G1` | `M` | `Done` | `INC-1409` | `bcd58bb53a3f9a71613ba287d5a733b7aecd467f` |
 | `LSP-2101` | LSP lifecycle skeleton | `G1` | `S` | `BlockedSpec` | `CLI-1701` | `` |
 | `LSP-2102` | LSP position-encoding negotiation | `G1` | `S` | `BlockedSpec` | `LSP-2101` | `` |
+| `LSP-2103` | LSP open-document overlay | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |
 | `PRJ-1102` | Deterministic module discovery | `G1` | `M` | `Done` | `PRJ-1101` | `f76f4953070b9ae555fce24c7dcc2fbf08a36f7a` |
 | `PRJ-1103` | Package-aware imports and visibility | `G1` | `M` | `Done` | `PRJ-1102`, `PRJ-1104` | `8e98d32f54301dee3f198273cfae3146bbf2846b` |
