@@ -1,6 +1,6 @@
 # TRAIT-1304 Implementation Report
 
-Status: **In Progress**
+Status: **Done**
 
 ## Outcome
 
