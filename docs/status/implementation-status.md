@@ -35,6 +35,7 @@
 | `ACT-2304` | Actor turn and reentry rules | `G2` | `L` | `BlockedSpec` | `ACT-2303` | `` |
 | `ACT-2305` | Actor runtime | `G2` | `L` | `BlockedSpec` | `ACT-2304` | `` |
 | `ACT-2306` | Actor properties and stress tests | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
+| `BACK-3501` | Native backend selection spike | `G3` | `M` | `BlockedSpec` | `NIR-3403` | `` |
 | `BASE-0001` | 仓库基线盘点与执行计划落位 | `G0` | `S` | `Done` | — | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
 | `CLI-1702` | CLI output and exit behavior | `G1` | `M` | `BlockedSpec` | `CLI-1701` | `` |
