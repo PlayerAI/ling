@@ -329,7 +329,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CBK-5902` | G5 | Lowering Validator | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:599`, `docs/status/CBK-5902-AUTHORITY-AUDIT.md` |
 | `CBK-5903` | G5 | Critical Runtime/Target Package | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:611`, `docs/status/CBK-5903-AUTHORITY-AUDIT.md` |
 | `STAB-6101` | G6 | 逐项支持矩阵审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:32`, `docs/status/STAB-6101-AUTHORITY-AUDIT.md` |
-| `STAB-6102` | G6 | 删除虚假入口 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:51` |
+| `STAB-6102` | G6 | 删除虚假入口 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:51`, `docs/status/STAB-6102-AUTHORITY-AUDIT.md` |
 | `STAB-6103` | G6 | Feature State 元数据 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:63` |
 | `PROTO-6201` | G6 | 协议注册表 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:86` |
 | `PROTO-6202` | G6 | Reader/Writer 兼容测试 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:109` |

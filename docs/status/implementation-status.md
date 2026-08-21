@@ -223,6 +223,7 @@
 | `SIMD-4302` | Portable SIMD IR | `G4` | `M` | `BlockedSpec` | `SIMD-4301` | `` |
 | `SIMD-4303` | SIMD Differential | `G4` | `M` | `BlockedSpec` | `SIMD-4302` | `` |
 | `STAB-6101` | Support-Matrix Item Audit | `G6` | `L` | `BlockedSpec` | `CBK-5903` | `` |
+| `STAB-6102` | Remove False Entry Points | `G6` | `L` | `BlockedSpec` | `STAB-6101` | `` |
 | `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
