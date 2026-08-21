@@ -240,7 +240,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GC-3301` | G3 | 最小对象模型 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:241`, `docs/status/GC-3301-AUTHORITY-AUDIT.md` |
 | `GC-3302` | G3 | 第一版 Collector | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:256`, `docs/status/GC-3302-AUTHORITY-AUDIT.md` |
 | `GC-3303` | G3 | Managed 与 Native/FFI 边界 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:271`, `docs/status/GC-3303-AUTHORITY-AUDIT.md` |
-| `GC-3304` | G3 | Profile 检查 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:282` |
+| `GC-3304` | G3 | Profile 检查 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:282`, `docs/status/GC-3304-AUTHORITY-AUDIT.md` |
 | `NIR-3401` | G3 | Native IR 设计 | L | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:291` |
 | `NIR-3402` | G3 | Core → Native IR Lowering | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:308` |
 | `NIR-3403` | G3 | IR Verifier | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:324` |
