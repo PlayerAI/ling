@@ -62,6 +62,7 @@
 | `CTR-5404` | Verification Condition Generation | `G5` | `L` | `BlockedSpec` | `CTR-5403` | `` |
 | `CTR-5405` | Solver/Proof Checker Adapter | `G5` | `L` | `BlockedSpec` | `CTR-5404` | `` |
 | `CTR-5406` | Contract-aware optimizer rules | `G5` | `M` | `BlockedSpec` | `CTR-5405` | `` |
+| `CTR-5407` | Contract LSP/Zed | `G5` | `L` | `BlockedSpec` | `CTR-5406`, `LSP-2205` | `` |
 | `DAP-3601` | Debugger stdio adapter | `G3+` | `L` | `BlockedSpec` | `DIFF-3702` | `` |
 | `DAP-3602` | Zed debugger registration | `G3+` | `M` | `BlockedSpec` | `DAP-3601` | `` |
 | `DAP-3603` | Staged debugger capabilities | `G3+` | `L` | `BlockedSpec` | `DAP-3602` | `` |
