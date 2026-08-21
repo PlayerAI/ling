@@ -2371,7 +2371,7 @@ notes = [
   "RFC-0015 is Accepted and is the sole new semantic/protocol authority used by this implementation; no unresolved semantic conflict was resolved through code.",
   "PROTO-BYTECODE and the support matrix now identify ling.bytecode/1.1 while retaining the Experimental status and the unchanged 1.0 golden artifact.",
   "No diagnostic allocation, JSON schema, Semantic ID, canonical semantic bytes, CLI contract, ABI/FFI layout, evaluator behavior, or Unicode 17.0.0 table changed.",
-  "VM-1206 is complete under Accepted RFC-0016; VM-1207 remains gated on mutable-place/borrow authority, while VM-1208 through VM-1210 retain the broader Effect/Fault, differential, fuzz, cancellation, and resource-model scope.",
+  "VM-1206 is complete under Accepted RFC-0016; VM-1207 is complete under Accepted RFC-0017, while VM-1208 through VM-1210 retain the broader Effect/Fault, differential, fuzz, cancellation, and resource-model scope.",
 ]
 
 [[task]]
@@ -2429,5 +2429,57 @@ notes = [
   "RFC-0016 is Accepted and is the sole new aggregate/match semantic and public-protocol authority used by this implementation.",
   "Diagnostic allocation and JSON framing are unchanged; v1.2 adds no new public diagnostic code.",
   "Unicode remains 17.0.0; source maps retain original UTF-8 byte spans and deterministic logical paths.",
-  "VM-1207 through VM-1210 remain deferred as documented in the implementation report.",
+  "VM-1208 through VM-1210 remain deferred as documented in the implementation report.",
+]
+
+[[task]]
+id = "VM-1207"
+title = "Mutable places and basic borrow-boundary lowering"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["VM-1204", "VM-1205", "VM-1206"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0016.md",
+  "docs/RFC-0017.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "crates/ling-bytecode/src/lower/v1_1.rs",
+  "crates/ling-bytecode/tests/lowering.rs",
+  "crates/ling-vm/tests/execution.rs",
+  "docs/RFC-0017.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/gap-register.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/VM-1207-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0017 defines the v1.2 mutable-place lowering boundary without a new opcode, wire field, protocol revision, or runtime cell.",
+  "Root assignment replaces the current SSA value, returns Unit, evaluates the right-hand side once, and preserves source order.",
+  "Nested mutable record-field assignment rebuilds independent values through existing GetField and UpdateRecord instructions.",
+  "if, checked match, and short-circuit joins carry every visible mutable root through typed CFG block parameters; mutable captures, parameters, imports, globals, and immutable fields remain rejected by the checked pipeline.",
+  "cargo test -p ling-bytecode --locked --offline: passed (21 tests).",
+  "cargo test -p ling-vm --locked --offline: passed (18 execution tests, including checked-interpreter differential coverage).",
+  "cargo clippy -p ling-bytecode -p ling-vm --all-targets --locked --offline, cargo fmt --all, git diff --check, and cargo xtask governance check-all: passed.",
+]
+verified_against_commit = "600e4d5d213f2c055237ab9645a21edca1d0f985"
+completion_commit = "600e4d5d213f2c055237ab9645a21edca1d0f985"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0017 is Accepted and is the sole new mutable-place lowering authority used by this implementation; no unresolved semantic conflict was resolved through code.",
+  "The bytecode wire model, diagnostic registry, JSON schemas, Semantic IDs, canonical semantic bytes, CLI contract, ABI/FFI layout, and Unicode 17.0.0 tables are unchanged.",
+  "Local State<T> remains visible in checked semantic/effect artifacts; the v1.2 runtime represents it with SSA updates rather than a host capability tag.",
+  "VM-1208 through VM-1210 remain deferred pending their own accepted authorities and evidence packages.",
 ]
