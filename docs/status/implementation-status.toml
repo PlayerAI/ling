@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 103 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, and LSP-2504 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 104 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, and EFF-2101 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -5085,6 +5085,50 @@ completed = ""
 notes = [
   "LSP-2504 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2201, LSP-2501/LSP-2502/LSP-2503, and the missing LSP quota/diagnostic contract; existing project/bytecode limits are domain-specific.",
   "No LSP resource accounting, request/queue quota, result-size policy, bilingual tool diagnostic, capability/configuration version, or protocol inventory entry exists.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "EFF-2101"
+title = "Effect core model freeze"
+state = "BlockedSpec"
+release = "G2"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = []
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/EFF-2101-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing Effect identity/order, open/closed rows, row variables, operation signatures, handler/recovery/resume semantics, Capability separation, Semantic Graph schema, diagnostics, and migration contracts.",
+  "The audit distinguishes the Accepted Seed EffectRow/State/Capability boundary from the missing v0.2 model and records RFC-C201 as an unregistered placeholder plus candidate RFC-0006 gaps.",
+  "The audit covers pure, Clock, handler discharge, polymorphic map, missing Capability, unhandled profile effects, nested/resumed handlers, State masking, Task/ActorSend, Unicode/CRLF/BOM, canonical ordering, and deterministic graph/differential fixtures.",
+  "No open-row or handler model, new Effect/Capability label, EffectId, schema field, diagnostic allocation, Semantic ID rule, or placeholder G2 crate/API is added while the authority is absent.",
+  "The future implementation must extend the Seed checker only from an Accepted model, preserve canonical rows, keep Capability authorization separate, and provide checked Typed Core plus differential evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "EFF-2101 is BlockedSpec by GAP-EFFECT-STATE-MASKING-001, GAP-EFFECT-HANDLER-001, RFC-C201 being absent/unregistered, and the G2 prerequisite v0.1 exit; Task/Actor effect labels depend on separate unaccepted authorities.",
+  "ling-effects currently implements only Seed Console.Write and State<T> rows with Capability closure and deterministic set behavior; no open rows, handlers, resumption, or v0.2 schema exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
