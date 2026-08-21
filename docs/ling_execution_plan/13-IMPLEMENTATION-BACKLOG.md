@@ -257,7 +257,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DIFF-3701` | G3 | 三方 Harness | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:492`, `docs/status/DIFF-3701-AUTHORITY-AUDIT.md` |
 | `DIFF-3702` | G3 | 已允许差异登记表 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:512`, `docs/status/DIFF-3702-AUTHORITY-AUDIT.md` |
 | `DAP-3601` | G3+ | `zero dap --stdio` | — | BlockedSpec | `05-ZED-EXTENSION.md:526`, `docs/status/DAP-3601-AUTHORITY-AUDIT.md` |
-| `DAP-3602` | G3+ | Zed debugger registration | — | Blocked by v0.2/G3 RFC | `05-ZED-EXTENSION.md:530` |
+| `DAP-3602` | G3+ | Zed debugger registration | — | BlockedSpec | `05-ZED-EXTENSION.md:530`, `docs/status/DAP-3602-AUTHORITY-AUDIT.md` |
 | `DAP-3603` | G3+ | 能力阶段 | — | Blocked by v0.2/G3 RFC | `05-ZED-EXTENSION.md:538` |
 | `KCHK-4101` | G4 | Kernel 允许能力矩阵 | M | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:69` |
 | `KCHK-4102` | G4 | Kernel Effect 与 Capability 检查 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:90` |
