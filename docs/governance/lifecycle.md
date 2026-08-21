@@ -18,7 +18,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `RFC-0001` | RFC | `Draft` | `Draft` | no | yes | — | [RFC-0001](../RFC-0001.md) |
 | `RFC-0002` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [RFC-0002](../RFC-0002.md) |
-| `RFC-0005` | RFC | `Draft` | `Open` → `Draft` | no | no | — | [RFC-0005](../RFC-0005.md) |
+| `RFC-0005` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [RFC-0005](../RFC-0005.md) |
 | `RFC-0014` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [RFC-0014](../RFC-0014.md) |
 | `RFC-0015` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [RFC-0015](../RFC-0015.md) |
 | `RFC-0016` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [RFC-0016](../RFC-0016.md) |

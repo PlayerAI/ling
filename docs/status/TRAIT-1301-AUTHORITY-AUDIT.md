@@ -1,14 +1,13 @@
 # TRAIT-1301 Authority Audit
 
-Status: **BlockedSpec**
+Status: **Accepted design / implementation gate closed**
 
 ## Outcome
 
-TRAIT-1301 is the next G1 work item in the execution plan, but it is a semantic
-design gate rather than an implementation file. No implementation is authorized
-until an accepted Trait RFC fixes the language contract. A new `docs/RFC-0005.md`
-now records a deliberately restricted Draft proposal; it is not implementation
-authority. The open `GAP-TRAIT-COHERENCE-001` remains unresolved.
+TRAIT-1301 is the G1 semantic design gate rather than a compiler implementation
+file. RFC-0005 is now Accepted and fixes the restricted first-slice Trait
+contract. The design milestone is complete; TRAIT-1302 is the next executable
+implementation target.
 
 Implementing parser, resolver, solver, or lowering behavior now would make Draft
 or illustrative text observable language semantics and would block compatible
@@ -26,9 +25,10 @@ cross-package evolution.
   decide declaration/impl syntax, nominal versus structural semantics,
   constraints, coherence, orphan and overlap rules, inference boundaries, public
   API presentation, lowering, and Semantic ID treatment.
-- `docs/RFC-0001.md` §22 lists RFC-0005 as a future RFC, and RFC-0001 is Draft;
-  it is not authority to implement Trait semantics. `docs/RFC-0005.md` is now a
-  Draft proposal with `stable_basis = false`.
+- `docs/RFC-0001.md` §22 originally listed RFC-0005 as a future RFC, and
+  RFC-0001 remains Draft; it is not authority to implement Trait semantics.
+  `docs/RFC-0005.md` is now the dedicated Accepted authority with
+  `stable_basis = true`.
 - `docs/governance/gap-register.toml` records `GAP-TRAIT-COHERENCE-001` as an
   open P0 gap blocking TRAIT-1301 through TRAIT-1307.
 
@@ -53,15 +53,15 @@ The following externally observable decisions are still open:
   lowering implementation exists in `crates/`, and no Trait conformance corpus
   is present under `tests/`.
 - No diagnostic allocation, protocol schema, Semantic ID rule, source-span
-  behavior, or Unicode table is changed by this audit.
-- No runtime or conformance test is run for Trait behavior because no accepted
-  behavior exists to test. Governance/status checks cover the bookkeeping change.
+  behavior, or Unicode table is changed by this design milestone.
+- No compiler Trait behavior is claimed yet. Governance/status checks cover the
+  authority transition; implementation evidence remains required by RFC-0005.
 
 ## Required next action
 
-Review and accept RFC-0005 after cross-package positive, negative,
-termination, determinism, and migration evidence. Only then may TRAIT-1302
-through TRAIT-1307 add implementation files; TRAIT-1301 remains BlockedSpec.
+Implement TRAIT-1302 through TRAIT-1307 against RFC-0005, adding the required
+cross-package positive, negative, termination, determinism, and migration
+evidence. TRAIT-1301 itself is complete as a design milestone.
 
 Intentionally deferred: all Trait syntax, AST/HIR, constraint collection,
 coherence/orphan checking, solving, Checked Core lowering, IDE support, and

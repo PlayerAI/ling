@@ -7,9 +7,9 @@
 ## Summary
 
 - Total gaps: 28
-- Open: 23
+- Open: 22
 - Proposed: 0
-- Accepted: 5
+- Accepted: 6
 - Rejected: 0
 - Superseded: 0
 
@@ -22,7 +22,7 @@
 | `G1-INCREMENTAL` — Incremental cache keys, Semantic Hash upgrades, and invalidation | `v0.1` | `ROADMAP-1.0` | `GAP-INCREMENTAL-CACHE-001`, `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `DEC-0012`, `DEC-0019`, `DEC-0021`, `DEC-0022` |
 | `G1-LSP-TRANSACTION` — LSP and Semantic Transaction Stable versus Experimental fields | `v0.1` | `ROADMAP-1.0` | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`, `GAP-LSP-TRANSACTION-PROTOCOL-001` | `DEC-0002`, `DEC-0012` |
 | `G1-PACKAGE` — Package identity, namespace, visibility, dependency, and lock rules | `v0.1` | `ROADMAP-1.0` | `GAP-PACKAGE-NAMESPACE-001`, `GAP-PACKAGE-PROTOCOL-001`, `GAP-PROJECT-CLI-INTERFACE-001` | `DEC-0007`, `RFC-0002` |
-| `G1-TRAIT` — Trait declarations, solving, coherence, orphan rules, and lowering | `v0.1` | `ROADMAP-1.0` | `GAP-TRAIT-COHERENCE-001` | — |
+| `G1-TRAIT` — Trait declarations, solving, coherence, orphan rules, and lowering | `v0.1` | `ROADMAP-1.0` | `GAP-TRAIT-COHERENCE-001` | `RFC-0005` |
 
 ## Gaps by earliest blocked release
 
@@ -38,12 +38,12 @@
 | `GAP-PROJECT-CLI-INTERFACE-001` | `P0` | `Open` | Project workspace selection and build/test CLI contract | `PRJ-1107` | — |
 | `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `P0` | `Open` | Semantic Hash algorithm, identity upgrade, and invalidation lifecycle | `INC-1406`, `INC-1409`, `GOV-0106` | `RFC-0004` |
 | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | `P0` | `Open` | Semantic Graph and Semantic Transaction protocol lifecycle | `GOV-0106`, `INC-1406`, `IDE-2306`, `IDE-2309`, `FMT-1507` | `RFC-0004` |
-| `GAP-TRAIT-COHERENCE-001` | `P0` | `Open` | Base Trait coherence, orphan rules, solving, and lowering | `TRAIT-1301`, `TRAIT-1302`, `TRAIT-1303`, `TRAIT-1304`, `TRAIT-1305`, `TRAIT-1306`, `TRAIT-1307` | `RFC-0005` |
 | `GAP-BYTECODE-SEMANTICS-001` | `P0` | `Accepted` | Versioned bytecode and verifier observable semantics | `VM-1210` | `RFC-0014`, `RFC-0015`, `RFC-0016`, `RFC-0017`, `RFC-0018`, `RFC-0019`, `RFC-0020` |
 | `GAP-GOV-RFC-STATUS-001` | `P0` | `Accepted` | RFC-0001 lifecycle status mismatch | `GOV-0103`, `PRJ-1101`, `VM-1201`, `TRAIT-1301`, `INC-1401`, `LSP-2101` | `RFC-0001` |
 | `GAP-PACKAGE-NAMESPACE-001` | `P0` | `Accepted` | Package namespace and domain ownership | `PRJ-1101`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
 | `GAP-PACKAGE-PROTOCOL-001` | `P0` | `Accepted` | Project manifest, dependency graph, visibility, and lock protocol | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
 | `GAP-SEED-BOOLEAN-OPERATORS-001` | `P0` | `Accepted` | Seed boolean operator syntax, precedence, and short-circuit boundary | `TS-3105` | `RFC-0001` |
+| `GAP-TRAIT-COHERENCE-001` | `P0` | `Accepted` | Base Trait coherence, orphan rules, solving, and lowering | `TRAIT-1301`, `TRAIT-1302`, `TRAIT-1303`, `TRAIT-1304`, `TRAIT-1305`, `TRAIT-1306`, `TRAIT-1307` | `RFC-0005` |
 | `GAP-UNICODE-ALIAS-SYNTAX-001` | `P1` | `Open` | Unicode Alias syntax and localized display rules | `TS-3104`, `IDE-2306`, `FMT-1501` | `RFC-0003` |
 
 ### v0.2

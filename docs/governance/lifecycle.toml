@@ -630,13 +630,13 @@ superseded_by = ""
 [[record]]
 id = "RFC-0005"
 kind = "RFC"
-status = "Draft"
+status = "Accepted"
 path = "docs/RFC-0005.md"
-history = ["Open", "Draft"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-21"
-proposed = ""
-decided = ""
-stable_basis = false
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Cover positive declarations, implementations, generic obligations, and explicit dictionary witnesses in checked core.",

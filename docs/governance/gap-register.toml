@@ -23,7 +23,7 @@ title = "Trait declarations, solving, coherence, orphan rules, and lowering"
 release = "v0.1"
 authority = ["ROADMAP-1.0"]
 gaps = ["GAP-TRAIT-COHERENCE-001"]
-decisions = []
+decisions = ["RFC-0005"]
 
 [[gate]]
 id = "G1-INCREMENTAL"
@@ -191,12 +191,12 @@ observed_markers = []
 [[gap]]
 id = "GAP-TRAIT-COHERENCE-001"
 title = "Base Trait coherence, orphan rules, solving, and lowering"
-status = "Open"
+status = "Accepted"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["TRAIT-1301", "TRAIT-1302", "TRAIT-1303", "TRAIT-1304", "TRAIT-1305", "TRAIT-1306", "TRAIT-1307"]
 observable_behavior = "Programs cannot predict which Trait implementations are legal or selected across packages, how ambiguity terminates, or how a selected instance reaches Checked Core."
-authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0005"]
 candidate_rfcs = ["RFC-0005"]
 source_items = ["SEMANTICS-31.3", "RFC-0001-22:RFC-0005", "ROADMAP-5.2:trait", "RFC-0005"]
 options = [
@@ -206,8 +206,8 @@ options = [
 irreversible_consequences = ["Coherence and orphan rules determine cross-package compatibility and whether later implementations are breaking changes."]
 required_evidence = ["positive", "negative", "migration", "cross-package", "termination", "determinism"]
 owner_role = "type-system-design"
-next_action = "Review and accept RFC-0005 with a cross-package acceptance corpus before TRAIT-1302."
-resolution = []
+next_action = "Implement TRAIT-1302 against Accepted RFC-0005 and add the required cross-package conformance corpus."
+resolution = ["RFC-0005"]
 superseded_by = ""
 observed_markers = []
 

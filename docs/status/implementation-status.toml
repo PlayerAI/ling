@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 60 tasks (57 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, and TRAIT-1301 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 60 tasks (58 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3597,12 +3597,12 @@ notes = [
 [[task]]
 id = "TRAIT-1301"
 title = "Trait RFC closure"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
 branch = "main"
-depends_on = ["PRJ-1107"]
+depends_on = []
 spec = [
   "AGENTS.md",
   "docs/ROADMAP-1.0.md",
@@ -3616,21 +3616,24 @@ spec = [
 ]
 artifacts = [
   "docs/status/TRAIT-1301-AUTHORITY-AUDIT.md",
+  "docs/RFC-0005.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
   "docs/governance/gap-register.toml",
   "docs/governance/gap-register.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "An accepted RFC-0005 fixes Trait declaration/impl syntax, coherence, orphan and overlap rules, inference boundaries, public constraints, lowering, and Semantic ID treatment.",
-  "Cross-package positive, negative, ambiguity-termination, determinism, and migration fixtures are accepted before any Trait implementation changes language behavior.",
-  "No Trait parser, solver, Checked Core lowering, diagnostic allocation, protocol schema, or placeholder API is introduced while GAP-TRAIT-COHERENCE-001 remains open.",
+  "Accepted RFC-0005 fixes the restricted Trait declaration/impl syntax, coherence, orphan and overlap rules, inference boundaries, public constraints, lowering witness, and Semantic ID treatment.",
+  "The RFC lifecycle and authority registries record Open -> Draft -> Proposed -> Accepted with stable_basis true, and GAP-TRAIT-COHERENCE-001 resolves to RFC-0005.",
+  "The design milestone adds no Trait implementation, diagnostic allocation, protocol schema, or placeholder API; TRAIT-1302 through TRAIT-1307 remain the implementation/evidence work.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
-completed = ""
+integration_state = "committed"
+completed = "2026-08-21"
 notes = [
-  "TRAIT-1301 is blocked by GAP-TRAIT-COHERENCE-001; SEMANTICS.md explicitly excludes Trait from v0.0.1 and RFC-0001 is Draft.",
-  "RFC-0005 is now a non-authoritative Draft proposal; no Ling Trait AST, solver, lowering, or conformance corpus is claimed by this milestone.",
+  "RFC-0005 is now Accepted dedicated authority; SEMANTICS.md still excludes Trait from v0.0.1 and RFC-0001 remains Draft.",
+  "No Ling Trait AST, solver, lowering, or conformance corpus is claimed by this design milestone; TRAIT-1302 is the next Ready implementation slice.",
 ]
