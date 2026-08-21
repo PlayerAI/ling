@@ -124,7 +124,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FMT-1502` | G1/Editor | Format IR | M | Done | DEC-0023；见 `crates/ling-format/src/format_ir.rs` 的 compiler-CST 投影、原始/词法双 span、精确 token spelling、无效源码保留与实施报告；不含渲染器、CLI/LSP 或第二 parser |
 | `FMT-1503` | G1/Editor | 核心语法格式化 | M | Done | DEC-0002、DEC-0006、DEC-0023；见 `crates/ling-format/src/author.rs` 的 compiler-IR 核心格式化、四空格布局、LF/spacing、编译器重解析回退、Seed 语法覆盖与实施报告；incomplete recovery、CLI/LSP deferred |
 | `FMT-1504` | G1/Editor | Comment attachment | M | Done | DEC-0002、DEC-0023；见 `crates/ling-format/src/comments.rs` 的 compiler-token/CST attachment、文档/行尾/中文/嵌套块注释覆盖、格式化保留守卫与实施报告；incomplete recovery、property evidence、CLI/LSP/Audit separation deferred |
-| `FMT-1505` | G1/Editor | 不完整源码 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:412` |
+| `FMT-1505` | G1/Editor | 不完整源码 | M | Done | DEC-0002、DEC-0023；见 `crates/ling-format/src/author.rs` 的 `FormatDisposition`/`FormatResult` 保守回退、完整前缀不部分改写、BOM/CRLF 字节保留测试与实施报告；完整节点局部恢复仍需后续 Accepted 决策，性质测试、CLI/LSP/Audit separation deferred |
 | `FMT-1506` | G1/Editor | 性质测试 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:416` |
 | `FMT-1507` | G1/Editor | CLI/LSP 接入 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:425` |
 | `FMT-1508` | G1/Editor | Audit 分离 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:433` |

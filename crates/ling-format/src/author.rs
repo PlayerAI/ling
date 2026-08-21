@@ -3,13 +3,55 @@
 //! The renderer consumes the compiler token stream projected by `format_ir`.
 //! It does not inspect text with a second parser, infer semantic structure, or
 //! move comments between CST regions.  Comment attachment metadata is consumed
-//! as a preservation guard; incomplete-source recovery remains a separate
-//! execution-plan task.
+//! as a preservation guard.  Incomplete-source recovery is deliberately
+//! conservative: invalid input is returned unchanged with an explicit
+//! disposition rather than receiving a partial edit.
 
 use ling_source::SourceFile;
 use ling_syntax::{TokenKind, parse};
 
 use crate::FormatDocument;
+
+/// The safe publication decision made for one formatting request.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FormatDisposition {
+    /// The complete source passed comment preservation and compiler
+    /// revalidation, so the formatted candidate is published.
+    Formatted,
+    /// The source was incomplete or invalid; the exact original bytes were
+    /// returned and no partial region was rewritten.
+    OriginalInvalidSource,
+    /// A valid-source candidate failed a preservation or compiler gate; the
+    /// exact original bytes were returned instead of publishing partial output.
+    OriginalRejectedCandidate,
+}
+
+/// Formatting text together with its conservative publication disposition.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct FormatResult {
+    text: String,
+    disposition: FormatDisposition,
+}
+
+impl FormatResult {
+    /// Returns the formatted or preserved source text.
+    #[must_use]
+    pub fn text(&self) -> &str {
+        &self.text
+    }
+
+    /// Consumes the result and returns its source text.
+    #[must_use]
+    pub fn into_text(self) -> String {
+        self.text
+    }
+
+    /// Returns the safe publication decision.
+    #[must_use]
+    pub const fn disposition(&self) -> FormatDisposition {
+        self.disposition
+    }
+}
 
 /// Formats valid Author Source core syntax using the compiler-owned Format IR.
 ///
@@ -24,16 +66,37 @@ use crate::FormatDocument;
 /// is returned and no partial rewrite is published.
 #[must_use]
 pub fn format_core(document: &FormatDocument) -> String {
+    format_core_with_disposition(document).into_text()
+}
+
+/// Formats valid Author Source or preserves incomplete/invalid source exactly.
+///
+/// The invalid-source branch is intentionally a no-op policy for this slice.
+/// It provides a stable recovery boundary while FMT-1505 has no authority to
+/// infer missing syntax or choose edits around error regions.  A caller can use
+/// [`FormatResult::disposition`] to distinguish that safe fallback from a
+/// published formatting result.
+#[must_use]
+pub fn format_core_with_disposition(document: &FormatDocument) -> FormatResult {
     if !document.is_valid() {
-        return document.original_text().to_owned();
+        return FormatResult {
+            text: document.original_text().to_owned(),
+            disposition: FormatDisposition::OriginalInvalidSource,
+        };
     }
     let candidate = Renderer::new(document.had_bom()).render(document);
     if comments_are_preserved(document, &candidate)
         && parses_valid_source(document.source_id(), &candidate)
     {
-        candidate
+        FormatResult {
+            text: candidate,
+            disposition: FormatDisposition::Formatted,
+        }
     } else {
-        document.original_text().to_owned()
+        FormatResult {
+            text: document.original_text().to_owned(),
+            disposition: FormatDisposition::OriginalRejectedCandidate,
+        }
     }
 }
 
@@ -374,6 +437,19 @@ mod tests {
     }
 
     #[test]
+    fn reports_a_published_disposition_for_a_valid_source() {
+        let source =
+            SourceFile::from_bytes(SourceId::new(84), "author.ling", b"let value=1\n".to_vec())
+                .expect("valid test source");
+        let parsed = parse(&source);
+        assert!(parsed.is_valid(), "{:#?}", parsed.parse_errors());
+        let document = build_format_ir(&source, &parsed).expect("Format IR builds");
+        let result = format_core_with_disposition(&document);
+        assert_eq!(result.disposition(), FormatDisposition::Formatted);
+        assert_eq!(result.text(), "let value = 1\n");
+    }
+
+    #[test]
     fn formats_records_variants_matches_and_pipelines() {
         let formatted = format(concat!(
             "type Person={name:Text;mutable hp:Int}\n",
@@ -470,7 +546,32 @@ mod tests {
         let parsed = parse(&source);
         assert!(!parsed.is_valid());
         let document = build_format_ir(&source, &parsed).expect("invalid IR still builds");
-        assert_eq!(format_core(&document), source.original_text());
+        let result = format_core_with_disposition(&document);
+        assert_eq!(
+            result.disposition(),
+            FormatDisposition::OriginalInvalidSource
+        );
+        assert_eq!(result.text(), source.original_text());
+    }
+
+    #[test]
+    fn never_partially_rewrites_a_valid_prefix_before_an_incomplete_region() {
+        let original = concat!("let good=1\r\n", "let broken=\"unterminated\r\n");
+        let source = SourceFile::from_bytes(
+            SourceId::new(85),
+            "author.ling",
+            original.as_bytes().to_vec(),
+        )
+        .expect("valid UTF-8 source");
+        let parsed = parse(&source);
+        assert!(!parsed.is_valid());
+        let document = build_format_ir(&source, &parsed).expect("invalid IR still builds");
+        let result = format_core_with_disposition(&document);
+        assert_eq!(
+            result.disposition(),
+            FormatDisposition::OriginalInvalidSource
+        );
+        assert_eq!(result.text(), original);
     }
 
     #[test]

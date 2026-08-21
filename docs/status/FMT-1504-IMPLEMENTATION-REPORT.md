@@ -85,6 +85,6 @@ formatting and canonical Audit Source rendering.
 
 ## Next target
 
-FMT-1505, incomplete-source recovery, is the next execution-plan target. It must
-preserve this attachment model and publish no partial rewrite for ambiguous
-error regions.
+FMT-1506, formatter property tests, is the next execution-plan target. It must
+retain this attachment model and the FMT-1505 no-partial-rewrite contract while
+checking deterministic valid and invalid corpora.

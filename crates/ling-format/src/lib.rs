@@ -4,7 +4,7 @@ mod author;
 mod comments;
 mod format_ir;
 
-pub use author::format_core;
+pub use author::{FormatDisposition, FormatResult, format_core, format_core_with_disposition};
 pub use comments::{CommentAttachment, CommentKind, CommentPlacement};
 pub use format_ir::{
     FORMAT_IR_SCHEMA, FormatDocument, FormatIrBuildError, FormatIrBuildErrorKind, FormatNode,
