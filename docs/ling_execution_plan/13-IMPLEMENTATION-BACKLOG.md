@@ -109,7 +109,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TRAIT-1306` | G1/Editor | Checked Core 显式化 | — | Done | DEC-0027; `03-G1-V0.1-LIVING.md:300`; `docs/status/TRAIT-1306-IMPLEMENTATION-REPORT.md` |
 | `TRAIT-1307` | G1/Editor | Interpreter/VM lowering | — | BlockedSpec | `GAP-TRAIT-COHERENCE-001`; see `docs/status/TRAIT-1307-AUTHORITY-AUDIT.md` and `03-G1-V0.1-LIVING.md:304` |
 | `TRAIT-1308` | G1/Editor | IDE 支持 | — | BlockedSpec | `03-G1-V0.1-LIVING.md:308`, `docs/status/TRAIT-1308-AUTHORITY-AUDIT.md` |
-| `TRAIT-1309` | G1/Editor | 性能与终止 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:316` |
+| `TRAIT-1309` | G1/Editor | 性能与终止 | — | BlockedSpec | `03-G1-V0.1-LIVING.md:316`, `docs/status/TRAIT-1309-AUTHORITY-AUDIT.md` |
 | `INC-1401` | G1/Editor | Query boundary ADR | M | Done | DEC-0019；见 `docs/decisions/0019-incremental-query-boundary.md` 与实施报告 |
 | `INC-1402` | G1/Editor | VFS 与 revision | M | Done | DEC-0019；见 `crates/ling-source/src/vfs.rs` 的 immutable snapshot、overlay、workspace revision 与 change-dedup 测试及实施报告 |
 | `INC-1403` | G1/Editor | Parse queries | M | Done | DEC-0019；见 `crates/ling-db/src/lib.rs` 的 source_bytes、line_index、tokens、parse、ast 查询、确定性缓存与 clean/incremental 等价测试及实施报告 |

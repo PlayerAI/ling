@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 67 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, and TRAIT-1308 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 68 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, and TRAIT-1309 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3805,6 +3805,47 @@ completed = ""
 notes = [
   "TRAIT-1308 is BlockedSpec by GAP-TRAIT-COHERENCE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; RFC-0005 §5.3 forbids an unverified Trait LSP entry point.",
   "DEC-0027 leaves the witness crate-private and does not define the Semantic Graph, method-slot, diagnostics, or editor projection required by this task.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "TRAIT-1309"
+title = "Trait solver performance and termination"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1308"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0026-trait-solver-v0-boundary.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/TRAIT-1309-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the accepted 64-level/cycle termination boundary and distinguishes it from the missing work-budget, cancellation, and LSP performance contract.",
+  "The audit identifies the absent production HIR obligation graph and defines required deep-chain, diamond, failure, cross-package, deterministic, and differential benchmark evidence.",
+  "No solver limit, wall-clock threshold, benchmark schema, public diagnostic, cancellation API, or Trait protocol claim is added while the authority and integration are absent.",
+  "The future implementation must preserve RFC-0005 termination semantics and keep host timing out of Ling language semantics.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "TRAIT-1309 is BlockedSpec by GAP-TRAIT-COHERENCE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; DEC-0026 fixes only the internal cycle/depth boundary.",
+  "The current solver already tests active cycles and the 64-level limit, but it is not attached to production HIR/LSP queries and has no accepted benchmark evidence contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
