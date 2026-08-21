@@ -29,6 +29,7 @@
 
 | Task | Title | Release | Size | State | Dependencies | Completion commit |
 | --- | --- | --- | --- | --- | --- | --- |
+| `ACC-4701` | Accelerator Plugin Interface | `G4` | `M` | `BlockedSpec` | — | `` |
 | `ACT-2301` | Actor identity and state isolation | `G2` | `M` | `BlockedSpec` | `TASK-2203` | `` |
 | `ACT-2302` | Actor message sendability checking | `G2` | `L` | `BlockedSpec` | `ACT-2301` | `` |
 | `ACT-2303` | Bounded mailbox and backpressure | `G2` | `L` | `BlockedSpec` | `ACT-2302` | `` |
