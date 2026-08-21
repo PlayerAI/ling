@@ -230,7 +230,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `MEM-3102` | G3 | Value 布局与 Copy/Move | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:88`, `docs/status/MEM-3102-AUTHORITY-AUDIT.md` |
 | `MEM-3103` | G3 | Resource 定义与 Drop 契约 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:99`, `docs/status/MEM-3103-AUTHORITY-AUDIT.md` |
 | `MEM-3104` | G3 | Managed 类型和 Island 边界 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:111`, `docs/status/MEM-3104-AUTHORITY-AUDIT.md` |
-| `OWN-3201` | G3 | Place 与 Move Analysis | L | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:125` |
+| `OWN-3201` | G3 | Place 与 Move Analysis | L | BlockedSpec | `07-G3-V0.3-NATIVE.md:125`, `docs/status/OWN-3201-AUTHORITY-AUDIT.md` |
 | `OWN-3202` | G3 | Borrow Exclusivity | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:152` |
 | `OWN-3203` | G3 | Region Inference | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:172` |
 | `OWN-3204` | G3 | 跨 `await` / Actor Turn 的 Borrow | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:186` |
