@@ -106,6 +106,7 @@
 | `FMT-1505` | Incomplete-source recovery | `G1` | `M` | `Done` | `FMT-1504` | `da412442bde5c7624946909996fa40772d14ce77` |
 | `FMT-1506` | Formatter property and semantic-equivalence evidence | `G1` | `M` | `Done` | `FMT-1505` | `18e14f0a4f19d668b1b854fb1584ec52f91afec1` |
 | `FMT-1507` | Formatter CLI/LSP integration | `G1` | `M` | `BlockedSpec` | `FMT-1506` | `` |
+| `FMT-1507-CLI` | Formatter CLI Preview slice | `G1` | `M` | `In Progress` | `FMT-1506` | `` |
 | `FMT-1508` | Audit Source separation | `G1` | `S` | `Done` | `FMT-1506` | `f247dfed98f104ea5227532965e8b579938a213e` |
 | `GC-3301` | Minimal Managed object model | `G3` | `M` | `BlockedSpec` | — | `` |
 | `GC-3302` | First Managed collector | `G3` | `L` | `BlockedSpec` | `GC-3301` | `` |

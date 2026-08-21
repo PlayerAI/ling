@@ -7,9 +7,9 @@
 ## Summary
 
 - Total gaps: 28
-- Open: 22
+- Open: 21
 - Proposed: 0
-- Accepted: 6
+- Accepted: 7
 - Rejected: 0
 - Superseded: 0
 
@@ -18,7 +18,7 @@
 | Gate | Release | Authority | Open gaps | Accepted decisions |
 | --- | --- | --- | --- | --- |
 | `G1-BYTECODE` — Bytecode version, verifier, evaluation, Fault, and compatibility | `v0.1` | `ROADMAP-1.0` | `GAP-BYTECODE-SEMANTICS-001` | `RFC-0014`, `RFC-0015`, `RFC-0016`, `RFC-0017`, `RFC-0018`, `RFC-0019`, `RFC-0020` |
-| `G1-FORMATTER` — Author Source preservation, normalization, and localization | `v0.1` | `ROADMAP-1.0` | `GAP-FORMATTER-AUTHOR-SOURCE-001`, `GAP-FORMATTER-CLI-PROTOCOL-001`, `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `DEC-0015`, `DEC-0023` |
+| `G1-FORMATTER` — Author Source preservation, normalization, and localization | `v0.1` | `ROADMAP-1.0` | `GAP-FORMATTER-AUTHOR-SOURCE-001`, `GAP-FORMATTER-CLI-PROTOCOL-001`, `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `DEC-0015`, `DEC-0023`, `DEC-0028` |
 | `G1-INCREMENTAL` — Incremental cache keys, Semantic Hash upgrades, and invalidation | `v0.1` | `ROADMAP-1.0` | `GAP-INCREMENTAL-CACHE-001`, `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `DEC-0012`, `DEC-0019`, `DEC-0021`, `DEC-0022` |
 | `G1-LSP-TRANSACTION` — LSP and Semantic Transaction Stable versus Experimental fields | `v0.1` | `ROADMAP-1.0` | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`, `GAP-LSP-TRANSACTION-PROTOCOL-001` | `DEC-0002`, `DEC-0012` |
 | `G1-PACKAGE` — Package identity, namespace, visibility, dependency, and lock rules | `v0.1` | `ROADMAP-1.0` | `GAP-PACKAGE-NAMESPACE-001`, `GAP-PACKAGE-PROTOCOL-001`, `GAP-PROJECT-CLI-INTERFACE-001` | `DEC-0007`, `RFC-0002` |
@@ -32,13 +32,13 @@
 | --- | --- | --- | --- | --- | --- |
 | `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `P0` | `Open` | Equivalent localized Author Source keyword views | `FMT-1501`, `FMT-1508`, `IDE-2306` | `RFC-0003` |
 | `GAP-FORMATTER-AUTHOR-SOURCE-001` | `P0` | `Open` | Author Source formatter preservation and normalization boundary | `FMT-1507` | — |
-| `GAP-FORMATTER-CLI-PROTOCOL-001` | `P0` | `Open` | Formatter CLI input, exit, and report contract | `FMT-1507` | — |
 | `GAP-INCREMENTAL-CACHE-001` | `P0` | `Open` | Incremental query keys, invalidation, persistence, and corruption recovery | `INC-1409` | — |
-| `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2104`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501`, `FMT-1507` | `RFC-0004` |
+| `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2104`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501` | `RFC-0004` |
 | `GAP-PROJECT-CLI-INTERFACE-001` | `P0` | `Open` | Project workspace selection and build/test CLI contract | `PRJ-1107` | — |
 | `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `P0` | `Open` | Semantic Hash algorithm, identity upgrade, and invalidation lifecycle | `INC-1406`, `INC-1409`, `GOV-0106` | `RFC-0004` |
-| `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | `P0` | `Open` | Semantic Graph and Semantic Transaction protocol lifecycle | `GOV-0106`, `INC-1406`, `IDE-2306`, `IDE-2309`, `FMT-1507` | `RFC-0004` |
+| `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | `P0` | `Open` | Semantic Graph and Semantic Transaction protocol lifecycle | `GOV-0106`, `INC-1406`, `IDE-2306`, `IDE-2309` | `RFC-0004` |
 | `GAP-BYTECODE-SEMANTICS-001` | `P0` | `Accepted` | Versioned bytecode and verifier observable semantics | `VM-1210` | `RFC-0014`, `RFC-0015`, `RFC-0016`, `RFC-0017`, `RFC-0018`, `RFC-0019`, `RFC-0020` |
+| `GAP-FORMATTER-CLI-PROTOCOL-001` | `P0` | `Accepted` | Formatter CLI input, exit, and report contract | `FMT-1507` | — |
 | `GAP-GOV-RFC-STATUS-001` | `P0` | `Accepted` | RFC-0001 lifecycle status mismatch | `GOV-0103`, `PRJ-1101`, `VM-1201`, `TRAIT-1301`, `INC-1401`, `LSP-2101` | `RFC-0001` |
 | `GAP-PACKAGE-NAMESPACE-001` | `P0` | `Accepted` | Package namespace and domain ownership | `PRJ-1101`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
 | `GAP-PACKAGE-PROTOCOL-001` | `P0` | `Accepted` | Project manifest, dependency graph, visibility, and lock protocol | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |

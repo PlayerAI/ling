@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:format:0.1",
+  "title": "Ling formatter report JSON 0.1",
+  "type": "object",
+  "required": ["schema", "source", "check", "changed", "disposition"],
+  "properties": {
+    "schema": { "const": "ling.format/0.1" },
+    "source": { "type": "string", "minLength": 1 },
+    "check": { "type": "boolean" },
+    "changed": { "type": "boolean" },
+    "disposition": { "enum": ["formatted", "unchanged", "invalid"] },
+    "text": { "type": "string" },
+    "diagnostics": { "type": "array", "items": { "type": "object", "additionalProperties": true } }
+  },
+  "additionalProperties": false
+}

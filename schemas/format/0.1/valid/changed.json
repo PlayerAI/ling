@@ -1,0 +1,8 @@
+{
+  "schema": "ling.format/0.1",
+  "source": "Main.ling",
+  "check": false,
+  "changed": true,
+  "disposition": "formatted",
+  "text": "module Main\n\nlet answer = 42\n"
+}

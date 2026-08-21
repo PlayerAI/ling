@@ -1,7 +1,7 @@
 use std::env;
 use std::ffi::OsString;
-use std::io::{BufRead, IsTerminal as _, Write as _};
-use std::path::PathBuf;
+use std::io::{BufRead, IsTerminal as _, Read as _, Write as _};
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use ling_cli::incident::{InternalIncident, Reproduction};
@@ -10,6 +10,7 @@ use ling_cli::{CompileFailure, compile_path};
 use ling_diagnostics::{Diagnostic, MessageLanguage};
 use ling_effects::locate_main;
 use ling_eval::{Console, HostError, HostErrorCategory};
+use ling_format::{FormatDisposition, build_format_ir, format_core_with_disposition};
 use ling_unicode::UNICODE_VERSION;
 
 const CLI_NAME: &str = "ling";
@@ -58,6 +59,15 @@ fn run(arguments: Vec<OsString>) -> u8 {
 fn execute(options: Options) -> u8 {
     if options.command == Command::Repl {
         return execute_repl(options.format, options.capabilities);
+    }
+
+    if options.command == Command::Format {
+        return execute_format(
+            options.format,
+            options.check,
+            options.path.expect("format requires an input"),
+            options.stdin_name,
+        );
     }
 
     let path = options
@@ -142,6 +152,293 @@ fn execute(options: Options) -> u8 {
             }
         }
         Command::Repl => unreachable!("handled before compilation"),
+        Command::Format => unreachable!("handled before compilation"),
+    }
+}
+
+fn execute_format(
+    format: OutputFormat,
+    check: bool,
+    path: PathBuf,
+    stdin_name: Option<String>,
+) -> u8 {
+    let (source_name, bytes) = match read_format_input(&path, stdin_name.as_deref()) {
+        Ok(input) => input,
+        Err((source_name, diagnostics)) => {
+            return emit_format_failure(format, source_name, check, diagnostics);
+        }
+    };
+
+    let source = match ling_source::SourceFile::from_bytes(
+        ling_source::SourceId::new(0),
+        source_name.clone(),
+        bytes,
+    ) {
+        Ok(source) => source,
+        Err(error) => {
+            return emit_format_failure(
+                format,
+                source_name.clone(),
+                check,
+                vec![format_source_error_diagnostic(&source_name, error)],
+            );
+        }
+    };
+    let parsed = ling_syntax::parse(&source);
+    let mut diagnostics = parsed
+        .lexical_errors()
+        .iter()
+        .map(|error| error.to_diagnostic(source.name()))
+        .collect::<Vec<_>>();
+    diagnostics.extend(
+        parsed
+            .parse_errors()
+            .iter()
+            .map(|error| error.to_diagnostic(source.name())),
+    );
+    if !diagnostics.is_empty() {
+        return emit_format_failure(format, source_name, check, diagnostics);
+    }
+
+    let document = match build_format_ir(&source, &parsed) {
+        Ok(document) => document,
+        Err(error) => {
+            return emit_internal_incident(
+                "format.ir",
+                error.to_string(),
+                Reproduction::new("ling fmt").with_input(source_name),
+                format,
+            );
+        }
+    };
+    let result = format_core_with_disposition(&document);
+    if matches!(
+        result.disposition(),
+        FormatDisposition::OriginalInvalidSource | FormatDisposition::OriginalRejectedCandidate
+    ) {
+        return emit_format_failure(
+            format,
+            source_name,
+            check,
+            vec![format_rejected_diagnostic()],
+        );
+    }
+
+    let changed = result.text() != source.original_text();
+    let disposition = if changed { "formatted" } else { "unchanged" };
+    if format == OutputFormat::Json {
+        return emit_format_report(
+            source_name,
+            check,
+            changed,
+            disposition,
+            (!check).then(|| result.text().to_owned()),
+            Vec::new(),
+        );
+    }
+    if check {
+        if changed {
+            eprintln!("需要格式化：{source_name}\nwould reformat: {source_name}");
+            EXIT_COMPILE_ERROR
+        } else {
+            EXIT_SUCCESS
+        }
+    } else {
+        match write_stdout(result.text().as_bytes()) {
+            Ok(()) => EXIT_SUCCESS,
+            Err(error) => emit_host_io_failure("format.stdout", &error, format),
+        }
+    }
+}
+
+fn read_format_input(
+    path: &PathBuf,
+    stdin_name: Option<&str>,
+) -> Result<(String, Vec<u8>), (String, Vec<Diagnostic>)> {
+    if path.as_os_str() == "-" {
+        let Some(name) = stdin_name else {
+            return Err((
+                "<stdin>".to_owned(),
+                vec![Diagnostic::new(
+                    ling_diagnostics::codes::SOURCE_READ_FAILED,
+                    ling_diagnostics::Severity::Error,
+                    "格式化标准输入缺少逻辑文件名",
+                    "formatter stdin requires a logical source name",
+                )],
+            ));
+        };
+        let mut bytes = Vec::new();
+        if let Err(error) = std::io::stdin().read_to_end(&mut bytes) {
+            return Err((
+                name.to_owned(),
+                vec![
+                    Diagnostic::new(
+                        ling_diagnostics::codes::SOURCE_READ_FAILED,
+                        ling_diagnostics::Severity::Error,
+                        "无法读取标准输入",
+                        "failed to read standard input",
+                    )
+                    .with_fact("io_kind", format_stable_io_kind(error.kind())),
+                ],
+            ));
+        }
+        return Ok((name.to_owned(), bytes));
+    }
+
+    if stdin_name.is_some() {
+        return Err((
+            path.to_string_lossy().into_owned(),
+            vec![Diagnostic::new(
+                ling_diagnostics::codes::SOURCE_READ_FAILED,
+                ling_diagnostics::Severity::Error,
+                "格式化输入逻辑文件名使用错误",
+                "formatter logical source name is only valid for stdin",
+            )],
+        ));
+    }
+    let source_name = path.to_string_lossy().into_owned();
+    match std::fs::read(path) {
+        Ok(bytes) => Ok((source_name, bytes)),
+        Err(error) => Err((
+            source_name.clone(),
+            vec![
+                Diagnostic::new(
+                    ling_diagnostics::codes::SOURCE_READ_FAILED,
+                    ling_diagnostics::Severity::Error,
+                    format!("无法读取源码文件“{source_name}”"),
+                    format!("failed to read source file `{source_name}`"),
+                )
+                .with_fact("io_kind", format_stable_io_kind(error.kind())),
+            ],
+        )),
+    }
+}
+
+fn emit_format_failure(
+    format: OutputFormat,
+    source_name: String,
+    check: bool,
+    diagnostics: Vec<Diagnostic>,
+) -> u8 {
+    if format == OutputFormat::Json {
+        return match diagnostic_values(&diagnostics) {
+            Ok(values) => emit_format_report(source_name, check, false, "invalid", None, values),
+            Err(status) => status,
+        };
+    }
+    emit_compile_errors(&diagnostics, OutputFormat::Human)
+}
+
+fn emit_format_report(
+    source: String,
+    check: bool,
+    changed: bool,
+    disposition: &str,
+    text: Option<String>,
+    diagnostics: Vec<serde_json::Value>,
+) -> u8 {
+    let mut report = serde_json::json!({
+        "schema": "ling.format/0.1",
+        "source": source,
+        "check": check,
+        "changed": changed,
+        "disposition": disposition,
+    });
+    let object = report.as_object_mut().expect("format report is an object");
+    if let Some(text) = text {
+        object.insert("text".to_owned(), serde_json::Value::String(text));
+    }
+    if !diagnostics.is_empty() {
+        object.insert(
+            "diagnostics".to_owned(),
+            serde_json::Value::Array(diagnostics),
+        );
+    }
+    let mut bytes = match serde_json::to_vec(&report) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            return emit_internal_incident(
+                "format.report",
+                error.to_string(),
+                Reproduction::new("ling fmt --format json"),
+                OutputFormat::Json,
+            );
+        }
+    };
+    bytes.push(b'\n');
+    match write_stdout(&bytes) {
+        Ok(()) => {
+            if disposition == "invalid" || (check && changed) {
+                EXIT_COMPILE_ERROR
+            } else {
+                EXIT_SUCCESS
+            }
+        }
+        Err(error) => emit_host_io_failure("format.stdout", &error, OutputFormat::Json),
+    }
+}
+
+fn format_rejected_diagnostic() -> Diagnostic {
+    Diagnostic::new(
+        ling_diagnostics::codes::INTERNAL_COMPILER_ERROR,
+        ling_diagnostics::Severity::Error,
+        "格式化候选文本未通过编译器验证",
+        "formatter candidate did not pass compiler validation",
+    )
+}
+
+const fn format_stable_io_kind(kind: std::io::ErrorKind) -> &'static str {
+    match kind {
+        std::io::ErrorKind::NotFound => "not_found",
+        std::io::ErrorKind::PermissionDenied => "permission_denied",
+        std::io::ErrorKind::InvalidData => "invalid_data",
+        std::io::ErrorKind::Interrupted => "interrupted",
+        _ => "other",
+    }
+}
+
+fn format_source_error_diagnostic(path: &str, error: ling_source::SourceError) -> Diagnostic {
+    match error {
+        ling_source::SourceError::InvalidUtf8 {
+            valid_up_to,
+            error_len,
+        } => {
+            let end = valid_up_to.saturating_add(error_len.unwrap_or(1));
+            Diagnostic::new(
+                ling_diagnostics::codes::INVALID_UTF8,
+                ling_diagnostics::Severity::Error,
+                "源码不是有效的 UTF-8",
+                "source is not valid UTF-8",
+            )
+            .with_primary_span(ling_diagnostics::DiagnosticSpan::at(
+                path,
+                u32::try_from(valid_up_to).unwrap_or(u32::MAX),
+                u32::try_from(end).unwrap_or(u32::MAX),
+            ))
+            .with_fact(
+                "valid_up_to",
+                u64::try_from(valid_up_to).unwrap_or(u64::MAX),
+            )
+        }
+        ling_source::SourceError::MisplacedByteOrderMark { byte_offset } => Diagnostic::new(
+            ling_diagnostics::codes::MISPLACED_BOM,
+            ling_diagnostics::Severity::Error,
+            "UTF-8 BOM 只能出现在文件开头",
+            "the UTF-8 byte-order mark is only allowed at the start of a file",
+        )
+        .with_primary_span(ling_diagnostics::DiagnosticSpan::at(
+            path,
+            u32::try_from(byte_offset).unwrap_or(u32::MAX),
+            u32::try_from(byte_offset.saturating_add(3)).unwrap_or(u32::MAX),
+        )),
+        ling_source::SourceError::TooLarge { byte_len } => Diagnostic::new(
+            ling_diagnostics::codes::SOURCE_TOO_LARGE,
+            ling_diagnostics::Severity::Error,
+            "源码文件超过当前实现支持的大小",
+            "source file exceeds the size supported by this implementation",
+        )
+        .with_fact("byte_len", u64::try_from(byte_len).unwrap_or(u64::MAX))
+        .with_fact("maximum_byte_len", u64::from(u32::MAX)),
     }
 }
 
@@ -736,7 +1033,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]"
     )
 }
 
@@ -747,6 +1044,7 @@ enum Command {
     Repl,
     Semantic,
     Audit,
+    Format,
 }
 
 impl Command {
@@ -757,6 +1055,7 @@ impl Command {
             "repl" => Some(Self::Repl),
             "semantic" => Some(Self::Semantic),
             "audit" => Some(Self::Audit),
+            "fmt" => Some(Self::Format),
             _ => None,
         }
     }
@@ -770,6 +1069,7 @@ impl std::fmt::Display for Command {
             Self::Repl => "repl",
             Self::Semantic => "semantic",
             Self::Audit => "audit",
+            Self::Format => "fmt",
         };
         formatter.write_str(name)
     }
@@ -797,6 +1097,8 @@ struct Options {
     format: OutputFormat,
     path: Option<PathBuf>,
     capabilities: Vec<String>,
+    check: bool,
+    stdin_name: Option<String>,
 }
 
 impl Options {
@@ -804,6 +1106,8 @@ impl Options {
         let mut format = OutputFormat::Human;
         let mut path = None;
         let mut capabilities = Vec::new();
+        let mut check = false;
+        let mut stdin_name = None;
         let mut index = 0;
 
         while index < arguments.len() {
@@ -839,7 +1143,38 @@ impl Options {
                 continue;
             }
 
-            if argument.to_string_lossy().starts_with('-') {
+            if argument == "--check" {
+                if command != Command::Format {
+                    return Err("`--check` is only valid with `fmt`".to_owned());
+                }
+                check = true;
+                index += 1;
+                continue;
+            }
+
+            if argument == "--stdin-name" {
+                if command != Command::Format {
+                    return Err("`--stdin-name` is only valid with `fmt`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--stdin-name` requires a logical `.ling` name".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the stdin logical name must be valid Unicode".to_owned())?;
+                if !valid_stdin_name(value) {
+                    return Err(
+                        "`--stdin-name` must be a relative UTF-8 path ending in `.ling`".to_owned(),
+                    );
+                }
+                if stdin_name.replace(value.to_owned()).is_some() {
+                    return Err("only one `--stdin-name` may be provided".to_owned());
+                }
+                index += 2;
+                continue;
+            }
+
+            if argument.to_string_lossy().starts_with('-') && argument != "-" {
                 return Err(format!("unknown option `{}`", argument.to_string_lossy()));
             }
             if path.replace(PathBuf::from(argument)).is_some() {
@@ -854,14 +1189,48 @@ impl Options {
         if command != Command::Repl && path.is_none() {
             return Err(format!("`{command}` requires a source file"));
         }
+        if command == Command::Format {
+            let is_stdin = path.as_deref().is_some_and(|value| value == Path::new("-"));
+            if is_stdin && stdin_name.is_none() {
+                return Err("`fmt -` requires `--stdin-name name`".to_owned());
+            }
+            if !is_stdin && stdin_name.is_some() {
+                return Err("`--stdin-name` is valid only with `fmt -`".to_owned());
+            }
+            if !is_stdin
+                && path
+                    .as_deref()
+                    .and_then(Path::extension)
+                    .and_then(|extension| extension.to_str())
+                    != Some("ling")
+            {
+                return Err("`fmt` input must be a `.ling` file or `-`".to_owned());
+            }
+        } else if check || stdin_name.is_some() {
+            return Err("formatter-only options require `fmt`".to_owned());
+        }
 
         Ok(Self {
             command,
             format,
             path,
             capabilities,
+            check,
+            stdin_name,
         })
     }
+}
+
+fn valid_stdin_name(value: &str) -> bool {
+    if value.is_empty() || !value.ends_with(".ling") || value.contains('\\') || value.contains('\0')
+    {
+        return false;
+    }
+    let path = Path::new(value);
+    !path.is_absolute()
+        && path
+            .components()
+            .all(|component| matches!(component, std::path::Component::Normal(_)))
 }
 
 #[cfg(test)]
@@ -895,6 +1264,46 @@ mod tests {
             Options::parse(Command::Check, &[]).unwrap_err(),
             "`check` requires a source file"
         );
+    }
+
+    #[test]
+    fn parses_formatter_file_and_stdin_inputs() {
+        let file = Options::parse(
+            Command::Format,
+            &[
+                "--check".into(),
+                "--format".into(),
+                "json".into(),
+                "main.ling".into(),
+            ],
+        )
+        .unwrap();
+        assert!(file.check);
+        assert_eq!(file.format, OutputFormat::Json);
+        assert_eq!(file.path.as_deref(), Some(Path::new("main.ling")));
+        assert!(file.stdin_name.is_none());
+
+        let stdin = Options::parse(
+            Command::Format,
+            &["-".into(), "--stdin-name".into(), "stdin/main.ling".into()],
+        )
+        .unwrap();
+        assert_eq!(stdin.path.as_deref(), Some(Path::new("-")));
+        assert_eq!(stdin.stdin_name.as_deref(), Some("stdin/main.ling"));
+    }
+
+    #[test]
+    fn rejects_invalid_formatter_inputs() {
+        assert_eq!(
+            Options::parse(Command::Format, &["-".into()]).unwrap_err(),
+            "`fmt -` requires `--stdin-name name`"
+        );
+        assert_eq!(
+            Options::parse(Command::Format, &["main.txt".into()]).unwrap_err(),
+            "`fmt` input must be a `.ling` file or `-`"
+        );
+        assert!(!valid_stdin_name("../main.ling"));
+        assert!(!valid_stdin_name("main.txt"));
     }
 
     #[test]

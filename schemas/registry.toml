@@ -173,6 +173,36 @@ canonical_dir = ""
 reader_adapter = "None"
 writer_evidence = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs"]
 
+[[schema]]
+id = "SCHEMA-FORMAT-REPORT-JSON"
+name = "format"
+protocol_id = "PROTO-FORMAT-CLI"
+version = "0.1"
+marker = "ling.format/0.1"
+version_kind = "MajorMinor"
+stability = "Preview"
+format = "JSON"
+canonical = false
+writer = "CurrentOnly"
+reader = "None"
+reader_versions = []
+previous_version = ""
+previous_marker = ""
+compatibility = "NoPreviousVersion"
+compatibility_dir = ""
+migration_adapter = "None"
+unknown_fields = "Reject"
+missing_fields = "RejectRequired"
+reader_defaults = []
+canonical_encoding = "None"
+hash_scheme_ids = []
+schema_path = "schemas/format/0.1/schema.json"
+valid_dir = "schemas/format/0.1/valid"
+invalid_dir = "schemas/format/0.1/invalid"
+canonical_dir = ""
+reader_adapter = "None"
+writer_evidence = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs"]
+
 [[non_json_boundary]]
 protocol_id = "PROTO-AUDIT-SOURCE"
 format = "CanonicalText"

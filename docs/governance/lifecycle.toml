@@ -96,6 +96,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0028"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0028-formatter-cli-contract.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+conformance_plan = [
+  "Exercise valid, already-formatted, CRLF/BOM, Unicode, stdin, logical-name, check-mode, invalid-source, missing-file, and unknown-option cases.",
+  "Compare human bytes and one-object ling.format/0.1 reports across independent processes and filesystem-independent runs.",
+  "Verify no input-path mutation, no partial invalid-source output, bounded host I/O failure, and exact exit classes.",
+]
+compatibility_impact = [
+  "Adds the Preview ling fmt command and ling.format/0.1 current-writer report only; existing CLI commands, diagnostics, Semantic IDs, Audit Source, bytecode, LSP, and Unicode 17.0.0 remain unchanged.",
+  "The stdout-only contract requires no source migration; in-place, range, format-on-save, or incompatible report changes require a new accepted decision/schema.",
+]
+unresolved_alternatives = [
+  "LSP Workspace Edit and Semantic Transaction lifecycle, in-place writing, range formatting, format-on-save, multiple operands, and localized keyword views remain deferred.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0024"
 kind = "Decision"
 status = "Accepted"

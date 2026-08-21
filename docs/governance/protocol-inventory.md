@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 21 records: 15 current public, 1 internal, 5 Future.
-- Current public stability: 9 Experimental, 6 Preview, 0 Stable.
+- 22 records: 16 current public, 1 internal, 5 Future.
+- Current public stability: 9 Experimental, 7 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -18,6 +18,7 @@
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
+| `PROTO-FORMAT-CLI` | Public | JSON | `ling.format/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-LOCKFILE` | Public | JSON | `ling.lock/1` | `Experimental` | yes | yes | 8 |
 | `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.2` | `Experimental` | yes | yes | 6 |
 | `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 5 |
@@ -89,6 +90,19 @@
 - Sources: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/governance/error-code-lock.toml`](../governance/error-code-lock.toml), [`tools/xtask/src/error_codes.rs`](../../tools/xtask/src/error_codes.rs), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/diagnostic/0.1/schema.json`](../../schemas/diagnostic/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
 - Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`tests/conformance/m2-invalid-number/expect.toml`](../../tests/conformance/m2-invalid-number/expect.toml), [`docs/governance/error-code-lock.toml`](../governance/error-code-lock.toml), [`tools/xtask/src/error_codes.rs`](../../tools/xtask/src/error_codes.rs), [`schemas/diagnostic/0.1/schema.json`](../../schemas/diagnostic/0.1/schema.json), [`schemas/diagnostic/0.1/valid`](../../schemas/diagnostic/0.1/valid), [`schemas/diagnostic/0.1/invalid`](../../schemas/diagnostic/0.1/invalid)
 - Notes: Code meaning, error/warning classification, and existing Facts types are the documented stable subset; the 0.1 container remains Preview until 1.0 gates close; The Markdown registry is the sole handwritten allocation source; the generated lock and offline checker reject drift, retired reuse, and unregistered implementation/test codes.
+
+### `PROTO-FORMAT-CLI` — Ling formatter CLI and report
+
+- Producer: ling fmt
+- Consumer: shell scripts; CI jobs; formatter integrations
+- Reader policy: Consumers must gate on the exact ling.format/0.1 marker; no standalone reader is provided and unknown core fields are rejected by the schema.
+- Writer policy: Emit exactly one report object in JSON mode with source, check, changed, disposition, and optional formatted text or diagnostics; human mode writes only formatted Author Source bytes when not checking.
+- Unknown-field policy: Reject unknown core fields; no extension namespace or compatibility promise exists for this Preview schema.
+- Migration tool: None; an incompatible report or write-in-place behavior requires a new schema and accepted decision.
+- Authority: `DEC-0003`, `DEC-0023`, `DEC-0028`
+- Sources: [`docs/decisions/0028-formatter-cli-contract.md`](../decisions/0028-formatter-cli-contract.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-format/src/author.rs`](../../crates/ling-format/src/author.rs), [`schemas/format/0.1/schema.json`](../../schemas/format/0.1/schema.json)
+- Fixtures: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`schemas/format/0.1/schema.json`](../../schemas/format/0.1/schema.json), [`schemas/format/0.1/valid`](../../schemas/format/0.1/valid), [`schemas/format/0.1/invalid`](../../schemas/format/0.1/invalid)
+- Notes: Preview, current-writer-only stdout contract; it does not claim in-place writing, range formatting, format-on-save, LSP Workspace Edits, or Semantic Transactions.
 
 ### `PROTO-LOCKFILE` — Ling dependency lockfile
 

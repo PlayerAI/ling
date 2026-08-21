@@ -3506,6 +3506,63 @@ notes = [
 ]
 
 [[task]]
+id = "FMT-1507-CLI"
+title = "Formatter CLI Preview slice"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1506"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/decisions/0028-formatter-cli-contract.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-cli/src/main.rs",
+  "schemas/format/0.1/schema.json",
+  "schemas/format/0.1/valid/changed.json",
+  "schemas/format/0.1/valid/unchanged.json",
+  "schemas/format/0.1/invalid/missing-schema.json",
+  "schemas/format/0.1/invalid/missing-schema.expect.toml",
+  "docs/status/FMT-1507-CLI-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "DEC-0028 authorizes exactly one `.ling` file or stdin input and requires a relative `.ling` logical name for stdin.",
+  "Human mode writes formatted source to stdout without mutating the input; check mode reports unchanged/changed status with the specified exit codes.",
+  "JSON mode emits one `ling.format/0.1` report with deterministic required fields, optional formatted text outside check mode, and diagnostics for invalid input.",
+  "The existing parser and formatter rejection boundary remains authoritative; invalid input never publishes partial formatted output.",
+  "Targeted CLI, schema, governance, formatting, and diff checks pass; LSP, Workspace Edit, format-on-save, and Semantic Transaction behavior remains deferred to FMT-1507.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This is the dependency-complete CLI subtask of FMT-1507. The parent FMT-1507 remains BlockedSpec for author-source, LSP transaction, and Semantic Transaction decisions.",
+  "The formatter protocol is Preview only and is registered in the protocol and schema inventories; no Stable compatibility promise is made.",
+]
+
+[[task]]
 id = "FMT-1508"
 title = "Audit Source separation"
 state = "Done"

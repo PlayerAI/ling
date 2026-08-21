@@ -94,6 +94,93 @@ fn semantic_output_is_deterministic_and_versioned() {
 }
 
 #[test]
+fn formatter_json_report_is_deterministic_and_non_mutating() {
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../tests/conformance/p7-hello-run/case.ling");
+    let run = || {
+        Command::new(env!("CARGO_BIN_EXE_ling"))
+            .args(["fmt", "--format", "json"])
+            .arg(&fixture)
+            .output()
+            .expect("formatter process runs")
+    };
+    let first = run();
+    let second = run();
+
+    assert!(first.status.success());
+    assert!(first.stderr.is_empty());
+    assert_eq!(first.stdout, second.stdout);
+    let report: serde_json::Value =
+        serde_json::from_slice(&first.stdout).expect("formatter report is JSON");
+    assert_eq!(report["schema"], "ling.format/0.1");
+    assert_eq!(report["check"], false);
+    assert_eq!(report["changed"], false);
+    assert_eq!(report["disposition"], "unchanged");
+    assert!(report["text"].as_str().is_some());
+}
+
+#[test]
+fn formatter_stdin_and_invalid_source_use_the_report_boundary() {
+    let mut child = Command::new(env!("CARGO_BIN_EXE_ling"))
+        .args(["fmt", "--format", "json", "--stdin-name", "stdin.ling", "-"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("formatter stdin process starts");
+    child
+        .stdin
+        .take()
+        .expect("formatter stdin is piped")
+        .write_all(b"let answer = 42")
+        .expect("formatter stdin is written");
+    let output = child.wait_with_output().expect("formatter stdin exits");
+    assert!(output.status.success());
+    assert!(output.stderr.is_empty());
+    let report: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("stdin formatter report is JSON");
+    assert_eq!(report["source"], "stdin.ling");
+    assert_eq!(report["changed"], true);
+    assert_eq!(report["disposition"], "formatted");
+
+    let mut child = Command::new(env!("CARGO_BIN_EXE_ling"))
+        .args([
+            "fmt",
+            "--format",
+            "json",
+            "--stdin-name",
+            "invalid.ling",
+            "-",
+        ])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("invalid formatter stdin process starts");
+    child
+        .stdin
+        .take()
+        .expect("invalid formatter stdin is piped")
+        .write_all(b"let =")
+        .expect("invalid formatter stdin is written");
+    let output = child
+        .wait_with_output()
+        .expect("invalid formatter stdin exits");
+    assert_eq!(output.status.code(), Some(1));
+    assert!(output.stderr.is_empty());
+    let report: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("invalid formatter report is JSON");
+    assert_eq!(report["source"], "invalid.ling");
+    assert_eq!(report["changed"], false);
+    assert_eq!(report["disposition"], "invalid");
+    assert!(
+        report["diagnostics"]
+            .as_array()
+            .is_some_and(|items| !items.is_empty())
+    );
+}
+
+#[test]
 fn audit_output_is_deterministic_and_round_trips() {
     let fixture = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../tests/conformance/p7-hello-run/case.ling");

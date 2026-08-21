@@ -52,6 +52,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0025` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0025](../decisions/0025-trait-coherence-index-boundary.md) |
 | `DEC-0026` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0026](../decisions/0026-trait-solver-v0-boundary.md) |
 | `DEC-0027` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0027](../decisions/0027-trait-checked-core-dictionary-witness.md) |
+| `DEC-0028` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0028](../decisions/0028-formatter-cli-contract.md) |
 
 ## Migration boundary
 

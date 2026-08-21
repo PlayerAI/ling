@@ -327,6 +327,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0028"
+title = "Formatter CLI contract"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0028-formatter-cli-contract.md"
+covers = ["ling fmt command", "formatter stdin and logical names", "formatter check exit status", "ling.format/0.1 report"]
+depends_on = ["DEC-0003", "DEC-0023", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0024"
 title = "Trait obligation collection boundary"
 kind = "Decision"

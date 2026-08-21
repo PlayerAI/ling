@@ -46,6 +46,28 @@ authority = ["DEC-0013", "DEC-0016"]
 notes = ["Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior."]
 
 [[protocol]]
+id = "PROTO-FORMAT-CLI"
+title = "Ling formatter CLI and report"
+category = "JSON"
+visibility = "Public"
+current_version = "ling.format/0.1"
+stability = "Preview"
+implemented = true
+public_schema = true
+canonical = false
+producer = ["ling fmt"]
+consumer = ["shell scripts", "CI jobs", "formatter integrations"]
+reader_policy = "Consumers must gate on the exact ling.format/0.1 marker; no standalone reader is provided and unknown core fields are rejected by the schema."
+writer_policy = "Emit exactly one report object in JSON mode with source, check, changed, disposition, and optional formatted text or diagnostics; human mode writes only formatted Author Source bytes when not checking."
+unknown_field_policy = "Reject unknown core fields; no extension namespace or compatibility promise exists for this Preview schema."
+migration_tool = "None; an incompatible report or write-in-place behavior requires a new schema and accepted decision."
+fixtures = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs", "schemas/format/0.1/schema.json", "schemas/format/0.1/valid", "schemas/format/0.1/invalid"]
+sources = ["docs/decisions/0028-formatter-cli-contract.md", "crates/ling-cli/src/main.rs", "crates/ling-format/src/author.rs", "schemas/format/0.1/schema.json"]
+version_markers = ["ling.format/0.1"]
+authority = ["DEC-0003", "DEC-0023", "DEC-0028"]
+notes = ["Preview, current-writer-only stdout contract; it does not claim in-place writing, range formatting, format-on-save, LSP Workspace Edits, or Semantic Transactions."]
+
+[[protocol]]
 id = "PROTO-HUMAN-OUTPUT"
 title = "Human-readable CLI and diagnostic output"
 category = "Human output"

@@ -426,6 +426,13 @@
       "implemented": false
     },
     {
+      "id": "PROTO-FORMAT-CLI",
+      "visibility": "Public",
+      "version": "ling.format/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-HUMAN-OUTPUT",
       "visibility": "Public",
       "version": "0.0.1-dev",
@@ -554,8 +561,8 @@
     {
       "id": "UNSUP-LSP-EDITOR",
       "area": "Tooling",
-      "capability": "LSP, Zed extension, formatter, or semantic mutation",
-      "reason": "No corresponding LSP executable, editor integration package, formatter, or accepted semantic-mutation transaction boundary exists.",
+      "capability": "LSP, Zed extension, or semantic mutation",
+      "reason": "No corresponding LSP executable, editor integration package, or accepted semantic-mutation transaction boundary exists; the formatter CLI is Preview-only and does not provide editor transactions.",
       "blockers": [
         "GAP-LSP-TRANSACTION-PROTOCOL-001",
         "GAP-FORMATTER-AUTHOR-SOURCE-001",
