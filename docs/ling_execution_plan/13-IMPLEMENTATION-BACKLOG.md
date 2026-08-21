@@ -110,7 +110,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TRAIT-1307` | G1/Editor | Interpreter/VM lowering | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:304` |
 | `TRAIT-1308` | G1/Editor | IDE 支持 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:308` |
 | `TRAIT-1309` | G1/Editor | 性能与终止 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:316` |
-| `INC-1401` | G1/Editor | Query boundary ADR | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:322` |
+| `INC-1401` | G1/Editor | Query boundary ADR | M | Done | DEC-0019；见 `docs/decisions/0019-incremental-query-boundary.md` 与实施报告 |
 | `INC-1402` | G1/Editor | VFS 与 revision | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:326` |
 | `INC-1403` | G1/Editor | Parse queries | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:335` |
 | `INC-1404` | G1/Editor | Resolve/module queries | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:347` |

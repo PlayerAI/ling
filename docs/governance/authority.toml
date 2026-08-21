@@ -249,6 +249,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0019"
+title = "Incremental query boundary and invalidation policy"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0019-incremental-query-boundary.md"
+covers = ["internal query graph", "source revisions", "dependency invalidation", "deterministic scheduling", "cache boundary"]
+depends_on = ["DEC-0002", "DEC-0012", "DEC-0013", "ROADMAP-1.0", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0002"
 title = "Local package identity and project protocol"
 kind = "RFC"

@@ -22,6 +22,32 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0019"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0019-incremental-query-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compare clean and incremental checked graphs, diagnostics, effects, Semantic IDs, canonical bytes, and VM logical outcomes.",
+  "Exercise source-byte, whitespace/comment, private-body, public-signature, import, package-revision, Unicode, BOM, CRLF, and logical-name invalidation frontiers.",
+  "Verify canonical-order, repeated-process, hash-seed, query-cycle, malformed-snapshot, oversized-input, and cancellation-at-publication evidence.",
+  "Keep persistent cache, corruption recovery, parallel scheduling, compiler cancellation protocol, and LSP/Task cancellation explicitly deferred.",
+]
+compatibility_impact = [
+  "Adds no source syntax, runtime behavior, CLI/LSP field, diagnostic code, JSON schema, Semantic ID version, cache file, or public protocol; it fixes only an internal compiler query boundary.",
+  "Existing Unicode 17.0.0, original UTF-8 spans, deterministic identities, and offline/locked dependency rules remain authoritative.",
+]
+unresolved_alternatives = [
+  "Persistent cache schema/migration, parallel scheduler, compiler-facing cancellation, LSP/Task cancellation, and third-party query-engine selection require separate evidence and authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0002"
 kind = "RFC"
 status = "Accepted"

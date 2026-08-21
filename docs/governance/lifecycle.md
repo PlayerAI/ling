@@ -43,6 +43,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0016` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-19` | [DEC-0016](../decisions/0016-repl-session-semantics.md) |
 | `DEC-0017` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-20` | [DEC-0017](../decisions/0017-seed-boolean-operators.md) |
 | `DEC-0018` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0018](../decisions/0018-rfc-0001-lifecycle.md) |
+| `DEC-0019` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-21` | [DEC-0019](../decisions/0019-incremental-query-boundary.md) |
 
 ## Migration boundary
 

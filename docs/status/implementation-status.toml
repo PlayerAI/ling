@@ -2670,3 +2670,52 @@ notes = [
   "PROTO-BYTECODE remains Experimental; PROTO-VM-CONTROL is separately registered as Experimental and does not create a wire, CLI, default-backend, or Stable compatibility claim.",
   "Diagnostics, schemas, Semantic IDs, canonical semantic bytes, CLI/ABI/FFI contracts, and Unicode 17.0.0 tables are unchanged. Structured Task/LSP cancellation, preemption, rollback, deadlines, and scheduler/heap/replay models are intentionally deferred.",
 ]
+
+[[task]]
+id = "INC-1401"
+title = "Incremental query boundary ADR"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0110"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/templates/DECISION.md",
+  "docs/governance/gap-register.toml",
+  "docs/decisions/0019-incremental-query-boundary.md",
+]
+artifacts = [
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1401-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0019 fixes the internal in-memory query families, immutable source/project revisions, transitive invalidation, deterministic cache keys, single-threaded scheduling, internal cancellation boundary, no-persistence rule, and test-only traces.",
+  "DEC-0019 explicitly preserves checked Typed Core as the only evaluation input and does not authorize source syntax, CLI/LSP fields, cache files, public protocols, diagnostics, or Semantic ID changes.",
+  "GAP-INCREMENTAL-CACHE-001 remains Open only for deferred persistent-cache, corruption, parallel-scheduler, and compiler-facing cancellation decisions; INC-1401 is removed from its blocked task list.",
+  "The backlog and status registry record INC-1401 as Done with a bilingual implementation report and deterministic governance evidence.",
+  "cargo xtask governance check-all, cargo xtask status verify, cargo fmt --all -- --check, and git diff --check: passed.",
+]
+verified_against_commit = "dcb3fc5c148d0b90a3481a736113c4551a35cf17"
+completion_commit = "dcb3fc5c148d0b90a3481a736113c4551a35cf17"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "INC-1401 is an architecture/governance target, so no placeholder `ling-incremental` crate or public API was created.",
+  "DEC-0019 is Accepted as an internal compiler boundary; it does not resolve the full persistent-cache gap or create a public compatibility promise.",
+  "INC-1402 VFS/revision is the next target and must provide executable clean/incremental equivalence evidence before later query tasks proceed.",
+]
