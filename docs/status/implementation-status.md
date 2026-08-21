@@ -159,6 +159,7 @@
 | `MC-5601` | Finite-State Projection | `G5` | `L` | `BlockedSpec` | `BND-5204`, `NODE-5307`, `PROOF-5503` | `` |
 | `MC-5602` | Exploration Engine | `G5` | `L` | `BlockedSpec` | `MC-5601` | `` |
 | `MC-5603` | Model-Check Report Semantics | `G5` | `M` | `BlockedSpec` | `MC-5602` | `` |
+| `MC-5604` | Replay Counterexample | `G5` | `L` | `BlockedSpec` | `MC-5603` | `` |
 | `MEM-3101` | Type classification model | `G3` | `M` | `BlockedSpec` | — | `` |
 | `MEM-3102` | Value layout and Copy/Move | `G3` | `L` | `BlockedSpec` | `MEM-3101` | `` |
 | `MEM-3103` | Resource definition and Drop contract | `G3` | `L` | `BlockedSpec` | `MEM-3102` | `` |
