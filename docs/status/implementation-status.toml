@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 61 tasks (58 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, and In Progress TRAIT-1302 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 61 tasks (59 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3641,7 +3641,7 @@ notes = [
 [[task]]
 id = "TRAIT-1302"
 title = "Trait AST/HIR representation"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -3677,10 +3677,10 @@ acceptance = [
   "Targeted syntax, AST, HIR, differential, Unicode, and snapshot tests pass offline with the locked dependency set.",
   "No diagnostic allocation, public protocol schema, Semantic ID rule, or Unicode table changes; constraint solving, coherence, Checked Core lowering, and runtime behavior remain deferred.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "693b841000c98ca8aae119e3797a737fe0cebc7f"
+completion_commit = "693b841000c98ca8aae119e3797a737fe0cebc7f"
+integration_state = "committed"
+completed = "2026-08-21"
 notes = [
   "TRAIT-1302 is the smallest accepted vertical representation slice. TRAIT-1303 through TRAIT-1309 remain pending or blocked by their own authority/interface gates.",
 ]
