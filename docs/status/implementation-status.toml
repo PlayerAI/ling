@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 74 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, and CLI-1706 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 75 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, and LSP-2101 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3847,6 +3847,46 @@ completed = ""
 notes = [
   "CLI-1706 is BlockedSpec downstream of CLI-1701 and CLI-1702; PROTO-CLI currently inventories only implemented commands and rejects unknown options.",
   "No shell-specific completion or stale `zero` command is advertised by the current CLI; completion remains a future Preview surface.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2101"
+title = "LSP lifecycle skeleton"
+state = "BlockedSpec"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/LSP-2101-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the absent accepted JSON-RPC framing, lifecycle state machine, capability/workspace schema, snapshot/cancellation boundary, and protocol inventory entry.",
+  "The audit covers pre-initialize and post-shutdown rejection, exit behavior, stdio purity, malformed framing, deterministic fixtures, and Stable/Experimental lifecycle requirements.",
+  "No LSP crate, transport loop, lifecycle API, capability field, workspace resolver, diagnostic allocation, or placeholder protocol is added while the authority and fixtures are absent.",
+  "The future implementation must use the approved compiler/VFS snapshot boundary and avoid a competing semantic or diagnostic authority.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "LSP-2101 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001 and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no LSP protocol is currently inventoried.",
+  "The current repository has compiler/VFS query foundations but no JSON-RPC transport or editor lifecycle implementation; no public LSP claim is made.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
