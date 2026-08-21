@@ -49,6 +49,7 @@
 | `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `CLI-1702` | `` |
 | `DAP-3601` | Debugger stdio adapter | `G3+` | `L` | `BlockedSpec` | `DIFF-3702` | `` |
 | `DAP-3602` | Zed debugger registration | `G3+` | `M` | `BlockedSpec` | `DAP-3601` | `` |
+| `DAP-3603` | Staged debugger capabilities | `G3+` | `L` | `BlockedSpec` | `DAP-3602` | `` |
 | `DIFF-3701` | Interpreter/VM/Native differential harness | `G3` | `L` | `BlockedSpec` | `FFI-3605` | `` |
 | `DIFF-3702` | Allowed-difference registry | `G3` | `M` | `BlockedSpec` | `DIFF-3701` | `` |
 | `EFF-2101` | Effect core model freeze | `G2` | `M` | `BlockedSpec` | — | `` |
