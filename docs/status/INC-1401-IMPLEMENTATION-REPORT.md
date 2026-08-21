@@ -35,10 +35,9 @@ cache file, LSP API, or public protocol.
 - No compiler/runtime source code, CLI command, LSP field, JSON schema,
   diagnostic code, Semantic ID version, cache artifact, or public protocol was
   added.
-- INC-1402 (VFS/revision) is the next implementation target and must consume
-  this boundary. Persistent cache, parallel query execution, compiler-facing
-  cancellation, LSP cancellation, and structured Task cancellation remain
-  separately governed.
+- INC-1402 (VFS/revision) now consumes this boundary. Persistent cache,
+  parallel query execution, compiler-facing cancellation, LSP cancellation,
+  and structured Task cancellation remain separately governed.
 
 ## Validation
 

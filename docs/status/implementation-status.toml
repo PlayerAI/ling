@@ -2717,5 +2717,51 @@ completed = "2026-08-21"
 notes = [
   "INC-1401 is an architecture/governance target, so no placeholder `ling-incremental` crate or public API was created.",
   "DEC-0019 is Accepted as an internal compiler boundary; it does not resolve the full persistent-cache gap or create a public compatibility promise.",
-  "INC-1402 VFS/revision is the next target and must provide executable clean/incremental equivalence evidence before later query tasks proceed.",
+  "INC-1402 VFS/revision is complete; INC-1403 parse queries are the next target and must provide executable clean/incremental equivalence evidence before later query tasks proceed.",
+]
+
+[[task]]
+id = "INC-1402"
+title = "VFS and revision boundary"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1401"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "crates/ling-source/Cargo.toml",
+]
+artifacts = [
+  "crates/ling-source/src/lib.rs",
+  "crates/ling-source/src/vfs.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/status/INC-1401-IMPLEMENTATION-REPORT.md",
+  "docs/status/INC-1402-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The internal VFS retains exact caller-provided UTF-8 bytes in immutable Arc-backed file snapshots with session-local revisions and canonical logical names; host filesystem paths, normalization, and cache persistence are not introduced.",
+  "Disk snapshots, open editor overlays, overlay close/reveal, package manifest, config, profile, and target inputs are represented explicitly; duplicate bytes reuse the visible revision and hidden disk changes do not invalidate an open overlay.",
+  "Visible snapshots are enumerated in canonical logical-name order, source IDs and revisions are deterministic within a session, and invalid logical names include traversal, separator, NUL, and drive-style forms.",
+  "No language semantics, diagnostics, schemas, Semantic IDs, CLI/LSP fields, public protocol, or Unicode tables changed; DEC-0019 remains the sole accepted internal boundary.",
+  "cargo test -p ling-source --locked --offline, cargo clippy -p ling-source --all-targets --locked --offline -- -D warnings, cargo fmt --all -- --check, and git diff --check: passed.",
+]
+verified_against_commit = "5c341078f3430a6fa1585fcaaf30d472dba7512f"
+completion_commit = "5c341078f3430a6fa1585fcaaf30d472dba7512f"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "INC-1402 is an internal in-memory source boundary; no public VFS protocol, cache schema, host filesystem watcher, or placeholder query crate was created.",
+  "The open incremental-cache gap remains for persistent schema/migration, corruption recovery, parallel scheduling, and later query invalidation tasks.",
+  "INC-1403 parse queries is the next executable target after this milestone.",
 ]
