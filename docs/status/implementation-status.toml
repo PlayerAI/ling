@@ -2541,3 +2541,63 @@ notes = [
   "No diagnostic allocation, JSON schema, Semantic ID, canonical semantic bytes, CLI contract, ABI/FFI layout, or Unicode 17.0.0 table changed.",
   "PROTO-BYTECODE remains Experimental; VM-1209 owns the broader differential corpus and VM-1210 owns fuzzing, cancellation, and additional resource-model work.",
 ]
+
+[[task]]
+id = "VM-1209"
+title = "Interpreter–VM differential contract and evidence"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["VM-1208"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0015.md",
+  "docs/RFC-0016.md",
+  "docs/RFC-0017.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "crates/ling-vm/tests/differential.rs",
+  "docs/RFC-0019.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/VM-1209-IMPLEMENTATION-REPORT.md",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0019 defines a table-driven, bounded Interpreter–VM oracle over one checked ProgramSnapshot, with no new source syntax, opcode, wire revision, diagnostic code, schema, or Semantic ID format.",
+  "The harness covers nine v1.0/v1.1/v1.2 cases: hello, direct call, deterministic format Fault, closure, recursion lowering, skipped effect, aggregate, checked match, and mutable-place observation.",
+  "Success compares ordered logical Console events and Unit entry results; Runtime Faults compare category, operation, canonical source name, original UTF-8 byte spans, and committed state.",
+  "Repeated snapshot construction asserts equal ProgramId values; encode/decode/verify execution compares the logical round-trip and treats VM internal/verification failures as test defects.",
+  "Explicit bounds cap fixture count, source names, source bytes, event streams, and event payloads; the harness does not compare paths, addresses, layouts, instruction counts, or debug output.",
+  "cargo test -p ling-vm --test differential --locked --offline: passed.",
+  "cargo test --workspace --locked --offline: passed, including the differential corpus, 19 ling-vm execution tests, and 92 xtask tests.",
+  "cargo clippy -p ling-bytecode -p ling-vm --all-targets --locked --offline -- -D warnings: passed.",
+  "cargo fmt --all -- --check, git diff --check, cargo xtask governance check-all, cargo xtask traceability verify --release v0.0.1, and cargo xtask support verify: passed.",
+]
+verified_against_commit = "558625676c0402cf793000297b0f388f87e532cc"
+completion_commit = "558625676c0402cf793000297b0f388f87e532cc"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0019 is Accepted and is the sole new VM-1209 differential authority; no unresolved semantic conflict was resolved through implementation behavior.",
+  "PROTO-BYTECODE remains Experimental and gains evidence only; no Stable, CLI artifact, default-backend, or general N-1 compatibility claim is made.",
+  "Diagnostics, schemas, Semantic IDs, canonical semantic bytes, CLI/ABI/FFI contracts, and Unicode 17.0.0 tables are unchanged; VM-1210 retains fuzzing, cancellation, and additional resource-model scope.",
+]
