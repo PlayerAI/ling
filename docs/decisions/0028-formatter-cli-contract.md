@@ -1,11 +1,11 @@
 # DEC-0028: Formatter CLI contract
 
-> 状态：Accepted  
-> Status: Accepted  
-> Proposed date: 2026-08-22  
-> Decision date: 2026-08-22  
-> Owner role：formatter-design  
-> Related authority/gap: `DEC-0003`, `DEC-0023`, `GAP-FORMATTER-CLI-PROTOCOL-001`  
+> 状态：Accepted
+> Status: Accepted
+> Proposed date: 2026-08-22
+> Decision date: 2026-08-22
+> Owner role：formatter-design
+> Related authority/gap: `DEC-0003`, `DEC-0023`, `GAP-FORMATTER-CLI-PROTOCOL-001`
 > Lifecycle record: `docs/governance/lifecycle.toml`
 
 This decision is intentionally limited to the file/stdin formatter command. It
