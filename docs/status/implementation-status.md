@@ -288,6 +288,7 @@
 | `VM-1209` | Interpreter–VM differential contract and evidence | `G1` | `L` | `Done` | `VM-1208` | `558625676c0402cf793000297b0f388f87e532cc` |
 | `VM-1210` | VM robustness, cancellation, and resource evidence | `G1` | `L` | `Done` | `VM-1209` | `611ab0db31d34219243d74a8ea53898a99296a04` |
 | `ZED-6801` | Zed Compatibility Matrix | `G6` | `M` | `BlockedSpec` | `DOC-6703` | `` |
+| `ZED-6802` | Language-server Discovery and Acquisition | `G6` | `L` | `BlockedSpec` | `ZED-6801` | `` |
 | `ZQ-3201` | Syntax highlighting queries | `G1` | `S` | `Done` | `TS-3108` | `77aab24ff8160e1535ea15b67d5302c1a4bb3fc8` |
 | `ZQ-3202` | Bracket matching queries | `G1` | `S` | `Done` | `ZQ-3201` | `1106b323685ed4910e6580a4347dce47df466208` |
 | `ZQ-3203` | Automatic indentation queries | `G1` | `S` | `Done` | `ZQ-3202` | `a4377450d26374098d95a9bb38520d3e3552dfd7` |
