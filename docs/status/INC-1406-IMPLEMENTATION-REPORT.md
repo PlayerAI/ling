@@ -61,14 +61,15 @@ changes.
 - No language syntax or semantics, diagnostic allocation, schema, Semantic ID
   algorithm, CLI/LSP field, public protocol, persistence format, or Unicode
   table changed.
-- Full clean versus incremental equivalence (INC-1407), deterministic parallel
-  scheduling, persistent cache decisions, compiler-facing cancellation, and
-  LSP adapters remain deferred.
+- Deterministic parallel scheduling, persistent cache decisions,
+  compiler-facing cancellation, and LSP adapters remain deferred. INC-1407
+  clean versus incremental equivalence is now complete in its test-only scope.
 - No third-party dependency was added; `ling-db` reuses the existing
   repository-owned `ling-semantic` crate and its canonical writer.
 
 ## Validation and next target
 
 The implementation commit and machine-readable completion evidence are recorded
-in `docs/status/implementation-status.toml`. INC-1407 full clean versus
-incremental equivalence is the next executable target.
+in `docs/status/implementation-status.toml`. INC-1408 deterministic parallel
+scheduling is the next execution-plan item, subject to its accepted design
+authority.

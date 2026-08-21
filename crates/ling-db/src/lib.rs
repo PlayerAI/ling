@@ -1556,6 +1556,89 @@ fn push_key_part(output: &mut String, value: &str) {
 mod tests {
     use super::*;
 
+    fn clean_database(source: &CompilerDb) -> CompilerDb {
+        let mut clean = CompilerDb::new();
+        for snapshot in source.vfs.snapshots() {
+            clean
+                .set_disk_snapshot(snapshot.logical_name(), snapshot.bytes().to_vec())
+                .expect("canonical snapshots can be reloaded into a clean VFS");
+        }
+        for kind in [
+            WorkspaceInput::PackageManifest,
+            WorkspaceInput::Config,
+            WorkspaceInput::Profile,
+            WorkspaceInput::Target,
+        ] {
+            if let Some(input) = source.vfs.workspace_input(kind) {
+                clean
+                    .set_workspace_input(kind, input.bytes().to_vec())
+                    .expect("workspace inputs can be reloaded into a clean VFS");
+            }
+        }
+        clean
+    }
+
+    fn clean_file(source: &CompilerDb, clean: &CompilerDb, file: SourceId) -> SourceId {
+        let name = source
+            .vfs
+            .snapshot(file)
+            .expect("source exists")
+            .logical_name()
+            .to_owned();
+        clean.vfs.file_id(&name).expect("clean source exists")
+    }
+
+    fn assert_clean_equivalent(db: &mut CompilerDb, file: SourceId) {
+        let mut clean = clean_database(db);
+        let clean_file = clean_file(db, &clean, file);
+        let incremental_types = db.type_effect(file).expect("incremental type/effect");
+        let clean_types = clean.type_effect(clean_file).expect("clean type/effect");
+        assert_eq!(&*incremental_types, &*clean_types);
+
+        let incremental_snapshot = db
+            .semantic_snapshot(file)
+            .expect("incremental semantic snapshot");
+        let clean_snapshot = clean
+            .semantic_snapshot(clean_file)
+            .expect("clean semantic snapshot");
+        assert_eq!(incremental_snapshot.json(), clean_snapshot.json());
+
+        let incremental_audit = ling_format::render_audit(&incremental_snapshot.audit_model())
+            .expect("incremental audit formatting");
+        let clean_audit = ling_format::render_audit(&clean_snapshot.audit_model())
+            .expect("clean audit formatting");
+        assert_eq!(incremental_audit, clean_audit);
+
+        let incremental_main = ling_effects::locate_main(incremental_snapshot.checked())
+            .expect("incremental Main entry");
+        let clean_main =
+            ling_effects::locate_main(clean_snapshot.checked()).expect("clean Main entry");
+        let mut incremental_console = ling_eval::MemoryConsole::default();
+        let mut clean_console = ling_eval::MemoryConsole::default();
+        let incremental_result = ling_eval::execute_main(
+            &incremental_snapshot,
+            &incremental_main,
+            &mut incremental_console,
+        )
+        .map_err(|error| {
+            error
+                .to_diagnostic()
+                .render_json()
+                .expect("incremental runtime diagnostic JSON")
+        });
+        let clean_result =
+            ling_eval::execute_main(&clean_snapshot, &clean_main, &mut clean_console).map_err(
+                |error| {
+                    error
+                        .to_diagnostic()
+                        .render_json()
+                        .expect("clean runtime diagnostic JSON")
+                },
+            );
+        assert_eq!(incremental_result, clean_result);
+        assert_eq!(incremental_console.output(), clean_console.output());
+    }
+
     fn file(event: ChangeEvent) -> SourceId {
         match event {
             ChangeEvent::Added { file, .. }
@@ -1976,5 +2059,50 @@ mod tests {
             changed_fragment.definition("main").unwrap().body_id()
         );
         assert_ne!(first_snapshot.program_id(), changed_snapshot.program_id());
+    }
+
+    #[test]
+    fn clean_and_incremental_pipelines_match_across_deterministic_edit_sequence() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "src/Main.ling",
+                b"module Main\n    requires Console.Write\n\nlet helper = 1\n\nlet main () = Console.write (Text.format \"{}\" helper)\n"
+                    .to_vec(),
+            )
+            .unwrap(),
+        );
+        assert_clean_equivalent(&mut db, main);
+
+        for edit in [
+            b"module Main\n    requires Console.Write\n\nlet helper = 2\n\nlet main () = Console.write (Text.format \"{}\" helper)\n".as_slice(),
+            b"module Main\r\n    requires Console.Write\r\n\r\n// presentation edit\r\nlet helper = 2\r\n\r\nlet main () = Console.write (Text.format \"{}\" helper)\r\n".as_slice(),
+            b"module Main\n    requires Console.Write\n\nlet helper = 3\n\nlet main () = Console.write (Text.format \"{}\" helper)\n".as_slice(),
+        ] {
+            db.set_disk_snapshot("src/Main.ling", edit.to_vec())
+                .unwrap();
+            assert_clean_equivalent(&mut db, main);
+        }
+    }
+
+    #[test]
+    fn clean_and_incremental_diagnostics_match_for_invalid_effects() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "Main.ling",
+                b"module Main\n\nlet main () = Console.write \"x\"\n".to_vec(),
+            )
+            .unwrap(),
+        );
+        let mut clean = clean_database(&db);
+        let clean_main = clean_file(&db, &clean, main);
+        let incremental_error = db.type_effect(main).unwrap_err();
+        let clean_error = clean.type_effect(clean_main).unwrap_err();
+        assert_eq!(incremental_error, clean_error);
+        assert!(matches!(
+            incremental_error,
+            QueryError::EffectChecking { .. }
+        ));
     }
 }

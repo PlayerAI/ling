@@ -16,5 +16,9 @@ ling-source = { path = "../ling-source" }
 ling-syntax = { path = "../ling-syntax" }
 ling-types = { path = "../ling-types" }
 
+[dev-dependencies]
+ling-eval = { path = "../ling-eval" }
+ling-format = { path = "../ling-format" }
+
 [lints]
 workspace = true
