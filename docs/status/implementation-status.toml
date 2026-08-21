@@ -3371,3 +3371,47 @@ notes = [
   "CommentAttachment is an in-process formatter model; incomplete-source recovery remains FMT-1505 and broad property/semantic evidence remains FMT-1506.",
   "The generated gap register removes FMT-1504 from the formatter gap blockers while the remaining recovery, evidence, and Audit separation work stays open.",
 ]
+
+[[task]]
+id = "FMT-1505"
+title = "Incomplete-source recovery"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1504"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+]
+artifacts = [
+  "crates/ling-format/src/author.rs",
+  "crates/ling-format/src/lib.rs",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/FMT-1504-IMPLEMENTATION-REPORT.md",
+  "docs/status/FMT-1505-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "FormatResult and FormatDisposition make the formatter publication decision explicit without adding a CLI/LSP or wire protocol.",
+  "Invalid or incomplete FormatDocument input returns exact original UTF-8 bytes, including BOM, CRLF, comments, localized text, and error-region spelling; no partial prefix edit is published.",
+  "A valid candidate is published only after comment-preservation and existing compiler-parser revalidation; rejected candidates fall back atomically to the original snapshot.",
+  "Targeted, clippy, full workspace, governance, formatting, and diff checks passed; no language semantics, diagnostics, Semantic IDs, Audit bytes, or public protocol changed.",
+]
+verified_against_commit = "da412442bde5c7624946909996fa40772d14ce77"
+completion_commit = "da412442bde5c7624946909996fa40772d14ce77"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The current accepted-safe policy is unchanged output for ambiguous/incomplete input; bounded complete-region recovery requires a future accepted decision and is not inferred here.",
+  "FMT-1506 formatter property and semantic-equivalence evidence is the next execution-plan target.",
+]
