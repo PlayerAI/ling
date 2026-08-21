@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 240 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, OWN-3206, GC-3301, GC-3302, GC-3303, GC-3304, NIR-3401, NIR-3402, NIR-3403, BACK-3501, BACK-3502, BACK-3503, BACK-3504, BACK-3505, FFI-3601, FFI-3602, FFI-3603, FFI-3604, FFI-3605, DIFF-3701, DIFF-3702, DAP-3601, DAP-3602, DAP-3603, KCHK-4101, KCHK-4102, KCHK-4103, KCHK-4104, KCHK-4105, CPU-4201, CPU-4202, CPU-4203, SIMD-4301, SIMD-4302, SIMD-4303, DBUF-4401, DBUF-4402, DBUF-4403, DBUF-4404, DIR-4501, DIR-4502, DIR-4503, GPU-4601, GPU-4602, GPU-4603, GPU-4604, GPU-4605, ACC-4701, ACC-4702, PLC-4801, PLC-4802, PLC-4803, PLC-4804, PLC-4805, PROF-5101, PROF-5102, PROF-5103, BND-5201, BND-5202, BND-5203, BND-5204, NODE-5301, NODE-5302, NODE-5303, NODE-5304, NODE-5305, NODE-5306, NODE-5307, CTR-5401, CTR-5402, CTR-5403, CTR-5404, CTR-5405, CTR-5406, CTR-5407, PROF-5104, PROOF-5501, PROOF-5502, PROOF-5503, MC-5601, MC-5602, MC-5603, MC-5604, TIM-5701, TIM-5702, TIM-5703, EVD-5801, EVD-5802, EVD-5803, EVD-5804, CBK-5901, CBK-5902, CBK-5903, STAB-6101, STAB-6102, STAB-6103, PROTO-6201, and OWN-3207 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 241 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, OWN-3206, GC-3301, GC-3302, GC-3303, GC-3304, NIR-3401, NIR-3402, NIR-3403, BACK-3501, BACK-3502, BACK-3503, BACK-3504, BACK-3505, FFI-3601, FFI-3602, FFI-3603, FFI-3604, FFI-3605, DIFF-3701, DIFF-3702, DAP-3601, DAP-3602, DAP-3603, KCHK-4101, KCHK-4102, KCHK-4103, KCHK-4104, KCHK-4105, CPU-4201, CPU-4202, CPU-4203, SIMD-4301, SIMD-4302, SIMD-4303, DBUF-4401, DBUF-4402, DBUF-4403, DBUF-4404, DIR-4501, DIR-4502, DIR-4503, GPU-4601, GPU-4602, GPU-4603, GPU-4604, GPU-4605, ACC-4701, ACC-4702, PLC-4801, PLC-4802, PLC-4803, PLC-4804, PLC-4805, PROF-5101, PROF-5102, PROF-5103, BND-5201, BND-5202, BND-5203, BND-5204, NODE-5301, NODE-5302, NODE-5303, NODE-5304, NODE-5305, NODE-5306, NODE-5307, CTR-5401, CTR-5402, CTR-5403, CTR-5404, CTR-5405, CTR-5406, CTR-5407, PROF-5104, PROOF-5501, PROOF-5502, PROOF-5503, MC-5601, MC-5602, MC-5603, MC-5604, TIM-5701, TIM-5702, TIM-5703, EVD-5801, EVD-5802, EVD-5803, EVD-5804, CBK-5901, CBK-5902, CBK-5903, STAB-6101, STAB-6102, STAB-6103, PROTO-6201, PROTO-6202, and OWN-3207 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -11889,6 +11889,64 @@ notes = [
   "The active docs/governance/protocol-inventory.toml and generated report record 21 protocols with 0 Stable current public protocols; Future records have no versions/fixtures, and schemas/registry.toml is a separate schema compatibility registry.",
   "The audit does not reinterpret the G6 registry checklist, governance inventory, schema registry, accepted Seed/VM protocols, support matrix, or roadmap and creates no duplicate registry or stale zero command.",
   "The audit adds no public protocol, dependency, runtime, backend, target, schema, diagnostic, CLI, editor, package, registry, or placeholder API; Protocol Registry remains deferred until accepted authority and executable compatibility evidence exist.",
+]
+
+[[task]]
+id = "PROTO-6202"
+title = "Reader/Writer Compatibility Tests"
+state = "BlockedSpec"
+release = "G6"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROTO-6201"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/SCHEMA-LIFECYCLE.md",
+  "schemas/registry.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "docs/status/PROTO-6202-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records that Reader/Writer Compatibility Tests remain non-normative until PROTO-6201 and each protocol-specific Accepted authority defines version graphs, reader/writer ownership, N-1/migration edges, unknown/missing fields, canonical identity, and resource limits.",
+  "The audit distinguishes current JSON/schema and bytecode malformed/compatibility tests, explicit NoPreviousVersion policy, accepted Seed/VM protocols, Future ABI/replay/evidence/device/LSP formats, and G6 planning from a universal 1.0 compatibility promise without adding readers or migrations.",
+  "The audit requires fail-closed future-version/corrupt/truncated/overlimit behavior, canonical re-encoding rules, stable bilingual L-<DOMAIN>-<NUMBER> diagnostics, original spans, deterministic/offline fixtures, and generated registry/report drift checks.",
+  "No N-1 reader, migration tool, canonical re-encoder, compatibility edge, protocol version, ABI/device/replay/evidence reader, diagnostic allocation, CLI/LSP route, dependency, or placeholder API is added while authority is unresolved.",
+  "The future implementation must preserve Unicode 17.0.0/source spans, checked Typed Core boundaries, deterministic identity and ordering, current schema/bytecode policies, accepted ling/.ling behavior, and explicit NoPreviousVersion/Experimental/Preview/Future states.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "PROTO-6202 is BlockedSpec by PROTO-6201, Draft SCHEMA-LIFECYCLE policy, absent protocol-specific Accepted version/migration authority, the 1.0-draft support matrix, Future protocol records, open G1-G5/protocol gaps, and unresolved compatibility, identity, diagnostic, and evidence boundaries.",
+  "The repository has scoped schema and bytecode validation/corrupt-input evidence; schemas/registry.toml explicitly records NoPreviousVersion and no general N-1 reader or migration tool exists for Future protocols.",
+  "The audit does not reinterpret the G6 compatibility checklist, schema policy, existing readers/writers, accepted Seed/VM protocols, support matrix, or roadmap and creates no stale zero command or placeholder.",
+  "The audit adds no public protocol, dependency, runtime, backend, target, schema, diagnostic, CLI, editor, package, reader, writer, migration, or placeholder API; compatibility tests remain deferred until accepted edges and fixtures exist.",
 ]
 
 [[task]]
