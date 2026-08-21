@@ -198,7 +198,7 @@ blocked_tasks = ["TRAIT-1301", "TRAIT-1302", "TRAIT-1303", "TRAIT-1304", "TRAIT-
 observable_behavior = "Programs cannot predict which Trait implementations are legal or selected across packages, how ambiguity terminates, or how a selected instance reaches Checked Core."
 authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0"]
 candidate_rfcs = ["RFC-0005"]
-source_items = ["SEMANTICS-31.3", "RFC-0001-22:RFC-0005", "ROADMAP-5.2:trait"]
+source_items = ["SEMANTICS-31.3", "RFC-0001-22:RFC-0005", "ROADMAP-5.2:trait", "RFC-0005"]
 options = [
   "Adopt a deliberately restricted global coherence and orphan model with explicit dictionary lowering.",
   "Adopt package-scoped instance ownership with a different accepted disambiguation and lowering rule.",
@@ -206,7 +206,7 @@ options = [
 irreversible_consequences = ["Coherence and orphan rules determine cross-package compatibility and whether later implementations are breaking changes."]
 required_evidence = ["positive", "negative", "migration", "cross-package", "termination", "determinism"]
 owner_role = "type-system-design"
-next_action = "Draft RFC-0005 and a cross-package acceptance corpus before TRAIT-1302."
+next_action = "Review and accept RFC-0005 with a cross-package acceptance corpus before TRAIT-1302."
 resolution = []
 superseded_by = ""
 observed_markers = []

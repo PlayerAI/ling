@@ -314,6 +314,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0005"
+title = "Restricted Traits and constraint solving"
+kind = "RFC"
+status = "Draft"
+version = "0.1-draft"
+authority = "Draft"
+path = "docs/RFC-0005.md"
+covers = ["Trait declarations", "nominal constraints", "coherence and orphan rules", "deterministic selection", "Checked Core dictionary witnesses"]
+depends_on = ["RFC-0001", "SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = false
+
+[[document]]
 id = "RFC-0014"
 title = "Portable verified bytecode and VM contract"
 kind = "RFC"

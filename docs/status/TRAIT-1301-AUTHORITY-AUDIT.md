@@ -6,9 +6,9 @@ Status: **BlockedSpec**
 
 TRAIT-1301 is the next G1 work item in the execution plan, but it is a semantic
 design gate rather than an implementation file. No implementation is authorized
-until an accepted Trait RFC fixes the language contract. The repository currently
-has no `docs/RFC-0005.md`; the only RFC-0005 reference is a future-RFC entry in
-Draft RFC-0001 and the open `GAP-TRAIT-COHERENCE-001`.
+until an accepted Trait RFC fixes the language contract. A new `docs/RFC-0005.md`
+now records a deliberately restricted Draft proposal; it is not implementation
+authority. The open `GAP-TRAIT-COHERENCE-001` remains unresolved.
 
 Implementing parser, resolver, solver, or lowering behavior now would make Draft
 or illustrative text observable language semantics and would block compatible
@@ -27,7 +27,8 @@ cross-package evolution.
   constraints, coherence, orphan and overlap rules, inference boundaries, public
   API presentation, lowering, and Semantic ID treatment.
 - `docs/RFC-0001.md` §22 lists RFC-0005 as a future RFC, and RFC-0001 is Draft;
-  it is not authority to implement Trait semantics.
+  it is not authority to implement Trait semantics. `docs/RFC-0005.md` is now a
+  Draft proposal with `stable_basis = false`.
 - `docs/governance/gap-register.toml` records `GAP-TRAIT-COHERENCE-001` as an
   open P0 gap blocking TRAIT-1301 through TRAIT-1307.
 
@@ -58,8 +59,7 @@ The following externally observable decisions are still open:
 
 ## Required next action
 
-Draft RFC-0005 from `docs/governance/templates/RFC.md`, register its lifecycle,
-and obtain acceptance together with cross-package positive, negative,
+Review and accept RFC-0005 after cross-package positive, negative,
 termination, determinism, and migration evidence. Only then may TRAIT-1302
 through TRAIT-1307 add implementation files; TRAIT-1301 remains BlockedSpec.
 

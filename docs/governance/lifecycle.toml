@@ -626,3 +626,29 @@ unresolved_alternatives = [
   "Wholesale acceptance is rejected until every broad RFC-0001 proposal has focused evidence; supersession is rejected because the Draft remains useful provenance, and dedicated Accepted RFCs are preferred for post-Seed work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0005"
+kind = "RFC"
+status = "Draft"
+path = "docs/RFC-0005.md"
+history = ["Open", "Draft"]
+opened = "2026-08-21"
+proposed = ""
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Cover positive declarations, implementations, generic obligations, and explicit dictionary witnesses in checked core.",
+  "Cover duplicate members, missing members, orphan violations, overlap, unsatisfied obligations, and recursive non-termination.",
+  "Cover cross-package ownership, locked/offline graph changes, visibility, deterministic selection, Unicode 17.0.0, CRLF, and original UTF-8 spans.",
+  "Add checked-interpreter/VM differential evidence and migration vectors for any future Semantic ID or rule revision.",
+]
+compatibility_impact = [
+  "The Draft changes no current source, runtime, CLI/LSP, diagnostic, schema, Semantic ID, bytecode, Unicode, or public protocol behavior.",
+  "Any accepted Trait syntax, diagnostic allocation, checked projection, or bytecode witness must receive its own compatibility evidence before implementation claims support.",
+]
+unresolved_alternatives = [
+  "Exact declaration punctuation, constraint spelling, blanket-impl scope, recursive progress measure, dictionary witness schema, associated types/default methods, and final bilingual diagnostic allocation remain unresolved.",
+]
+superseded_by = ""

@@ -3609,6 +3609,7 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/RFC-0001.md",
+  "docs/RFC-0005.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -3631,5 +3632,5 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "TRAIT-1301 is blocked by GAP-TRAIT-COHERENCE-001; SEMANTICS.md explicitly excludes Trait from v0.0.1 and RFC-0001 is Draft.",
-  "The repository contains no accepted RFC-0005 and no Ling Trait AST, solver, lowering, or conformance corpus; this milestone records the authority boundary only.",
+  "RFC-0005 is now a non-authoritative Draft proposal; no Ling Trait AST, solver, lowering, or conformance corpus is claimed by this milestone.",
 ]

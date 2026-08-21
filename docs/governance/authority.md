@@ -78,6 +78,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `DESIGN-REVIEW` | Review | `Active` | `2026-08-17` | `Opinion` | no | [Ling design review](../design-review.html) | `non-normative design critique` | `SEMANTICS`, `LANGUAGE` | — |
 | `RUST-IMPLEMENTATION` | Implementation | `Active` | `0.0.1` | `Implementation` | no | [Ling Rust implementation](../../crates) | `compiler`, `interpreter`, `CLI` | `CONFORMANCE` | — |
 | `RFC-0001` | RFC | `Draft` | `0.0.1-draft` | `Draft` | no | [Ling foundation and v0.0.1 Seed](../RFC-0001.md) | `Seed scope`, `syntax`, `compiler architecture`, `CLI`, `governance` | `SEMANTICS`, `LANGUAGE` | — |
+| `RFC-0005` | RFC | `Draft` | `0.1-draft` | `Draft` | no | [Restricted Traits and constraint solving](../RFC-0005.md) | `Trait declarations`, `nominal constraints`, `coherence and orphan rules`, `deterministic selection`, `Checked Core dictionary witnesses` | `RFC-0001`, `SEMANTICS`, `LANGUAGE`, `ROADMAP-1.0`, `GAP-REGISTER` | — |
 
 ## Conflict and correction workflow
 
