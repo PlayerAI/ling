@@ -78,6 +78,6 @@ not infer or rewrite ambiguous error regions.
 
 ## Next target
 
-FMT-1506, formatter property tests, is the next execution-plan target. It must
-retain the unchanged-invalid-source contract and exercise the disposition and
-comment-preservation gates over deterministic valid and invalid corpora.
+FMT-1507, formatter CLI/LSP integration, is the next execution-plan target. It
+must retain the unchanged-invalid-source contract and property evidence while
+waiting for its separate accepted command and transaction protocol decisions.

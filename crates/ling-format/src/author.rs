@@ -412,8 +412,14 @@ const fn is_word_like(kind: TokenKind) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use ling_ast::lower as lower_ast;
+    use ling_effects::check as check_effects;
+    use ling_hir::lower as lower_hir;
+    use ling_resolve::resolve;
+    use ling_semantic::build as build_snapshot;
     use ling_source::{SourceFile, SourceId};
     use ling_syntax::parse;
+    use ling_types::check as check_types;
 
     use super::*;
     use crate::build_format_ir;
@@ -428,12 +434,123 @@ mod tests {
         format_core(&document)
     }
 
+    fn semantic_snapshot(input: &str) -> String {
+        let source = SourceFile::from_bytes(
+            SourceId::new(15106),
+            "property.ling",
+            input.as_bytes().to_vec(),
+        )
+        .expect("valid property source");
+        let parsed = parse(&source);
+        assert!(parsed.is_valid(), "{:#?}", parsed.parse_errors());
+        let ast = lower_ast(&source, &parsed).expect("valid AST");
+        let hir = lower_hir(source.name(), &ast).expect("valid HIR");
+        let resolved = resolve(vec![hir], "Main").expect("valid resolution");
+        let typed = check_types(resolved).expect("valid types");
+        let checked = check_effects(typed).expect("valid effects");
+        build_snapshot(checked)
+            .expect("semantic snapshot builds")
+            .json()
+            .to_owned()
+    }
+
+    fn syntax_signature(input: &str) -> Vec<(TokenKind, String)> {
+        let source = SourceFile::from_bytes(
+            SourceId::new(15107),
+            "signature.ling",
+            input.as_bytes().to_vec(),
+        )
+        .expect("valid signature source");
+        parse(&source)
+            .tree()
+            .tokens()
+            .iter()
+            .filter(|token| !token.kind().is_trivia() && !token.kind().is_layout())
+            .filter(|token| token.kind() != TokenKind::Eof)
+            .map(|token| {
+                let span = token.span();
+                (
+                    token.kind(),
+                    source.original_text()[span.start().get() as usize..span.end().get() as usize]
+                        .to_owned(),
+                )
+            })
+            .collect()
+    }
+
+    fn comment_signature(input: &str) -> Vec<String> {
+        let source = SourceFile::from_bytes(
+            SourceId::new(15108),
+            "comments-property.ling",
+            input.as_bytes().to_vec(),
+        )
+        .expect("valid comment source");
+        let parsed = parse(&source);
+        let document = build_format_ir(&source, &parsed).expect("Format IR builds");
+        document
+            .tokens()
+            .iter()
+            .filter(|token| {
+                matches!(
+                    token.kind(),
+                    TokenKind::LineComment | TokenKind::DocComment | TokenKind::BlockComment
+                )
+            })
+            .map(|token| token.text().to_owned())
+            .collect()
+    }
+
     #[test]
     fn formats_core_spacing_and_four_space_layout() {
         assert_eq!(
             format("let add a b=\n  a+b\nlet main ()=add 1 2\n"),
             "let add a b =\n    a + b\nlet main () = add 1 2\n"
         );
+    }
+
+    #[test]
+    fn property_corpus_is_idempotent_parse_equivalent_and_semantically_equivalent() {
+        let corpus = [
+            "module Main\n\nlet identity value=value\n\nlet main ()=identity ()\n",
+            concat!(
+                "module Main\r\n",
+                "    requires Console.Write\r\n",
+                "\r\n",
+                "/// 输出\r\n",
+                "let main ()=Console.write \"你好，零\"// 行尾\r\n",
+            ),
+            concat!(
+                "module Main\n\n",
+                "/* 外层\n",
+                "   /* 内层 */\n",
+                "*/\n",
+                "let main ()=if true then () else ()\n",
+            ),
+        ];
+
+        for original in corpus {
+            let formatted = format(original);
+            assert_eq!(
+                format(&formatted),
+                formatted,
+                "not idempotent: {original:?}"
+            );
+            assert_eq!(
+                syntax_signature(original),
+                syntax_signature(&formatted),
+                "syntax signature changed: {original:?}"
+            );
+            assert_eq!(
+                comment_signature(original),
+                comment_signature(&formatted),
+                "comment spelling/order changed: {original:?}"
+            );
+            assert_eq!(
+                semantic_snapshot(original),
+                semantic_snapshot(&formatted),
+                "checked semantic snapshot changed: {original:?}"
+            );
+        }
     }
 
     #[test]

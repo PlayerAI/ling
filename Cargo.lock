@@ -293,10 +293,15 @@ dependencies = [
 name = "ling-format"
 version = "0.0.1-dev"
 dependencies = [
+ "ling-ast",
  "ling-diagnostics",
+ "ling-effects",
+ "ling-hir",
+ "ling-resolve",
  "ling-semantic",
  "ling-source",
  "ling-syntax",
+ "ling-types",
  "serde_json",
 ]
 

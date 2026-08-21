@@ -13,5 +13,12 @@ ling-source = { path = "../ling-source" }
 ling-syntax = { path = "../ling-syntax" }
 serde_json.workspace = true
 
+[dev-dependencies]
+ling-ast = { path = "../ling-ast" }
+ling-effects = { path = "../ling-effects" }
+ling-hir = { path = "../ling-hir" }
+ling-resolve = { path = "../ling-resolve" }
+ling-types = { path = "../ling-types" }
+
 [lints]
 workspace = true
