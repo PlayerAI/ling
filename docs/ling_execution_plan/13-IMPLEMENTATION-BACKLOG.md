@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1106`、`PRJ-1108` 与 `VM-1201`～`VM-1204` Done；`PRJ-1107` 的 project `test`/`build` CLI 行为与 VM-1205 后续扩展仍服从各自接口/RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1106`、`PRJ-1108` 与 `VM-1201`～`VM-1210` Done；`PRJ-1107` 的 project `test`/`build` CLI 行为仍服从其接口前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -95,7 +95,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | L | Done | `03-G1-V0.1-LIVING.md:166`；见 deterministic lowering/encoder/disassembler、Hello exact goldens、机器状态与实施报告 |
 | `VM-1203` | G1/Editor | 独立 decoder/verifier | L | Done | `03-G1-V0.1-LIVING.md:180`；见 bounded decoder、独立 verifier、双语诊断、malformed/fuzz evidence、机器状态与实施报告 |
 | `VM-1204` | G1/Editor | VM 基础执行 | L | Done | `03-G1-V0.1-LIVING.md:196`；见 verifier-gated `ling-vm`、显式 value/host Capability/budget/source-map Fault、differential evidence、机器状态与实施报告 |
-| `VM-1205` | G1/Editor | 函数、closure、recursion | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:205` |
+| `VM-1205` | G1/Editor | 函数、closure、recursion | L | Done | Accepted RFC-0015；见 `crates/ling-bytecode/src/lower/v1_1.rs`、`crates/ling-vm/src/execute.rs` 与 `docs/status/VM-1205-IMPLEMENTATION-REPORT.md` |
 | `VM-1206` | G1/Editor | Record、ADT、match | L | Done | RFC-0016；见 `ling-bytecode` v1.2 lowering/verifier/round-trip tests、`ling-vm` aggregate differential tests、`docs/status/VM-1206-IMPLEMENTATION-REPORT.md` |
 | `VM-1207` | G1/Editor | Mutable place 与基础 borrow | L | Done | RFC-0017；见 v1.2 SSA place lowering、CFG join、interpreter/VM differential evidence、机器状态与实施报告 |
 | `VM-1208` | G1/Editor | Effect/Capability/Fault | L | Done | RFC-0018；见现有 Effect/Capability 元数据闭包、执行前 capability preflight、稳定 Runtime Fault/source-map 证据及 host panic containment 测试 |
