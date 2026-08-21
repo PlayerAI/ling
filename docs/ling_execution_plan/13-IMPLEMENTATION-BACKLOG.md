@@ -261,7 +261,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DAP-3603` | G3+ | 能力阶段 | — | BlockedSpec | `05-ZED-EXTENSION.md:538`, `docs/status/DAP-3603-AUTHORITY-AUDIT.md` |
 | `KCHK-4101` | G4 | Kernel 允许能力矩阵 | M | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:69`, `docs/status/KCHK-4101-AUTHORITY-AUDIT.md` |
 | `KCHK-4102` | G4 | Kernel Effect 与 Capability 检查 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:90`, `docs/status/KCHK-4102-AUTHORITY-AUDIT.md` |
-| `KCHK-4103` | G4 | Shape、Index 与 Bounds | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:103` |
+| `KCHK-4103` | G4 | Shape、Index 与 Bounds | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:103`, `docs/status/KCHK-4103-AUTHORITY-AUDIT.md` |
 | `KCHK-4104` | G4 | Alias 和并行写冲突 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:113` |
 | `KCHK-4105` | G4 | Kernel Core 与 Verifier | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:124` |
 | `CPU-4201` | G4 | Scalar Reference Backend | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:137` |
