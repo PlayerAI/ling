@@ -15,6 +15,9 @@ use num_bigint::BigInt;
 
 mod coherence;
 mod constraints;
+// Solver evidence remains crate-private until dictionary lowering integrates it.
+#[allow(dead_code)]
+mod solver;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct TypeId(u32);

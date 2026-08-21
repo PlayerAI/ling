@@ -373,55 +373,37 @@ fn resolve_trait_id(
     name: &hir::QualifiedName,
     traits: &BTreeMap<TraitId, TraitInfo>,
 ) -> Option<TraitId> {
-    if name.segments.len() == 1 {
-        return traits
-            .keys()
-            .find(|id| id.module == module.id && id.name == name.normalized())
-            .cloned();
-    }
-    let first = name.segments.first()?.normalized.as_str();
-    let tail = name
-        .segments
-        .iter()
-        .skip(1)
-        .map(|segment| segment.normalized.as_str())
-        .collect::<Vec<_>>()
-        .join(".");
-    let final_name = name.segments.last()?.normalized.clone();
-    let imported = module.imports.get(first).copied();
-    imported
-        .or_else(|| {
-            let module_name = name
-                .segments
-                .iter()
-                .take(name.segments.len() - 1)
-                .map(|segment| segment.normalized.as_str())
-                .collect::<Vec<_>>()
-                .join(".");
-            traits
-                .keys()
-                .find(|id| {
-                    traits
-                        .get(id)
-                        .is_some_and(|info| info.id.name == final_name)
-                        && resolved_module_name(id.module, traits) == module_name
-                })
-                .map(|id| id.module)
-        })
-        .and_then(|module_id| {
-            traits
-                .keys()
-                .find(|id| id.module == module_id && id.name == tail)
-                .cloned()
-        })
+    resolve_trait_id_name(module, &name.normalized(), traits)
 }
 
-fn resolved_module_name(module: ModuleId, traits: &BTreeMap<TraitId, TraitInfo>) -> String {
+pub(crate) fn resolve_trait_id_name(
+    module: &ResolvedModule,
+    normalized_name: &str,
+    traits: &BTreeMap<TraitId, TraitInfo>,
+) -> Option<TraitId> {
+    let segments = normalized_name.split('.').collect::<Vec<_>>();
+    let name = segments.last().copied()?;
+    if segments.len() == 1 {
+        return traits
+            .keys()
+            .find(|id| id.module == module.id && id.name == name)
+            .cloned();
+    }
+
+    let first = segments[0];
+    let tail = segments[1..].join(".");
+    if let Some(imported) = module.imports.get(first) {
+        return traits
+            .keys()
+            .find(|id| id.module == *imported && id.name == tail)
+            .cloned();
+    }
+
+    let module_name = segments[..segments.len() - 1].join(".");
     traits
         .values()
-        .find(|info| info.id.module == module)
-        .map(|info| info.module_name.clone())
-        .unwrap_or_default()
+        .find(|info| info.module_name == module_name && info.id.name == name)
+        .map(|info| info.id.clone())
 }
 
 fn receiver_owner(
@@ -487,7 +469,7 @@ fn owns_target(current: Option<&str>, target: Option<&str>, local: bool) -> bool
     local && current == target
 }
 
-fn receiver_head(receiver: &ConstraintType) -> Option<String> {
+pub(crate) fn receiver_head(receiver: &ConstraintType) -> Option<String> {
     match receiver {
         ConstraintType::Named(name) | ConstraintType::Variable(name) => {
             (!name.is_empty()).then(|| name.clone())
@@ -496,7 +478,7 @@ fn receiver_head(receiver: &ConstraintType) -> Option<String> {
     }
 }
 
-fn contains_variable(value: &ConstraintType) -> bool {
+pub(crate) fn contains_variable(value: &ConstraintType) -> bool {
     match value {
         ConstraintType::Variable(_) => true,
         ConstraintType::Named(_) => false,
@@ -508,7 +490,7 @@ fn may_overlap(left: &ConstraintType, right: &ConstraintType) -> bool {
     contains_variable(left) || contains_variable(right)
 }
 
-fn canonical_type(value: &ConstraintType) -> String {
+pub(crate) fn canonical_type(value: &ConstraintType) -> String {
     match value {
         ConstraintType::Named(name) => name.clone(),
         ConstraintType::Variable(name) => format!("'{name}"),

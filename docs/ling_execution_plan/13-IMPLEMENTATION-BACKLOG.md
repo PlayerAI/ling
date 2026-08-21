@@ -105,7 +105,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TRAIT-1302` | G1/Editor | AST/HIR 表示 | — | Done | RFC-0005 §1; see `docs/status/TRAIT-1302-IMPLEMENTATION-REPORT.md` |
 | `TRAIT-1303` | G1/Editor | Constraint collection | — | Done | DEC-0024; see `docs/status/TRAIT-1303-IMPLEMENTATION-REPORT.md` |
 | `TRAIT-1304` | G1/Editor | Coherence/orphan checker | — | Done | DEC-0025; `03-G1-V0.1-LIVING.md:289`; `docs/status/TRAIT-1304-IMPLEMENTATION-REPORT.md` |
-| `TRAIT-1305` | G1/Editor | Solver v0 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:296` |
+| `TRAIT-1305` | G1/Editor | Solver v0 | — | In Progress | DEC-0026; `03-G1-V0.1-LIVING.md:296`; `docs/status/TRAIT-1305-IMPLEMENTATION-REPORT.md` |
 | `TRAIT-1306` | G1/Editor | Checked Core 显式化 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:300` |
 | `TRAIT-1307` | G1/Editor | Interpreter/VM lowering | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:304` |
 | `TRAIT-1308` | G1/Editor | IDE 支持 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:308` |

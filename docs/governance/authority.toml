@@ -301,6 +301,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0026"
+title = "Trait solver v0 boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0026-trait-solver-v0-boundary.md"
+covers = ["unique concrete Trait candidate selection", "stable unsatisfied and ambiguous evidence", "recursive obligation cycle and depth termination"]
+depends_on = ["RFC-0005", "DEC-0025", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0024"
 title = "Trait obligation collection boundary"
 kind = "Decision"

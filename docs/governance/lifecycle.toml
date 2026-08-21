@@ -46,6 +46,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0026"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0026-trait-solver-v0-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Select one exact concrete nominal receiver and preserve Trait, impl, member, and origin-span identity.",
+  "Reject zero, variable, malformed, and multiple candidates with stable internal evidence and candidate order.",
+  "Reject active recursion cycles and the 64-level nested-obligation limit without unbounded execution.",
+  "Keep the solver crate-private and outside executable Typed Core and public Trait diagnostics.",
+]
+compatibility_impact = [
+  "Adds only an internal ling-types solver boundary; source, diagnostics, schemas, Semantic IDs, CLI/LSP and package protocols, ABI, bytecode, runtime, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Generic or blanket impls, type-variable substitution, specialization, dictionary witnesses, Semantic Graph projection, public diagnostics, and runtime lowering require later authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0024"
 kind = "Decision"
 status = "Accepted"

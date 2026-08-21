@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 63 tasks (61 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 64 tasks (61 Done, one In Progress TRAIT task, and the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3636,6 +3636,49 @@ completed = "2026-08-21"
 notes = [
   "RFC-0005 is now Accepted dedicated authority; SEMANTICS.md still excludes Trait from v0.0.1 and RFC-0001 remains Draft.",
   "No Ling Trait AST, solver, lowering, or conformance corpus is claimed by this design milestone; TRAIT-1302 is the next Ready implementation slice.",
+]
+
+[[task]]
+id = "TRAIT-1305"
+title = "Trait solver v0"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1304"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0025-trait-coherence-index-boundary.md",
+  "docs/decisions/0026-trait-solver-v0-boundary.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-types/src/solver.rs",
+  "docs/status/TRAIT-1305-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0005 §2.4–§2.5 unique-candidate and recursive-termination rules are represented by an internal immutable solver boundary.",
+  "Exactly one concrete nominal candidate selects; zero candidates, variable receivers, unknown Traits, malformed receiver arity, and multiple candidates produce distinct bounded internal evidence.",
+  "Nested requirements terminate on repeated active obligation keys and at the 64-level depth bound without stack overflow or unbounded allocation.",
+  "Selection preserves Trait/impl/member identity, ordered source origin, and deterministic candidate/error order; it cannot resolve ambiguity by ordering.",
+  "No dictionary witness, public diagnostic, schema, Semantic ID, CLI/LSP, ABI, bytecode, runtime, or Unicode 17.0.0 behavior changes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "DEC-0026 accepts the crate-private first-slice solver contract after the TRAIT-1304 coherence index.",
+  "TRAIT-1306 and TRAIT-1307 remain deferred for Checked Core dictionary witnesses and interpreter/VM lowering.",
 ]
 
 [[task]]
