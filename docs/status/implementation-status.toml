@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 70 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, and CLI-1702 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 71 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, and CLI-1703 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3679,6 +3679,49 @@ completed = ""
 notes = [
   "CLI-1702 is BlockedSpec downstream of CLI-1701 and the project/formatter CLI gates; the current PROTO-CLI-EXIT and DEC-0013 behavior remains unchanged.",
   "The current Seed subset already supports human/JSON rendering and stable exit classes; this audit does not relabel that implemented evidence as a future command contract.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "CLI-1703"
+title = "Project initialization command"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701", "PRJ-1107"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/CLI-1703-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the accepted RFC-0002 library boundary and identifies the missing init root, template, generated-file, editor-file, output, and failure-atomicity contracts.",
+  "The audit explicitly rejects stale `zero init` material and preserves the accepted `ling` command and `.ling` source names.",
+  "No init command, filesystem writer, template, manifest field, editor task file, diagnostic allocation, or protocol entry is added while the contract and fixtures are absent.",
+  "The future implementation must be offline, deterministic, failure-atomic, and covered by generated-byte and existing-root fixtures.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "CLI-1703 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001 and CLI-1701; RFC-0002 defines library project inputs but no initializer or template protocol.",
+  "No lower-authority `zero` spelling, `.zero` file, or unregistered editor metadata is allowed to enter the implementation.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 

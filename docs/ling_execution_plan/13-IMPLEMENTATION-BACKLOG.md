@@ -130,7 +130,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FMT-1508` | G1/Editor | Audit 分离 | S | Done | DEC-0015、DEC-0023；见 `crates/ling-format/src/author.rs` 的 canonical Audit Source byte-equivalence property 与实施报告；CLI/LSP protocol decisions remain FMT-1507 blockers |
 | `CLI-1701` | G1/Editor | 命令模型统一 | — | BlockedSpec | `03-G1-V0.1-LIVING.md:462`, `docs/status/CLI-1701-AUTHORITY-AUDIT.md` |
 | `CLI-1702` | G1/Editor | 输出与退出码 | — | BlockedSpec | `03-G1-V0.1-LIVING.md:466`, `docs/status/CLI-1702-AUTHORITY-AUDIT.md` |
-| `CLI-1703` | G1/Editor | `init` | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:470` |
+| `CLI-1703` | G1/Editor | `init` | — | BlockedSpec | `03-G1-V0.1-LIVING.md:470`, `docs/status/CLI-1703-AUTHORITY-AUDIT.md` |
 | `CLI-1704` | G1/Editor | `test` | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:474` |
 | `CLI-1705` | G1/Editor | `query/patch` | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:478` |
 | `CLI-1706` | G1/Editor | Shell completion 与 help fixtures | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:482` |
