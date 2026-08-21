@@ -242,7 +242,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GC-3303` | G3 | Managed 与 Native/FFI 边界 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:271`, `docs/status/GC-3303-AUTHORITY-AUDIT.md` |
 | `GC-3304` | G3 | Profile 检查 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:282`, `docs/status/GC-3304-AUTHORITY-AUDIT.md` |
 | `NIR-3401` | G3 | Native IR 设计 | L | BlockedSpec | `07-G3-V0.3-NATIVE.md:291`, `docs/status/NIR-3401-AUTHORITY-AUDIT.md` |
-| `NIR-3402` | G3 | Core → Native IR Lowering | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:308` |
+| `NIR-3402` | G3 | Core → Native IR Lowering | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:308`, `docs/status/NIR-3402-AUTHORITY-AUDIT.md` |
 | `NIR-3403` | G3 | IR Verifier | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:324` |
 | `BACK-3501` | G3 | Backend 选择 Spike | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:341` |
 | `BACK-3502` | G3 | Baseline Codegen | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:352` |
