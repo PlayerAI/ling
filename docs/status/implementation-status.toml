@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 164 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, OWN-3206, GC-3301, GC-3302, GC-3303, GC-3304, NIR-3401, NIR-3402, NIR-3403, BACK-3501, BACK-3502, BACK-3503, BACK-3504, BACK-3505, FFI-3601, FFI-3602, FFI-3603, FFI-3604, FFI-3605, DIFF-3701, DIFF-3702, and OWN-3207 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 165 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, OWN-3206, GC-3301, GC-3302, GC-3303, GC-3304, NIR-3401, NIR-3402, NIR-3403, BACK-3501, BACK-3502, BACK-3503, BACK-3504, BACK-3505, FFI-3601, FFI-3602, FFI-3603, FFI-3604, FFI-3605, DIFF-3701, DIFF-3702, DAP-3601, and OWN-3207 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -7978,6 +7978,57 @@ notes = [
   "DIFF-3702 is BlockedSpec by DIFF-3701, GAP-NATIVE-BACKEND-ABI-001, GAP-NUMERIC-CHECKED-FAULT-001, GAP-DETERMINISTIC-REPLAY-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, absent Native/FFI/ownership RFCs, and the unimplemented PROTO-ABI/PROTO-EVIDENCE boundaries.",
   "The current workspace has no Native backend, three-engine harness, allowed-difference registry, or machine-readable comparison exemption; accepted RFC-0018/RFC-0019 continue to govern only the experimental checked Interpreter–VM differential path.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "DAP-3601"
+title = "Debugger stdio adapter"
+state = "BlockedSpec"
+release = "G3+"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["DIFF-3702"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/DAP-3601-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records that the proposed DAP stdio adapter is non-normative until VM/Native source maps, runtime debug behavior, ProgramSnapshot/binary identity, Fault categories, protocol lifecycle, and an Accepted debugger RFC exist.",
+  "The audit identifies the missing DAP wire/framing/lifecycle, launch/attach/cancel/session/security, engine-neutral breakpoint/step/stack/locals/Fault/ownership, source-map/identity, target/profile, protocol inventory, and editor integration contracts.",
+  "The audit covers capability/launch/attach/cancel, source-map and UTF-8/LSP positions, breakpoints/steps/stacks/scopes/variables/Fault/Resource/Managed, malformed/unknown/oversized messages, multi-session/security/timeouts, VM/Native differential, migrations, and deterministic evidence without unverified claims.",
+  "No DAP adapter, stdio command, wire schema, debugger dependency, source-map bridge, runtime hook, diagnostic allocation, public protocol implementation, extension manifest, zero command, or placeholder API is added while debugger/VM/Native/identity/semantic-protocol authority is absent.",
+  "The future implementation must use the authoritative ling CLI name, consume verified Typed Core/derived artifacts only, keep debugger host details outside Ling semantics, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before claiming debugger support.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "DAP-3601 is BlockedSpec by DIFF-3702, GAP-NATIVE-BACKEND-ABI-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, absent debugger RFC, and unregistered DAP protocol authority.",
+  "The current workspace has no DAP adapter, stdio framing, debugger command, editor extension, Native debug metadata, launch/attach model, breakpoint index, stack/locals projection, or DAP protocol inventory entry; RFC-0014/RFC-0018/RFC-0019 only provide experimental VM/source-map/Fault/differential foundations.",
+  "The plan's zero dap --stdio spelling is stale; the audit adds no command and preserves the authoritative ling/.ling naming. No debugger dependency, transport, toolchain, or extension state was changed.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, CLI, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
