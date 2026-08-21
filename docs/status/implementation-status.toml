@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 108 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, and EFF-2105 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 109 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, and TASK-2201 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -5305,6 +5305,52 @@ notes = [
   "EFF-2105 is BlockedSpec by EFF-2101/EFF-2102/EFF-2103/EFF-2104, GAP-EFFECT-HANDLER-001, GAP-EFFECT-STATE-MASKING-001, absent RFC-0006, and missing residual-row/generator/VM equivalence authority.",
   "The excluded fuzz workspace covers source, lexer/parser, manifests, and bytecode verification; current differential tests compare checked Seed events, Unit results, and Runtime Fault projections but do not expose handler effects or residual rows.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, fuzz protocols, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "TASK-2201"
+title = "Structured Task syntax and Checked Core"
+state = "BlockedSpec"
+release = "G2"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2103"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0020.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/TASK-2201-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing Task grammar/Core shape, scope identity, parent/child ownership, spawn/join, suspension, cancellation, cleanup, detach, Effect/Capability, Fault aggregation, scheduler, diagnostics, schemas, and migration contracts.",
+  "The audit distinguishes the current Seed Core/evaluator/VM and host-only RFC-0020 cancellation from the missing Structured Task authority and preserves the checked-only evaluation boundary.",
+  "The audit covers nested scopes, multiple suspension points, match/loop paths, cancellation before and after effects, cleanup on success/cancel/Fault, child Fault aggregation, unobserved results, detach rejection/acceptance, Unicode/CRLF/BOM spans, deterministic scheduling, bounded resources, and interpreter/VM differential fixtures.",
+  "No Task grammar, AST/HIR/Typed Core node, task type checker, suspension representation, cancellation token field, cleanup region, detach capability, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
+  "The future implementation must lower only accepted Task syntax to checked Typed Core, make suspension and cleanup edges explicit, preserve source identity, and prove interpreter/VM and cancellation/cleanup equivalence before Task execution is exposed.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "TASK-2201 is BlockedSpec by EFF-2103, GAP-STRUCTURED-TASK-001, absent RFC-C202/RFC-0008, and the unresolved Task lifecycle, cancellation, suspension, cleanup, and detach contracts; RFC-0020 covers only host VM cancellation.",
+  "Current syntax/AST/HIR/types/effects/evaluator/bytecode/VM implement Seed only; no Task lifecycle node, scope identity, suspension state, cleanup region, or structured runtime exists.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, scheduler, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]

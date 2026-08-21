@@ -1,0 +1,101 @@
+# TASK-2201 Authority Audit: Structured Task Syntax and Checked Core
+
+## Outcome
+
+`TASK-2201` is correctly recorded as `BlockedSpec`. The G2 plan proposes a
+minimal `task`/`scope`/`let!`/`return` surface and requires Checked Core fields
+for scope identity, parent/child relation, spawn/join, suspension points,
+cancellation, cleanup, and optionally capability-gated detach. The syntax,
+lifecycle, cancellation, suspension, Fault aggregation, and detach contracts
+are not accepted.
+
+No Task grammar, AST/HIR/Typed Core node, task type checker, suspension
+representation, cancellation token field, cleanup region, detach capability,
+diagnostic allocation, or placeholder G2 API was added.
+
+## Normative traceability
+
+- The G2 execution package is non-normative; its sample syntax and Core field
+  list do not authorize a new source construct or lifecycle semantics.
+- `docs/SEMANTICS.md` describes Task as a future Core/runtime form and states
+  the high-level structured-lifetime intent, but v0.0.1 implements only the
+  first twelve Core forms and explicitly excludes Task/Actor/Node/Kernel.
+  It does not fix syntax, type/effect rules, suspension ownership, cleanup
+  order, or Fault aggregation.
+- `docs/LANGUAGE.md` and `docs/ROADMAP-1.0.md` place Structured Task in the
+  v0.2 Concurrent scope and require a specification gate before implementation.
+- The plan dependency `RFC-C202` is only a planning placeholder. No Accepted
+  RFC-0008 (or replacement) defines Task syntax or Checked Core, and RFC-0001
+  remains a Draft design baseline under DEC-0018.
+- `GAP-STRUCTURED-TASK-001` leaves parent/child lifetime, cancellation
+  propagation, Fault aggregation, detach authority, suspension points, and
+  cleanup ordering open. EFF-2103 is also not accepted, so the planned
+  `let!`/Effect interaction has no checked foundation.
+- RFC-0020 accepts only host-owned VM cancellation for the existing Seed
+  bytecode entry point. It does not define source Task cancellation,
+  structured cleanup, suspension, or child Fault propagation.
+
+## Current implementation evidence
+
+- `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` have
+  no `task`, `scope`, `let!`, `spawn`, `join`, `await`, or Task lifecycle node;
+  the current grammar and type pipeline implement the Seed subset only.
+- `ling-types::TypedProgram` and the current checked Core boundary contain no
+  scope/parent identity, child registration, suspension continuation,
+  cancellation token, cleanup region, or detach capability.
+- `ling-eval`, `ling-bytecode`, and `ling-vm` execute only accepted Seed
+  constructs. They have no Task state machine, structured scope runtime,
+  cancellation propagation, cleanup stack, or Task Fault aggregation.
+- Existing VM cancellation is an explicit host-control boundary and cannot be
+  reused as source-level Task semantics. No Task conformance, differential,
+  scheduler, resource-cleanup, or migration fixture exists.
+
+## Required authority before implementation
+
+An Accepted RFC or decision must define, at minimum:
+
+1. source grammar, AST/HIR/Checked Core representation, type/effect rules for
+   `task`, `scope`, `let!`, `return`, `await`, spawn, join, and result
+   observation, including original UTF-8 source spans and stable identities;
+2. lexical parent/child ownership, scope exit obligations, join/cancel/transfer
+   ordering, unobserved-result behavior, detach authority, supervisor/owner
+   requirements, and whether detach is available in the initial profile;
+3. suspension semantics: continuation/frame shape, active locals, borrow and
+   mutable-State restrictions, cancellation checkpoints, cleanup ordering,
+   idempotence, deadlines, and interaction with Effect/Capability handlers;
+4. child Fault representation and aggregation, propagation and recovery rules,
+   resource limits, scheduler determinism, interpreter reference behavior, VM
+   lowering/state-machine ABI, verifier rules, diagnostics, schemas, Semantic
+   IDs, Audit Source, and compatibility/migration policy; and
+5. executable positive/negative/migration/differential fixtures for nested
+   scopes, multiple suspension points, match/loop paths, cancellation before
+   and after effects, cleanup on success/cancel/Fault, child Fault aggregation,
+   unobserved results, detach rejection/acceptance, Unicode/CRLF/BOM spans,
+   deterministic scheduling, bounded resources, and no unchecked-AST
+   execution.
+
+Until these decisions are Accepted, a Task node could leak children, skip
+cleanup, resume with invalid borrows, lose or duplicate cancellation, or make
+interpreter and VM behavior diverge.
+
+## Evidence and compatibility
+
+This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
+RFC-0001, RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
+`docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
+`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
+and the current syntax, AST, HIR, types, effects, evaluator, bytecode, and VM
+crates.
+
+No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
+source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
+
+## Intentionally deferred
+
+`TASK-2201` can begin only after an Accepted RFC-0008 (or replacement), a
+resolved `GAP-STRUCTURED-TASK-001`, and the required EFF-2103 handler/Core
+authority. The future implementation must lower only accepted Task syntax to
+checked Typed Core, make every suspension and cleanup edge explicit, preserve
+source identity, and prove interpreter/VM and cancellation/cleanup equivalence
+before exposing Task execution.
