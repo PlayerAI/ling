@@ -252,7 +252,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FFI-3601` | G3 | FFI 声明模型 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:411`, `docs/status/FFI-3601-AUTHORITY-AUDIT.md` |
 | `FFI-3602` | G3 | C ABI 最小互操作 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:431`, `docs/status/FFI-3602-AUTHORITY-AUDIT.md` |
 | `FFI-3603` | G3 | Shim Generator | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:445`, `docs/status/FFI-3603-AUTHORITY-AUDIT.md` |
-| `FFI-3604` | G3 | Target Primitive Package | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:460` |
+| `FFI-3604` | G3 | Target Primitive Package | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:460`, `docs/status/FFI-3604-AUTHORITY-AUDIT.md` |
 | `FFI-3605` | G3 | FFI fuzz/sanitizer 套件 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:476` |
 | `DIFF-3701` | G3 | 三方 Harness | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:492` |
 | `DIFF-3702` | G3 | 已允许差异登记表 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:512` |
