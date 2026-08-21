@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 81 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, and LSP-2202 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 82 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, and LSP-2203 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -4131,6 +4131,46 @@ completed = ""
 notes = [
   "LSP-2202 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2103, and LSP-2201; current diagnostic JSON remains a CLI/REPL Preview writer.",
   "The current compiler and diagnostic registry remain unchanged; no push publication or stale-result policy is claimed.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2203"
+title = "LSP pull diagnostics Preview"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2101", "LSP-2201"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/ERROR-CODES.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/LSP-2203-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing pull request/result, result-id, unchanged, workspace, partial-result, snapshot, cancellation, and push/pull interaction contracts.",
+  "The audit covers diagnostic adapter dependencies, cache invalidation, limits, deterministic ordering, stale revisions, and required Preview/migration fixtures.",
+  "No pull endpoint, result-id cache, workspace report, protocol field, diagnostic allocation, Semantic ID change, or placeholder handler is added while the authority is absent.",
+  "The future implementation must pin results to immutable revisions and keep Preview fields out of Stable contracts.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "LSP-2203 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2101, and LSP-2201; PROTO-DIAGNOSTIC-JSON is not an LSP pull response.",
+  "The current diagnostic and query services remain internal/CLI-facing and make no pull result-id or workspace report claim.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
