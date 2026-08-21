@@ -158,7 +158,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2401` | G1/Editor | Token taxonomy RFC/decision | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:339`, `docs/status/LSP-2401-AUTHORITY-AUDIT.md` |
 | `LSP-2402` | G1/Editor | Typed token generation | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:370`, `docs/status/LSP-2402-AUTHORITY-AUDIT.md` |
 | `LSP-2403` | G1/Editor | Full 与 delta | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:374`, `docs/status/LSP-2403-AUTHORITY-AUDIT.md` |
-| `LSP-2404` | G1/Editor | Semantic token fixtures | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:378` |
+| `LSP-2404` | G1/Editor | Semantic token fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:378`, `docs/status/LSP-2404-AUTHORITY-AUDIT.md` |
 | `LSP-2501` | G1/Editor | Request snapshot | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:384` |
 | `LSP-2502` | G1/Editor | Cancellation | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:388` |
 | `LSP-2503` | G1/Editor | Debounce 与优先级 | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:395` |
