@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 68 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, and TRAIT-1309 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 69 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, and CLI-1701 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3592,6 +3592,51 @@ completed = ""
 notes = [
   "PRJ-1107 is blocked by GAP-PROJECT-CLI-INTERFACE-001; RFC-0002 explicitly leaves CLI integration to this task and no accepted command/build/test contract exists.",
   "The current file-oriented `ling` CLI and accepted `ling.manifest/1`, `ling.semantic/0.2`, and `ling.lock/1` library protocols remain unchanged.",
+]
+
+[[task]]
+id = "CLI-1701"
+title = "Unified CLI command model"
+state = "BlockedSpec"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1507", "PRJ-1107"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/CLI-1701-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the accepted current parser and Seed command/exit boundary and distinguishes it from the unaccepted init/test/fmt/query/patch/build/lsp extensions.",
+  "The missing command registry, shared service boundary, project/formatter/query contracts, protocol lifecycle, and deterministic fixtures are identified with direct authority references.",
+  "No command, alias, CompilerHost API, placeholder help entry, diagnostic allocation, protocol field, or stale zero spelling is added while the contracts are absent.",
+  "The future implementation must reuse the checked services and update protocol inventory and fixtures atomically without advertising unimplemented commands.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "CLI-1701 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001, GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; DEC-0003 and PROTO-CLI authorize only the current Preview command surface.",
+  "PRJ-1107 and FMT-1507 remain separate authority gates; this audit does not broaden either contract or create a public command model.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]

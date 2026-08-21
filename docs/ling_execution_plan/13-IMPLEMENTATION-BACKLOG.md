@@ -128,7 +128,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FMT-1506` | G1/Editor | 性质测试 | M | Done | DEC-0002、DEC-0023；见 `crates/ling-format/src/author.rs` 的固定离线 corpus：幂等、compiler token signature、comment spelling/order、AST→HIR→resolve→types→effects→Semantic Graph 等价测试与实施报告；CLI/LSP、Audit separation deferred |
 | `FMT-1507` | G1/Editor | CLI/LSP 接入 | M | BlockedSpec | `GAP-FORMATTER-AUTHOR-SOURCE-001`, `GAP-FORMATTER-CLI-PROTOCOL-001`, `GAP-LSP-TRANSACTION-PROTOCOL-001`, `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`; see `docs/status/FMT-1507-AUTHORITY-AUDIT.md` |
 | `FMT-1508` | G1/Editor | Audit 分离 | S | Done | DEC-0015、DEC-0023；见 `crates/ling-format/src/author.rs` 的 canonical Audit Source byte-equivalence property 与实施报告；CLI/LSP protocol decisions remain FMT-1507 blockers |
-| `CLI-1701` | G1/Editor | 命令模型统一 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:462` |
+| `CLI-1701` | G1/Editor | 命令模型统一 | — | BlockedSpec | `03-G1-V0.1-LIVING.md:462`, `docs/status/CLI-1701-AUTHORITY-AUDIT.md` |
 | `CLI-1702` | G1/Editor | 输出与退出码 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:466` |
 | `CLI-1703` | G1/Editor | `init` | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:470` |
 | `CLI-1704` | G1/Editor | `test` | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:474` |
