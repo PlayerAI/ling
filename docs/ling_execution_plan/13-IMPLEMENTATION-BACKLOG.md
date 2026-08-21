@@ -266,7 +266,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `KCHK-4105` | G4 | Kernel Core 与 Verifier | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:124`, `docs/status/KCHK-4105-AUTHORITY-AUDIT.md` |
 | `CPU-4201` | G4 | Scalar Reference Backend | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:137`, `docs/status/CPU-4201-AUTHORITY-AUDIT.md` |
 | `CPU-4202` | G4 | Reference Trace | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:153`, `docs/status/CPU-4202-AUTHORITY-AUDIT.md` |
-| `CPU-4203` | G4 | Kernel Corpus | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:167` |
+| `CPU-4203` | G4 | Kernel Corpus | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:167`, `docs/status/CPU-4203-AUTHORITY-AUDIT.md` |
 | `SIMD-4301` | G4 | 向量化合法性分析 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:183` |
 | `SIMD-4302` | G4 | Portable SIMD IR | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:198` |
 | `SIMD-4303` | G4 | SIMD Differential | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:210` |
