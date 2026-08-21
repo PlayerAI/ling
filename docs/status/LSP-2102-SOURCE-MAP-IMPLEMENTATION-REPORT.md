@@ -1,6 +1,6 @@
 # LSP-2102-SOURCE-MAP implementation report
 
-Status: In Progress (bounded source projection slice)
+Status: Done (bounded source projection slice)
 
 ## Scope
 
@@ -60,3 +60,5 @@ defines document lifecycle, snapshot/version preconditions, stale-result and
 failure handling, handler-wide conversion, and public protocol field
 stability. Downstream diagnostics, overlays, edits, and Semantic Transaction
 work remain deferred with that parent gate.
+
+Implementation commit: `9e917250bff5bb3ebba1ef02a5f2f6b66ab700de`.
