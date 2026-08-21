@@ -56,6 +56,7 @@
 | `FMT-1507` | Formatter CLI/LSP integration | `G1` | `M` | `BlockedSpec` | `FMT-1506` | `` |
 | `FMT-1508` | Audit Source separation | `G1` | `S` | `Done` | `FMT-1506` | `f247dfed98f104ea5227532965e8b579938a213e` |
 | `GC-3301` | Minimal Managed object model | `G3` | `M` | `BlockedSpec` | — | `` |
+| `GC-3302` | First Managed collector | `G3` | `L` | `BlockedSpec` | `GC-3301` | `` |
 | `GOV-0101` | 建立规范权威索引 | `G0` | `S` | `Done` | `BASE-0001` | `7bba2adf9104d7d7f96c7ef50343647f649e229e` |
 | `GOV-0102` | 规范缺口台账 | `G0` | `M` | `Done` | `GOV-0101` | `c147b5c02532b61e23df46f6cb25251d8c94dd7d` |
 | `GOV-0103` | RFC 与 decision 生命周期 | `G0` | `S` | `Done` | `GOV-0101` | `4876a0328d994121fb32c10b3f2a25e3ce11e5ff` |

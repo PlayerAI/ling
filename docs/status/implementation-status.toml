@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 146 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, OWN-3206, GC-3301, and OWN-3207 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 147 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, OWN-3206, GC-3301, GC-3302, and OWN-3207 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -7103,6 +7103,54 @@ completed = ""
 notes = [
   "GC-3301 is BlockedSpec by absent RFC-N303, RFC-0007, and the Open GAP-OWNERSHIP-MODEL-001 contract for Managed roots/finalization and Profile boundaries.",
   "The current workspace has no Managed-runtime or collector crate and no Ling object header, root registration, write barrier, weak reference, finalizer, OOM boundary, or pointer-identity operation; existing Rust/JSON objects are not Ling Managed values.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "GC-3302"
+title = "First Managed collector"
+state = "BlockedSpec"
+release = "G3"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["GC-3301"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/GC-3302-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing collector-choice boundary, pause/safepoint behavior, root registration, cycle handling, Task/Actor interaction, memory limits, metrics, and stress/fuzz evidence required by GC-3302.",
+  "The audit records the missing GC-3301 object/root contract, ownership/region/borrow and Resource Drop interaction, cancellation/restart/shutdown rules, OOM Fault and diagnostic boundary, Profile, FFI, and replay contracts.",
+  "The audit covers root loss, cycles, safe points, pauses, cancellation/restart, memory limits, deterministic metrics, bounded stress/fuzz behavior, Unicode/CRLF/BOM spans, and interpreter/VM/Native differential fixtures.",
+  "No collector algorithm, Managed heap, scheduler hook, root registry, memory-limit API, metrics schema, OOM diagnostic, public protocol, or placeholder G3 API is added while RFC-N303/RFC-0007 and Task/Actor authority are absent.",
+  "The future implementation must preserve Seed value semantics, consume accepted types and checked Core only, keep collector strategy and host timing non-semantic, and publish root, cycle, pause, OOM, Profile, and interpreter/VM/Native evidence before exposing v0.3 behavior.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "GC-3302 is BlockedSpec by GC-3301, absent RFC-N303/RFC-0007, GAP-OWNERSHIP-MODEL-001, GAP-STRUCTURED-TASK-001, and GAP-ACTOR-AWAIT-REENTRY-001.",
+  "The current workspace has no Managed heap, collector, root registry, safepoint, pause event, memory limit, metrics schema, Task/Actor scheduler, or OOM-as-Ling-Fault boundary; host VM cancellation is not a collector contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
