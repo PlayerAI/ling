@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 73 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, and CLI-1705 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 74 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, and CLI-1706 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3806,6 +3806,47 @@ completed = ""
 notes = [
   "CLI-1705 is BlockedSpec by GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-PROJECT-CLI-INTERFACE-001, and CLI-1701; PROTO-SEMANTIC-TRANSACTION remains Future.",
   "The current `ling semantic` and `ling audit` commands remain file-oriented read-only projections; no patch behavior or public query language is claimed.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "CLI-1706"
+title = "Shell completion and help fixtures"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701", "CLI-1702"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/CLI-1706-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the current truthful Preview help surface and distinguishes it from the unaccepted command/flag/exit inventory and shell completion contract.",
+  "The missing help lifecycle, locale/order, shell quoting, generated-script, deprecated-command, and deterministic fixture rules are identified with direct authority references.",
+  "No completion generator, script, help snapshot, command registry, diagnostic allocation, or placeholder entry is added while the CLI contracts are absent.",
+  "The future implementation must generate only from the accepted command registry and keep help truthful without making help bytes a semantic authority.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "CLI-1706 is BlockedSpec downstream of CLI-1701 and CLI-1702; PROTO-CLI currently inventories only implemented commands and rejects unknown options.",
+  "No shell-specific completion or stale `zero` command is advertised by the current CLI; completion remains a future Preview surface.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
