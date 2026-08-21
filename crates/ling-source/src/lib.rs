@@ -1,5 +1,12 @@
 //! UTF-8 source storage, newline normalization, and byte-accurate span mapping.
 
+mod vfs;
+
+pub use vfs::{
+    ChangeEvent, FileOrigin, FileSnapshot, InputChange, Revision, VfsError, VirtualFileSystem,
+    WorkspaceInput, WorkspaceSnapshot,
+};
+
 use std::error::Error;
 use std::fmt;
 
