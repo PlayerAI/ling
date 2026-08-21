@@ -174,6 +174,7 @@
 | `PRJ-1108` | Project graph property and manifest fuzz coverage | `G1` | `M` | `Done` | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105`, `PRJ-1106` | `29f9c4465b58c7eff23c227436563d69409b880e` |
 | `PROF-5101` | Machine-Readable Critical Profile | `G5` | `M` | `BlockedSpec` | `PLC-4805` | `` |
 | `PROF-5102` | Forbidden Capability Checks | `G5` | `M` | `BlockedSpec` | `PROF-5101` | `` |
+| `PROF-5103` | Profile Composition | `G5` | `M` | `BlockedSpec` | `PROF-5102` | `` |
 | `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |
 | `REM-2602` | Transport-neutral envelope | `G2` | `L` | `BlockedSpec` | `REM-2601` | `` |
 | `REM-2603` | Delivery semantics | `G2` | `L` | `BlockedSpec` | `REM-2602` | `` |
