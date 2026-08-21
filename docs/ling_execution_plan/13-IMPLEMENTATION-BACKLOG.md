@@ -202,7 +202,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EFF-2105` | G2 | Effect fuzz/property tests | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:143`, `docs/status/EFF-2105-AUTHORITY-AUDIT.md` |
 | `TASK-2201` | G2 | Task 语法与 Checked Core | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:158`, `docs/status/TASK-2201-AUTHORITY-AUDIT.md` |
 | `TASK-2202` | G2 | Task 状态机 Lowering | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:182`, `docs/status/TASK-2202-AUTHORITY-AUDIT.md` |
-| `TASK-2203` | G2 | 结构化生命周期 Runtime | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:195` |
+| `TASK-2203` | G2 | 结构化生命周期 Runtime | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:195`, `docs/status/TASK-2203-AUTHORITY-AUDIT.md` |
 | `TASK-2204` | G2 | 确定性测试调度器 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:207` |
 | `TASK-2205` | G2 | 生产本地调度器 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:221` |
 | `TASK-2206` | G2 | Task conformance 与压力测试 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:235` |
