@@ -13,6 +13,8 @@ use ling_resolve::{
 use ling_source::Span;
 use num_bigint::BigInt;
 
+mod constraints;
+
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct TypeId(u32);
 
@@ -435,6 +437,48 @@ impl Error for TypeError {}
 
 /// Infers all Seed types and validates assignment places.
 pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> {
+    let mut trait_errors = constraints::trait_item_spans(&resolved)
+        .into_iter()
+        .map(|(source_name, span)| TypeError {
+            kind: TypeErrorKind::UnsupportedTypeSyntax,
+            source_name,
+            span,
+            restriction_reason: None,
+        })
+        .collect::<Vec<_>>();
+    match constraints::collect_obligations(&resolved) {
+        Ok(obligations) => {
+            trait_errors.extend(obligations.into_iter().map(|obligation| TypeError {
+                kind: TypeErrorKind::UnsupportedTypeSyntax,
+                source_name: obligation.origin.source_name,
+                span: obligation.origin.span,
+                restriction_reason: None,
+            }))
+        }
+        Err(collection_errors) => {
+            trait_errors.extend(collection_errors.into_iter().map(|error| TypeError {
+                kind: TypeErrorKind::UnsupportedTypeSyntax,
+                source_name: error.source_name,
+                span: error.span,
+                restriction_reason: None,
+            }))
+        }
+    }
+    if !trait_errors.is_empty() {
+        trait_errors.sort_by(|left, right| {
+            (
+                &left.source_name,
+                left.span.start(),
+                format!("{:?}", left.kind),
+            )
+                .cmp(&(
+                    &right.source_name,
+                    right.span.start(),
+                    format!("{:?}", right.kind),
+                ))
+        });
+        return Err(trait_errors);
+    }
     Inferencer::new(resolved).run()
 }
 

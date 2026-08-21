@@ -3639,6 +3639,48 @@ notes = [
 ]
 
 [[task]]
+id = "TRAIT-1303"
+title = "Trait constraint collection"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1302"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0024-trait-obligation-collection-boundary.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-types/src/constraints.rs",
+  "docs/status/TRAIT-1303-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0005 §2.1–§2.3 obligations are collected into an internal normalized representation with deterministic source order and original UTF-8 origin spans.",
+  "Qualified names, variables, nested nominal applications, and parenthesized first-slice arguments are supported; malformed or unsupported forms return bounded collection errors.",
+  "Top-level definitions and expression-local bindings are traversed without filesystem or hash-map iteration and repeated collection runs are identical.",
+  "No impl candidate is selected and no unresolved obligation reaches executable Typed Core; the existing UnsupportedTypeSyntax boundary rejects Trait-bearing programs until later TRAIT stages.",
+  "No diagnostic allocation, schema, Semantic ID, CLI/LSP, ABI, or Unicode 17.0.0 behavior changes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "DEC-0024 accepts the internal collection/interface boundary without expanding Trait support in the v0.0.1 matrix.",
+  "TRAIT-1304 through TRAIT-1307 remain deferred for coherence, solving, dictionary lowering, and runtime integration.",
+]
+
+[[task]]
 id = "TRAIT-1302"
 title = "Trait AST/HIR representation"
 state = "Done"

@@ -103,7 +103,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `VM-1210` | G1/Editor | Fuzz 与资源限制 | L | Done | RFC-0020；见 `crates/ling-vm` cancellation/resource tests、bytecode fuzz target、机器状态与实施报告 |
 | `TRAIT-1301` | G1/Editor | Trait RFC 收口 | — | Done | Accepted RFC-0005; see `docs/RFC-0005.md` and the authority audit |
 | `TRAIT-1302` | G1/Editor | AST/HIR 表示 | — | Done | RFC-0005 §1; see `docs/status/TRAIT-1302-IMPLEMENTATION-REPORT.md` |
-| `TRAIT-1303` | G1/Editor | Constraint collection | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:285` |
+| `TRAIT-1303` | G1/Editor | Constraint collection | — | In Progress | DEC-0024; `03-G1-V0.1-LIVING.md:285` |
 | `TRAIT-1304` | G1/Editor | Coherence/orphan checker | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:289` |
 | `TRAIT-1305` | G1/Editor | Solver v0 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:296` |
 | `TRAIT-1306` | G1/Editor | Checked Core 显式化 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:300` |

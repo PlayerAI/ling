@@ -301,6 +301,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0024"
+title = "Trait obligation collection boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0024-trait-obligation-collection-boundary.md"
+covers = ["deterministic Trait obligation collection", "source-origin preservation", "non-executable unresolved-obligation boundary"]
+depends_on = ["RFC-0005", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0002"
 title = "Local package identity and project protocol"
 kind = "RFC"

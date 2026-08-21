@@ -22,6 +22,30 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0024"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0024-trait-obligation-collection-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Collect ordered normalized obligations with owner identity, origin spans, nested arguments, and deterministic ordinals.",
+  "Exercise local bindings and malformed or unsupported obligation syntax without heuristic recovery.",
+  "Keep unresolved Trait items and obligations outside executable Typed Core through the existing unsupported-syntax boundary.",
+]
+compatibility_impact = [
+  "Adds an internal ling-types collection boundary only; diagnostics, schemas, Semantic IDs, CLI/LSP protocols, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Solver substitutions, cross-package candidate indexes, coherence, dictionary layout, runtime lowering, and any public obligation schema are deferred to later TRAIT tasks.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0019"
 kind = "Decision"
 status = "Accepted"
