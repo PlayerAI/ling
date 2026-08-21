@@ -222,7 +222,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REP-2505` | G2 | 隐私、裁剪与损坏 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:429`, `docs/status/REP-2505-AUTHORITY-AUDIT.md` |
 | `REP-2506` | G2 | 跨进程重放验收 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:440`, `docs/status/REP-2506-AUTHORITY-AUDIT.md` |
 | `REM-2601` | G2 | RemoteRef 与 Endpoint | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:452`, `docs/status/REM-2601-AUTHORITY-AUDIT.md` |
-| `REM-2602` | G2 | Transport-neutral Envelope | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:466` |
+| `REM-2602` | G2 | Transport-neutral Envelope | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:466`, `docs/status/REM-2602-AUTHORITY-AUDIT.md` |
 | `REM-2603` | G2 | Delivery 语义 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:482` |
 | `REM-2604` | G2 | 最小参考传输 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:497` |
 | `REM-2605` | G2 | 安全与资源限制 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:506` |
