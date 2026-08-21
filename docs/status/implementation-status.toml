@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 143 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, and OWN-3205 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 144 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, and OWN-3206 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -6954,6 +6954,57 @@ notes = [
   "OWN-3205 is BlockedSpec by MEM-3103, OWN-3204, absent RFC-N304/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved Resource/Drop, cleanup, failure, cancellation, Effect/Fault, and FFI contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Resource type or ownership checker, Cleanup Core, implicit Drop operation, cleanup CFG, partial-initialization state, drop order, cancellation/Actor termination cleanup, or Resource Drop Effect/Fault; Rust Drop/unwinding is not Ling semantics.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Seed Place lowering, future Resource/Drop semantics, Cleanup Core, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3206"
+title = "Ownership diagnostics and repairs"
+state = "BlockedSpec"
+release = "G3"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3201", "OWN-3202", "OWN-3203", "OWN-3204", "OWN-3205"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/OWN-3206-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing ownership error taxonomy, resource origin, move/borrow start, conflicting use, region boundary, root cause, Facts, severity, and deterministic ordering semantics.",
+  "The audit records the missing structured Repair schema/ranking, source edits/preconditions/stale-version checks, alternatives, localization, safety proof, LSP mapping, code-action, and source/Graph/Checked Core/FFI/Profile contracts.",
+  "The audit covers moves, aliases, partial moves, branches/loops/match/closures, cancellation, Task/Actor/await, FFI transfer, region escape, automatic-borrow ambiguity, repair preconditions/ranking, Unicode/CRLF/BOM spans, and interpreter/VM/Native differential fixtures.",
+  "No future ownership diagnostic, error-code allocation, repair ranking, ownership-specific JSON field, LSP code action, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N305 authority is absent; existing codes and schemas remain unchanged.",
+  "The future implementation must preserve existing diagnostic codes and schemas, consume accepted types and checked Core only, keep repairs deterministic and safe, and publish diagnostic, LSP, migration, source-span, and interpreter/VM/Native evidence before exposing v0.3 ownership repairs.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "OWN-3206 is BlockedSpec by OWN-3201 through OWN-3205, absent RFC-N305/RFC-0007, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, and unresolved ownership semantics, diagnostic meanings, repair ranking, and LSP contracts.",
+  "Current repository has a Preview bilingual Diagnostic JSON container and generic Facts/Repair structures, but no ownership-specific code, resource-origin tracking, move/borrow conflict model, region facts, ranked repairs, or v0.3 LSP code-action adapter; no new L-* code is allocated.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, existing diagnostic registry, future ownership diagnostics, error-code allocation, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
