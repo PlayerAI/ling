@@ -340,7 +340,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `STD-6303` | G6 | Unicode 与中文编程稳定性 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:195`, `docs/status/STD-6303-AUTHORITY-AUDIT.md` |
 | `PKG-6401` | G6 | 包发布协议 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:210`, `docs/status/PKG-6401-AUTHORITY-AUDIT.md` |
 | `PKG-6402` | G6 | Hermetic Build | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:226`, `docs/status/PKG-6402-AUTHORITY-AUDIT.md` |
-| `PKG-6403` | G6 | Registry 最小实现或推迟策略 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:239` |
+| `PKG-6403` | G6 | Registry 最小实现或推迟策略 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:239`, `docs/status/PKG-6403-AUTHORITY-AUDIT.md` |
 | `PKG-6404` | G6 | 供应链攻击测试 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:248` |
 | `COMPAT-6501` | G6 | 历史 Corpus | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:265` |
 | `COMPAT-6502` | G6 | 1.0 Compiler 兼容矩阵 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:280` |
