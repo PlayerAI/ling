@@ -162,7 +162,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2501` | G1/Editor | Request snapshot | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:384`, `docs/status/LSP-2501-AUTHORITY-AUDIT.md` |
 | `LSP-2502` | G1/Editor | Cancellation | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:388`, `docs/status/LSP-2502-AUTHORITY-AUDIT.md` |
 | `LSP-2503` | G1/Editor | Debounce 与优先级 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:395`, `docs/status/LSP-2503-AUTHORITY-AUDIT.md` |
-| `LSP-2504` | G1/Editor | Memory/resource limits | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:403` |
+| `LSP-2504` | G1/Editor | Memory/resource limits | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:403`, `docs/status/LSP-2504-AUTHORITY-AUDIT.md` |
 | `TS-3101` | G1/Editor | Grammar 规范映射表 | S | Done | `05-ZED-EXTENSION.md:154`；见 `docs/grammar-map.md`、机器状态与实施报告 |
 | `TS-3102` | G1/Editor | 宽度优先 grammar skeleton | M | Done | `05-ZED-EXTENSION.md:165`；见 `editors/tree-sitter-ling/`、机器状态与实施报告 |
 | `TS-3103` | G1/Editor | Offside/缩进策略 | M | Done | `05-ZED-EXTENSION.md:187`；见 scanner、ADR、layout corpus、机器状态与实施报告 |
