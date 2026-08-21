@@ -58,6 +58,7 @@
 | `IDE-2302` | IDE hover | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `LSP-2201` | `` |
 | `IDE-2303` | IDE definition navigation | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `IDE-2302`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2304` | IDE references | `G1` | `M` | `BlockedSpec` | `IDE-2303`, `LSP-2101`, `LSP-2102` | `` |
+| `IDE-2305` | IDE prepare rename | `G1` | `M` | `BlockedSpec` | `IDE-2304`, `LSP-2102` | `` |
 | `INC-1401` | Incremental query boundary ADR | `G1` | `M` | `Done` | `GOV-0110` | `dcb3fc5c148d0b90a3481a736113c4551a35cf17` |
 | `INC-1402` | VFS and revision boundary | `G1` | `M` | `Done` | `INC-1401` | `5c341078f3430a6fa1585fcaaf30d472dba7512f` |
 | `INC-1403` | Parse queries | `G1` | `M` | `Done` | `INC-1402` | `a73e5c7150cce3fb86da5d48508158e7e1637f40` |

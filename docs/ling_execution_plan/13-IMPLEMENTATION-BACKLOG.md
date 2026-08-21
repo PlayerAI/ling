@@ -148,7 +148,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `IDE-2302` | G1/Editor | Hover | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:248`, `docs/status/IDE-2302-AUTHORITY-AUDIT.md` |
 | `IDE-2303` | G1/Editor | Go to definition/declaration/type definition | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:262`, `docs/status/IDE-2303-AUTHORITY-AUDIT.md` |
 | `IDE-2304` | G1/Editor | References | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:266`, `docs/status/IDE-2304-AUTHORITY-AUDIT.md` |
-| `IDE-2305` | G1/Editor | Prepare rename | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:270` |
+| `IDE-2305` | G1/Editor | Prepare rename | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:270`, `docs/status/IDE-2305-AUTHORITY-AUDIT.md` |
 | `IDE-2306` | G1/Editor | Rename | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:283` |
 | `IDE-2307` | G1/Editor | Completion v0 | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:299` |
 | `IDE-2308` | G1/Editor | Completion resolve | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:312` |
