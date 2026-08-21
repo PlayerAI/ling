@@ -308,7 +308,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CTR-5402` | G5 | Contract 状态模型 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:320`, `docs/status/CTR-5402-AUTHORITY-AUDIT.md` |
 | `CTR-5403` | G5 | Runtime Contract Check | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:335`, `docs/status/CTR-5403-AUTHORITY-AUDIT.md` |
 | `CTR-5404` | G5 | Verification Condition Generation | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:347`, `docs/status/CTR-5404-AUTHORITY-AUDIT.md` |
-| `CTR-5405` | G5 | Solver/Proof Checker Adapter | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:360` |
+| `CTR-5405` | G5 | Solver/Proof Checker Adapter | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:360`, `docs/status/CTR-5405-AUTHORITY-AUDIT.md` |
 | `CTR-5406` | G5 | 优化器使用 Contract 的规则 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:371` |
 | `CTR-5407` | G5 | Contract LSP/Zed | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:375` |
 | `PROOF-5501` | G5 | Proof IR | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:386` |
