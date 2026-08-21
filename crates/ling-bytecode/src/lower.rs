@@ -15,10 +15,15 @@ use sha2::{Digest, Sha256};
 
 use crate::{
     Block, BlockIndex, BlockParameter, Capability, Constant, ConstantIndex, DecodeLimits, Effect,
-    Function, FunctionIndex, Instruction, IntegerSign, Module, ModuleIndex, PackageReference,
-    ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin,
-    SourceSpan, StringIndex, Terminator, TypeIndex, UnverifiedProgram, ValueType,
+    Function, FunctionIndex, FunctionKind, Instruction, IntegerSign, Module, ModuleIndex,
+    PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
+    SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex,
+    UnverifiedProgram, ValueType,
 };
+
+mod v1_1;
+
+pub use v1_1::{LoweredProgramV1_1, lower_v1_1};
 
 /// Exact original source bytes and the logical name permitted in bytecode.
 ///
@@ -99,7 +104,7 @@ impl LoweringError {
         self.span
     }
 
-    fn at(source_name: &str, span: Span, kind: LoweringErrorKind) -> Self {
+    pub(crate) fn at(source_name: &str, span: Span, kind: LoweringErrorKind) -> Self {
         Self {
             kind,
             source_name: Some(source_name.to_owned()),
@@ -107,7 +112,7 @@ impl LoweringError {
         }
     }
 
-    fn without_span(source_name: Option<&str>, kind: LoweringErrorKind) -> Self {
+    pub(crate) fn without_span(source_name: Option<&str>, kind: LoweringErrorKind) -> Self {
         Self {
             kind,
             source_name: source_name.map(str::to_owned),
@@ -655,8 +660,10 @@ impl<'a> FunctionLowerer<'a> {
         )?;
 
         Ok(Function {
+            kind: FunctionKind::Named,
             module: self.module_index,
             name: string_index(self.string_indices, &self.plan.definition.name.normalized)?,
+            capture_count: 0,
             parameter_types: self.signature.parameters.clone(),
             result_type: self.signature.result,
             effects: effects(self.snapshot, self.plan)?,

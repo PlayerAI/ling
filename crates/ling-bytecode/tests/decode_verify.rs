@@ -1,13 +1,141 @@
 mod support;
 
 use ling_bytecode::{
-    BytecodePhase, BytecodeReason, LoweringSource, decode_and_verify_v1, decode_v1, encode_v1,
-    encode_verified_v1, lower_v1, verify_v1,
+    BytecodePhase, BytecodeReason, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, LoweringSource,
+    decode_and_verify_v1, decode_and_verify_v1_1, decode_v1, encode_v1, encode_verified_v1,
+    lower_v1, verify_v1,
 };
 use ling_diagnostics::{MessageLanguage, codes};
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId};
-use support::branch_artifact;
+use support::{branch_artifact, closure_artifact};
+
+#[test]
+fn version_1_1_reader_accepts_both_revisions_and_round_trips_closures() {
+    let closure = closure_artifact();
+    let verified = decode_and_verify_v1_1(&closure.bytes).expect("independent closure artifact");
+    assert_eq!(verified.version(), FORMAT_VERSION_1_1);
+    assert_eq!(encode_verified_v1(&verified).unwrap(), closure.bytes);
+
+    let legacy = decode_and_verify_v1_1(&hello_bytes()).expect("1.1 reader accepts 1.0");
+    assert_eq!(legacy.version(), FORMAT_VERSION_1_0);
+
+    let error = decode_and_verify_v1(&closure.bytes).expect_err("1.0 reader rejects 1.1");
+    assert_eq!(error.phase(), BytecodePhase::Envelope);
+    assert_eq!(error.reason(), BytecodeReason::UnsupportedVersion);
+}
+
+#[test]
+fn version_1_1_closure_metadata_failures_are_bounded_and_structured() {
+    let base = closure_artifact();
+    let cases = [
+        ("forward_function_type", BytecodeReason::InvalidTypeIndex, {
+            let mut bytes = base.bytes.clone();
+            overwrite_u32(
+                &mut bytes,
+                base.position("suffix_function_type_parameter"),
+                5,
+            );
+            bytes
+        }),
+        ("invalid_function_kind", BytecodeReason::InvalidTag, {
+            let mut bytes = base.bytes.clone();
+            bytes[base.position("closure_body_kind")] = 2;
+            bytes
+        }),
+        (
+            "capture_count_mismatch",
+            BytecodeReason::InvalidInstructionLength,
+            {
+                let mut bytes = base.bytes.clone();
+                overwrite_u32(&mut bytes, base.position("make_closure_capture_count"), 0);
+                bytes
+            },
+        ),
+        ("invalid_capture_kind", BytecodeReason::InvalidTag, {
+            let mut bytes = base.bytes.clone();
+            bytes[base.position("make_closure_capture_kind")] = 2;
+            bytes
+        }),
+        (
+            "invalid_capture_register",
+            BytecodeReason::InvalidRegisterIndex,
+            {
+                let mut bytes = base.bytes.clone();
+                overwrite_u32(
+                    &mut bytes,
+                    base.position("make_closure_capture_register"),
+                    u32::MAX,
+                );
+                bytes
+            },
+        ),
+        (
+            "wrong_self_capture_type",
+            BytecodeReason::CallSignatureMismatch,
+            {
+                let mut bytes = base.bytes.clone();
+                bytes[base.position("make_closure_capture_kind")] = 1;
+                overwrite_u32(
+                    &mut bytes,
+                    base.position("make_closure_capture_register"),
+                    u32::MAX,
+                );
+                bytes
+            },
+        ),
+        (
+            "invalid_direct_call_target",
+            BytecodeReason::InvalidFunctionIndex,
+            {
+                let mut bytes = base.bytes.clone();
+                bytes[base.position("partial_call_closure_opcode")] = 0x10;
+                bytes
+            },
+        ),
+        (
+            "direct_opcode_on_closure_register",
+            BytecodeReason::InvalidRegisterType,
+            {
+                let mut bytes = base.bytes.clone();
+                bytes[base.position("partial_call_closure_opcode")] = 0x10;
+                overwrite_u32(&mut bytes, base.position("partial_call_closure_callee"), 1);
+                bytes
+            },
+        ),
+        (
+            "non_function_indirect_callee",
+            BytecodeReason::InvalidRegisterType,
+            {
+                let mut bytes = base.bytes.clone();
+                overwrite_u32(&mut bytes, base.position("complete_call_closure_callee"), 1);
+                bytes
+            },
+        ),
+        (
+            "mistyped_indirect_argument",
+            BytecodeReason::CallSignatureMismatch,
+            {
+                let mut bytes = base.bytes.clone();
+                overwrite_u32(
+                    &mut bytes,
+                    base.position("partial_call_closure_argument"),
+                    2,
+                );
+                bytes
+            },
+        ),
+    ];
+
+    for (name, expected, bytes) in cases {
+        let result = std::panic::catch_unwind(|| decode_and_verify_v1_1(&bytes));
+        let error = result
+            .unwrap_or_else(|_| panic!("{name} panicked"))
+            .expect_err(name);
+        assert_eq!(error.reason(), expected, "{name}");
+        assert_ne!(error.phase(), BytecodePhase::Envelope, "{name}");
+    }
+}
 
 const HELLO_HEX: &str = include_str!("../../../tests/bytecode/v1/golden/hello.lbc.hex");
 

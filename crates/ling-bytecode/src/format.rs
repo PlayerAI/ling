@@ -1,5 +1,9 @@
 /// Public protocol label assigned by RFC-0014.
-pub const BYTECODE_PROTOCOL: &str = "ling.bytecode/1.0";
+pub const BYTECODE_PROTOCOL: &str = BYTECODE_PROTOCOL_1_0;
+/// Exact bytecode-1.0 protocol label.
+pub const BYTECODE_PROTOCOL_1_0: &str = "ling.bytecode/1.0";
+/// Exact bytecode-1.1 protocol label assigned by RFC-0015.
+pub const BYTECODE_PROTOCOL_1_1: &str = "ling.bytecode/1.1";
 /// Exact eight-byte bytecode magic.
 pub const BYTECODE_MAGIC: [u8; 8] = *b"LINGBC\0\0";
 /// Exact encoded header width.
@@ -35,7 +39,11 @@ impl FormatVersion {
 }
 
 /// Exact bytecode format accepted by RFC-0014.
-pub const FORMAT_VERSION: FormatVersion = FormatVersion::new(1, 0);
+pub const FORMAT_VERSION: FormatVersion = FORMAT_VERSION_1_0;
+/// Exact version-1.0 format tuple.
+pub const FORMAT_VERSION_1_0: FormatVersion = FormatVersion::new(1, 0);
+/// Exact version-1.1 format tuple accepted by RFC-0015.
+pub const FORMAT_VERSION_1_1: FormatVersion = FormatVersion::new(1, 1);
 /// Language compatibility version encoded by RFC-0014.
 pub const LANGUAGE_VERSION: FormatVersion = FormatVersion::new(0, 1);
 
@@ -119,6 +127,15 @@ impl DecodeLimits {
         }
     }
 
+    /// Returns the RFC-0015 hard-limit set for bytecode 1.1.
+    #[must_use]
+    pub const fn rfc_0015() -> Self {
+        Self {
+            types: 262_144,
+            ..Self::rfc_0014()
+        }
+    }
+
     /// Returns the maximum artifact byte length.
     #[must_use]
     pub const fn artifact_bytes(self) -> u64 {
@@ -149,7 +166,7 @@ impl DecodeLimits {
         self.modules
     }
 
-    /// Returns the exact version-1.0 type count.
+    /// Returns the exact or maximum type count for the selected revision.
     #[must_use]
     pub const fn types(self) -> u32 {
         self.types

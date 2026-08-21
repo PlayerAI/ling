@@ -1,6 +1,7 @@
 use ling_bytecode::{
-    CompareOperator, Constant, Effect, Instruction, IntBinaryOperator, IntUnaryOperator,
-    IntegerSign, Intrinsic, RegisterIndex, Terminator, UnverifiedProgram, VerifiedProgramV1,
+    CaptureOperand, CompareOperator, Constant, Effect, Instruction, IntBinaryOperator,
+    IntUnaryOperator, IntegerSign, Intrinsic, RegisterIndex, Terminator, UnverifiedProgram,
+    VerifiedProgramV1,
 };
 use num_bigint::{BigInt, Sign};
 
@@ -8,7 +9,7 @@ use crate::fault::{
     ExecutionError, InternalExecutionError, RuntimeFault, RuntimeFaultKind, RuntimeResource,
 };
 use crate::host::HostCapabilities;
-use crate::value::{Heap, Value};
+use crate::value::{Allocation, BoundValue, Closure, Heap, Value};
 
 /// Explicit execution limits required by RFC-0014.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -184,6 +185,34 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
                 let values = self.collect_registers(arguments, location, "call_arguments")?;
                 self.push_frame(function.get(), &values, Some(*destination), location)
             }
+            Instruction::MakeClosure {
+                destination,
+                function,
+                captures,
+            } => {
+                let mut bound = Vec::new();
+                bound
+                    .try_reserve_exact(captures.len())
+                    .map_err(|_| self.out_of_memory("make_closure", location))?;
+                for capture in captures {
+                    bound.push(match capture {
+                        CaptureOperand::Register(register) => {
+                            BoundValue::Value(self.read_current(*register)?)
+                        }
+                        CaptureOperand::SelfReference => BoundValue::SelfReference,
+                    });
+                }
+                let closure = self
+                    .heap
+                    .closure(function.get(), bound)
+                    .map_err(|()| self.out_of_memory("make_closure", location))?;
+                self.write_current(*destination, closure)
+            }
+            Instruction::CallClosure {
+                destination,
+                callee,
+                arguments,
+            } => self.execute_call_closure(*destination, *callee, arguments, location),
             Instruction::Intrinsic {
                 destination,
                 intrinsic,
@@ -507,6 +536,77 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
                 })
             }
         }
+    }
+
+    fn execute_call_closure(
+        &mut self,
+        destination: RegisterIndex,
+        callee: RegisterIndex,
+        argument_registers: &[RegisterIndex],
+        location: Location,
+    ) -> Result<(), ExecutionError> {
+        let callee_value = self.read_current(callee)?;
+        let closure = callee_value
+            .as_closure()
+            .cloned()
+            .ok_or_else(|| internal("verified CallClosure callee is not a closure"))?;
+        let function_index = closure.value().function();
+        let parameter_count = self.function(function_index)?.parameter_types.len();
+        let bound_count = closure.value().bound().len();
+        let remaining = parameter_count.checked_sub(bound_count).ok_or_else(|| {
+            internal("verified closure has more bound values than target parameters")
+        })?;
+        if argument_registers.is_empty() || argument_registers.len() > remaining {
+            return Err(
+                internal("verified CallClosure argument count changed after verification").into(),
+            );
+        }
+        let complete = argument_registers.len() == remaining;
+        if complete {
+            self.ensure_frame_slot(location)?;
+        }
+
+        let arguments =
+            self.collect_registers(argument_registers, location, "call_closure_arguments")?;
+        let mut bound = self.materialize_closure_bound(&closure, location)?;
+        bound
+            .try_reserve_exact(arguments.len())
+            .map_err(|_| self.out_of_memory("call_closure_arguments", location))?;
+        bound.extend(arguments);
+
+        if complete {
+            self.push_frame(function_index, &bound, Some(destination), location)
+        } else {
+            let mut partial_bound = Vec::new();
+            partial_bound
+                .try_reserve_exact(bound.len())
+                .map_err(|_| self.out_of_memory("partial_application", location))?;
+            partial_bound.extend(bound.into_iter().map(BoundValue::Value));
+            let partial = self
+                .heap
+                .closure(function_index, partial_bound)
+                .map_err(|()| self.out_of_memory("partial_application", location))?;
+            self.write_current(destination, partial)
+        }
+    }
+
+    fn materialize_closure_bound(
+        &self,
+        closure: &std::rc::Rc<Allocation<Closure>>,
+        location: Location,
+    ) -> Result<Vec<Value>, ExecutionError> {
+        let captures = closure.value().bound();
+        let mut values = Vec::new();
+        values
+            .try_reserve_exact(captures.len())
+            .map_err(|_| self.out_of_memory("call_closure_captures", location))?;
+        for capture in captures {
+            values.push(match capture {
+                BoundValue::Value(value) => value.clone(),
+                BoundValue::SelfReference => Value::Closure(std::rc::Rc::clone(closure)),
+            });
+        }
+        Ok(values)
     }
 
     fn constant_value(

@@ -1,8 +1,8 @@
 use ling_bytecode::{
     BYTECODE_MAGIC, BYTECODE_PROTOCOL, Capability, CompareOperator, Constant, ConstantIndex,
-    DecodeLimits, Effect, FORMAT_VERSION, Function, FunctionIndex, Instruction, IntBinaryOperator,
-    IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module, ModuleIndex,
-    PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
+    DecodeLimits, Effect, FORMAT_VERSION, Function, FunctionIndex, FunctionKind, Instruction,
+    IntBinaryOperator, IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module,
+    ModuleIndex, PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
     SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex, UNICODE_VERSION,
     UnverifiedProgram, ValueType,
 };
@@ -156,8 +156,10 @@ fn represents_a_hello_program_only_as_unverified_data() {
         content_sha256: SourceDigest::new([0x5a; 32]),
     };
     let function = Function {
+        kind: FunctionKind::Named,
         module: ModuleIndex::new(0),
         name: StringIndex::new(1),
+        capture_count: 0,
         parameter_types: vec![TypeIndex::new(0)],
         result_type: TypeIndex::new(0),
         effects: vec![Effect::ConsoleWrite],

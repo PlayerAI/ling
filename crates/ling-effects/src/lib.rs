@@ -373,6 +373,7 @@ struct Checker {
     typed: TypedProgram,
     direct_effects: BTreeMap<Callable, EffectRow>,
     calls: BTreeMap<Callable, BTreeSet<Callable>>,
+    returns: BTreeMap<Callable, BTreeSet<Callable>>,
     callable_parameters: BTreeMap<Callable, Vec<Option<BindingKey>>>,
     errors: Vec<EffectError>,
     warnings: Vec<Diagnostic>,
@@ -385,6 +386,7 @@ impl Checker {
             typed,
             direct_effects: BTreeMap::new(),
             calls: BTreeMap::new(),
+            returns: BTreeMap::new(),
             callable_parameters: BTreeMap::new(),
             errors: Vec::new(),
             warnings,
@@ -495,7 +497,13 @@ impl Checker {
         let mut calls = BTreeSet::new();
         self.visit_expression(module, expression, &mut effects, &mut calls);
         self.direct_effects.insert(callable.clone(), effects);
-        self.calls.entry(callable).or_default().extend(calls);
+        self.calls
+            .entry(callable.clone())
+            .or_default()
+            .extend(calls);
+        if let Some(target) = self.value_callable(module, expression) {
+            self.returns.entry(callable).or_default().insert(target);
+        }
     }
 
     fn register_parameters(
@@ -515,7 +523,7 @@ impl Checker {
     }
 
     fn connect_alias(&mut self, alias: Callable, module: ModuleId, expression: &hir::Expression) {
-        if let Some(target) = self.expression_callable(module, expression) {
+        if let Some(target) = self.value_callable(module, expression) {
             self.calls.entry(alias).or_default().insert(target);
         }
     }
@@ -591,24 +599,35 @@ impl Checker {
                 function,
                 arguments,
             } => {
-                if let Some(callee) = self.expression_callable(module, function) {
-                    let is_map = matches!(
-                        &callee,
-                        Callable::Definition(definition)
-                            if definition == self.typed.resolved().builtin_id(Builtin::Map)
-                    );
-                    calls.insert(callee.clone());
-                    self.connect_arguments(&callee, module, arguments);
-                    if is_map {
-                        if let Some(callback) = arguments
-                            .first()
-                            .and_then(|argument| self.expression_callable(module, argument))
-                        {
-                            calls.insert(callback);
+                self.visit_expression(module, function, effects, calls);
+                if let Some((callee, applied)) = self.expression_callable_state(module, function) {
+                    let target = if applied > 0 {
+                        self.value_callable(module, function)
+                            .unwrap_or_else(|| callee.clone())
+                    } else {
+                        callee.clone()
+                    };
+                    let target_applied = if target == callee { applied } else { 0 };
+                    let complete = self.callable_arity(&target).is_none_or(|arity| {
+                        target_applied.saturating_add(arguments.len()) >= arity
+                    });
+                    if complete {
+                        let is_map = matches!(
+                            &target,
+                            Callable::Definition(definition)
+                                if definition == self.typed.resolved().builtin_id(Builtin::Map)
+                        );
+                        calls.insert(target.clone());
+                        self.connect_arguments(&target, module, arguments);
+                        if is_map {
+                            if let Some(callback) = arguments
+                                .first()
+                                .and_then(|argument| self.expression_callable(module, argument))
+                            {
+                                calls.insert(callback);
+                            }
                         }
                     }
-                } else {
-                    self.visit_expression(module, function, effects, calls);
                 }
                 for argument in arguments {
                     self.visit_expression(module, argument, effects, calls);
@@ -663,7 +682,10 @@ impl Checker {
             let Some(parameter) = parameter else {
                 continue;
             };
-            let Some(argument) = self.expression_callable(module, argument) else {
+            let Some(argument) = self
+                .value_callable(module, argument)
+                .or_else(|| self.expression_callable(module, argument))
+            else {
                 continue;
             };
             self.calls
@@ -678,6 +700,23 @@ impl Checker {
         module: ModuleId,
         expression: &hir::Expression,
     ) -> Option<Callable> {
+        self.expression_callable_state(module, expression)
+            .map(|(callable, _)| callable)
+    }
+
+    fn expression_callable_state(
+        &self,
+        module: ModuleId,
+        expression: &hir::Expression,
+    ) -> Option<(Callable, usize)> {
+        if let hir::ExpressionKind::Application {
+            function,
+            arguments,
+        } = &expression.kind
+        {
+            let (callable, applied) = self.expression_callable_state(module, function)?;
+            return Some((callable, applied.saturating_add(arguments.len())));
+        }
         let reference = match &expression.kind {
             hir::ExpressionKind::Name { reference, .. }
             | hir::ExpressionKind::Projection { reference, .. } => *reference,
@@ -685,10 +724,48 @@ impl Checker {
         };
         match self.typed.resolved().reference(module, reference) {
             Some(ReferenceTarget::Definition(definition)) => {
-                Some(Callable::Definition(definition.clone()))
+                Some((Callable::Definition(definition.clone()), 0))
             }
-            Some(ReferenceTarget::Binding(binding)) => Some(Callable::Binding(*binding)),
+            Some(ReferenceTarget::Binding(binding)) => Some((Callable::Binding(*binding), 0)),
             None => None,
+        }
+    }
+
+    fn value_callable(&self, module: ModuleId, expression: &hir::Expression) -> Option<Callable> {
+        match &expression.kind {
+            hir::ExpressionKind::Sequence(elements) => {
+                elements.iter().rev().find_map(|element| match element {
+                    hir::SequenceElement::Expression(value) => self.value_callable(module, value),
+                    hir::SequenceElement::Let(_) => None,
+                })
+            }
+            hir::ExpressionKind::Application {
+                function,
+                arguments,
+            } => {
+                let (callee, applied) = self.expression_callable_state(module, function)?;
+                let arity = self.callable_arity(&callee)?;
+                let total = applied.saturating_add(arguments.len());
+                if total < arity {
+                    return Some(callee);
+                }
+                self.returns.get(&callee)?.iter().next().cloned()
+            }
+            hir::ExpressionKind::Name { .. } | hir::ExpressionKind::Projection { .. } => {
+                self.expression_callable(module, expression)
+            }
+            _ => None,
+        }
+    }
+
+    fn callable_arity(&self, callable: &Callable) -> Option<usize> {
+        let type_id = match callable {
+            Callable::Definition(definition) => self.typed.definition_type(definition)?,
+            Callable::Binding(binding) => self.typed.binding_type(*binding)?,
+        };
+        match self.typed.arena().get(type_id) {
+            Type::Function { parameters, .. } => Some(parameters.len()),
+            _ => None,
         }
     }
 
@@ -974,6 +1051,35 @@ mod tests {
             "module Main\n    requires Console.Write\n\n",
         );
         let checked = check(typed(&declared)).expect("wrapper callback capability is declared");
+        let main = locate_main(&checked).expect("valid main");
+        assert_eq!(
+            checked
+                .definition_effect(&main)
+                .expect("main effects")
+                .names(),
+            vec!["Console.Write"]
+        );
+
+        let partial = concat!(
+            "module Main\n    requires Console.Write\n\n",
+            "let write prefix value = Console.write value\n\n",
+            "let main () =\n",
+            "    let partial = write \"prefix\"\n",
+            "    ()\n",
+        );
+        let checked = check(typed(partial))
+            .expect("partial application is pure until the returned function is called");
+        let main = locate_main(&checked).expect("valid main");
+        assert!(
+            checked
+                .definition_effect(&main)
+                .expect("main effects")
+                .is_pure()
+        );
+
+        let complete = partial.replace("    ()\n", "    partial \"value\"\n");
+        let checked = check(typed(&complete))
+            .expect("calling the partially applied function uses its latent Effect");
         let main = locate_main(&checked).expect("valid main");
         assert_eq!(
             checked

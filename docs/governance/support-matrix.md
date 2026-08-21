@@ -72,7 +72,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-ABI` | `Planned public` | — | `Future` | no |
 | `PROTO-AUDIT-SOURCE` | `Public` | `ling.audit/0.1` | `Preview` | yes |
 | `PROTO-BUILD-METADATA` | `Planned public` | — | `Future` | no |
-| `PROTO-BYTECODE` | `Public` | `ling.bytecode/1.0` | `Experimental` | yes |
+| `PROTO-BYTECODE` | `Public` | `ling.bytecode/1.1` | `Experimental` | yes |
 | `PROTO-CANONICAL-BYTES` | `Public` | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | yes |
 | `PROTO-CLI` | `Public` | `0.0.1-dev` | `Preview` | yes |
 | `PROTO-CLI-EXIT` | `Public` | `0.0.1-dev` | `Preview` | yes |

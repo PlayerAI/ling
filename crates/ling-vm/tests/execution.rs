@@ -2,7 +2,7 @@ mod support;
 
 use ling_bytecode::{
     Instruction, LoweringSource, SourceMapEntry, VerifiedProgramV1, decode_and_verify_v1,
-    encode_v1, lower_v1,
+    decode_and_verify_v1_1, encode_v1, encode_v1_1, lower_v1, lower_v1_1,
 };
 use ling_diagnostics::codes;
 use ling_effects::locate_main;
@@ -46,6 +46,16 @@ fn verified(fixture: &Fixture) -> VerifiedProgramV1 {
     .expect("fixture lowers to bytecode 1.0");
     let bytes = encode_v1(&lowered).expect("fixture encodes");
     decode_and_verify_v1(&bytes).expect("fixture independently verifies")
+}
+
+fn verified_v1_1(fixture: &Fixture) -> VerifiedProgramV1 {
+    let lowered = lower_v1_1(
+        &fixture.snapshot,
+        &[LoweringSource::new(&fixture.source, "src/Main.ling")],
+    )
+    .expect("fixture lowers to bytecode 1.1");
+    let bytes = encode_v1_1(&lowered).expect("fixture encodes");
+    decode_and_verify_v1_1(&bytes).expect("fixture independently verifies")
 }
 
 fn generous_limits() -> ExecutionLimits {
@@ -133,6 +143,186 @@ fn vm_executes_every_scalar_operator_and_both_branch_directions() {
         execute_v1(&program, generous_limits(), &mut host).expect("scalar artifact executes");
         assert_eq!(console.output, "value=10\n");
     }
+}
+
+#[test]
+fn vm_executes_captured_and_partially_applied_closures() {
+    let program = decode_and_verify_v1_1(&wire::closure_artifact())
+        .expect("independent closure artifact verifies");
+    let mut console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut console);
+    execute_v1(&program, generous_limits(), &mut host).expect("closure artifact executes");
+    assert_eq!(console.output, "hello\n");
+}
+
+#[test]
+fn vm_matches_the_checked_interpreter_for_source_level_closure_lowering() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let select prefix value = prefix\n\n",
+        "let main () =\n",
+        "    let prefix = \"hello\"\n",
+        "    let local value = Console.write prefix\n",
+        "    let partial = select prefix\n",
+        "    local (partial \"world\")\n",
+    );
+    let fixture = fixture("source-closures.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("interpreter executes closure source");
+
+    let program = verified_v1_1(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host).expect("VM executes closure source");
+    assert_eq!(vm_console.output, interpreter_console.output());
+    assert_eq!(vm_console.output, "hello\n");
+}
+
+#[test]
+fn vm_bounds_source_level_top_and_local_recursion_with_explicit_frames() {
+    let text = concat!(
+        "module Main\n\n",
+        "let rec top () : Unit = top ()\n\n",
+        "let main () =\n",
+        "    let rec local () : Unit = local ()\n",
+        "    local ()\n",
+    );
+    let fixture = fixture("source-recursion.ling", text);
+    let program = verified_v1_1(&fixture);
+    let mut host = HostCapabilities::none();
+    let fault = runtime(
+        execute_v1(&program, ExecutionLimits::new(10_000, 8, 1_024), &mut host)
+            .expect_err("source recursion must reach the configured frame limit"),
+    );
+    assert!(matches!(
+        fault.kind(),
+        RuntimeFaultKind::ResourceLimit {
+            resource: RuntimeResource::Frame
+        }
+    ));
+    assert!(!fault.committed());
+}
+
+#[test]
+fn vm_matches_the_checked_interpreter_for_a_returned_closure() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let factory prefix =\n",
+        "    let local value = Console.write prefix\n",
+        "    local\n\n",
+        "let main () =\n",
+        "    let callback = factory \"hello\"\n",
+        "    callback \"world\"\n",
+    );
+    let fixture = fixture("returned-closure.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("interpreter executes returned closure");
+
+    let program = verified_v1_1(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host).expect("VM executes returned closure");
+    assert_eq!(vm_console.output, interpreter_console.output());
+    assert_eq!(vm_console.output, "hello\n");
+}
+
+#[test]
+fn vm_matches_the_checked_interpreter_for_a_higher_order_parameter() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let apply callback value: Unit =\n",
+        "    let ignored: Unit = callback value\n",
+        "    Console.write value\n\n",
+        "let main () =\n",
+        "    let local value = Console.write value\n",
+        "    apply local \"hello\"\n",
+    );
+    let fixture = fixture("higher-order.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("interpreter executes higher-order parameter");
+
+    let program = verified_v1_1(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host).expect("VM executes higher-order parameter");
+    assert_eq!(vm_console.output, interpreter_console.output());
+    assert_eq!(vm_console.output, "hello\nhello\n");
+}
+
+#[test]
+fn vm_reports_atomic_heap_failure_for_closure_and_partial_allocation() {
+    let returned = fixture(
+        "returned-closure-oom.ling",
+        concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let factory prefix =\n",
+            "    let local value = Console.write prefix\n",
+            "    local\n\n",
+            "let main () =\n",
+            "    let callback = factory \"hello\"\n",
+            "    callback \"world\"\n",
+        ),
+    );
+    let returned_program = verified_v1_1(&returned);
+    let mut console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1(
+            &returned_program,
+            ExecutionLimits::new(1_000, 16, 36),
+            &mut host,
+        )
+        .expect_err("captured closure allocation must exceed the heap limit"),
+    );
+    assert!(matches!(
+        fault.kind(),
+        RuntimeFaultKind::OutOfMemory {
+            operation: "make_closure"
+        }
+    ));
+    assert!(!fault.committed());
+    assert_eq!(console.output, "");
+
+    let partial = fixture(
+        "partial-oom.ling",
+        concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let select prefix value = prefix\n\n",
+            "let main () =\n",
+            "    let partial = select \"hello\"\n",
+            "    Console.write (partial \"world\")\n",
+        ),
+    );
+    let partial_program = verified_v1_1(&partial);
+    let mut console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1(
+            &partial_program,
+            ExecutionLimits::new(1_000, 16, 52),
+            &mut host,
+        )
+        .expect_err("partial application allocation must exceed the heap limit"),
+    );
+    assert!(matches!(
+        fault.kind(),
+        RuntimeFaultKind::OutOfMemory {
+            operation: "partial_application"
+        }
+    ));
+    assert!(!fault.committed());
+    assert_eq!(console.output, "");
 }
 
 #[test]

@@ -1,18 +1,31 @@
 use std::fmt::Write;
 
 use crate::{
-    Constant, Instruction, IntegerSign, LoweredProgramV1, PackageReference, SourceOrigin,
-    Terminator, UnverifiedProgram, ValueType,
+    CaptureOperand, Constant, FunctionKind, Instruction, IntegerSign, LoweredProgramV1,
+    LoweredProgramV1_1, PackageReference, SourceOrigin, Terminator, UnverifiedProgram, ValueType,
 };
 
 /// Renders a deterministic human-readable debug view; this text is not a wire protocol.
 #[must_use]
 pub fn disassemble_v1(program: &LoweredProgramV1) -> String {
-    let model = program.model();
+    disassemble_model(program.model(), "1.0", false)
+}
+
+/// Renders a deterministic version-1.1 debug view; this text is not a wire protocol.
+#[must_use]
+pub fn disassemble_v1_1(program: &LoweredProgramV1_1) -> String {
+    disassemble_model(program.model(), "1.1", true)
+}
+
+fn disassemble_model(
+    model: &UnverifiedProgram,
+    revision: &str,
+    show_closure_metadata: bool,
+) -> String {
     let mut output = String::new();
     writeln!(
         output,
-        "; ling.bytecode/1.0 debug disassembly (non-contract)"
+        "; ling.bytecode/{revision} debug disassembly (non-contract)"
     )
     .expect("writing to String cannot fail");
 
@@ -54,7 +67,7 @@ pub fn disassemble_v1(program: &LoweredProgramV1) -> String {
         writeln!(
             output,
             "  @t{index} {} tag=0x{:02x}",
-            type_name(*value),
+            type_text(value),
             value.tag()
         )
         .expect("writing to String cannot fail");
@@ -92,13 +105,25 @@ pub fn disassemble_v1(program: &LoweredProgramV1) -> String {
             .join(", ");
         writeln!(
             output,
-            "  fn @f{function_index} @m{} @s{} {} ({parameters}) -> @t{} effects={} registers={}",
+            "  fn @f{function_index} @m{} @s{} {} ({parameters}) -> @t{} effects={} registers={}{}",
             function.module.get(),
             function.name.get(),
             quoted(string(model, function.name.get())),
             function.result_type.get(),
             effect_list(&function.effects),
-            function.register_count
+            function.register_count,
+            if show_closure_metadata {
+                format!(
+                    " kind={} captures={}",
+                    match function.kind {
+                        FunctionKind::Named => "named",
+                        FunctionKind::ClosureBody => "closure-body",
+                    },
+                    function.capture_count
+                )
+            } else {
+                String::new()
+            }
         )
         .expect("writing to String cannot fail");
         for (block_index, block) in function.blocks.iter().enumerate() {
@@ -160,12 +185,26 @@ fn string(model: &UnverifiedProgram, index: u32) -> &str {
         .map_or("<invalid-string-index>", String::as_str)
 }
 
-fn type_name(value: ValueType) -> &'static str {
+fn type_text(value: &ValueType) -> String {
     match value {
-        ValueType::Unit => "Unit",
-        ValueType::Bool => "Bool",
-        ValueType::Int => "Int",
-        ValueType::Text => "Text",
+        ValueType::Unit => "Unit".to_owned(),
+        ValueType::Bool => "Bool".to_owned(),
+        ValueType::Int => "Int".to_owned(),
+        ValueType::Text => "Text".to_owned(),
+        ValueType::Function {
+            parameters,
+            result,
+            effects,
+        } => format!(
+            "Function ({}) -> @t{} effects={}",
+            parameters
+                .iter()
+                .map(|parameter| format!("@t{}", parameter.get()))
+                .collect::<Vec<_>>()
+                .join(", "),
+            result.get(),
+            effect_list(effects)
+        ),
     }
 }
 
@@ -268,6 +307,33 @@ fn instruction_text(value: &Instruction) -> String {
             "%r{} = call @f{} ({})",
             destination.get(),
             function.get(),
+            register_list(arguments)
+        ),
+        Instruction::MakeClosure {
+            destination,
+            function,
+            captures,
+        } => format!(
+            "%r{} = make-closure @f{} ({})",
+            destination.get(),
+            function.get(),
+            captures
+                .iter()
+                .map(|capture| match capture {
+                    CaptureOperand::Register(register) => format!("%r{}", register.get()),
+                    CaptureOperand::SelfReference => "self".to_owned(),
+                })
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
+        Instruction::CallClosure {
+            destination,
+            callee,
+            arguments,
+        } => format!(
+            "%r{} = call-closure %r{} ({})",
+            destination.get(),
+            callee.get(),
             register_list(arguments)
         ),
         Instruction::Intrinsic {

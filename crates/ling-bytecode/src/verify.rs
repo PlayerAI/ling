@@ -6,15 +6,18 @@ use ling_unicode::{IdentifierStatus, inspect_identifier};
 use crate::decode::{DecodedOffsets, DecodedProgramV1};
 use crate::path::validate_logical_name;
 use crate::{
-    Block, BytecodeError, BytecodePhase, BytecodeReason, Capability, Constant, DecodeLimits,
-    Effect, Function, Instruction, IntegerSign, Intrinsic, PackageReference, RegisterIndex,
-    Terminator, UnverifiedProgram, ValueType, decode_v1, decode_v1_with_limit,
+    Block, BytecodeError, BytecodePhase, BytecodeReason, Capability, CaptureOperand, Constant,
+    DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FormatVersion, Function,
+    FunctionKind, Instruction, IntegerSign, Intrinsic, PackageReference, RegisterIndex, Terminator,
+    TypeIndex, UnverifiedProgram, ValueType, decode_v1, decode_v1_1, decode_v1_1_with_limit,
+    decode_v1_with_limit,
 };
 
 /// Immutable bytecode state that has passed every RFC-0014 verifier phase.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct VerifiedProgramV1 {
     model: UnverifiedProgram,
+    version: FormatVersion,
 }
 
 impl VerifiedProgramV1 {
@@ -23,13 +26,19 @@ impl VerifiedProgramV1 {
     pub const fn model(&self) -> &UnverifiedProgram {
         &self.model
     }
+
+    /// Returns the exact verified wire-format revision.
+    #[must_use]
+    pub const fn version(&self) -> FormatVersion {
+        self.version
+    }
 }
 
 /// Independently verifies a decoded, untrusted version-1.0 program.
 pub fn verify_v1(decoded: DecodedProgramV1) -> Result<VerifiedProgramV1, BytecodeError> {
-    Verifier::new(decoded.model(), &decoded.offsets).verify()?;
-    let (model, _) = decoded.into_parts();
-    Ok(VerifiedProgramV1 { model })
+    Verifier::new(decoded.model(), decoded.version(), &decoded.offsets).verify()?;
+    let (model, version, _) = decoded.into_parts();
+    Ok(VerifiedProgramV1 { model, version })
 }
 
 /// Decodes and independently verifies one version-1.0 artifact.
@@ -45,14 +54,36 @@ pub fn decode_and_verify_v1_with_limit(
     verify_v1(decode_v1_with_limit(bytes, artifact_byte_limit)?)
 }
 
+/// Decodes and independently verifies either bytecode 1.0 or 1.1.
+pub fn decode_and_verify_v1_1(bytes: &[u8]) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_1(bytes)?)
+}
+
+/// Decodes and verifies either supported 1.x revision under a caller limit.
+pub fn decode_and_verify_v1_1_with_limit(
+    bytes: &[u8],
+    artifact_byte_limit: u64,
+) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_1_with_limit(bytes, artifact_byte_limit)?)
+}
+
 struct Verifier<'a> {
     model: &'a UnverifiedProgram,
+    version: FormatVersion,
     offsets: &'a DecodedOffsets,
 }
 
 impl<'a> Verifier<'a> {
-    const fn new(model: &'a UnverifiedProgram, offsets: &'a DecodedOffsets) -> Self {
-        Self { model, offsets }
+    const fn new(
+        model: &'a UnverifiedProgram,
+        version: FormatVersion,
+        offsets: &'a DecodedOffsets,
+    ) -> Self {
+        Self {
+            model,
+            version,
+            offsets,
+        }
     }
 
     fn verify(&self) -> Result<(), BytecodeError> {
@@ -209,25 +240,65 @@ impl<'a> Verifier<'a> {
     }
 
     fn verify_types(&self) -> Result<(), BytecodeError> {
-        const REQUIRED: [ValueType; 4] = [
+        let required = [
             ValueType::Unit,
             ValueType::Bool,
             ValueType::Int,
             ValueType::Text,
         ];
-        if self.model.types() != REQUIRED {
+        let prefix_matches = self.model.types().get(..4) == Some(required.as_slice());
+        let exact_1_0 = self.version == FORMAT_VERSION_1_0 && self.model.types().len() == 4;
+        if !prefix_matches || (self.version == FORMAT_VERSION_1_0 && !exact_1_0) {
             let mismatch = self
                 .model
                 .types()
                 .iter()
-                .zip(REQUIRED)
-                .position(|(actual, expected)| *actual != expected)
-                .unwrap_or(self.model.types().len().min(REQUIRED.len()));
+                .zip(&required)
+                .position(|(actual, expected)| actual != expected)
+                .unwrap_or(self.model.types().len().min(required.len()));
             return Err(self.table_error(
                 BytecodeReason::InvalidTableOrder,
                 offset(&self.offsets.types, mismatch, self.offsets.type_count),
                 [to_u32(mismatch)],
             ));
+        }
+        if self.version == FORMAT_VERSION_1_1 {
+            for (index, value) in self.model.types().iter().enumerate().skip(4) {
+                let record_offset = offset(&self.offsets.types, index, self.offsets.type_count);
+                let ValueType::Function {
+                    parameters,
+                    result,
+                    effects,
+                } = value
+                else {
+                    return Err(self.table_error(
+                        BytecodeReason::InvalidTableOrder,
+                        record_offset,
+                        [to_u32(index)],
+                    ));
+                };
+                if parameters.is_empty()
+                    || effects.windows(2).any(|pair| pair[0] >= pair[1])
+                    || parameters
+                        .iter()
+                        .chain(std::iter::once(result))
+                        .any(|value| to_usize(value.get()) >= index)
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        record_offset,
+                        [to_u32(index)],
+                    ));
+                }
+                if index > 4 && &self.model.types()[index - 1] >= value {
+                    return Err(self.table_error(
+                        BytecodeReason::InvalidTableOrder,
+                        record_offset,
+                        [to_u32(index - 1), to_u32(index)],
+                    ));
+                }
+            }
         }
         Ok(())
     }
@@ -351,7 +422,11 @@ impl<'a> Verifier<'a> {
                 function_offset,
                 BytecodePhase::Instruction,
             )?;
-            if !is_valid_identifier(name) {
+            let valid_name = match function.kind {
+                FunctionKind::Named => is_valid_identifier(name),
+                FunctionKind::ClosureBody => is_valid_closure_label(name),
+            };
+            if !valid_name {
                 return Err(error(
                     BytecodePhase::Instruction,
                     BytecodeReason::InvalidName,
@@ -361,6 +436,7 @@ impl<'a> Verifier<'a> {
             }
             let skeleton_key = (
                 function.module.get(),
+                function.kind,
                 ling_unicode::confusable_skeleton(name),
             );
             if !skeletons.insert(skeleton_key) {
@@ -372,6 +448,29 @@ impl<'a> Verifier<'a> {
                 ));
             }
             self.verify_type_indexes(function, function_index, function_offset)?;
+            if function.capture_count > to_u32(function.parameter_types.len())
+                || (function.kind == FunctionKind::Named && function.capture_count != 0)
+                || (function.kind == FunctionKind::ClosureBody
+                    && to_usize(function.capture_count) >= function.parameter_types.len())
+                || (self.version == FORMAT_VERSION_1_0 && function.kind != FunctionKind::Named)
+            {
+                return Err(error(
+                    BytecodePhase::Instruction,
+                    BytecodeReason::InvalidBlockShape,
+                    function_offset,
+                    [to_u32(function_index), function.capture_count],
+                ));
+            }
+            if function.kind == FunctionKind::ClosureBody
+                && self.complete_function_type(function).is_none()
+            {
+                return Err(error(
+                    BytecodePhase::Type,
+                    BytecodeReason::InvalidTypeIndex,
+                    function_offset,
+                    [to_u32(function_index)],
+                ));
+            }
             if function.effects.windows(2).any(|pair| pair[0] >= pair[1]) {
                 return Err(error(
                     BytecodePhase::Effect,
@@ -398,8 +497,8 @@ impl<'a> Verifier<'a> {
                     .strings()
                     .get(to_usize(previous.name.get()))
                     .map_or(&[][..], |value| value.as_bytes());
-                if (previous.module.get(), previous_name)
-                    >= (function.module.get(), name.as_bytes())
+                if (previous.module.get(), previous.kind, previous_name)
+                    >= (function.module.get(), function.kind, name.as_bytes())
                 {
                     return Err(error(
                         BytecodePhase::Instruction,
@@ -581,6 +680,50 @@ impl<'a> Verifier<'a> {
                     BytecodeReason::InvalidFunctionIndex,
                     instruction_offset,
                     [to_u32(function_index), callee.get()],
+                )?;
+                self.ensure_registers(
+                    function,
+                    arguments,
+                    instruction_offset,
+                    function_index,
+                    block_index,
+                )
+            }
+            Instruction::MakeClosure {
+                function: callee,
+                captures,
+                ..
+            } => {
+                self.ensure_index(
+                    callee.get(),
+                    self.model.functions().len(),
+                    BytecodePhase::Instruction,
+                    BytecodeReason::InvalidFunctionIndex,
+                    instruction_offset,
+                    [to_u32(function_index), callee.get()],
+                )?;
+                for capture in captures {
+                    if let CaptureOperand::Register(register) = capture {
+                        self.ensure_register(
+                            function,
+                            *register,
+                            instruction_offset,
+                            function_index,
+                            block_index,
+                        )?;
+                    }
+                }
+                Ok(())
+            }
+            Instruction::CallClosure {
+                callee, arguments, ..
+            } => {
+                self.ensure_register(
+                    function,
+                    *callee,
+                    instruction_offset,
+                    function_index,
+                    block_index,
                 )?;
                 self.ensure_registers(
                     function,
@@ -782,19 +925,20 @@ impl<'a> Verifier<'a> {
         let mut definitions = vec![None; to_usize(function.register_count)];
         for (block_index, block) in function.blocks.iter().enumerate() {
             for parameter in &block.parameters {
-                let value_type = self.value_type(parameter.value_type.get());
                 self.define_register(
                     &mut definitions,
                     parameter.register,
                     DefinitionLocation::BlockParameter,
-                    value_type,
+                    parameter.value_type,
                     function_index,
                     block_index,
                     self.block_offset(function_index, block_index),
                 )?;
             }
             for (instruction_index, instruction) in block.instructions.iter().enumerate() {
-                let value_type = self.instruction_result_type(instruction);
+                let value_type = self
+                    .instruction_result_type(instruction, &definitions)
+                    .unwrap_or(TypeIndex::new(u32::MAX));
                 self.define_register(
                     &mut definitions,
                     instruction_destination(instruction),
@@ -814,6 +958,44 @@ impl<'a> Verifier<'a> {
                 [to_u32(function_index), to_u32(register)],
             ));
         }
+        let mut changed = true;
+        while changed {
+            changed = false;
+            for block in &function.blocks {
+                for instruction in &block.instructions {
+                    let Instruction::CallClosure { destination, .. } = instruction else {
+                        continue;
+                    };
+                    let index = to_usize(destination.get());
+                    if definitions[index]
+                        .as_ref()
+                        .is_some_and(|definition| definition.value_type.get() != u32::MAX)
+                    {
+                        continue;
+                    }
+                    if let Some(value_type) =
+                        self.instruction_result_type(instruction, &definitions)
+                    {
+                        if let Some(definition) = definitions[index].as_mut() {
+                            definition.value_type = value_type;
+                        }
+                        changed = true;
+                    }
+                }
+            }
+        }
+        if let Some(register) = definitions.iter().position(|definition| {
+            definition
+                .as_ref()
+                .is_some_and(|definition| definition.value_type.get() == u32::MAX)
+        }) {
+            return Err(error(
+                BytecodePhase::Type,
+                BytecodeReason::InvalidRegisterType,
+                self.function_offset(function_index),
+                [to_u32(function_index), to_u32(register)],
+            ));
+        }
         Ok(definitions.into_iter().flatten().collect())
     }
 
@@ -823,7 +1005,7 @@ impl<'a> Verifier<'a> {
         definitions: &mut [Option<Definition>],
         register: RegisterIndex,
         location: DefinitionLocation,
-        value_type: ValueType,
+        value_type: TypeIndex,
         function_index: usize,
         block_index: usize,
         definition_offset: u64,
@@ -913,12 +1095,20 @@ impl<'a> Verifier<'a> {
             Instruction::Const { .. } => Ok(()),
             Instruction::IntUnary { operand, .. } => check(
                 *operand,
-                ValueType::Int,
+                TypeIndex::new(2),
                 BytecodeReason::InvalidRegisterType,
             ),
             Instruction::IntBinary { left, right, .. } => {
-                check(*left, ValueType::Int, BytecodeReason::InvalidRegisterType)?;
-                check(*right, ValueType::Int, BytecodeReason::InvalidRegisterType)
+                check(
+                    *left,
+                    TypeIndex::new(2),
+                    BytecodeReason::InvalidRegisterType,
+                )?;
+                check(
+                    *right,
+                    TypeIndex::new(2),
+                    BytecodeReason::InvalidRegisterType,
+                )
             }
             Instruction::Compare {
                 operator,
@@ -928,12 +1118,12 @@ impl<'a> Verifier<'a> {
             } => {
                 check(
                     *left,
-                    operator.operand_type(),
+                    scalar_type_index(operator.operand_type()),
                     BytecodeReason::InvalidRegisterType,
                 )?;
                 check(
                     *right,
-                    operator.operand_type(),
+                    scalar_type_index(operator.operand_type()),
                     BytecodeReason::InvalidRegisterType,
                 )
             }
@@ -943,7 +1133,9 @@ impl<'a> Verifier<'a> {
                 ..
             } => {
                 let callee = &self.model.functions()[to_usize(callee.get())];
-                if arguments.len() != callee.parameter_types.len() {
+                if callee.kind != FunctionKind::Named
+                    || arguments.len() != callee.parameter_types.len()
+                {
                     return Err(error(
                         BytecodePhase::Type,
                         BytecodeReason::CallSignatureMismatch,
@@ -952,11 +1144,82 @@ impl<'a> Verifier<'a> {
                     ));
                 }
                 for (argument, expected) in arguments.iter().zip(&callee.parameter_types) {
-                    check(
-                        *argument,
-                        self.value_type(expected.get()),
+                    check(*argument, *expected, BytecodeReason::CallSignatureMismatch)?;
+                }
+                Ok(())
+            }
+            Instruction::MakeClosure {
+                function: target,
+                captures,
+                ..
+            } => {
+                let target = &self.model.functions()[to_usize(target.get())];
+                let Some(closure_type) = self.complete_function_type(target) else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        instruction_offset,
+                        [to_u32(function_index)],
+                    ));
+                };
+                if captures.len() != to_usize(target.capture_count)
+                    || (target.kind == FunctionKind::Named && !captures.is_empty())
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
                         BytecodeReason::CallSignatureMismatch,
-                    )?;
+                        instruction_offset,
+                        [to_u32(function_index), target.capture_count],
+                    ));
+                }
+                let mut self_seen = false;
+                for (capture, expected) in captures.iter().zip(&target.parameter_types) {
+                    match capture {
+                        CaptureOperand::Register(register) => {
+                            check(*register, *expected, BytecodeReason::CallSignatureMismatch)?
+                        }
+                        CaptureOperand::SelfReference
+                            if !self_seen
+                                && target.kind == FunctionKind::ClosureBody
+                                && *expected == closure_type =>
+                        {
+                            self_seen = true;
+                        }
+                        CaptureOperand::SelfReference => {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::CallSignatureMismatch,
+                                instruction_offset,
+                                [to_u32(function_index), expected.get()],
+                            ));
+                        }
+                    }
+                }
+                Ok(())
+            }
+            Instruction::CallClosure {
+                callee, arguments, ..
+            } => {
+                let callee_type = definitions[to_usize(callee.get())].value_type;
+                let Some((parameters, _, _)) = self.function_type(callee_type) else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::CallSignatureMismatch,
+                        instruction_offset,
+                        [to_u32(function_index), callee_type.get()],
+                    ));
+                };
+                if arguments.is_empty() || arguments.len() > parameters.len() {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::CallSignatureMismatch,
+                        instruction_offset,
+                        [to_u32(function_index), to_u32(arguments.len())],
+                    ));
+                }
+                check(*callee, callee_type, BytecodeReason::CallSignatureMismatch)?;
+                for (argument, expected) in arguments.iter().zip(parameters) {
+                    check(*argument, *expected, BytecodeReason::CallSignatureMismatch)?;
                 }
                 Ok(())
             }
@@ -975,13 +1238,19 @@ impl<'a> Verifier<'a> {
                     ));
                 }
                 for (argument, expected) in arguments.iter().zip(expected) {
-                    check(*argument, *expected, BytecodeReason::CallSignatureMismatch)?;
+                    check(
+                        *argument,
+                        scalar_type_index(expected.clone()),
+                        BytecodeReason::CallSignatureMismatch,
+                    )?;
                 }
                 Ok(())
             }
-            Instruction::ConsoleWrite { text, .. } => {
-                check(*text, ValueType::Text, BytecodeReason::InvalidRegisterType)
-            }
+            Instruction::ConsoleWrite { text, .. } => check(
+                *text,
+                TypeIndex::new(3),
+                BytecodeReason::InvalidRegisterType,
+            ),
         }
     }
 
@@ -1031,7 +1300,7 @@ impl<'a> Verifier<'a> {
             } => {
                 check(
                     *condition,
-                    ValueType::Bool,
+                    TypeIndex::new(1),
                     BytecodeReason::InvalidRegisterType,
                 )?;
                 self.verify_edge_arguments(
@@ -1059,7 +1328,7 @@ impl<'a> Verifier<'a> {
             }
             Terminator::Return { value } => check(
                 *value,
-                self.value_type(function.result_type.get()),
+                function.result_type,
                 BytecodeReason::InvalidReturnType,
             ),
         }
@@ -1092,7 +1361,7 @@ impl<'a> Verifier<'a> {
                 definitions,
                 dominators,
                 *argument,
-                self.value_type(parameter.value_type.get()),
+                parameter.value_type,
                 block_index,
                 use_ordinal,
                 terminator_offset,
@@ -1118,10 +1387,31 @@ impl<'a> Verifier<'a> {
                             caller,
                             self.function_offset(caller),
                         )?,
+                        Instruction::CallClosure {
+                            callee, arguments, ..
+                        } => {
+                            let definitions = self.collect_definitions(function, caller)?;
+                            let callee_type = definitions[to_usize(callee.get())].value_type;
+                            let Some((parameters, _, effects)) = self.function_type(callee_type)
+                            else {
+                                return Err(error(
+                                    BytecodePhase::Type,
+                                    BytecodeReason::CallSignatureMismatch,
+                                    self.function_offset(caller),
+                                    [to_u32(caller), callee_type.get()],
+                                ));
+                            };
+                            if arguments.len() == parameters.len()
+                                && effects.contains(&Effect::ConsoleWrite)
+                            {
+                                required[caller] = true;
+                            }
+                        }
                         Instruction::Const { .. }
                         | Instruction::IntUnary { .. }
                         | Instruction::IntBinary { .. }
                         | Instruction::Compare { .. }
+                        | Instruction::MakeClosure { .. }
                         | Instruction::Intrinsic { .. } => {}
                     }
                 }
@@ -1182,7 +1472,11 @@ impl<'a> Verifier<'a> {
             && entry.result_type == crate::TypeIndex::new(0)
             && entry.blocks[0].parameters.len() == 1
             && entry.blocks[0].parameters[0].value_type == crate::TypeIndex::new(0);
-        if module_name != "Main" || function_name != "main" || !valid_signature {
+        if module_name != "Main"
+            || function_name != "main"
+            || entry.kind != FunctionKind::Named
+            || !valid_signature
+        {
             return Err(error(
                 BytecodePhase::Entry,
                 BytecodeReason::InvalidEntry,
@@ -1328,28 +1622,94 @@ impl<'a> Verifier<'a> {
         Ok(())
     }
 
-    fn instruction_result_type(&self, instruction: &Instruction) -> ValueType {
+    fn instruction_result_type(
+        &self,
+        instruction: &Instruction,
+        definitions: &[Option<Definition>],
+    ) -> Option<TypeIndex> {
         match instruction {
-            Instruction::Const { constant, .. } => {
-                constant_value_type(&self.model.constants()[to_usize(constant.get())])
-            }
-            Instruction::IntUnary { .. } | Instruction::IntBinary { .. } => ValueType::Int,
-            Instruction::Compare { .. } => ValueType::Bool,
+            Instruction::Const { constant, .. } => Some(TypeIndex::new(constant_type_index(
+                &self.model.constants()[to_usize(constant.get())],
+            ))),
+            Instruction::IntUnary { .. } | Instruction::IntBinary { .. } => Some(TypeIndex::new(2)),
+            Instruction::Compare { .. } => Some(TypeIndex::new(1)),
             Instruction::Call { function, .. } => {
                 let function = &self.model.functions()[to_usize(function.get())];
-                self.value_type(function.result_type.get())
+                Some(function.result_type)
             }
-            Instruction::Intrinsic { intrinsic, .. } => intrinsic_result(*intrinsic),
-            Instruction::ConsoleWrite { .. } => ValueType::Unit,
+            Instruction::MakeClosure { function, .. } => {
+                self.complete_function_type(&self.model.functions()[to_usize(function.get())])
+            }
+            Instruction::CallClosure {
+                callee, arguments, ..
+            } => {
+                let callee_type = definitions
+                    .get(to_usize(callee.get()))?
+                    .as_ref()?
+                    .value_type;
+                if callee_type.get() == u32::MAX {
+                    return None;
+                }
+                let (parameters, result, effects) = self.function_type(callee_type)?;
+                if arguments.is_empty() || arguments.len() > parameters.len() {
+                    return None;
+                }
+                if arguments.len() == parameters.len() {
+                    Some(result)
+                } else {
+                    self.find_function_type(&parameters[arguments.len()..], result, effects)
+                }
+            }
+            Instruction::Intrinsic { intrinsic, .. } => {
+                Some(scalar_type_index(intrinsic_result(*intrinsic)))
+            }
+            Instruction::ConsoleWrite { .. } => Some(TypeIndex::new(0)),
         }
     }
 
-    fn value_type(&self, index: u32) -> ValueType {
+    fn function_type(&self, index: TypeIndex) -> Option<(&[TypeIndex], TypeIndex, &[Effect])> {
+        match self.model.types().get(to_usize(index.get()))? {
+            ValueType::Function {
+                parameters,
+                result,
+                effects,
+            } => Some((parameters, *result, effects)),
+            ValueType::Unit | ValueType::Bool | ValueType::Int | ValueType::Text => None,
+        }
+    }
+
+    fn find_function_type(
+        &self,
+        parameters: &[TypeIndex],
+        result: TypeIndex,
+        effects: &[Effect],
+    ) -> Option<TypeIndex> {
         self.model
             .types()
-            .get(to_usize(index))
-            .copied()
-            .unwrap_or(ValueType::Unit)
+            .iter()
+            .position(|value| {
+                matches!(
+                    value,
+                    ValueType::Function {
+                        parameters: candidate_parameters,
+                        result: candidate_result,
+                        effects: candidate_effects,
+                    } if candidate_parameters == parameters
+                        && *candidate_result == result
+                        && candidate_effects == effects
+                )
+            })
+            .map(|index| TypeIndex::new(to_u32(index)))
+    }
+
+    fn complete_function_type(&self, function: &Function) -> Option<TypeIndex> {
+        self.find_function_type(
+            function
+                .parameter_types
+                .get(to_usize(function.capture_count)..)?,
+            function.result_type,
+            &function.effects,
+        )
     }
 
     fn string_at(&self, index: u32, record_offset: u64) -> Result<&'a str, BytecodeError> {
@@ -1498,7 +1858,7 @@ impl<'a> Verifier<'a> {
 struct Definition {
     block: usize,
     location: DefinitionLocation,
-    value_type: ValueType,
+    value_type: TypeIndex,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -1646,7 +2006,7 @@ fn check_use(
     definitions: &[Definition],
     dominators: &Dominators,
     register: RegisterIndex,
-    expected: ValueType,
+    expected: TypeIndex,
     use_block: usize,
     use_ordinal: usize,
     use_offset: u64,
@@ -1754,6 +2114,22 @@ fn is_valid_identifier(value: &str) -> bool {
         && !security.has_suspicious_mixed_script()
 }
 
+fn is_valid_closure_label(value: &str) -> bool {
+    let Some(suffix) = value.strip_prefix("closure_") else {
+        return false;
+    };
+    let mut components = suffix.split('_');
+    (0..3).all(|_| components.next().is_some_and(is_canonical_unsigned_decimal))
+        && components.next().is_none()
+}
+
+fn is_canonical_unsigned_decimal(value: &str) -> bool {
+    !value.is_empty()
+        && value.bytes().all(|byte| byte.is_ascii_digit())
+        && (value == "0" || !value.starts_with('0'))
+        && value.parse::<u64>().is_ok()
+}
+
 fn package_reference_key(reference: PackageReference) -> Option<u32> {
     match reference {
         PackageReference::Standalone => None,
@@ -1770,12 +2146,13 @@ fn constant_type_index(constant: &Constant) -> u32 {
     }
 }
 
-fn constant_value_type(constant: &Constant) -> ValueType {
-    match constant {
-        Constant::Unit => ValueType::Unit,
-        Constant::Bool(_) => ValueType::Bool,
-        Constant::Int { .. } => ValueType::Int,
-        Constant::Text(_) => ValueType::Text,
+fn scalar_type_index(value: ValueType) -> TypeIndex {
+    match value {
+        ValueType::Unit => TypeIndex::new(0),
+        ValueType::Bool => TypeIndex::new(1),
+        ValueType::Int => TypeIndex::new(2),
+        ValueType::Text => TypeIndex::new(3),
+        ValueType::Function { .. } => unreachable!("function types are not scalar"),
     }
 }
 
@@ -1827,6 +2204,8 @@ fn instruction_destination(instruction: &Instruction) -> RegisterIndex {
         | Instruction::IntBinary { destination, .. }
         | Instruction::Compare { destination, .. }
         | Instruction::Call { destination, .. }
+        | Instruction::MakeClosure { destination, .. }
+        | Instruction::CallClosure { destination, .. }
         | Instruction::Intrinsic { destination, .. }
         | Instruction::ConsoleWrite { destination, .. } => *destination,
     }

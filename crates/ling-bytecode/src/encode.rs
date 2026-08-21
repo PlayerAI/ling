@@ -2,9 +2,10 @@ use std::error::Error;
 use std::fmt;
 
 use crate::{
-    BYTECODE_MAGIC, Block, Constant, DecodeLimits, FORMAT_VERSION, Function, HEADER_BYTES,
-    Instruction, LANGUAGE_VERSION, LoweredProgramV1, NO_INDEX, PackageReference, SourceMapEntry,
-    Terminator, UNICODE_VERSION, UnverifiedProgram, VerifiedProgramV1,
+    BYTECODE_MAGIC, Block, CaptureOperand, Constant, DecodeLimits, FORMAT_VERSION_1_0,
+    FORMAT_VERSION_1_1, FormatVersion, Function, FunctionKind, HEADER_BYTES, Instruction,
+    LANGUAGE_VERSION, LoweredProgramV1, LoweredProgramV1_1, NO_INDEX, PackageReference,
+    SourceMapEntry, Terminator, UNICODE_VERSION, UnverifiedProgram, ValueType, VerifiedProgramV1,
 };
 
 /// Failure categories for deterministic bytecode writing.
@@ -82,7 +83,28 @@ pub fn encode_v1_with_limit(
     artifact_byte_limit: u64,
 ) -> Result<Vec<u8>, EncodingError> {
     let hard_limit = DecodeLimits::rfc_0014().artifact_bytes();
-    let bytes = encode_model(program.model(), hard_limit)?;
+    let bytes = encode_model(program.model(), FORMAT_VERSION_1_0, hard_limit)?;
+    let actual =
+        u64::try_from(bytes.len()).map_err(|_| EncodingError::resource(u64::MAX, hard_limit))?;
+    let effective_limit = artifact_byte_limit.min(hard_limit);
+    if actual > effective_limit {
+        return Err(EncodingError::resource(actual, effective_limit));
+    }
+    Ok(bytes)
+}
+
+/// Encodes canonical bytecode 1.1 using the RFC-0015 hard artifact limit.
+pub fn encode_v1_1(program: &LoweredProgramV1_1) -> Result<Vec<u8>, EncodingError> {
+    encode_v1_1_with_limit(program, DecodeLimits::rfc_0015().artifact_bytes())
+}
+
+/// Encodes canonical bytecode 1.1 under a caller-supplied limit no larger than RFC-0015.
+pub fn encode_v1_1_with_limit(
+    program: &LoweredProgramV1_1,
+    artifact_byte_limit: u64,
+) -> Result<Vec<u8>, EncodingError> {
+    let hard_limit = DecodeLimits::rfc_0015().artifact_bytes();
+    let bytes = encode_model(program.model(), FORMAT_VERSION_1_1, hard_limit)?;
     let actual =
         u64::try_from(bytes.len()).map_err(|_| EncodingError::resource(u64::MAX, hard_limit))?;
     let effective_limit = artifact_byte_limit.min(hard_limit);
@@ -102,8 +124,13 @@ pub fn encode_verified_v1_with_limit(
     program: &VerifiedProgramV1,
     artifact_byte_limit: u64,
 ) -> Result<Vec<u8>, EncodingError> {
-    let hard_limit = DecodeLimits::rfc_0014().artifact_bytes();
-    let bytes = encode_model(program.model(), hard_limit)?;
+    let limits = if program.version() == FORMAT_VERSION_1_1 {
+        DecodeLimits::rfc_0015()
+    } else {
+        DecodeLimits::rfc_0014()
+    };
+    let hard_limit = limits.artifact_bytes();
+    let bytes = encode_model(program.model(), program.version(), hard_limit)?;
     let actual =
         u64::try_from(bytes.len()).map_err(|_| EncodingError::resource(u64::MAX, hard_limit))?;
     let effective_limit = artifact_byte_limit.min(hard_limit);
@@ -113,12 +140,21 @@ pub fn encode_verified_v1_with_limit(
     Ok(bytes)
 }
 
-fn encode_model(program: &UnverifiedProgram, hard_limit: u64) -> Result<Vec<u8>, EncodingError> {
+pub(crate) fn encode_model(
+    program: &UnverifiedProgram,
+    version: FormatVersion,
+    hard_limit: u64,
+) -> Result<Vec<u8>, EncodingError> {
+    if version != FORMAT_VERSION_1_0 && version != FORMAT_VERSION_1_1 {
+        return Err(EncodingError::invariant(
+            "unsupported bytecode writer version",
+        ));
+    }
     let mut writer = Writer::new(hard_limit)?;
     writer.bytes(&BYTECODE_MAGIC)?;
     writer.u32(HEADER_BYTES)?;
-    writer.u16(FORMAT_VERSION.major())?;
-    writer.u16(FORMAT_VERSION.minor())?;
+    writer.u16(version.major())?;
+    writer.u16(version.minor())?;
     writer.u16(LANGUAGE_VERSION.major())?;
     writer.u16(LANGUAGE_VERSION.minor())?;
     writer.u16(UNICODE_VERSION.major())?;
@@ -148,7 +184,9 @@ fn encode_model(program: &UnverifiedProgram, hard_limit: u64) -> Result<Vec<u8>,
         }
         Ok(())
     })?;
-    writer.table(program.types(), |payload, value| payload.u8(value.tag()))?;
+    writer.table(program.types(), |payload, value| {
+        encode_type(payload, value, version)
+    })?;
     writer.table(program.constants(), encode_constant)?;
     writer.table(program.sources(), |payload, source| {
         payload.u32(source.module.get())?;
@@ -156,7 +194,9 @@ fn encode_model(program: &UnverifiedProgram, hard_limit: u64) -> Result<Vec<u8>,
         payload.u64(source.original_byte_length)?;
         payload.bytes(source.content_sha256.as_bytes())
     })?;
-    writer.table(program.functions(), encode_function)?;
+    writer.table(program.functions(), |payload, function| {
+        encode_function(payload, function, version)
+    })?;
     writer.u32(program.entry().get())?;
     writer.table(program.source_map(), encode_source_map)?;
 
@@ -168,6 +208,37 @@ fn encode_model(program: &UnverifiedProgram, hard_limit: u64) -> Result<Vec<u8>,
         .ok_or_else(|| EncodingError::invariant("encoded header is shorter than 40 bytes"))?;
     target.copy_from_slice(&total.to_le_bytes());
     Ok(bytes)
+}
+
+fn encode_type(
+    writer: &mut Writer,
+    value: &ValueType,
+    version: FormatVersion,
+) -> Result<(), EncodingError> {
+    writer.u8(value.tag())?;
+    match value {
+        ValueType::Unit | ValueType::Bool | ValueType::Int | ValueType::Text => Ok(()),
+        ValueType::Function {
+            parameters,
+            result,
+            effects,
+        } if version == FORMAT_VERSION_1_1 => {
+            writer.bytes(&[0; 3])?;
+            writer.length(parameters.len(), "function type parameter count")?;
+            for parameter in parameters {
+                writer.u32(parameter.get())?;
+            }
+            writer.u32(result.get())?;
+            writer.length(effects.len(), "function type effect count")?;
+            for effect in effects {
+                writer.u8(effect.tag())?;
+            }
+            Ok(())
+        }
+        ValueType::Function { .. } => Err(EncodingError::invariant(
+            "bytecode 1.0 cannot encode a function value type",
+        )),
+    }
 }
 
 fn encode_constant(writer: &mut Writer, constant: &Constant) -> Result<(), EncodingError> {
@@ -193,9 +264,24 @@ fn encode_constant(writer: &mut Writer, constant: &Constant) -> Result<(), Encod
     }
 }
 
-fn encode_function(writer: &mut Writer, function: &Function) -> Result<(), EncodingError> {
+fn encode_function(
+    writer: &mut Writer,
+    function: &Function,
+    version: FormatVersion,
+) -> Result<(), EncodingError> {
+    if version == FORMAT_VERSION_1_1 {
+        writer.u8(function.kind.tag())?;
+        writer.bytes(&[0; 3])?;
+    } else if function.kind != FunctionKind::Named || function.capture_count != 0 {
+        return Err(EncodingError::invariant(
+            "bytecode 1.0 functions must be named and captureless",
+        ));
+    }
     writer.u32(function.module.get())?;
     writer.u32(function.name.get())?;
+    if version == FORMAT_VERSION_1_1 {
+        writer.u32(function.capture_count)?;
+    }
     writer.length(function.parameter_types.len(), "parameter type count")?;
     for parameter in &function.parameter_types {
         writer.u32(parameter.get())?;
@@ -208,12 +294,16 @@ fn encode_function(writer: &mut Writer, function: &Function) -> Result<(), Encod
     writer.u32(function.register_count)?;
     writer.length(function.blocks.len(), "block count")?;
     for block in &function.blocks {
-        writer.record(|payload| encode_block(payload, block))?;
+        writer.record(|payload| encode_block(payload, block, version))?;
     }
     Ok(())
 }
 
-fn encode_block(writer: &mut Writer, block: &Block) -> Result<(), EncodingError> {
+fn encode_block(
+    writer: &mut Writer,
+    block: &Block,
+    version: FormatVersion,
+) -> Result<(), EncodingError> {
     writer.length(block.parameters.len(), "block parameter count")?;
     for parameter in &block.parameters {
         writer.u32(parameter.register.get())?;
@@ -221,12 +311,16 @@ fn encode_block(writer: &mut Writer, block: &Block) -> Result<(), EncodingError>
     }
     writer.length(block.instructions.len(), "instruction count")?;
     for instruction in &block.instructions {
-        writer.record(|payload| encode_instruction(payload, instruction))?;
+        writer.record(|payload| encode_instruction(payload, instruction, version))?;
     }
     writer.record(|payload| encode_terminator(payload, &block.terminator))
 }
 
-fn encode_instruction(writer: &mut Writer, instruction: &Instruction) -> Result<(), EncodingError> {
+fn encode_instruction(
+    writer: &mut Writer,
+    instruction: &Instruction,
+    version: FormatVersion,
+) -> Result<(), EncodingError> {
     writer.u8(instruction.opcode())?;
     writer.bytes(&[0; 3])?;
     match instruction {
@@ -280,6 +374,36 @@ fn encode_instruction(writer: &mut Writer, instruction: &Instruction) -> Result<
             writer.u32(function.get())?;
             writer.registers(arguments)
         }
+        Instruction::MakeClosure {
+            destination,
+            function,
+            captures,
+        } if version == FORMAT_VERSION_1_1 => {
+            writer.u32(destination.get())?;
+            writer.u32(function.get())?;
+            writer.length(captures.len(), "closure capture count")?;
+            for capture in captures {
+                writer.u8(capture.tag())?;
+                writer.bytes(&[0; 3])?;
+                match capture {
+                    CaptureOperand::Register(register) => writer.u32(register.get())?,
+                    CaptureOperand::SelfReference => writer.u32(NO_INDEX)?,
+                }
+            }
+            Ok(())
+        }
+        Instruction::CallClosure {
+            destination,
+            callee,
+            arguments,
+        } if version == FORMAT_VERSION_1_1 => {
+            writer.u32(destination.get())?;
+            writer.u32(callee.get())?;
+            writer.registers(arguments)
+        }
+        Instruction::MakeClosure { .. } | Instruction::CallClosure { .. } => Err(
+            EncodingError::invariant("bytecode 1.0 cannot encode closure instructions"),
+        ),
         Instruction::Intrinsic {
             destination,
             intrinsic,

@@ -1,5 +1,6 @@
 use ling_bytecode::{
-    BYTECODE_MAGIC, FORMAT_VERSION, HEADER_BYTES, LANGUAGE_VERSION, UNICODE_VERSION,
+    BYTECODE_MAGIC, FORMAT_VERSION, FORMAT_VERSION_1_1, HEADER_BYTES, LANGUAGE_VERSION,
+    UNICODE_VERSION,
 };
 
 pub fn scalar_artifact(
@@ -159,6 +160,146 @@ pub fn scalar_artifact(
     finish(writer)
 }
 
+pub fn closure_artifact() -> Vec<u8> {
+    let mut writer = Writer::new();
+    header_with_version(&mut writer, FORMAT_VERSION_1_1);
+
+    writer.u32(5);
+    for value in ["Main", "closure_0_1_0", "hello", "main", "src/Main.ling"] {
+        writer.record(|record| record.bytes(value.as_bytes()));
+    }
+    writer.u32(0);
+    writer.u32(1);
+    writer.record(|record| {
+        record.u32(u32::MAX);
+        record.u32(0);
+        record.u32(1);
+        record.u8(1);
+    });
+    writer.u32(6);
+    for tag in 0..4_u8 {
+        writer.record(|record| record.u8(tag));
+    }
+    for parameters in [&[0_u32][..], &[3_u32, 0_u32][..]] {
+        writer.record(|record| {
+            record.u8(0x10);
+            record.bytes(&[0; 3]);
+            record.registers(parameters);
+            record.u32(0);
+            record.u32(1);
+            record.u8(1);
+        });
+    }
+    writer.u32(2);
+    constant_unit(&mut writer);
+    writer.record(|record| {
+        record.u8(3);
+        record.bytes(&[0; 3]);
+        record.u32(3);
+        record.u32(2);
+    });
+    writer.u32(1);
+    writer.record(|record| {
+        record.u32(0);
+        record.u32(4);
+        record.u64(1);
+        record.bytes(&[0; 32]);
+    });
+
+    writer.u32(2);
+    writer.record(|function| {
+        function.u8(0);
+        function.bytes(&[0; 3]);
+        function.u32(0);
+        function.u32(3);
+        function.u32(0);
+        function.registers(&[0]);
+        function.u32(0);
+        function.u32(1);
+        function.u8(1);
+        function.u32(5);
+        function.u32(1);
+        function.record(|block| {
+            block.u32(1);
+            block.u32(0);
+            block.u32(0);
+            block.u32(4);
+            instruction_const(block, 1, 1);
+            block.record(|instruction| {
+                instruction.u8(0x12);
+                instruction.bytes(&[0; 3]);
+                instruction.u32(2);
+                instruction.u32(1);
+                instruction.u32(1);
+                instruction.u8(0);
+                instruction.bytes(&[0; 3]);
+                instruction.u32(1);
+            });
+            for (destination, callee, argument) in [(3, 2, 1), (4, 3, 0)] {
+                block.record(|instruction| {
+                    instruction.u8(0x13);
+                    instruction.bytes(&[0; 3]);
+                    instruction.u32(destination);
+                    instruction.u32(callee);
+                    instruction.registers(&[argument]);
+                });
+            }
+            block.record(|terminator| {
+                terminator.u8(0x82);
+                terminator.bytes(&[0; 3]);
+                terminator.u32(4);
+            });
+        });
+    });
+    writer.record(|function| {
+        function.u8(1);
+        function.bytes(&[0; 3]);
+        function.u32(0);
+        function.u32(1);
+        function.u32(1);
+        function.registers(&[3, 3, 0]);
+        function.u32(0);
+        function.u32(1);
+        function.u8(1);
+        function.u32(4);
+        function.u32(1);
+        function.record(|block| {
+            block.u32(3);
+            for (register, value_type) in [(0, 3), (1, 3), (2, 0)] {
+                block.u32(register);
+                block.u32(value_type);
+            }
+            block.u32(1);
+            block.record(|instruction| {
+                instruction.u8(0x20);
+                instruction.bytes(&[0; 3]);
+                instruction.u32(3);
+                instruction.u32(0);
+            });
+            block.record(|terminator| {
+                terminator.u8(0x82);
+                terminator.bytes(&[0; 3]);
+                terminator.u32(3);
+            });
+        });
+    });
+    writer.u32(0);
+    writer.u32(7);
+    for (function, ordinal) in [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 0), (1, 1)] {
+        writer.record(|record| {
+            record.u32(function);
+            record.u32(0);
+            record.u32(ordinal);
+            record.u32(0);
+            record.u64(0);
+            record.u64(1);
+            record.u8(0);
+            record.bytes(&[0; 7]);
+        });
+    }
+    finish(writer)
+}
+
 pub fn recursive_artifact() -> Vec<u8> {
     let mut writer = Writer::new();
     header(&mut writer);
@@ -233,10 +374,14 @@ pub fn recursive_artifact() -> Vec<u8> {
 }
 
 fn header(writer: &mut Writer) {
+    header_with_version(writer, FORMAT_VERSION);
+}
+
+fn header_with_version(writer: &mut Writer, version: ling_bytecode::FormatVersion) {
     writer.bytes(&BYTECODE_MAGIC);
     writer.u32(HEADER_BYTES);
-    writer.u16(FORMAT_VERSION.major());
-    writer.u16(FORMAT_VERSION.minor());
+    writer.u16(version.major());
+    writer.u16(version.minor());
     writer.u16(LANGUAGE_VERSION.major());
     writer.u16(LANGUAGE_VERSION.minor());
     writer.u16(UNICODE_VERSION.major());

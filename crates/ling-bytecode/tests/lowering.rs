@@ -1,6 +1,7 @@
 use ling_bytecode::{
-    Constant, EncodingErrorKind, Instruction, LoweringErrorKind, LoweringSource, disassemble_v1,
-    encode_v1, encode_v1_with_limit, lower_v1,
+    CaptureOperand, Constant, EncodingErrorKind, FunctionKind, Instruction, LoweringErrorKind,
+    LoweringSource, decode_and_verify_v1_1, disassemble_v1, disassemble_v1_1, encode_v1,
+    encode_v1_1, encode_v1_with_limit, lower_v1, lower_v1_1,
 };
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId};
@@ -263,4 +264,177 @@ fn encoder_reports_a_structured_error_instead_of_panicking() {
             maximum: 40,
         } if resource == "artifact_bytes" && *actual > 40
     ));
+}
+
+#[test]
+fn v1_1_lowering_emits_lexical_capture_partial_application_and_indirect_call() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let select prefix value = value\n\n",
+        "let main () =\n",
+        "    let prefix = \"hello \"\n",
+        "    let local value = Console.write prefix\n",
+        "    let partial = select prefix\n",
+        "    local (partial \"world\")\n",
+    );
+    let (source, snapshot) = checked_source("closures.ling", text);
+    let lowered = lower_v1_1(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("the accepted first-class closure slice lowers");
+    let model = lowered.model();
+
+    assert!(model.functions().iter().any(|function| {
+        function.kind == FunctionKind::ClosureBody && function.capture_count > 0
+    }));
+    assert!(model.functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block.instructions.iter().any(|instruction| {
+                matches!(instruction, Instruction::MakeClosure { captures, .. } if captures.iter().any(|capture| matches!(capture, CaptureOperand::Register(_))))
+            })
+        })
+    }));
+    assert!(model.functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block
+                .instructions
+                .iter()
+                .any(|instruction| matches!(instruction, Instruction::CallClosure { .. }))
+        })
+    }));
+
+    let bytes = encode_v1_1(&lowered).expect("the lowered 1.1 model encodes");
+    let verified = decode_and_verify_v1_1(&bytes).expect("the encoded 1.1 model verifies");
+    assert_eq!(
+        encode_v1_1(&lowered).unwrap(),
+        encode_v1_1(&lowered).unwrap()
+    );
+    assert!(disassemble_v1_1(&lowered).contains("kind=closure-body"));
+    assert_eq!(verified.version().minor(), 1);
+}
+
+#[test]
+fn v1_1_lowering_rejects_mutable_lexical_capture() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let mutable prefix = \"hello \"\n",
+        "    let local value = prefix\n",
+        "    Console.write (local \"world\")\n",
+    );
+    let (source, snapshot) = checked_source("mutable-capture.ling", text);
+    let error = lower_v1_1(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect_err("mutable captures are explicitly outside RFC-0015");
+    assert!(matches!(
+        error.kind(),
+        LoweringErrorKind::UnsupportedFeature { feature }
+            if feature == "mutable lexical capture" || feature == "mutable local binding"
+    ));
+}
+
+#[test]
+fn v1_1_lowering_emits_direct_and_local_self_recursion() {
+    let text = concat!(
+        "module Main\n\n",
+        "let rec top () : Unit = top ()\n\n",
+        "let main () =\n",
+        "    let rec local () : Unit = local ()\n",
+        "    local ()\n",
+    );
+    let (source, snapshot) = checked_source("recursion.ling", text);
+    let lowered = lower_v1_1(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("top-level and local recursion are accepted by RFC-0015");
+    let model = lowered.model();
+
+    assert!(model.functions().iter().any(|function| {
+        function.kind == FunctionKind::Named
+            && function.capture_count == 0
+            && function.blocks.iter().any(|block| {
+                block
+                    .instructions
+                    .iter()
+                    .any(|instruction| matches!(instruction, Instruction::Call { .. }))
+            })
+    }));
+    assert!(model.functions().iter().any(|function| {
+        function.kind == FunctionKind::ClosureBody
+            && function.capture_count == 1
+            && function.blocks.iter().any(|block| {
+                block
+                    .instructions
+                    .iter()
+                    .any(|instruction| matches!(instruction, Instruction::CallClosure { .. }))
+            })
+    }));
+    assert!(model.functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block.instructions.iter().any(|instruction| {
+                matches!(
+                    instruction,
+                    Instruction::MakeClosure { captures, .. }
+                        if captures == &[CaptureOperand::SelfReference]
+                )
+            })
+        })
+    }));
+
+    let bytes = encode_v1_1(&lowered).expect("recursive 1.1 model encodes");
+    decode_and_verify_v1_1(&bytes).expect("recursive 1.1 model verifies");
+}
+
+#[test]
+fn v1_1_lowering_emits_a_returned_closure_value() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let factory prefix =\n",
+        "    let local value = Console.write prefix\n",
+        "    local\n\n",
+        "let main () =\n",
+        "    let callback = factory \"hello\"\n",
+        "    callback \"world\"\n",
+    );
+    let (source, snapshot) = checked_source("returned-closure.ling", text);
+    let lowered = lower_v1_1(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("a closure returned from a checked function lowers");
+    assert!(lowered.model().functions().iter().any(|function| {
+        function.kind == FunctionKind::ClosureBody && function.capture_count > 0
+    }));
+    assert!(lowered.model().functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block
+                .instructions
+                .iter()
+                .any(|instruction| matches!(instruction, Instruction::CallClosure { .. }))
+        })
+    }));
+    decode_and_verify_v1_1(&encode_v1_1(&lowered).unwrap())
+        .expect("returned closure artifact verifies");
+}
+
+#[test]
+fn v1_1_lowering_emits_higher_order_function_parameters() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let apply callback value: Unit =\n",
+        "    let ignored: Unit = callback value\n",
+        "    Console.write value\n\n",
+        "let main () =\n",
+        "    let local value = Console.write value\n",
+        "    apply local \"hello\"\n",
+    );
+    let (source, snapshot) = checked_source("higher-order.ling", text);
+    let lowered = lower_v1_1(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("a checked function-typed parameter lowers");
+    assert!(lowered.model().functions().iter().any(|function| {
+        function.blocks.iter().any(|block| {
+            block
+                .instructions
+                .iter()
+                .any(|instruction| matches!(instruction, Instruction::CallClosure { .. }))
+        })
+    }));
+    decode_and_verify_v1_1(&encode_v1_1(&lowered).unwrap())
+        .expect("higher-order artifact verifies");
 }

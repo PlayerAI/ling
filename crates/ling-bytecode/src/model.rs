@@ -123,24 +123,66 @@ pub struct Module {
     pub capabilities: Vec<Capability>,
 }
 
-/// A value type admitted by bytecode version 1.0.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+/// A structural value type admitted by the selected bytecode 1.x revision.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ValueType {
     Unit,
     Bool,
     Int,
     Text,
+    Function {
+        parameters: Vec<TypeIndex>,
+        result: TypeIndex,
+        effects: Vec<Effect>,
+    },
 }
 
 impl ValueType {
     /// Returns the explicit wire tag.
     #[must_use]
-    pub const fn tag(self) -> u8 {
+    pub const fn tag(&self) -> u8 {
         match self {
             Self::Unit => 0x00,
             Self::Bool => 0x01,
             Self::Int => 0x02,
             Self::Text => 0x03,
+            Self::Function { .. } => 0x10,
+        }
+    }
+}
+
+/// Function-table role encoded explicitly by bytecode version 1.1.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum FunctionKind {
+    Named,
+    ClosureBody,
+}
+
+impl FunctionKind {
+    /// Returns the explicit version-1.1 wire tag.
+    #[must_use]
+    pub const fn tag(self) -> u8 {
+        match self {
+            Self::Named => 0,
+            Self::ClosureBody => 1,
+        }
+    }
+}
+
+/// One source for a lexically ordered closure capture.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum CaptureOperand {
+    Register(RegisterIndex),
+    SelfReference,
+}
+
+impl CaptureOperand {
+    /// Returns the explicit version-1.1 wire tag.
+    #[must_use]
+    pub const fn tag(self) -> u8 {
+        match self {
+            Self::Register(_) => 0,
+            Self::SelfReference => 1,
         }
     }
 }
@@ -339,6 +381,16 @@ pub enum Instruction {
         function: FunctionIndex,
         arguments: Vec<RegisterIndex>,
     },
+    MakeClosure {
+        destination: RegisterIndex,
+        function: FunctionIndex,
+        captures: Vec<CaptureOperand>,
+    },
+    CallClosure {
+        destination: RegisterIndex,
+        callee: RegisterIndex,
+        arguments: Vec<RegisterIndex>,
+    },
     Intrinsic {
         destination: RegisterIndex,
         intrinsic: Intrinsic,
@@ -361,6 +413,8 @@ impl Instruction {
             Self::Compare { .. } => 0x04,
             Self::Call { .. } => 0x10,
             Self::Intrinsic { .. } => 0x11,
+            Self::MakeClosure { .. } => 0x12,
+            Self::CallClosure { .. } => 0x13,
             Self::ConsoleWrite { .. } => 0x20,
         }
     }
@@ -415,8 +469,10 @@ pub struct Block {
 /// One unverified function-table record.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Function {
+    pub kind: FunctionKind,
     pub module: ModuleIndex,
     pub name: StringIndex,
+    pub capture_count: u32,
     pub parameter_types: Vec<TypeIndex>,
     pub result_type: TypeIndex,
     pub effects: Vec<Effect>,
