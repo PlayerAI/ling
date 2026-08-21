@@ -348,7 +348,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `COMPAT-6504` | G6 | 弃用政策 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:307`, `docs/status/COMPAT-6504-AUTHORITY-AUDIT.md` |
 | `REL-6601` | G6 | Fuzz 总覆盖盘点 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:321`, `docs/status/REL-6601-AUTHORITY-AUDIT.md`, `docs/testing/FUZZ-COVERAGE.md` |
 | `REL-6602` | G6 | 故障注入 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:340`, `docs/status/REL-6602-AUTHORITY-AUDIT.md`, `docs/testing/FAULT-INJECTION.md` |
-| `REL-6603` | G6 | 安全审计 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:354` |
+| `REL-6603` | G6 | 安全审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:354`, `docs/status/REL-6603-AUTHORITY-AUDIT.md`, `docs/testing/SECURITY-AUDIT.md` |
 | `REL-6604` | G6 | 性能基线 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:368` |
 | `DOC-6701` | G6 | 正式文档集 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:391` |
 | `DOC-6702` | G6 | 双层示例 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:406` |

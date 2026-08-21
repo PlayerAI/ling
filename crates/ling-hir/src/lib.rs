@@ -291,6 +291,11 @@ pub enum ExpressionKind {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+// `LocalBinding` is intentionally kept inline: sequence lowering is an
+// internal, short-lived HIR boundary and boxing it would add an allocation to
+// every local declaration. Preserve that layout while keeping the workspace
+// `-D warnings` gate explicit.
+#[allow(clippy::large_enum_variant)]
 pub enum SequenceElement {
     Let(LocalBinding),
     Expression(Expression),
