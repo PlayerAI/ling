@@ -322,7 +322,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TIM-5702` | G5 | 测量与静态分析分离 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:489`, `docs/status/TIM-5702-AUTHORITY-AUDIT.md` |
 | `TIM-5703` | G5 | Deadline Check | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:503`, `docs/status/TIM-5703-AUTHORITY-AUDIT.md` |
 | `EVD-5801` | G5 | Bundle Schema | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:518`, `docs/status/EVD-5801-AUTHORITY-AUDIT.md` |
-| `EVD-5802` | G5 | 独立验证器 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:543` |
+| `EVD-5802` | G5 | 独立验证器 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:543`, `docs/status/EVD-5802-AUTHORITY-AUDIT.md` |
 | `EVD-5803` | G5 | 可重复构建绑定 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:557` |
 | `EVD-5804` | G5 | AI Provenance | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:566` |
 | `CBK-5901` | G5 | 可信编译路线决策 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:585` |
