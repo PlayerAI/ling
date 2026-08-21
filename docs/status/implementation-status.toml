@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 111 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, and TASK-2203 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 112 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, and TASK-2204 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -5441,6 +5441,53 @@ notes = [
   "TASK-2203 is BlockedSpec by TASK-2201/TASK-2202, GAP-STRUCTURED-TASK-001, absent RFC-C202/RFC-0008, and missing scope, join, cancellation, timeout, cleanup, Fault, orphan, scheduler, and runtime authority; RFC-0020 covers only host VM cancellation.",
   "ling-eval executes checked Seed snapshots synchronously and ling-vm provides Seed frame/resource limits and host cancellation; neither has a Task scope tree, child registry, join barrier, cleanup stack, or Fault aggregation.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, scheduler, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "TASK-2204"
+title = "Deterministic Task test scheduler"
+state = "BlockedSpec"
+release = "G2"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["TASK-2203"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0020.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/TASK-2204-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing test/production boundary, Task scheduler input, seed/order, virtual-clock, wake/interleaving, trace, replay/equivalence, cancellation/cleanup, resource, diagnostics, schemas, and migration contracts.",
+  "The audit distinguishes accepted compiler-query scheduling decisions DEC-0019/DEC-0021 and host-only RFC-0020 cancellation from the missing Task test-scheduler authority and preserves the checked-only evaluation boundary.",
+  "The audit covers nested scopes, multiple wake orders, virtual timeouts, cancellation before/after effects, cleanup and Fault races, bounded exploration, repeated seeds, malformed/oversized traces, deterministic output, Unicode/CRLF/BOM spans, and interpreter/VM differential fixtures.",
+  "No Task scheduler, virtual-clock type, seed-to-order algorithm, wake queue, interleaving explorer, trace schema, scheduler diagnostic, production API, or placeholder G2 surface is added while the authority is absent.",
+  "The future scheduler must drive checked Task Core only, use reproducible bounded seeds and virtual time, export a versioned test-only trace, and prove cancellation/cleanup/interpreter/VM equivalence without making production scheduling order semantic.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "TASK-2204 is BlockedSpec by TASK-2201/TASK-2202/TASK-2203, GAP-STRUCTURED-TASK-001, absent RFC-C202/RFC-0008, and missing Task test-scheduler, virtual-clock, interleaving, trace, and replay authority; DEC-0019/DEC-0021 apply only to internal compiler queries.",
+  "The current compiler query scheduler is an internal immutable-query boundary; ling-eval/ling-vm have no Task scopes, suspension queues, virtual clock, child tokens, or lifecycle trace.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, traces, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
