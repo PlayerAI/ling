@@ -126,7 +126,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FMT-1504` | G1/Editor | Comment attachment | M | Done | DEC-0002、DEC-0023；见 `crates/ling-format/src/comments.rs` 的 compiler-token/CST attachment、文档/行尾/中文/嵌套块注释覆盖、格式化保留守卫与实施报告；incomplete recovery、property evidence、CLI/LSP/Audit separation deferred |
 | `FMT-1505` | G1/Editor | 不完整源码 | M | Done | DEC-0002、DEC-0023；见 `crates/ling-format/src/author.rs` 的 `FormatDisposition`/`FormatResult` 保守回退、完整前缀不部分改写、BOM/CRLF 字节保留测试与实施报告；完整节点局部恢复仍需后续 Accepted 决策，性质测试、CLI/LSP/Audit separation deferred |
 | `FMT-1506` | G1/Editor | 性质测试 | M | Done | DEC-0002、DEC-0023；见 `crates/ling-format/src/author.rs` 的固定离线 corpus：幂等、compiler token signature、comment spelling/order、AST→HIR→resolve→types→effects→Semantic Graph 等价测试与实施报告；CLI/LSP、Audit separation deferred |
-| `FMT-1507` | G1/Editor | CLI/LSP 接入 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:425` |
+| `FMT-1507` | G1/Editor | CLI/LSP 接入 | M | BlockedSpec | `GAP-FORMATTER-CLI-PROTOCOL-001`, `GAP-LSP-TRANSACTION-PROTOCOL-001`, `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`; see `docs/status/FMT-1507-AUTHORITY-AUDIT.md` |
 | `FMT-1508` | G1/Editor | Audit 分离 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:433` |
 | `CLI-1701` | G1/Editor | 命令模型统一 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:462` |
 | `CLI-1702` | G1/Editor | 输出与退出码 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:466` |

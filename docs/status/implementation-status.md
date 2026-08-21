@@ -36,6 +36,7 @@
 | `FMT-1504` | Comment attachment | `G1` | `M` | `Done` | `FMT-1503` | `4348bfe548d0f62c25efdd5bb5c704e0a46958f9` |
 | `FMT-1505` | Incomplete-source recovery | `G1` | `M` | `Done` | `FMT-1504` | `da412442bde5c7624946909996fa40772d14ce77` |
 | `FMT-1506` | Formatter property and semantic-equivalence evidence | `G1` | `M` | `Done` | `FMT-1505` | `18e14f0a4f19d668b1b854fb1584ec52f91afec1` |
+| `FMT-1507` | Formatter CLI/LSP integration | `G1` | `M` | `BlockedSpec` | `FMT-1506` | `` |
 | `GOV-0101` | 建立规范权威索引 | `G0` | `S` | `Done` | `BASE-0001` | `7bba2adf9104d7d7f96c7ef50343647f649e229e` |
 | `GOV-0102` | 规范缺口台账 | `G0` | `M` | `Done` | `GOV-0101` | `c147b5c02532b61e23df46f6cb25251d8c94dd7d` |
 | `GOV-0103` | RFC 与 decision 生命周期 | `G0` | `S` | `Done` | `GOV-0101` | `4876a0328d994121fb32c10b3f2a25e3ce11e5ff` |

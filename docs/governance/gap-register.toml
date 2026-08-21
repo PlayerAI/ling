@@ -38,7 +38,7 @@ id = "G1-FORMATTER"
 title = "Author Source preservation, normalization, and localization"
 release = "v0.1"
 authority = ["ROADMAP-1.0"]
-gaps = ["GAP-FORMATTER-AUTHOR-SOURCE-001", "GAP-AUTHOR-SOURCE-LOCALIZATION-001"]
+gaps = ["GAP-FORMATTER-AUTHOR-SOURCE-001", "GAP-FORMATTER-CLI-PROTOCOL-001", "GAP-AUTHOR-SOURCE-LOCALIZATION-001"]
 decisions = ["DEC-0015", "DEC-0023"]
 
 [[gate]]
@@ -246,7 +246,7 @@ title = "Semantic Graph and Semantic Transaction protocol lifecycle"
 status = "Open"
 priority = "P0"
 blocked_releases = ["v0.1", "v1.0"]
-blocked_tasks = ["GOV-0106", "INC-1406", "IDE-2306", "IDE-2309"]
+blocked_tasks = ["GOV-0106", "INC-1406", "IDE-2306", "IDE-2309", "FMT-1507"]
 observable_behavior = "Stable versus Experimental fields, reader/writer compatibility, stale transaction rejection, and schema migration are not accepted for Semantic Graph/Transaction protocols."
 authority = ["SEMANTICS", "ROADMAP-1.0", "DEC-0012", "DEC-0015"]
 candidate_rfcs = ["RFC-0004"]
@@ -287,12 +287,35 @@ superseded_by = ""
 observed_markers = []
 
 [[gap]]
+id = "GAP-FORMATTER-CLI-PROTOCOL-001"
+title = "Formatter CLI input, exit, and report contract"
+status = "Open"
+priority = "P0"
+blocked_releases = ["v0.1"]
+blocked_tasks = ["FMT-1507"]
+observable_behavior = "The execution plan proposes a formatter command, stdin with a logical filename, check mode, and JSON reporting, but accepted authority does not define the command spelling, input/output contract, check exit status, source-name rules, or report schema."
+authority = ["LANGUAGE", "ROADMAP-1.0", "DEC-0003", "DEC-0023"]
+candidate_rfcs = []
+source_items = ["03-G1-V0.1-LIVING.md:425-431", "DEC-0003:CLI", "DEC-0023:9"]
+options = [
+  "Accept a versioned `ling fmt` CLI contract with explicit stdin, logical filename, check, exit-code, and report behavior.",
+  "Keep formatting library-only until CLI, editor transaction, and report contracts are accepted together.",
+]
+irreversible_consequences = ["A formatter command and its exit/report behavior become automation compatibility commitments; an incorrect contract can silently rewrite source or break editor integrations."]
+required_evidence = ["positive", "negative", "migration", "stdin", "logical-filename", "check-exit", "json-report"]
+owner_role = "formatter-design"
+next_action = "Accept a formatter CLI decision that uses the current `ling` name and defines input, output, check, exit, and report behavior before implementing FMT-1507 CLI code."
+resolution = []
+superseded_by = ""
+observed_markers = []
+
+[[gap]]
 id = "GAP-LSP-TRANSACTION-PROTOCOL-001"
 title = "LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary"
 status = "Open"
 priority = "P0"
 blocked_releases = ["v0.1"]
-blocked_tasks = ["LSP-2102", "LSP-2104", "IDE-2305", "IDE-2306", "IDE-2309", "LSP-2501"]
+blocked_tasks = ["LSP-2102", "LSP-2104", "IDE-2305", "IDE-2306", "IDE-2309", "LSP-2501", "FMT-1507"]
 observable_behavior = "The adapter between UTF-8 byte spans and negotiated LSP positions is accepted, but snapshot/version preconditions and Stable versus Experimental edit fields are not."
 authority = ["ROADMAP-1.0", "DEC-0002", "DEC-0012"]
 candidate_rfcs = ["RFC-0004"]

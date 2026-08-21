@@ -3460,3 +3460,47 @@ notes = [
   "The corpus is deliberately fixed and offline for reproducibility; adding generated/fuzzed cases later does not change the accepted formatter boundary.",
   "FMT-1507 formatter CLI/LSP integration is the next execution-plan target; its public command and transaction fields remain separately governed.",
 ]
+
+[[task]]
+id = "FMT-1507"
+title = "Formatter CLI/LSP integration"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1506"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/FMT-1507-AUTHORITY-AUDIT.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "An accepted formatter CLI decision defines the current `ling` command, stdin and logical-filename behavior, check-mode output and exit status, and the JSON report schema.",
+  "Accepted LSP and Semantic Transaction decisions define position encoding, document-version preconditions, Workspace Edit fields, and Stable versus Experimental compatibility before any public adapter is implemented.",
+  "The implementation adds no stale `zero` command, placeholder public API, unregistered protocol, diagnostic allocation, or Audit/semantic mutation while these decisions are absent.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "FMT-1507 is blocked by GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no public formatter surface is authorized yet.",
+  "The lower-authority execution-plan `zero fmt` spelling is stale; current accepted CLI and source names remain `ling` and `.ling`.",
+  "FMT-1508 is the next executable formatter slice because its Audit-separation test is already authorized by DEC-0015 and DEC-0023.",
+]
