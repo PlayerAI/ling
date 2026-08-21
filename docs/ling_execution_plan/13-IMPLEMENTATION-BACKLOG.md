@@ -273,7 +273,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DBUF-4401` | G4 | Device 类型与 Capability | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:223`, `docs/status/DBUF-4401-AUTHORITY-AUDIT.md` |
 | `DBUF-4402` | G4 | Buffer Ownership | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:240`, `docs/status/DBUF-4402-AUTHORITY-AUDIT.md` |
 | `DBUF-4403` | G4 | Transfer Effect | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:252`, `docs/status/DBUF-4403-AUTHORITY-AUDIT.md` |
-| `DBUF-4404` | G4 | 同步模型 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:272` |
+| `DBUF-4404` | G4 | 同步模型 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:272`, `docs/status/DBUF-4404-AUTHORITY-AUDIT.md` |
 | `DIR-4501` | G4 | Device IR Schema | L | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:287` |
 | `DIR-4502` | G4 | Kernel Core → Device IR | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:305` |
 | `DIR-4503` | G4 | Device IR Canonicalization | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:317` |
