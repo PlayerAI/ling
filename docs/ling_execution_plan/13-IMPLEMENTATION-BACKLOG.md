@@ -333,7 +333,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `STAB-6103` | G6 | Feature State 元数据 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:63`, `docs/status/STAB-6103-AUTHORITY-AUDIT.md` |
 | `PROTO-6201` | G6 | 协议注册表 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:86`, `docs/status/PROTO-6201-AUTHORITY-AUDIT.md` |
 | `PROTO-6202` | G6 | Reader/Writer 兼容测试 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:109`, `docs/status/PROTO-6202-AUTHORITY-AUDIT.md` |
-| `PROTO-6203` | G6 | Semantic Hash 升级演练 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:123` |
+| `PROTO-6203` | G6 | Semantic Hash 升级演练 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:123`, `docs/status/PROTO-6203-AUTHORITY-AUDIT.md` |
 | `PROTO-6204` | G6 | CLI 与退出码冻结 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:136` |
 | `STD-6301` | G6 | 稳定标准库审计 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:164` |
 | `STD-6302` | G6 | 删除过度便利 API | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:180` |

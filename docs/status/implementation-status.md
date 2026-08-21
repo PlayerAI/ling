@@ -210,6 +210,7 @@
 | `PROOF-5503` | Assumption Registry | `G5` | `M` | `BlockedSpec` | `PROOF-5502` | `` |
 | `PROTO-6201` | Protocol Registry | `G6` | `L` | `BlockedSpec` | `STAB-6103` | `` |
 | `PROTO-6202` | Reader/Writer Compatibility Tests | `G6` | `L` | `BlockedSpec` | `PROTO-6201` | `` |
+| `PROTO-6203` | Semantic Hash Upgrade Rehearsal | `G6` | `L` | `BlockedSpec` | `PROTO-6202` | `` |
 | `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |
 | `REM-2602` | Transport-neutral envelope | `G2` | `L` | `BlockedSpec` | `REM-2601` | `` |
 | `REM-2603` | Delivery semantics | `G2` | `L` | `BlockedSpec` | `REM-2602` | `` |
