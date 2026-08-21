@@ -146,7 +146,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2205` | G1/Editor | Diagnostic fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:227`, `docs/status/LSP-2205-AUTHORITY-AUDIT.md` |
 | `IDE-2301` | G1/Editor | Document symbols | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:244`, `docs/status/IDE-2301-AUTHORITY-AUDIT.md` |
 | `IDE-2302` | G1/Editor | Hover | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:248`, `docs/status/IDE-2302-AUTHORITY-AUDIT.md` |
-| `IDE-2303` | G1/Editor | Go to definition/declaration/type definition | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:262` |
+| `IDE-2303` | G1/Editor | Go to definition/declaration/type definition | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:262`, `docs/status/IDE-2303-AUTHORITY-AUDIT.md` |
 | `IDE-2304` | G1/Editor | References | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:266` |
 | `IDE-2305` | G1/Editor | Prepare rename | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:270` |
 | `IDE-2306` | G1/Editor | Rename | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:283` |
