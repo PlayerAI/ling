@@ -3130,5 +3130,54 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "The persistent artifact is private and disposable; DEC-0022 deliberately defers persistent dependent-query graphs, migrations, eviction, locking, compression, encryption, and shared cache roots.",
-  "The next execution-plan target is INC-1410 incremental performance baseline; the incremental-cache gap remains open for the deferred broader scope.",
+  "INC-1410 records an opt-in incremental performance trend baseline; the incremental-cache gap remains open for the deferred broader scope.",
+]
+
+[[task]]
+id = "INC-1410"
+title = "Incremental performance baseline"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1409"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "tools/xtask/Cargo.toml",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/performance.rs",
+]
+artifacts = [
+  "Cargo.lock",
+  "tools/xtask/Cargo.toml",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/performance.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1410-PERFORMANCE-BASELINE.json",
+  "docs/status/INC-1410-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask performance baseline is an explicit opt-in measurement command and emits the versioned internal ling.performance-baseline/1 JSON artifact without changing source semantics or public protocols.",
+  "The baseline records three samples each for cold/warm checked queries, a single-character edit, a signature edit, a PackageManifest workspace-input edit as the current cross-package revision boundary, and cold/warm/single-edit 10,000-file parse workloads.",
+  "Timed regions exclude fixture construction and expose query trace event, hit/miss, and completed-result observations; no host path, allocation identity, map order, unchecked compiler value, or absolute release promise is encoded.",
+  "The checked-in artifact is valid, contains eight scenarios and 10,000 synthetic logical files, and the observed values are described as one local trend baseline rather than a frozen threshold.",
+  "No source syntax, Typed Core semantics, diagnostics, schemas, Semantic IDs, CLI/LSP fields, cache format, Unicode table, or public protocol changes; no benchmark dependency was added.",
+  "cargo fmt --all -- --check, cargo clippy -p xtask --all-targets --locked --offline -- -D warnings, cargo test --workspace --all-targets --locked --offline, cargo xtask performance baseline, and git diff --check: passed.",
+]
+verified_against_commit = "bcd58bb53a3f9a71613ba287d5a733b7aecd467f"
+completion_commit = "bcd58bb53a3f9a71613ba287d5a733b7aecd467f"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The benchmark intentionally measures the current file-mode compiler boundary; package-graph scale and memory/IO profiles require their owning public query surfaces.",
+  "The next execution-plan target is FMT-1501 formatter preservation authority, which requires an Accepted decision before implementation.",
 ]
