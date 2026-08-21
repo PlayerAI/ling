@@ -31,6 +31,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | `BASE-0001` | 仓库基线盘点与执行计划落位 | `G0` | `S` | `Done` | — | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
+| `CLI-1702` | CLI output and exit behavior | `G1` | `M` | `BlockedSpec` | `CLI-1701` | `` |
 | `FMT-1501` | Author Source formatter preservation decision | `G1` | `M` | `Done` | `INC-1410` | `fa2560fc09772ed98f8af97a71164ee1f465495f` |
 | `FMT-1502` | Compiler-CST Format IR | `G1` | `M` | `Done` | `FMT-1501` | `4d006e0c410c1c59f5717df43b8fac843ed960ec` |
 | `FMT-1503` | Core syntax formatting | `G1` | `M` | `Done` | `FMT-1502` | `05fe7fb9827b5e33afd094e99a0908c69d0af972` |

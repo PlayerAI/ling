@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 69 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, and CLI-1701 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 70 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, and CLI-1702 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3636,6 +3636,49 @@ completed = ""
 notes = [
   "CLI-1701 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001, GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; DEC-0003 and PROTO-CLI authorize only the current Preview command surface.",
   "PRJ-1107 and FMT-1507 remain separate authority gates; this audit does not broaden either contract or create a public command model.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "CLI-1702"
+title = "CLI output and exit behavior"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/CLI-1702-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the accepted human/JSON and exit-code subset and distinguishes it from unaccepted language, color, quiet/verbose, and future-command output extensions.",
+  "The missing localization, TTY/color, event-level, stdout/stderr, per-command failure, schema, and fixture contracts are identified with direct authority references.",
+  "No flag, exit class, diagnostic allocation, output schema, ANSI policy, or localization behavior is added while the command contracts and fixtures are absent.",
+  "The future implementation must preserve stable diagnostic identity, source spans, Semantic IDs, and program Fault semantics while adding only registered options.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "CLI-1702 is BlockedSpec downstream of CLI-1701 and the project/formatter CLI gates; the current PROTO-CLI-EXIT and DEC-0013 behavior remains unchanged.",
+  "The current Seed subset already supports human/JSON rendering and stable exit classes; this audit does not relabel that implemented evidence as a future command contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
