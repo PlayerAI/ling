@@ -1,0 +1,64 @@
+{
+  "schema": "ling.performance-baseline/1",
+  "sample_count": 3,
+  "synthetic_file_count": 10000,
+  "timed_region_excludes_fixture_setup": true,
+  "scenarios": [
+    {"name": "cold_check",
+      "samples_ns": [3733600, 1526500, 1382600],
+      "trace_events": [24, 24, 24],
+      "misses": [9, 9, 9],
+      "hits": [15, 15, 15],
+      "completed_items": [17797, 17797, 17797]
+    },
+    {"name": "warm_check",
+      "samples_ns": [23300, 18600, 19300],
+      "trace_events": [8, 8, 8],
+      "misses": [0, 0, 0],
+      "hits": [8, 8, 8],
+      "completed_items": [17797, 17797, 17797]
+    },
+    {"name": "single_character_edit",
+      "samples_ns": [1297900, 1387700, 1247600],
+      "trace_events": [20, 20, 20],
+      "misses": [5, 5, 5],
+      "hits": [15, 15, 15],
+      "completed_items": [17797, 17797, 17797]
+    },
+    {"name": "signature_edit",
+      "samples_ns": [1290100, 1280800, 1308900],
+      "trace_events": [20, 20, 20],
+      "misses": [5, 5, 5],
+      "hits": [15, 15, 15],
+      "completed_items": [17804, 17804, 17804]
+    },
+    {"name": "cross_package_edit",
+      "samples_ns": [1417300, 1395300, 1453300],
+      "trace_events": [24, 24, 24],
+      "misses": [9, 9, 9],
+      "hits": [15, 15, 15],
+      "completed_items": [17797, 17797, 17797]
+    },
+    {"name": "synthetic_10k_cold_parse",
+      "samples_ns": [654263000, 653288400, 639000800],
+      "trace_events": [20000, 20000, 20000],
+      "misses": [20000, 20000, 20000],
+      "hits": [0, 0, 0],
+      "completed_items": [10000, 10000, 10000]
+    },
+    {"name": "synthetic_10k_warm_parse",
+      "samples_ns": [38254700, 41091000, 42011600],
+      "trace_events": [20000, 20000, 20000],
+      "misses": [0, 0, 0],
+      "hits": [20000, 20000, 20000],
+      "completed_items": [10000, 10000, 10000]
+    },
+    {"name": "synthetic_10k_single_edit",
+      "samples_ns": [42071800, 42570200, 40828700],
+      "trace_events": [20000, 20000, 20000],
+      "misses": [2, 2, 2],
+      "hits": [19998, 19998, 19998],
+      "completed_items": [10000, 10000, 10000]
+    }
+  ]
+}

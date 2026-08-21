@@ -119,7 +119,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `INC-1407` | G1/Editor | Clean ↔ incremental equivalence | M | Done | DEC-0019; see `crates/ling-db/src/lib.rs` clean-rebuild equivalence harness/tests and implementation report |
 | `INC-1408` | G1/Editor | Deterministic parallel scheduling | M | Done | DEC-0019 §4, DEC-0021; see `crates/ling-db/src/lib.rs` canonical parallel parse scheduling and implementation report |
 | `INC-1409` | G1/Editor | Persistent cache（bounded disposable slice） | L | Done | DEC-0022；见 `crates/ling-cache` 的 versioned envelope、`crates/ling-db/src/lib.rs` 的 checked line-index persistence/corruption fallback、实施报告；dependent-query serialization and migration remain open |
-| `INC-1410` | G1/Editor | 增量性能基线 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:390` |
+| `INC-1410` | G1/Editor | 增量性能基线 | M | Done | `cargo xtask performance baseline`；见 `tools/xtask/src/performance.rs` 与 `docs/status/INC-1410-PERFORMANCE-BASELINE.json`；门禁采用趋势比较，不冻结绝对时延 |
 | `FMT-1501` | G1/Editor | Formatter preservation RFC | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:396` |
 | `FMT-1502` | G1/Editor | Format IR | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:400` |
 | `FMT-1503` | G1/Editor | 核心语法格式化 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:404` |
