@@ -36,6 +36,8 @@ assumptions:
 - `GAP-FORMATTER-CLI-PROTOCOL-001` covers the command spelling, stdin and
   logical-filename rules, check-mode output and exit status, and JSON report
   schema.
+- `GAP-FORMATTER-AUTHOR-SOURCE-001` keeps broader formatter normalization and
+  localization policy from becoming an implicit public CLI guarantee.
 - `GAP-LSP-TRANSACTION-PROTOCOL-001` covers position encoding, document
   versions, stale-edit preconditions, and Workspace Edit shape for any LSP
   formatter request.
@@ -65,6 +67,6 @@ Audit byte, source span, or Unicode table changed.
 
 FMT-1507 can start only after an accepted formatter CLI decision and the LSP
 transaction authority define their externally visible fields and failure
-behavior. Until then, the next executable formatter slice is FMT-1508: an
-in-process proof that Author Source formatting does not replace or mutate the
-canonical Audit renderer.
+behavior. FMT-1508 now supplies the separate in-process proof that Author
+Source formatting does not replace or mutate canonical Audit rendering; it does
+not unblock the missing public protocol decisions.

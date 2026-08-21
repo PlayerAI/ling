@@ -3500,7 +3500,53 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "FMT-1507 is blocked by GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no public formatter surface is authorized yet.",
+  "FMT-1507 is blocked by GAP-FORMATTER-AUTHOR-SOURCE-001, GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no public formatter surface is authorized yet.",
   "The lower-authority execution-plan `zero fmt` spelling is stale; current accepted CLI and source names remain `ling` and `.ling`.",
-  "FMT-1508 is the next executable formatter slice because its Audit-separation test is already authorized by DEC-0015 and DEC-0023.",
+  "FMT-1508 now proves canonical Audit Source byte equality after formatting; it does not alter the public CLI/LSP blocker set.",
+]
+
+[[task]]
+id = "FMT-1508"
+title = "Audit Source separation"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1506"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-format/src/author.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/status.rs",
+  "docs/status/FMT-1508-IMPLEMENTATION-REPORT.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The fixed valid formatter corpus renders identical canonical Audit Source bytes before and after Author Source formatting.",
+  "Audit rendering continues to use the existing checked ProgramSnapshot and `render_audit` path; the formatter does not replace, mutate, or become an Audit Source authority.",
+  "Targeted formatter, clippy, full workspace, governance, status, formatting, and diff checks pass without changing language semantics, diagnostics, Semantic IDs, source spans, protocols, or Unicode 17.0.0 data.",
+]
+verified_against_commit = "f247dfed98f104ea5227532965e8b579938a213e"
+completion_commit = "f247dfed98f104ea5227532965e8b579938a213e"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
+  "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
+  "Registry count self-tests now expect 27 specification gaps and 58 tasks (57 Done plus the intentionally BlockedSpec FMT-1507 task).",
+  "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
