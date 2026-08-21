@@ -3549,7 +3549,7 @@ notes = [
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
   "Registry count self-tests now expect 28 specification gaps and 242 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, EFF-2105, TASK-2201, TASK-2202, TASK-2203, TASK-2204, TASK-2205, TASK-2206, ACT-2301, ACT-2302, ACT-2303, ACT-2304, ACT-2305, ACT-2306, SUP-2401, SUP-2402, SUP-2403, REP-2501, REP-2502, REP-2503, REP-2504, REP-2505, REP-2506, REM-2601, REM-2602, REM-2603, REM-2604, REM-2605, MEM-3101, MEM-3102, MEM-3103, MEM-3104, OWN-3201, OWN-3202, OWN-3203, OWN-3204, OWN-3205, OWN-3206, GC-3301, GC-3302, GC-3303, GC-3304, NIR-3401, NIR-3402, NIR-3403, NIR-3404, BACK-3501, BACK-3502, BACK-3503, BACK-3504, BACK-3505, FFI-3601, FFI-3602, FFI-3603, FFI-3604, FFI-3605, DIFF-3701, DIFF-3702, DAP-3601, DAP-3602, DAP-3603, KCHK-4101, KCHK-4102, KCHK-4103, KCHK-4104, KCHK-4105, CPU-4201, CPU-4202, CPU-4203, SIMD-4301, SIMD-4302, SIMD-4303, DBUF-4401, DBUF-4402, DBUF-4403, DBUF-4404, DIR-4501, DIR-4502, DIR-4503, GPU-4601, GPU-4602, GPU-4603, GPU-4604, GPU-4605, ACC-4701, ACC-4702, PLC-4801, PLC-4802, PLC-4803, PLC-4804, PLC-4805, PROF-5101, PROF-5102, PROF-5103, BND-5201, BND-5202, BND-5203, BND-5204, NODE-5301, NODE-5302, NODE-5303, NODE-5304, NODE-5305, NODE-5306, NODE-5307, CTR-5401, CTR-5402, CTR-5403, CTR-5404, CTR-5405, CTR-5406, CTR-5407, PROF-5104, PROOF-5501, PROOF-5502, PROOF-5503, MC-5601, MC-5602, MC-5603, MC-5604, TIM-5701, TIM-5702, TIM-5703, EVD-5801, EVD-5802, EVD-5803, EVD-5804, CBK-5901, CBK-5902, CBK-5903, STAB-6101, STAB-6102, STAB-6103, PROTO-6201, PROTO-6202, PROTO-6203, and OWN-3207 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
-  "The authoritative registry count is now 259 tasks; the historical enumeration above remains traceability prose, and PROTO-6204 through DOC-6701 remain BlockedSpec until their accepted command-matrix, standard-library, Unicode, package-publication, hermetic-build, registry-support, supply-chain-security, historical-corpus, compiler-compatibility, migration, deprecation, release-level fuzz-coverage, fault-injection, security, performance, and formal-documentation contracts exist.",
+  "The authoritative registry count is now 260 tasks; the historical enumeration above remains traceability prose, and PROTO-6204 through DOC-6702 remain BlockedSpec until their accepted command-matrix, standard-library, Unicode, package-publication, hermetic-build, registry-support, supply-chain-security, historical-corpus, compiler-compatibility, migration, deprecation, release-level fuzz-coverage, fault-injection, security, performance, formal-documentation, and example-coverage contracts exist.",
 ]
 
 [[task]]
@@ -12925,6 +12925,64 @@ notes = [
   "DOC-6701 is BlockedSpec because G6 depends on G1-G5 exits and future manual subjects have no accepted semantics, implementations, support, or release evidence.",
   "The Seed formal set and governance/status references are documented; future manuals remain planning/status evidence only.",
   "The audit changes no language semantics, protocols, CLI, package behavior, runtime, editor integration, dependencies, or public API.",
+]
+
+[[task]]
+id = "DOC-6702"
+title = "Two-layer Examples"
+state = "BlockedSpec"
+release = "G6"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["DOC-6701"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/SEED-TRACEABILITY.md",
+  "docs/SEED-RELEASE-REPORT.md",
+  "docs/traceability/v0.0.1.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/EXAMPLE-COVERAGE.md",
+  "docs/status/DOC-6701-AUTHORITY-AUDIT.md",
+  "examples/hello.ling",
+  "examples/人物.ling",
+  "examples/adt-match.ling",
+  "examples/pipeline.ling",
+  "crates/ling-cli/tests/conformance.rs",
+  "tests/conformance/p7-hello-run/expect.toml",
+  "tests/conformance/p7-missing-capability/expect.toml",
+  "tests/conformance/p9-person-run/expect.toml",
+  "tests/conformance/p9-adt-match-run/expect.toml",
+  "tests/conformance/p9-pipeline-run/expect.toml",
+]
+artifacts = [
+  "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
+  "docs/testing/EXAMPLE-COVERAGE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The inventory maps the six requested example dimensions to current Seed examples, negative conformance fixtures, Semantic/Audit evidence, and explicit profile/Effect/ownership boundaries.",
+  "The current support matrix is checked before claiming coverage; all current Seed features remain Experimental and no future capability is presented as Stable.",
+  "Minimal, realistic, correct-error, Chinese-identifier, Effect/Capability, and Semantic/Audit paths link to reproducible locked offline commands and registered evidence.",
+  "The audit records G1-G5 and future Accepted-authority dependencies; unsupported ownership, profile, backend, package, concurrency, and editor examples remain deferred.",
+  "No placeholder syntax, API, protocol, backend, migration promise, security claim, or stale legacy name is added.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "DOC-6702 is BlockedSpec because no current feature is Stable and G6 depends on G1-G5 exits before a 1.0 support matrix can freeze the required example layers.",
+  "The Seed matrix reuses existing examples, conformance positives/negatives, process-level Semantic checks, and deterministic Audit evidence without inventing syntax or public behavior.",
+  "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, or public API.",
 ]
 
 [[task]]
