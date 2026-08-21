@@ -2421,9 +2421,9 @@ acceptance = [
   "cargo test -p ling-vm --test execution --locked --offline: passed, including v1.2 variant-match and record/tuple interpreter differential tests.",
   "cargo fmt --all and git diff --check: passed.",
 ]
-verified_against_commit = "pending"
-completion_commit = "pending"
-integration_state = "working-tree"
+verified_against_commit = "84af63773310b91249a6447ee8b59348c1e80bcd"
+completion_commit = "84af63773310b91249a6447ee8b59348c1e80bcd"
+integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "RFC-0016 is Accepted and is the sole new aggregate/match semantic and public-protocol authority used by this implementation.",

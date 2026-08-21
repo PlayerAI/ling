@@ -61,6 +61,7 @@
 | `VM-1203` | Independent bounded bytecode decoder and verifier | `G1` | `L` | `Done` | `TEST-VM-0001`, `VM-1201`, `VM-1202` | `e08940ef511cbcb1416e4b32e0c0805601d5c160` |
 | `VM-1204` | Verifier-gated deterministic bytecode execution | `G1` | `L` | `Done` | `TEST-VM-0001`, `VM-1201`, `VM-1202`, `VM-1203` | `dfe2df79bcee020a30e178a568c8921b04aea346` |
 | `VM-1205` | First-class functions, lexical closures, and recursion in bytecode | `G1` | `L` | `Done` | `VM-1201`, `VM-1202`, `VM-1203`, `VM-1204` | `9a54775ae0ee48d9fb0c75ce819989a24df27ed2` |
+| `VM-1206` | Nominal aggregates, immutable record update, and checked match lowering | `G1` | `L` | `Done` | `VM-1204`, `VM-1205` | `84af63773310b91249a6447ee8b59348c1e80bcd` |
 | `ZQ-3201` | Syntax highlighting queries | `G1` | `S` | `Done` | `TS-3108` | `77aab24ff8160e1535ea15b67d5302c1a4bb3fc8` |
 | `ZQ-3202` | Bracket matching queries | `G1` | `S` | `Done` | `ZQ-3201` | `1106b323685ed4910e6580a4347dce47df466208` |
 | `ZQ-3203` | Automatic indentation queries | `G1` | `S` | `Done` | `ZQ-3202` | `a4377450d26374098d95a9bb38520d3e3552dfd7` |
