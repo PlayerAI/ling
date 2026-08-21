@@ -95,6 +95,7 @@
 | `GOV-0109` | 发布状态机器可读化 | `G0` | `S` | `Done` | `GOV-0108` | `695e40eb6310ba1dcb36580f5feb63b4301ab656` |
 | `GOV-0110` | G0 CI 门禁 | `G0` | `M` | `Done` | `GOV-0101`, `GOV-0102`, `GOV-0103`, `GOV-0104`, `GOV-0105`, `GOV-0106`, `GOV-0107`, `GOV-0108`, `GOV-0109` | `a7f2b03270f0e4a163cd8f927cd56475c5062daf` |
 | `GPU-4601` | Backend Spike and Selection | `G4` | `M` | `BlockedSpec` | — | `` |
+| `GPU-4602` | Backend Adapter | `G4` | `M` | `BlockedSpec` | — | `` |
 | `IDE-2301` | IDE document symbols | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2302` | IDE hover | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `LSP-2201` | `` |
 | `IDE-2303` | IDE definition navigation | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `IDE-2302`, `LSP-2101`, `LSP-2102` | `` |
