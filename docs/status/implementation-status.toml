@@ -2429,7 +2429,7 @@ notes = [
   "RFC-0016 is Accepted and is the sole new aggregate/match semantic and public-protocol authority used by this implementation.",
   "Diagnostic allocation and JSON framing are unchanged; v1.2 adds no new public diagnostic code.",
   "Unicode remains 17.0.0; source maps retain original UTF-8 byte spans and deterministic logical paths.",
-  "VM-1208 through VM-1210 remain deferred as documented in the implementation report.",
+  "VM-1209 and VM-1210 remain deferred as documented in their execution-plan scope; VM-1208 is tracked by its own accepted authority and evidence package.",
 ]
 
 [[task]]
@@ -2481,5 +2481,63 @@ notes = [
   "RFC-0017 is Accepted and is the sole new mutable-place lowering authority used by this implementation; no unresolved semantic conflict was resolved through code.",
   "The bytecode wire model, diagnostic registry, JSON schemas, Semantic IDs, canonical semantic bytes, CLI contract, ABI/FFI layout, and Unicode 17.0.0 tables are unchanged.",
   "Local State<T> remains visible in checked semantic/effect artifacts; the v1.2 runtime represents it with SSA updates rather than a host capability tag.",
-  "VM-1208 through VM-1210 remain deferred pending their own accepted authorities and evidence packages.",
+  "VM-1209 and VM-1210 remain deferred pending their own accepted authorities and evidence packages; VM-1208 is complete under RFC-0018.",
+]
+
+[[task]]
+id = "VM-1208"
+title = "Effect, Capability, and Fault boundary"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["VM-1204", "VM-1205", "VM-1206", "VM-1207"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0016.md",
+  "docs/RFC-0017.md",
+  "docs/RFC-0018.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "crates/ling-vm/src/execute.rs",
+  "crates/ling-vm/tests/execution.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "docs/RFC-0018.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/VM-1208-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0018 defines the v1.0/v1.1/v1.2 Effect closure, explicit Capability preflight, source-mapped Runtime Fault, stable host-category, and host-panic containment boundary without a new bytecode revision.",
+  "The verifier and checked lowerers retain deterministic Console.Write Effect/Capability closure while local State<T> remains an SSA-only v1.2 runtime representation.",
+  "Missing Console.Write capability fails before configured step, frame, and heap limits or user effects; host failures preserve category, operation, source span, bilingual L-RUNTIME-0001 facts, and committed state.",
+  "An unwinding host adapter panic is contained and normalized to stable other/committed=true Runtime Fault behavior; no panic crosses execute_v1.",
+  "cargo test --workspace --locked --offline: passed, including 92 xtask tests and 19 ling-vm execution tests.",
+  "cargo clippy -p ling-bytecode -p ling-vm --all-targets --locked --offline -- -D warnings: passed.",
+  "cargo fmt --all -- --check, git diff --check, and cargo xtask governance check-all: passed.",
+]
+verified_against_commit = "4c07a68b42aa86c1b5e52feb856b94f61f99ff01"
+completion_commit = "4c07a68b42aa86c1b5e52feb856b94f61f99ff01"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0018 is Accepted and is the sole new VM-1208 integration authority; no unresolved semantic conflict was resolved through implementation behavior.",
+  "No diagnostic allocation, JSON schema, Semantic ID, canonical semantic bytes, CLI contract, ABI/FFI layout, or Unicode 17.0.0 table changed.",
+  "PROTO-BYTECODE remains Experimental; VM-1209 owns the broader differential corpus and VM-1210 owns fuzzing, cancellation, and additional resource-model work.",
 ]

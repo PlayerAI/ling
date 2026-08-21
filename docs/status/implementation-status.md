@@ -63,6 +63,7 @@
 | `VM-1205` | First-class functions, lexical closures, and recursion in bytecode | `G1` | `L` | `Done` | `VM-1201`, `VM-1202`, `VM-1203`, `VM-1204` | `9a54775ae0ee48d9fb0c75ce819989a24df27ed2` |
 | `VM-1206` | Nominal aggregates, immutable record update, and checked match lowering | `G1` | `L` | `Done` | `VM-1204`, `VM-1205` | `84af63773310b91249a6447ee8b59348c1e80bcd` |
 | `VM-1207` | Mutable places and basic borrow-boundary lowering | `G1` | `L` | `Done` | `VM-1204`, `VM-1205`, `VM-1206` | `600e4d5d213f2c055237ab9645a21edca1d0f985` |
+| `VM-1208` | Effect, Capability, and Fault boundary | `G1` | `L` | `Done` | `VM-1204`, `VM-1205`, `VM-1206`, `VM-1207` | `4c07a68b42aa86c1b5e52feb856b94f61f99ff01` |
 | `ZQ-3201` | Syntax highlighting queries | `G1` | `S` | `Done` | `TS-3108` | `77aab24ff8160e1535ea15b67d5302c1a4bb3fc8` |
 | `ZQ-3202` | Bracket matching queries | `G1` | `S` | `Done` | `ZQ-3201` | `1106b323685ed4910e6580a4347dce47df466208` |
 | `ZQ-3203` | Automatic indentation queries | `G1` | `S` | `Done` | `ZQ-3202` | `a4377450d26374098d95a9bb38520d3e3552dfd7` |
