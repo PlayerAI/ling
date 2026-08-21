@@ -314,6 +314,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0027"
+title = "Trait Checked Core dictionary witness boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0027-trait-checked-core-dictionary-witness.md"
+covers = ["immutable Checked Core dictionary witnesses", "selected implementation identity", "canonical witness bytes"]
+depends_on = ["RFC-0005", "DEC-0026", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0024"
 title = "Trait obligation collection boundary"
 kind = "Decision"

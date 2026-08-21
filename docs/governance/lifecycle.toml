@@ -71,6 +71,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0027"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0027-trait-checked-core-dictionary-witness.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Lower exact solver selections into immutable Checked Core witnesses with Trait, impl, receiver, ordered member, and origin identity.",
+  "Reject duplicate ordinals, unknown implementations, identity mismatches, and member-order mismatches without re-running selection.",
+  "Compare canonical witness bytes across repeated lowering and source-origin presentation changes while excluding paths and spans.",
+  "Keep the module crate-private and preserve the existing Seed non-executable Trait boundary.",
+]
+compatibility_impact = [
+  "Adds only an internal ling-types witness table; diagnostics, schemas, Semantic IDs, CLI/LSP and package protocols, ABI, bytecode, runtime, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Semantic Graph projection, TypedProgram integration, interpreter/VM calling convention, bytecode encoding, public Trait diagnostics, and generic/blanket implementations require later authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0024"
 kind = "Decision"
 status = "Accepted"

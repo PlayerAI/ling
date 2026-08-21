@@ -18,6 +18,10 @@ mod constraints;
 // Solver evidence remains crate-private until dictionary lowering integrates it.
 #[allow(dead_code)]
 mod solver;
+// Checked Core dictionary witnesses remain crate-private until a runtime and
+// semantic-projection contract integrates them.
+#[allow(dead_code)]
+mod checked_core;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct TypeId(u32);

@@ -106,7 +106,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TRAIT-1303` | G1/Editor | Constraint collection | — | Done | DEC-0024; see `docs/status/TRAIT-1303-IMPLEMENTATION-REPORT.md` |
 | `TRAIT-1304` | G1/Editor | Coherence/orphan checker | — | Done | DEC-0025; `03-G1-V0.1-LIVING.md:289`; `docs/status/TRAIT-1304-IMPLEMENTATION-REPORT.md` |
 | `TRAIT-1305` | G1/Editor | Solver v0 | — | Done | DEC-0026; `03-G1-V0.1-LIVING.md:296`; `docs/status/TRAIT-1305-IMPLEMENTATION-REPORT.md` |
-| `TRAIT-1306` | G1/Editor | Checked Core 显式化 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:300` |
+| `TRAIT-1306` | G1/Editor | Checked Core 显式化 | — | In Progress | DEC-0027; `03-G1-V0.1-LIVING.md:300`; `docs/status/TRAIT-1306-IMPLEMENTATION-REPORT.md` |
 | `TRAIT-1307` | G1/Editor | Interpreter/VM lowering | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:304` |
 | `TRAIT-1308` | G1/Editor | IDE 支持 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:308` |
 | `TRAIT-1309` | G1/Editor | 性能与终止 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:316` |

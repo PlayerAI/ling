@@ -3678,8 +3678,50 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "DEC-0026 accepts the crate-private first-slice solver contract after the TRAIT-1304 coherence index.",
-  "TRAIT-1306 and TRAIT-1307 remain deferred for Checked Core dictionary witnesses and interpreter/VM lowering.",
+  "TRAIT-1306 is tracked under DEC-0027; TRAIT-1307 remains deferred for interpreter/VM lowering.",
   "Verified and committed as 530de657bfc63018090426f2e6e47eeeaf710f2c after the full offline workspace, governance, status, formatting, and diff gates passed.",
+]
+
+[[task]]
+id = "TRAIT-1306"
+title = "Trait Checked Core dictionary witnesses"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1305"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0026-trait-solver-v0-boundary.md",
+  "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-types/src/checked_core.rs",
+  "docs/status/TRAIT-1306-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0005 §4.1–§4.3 and DEC-0027 lower immutable witnesses containing TraitId, ImplId, receiver type, ordered member definitions, ordinal, and source origin.",
+  "Lowering consumes solver selections and the coherence index without re-running candidate selection; duplicate ordinals, unknown implementations, identity mismatches, and member-order mismatches are rejected deterministically.",
+  "Canonical witness bytes are repeatable and encode semantic identity only; source paths, spans, map order, allocation addresses, and hash seeds are excluded.",
+  "The module remains crate-private, no public Trait diagnostic/schema/Semantic ID/runtime behavior is added, and ling-types::check continues to reject Trait programs.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "DEC-0027 accepts the internal Checked Core dictionary witness boundary after the TRAIT-1305 solver.",
+  "TRAIT-1307 remains deferred for interpreter/VM dictionary passing and differential conformance.",
 ]
 
 [[task]]
@@ -3721,7 +3763,7 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "DEC-0025 accepts the internal package-aware coherence/index boundary without expanding Trait support in the v0.0.1 matrix.",
-  "TRAIT-1306 and TRAIT-1307 remain deferred for dictionary lowering and runtime integration.",
+  "TRAIT-1306 is now tracked under DEC-0027; TRAIT-1307 remains deferred for runtime integration.",
   "Verified and committed as 94a8daec579b1c730e51ff37bd3cde63dfd9d046 after the full offline workspace, governance, status, formatting, and diff gates passed.",
 ]
 
@@ -3764,7 +3806,7 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "DEC-0024 accepts the internal collection/interface boundary without expanding Trait support in the v0.0.1 matrix.",
-  "TRAIT-1305 through TRAIT-1307 remain deferred for solving, dictionary lowering, and runtime integration.",
+  "Later solver, dictionary, and runtime slices were intentionally deferred at this milestone and are tracked by TRAIT-1305 through TRAIT-1307.",
   "Verified and committed as 1dfc52ee4439c43f284fbf384869436a408344d3 after the full offline workspace, governance, status, formatting, and diff gates passed.",
 ]
 
