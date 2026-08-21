@@ -32,6 +32,7 @@
 | `ACT-2301` | Actor identity and state isolation | `G2` | `M` | `BlockedSpec` | `TASK-2203` | `` |
 | `ACT-2302` | Actor message sendability checking | `G2` | `L` | `BlockedSpec` | `ACT-2301` | `` |
 | `ACT-2303` | Bounded mailbox and backpressure | `G2` | `L` | `BlockedSpec` | `ACT-2302` | `` |
+| `ACT-2304` | Actor turn and reentry rules | `G2` | `L` | `BlockedSpec` | `ACT-2303` | `` |
 | `BASE-0001` | 仓库基线盘点与执行计划落位 | `G0` | `S` | `Done` | — | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
 | `CLI-1702` | CLI output and exit behavior | `G1` | `M` | `BlockedSpec` | `CLI-1701` | `` |
