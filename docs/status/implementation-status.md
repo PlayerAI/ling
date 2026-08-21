@@ -116,6 +116,7 @@
 | `REP-2502` | Replay log schema | `G2` | `L` | `BlockedSpec` | `REP-2501` | `` |
 | `REP-2503` | Effect recorder | `G2` | `L` | `BlockedSpec` | `EFF-2105`, `REP-2502` | `` |
 | `REP-2504` | Replay player | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503` | `` |
+| `REP-2505` | Replay privacy, trimming, and corruption | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504` | `` |
 | `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
