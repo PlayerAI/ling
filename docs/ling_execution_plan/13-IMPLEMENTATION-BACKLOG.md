@@ -311,7 +311,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CTR-5405` | G5 | Solver/Proof Checker Adapter | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:360`, `docs/status/CTR-5405-AUTHORITY-AUDIT.md` |
 | `CTR-5406` | G5 | 优化器使用 Contract 的规则 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:371`, `docs/status/CTR-5406-AUTHORITY-AUDIT.md` |
 | `CTR-5407` | G5 | Contract LSP/Zed | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:375`, `docs/status/CTR-5407-AUTHORITY-AUDIT.md` |
-| `PROOF-5501` | G5 | Proof IR | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:386` |
+| `PROOF-5501` | G5 | Proof IR | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:386`, `docs/status/PROOF-5501-AUTHORITY-AUDIT.md` |
 | `PROOF-5502` | G5 | 独立 Checker | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:400` |
 | `PROOF-5503` | G5 | 假设注册表 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:412` |
 | `MC-5601` | G5 | 有限状态投影 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:431` |
