@@ -288,7 +288,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PLC-4802` | G4 | 静态候选与运行时选择 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:448`, `docs/status/PLC-4802-AUTHORITY-AUDIT.md` |
 | `PLC-4803` | G4 | Cost Model v0 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:466`, `docs/status/PLC-4803-AUTHORITY-AUDIT.md` |
 | `PLC-4804` | G4 | `zero explain placement` | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:480`, `docs/status/PLC-4804-AUTHORITY-AUDIT.md` |
-| `PLC-4805` | G4 | 设备二进制缓存 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:495` |
+| `PLC-4805` | G4 | 设备二进制缓存 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:495`, `docs/status/PLC-4805-AUTHORITY-AUDIT.md` |
 | `PROF-5101` | G5 | 机器可读 Profile | M | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:77` |
 | `PROF-5102` | G5 | 禁止能力检查 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:108` |
 | `PROF-5103` | G5 | Profile Composition | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:122` |
