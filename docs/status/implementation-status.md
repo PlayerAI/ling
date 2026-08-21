@@ -225,6 +225,7 @@
 | `TASK-2205` | Production local Task scheduler | `G2` | `L` | `BlockedSpec` | `TASK-2204` | `` |
 | `TASK-2206` | Task conformance and stress tests | `G2` | `L` | `BlockedSpec` | `TASK-2205` | `` |
 | `TEST-VM-0001` | VM failing-first corpus and differential harness baseline | `G1` | `M` | `Done` | `GOV-0104`, `GOV-0105` | `5bd49583c9160cd2067a7124bc014ebc3b4bcf95` |
+| `TIM-5701` | Timing IR and Path | `G5` | `L` | `BlockedSpec` | `MC-5604` | `` |
 | `TRAIT-1301` | Trait RFC closure | `G1` | `M` | `Done` | — | `ccab6ea91e05ed477457cc1ed870d76faaa46e3c` |
 | `TRAIT-1302` | Trait AST/HIR representation | `G1` | `M` | `Done` | `TRAIT-1301` | `693b841000c98ca8aae119e3797a737fe0cebc7f` |
 | `TRAIT-1303` | Trait constraint collection | `G1` | `M` | `Done` | `TRAIT-1302` | `1dfc52ee4439c43f284fbf384869436a408344d3` |
