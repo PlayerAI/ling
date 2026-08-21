@@ -47,6 +47,7 @@
 | `BND-5202` | Loop and Recursion Checks | `G5` | `M` | `BlockedSpec` | `BND-5201` | `` |
 | `BND-5203` | Memory Budget Analysis | `G5` | `M` | `BlockedSpec` | `BND-5202` | `` |
 | `BND-5204` | Resource Budget Diagnostics | `G5` | `M` | `BlockedSpec` | `BND-5203` | `` |
+| `CBK-5901` | Trusted Compiler Route Decision | `G5` | `L` | `BlockedSpec` | `EVD-5804` | `` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
 | `CLI-1702` | CLI output and exit behavior | `G1` | `M` | `BlockedSpec` | `CLI-1701` | `` |
 | `CLI-1703` | Project initialization command | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |

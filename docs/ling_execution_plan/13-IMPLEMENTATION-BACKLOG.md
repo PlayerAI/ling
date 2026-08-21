@@ -325,7 +325,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EVD-5802` | G5 | 独立验证器 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:543`, `docs/status/EVD-5802-AUTHORITY-AUDIT.md` |
 | `EVD-5803` | G5 | 可重复构建绑定 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:557`, `docs/status/EVD-5803-AUTHORITY-AUDIT.md` |
 | `EVD-5804` | G5 | AI Provenance | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:566`, `docs/status/EVD-5804-AUTHORITY-AUDIT.md` |
-| `CBK-5901` | G5 | 可信编译路线决策 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:585` |
+| `CBK-5901` | G5 | 可信编译路线决策 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:585`, `docs/status/CBK-5901-AUTHORITY-AUDIT.md` |
 | `CBK-5902` | G5 | Lowering Validator | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:599` |
 | `CBK-5903` | G5 | Critical Runtime/Target Package | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:611` |
 | `STAB-6101` | G6 | 逐项支持矩阵审计 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:32` |
