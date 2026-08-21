@@ -295,6 +295,8 @@ version = "0.0.1-dev"
 dependencies = [
  "ling-diagnostics",
  "ling-semantic",
+ "ling-source",
+ "ling-syntax",
  "serde_json",
 ]
 

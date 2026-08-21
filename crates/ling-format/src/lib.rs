@@ -1,4 +1,11 @@
-//! Canonical Audit Source rendering and isolated parsing.
+//! Canonical Audit Source rendering and compiler-CST-backed format IR.
+
+mod format_ir;
+
+pub use format_ir::{
+    FORMAT_IR_SCHEMA, FormatDocument, FormatIrBuildError, FormatIrBuildErrorKind, FormatNode,
+    FormatToken, build_format_ir,
+};
 
 use std::error::Error;
 use std::fmt;
