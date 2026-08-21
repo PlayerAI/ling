@@ -2225,3 +2225,79 @@ notes = [
   "Unicode remains 17.0.0; identifiers use the accepted validation pipeline and source maps retain original UTF-8 byte spans.",
   "The pinned nightly libFuzzer target builds, but the local Windows host lacks the Visual Studio ASan runtime DLL; sanitizer corpus replay is assigned to the pinned Linux CI job and is not claimed as a passing local run.",
 ]
+
+[[task]]
+id = "VM-1204"
+title = "Verifier-gated deterministic bytecode execution"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["TEST-VM-0001", "VM-1201", "VM-1202", "VM-1203"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0014.md",
+  "docs/SEMANTICS.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0011-seed-builtins.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "Cargo.lock",
+  "Cargo.toml",
+  "README.md",
+  "crates/ling-bytecode/src/lib.rs",
+  "crates/ling-bytecode/tests/differential_baseline.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "crates/ling-vm/Cargo.toml",
+  "crates/ling-vm/src/execute.rs",
+  "crates/ling-vm/src/fault.rs",
+  "crates/ling-vm/src/host.rs",
+  "crates/ling-vm/src/lib.rs",
+  "crates/ling-vm/src/value.rs",
+  "crates/ling-vm/tests/execution.rs",
+  "crates/ling-vm/tests/support/wire.rs",
+  "docs/DEPENDENCIES.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/ling_execution_plan/SHA256SUMS.txt",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/VM-1204-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+  "tests/bytecode/README.md",
+]
+acceptance = [
+  "ling-vm accepts only verifier-created VerifiedProgramV1 plus explicit ExecutionLimits and injected HostCapabilities; no unverified or ambient execution path exists",
+  "the explicit Unit/Bool/Int/Text value model and iterative frame engine execute every ling.bytecode/1.0 scalar opcode and terminator in stored order",
+  "Capability preflight uses the verifier-proved transitive entry Effect closure before any instruction or Effect, including an indirect direct-call fixture",
+  "step and frame exhaustion occur before the charged operation; prior Effects and host before/after-commit state remain observable exactly as structured Runtime Fault facts",
+  "division, remainder, Text.format, host, Capability, resource, and implementation heap-ceiling failures use L-RUNTIME-0001 and verified original u64 UTF-8 source-map spans",
+  "interpreter and VM logical Console output match for the supported Hello/direct-call lowering slice; independent wire artifacts cover all remaining scalar operators, branch directions, jump, and recursive frame exhaustion",
+  "cargo test -p ling-vm --all-targets --all-features --locked --offline: 9 passed",
+  "cargo test --workspace --all-targets --all-features --locked --offline: passed, including 92 xtask tests",
+  "cargo xtask governance check-all: 46 documents, 26 gaps, 21 lifecycle records, 20 protocols, and 82 diagnostic codes passed",
+  "cargo xtask support verify, ci verify, traceability verify, schema gates, seed reproduce, and pre-completion status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified and pre-completion status: 33 tasks Done",
+  "cargo fmt --all -- --check and git diff --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed after sandbox permission was granted for the installed toolchain",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+]
+verified_against_commit = "dfe2df79bcee020a30e178a568c8921b04aea346"
+completion_commit = "dfe2df79bcee020a30e178a568c8921b04aea346"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0014 is Accepted and sufficient for VM-1204; no unresolved language semantic or public protocol decision was implemented through code.",
+  "PROTO-BYTECODE is now public Experimental ling.bytecode/1.0 and BACKEND-VM is an implemented Experimental Tier2 library backend; CLI bytecode commands, backend selection, default limits, and full-Seed lowering remain explicitly unsupported.",
+  "Diagnostic JSON framing/schema is unchanged; DiagnosticSpan Rust offset accessors widen to u64 so verified protocol spans are never clamped.",
+  "No source behavior, CLI behavior, Semantic ID, canonical semantic bytes, ABI/FFI, evaluator behavior, Unicode table, or third-party package version changed.",
+  "Unicode remains 17.0.0; VM Text is not normalized and Runtime Faults retain verified original UTF-8 byte spans and path-free logical names.",
+  "VM-1205 through VM-1210 remain gated owners for closures/broader recursion lowering, aggregates, mutation, broader Effect/Fault coverage, full differential testing, cancellation, fuzzing, and any common logical heap model.",
+]

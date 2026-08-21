@@ -45,7 +45,7 @@
 | 23 | `ZQ-3201` | 基础 highlights | TS grammar | 与 LSP | highlight fixtures |
 | 24 | `ZQ-3202` | brackets | TS grammar | 与 ZQ-3201 | pair fixtures |
 | 25 | `ZQ-3204` | outline | TS declarations | 与 query tasks | symbols visible in Zed |
-| 26 | `VM-1204` | VM 基础执行 | VM-1202/1203 | 否 | interpreter differential |
+| 26 | `VM-1204` | VM 基础执行 | VM-1202/1203 | 否 | **Done**；verifier-gated `ling-vm`、全 1.0 scalar operator/control flow、Capability preflight、budget/Fault/source-map 与 interpreter differential evidence |
 | 27 | `LSP-2202` | push diagnostics | LSP-2201 | 与 hover | stale diagnostics handled |
 | 28 | `ZEXT-3302` | Zed Wasm extension | grammar-only stable | 与 LSP | wasm32-wasip2 build |
 | 29 | `ZEXT-3303` | 查找本地 zero | extension skeleton | 与 queries | setting/PATH behavior |
@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1106` 与 `PRJ-1108` Done；`PRJ-1107` 的 project `test`/`build` CLI 行为仍需先冻结，后续任务继续服从各自接口与 RFC 前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1106`、`PRJ-1108` 与 `VM-1201`～`VM-1204` Done；`PRJ-1107` 的 project `test`/`build` CLI 行为与 VM-1205 后续扩展仍服从各自接口/RFC 前置
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -94,7 +94,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `VM-1201` | G1/Editor | bytecode RFC 与模型 | M | Done | `03-G1-V0.1-LIVING.md:150`；见 RFC-0014、`ling-bytecode` 未验证模型、TEST-VM-0001 corpus、机器状态与实施报告 |
 | `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | L | Done | `03-G1-V0.1-LIVING.md:166`；见 deterministic lowering/encoder/disassembler、Hello exact goldens、机器状态与实施报告 |
 | `VM-1203` | G1/Editor | 独立 decoder/verifier | L | Done | `03-G1-V0.1-LIVING.md:180`；见 bounded decoder、独立 verifier、双语诊断、malformed/fuzz evidence、机器状态与实施报告 |
-| `VM-1204` | G1/Editor | VM 基础执行 | L | Ready | `03-G1-V0.1-LIVING.md:196`；RFC-0014 已 Accepted，VM-1201/VM-1202/VM-1203 与 TEST-VM-0001 已完成，下一纵向切片 |
+| `VM-1204` | G1/Editor | VM 基础执行 | L | Done | `03-G1-V0.1-LIVING.md:196`；见 verifier-gated `ling-vm`、显式 value/host Capability/budget/source-map Fault、differential evidence、机器状态与实施报告 |
 | `VM-1205` | G1/Editor | 函数、closure、recursion | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:205` |
 | `VM-1206` | G1/Editor | Record、ADT、match | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:209` |
 | `VM-1207` | G1/Editor | Mutable place 与基础 borrow | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:218` |
@@ -375,7 +375,7 @@ owner = ""
 branch = ""
 depends_on = []
 spec = ["ROADMAP-1.0#G0"]
-updated = "2026-08-20"
+updated = "2026-08-21"
 
 [[task]]
 id = "VM-1203"
@@ -384,7 +384,7 @@ depends_on = ["VM-1201", "VM-1202"]
 
 [[task]]
 id = "VM-1204"
-state = "Ready"
+state = "Done"
 depends_on = ["TEST-VM-0001", "VM-1201", "VM-1202", "VM-1203"]
 ```
 
