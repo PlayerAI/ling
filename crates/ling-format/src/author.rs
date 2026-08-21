@@ -434,7 +434,7 @@ mod tests {
         format_core(&document)
     }
 
-    fn semantic_snapshot(input: &str) -> String {
+    fn checked_snapshot(input: &str) -> ling_semantic::ProgramSnapshot {
         let source = SourceFile::from_bytes(
             SourceId::new(15106),
             "property.ling",
@@ -448,10 +448,16 @@ mod tests {
         let resolved = resolve(vec![hir], "Main").expect("valid resolution");
         let typed = check_types(resolved).expect("valid types");
         let checked = check_effects(typed).expect("valid effects");
-        build_snapshot(checked)
-            .expect("semantic snapshot builds")
-            .json()
-            .to_owned()
+        build_snapshot(checked).expect("semantic snapshot builds")
+    }
+
+    fn semantic_snapshot(input: &str) -> String {
+        checked_snapshot(input).json().to_owned()
+    }
+
+    fn audit_source(input: &str) -> String {
+        let snapshot = checked_snapshot(input);
+        crate::render_audit(&snapshot.audit_model()).expect("canonical Audit Source renders")
     }
 
     fn syntax_signature(input: &str) -> Vec<(TokenKind, String)> {
@@ -500,17 +506,8 @@ mod tests {
             .collect()
     }
 
-    #[test]
-    fn formats_core_spacing_and_four_space_layout() {
-        assert_eq!(
-            format("let add a b=\n  a+b\nlet main ()=add 1 2\n"),
-            "let add a b =\n    a + b\nlet main () = add 1 2\n"
-        );
-    }
-
-    #[test]
-    fn property_corpus_is_idempotent_parse_equivalent_and_semantically_equivalent() {
-        let corpus = [
+    fn property_corpus() -> [&'static str; 3] {
+        [
             "module Main\n\nlet identity value=value\n\nlet main ()=identity ()\n",
             concat!(
                 "module Main\r\n",
@@ -526,9 +523,20 @@ mod tests {
                 "*/\n",
                 "let main ()=if true then () else ()\n",
             ),
-        ];
+        ]
+    }
 
-        for original in corpus {
+    #[test]
+    fn formats_core_spacing_and_four_space_layout() {
+        assert_eq!(
+            format("let add a b=\n  a+b\nlet main ()=add 1 2\n"),
+            "let add a b =\n    a + b\nlet main () = add 1 2\n"
+        );
+    }
+
+    #[test]
+    fn property_corpus_is_idempotent_parse_equivalent_and_semantically_equivalent() {
+        for original in property_corpus() {
             let formatted = format(original);
             assert_eq!(
                 format(&formatted),
@@ -549,6 +557,18 @@ mod tests {
                 semantic_snapshot(original),
                 semantic_snapshot(&formatted),
                 "checked semantic snapshot changed: {original:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn author_formatting_does_not_replace_canonical_audit_source() {
+        for original in property_corpus() {
+            let formatted = format(original);
+            assert_eq!(
+                audit_source(original),
+                audit_source(&formatted),
+                "canonical Audit Source changed after formatting: {original:?}"
             );
         }
     }
