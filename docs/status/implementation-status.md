@@ -62,6 +62,7 @@
 | `IDE-2306` | IDE rename | `G1` | `L` | `BlockedSpec` | `IDE-2305`, `LSP-2102`, `LSP-2104` | `` |
 | `IDE-2307` | IDE completion v0 | `G1` | `L` | `BlockedSpec` | `IDE-2304`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2308` | IDE completion resolve | `G1` | `M` | `BlockedSpec` | `IDE-2307`, `LSP-2101`, `LSP-2102` | `` |
+| `IDE-2309` | IDE code actions | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `IDE-2308`, `LSP-2201`, `LSP-2202` | `` |
 | `INC-1401` | Incremental query boundary ADR | `G1` | `M` | `Done` | `GOV-0110` | `dcb3fc5c148d0b90a3481a736113c4551a35cf17` |
 | `INC-1402` | VFS and revision boundary | `G1` | `M` | `Done` | `INC-1401` | `5c341078f3430a6fa1585fcaaf30d472dba7512f` |
 | `INC-1403` | Parse queries | `G1` | `M` | `Done` | `INC-1402` | `a73e5c7150cce3fb86da5d48508158e7e1637f40` |
