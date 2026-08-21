@@ -73,6 +73,7 @@
 | `TRAIT-1304` | Trait coherence and orphan index | `G1` | `M` | `Done` | `TRAIT-1303` | `94a8daec579b1c730e51ff37bd3cde63dfd9d046` |
 | `TRAIT-1305` | Trait solver v0 | `G1` | `M` | `Done` | `TRAIT-1304` | `530de657bfc63018090426f2e6e47eeeaf710f2c` |
 | `TRAIT-1306` | Trait Checked Core dictionary witnesses | `G1` | `M` | `Done` | `TRAIT-1305` | `bfd00305473363c03286c2e0dbd060d7d136a95d` |
+| `TRAIT-1307` | Trait interpreter and VM dictionary lowering | `G1` | `L` | `BlockedSpec` | `TRAIT-1306` | `` |
 | `TS-3101` | Grammar 规范映射表 | `G1` | `S` | `Done` | `BASE-0001` | `4d1b643bd1a971bcd01d101cd81411557d3c3074` |
 | `TS-3102` | 宽度优先 Tree-sitter grammar skeleton | `G1` | `M` | `Done` | `TS-3101` | `14fb7986501abda6eed178b5b7af405fcb0313e9` |
 | `TS-3103` | Offside/缩进策略 | `G1` | `M` | `Done` | `TS-3102` | `28750bcbd458322e856cf45842b8241047a8e41b` |

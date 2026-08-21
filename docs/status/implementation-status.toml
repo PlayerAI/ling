@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 65 tasks (63 Done plus the intentionally BlockedSpec FMT-1507 and PRJ-1107 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 66 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, and TRAIT-1307 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3723,6 +3723,47 @@ notes = [
   "DEC-0027 accepts the internal Checked Core dictionary witness boundary after the TRAIT-1305 solver.",
   "TRAIT-1307 remains deferred for interpreter/VM dictionary passing and differential conformance.",
   "Verified and committed as bfd00305473363c03286c2e0dbd060d7d136a95d after targeted, full offline workspace, governance, status, formatting, and diff gates passed.",
+]
+
+[[task]]
+id = "TRAIT-1307"
+title = "Trait interpreter and VM dictionary lowering"
+state = "BlockedSpec"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1306"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "docs/status/TRAIT-1307-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The missing interpreter/VM dictionary contract is recorded with direct references to RFC-0005 §4 and DEC-0027.",
+  "The audit identifies the absent CheckedProgram/Semantic Graph integration, executable member-slot identity, interpreter call convention, and versioned bytecode/verifier contract.",
+  "No backend re-runs Trait selection, adds a placeholder public API, changes v0.0.1 Seed execution, allocates diagnostics, or claims an unaccepted bytecode protocol.",
+  "The next executable source file is explicitly identified as crates/ling-eval/src/lib.rs, with VM and bytecode work deferred until their accepted authority exists.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "TRAIT-1307 is BlockedSpec by GAP-TRAIT-COHERENCE-001 and RFC-0005's explicit deferral of current bytecode/runtime changes.",
+  "The current Seed checker rejects Trait-bearing programs, and DEC-0027 does not expose callable method definitions; implementing runtime behavior would invent semantics.",
+  "The authority audit preserves the next-file ordering without changing compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
