@@ -285,7 +285,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ACC-4701` | G4 | Accelerator Plugin Interface | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:412`, `docs/status/ACC-4701-AUTHORITY-AUDIT.md` |
 | `ACC-4702` | G4 | Experimental 适配器 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:425`, `docs/status/ACC-4702-AUTHORITY-AUDIT.md` |
 | `PLC-4801` | G4 | Placement 约束模型 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:431`, `docs/status/PLC-4801-AUTHORITY-AUDIT.md` |
-| `PLC-4802` | G4 | 静态候选与运行时选择 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:448` |
+| `PLC-4802` | G4 | 静态候选与运行时选择 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:448`, `docs/status/PLC-4802-AUTHORITY-AUDIT.md` |
 | `PLC-4803` | G4 | Cost Model v0 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:466` |
 | `PLC-4804` | G4 | `zero explain placement` | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:480` |
 | `PLC-4805` | G4 | 设备二进制缓存 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:495` |
