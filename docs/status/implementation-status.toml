@@ -3322,6 +3322,52 @@ completion_commit = "05fe7fb9827b5e33afd094e99a0908c69d0af972"
 integration_state = "committed"
 completed = "2026-08-21"
 notes = [
-  "The formatter is an opt-in library operation only; comment attachment, incomplete recovery, property evidence, CLI/LSP, and Audit separation remain subsequent tasks.",
-  "FMT-1504 is the next execution-plan target and must consume the same compiler-owned formatter path.",
+  "The formatter is an opt-in library operation only; incomplete recovery, property evidence, CLI/LSP, and Audit separation remain subsequent tasks.",
+  "FMT-1504 comment attachment is closed over the same compiler-owned formatter path; FMT-1505 is the next execution-plan target.",
+]
+
+[[task]]
+id = "FMT-1504"
+title = "Comment attachment"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1503"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+]
+artifacts = [
+  "crates/ling-format/src/author.rs",
+  "crates/ling-format/src/comments.rs",
+  "crates/ling-format/src/format_ir.rs",
+  "crates/ling-format/src/lib.rs",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/FMT-1504-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Format IR exposes deterministic documentation, line, and block comment attachments derived only from compiler tokens and CST ranges; no regex, Tree-sitter, or second parser authority is introduced.",
+  "Attachment placement distinguishes leading, trailing, and standalone comments; top-level declaration ownership prevents comments inside or adjacent to a definition from drifting across definitions.",
+  "Nested multiline block-comment lexer segments are grouped only while balanced delimiters prove they belong to one block comment; independent comments remain separate and exact spelling/order are retained.",
+  "format_core checks attached comment preservation before publishing a candidate, while valid formatting remains compiler-revalidated and no partial output is published.",
+  "Targeted, clippy, full workspace, governance, formatting, and diff checks passed; no language semantics, diagnostics, Semantic IDs, Audit bytes, or public wire protocol changed.",
+]
+verified_against_commit = "4348bfe548d0f62c25efdd5bb5c704e0a46958f9"
+completion_commit = "4348bfe548d0f62c25efdd5bb5c704e0a46958f9"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "CommentAttachment is an in-process formatter model; incomplete-source recovery remains FMT-1505 and broad property/semantic evidence remains FMT-1506.",
+  "The generated gap register removes FMT-1504 from the formatter gap blockers while the remaining recovery, evidence, and Audit separation work stays open.",
 ]
