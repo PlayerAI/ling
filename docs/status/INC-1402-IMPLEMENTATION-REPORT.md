@@ -54,9 +54,9 @@ bytes; it does not read the host filesystem or publish a cache format.
 - No language syntax or semantics, diagnostic code, schema, Semantic ID,
   canonical semantic bytes, CLI/LSP field, public protocol, or Unicode table
   changed.
-- Host filesystem watching, persistent cache serialization, query evaluation,
-  line-index/query nodes, cancellation of later query work, and LSP document
-  version adapters remain separate targets.
+- Host filesystem watching, persistent cache serialization, resolve/module
+  queries, cancellation of later query work, and LSP document version
+  adapters remain separate targets.
 
 ## Validation
 

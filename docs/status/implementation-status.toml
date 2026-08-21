@@ -2763,5 +2763,54 @@ completed = "2026-08-21"
 notes = [
   "INC-1402 is an internal in-memory source boundary; no public VFS protocol, cache schema, host filesystem watcher, or placeholder query crate was created.",
   "The open incremental-cache gap remains for persistent schema/migration, corruption recovery, parallel scheduling, and later query invalidation tasks.",
-  "INC-1403 parse queries is the next executable target after this milestone.",
+  "INC-1403 parse queries is complete; INC-1404 resolve/module queries is the next executable target.",
+]
+
+[[task]]
+id = "INC-1403"
+title = "Parse queries"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1402"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "crates/ling-source/Cargo.toml",
+  "crates/ling-syntax/Cargo.toml",
+  "crates/ling-ast/Cargo.toml",
+]
+artifacts = [
+  "Cargo.toml",
+  "Cargo.lock",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1402-IMPLEMENTATION-REPORT.md",
+  "docs/status/INC-1403-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The internal ling-db query layer implements source_bytes, line_index, tokens, parse, and ast over immutable Arc-backed values; AST lowering consumes only valid ParsedSource and never unresolved syntax as evaluation input.",
+  "In-memory cache keys include the compiler/language/query-schema versions, Unicode 17.0.0, canonical logical name, source revision, visible layer, and selected workspace input revisions; host paths, addresses, map order, time, and debug text are excluded.",
+  "A deterministic BTreeMap cache reuses unchanged modules, invalidates changed source revisions, traverses parse_all in canonical logical-name order, and matches clean parsing after edits.",
+  "Malformed UTF-8 is rejected as a bounded QueryError without publishing a partial parse or AST; BOM, CRLF, Chinese identifiers, original spans, and parser diagnostics remain delegated to existing source/syntax/AST crates.",
+  "No language semantics, diagnostics, schemas, Semantic IDs, CLI/LSP fields, public protocol, persistence format, or parallel scheduler was added.",
+  "cargo test -p ling-db --locked --offline, cargo clippy -p ling-db --all-targets --locked --offline -- -D warnings, cargo test --workspace --locked --offline, cargo fmt --all -- --check, and git diff --check: passed.",
+]
+verified_against_commit = "a73e5c7150cce3fb86da5d48508158e7e1637f40"
+completion_commit = "a73e5c7150cce3fb86da5d48508158e7e1637f40"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "ling-db is an internal repository-owned query primitive; no third-party query engine, persistent cache, compiler-facing cancellation API, or public query protocol was introduced.",
+  "The query cache retains exact source bytes and original UTF-8 spans while using only deterministic BTreeMap traversal; old revisions remain in-memory and are not serialized.",
+  "INC-1404 resolve/module queries is the next target and must build on the VFS and parse query boundary.",
 ]
