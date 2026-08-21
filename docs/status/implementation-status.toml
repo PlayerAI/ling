@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 97 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, and LSP-2402 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 98 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, and LSP-2403 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -4826,6 +4826,47 @@ completed = ""
 notes = [
   "LSP-2402 is BlockedSpec by LSP-2401, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and LSP-2101/LSP-2102; no semantic-token protocol or fallback source contract is accepted.",
   "Current checked pipeline and syntax tokens remain separate internal inputs; no public typed-token generator or explicit parsed-fallback source marker exists.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2403"
+title = "Semantic token full and delta transport"
+state = "BlockedSpec"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2401", "LSP-2402"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/LSP-2403-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing full/delta response, token legend/encoding, result-ID/base validation, same-document-version, stale/cancellation/limit, position, taxonomy, and protocol lifecycle contracts.",
+  "The audit covers insertion/deletion/reorder deltas, invalid-base full fallback, result-ID eviction, full/delta equivalence, non-overlap/order, Unicode/emoji/CRLF/BOM, stale versions, cancellation, deterministic bytes, and migration fixtures.",
+  "No full-token writer, delta encoder, result-ID store, protocol field, diagnostic allocation, Semantic ID change, or placeholder LSP API is added while the authority is absent.",
+  "The future implementation must publish only same-version, non-overlapping deterministic tokens, recover to full on invalid bases, and label experimental fields.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "LSP-2403 is BlockedSpec by LSP-2401/LSP-2402, LSP-2501/LSP-2502, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no semantic-token transport inventory entry exists.",
+  "Current semantic graph and source revisions provide no full/delta token writer, result-ID lifecycle, base mismatch handling, or same-version publication boundary.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
