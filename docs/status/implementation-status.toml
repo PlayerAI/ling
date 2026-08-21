@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 66 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, and TRAIT-1307 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 67 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, and TRAIT-1308 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -3764,6 +3764,48 @@ notes = [
   "TRAIT-1307 is BlockedSpec by GAP-TRAIT-COHERENCE-001 and RFC-0005's explicit deferral of current bytecode/runtime changes.",
   "The current Seed checker rejects Trait-bearing programs, and DEC-0027 does not expose callable method definitions; implementing runtime behavior would invent semantics.",
   "The authority audit preserves the next-file ordering without changing compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "TRAIT-1308"
+title = "Trait IDE support"
+state = "BlockedSpec"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1307"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/TRAIT-1308-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The missing Trait Semantic Graph projection, stable method identity, bilingual diagnostic registry, and LSP/Semantic Transaction contracts are recorded with direct normative references.",
+  "The audit covers hover, go-to implementation/trait, completion, identity-preserving rename, safe constraint repairs, position/version/transaction behavior, and required deterministic editor fixtures.",
+  "No IDE adapter, public protocol field, diagnostic allocation, placeholder repair, unstable Semantic ID, or Trait claim is added while the authorities and fixtures are absent.",
+  "The next implementation remains downstream of the approved immutable witness and must project identity without re-running Trait selection.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "TRAIT-1308 is BlockedSpec by GAP-TRAIT-COHERENCE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; RFC-0005 §5.3 forbids an unverified Trait LSP entry point.",
+  "DEC-0027 leaves the witness crate-private and does not define the Semantic Graph, method-slot, diagnostics, or editor projection required by this task.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
