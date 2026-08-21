@@ -288,6 +288,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0023"
+title = "Author Source formatter preservation boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0023-author-source-formatter-preservation.md"
+covers = ["Author Source preservation", "formatter idempotence", "comment and Unicode spelling retention", "incomplete-source safety", "Audit separation"]
+depends_on = ["DEC-0002", "DEC-0006", "DEC-0015", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0002"
 title = "Local package identity and project protocol"
 kind = "RFC"

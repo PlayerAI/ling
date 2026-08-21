@@ -99,6 +99,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0023"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0023-author-source-formatter-preservation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Exercise valid source, CRLF, BOM, Unicode, comments, documentation, blank lines, delimiters, parentheses, mutable places, and four-space layout while comparing existing checked equivalence contracts.",
+  "Verify idempotence, comment attachment, optional comma preservation, LF output, exact scalar spelling, and deterministic independent-process output.",
+  "Treat invalid UTF-8, tabs, inconsistent dedents, unterminated text/comments, and incomplete blocks as bounded diagnostics with unchanged bytes or complete-span-only edits.",
+  "Compare canonical Audit Source before and after formatting and keep Author Source and Audit Source byte domains separate.",
+]
+compatibility_impact = [
+  "Adds Accepted internal formatter authority only; current compiler, Audit Source, diagnostics, schemas, Semantic IDs, CLI/LSP behavior, ABI, and Unicode 17.0.0 are unchanged.",
+  "Future opt-in formatting may rewrite whitespace and LF boundaries within the preservation rules; no migration, format-on-save, range protocol, or public JSON contract is introduced.",
+]
+unresolved_alternatives = [
+  "Trailing-comma style, aggressive parenthesis removal, localized keyword views, recovery heuristics, range formatting, and editor transactions require separate decisions or RFC authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0002"
 kind = "RFC"
 status = "Accepted"
