@@ -3009,5 +3009,62 @@ integration_state = "committed"
 completed = "2026-08-21"
 notes = [
   "The equivalence harness is intentionally test-only and compares existing type/effect, semantic, formatter, and interpreter contracts; it does not add a scheduler or persistence layer.",
-  "INC-1408 deterministic parallel scheduling is the next execution-plan item, but it remains blocked by the open incremental-cache gap and missing accepted design authority.",
+  "INC-1408 deterministic parallel scheduling is complete under Accepted DEC-0021; INC-1409 remains deferred until a persistent-cache and corruption-recovery decision is accepted.",
+]
+
+[[task]]
+id = "INC-1408"
+title = "Deterministic parallel scheduling"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1407"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/governance/gap-register.toml",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+]
+artifacts = [
+  "Cargo.toml",
+  "Cargo.lock",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/gap-register.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1408-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+]
+acceptance = [
+  "Accepted DEC-0021 authorizes bounded internal parallel execution only for independent pure query jobs over immutable snapshots; no language or public protocol behavior changes.",
+  "CompilerDb::parse_all schedules source parse misses in bounded worker scopes, joins before publication, and publishes cache entries and QueryEvent traces in canonical logical-name order.",
+  "Five deterministic scheduling seeds produce equal parsed structures and traces for a multi-file corpus containing Unicode names and malformed syntax; cache hits do not spawn workers and malformed UTF-8 remains bounded at the source boundary.",
+  "The INC-1407 clean/incremental equivalence evidence remains valid with the parallel source-query path; dependent workspace queries, persistence, and corruption recovery are explicitly deferred.",
+  "No source syntax, diagnostics, schemas, Semantic IDs, CLI/LSP fields, public protocol, persistence artifact, or Unicode table changes.",
+  "cargo fmt --all -- --check, cargo clippy -p ling-db --all-targets --locked --offline -- -D warnings, cargo test -p ling-db --all-targets --locked --offline, cargo test --workspace --all-targets --locked --offline, cargo xtask governance check-all, cargo xtask status verify, cargo xtask traceability verify --release v0.0.1, cargo xtask support verify, and git diff --check: passed.",
+]
+verified_against_commit = "4053acb49de1ffaa270d3520434aa8bc00858d6e"
+completion_commit = "4053acb49de1ffaa270d3520434aa8bc00858d6e"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The scheduler is private internal infrastructure; canonical publication prevents worker timing, host parallelism, and map order from entering observable query results or traces.",
+  "INC-1409 persistent cache and corruption recovery is the next target and requires a separate accepted protocol before implementation.",
 ]

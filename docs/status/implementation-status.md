@@ -47,6 +47,7 @@
 | `INC-1405` | Type and effect queries | `G1` | `M` | `Done` | `INC-1404` | `f9f2512d653f95955e7861953a8e12c3d38e31cc` |
 | `INC-1406` | Semantic queries | `G1` | `M` | `Done` | `INC-1405` | `4a3cbbd8e91da023e9bf9c56e606e23cbbcb7a83` |
 | `INC-1407` | Clean/incremental equivalence | `G1` | `M` | `Done` | `INC-1406` | `e79c0a51fa9fe17457e885b327cbe205e8b43778` |
+| `INC-1408` | Deterministic parallel scheduling | `G1` | `M` | `Done` | `INC-1407` | `4053acb49de1ffaa270d3520434aa8bc00858d6e` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |
 | `PRJ-1102` | Deterministic module discovery | `G1` | `M` | `Done` | `PRJ-1101` | `f76f4953070b9ae555fce24c7dcc2fbf08a36f7a` |
 | `PRJ-1103` | Package-aware imports and visibility | `G1` | `M` | `Done` | `PRJ-1102`, `PRJ-1104` | `8e98d32f54301dee3f198273cfae3146bbf2846b` |
