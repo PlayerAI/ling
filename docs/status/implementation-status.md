@@ -56,6 +56,7 @@
 | `CPU-4201` | Scalar Reference Backend | `G4` | `L` | `BlockedSpec` | `KCHK-4105` | `` |
 | `CPU-4202` | Reference Trace | `G4` | `M` | `BlockedSpec` | `CPU-4201` | `` |
 | `CPU-4203` | Kernel Corpus | `G4` | `M` | `BlockedSpec` | `CPU-4202` | `` |
+| `CTR-5401` | Contract Syntax and AST/Core | `G5` | `M` | `BlockedSpec` | `NODE-5307` | `` |
 | `DAP-3601` | Debugger stdio adapter | `G3+` | `L` | `BlockedSpec` | `DIFF-3702` | `` |
 | `DAP-3602` | Zed debugger registration | `G3+` | `M` | `BlockedSpec` | `DAP-3601` | `` |
 | `DAP-3603` | Staged debugger capabilities | `G3+` | `L` | `BlockedSpec` | `DAP-3602` | `` |

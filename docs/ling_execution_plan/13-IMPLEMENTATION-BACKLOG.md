@@ -304,7 +304,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `NODE-5305` | G5 | Native Node Runtime | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:266`, `docs/status/NODE-5305-AUTHORITY-AUDIT.md` |
 | `NODE-5306` | G5 | Node/Actor 边界 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:277`, `docs/status/NODE-5306-AUTHORITY-AUDIT.md` |
 | `NODE-5307` | G5 | Node conformance | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:288`, `docs/status/NODE-5307-AUTHORITY-AUDIT.md` |
-| `CTR-5401` | G5 | Contract 语法与 AST/Core | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:304` |
+| `CTR-5401` | G5 | Contract 语法与 AST/Core | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:304`, `docs/status/CTR-5401-AUTHORITY-AUDIT.md` |
 | `CTR-5402` | G5 | Contract 状态模型 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:320` |
 | `CTR-5403` | G5 | Runtime Contract Check | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:335` |
 | `CTR-5404` | G5 | Verification Condition Generation | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:347` |
