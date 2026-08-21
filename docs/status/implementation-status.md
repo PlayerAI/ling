@@ -39,6 +39,7 @@
 | `EFF-2101` | Effect core model freeze | `G2` | `M` | `BlockedSpec` | — | `` |
 | `EFF-2102` | Effect inference and constraint solving | `G2` | `L` | `BlockedSpec` | `EFF-2101` | `` |
 | `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `BlockedSpec` | `EFF-2101`, `EFF-2102` | `` |
+| `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `BlockedSpec` | `EFF-2103` | `` |
 | `FMT-1501` | Author Source formatter preservation decision | `G1` | `M` | `Done` | `INC-1410` | `fa2560fc09772ed98f8af97a71164ee1f465495f` |
 | `FMT-1502` | Compiler-CST Format IR | `G1` | `M` | `Done` | `FMT-1501` | `4d006e0c410c1c59f5717df43b8fac843ed960ec` |
 | `FMT-1503` | Core syntax formatting | `G1` | `M` | `Done` | `FMT-1502` | `05fe7fb9827b5e33afd094e99a0908c69d0af972` |

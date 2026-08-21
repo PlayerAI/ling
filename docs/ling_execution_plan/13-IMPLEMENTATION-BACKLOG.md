@@ -198,7 +198,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EFF-2101` | G2 | Effect 核心模型冻结 | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:81`, `docs/status/EFF-2101-AUTHORITY-AUDIT.md` |
 | `EFF-2102` | G2 | Effect 推导和约束求解 | L | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:105`, `docs/status/EFF-2102-AUTHORITY-AUDIT.md` |
 | `EFF-2103` | G2 | Handler Typed Core 表示 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:115`, `docs/status/EFF-2103-AUTHORITY-AUDIT.md` |
-| `EFF-2104` | G2 | 解释器与 VM Handler 执行 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:131` |
+| `EFF-2104` | G2 | 解释器与 VM Handler 执行 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:131`, `docs/status/EFF-2104-AUTHORITY-AUDIT.md` |
 | `EFF-2105` | G2 | Effect fuzz/property tests | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:143` |
 | `TASK-2201` | G2 | Task 语法与 Checked Core | M | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:158` |
 | `TASK-2202` | G2 | Task 状态机 Lowering | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:182` |
