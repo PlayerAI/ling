@@ -271,7 +271,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `SIMD-4302` | G4 | Portable SIMD IR | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:198`, `docs/status/SIMD-4302-AUTHORITY-AUDIT.md` |
 | `SIMD-4303` | G4 | SIMD Differential | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:210`, `docs/status/SIMD-4303-AUTHORITY-AUDIT.md` |
 | `DBUF-4401` | G4 | Device 类型与 Capability | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:223`, `docs/status/DBUF-4401-AUTHORITY-AUDIT.md` |
-| `DBUF-4402` | G4 | Buffer Ownership | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:240` |
+| `DBUF-4402` | G4 | Buffer Ownership | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:240`, `docs/status/DBUF-4402-AUTHORITY-AUDIT.md` |
 | `DBUF-4403` | G4 | Transfer Effect | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:252` |
 | `DBUF-4404` | G4 | 同步模型 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:272` |
 | `DIR-4501` | G4 | Device IR Schema | L | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:287` |
