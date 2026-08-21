@@ -80,6 +80,7 @@
 | `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `BlockedSpec` | `EFF-2101`, `EFF-2102` | `` |
 | `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `BlockedSpec` | `EFF-2103` | `` |
 | `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `BlockedSpec` | `EFF-2104` | `` |
+| `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |
 | `FFI-3601` | FFI declaration model | `G3` | `M` | `BlockedSpec` | `BACK-3505` | `` |
 | `FFI-3602` | Minimal C ABI interoperability | `G3` | `M` | `BlockedSpec` | `FFI-3601` | `` |
 | `FFI-3603` | FFI shim generator | `G3` | `M` | `BlockedSpec` | `FFI-3602` | `` |
