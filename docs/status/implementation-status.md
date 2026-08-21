@@ -231,6 +231,7 @@
 | `STAB-6103` | Feature State Metadata | `G6` | `L` | `BlockedSpec` | `STAB-6102` | `` |
 | `STD-6301` | Stable Standard Library Audit | `G6` | `L` | `BlockedSpec` | `PROTO-6204` | `` |
 | `STD-6302` | Remove Convenience APIs | `G6` | `L` | `BlockedSpec` | `STD-6301` | `` |
+| `STD-6303` | Unicode and Chinese-Programming Stability | `G6` | `L` | `BlockedSpec` | `STD-6302` | `` |
 | `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
