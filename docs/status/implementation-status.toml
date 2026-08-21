@@ -2860,7 +2860,7 @@ completed = "2026-08-21"
 notes = [
   "INC-1404 builds on the INC-1402 VFS and INC-1403 parse/AST query boundary; no placeholder public query crate or third-party query engine was created.",
   "The module graph key tracks canonical module headers and workspace revisions while omitting private source body revisions; resolve keys retain the requested module source key and imported export surfaces.",
-  "INC-1405 type/effect queries is complete; INC-1406 semantic queries is the next executable target. Persistent cache, parallel scheduling, and compiler-facing cancellation remain governed by the open incremental-cache gap.",
+  "INC-1405 type/effect queries and INC-1406 semantic queries are complete. Persistent cache, parallel scheduling, and compiler-facing cancellation remain governed by the open incremental-cache gap.",
 ]
 
 [[task]]
@@ -2909,7 +2909,7 @@ completed = "2026-08-21"
 notes = [
   "The query result is a module-local projection; it does not expose stale unrelated modules from the workspace checker and does not create a public checked-snapshot protocol.",
   "Interface keys use explicit declaration shapes and conservative source-revision retention for inferred public definitions or effect-bearing bodies; this keeps private annotated pure-body reuse safe without inventing type semantics.",
-  "INC-1406 semantic queries is complete; INC-1407 full clean/incremental equivalence is the next executable target. Persistent cache, parallel scheduling, and compiler-facing cancellation remain open gap work.",
+  "INC-1406 semantic queries and INC-1407 clean/incremental equivalence are complete. Persistent cache, parallel scheduling, and compiler-facing cancellation remain open gap work.",
 ]
 
 [[task]]
@@ -2957,5 +2957,57 @@ completed = "2026-08-21"
 notes = [
   "ProgramSnapshot remains the full canonical writer result; SemanticModuleFragment is a deliberately narrower identity projection and does not claim a new wire schema.",
   "Imported body edits can change the workspace program ID while leaving an unaffected module fragment Arc-reusable; comment/presentation edits follow the existing semantic identity contract and may still alter node-fragment identity when structure changes.",
-  "INC-1407 full clean/incremental equivalence is the next target; deterministic parallel scheduling and persistent/cancellation decisions remain deferred under the incremental-cache gap.",
+  "INC-1407 clean/incremental equivalence is complete; deterministic parallel scheduling and persistent/cancellation decisions remain deferred under the incremental-cache gap.",
+]
+
+[[task]]
+id = "INC-1407"
+title = "Clean/incremental equivalence"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1406"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-types/Cargo.toml",
+  "crates/ling-effects/Cargo.toml",
+  "crates/ling-semantic/Cargo.toml",
+  "crates/ling-format/Cargo.toml",
+  "crates/ling-eval/Cargo.toml",
+]
+artifacts = [
+  "Cargo.toml",
+  "Cargo.lock",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1406-IMPLEMENTATION-REPORT.md",
+  "docs/status/INC-1407-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "A test-only clean rebuild can load the same canonical VFS snapshots and workspace inputs as an incrementally edited CompilerDb without reading physical paths or ambient state.",
+  "The deterministic edit sequence covers a body edit, CRLF/comment presentation edit, and a later body edit; every step compares module type/effect projections, canonical semantic JSON, audit formatter output, interpreter result, runtime diagnostic JSON, and console output.",
+  "Invalid effect programs produce equal structured QueryError values in clean and incremental databases, preserving registered diagnostics and original UTF-8 source spans.",
+  "Comparisons use observable checked/public outputs rather than SourceId, allocation identity, hash-map order, or debug output; no new public protocol or cache schema is implied.",
+  "Only existing repository-owned crates are used as ling-db test dependencies; no language semantics, diagnostics, schemas, Semantic IDs, CLI/LSP fields, or Unicode tables change.",
+  "cargo fmt --all -- --check, cargo clippy -p ling-db --all-targets --locked --offline -- -D warnings, cargo test -p ling-db --all-targets --locked --offline, cargo test --workspace --all-targets --locked --offline, cargo xtask governance check-all, cargo xtask status verify, cargo xtask traceability verify --release v0.0.1, cargo xtask support verify, and git diff --check: passed.",
+]
+verified_against_commit = "e79c0a51fa9fe17457e885b327cbe205e8b43778"
+completion_commit = "e79c0a51fa9fe17457e885b327cbe205e8b43778"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The equivalence harness is intentionally test-only and compares existing type/effect, semantic, formatter, and interpreter contracts; it does not add a scheduler or persistence layer.",
+  "INC-1408 deterministic parallel scheduling is the next execution-plan item, but it remains blocked by the open incremental-cache gap and missing accepted design authority.",
 ]
