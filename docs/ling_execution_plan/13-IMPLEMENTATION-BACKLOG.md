@@ -140,7 +140,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2104` | G1/Editor | 增量文本变更 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:170`, `docs/status/LSP-2104-AUTHORITY-AUDIT.md` |
 | `LSP-2105` | G1/Editor | Workspace reload | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:182`, `docs/status/LSP-2105-AUTHORITY-AUDIT.md` |
 | `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:188`, `docs/status/LSP-2201-AUTHORITY-AUDIT.md` |
-| `LSP-2202` | G1/Editor | Push diagnostics v0 | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:204` |
+| `LSP-2202` | G1/Editor | Push diagnostics v0 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:204`, `docs/status/LSP-2202-AUTHORITY-AUDIT.md` |
 | `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:215` |
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:219` |
 | `LSP-2205` | G1/Editor | Diagnostic fixtures | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:227` |
