@@ -236,7 +236,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `OWN-3204` | G3 | 跨 `await` / Actor Turn 的 Borrow | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:186`, `docs/status/OWN-3204-AUTHORITY-AUDIT.md` |
 | `OWN-3205` | G3 | Drop 顺序 Lowering | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:196`, `docs/status/OWN-3205-AUTHORITY-AUDIT.md` |
 | `OWN-3206` | G3 | Ownership 诊断与修复 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:209`, `docs/status/OWN-3206-AUTHORITY-AUDIT.md` |
-| `OWN-3207` | G3 | 负向 corpus 与 property tests | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:224` |
+| `OWN-3207` | G3 | 负向 corpus 与 property tests | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:224`, `docs/status/OWN-3207-AUTHORITY-AUDIT.md` |
 | `GC-3301` | G3 | 最小对象模型 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:241` |
 | `GC-3302` | G3 | 第一版 Collector | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:256` |
 | `GC-3303` | G3 | Managed 与 Native/FFI 边界 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:271` |
