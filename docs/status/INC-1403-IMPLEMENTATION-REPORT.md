@@ -58,9 +58,10 @@ filesystem, persistent cache, or public query protocol is involved.
 
 - No language syntax or semantics, diagnostic allocation, schema, Semantic ID,
   canonical bytes, CLI/LSP field, or public protocol changed.
-- Resolve/module queries, type/effect queries, checked snapshots, persistent
-  cache serialization/migration, cycle diagnostics, parallel scheduling,
-  compiler cancellation, and LSP adapters remain later targets.
+- Type/effect queries, checked snapshots, persistent cache serialization/migration,
+  cycle diagnostics, parallel scheduling, compiler cancellation, and LSP adapters
+  remain later targets. INC-1404 resolve/module queries is now complete; INC-1405
+  type/effect queries is the next target.
 
 ## Validation
 

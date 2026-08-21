@@ -11,6 +11,8 @@ use std::fmt;
 use std::sync::Arc;
 
 use ling_ast::{LowerError, Program, lower};
+use ling_hir::{self, LowerError as HirLowerError};
+use ling_resolve::{ResolveError, ResolvedModule, resolve};
 use ling_source::{
     ChangeEvent, FileOrigin, FileSnapshot, InputChange, LexicalOffset, Revision, SourceError,
     SourceId, VfsError, VirtualFileSystem, WorkspaceInput,
@@ -29,6 +31,9 @@ pub enum QueryKind {
     Tokens,
     Parse,
     Ast,
+    Hir,
+    ModuleGraph,
+    Resolve,
 }
 
 /// Whether a query result was reused or computed during the current request.
@@ -128,12 +133,109 @@ impl LineIndex {
     }
 }
 
+/// A canonical source/module node used by the resolve query boundary.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ModuleNode {
+    file: SourceId,
+    name: String,
+    imports: Box<[String]>,
+    exports: Box<[String]>,
+}
+
+impl ModuleNode {
+    #[must_use]
+    pub const fn file(&self) -> SourceId {
+        self.file
+    }
+
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    #[must_use]
+    pub fn imports(&self) -> &[String] {
+        &self.imports
+    }
+
+    #[must_use]
+    pub fn exports(&self) -> &[String] {
+        &self.exports
+    }
+}
+
+/// A canonical directed module import edge.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ModuleEdge {
+    from: String,
+    to: String,
+}
+
+impl ModuleEdge {
+    #[must_use]
+    pub fn from(&self) -> &str {
+        &self.from
+    }
+
+    #[must_use]
+    pub fn to(&self) -> &str {
+        &self.to
+    }
+}
+
+/// An immutable module graph derived from the current VFS/HIR snapshots.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ModuleGraph {
+    nodes: Box<[ModuleNode]>,
+    edges: Box<[ModuleEdge]>,
+}
+
+impl ModuleGraph {
+    #[must_use]
+    pub fn nodes(&self) -> &[ModuleNode] {
+        &self.nodes
+    }
+
+    #[must_use]
+    pub fn edges(&self) -> &[ModuleEdge] {
+        &self.edges
+    }
+
+    #[must_use]
+    pub fn node(&self, file: SourceId) -> Option<&ModuleNode> {
+        self.nodes.iter().find(|node| node.file == file)
+    }
+
+    #[must_use]
+    pub fn node_by_name(&self, name: &str) -> Option<&ModuleNode> {
+        self.nodes.iter().find(|node| node.name == name)
+    }
+}
+
 /// Errors raised while materializing a query result.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum QueryError {
-    UnknownFile { file: SourceId },
-    InvalidSource { file: SourceId, error: SourceError },
-    AstLowering { file: SourceId, error: LowerError },
+    UnknownFile {
+        file: SourceId,
+    },
+    InvalidSource {
+        file: SourceId,
+        error: SourceError,
+    },
+    AstLowering {
+        file: SourceId,
+        error: LowerError,
+    },
+    HirLowering {
+        file: SourceId,
+        error: HirLowerError,
+    },
+    ResolvedModuleMissing {
+        file: SourceId,
+    },
+    Resolution {
+        errors: Box<[ResolveError]>,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -148,6 +250,27 @@ impl fmt::Display for QueryError {
                     formatter,
                     "source file {} cannot lower to AST: {error}",
                     file.get()
+                )
+            }
+            Self::HirLowering { file, error } => {
+                write!(
+                    formatter,
+                    "source file {} cannot lower to HIR: {error}",
+                    file.get()
+                )
+            }
+            Self::ResolvedModuleMissing { file } => {
+                write!(
+                    formatter,
+                    "resolved module for source file {} is missing",
+                    file.get()
+                )
+            }
+            Self::Resolution { errors } => {
+                write!(
+                    formatter,
+                    "module resolution produced {} error(s)",
+                    errors.len()
                 )
             }
         }
@@ -192,6 +315,41 @@ impl QueryKey {
     }
 }
 
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct ModuleHeaderKey {
+    file: SourceId,
+    logical_name: String,
+    name: String,
+    imports: Box<[String]>,
+    exports: Box<[String]>,
+    workspace_revisions: [Option<Revision>; 4],
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct ModuleTopologyKey {
+    name: String,
+    imports: Box<[String]>,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct ModuleGraphKey {
+    headers: Box<[ModuleHeaderKey]>,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct SurfaceKey {
+    name: String,
+    exports: Box<[String]>,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct ModuleResolveKey {
+    topology: Box<[ModuleTopologyKey]>,
+    file: SourceId,
+    source: QueryKey,
+    imported_surfaces: Box<[SurfaceKey]>,
+}
+
 /// Internal, deterministic compiler query database.
 #[derive(Debug, Default)]
 pub struct CompilerDb {
@@ -202,6 +360,9 @@ pub struct CompilerDb {
     tokens: BTreeMap<QueryKey, Arc<LexedSource>>,
     parses: BTreeMap<QueryKey, Arc<ParsedSource>>,
     asts: BTreeMap<QueryKey, Result<Arc<Program>, LowerError>>,
+    hirs: BTreeMap<QueryKey, Result<Arc<ling_hir::Program>, HirLowerError>>,
+    module_graphs: BTreeMap<ModuleGraphKey, Arc<ModuleGraph>>,
+    resolved_modules: BTreeMap<ModuleResolveKey, Result<Arc<ResolvedModule>, Box<[ResolveError]>>>,
     trace: Vec<QueryEvent>,
 }
 
@@ -217,6 +378,9 @@ impl CompilerDb {
             tokens: BTreeMap::new(),
             parses: BTreeMap::new(),
             asts: BTreeMap::new(),
+            hirs: BTreeMap::new(),
+            module_graphs: BTreeMap::new(),
+            resolved_modules: BTreeMap::new(),
             trace: Vec::new(),
         }
     }
@@ -324,6 +488,102 @@ impl CompilerDb {
         result.map_err(|error| QueryError::AstLowering { file, error })
     }
 
+    /// Returns unresolved HIR lowered from the valid AST query.
+    pub fn hir(&mut self, file: SourceId) -> Result<Arc<ling_hir::Program>, QueryError> {
+        let (key, snapshot, _) = self.source(file)?;
+        if let Some(cached) = self.hirs.get(&key).cloned() {
+            self.record(QueryKind::Hir, &snapshot, QueryOutcome::Hit);
+            return cached.map_err(|error| QueryError::HirLowering { file, error });
+        }
+        let ast = self.ast(file)?;
+        let result = ling_hir::lower(snapshot.logical_name().to_owned(), &ast).map(Arc::new);
+        self.hirs.insert(key, result.clone());
+        self.record(QueryKind::Hir, &snapshot, QueryOutcome::Miss);
+        result.map_err(|error| QueryError::HirLowering { file, error })
+    }
+
+    /// Returns the canonical module graph derived from the current HIR set.
+    pub fn module_graph(&mut self) -> Result<Arc<ModuleGraph>, QueryError> {
+        let (_, graph) = self.module_graph_query()?;
+        Ok(graph)
+    }
+
+    /// Resolves one module body against the current module set and import
+    /// surfaces. Private body edits only change that module's resolve key;
+    /// imported surface changes invalidate its dependents.
+    pub fn resolve_module(&mut self, file: SourceId) -> Result<Arc<ResolvedModule>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let snapshot = self.source_bytes(file)?;
+        let source_key = QueryKey::new(&self.vfs, &snapshot);
+        let topology = graph_key
+            .headers
+            .iter()
+            .map(|header| ModuleTopologyKey {
+                name: header.name.clone(),
+                imports: header.imports.clone(),
+            })
+            .collect::<Vec<_>>();
+        let mut imported_surfaces = node
+            .imports
+            .iter()
+            .map(|name| {
+                graph.node_by_name(name).map_or_else(
+                    || SurfaceKey {
+                        name: name.clone(),
+                        exports: Box::new([]),
+                    },
+                    |target| SurfaceKey {
+                        name: target.name.clone(),
+                        exports: target.exports.clone(),
+                    },
+                )
+            })
+            .collect::<Vec<_>>();
+        imported_surfaces.sort();
+        imported_surfaces.dedup();
+        let key = ModuleResolveKey {
+            topology: topology.into_boxed_slice(),
+            file,
+            source: source_key,
+            imported_surfaces: imported_surfaces.into_boxed_slice(),
+        };
+        if let Some(cached) = self.resolved_modules.get(&key).cloned() {
+            return cached.map_err(|errors| QueryError::Resolution { errors });
+        }
+
+        let files = graph
+            .nodes()
+            .iter()
+            .map(ModuleNode::file)
+            .collect::<Vec<_>>();
+        let mut programs = Vec::with_capacity(files.len());
+        for module_file in files {
+            programs.push((*self.hir(module_file)?).clone());
+        }
+        let result = match resolve(programs, &node.name) {
+            Ok(program) => program
+                .modules()
+                .iter()
+                .find(|module| module.hir.module.name.normalized() == node.name)
+                .cloned()
+                .map(Arc::new)
+                .ok_or(QueryError::ResolvedModuleMissing { file }),
+            Err(errors) => {
+                let errors = errors.into_boxed_slice();
+                self.resolved_modules.insert(key, Err(errors.clone()));
+                return Err(QueryError::Resolution { errors });
+            }
+        };
+        if let Ok(module) = &result {
+            self.resolved_modules.insert(key, Ok(module.clone()));
+        }
+        result
+    }
+
     /// Parses all visible files in canonical logical-name order.
     pub fn parse_all(&mut self) -> Result<Vec<(SourceId, Arc<ParsedSource>)>, QueryError> {
         let files = self
@@ -346,6 +606,89 @@ impl CompilerDb {
 
     pub fn clear_trace(&mut self) {
         self.trace.clear();
+    }
+
+    fn module_graph_query(&mut self) -> Result<(ModuleGraphKey, Arc<ModuleGraph>), QueryError> {
+        let snapshots = self.vfs.snapshots();
+        let mut headers = Vec::with_capacity(snapshots.len());
+        let mut nodes = Vec::with_capacity(snapshots.len());
+        for snapshot in snapshots {
+            let file = snapshot.id();
+            let hir = self.hir(file)?;
+            let name = hir.module.name.normalized();
+            let mut imports = hir
+                .imports
+                .iter()
+                .map(|import| import.module.normalized())
+                .collect::<Vec<_>>();
+            imports.sort();
+            imports.dedup();
+            let mut exports = hir
+                .definitions
+                .iter()
+                .map(|definition| definition.name.normalized.clone())
+                .chain(
+                    hir.types
+                        .iter()
+                        .map(|declaration| declaration.name.normalized.clone()),
+                )
+                .collect::<Vec<_>>();
+            exports.sort();
+            exports.dedup();
+            let query_key = QueryKey::new(&self.vfs, &snapshot);
+            headers.push(ModuleHeaderKey {
+                file,
+                logical_name: snapshot.logical_name().to_owned(),
+                name: name.clone(),
+                imports: imports.clone().into_boxed_slice(),
+                exports: exports.clone().into_boxed_slice(),
+                workspace_revisions: query_key.workspace_revisions,
+            });
+            nodes.push(ModuleNode {
+                file,
+                name,
+                imports: imports.into_boxed_slice(),
+                exports: exports.into_boxed_slice(),
+            });
+        }
+        headers.sort_by(|left, right| {
+            left.name
+                .cmp(&right.name)
+                .then_with(|| left.logical_name.cmp(&right.logical_name))
+                .then_with(|| left.file.cmp(&right.file))
+        });
+        nodes.sort_by(|left, right| {
+            left.name
+                .cmp(&right.name)
+                .then_with(|| left.file.cmp(&right.file))
+        });
+        let mut edges = nodes
+            .iter()
+            .flat_map(|node| {
+                node.imports.iter().map(|import| ModuleEdge {
+                    from: node.name.clone(),
+                    to: import.clone(),
+                })
+            })
+            .collect::<Vec<_>>();
+        edges.sort_by(|left, right| {
+            left.from
+                .cmp(&right.from)
+                .then_with(|| left.to.cmp(&right.to))
+        });
+        edges.dedup();
+        let key = ModuleGraphKey {
+            headers: headers.into_boxed_slice(),
+        };
+        if let Some(cached) = self.module_graphs.get(&key).cloned() {
+            return Ok((key, cached));
+        }
+        let graph = Arc::new(ModuleGraph {
+            nodes: nodes.into_boxed_slice(),
+            edges: edges.into_boxed_slice(),
+        });
+        self.module_graphs.insert(key.clone(), graph.clone());
+        Ok((key, graph))
     }
 
     fn source(
@@ -555,5 +898,83 @@ mod tests {
             parsed.into_iter().map(|(id, _)| id).collect::<Vec<_>>(),
             [a, z]
         );
+    }
+
+    #[test]
+    fn module_graph_is_canonical_and_retains_exports_and_edges() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "src/Main.ling",
+                b"module Main\n\nimport Lib\n\nlet main = Lib.answer\n".to_vec(),
+            )
+            .unwrap(),
+        );
+        let lib = file(
+            db.set_disk_snapshot("src/Lib.ling", b"module Lib\n\nlet answer = 42\n".to_vec())
+                .unwrap(),
+        );
+        let graph = db.module_graph().unwrap();
+        assert_eq!(
+            graph
+                .nodes()
+                .iter()
+                .map(|node| node.name())
+                .collect::<Vec<_>>(),
+            ["Lib", "Main"]
+        );
+        assert_eq!(
+            graph
+                .node(main)
+                .unwrap()
+                .imports()
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<_>>(),
+            ["Lib"]
+        );
+        assert_eq!(
+            graph
+                .node(lib)
+                .unwrap()
+                .exports()
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<_>>(),
+            ["answer"]
+        );
+        assert_eq!(graph.edges()[0].from(), "Main");
+        assert_eq!(graph.edges()[0].to(), "Lib");
+        assert!(Arc::ptr_eq(&graph, &db.module_graph().unwrap()));
+    }
+
+    #[test]
+    fn resolve_queries_reuse_private_bodies_and_invalidate_dependents_on_exports() {
+        let mut db = CompilerDb::new();
+        let main = file(
+            db.set_disk_snapshot(
+                "src/Main.ling",
+                b"module Main\n\nimport Lib\n\nlet main = Lib.answer\n".to_vec(),
+            )
+            .unwrap(),
+        );
+        let lib = file(
+            db.set_disk_snapshot("src/Lib.ling", b"module Lib\n\nlet answer = 42\n".to_vec())
+                .unwrap(),
+        );
+
+        let first_main = db.resolve_module(main).unwrap();
+        let first_lib = db.resolve_module(lib).unwrap();
+        db.set_disk_snapshot("src/Lib.ling", b"module Lib\n\nlet answer = 7\n".to_vec())
+            .unwrap();
+        assert!(Arc::ptr_eq(&first_main, &db.resolve_module(main).unwrap()));
+        assert!(!Arc::ptr_eq(&first_lib, &db.resolve_module(lib).unwrap()));
+
+        db.set_disk_snapshot("src/Lib.ling", b"module Lib\n\nlet other = 7\n".to_vec())
+            .unwrap();
+        assert!(matches!(
+            db.resolve_module(main),
+            Err(QueryError::Resolution { .. })
+        ));
     }
 }

@@ -113,7 +113,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `INC-1401` | G1/Editor | Query boundary ADR | M | Done | DEC-0019；见 `docs/decisions/0019-incremental-query-boundary.md` 与实施报告 |
 | `INC-1402` | G1/Editor | VFS 与 revision | M | Done | DEC-0019；见 `crates/ling-source/src/vfs.rs` 的 immutable snapshot、overlay、workspace revision 与 change-dedup 测试及实施报告 |
 | `INC-1403` | G1/Editor | Parse queries | M | Done | DEC-0019；见 `crates/ling-db/src/lib.rs` 的 source_bytes、line_index、tokens、parse、ast 查询、确定性缓存与 clean/incremental 等价测试及实施报告 |
-| `INC-1404` | G1/Editor | Resolve/module queries | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:347` |
+| `INC-1404` | G1/Editor | Resolve/module queries | M | Done | DEC-0019；见 `crates/ling-db/src/lib.rs` 的 HIR、模块图与 resolve 查询、公共导出失效及私有实现复用测试，以及实施报告 |
 | `INC-1405` | G1/Editor | Type/effect queries | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:356` |
 | `INC-1406` | G1/Editor | Semantic queries | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:360` |
 | `INC-1407` | G1/Editor | Clean ↔ incremental equivalence | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:368` |
