@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 107 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, and EFF-2104 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 108 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, LSP-2401, LSP-2402, LSP-2403, LSP-2404, LSP-2501, LSP-2502, LSP-2503, LSP-2504, EFF-2101, EFF-2102, EFF-2103, EFF-2104, and EFF-2105 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -5261,6 +5261,50 @@ notes = [
   "EFF-2104 is BlockedSpec by EFF-2101/EFF-2102/EFF-2103, GAP-EFFECT-HANDLER-001, GAP-EFFECT-STATE-MASKING-001, absent RFC-0006, and missing handler bytecode/VM authority; RFC-0020 applies only to VM host cancellation.",
   "ling-eval, ling-bytecode, and ling-vm implement checked Seed execution only; no handler stack, continuation ABI, effect instruction, residual-row result, or differential corpus exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "EFF-2105"
+title = "Effect fuzz and property tests"
+state = "BlockedSpec"
+release = "G2"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2104"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/RFC-0020.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/EFF-2105-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing checked-Core generator, Effect Row/residual-row oracle, handler/resume semantics, interpreter/VM equivalence, Fault/cancellation, bounds, canonicalization, diagnostics, and migration contracts.",
+  "The audit distinguishes the current Seed closed-row checker and fixed interpreter/VM event/Unit/Fault differential harness from the missing handler-bearing property-test authority and preserves the checked-only evaluation boundary.",
+  "The audit covers pure/effectful programs, single/nested handlers, propagation, resume cardinality, handler Faults, mutable State, cancellation, missing/unhandled operations, malformed bytecode, resource limits, Unicode/CRLF/BOM spans, deterministic output, reproducible seeds, and shrinking.",
+  "No Core generator, handler/effect oracle, residual-row comparator, fuzz protocol, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
+  "The future implementation must generate only bounded checked Core, compare stable semantic projections, retain minimized corpus evidence, and prove interpreter/VM equivalence before exposing effect property tests as a public compatibility gate.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "EFF-2105 is BlockedSpec by EFF-2101/EFF-2102/EFF-2103/EFF-2104, GAP-EFFECT-HANDLER-001, GAP-EFFECT-STATE-MASKING-001, absent RFC-0006, and missing residual-row/generator/VM equivalence authority.",
+  "The excluded fuzz workspace covers source, lexer/parser, manifests, and bytecode verification; current differential tests compare checked Seed events, Unit results, and Runtime Fault projections but do not expose handler effects or residual rows.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, fuzz protocols, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
