@@ -143,7 +143,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2202` | G1/Editor | Push diagnostics v0 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:204`, `docs/status/LSP-2202-AUTHORITY-AUDIT.md` |
 | `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:215`, `docs/status/LSP-2203-AUTHORITY-AUDIT.md` |
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:219`, `docs/status/LSP-2204-AUTHORITY-AUDIT.md` |
-| `LSP-2205` | G1/Editor | Diagnostic fixtures | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:227` |
+| `LSP-2205` | G1/Editor | Diagnostic fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:227`, `docs/status/LSP-2205-AUTHORITY-AUDIT.md` |
 | `IDE-2301` | G1/Editor | Document symbols | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:244` |
 | `IDE-2302` | G1/Editor | Hover | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:248` |
 | `IDE-2303` | G1/Editor | Go to definition/declaration/type definition | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:262` |
