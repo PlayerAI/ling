@@ -178,6 +178,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0019"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0019.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compare checked-interpreter and verifier-created VM logical Console events and Unit entry results for supported v1.0, v1.1, and v1.2 fixtures.",
+  "Compare stable Runtime Fault category, operation, source name, original UTF-8 byte span, and committed state without exposing implementation details.",
+  "Rebuild checked snapshots and encode/decode/verify bytecode repeatedly while asserting deterministic ProgramId and preserving logical outcomes.",
+]
+compatibility_impact = [
+  "Adds no source syntax, opcode, wire field, format revision, diagnostic code, schema, CLI, ABI/FFI, or Unicode behavior; it adds only Experimental PROTO-BYTECODE evidence.",
+  "The differential harness treats VM internal errors and verification failures as defects rather than user Runtime Faults; no new public Fault is allocated.",
+]
+unresolved_alternatives = [
+  "Decoder/verifier fuzzing, cancellation, and additional resource models remain separately governed by VM-1210.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

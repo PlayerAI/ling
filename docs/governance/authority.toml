@@ -327,6 +327,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0019"
+title = "Seed Interpreter–VM Differential Contract"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0019.md"
+covers = ["interpreter–VM logical event equivalence", "Runtime Fault projection", "checked snapshot identity", "bytecode round-trip differential evidence"]
+depends_on = ["DEC-0012", "RFC-0014", "RFC-0015", "RFC-0016", "RFC-0017", "RFC-0018", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

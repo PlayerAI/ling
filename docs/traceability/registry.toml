@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-20"
+updated = "2026-08-21"
 
 [[release]]
 id = "v0.0.1"
@@ -24,7 +24,7 @@ requirements = [
   { path = "docs/RFC-0001.md", clause = "18.1" },
   { path = "docs/IMPLEMENTATION.md", clause = "10" },
 ]
-authorities = ["RFC-0001", "DEC-0011", "DEC-0013", "DEC-0017"]
+authorities = ["RFC-0001", "DEC-0011", "DEC-0013", "DEC-0017", "RFC-0019"]
 core = [
   { path = "crates/ling-effects/src/lib.rs", symbol = "pub struct CheckedProgram" },
   { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct ProgramSnapshot" },
@@ -34,9 +34,9 @@ implementation = [
   { path = "crates/ling-eval/src/lib.rs", symbol = "pub fn execute_main" },
 ]
 release_artifacts = ["examples/人物.ling", "crates/ling-cli/Cargo.toml"]
-differential_state = "Deferred"
-differential_reason = "RFC-0001 §14.5 defers cross-engine comparison until a second evaluator or VM exists."
-differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+differential_state = "Covered"
+differential_reason = "VM-1209 covers the accepted Interpreter–VM execution slices registered for Seed; unsupported language features are outside this evidence contract."
+differential_tracking = ["docs/RFC-0019.md", "crates/ling-vm/tests/differential.rs"]
 
 [[feature]]
 id = "FTR-SEED-0002"
@@ -60,7 +60,7 @@ implementation = [
 ]
 release_artifacts = ["docs/ERROR-CODES.md", "docs/governance/error-code-lock.toml"]
 differential_state = "Deferred"
-differential_reason = "No second checker or execution engine exists for a semantic differential oracle."
+differential_reason = "Diagnostic-schema parity is not the VM-1209 scope; runtime Fault projections are covered separately, while checker/diagnostic differential remains deferred."
 differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 
 [[feature]]
@@ -86,7 +86,7 @@ implementation = [
 ]
 release_artifacts = ["examples/人物.ling", "crates/ling-unicode/src/generated.rs"]
 differential_state = "Deferred"
-differential_reason = "Unicode conformance is checked against pinned Unicode 17 data; cross-engine language differential awaits a second engine."
+differential_reason = "Unicode conformance remains pinned to Unicode 17.0.0; the VM-1209 corpus does not expand Unicode identifier coverage."
 differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
 
 [[feature]]
@@ -102,7 +102,7 @@ requirements = [
   { path = "docs/SEMANTICS.md", clause = "9" },
   { path = "docs/SEMANTICS.md", clause = "11" },
 ]
-authorities = ["RFC-0001", "SEMANTICS", "DEC-0005", "DEC-0008", "DEC-0009", "DEC-0011", "DEC-0014", "DEC-0017"]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0005", "DEC-0008", "DEC-0009", "DEC-0011", "DEC-0014", "DEC-0017", "RFC-0019"]
 core = [
   { path = "crates/ling-types/src/lib.rs", symbol = "pub struct TypedProgram" },
   { path = "crates/ling-hir/src/lib.rs", symbol = "pub struct Place" },
@@ -112,9 +112,9 @@ implementation = [
   { path = "crates/ling-eval/src/lib.rs", symbol = "fn match_pattern" },
 ]
 release_artifacts = ["examples/adt-match.ling", "examples/pipeline.ling"]
-differential_state = "Deferred"
-differential_reason = "Type and evaluator behavior currently have no independent VM implementation to compare."
-differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+differential_state = "Covered"
+differential_reason = "VM-1209 covers the accepted closure, aggregate, match, and mutable-place slices registered for Seed; unsupported type and pattern forms are outside this evidence contract."
+differential_tracking = ["docs/RFC-0019.md", "crates/ling-vm/tests/differential.rs"]
 
 [[feature]]
 id = "FTR-SEED-0005"
@@ -128,7 +128,7 @@ requirements = [
   { path = "docs/SEMANTICS.md", clause = "15" },
   { path = "docs/SEMANTICS.md", clause = "16" },
 ]
-authorities = ["RFC-0001", "SEMANTICS", "DEC-0010", "DEC-0011", "DEC-0017"]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0010", "DEC-0011", "DEC-0017", "RFC-0019"]
 core = [
   { path = "crates/ling-effects/src/lib.rs", symbol = "pub struct EffectRow" },
   { path = "crates/ling-effects/src/lib.rs", symbol = "pub enum Capability" },
@@ -138,9 +138,9 @@ implementation = [
   { path = "crates/ling-effects/src/lib.rs", symbol = "fn check_capabilities" },
 ]
 release_artifacts = ["examples/人物.ling", "crates/ling-effects/Cargo.toml"]
-differential_state = "Deferred"
-differential_reason = "Only the checked reference interpreter exists; VM-1209 owns future interpreter/VM differential coverage."
-differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+differential_state = "Covered"
+differential_reason = "VM-1209 covers the supported Effect/Capability and Runtime Fault execution slices registered for Seed; broader effect behavior and host/resource models are outside this evidence contract."
+differential_tracking = ["docs/RFC-0019.md", "crates/ling-vm/tests/differential.rs"]
 
 [[feature]]
 id = "FTR-SEED-0006"
@@ -154,7 +154,7 @@ requirements = [
   { path = "docs/SEMANTICS.md", clause = "4.4" },
   { path = "docs/SEMANTICS.md", clause = "24" },
 ]
-authorities = ["RFC-0001", "SEMANTICS", "DEC-0012", "DEC-0015", "DEC-0017"]
+authorities = ["RFC-0001", "SEMANTICS", "DEC-0012", "DEC-0015", "DEC-0017", "RFC-0019"]
 core = [
   { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct SemanticGraph" },
   { path = "crates/ling-semantic/src/lib.rs", symbol = "pub struct BodyId" },
@@ -166,9 +166,9 @@ implementation = [
   { path = "crates/ling-format/src/lib.rs", symbol = "pub fn render_audit" },
 ]
 release_artifacts = ["docs/governance/protocol-inventory.toml", "docs/SEED-RELEASE-REPORT.md"]
-differential_state = "Deferred"
-differential_reason = "Canonical reader round-trips and independent processes are covered, but cross-engine semantic differential requires the planned VM."
-differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+differential_state = "Covered"
+differential_reason = "VM-1209 adds deterministic ProgramId and bytecode round-trip checks for the supported slices registered for Seed; full graph/protocol differential is outside this evidence contract."
+differential_tracking = ["docs/RFC-0019.md", "crates/ling-vm/tests/differential.rs"]
 
 [[feature]]
 id = "FTR-SEED-0007"
@@ -192,8 +192,15 @@ implementation = [
 ]
 release_artifacts = ["Cargo.lock", "docs/DEPENDENCIES.md", ".github/workflows/ci.yml"]
 differential_state = "Deferred"
-differential_reason = "The Seed release has one evaluator; cross-engine equivalence is assigned to VM-1209."
+differential_reason = "VM-1209 exercises the shared checked pipeline for supported VM slices; CLI/session, Unicode, and full release-matrix equivalence remain deferred."
 differential_tracking = ["docs/ling_execution_plan/03-G1-V0.1-LIVING.md"]
+
+[[evidence]]
+id = "EVD-DIFF-VM-1209"
+kind = "Differential"
+path = "crates/ling-vm/tests/differential.rs"
+symbol = "supported_bytecode_slices_match_the_checked_interpreter"
+feature_ids = ["FTR-SEED-0001", "FTR-SEED-0004", "FTR-SEED-0005", "FTR-SEED-0006"]
 
 [[evidence]]
 id = "EVD-POS-BOOLEAN-PRECEDENCE-DIFFERENTIAL"
