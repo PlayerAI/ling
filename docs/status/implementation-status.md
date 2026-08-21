@@ -112,6 +112,7 @@
 | `MEM-3102` | Value layout and Copy/Move | `G3` | `L` | `BlockedSpec` | `MEM-3101` | `` |
 | `MEM-3103` | Resource definition and Drop contract | `G3` | `L` | `BlockedSpec` | `MEM-3102` | `` |
 | `MEM-3104` | Managed types and island boundaries | `G3` | `L` | `BlockedSpec` | `MEM-3103` | `` |
+| `NIR-3401` | Native IR design | `G3` | `L` | `BlockedSpec` | `GC-3304` | `` |
 | `OWN-3201` | Place and Move analysis | `G3` | `L` | `BlockedSpec` | `MEM-3104` | `` |
 | `OWN-3202` | Borrow exclusivity | `G3` | `L` | `BlockedSpec` | `OWN-3201` | `` |
 | `OWN-3203` | Region inference | `G3` | `L` | `BlockedSpec` | `OWN-3202` | `` |
