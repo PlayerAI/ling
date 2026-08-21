@@ -98,7 +98,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `VM-1205` | G1/Editor | 函数、closure、recursion | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:205` |
 | `VM-1206` | G1/Editor | Record、ADT、match | L | Done | RFC-0016；见 `ling-bytecode` v1.2 lowering/verifier/round-trip tests、`ling-vm` aggregate differential tests、`docs/status/VM-1206-IMPLEMENTATION-REPORT.md` |
 | `VM-1207` | G1/Editor | Mutable place 与基础 borrow | L | Done | RFC-0017；见 v1.2 SSA place lowering、CFG join、interpreter/VM differential evidence、机器状态与实施报告 |
-| `VM-1208` | G1/Editor | Effect/Capability/Fault | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:225` |
+| `VM-1208` | G1/Editor | Effect/Capability/Fault | L | Done | RFC-0018；见现有 Effect/Capability 元数据闭包、执行前 capability preflight、稳定 Runtime Fault/source-map 证据及 host panic containment 测试 |
 | `VM-1209` | G1/Editor | Interpreter ↔ VM differential | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:233` |
 | `VM-1210` | G1/Editor | Fuzz 与资源限制 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:246` |
 | `TRAIT-1301` | G1/Editor | Trait RFC 收口 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:260` |

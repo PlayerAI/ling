@@ -314,6 +314,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0018"
+title = "Seed VM Effect, Capability, and Fault boundary"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0018.md"
+covers = ["Effect closure", "Capability preflight", "host failure normalization", "source-mapped Runtime Faults", "host panic containment"]
+depends_on = ["DEC-0010", "RFC-0014", "RFC-0016", "RFC-0017", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

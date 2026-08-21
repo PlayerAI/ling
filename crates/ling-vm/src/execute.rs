@@ -1,3 +1,5 @@
+use std::panic::{AssertUnwindSafe, catch_unwind};
+
 use ling_bytecode::{
     CaptureOperand, CompareOperator, Constant, Effect, Instruction, IntBinaryOperator,
     IntUnaryOperator, IntegerSign, Intrinsic, RegisterIndex, Terminator, UnverifiedProgram,
@@ -8,7 +10,7 @@ use num_bigint::{BigInt, Sign};
 use crate::fault::{
     ExecutionError, InternalExecutionError, RuntimeFault, RuntimeFaultKind, RuntimeResource,
 };
-use crate::host::HostCapabilities;
+use crate::host::{HostCapabilities, HostError, HostErrorCategory};
 use crate::value::{Allocation, BoundValue, Closure, Heap, Value};
 
 /// Explicit execution limits required by RFC-0014.
@@ -381,12 +383,14 @@ impl<'program, 'host_ref, 'capability> Engine<'program, 'host_ref, 'capability> 
                 let text = text
                     .as_text()
                     .ok_or_else(|| internal("verified ConsoleWrite operand is not Text"))?;
-                let result = self
-                    .host
-                    .console
-                    .as_deref_mut()
-                    .ok_or_else(|| internal("preflighted Console.Write capability disappeared"))?
-                    .write_line(text);
+                let console =
+                    self.host.console.as_deref_mut().ok_or_else(|| {
+                        internal("preflighted Console.Write capability disappeared")
+                    })?;
+                let result = match catch_unwind(AssertUnwindSafe(|| console.write_line(text))) {
+                    Ok(result) => result,
+                    Err(_) => Err(HostError::after_commit(HostErrorCategory::Other)),
+                };
                 match result {
                     Ok(()) => {
                         self.committed = true;

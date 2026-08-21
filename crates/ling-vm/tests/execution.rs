@@ -104,6 +104,14 @@ impl ConsoleCapability for RecordingConsole {
     }
 }
 
+struct PanickingConsole;
+
+impl ConsoleCapability for PanickingConsole {
+    fn write_line(&mut self, _text: &str) -> Result<(), HostError> {
+        panic!("injected host adapter panic")
+    }
+}
+
 fn runtime(error: ExecutionError) -> RuntimeFault {
     match error {
         ExecutionError::Runtime(fault) => fault,
@@ -643,4 +651,39 @@ fn host_failure_preserves_category_commit_state_and_bilingual_diagnostic() {
         assert!(json.contains("\"operation\":\"Console.write\""));
         assert!(json.contains(&format!("\"committed\":{committed}")));
     }
+}
+
+#[test]
+fn host_panic_becomes_stable_other_fault_without_escaping_the_vm() {
+    let fixture = fixture("hello.ling", HELLO);
+    let program = verified(&fixture);
+    let entry = program.model().entry().get();
+    let console_ordinal = program.model().functions()[entry as usize].blocks[0]
+        .instructions
+        .iter()
+        .position(|instruction| matches!(instruction, Instruction::ConsoleWrite { .. }))
+        .expect("hello fixture contains a Console.write instruction");
+    let expected = source_map_entry(
+        &program,
+        entry,
+        0,
+        u32::try_from(console_ordinal).expect("ordinal fits u32"),
+    );
+    let mut console = PanickingConsole;
+    let mut host = HostCapabilities::with_console(&mut console);
+
+    let fault = runtime(
+        execute_v1(&program, generous_limits(), &mut host)
+            .expect_err("host panic must become a Runtime Fault"),
+    );
+    assert!(matches!(
+        fault.kind(),
+        RuntimeFaultKind::HostCapability {
+            operation: "Console.write",
+            category: HostErrorCategory::Other,
+        }
+    ));
+    assert!(fault.committed());
+    assert_eq!(fault.span(), expected.span);
+    assert_eq!(fault.to_diagnostic().code(), codes::RUNTIME_FAULT);
 }

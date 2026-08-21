@@ -152,6 +152,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0018"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0018.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-21"
+proposed = "2026-08-21"
+decided = "2026-08-21"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify Effect closure, module Capability metadata, and preflight for direct calls, closures, aggregate values, and mutable-place lowering.",
+  "Exercise all stable host failure categories, committed states, source-map spans, bilingual diagnostics, and missing-capability preflight.",
+  "Invoke an unwinding host adapter panic and require a stable other Runtime Fault without an escaping panic or host payload.",
+  "Re-run deterministic 1.x bytecode round trips without exposing paths, addresses, Rust layout, or instruction-count identity.",
+]
+compatibility_impact = [
+  "Adds no source syntax, Effect, Capability, opcode, wire field, protocol revision, CLI command, schema, Semantic ID, ABI, or Unicode change.",
+  "Extends PROTO-BYTECODE evidence with the existing L-RUNTIME-0001 host-failure boundary; the protocol remains Experimental.",
+]
+unresolved_alternatives = [
+  "Dynamic capability discovery remains rejected; panic=abort and terminating FFI hosts remain outside the VM recovery boundary.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"
