@@ -276,7 +276,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DBUF-4404` | G4 | 同步模型 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:272`, `docs/status/DBUF-4404-AUTHORITY-AUDIT.md` |
 | `DIR-4501` | G4 | Device IR Schema | L | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:287`, `docs/status/DIR-4501-AUTHORITY-AUDIT.md` |
 | `DIR-4502` | G4 | Kernel Core → Device IR | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:305`, `docs/status/DIR-4502-AUTHORITY-AUDIT.md` |
-| `DIR-4503` | G4 | Device IR Canonicalization | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:317` |
+| `DIR-4503` | G4 | Device IR Canonicalization | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:317`, `docs/status/DIR-4503-AUTHORITY-AUDIT.md` |
 | `GPU-4601` | G4 | Backend Spike 与选择 | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:328` |
 | `GPU-4602` | G4 | Backend Adapter | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:351` |
 | `GPU-4603` | G4 | Launch 与 Runtime | — | Blocked by v0.3 + RFC | `08-G4-V0.4-HETEROGENEOUS.md:365` |
