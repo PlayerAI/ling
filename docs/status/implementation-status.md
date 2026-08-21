@@ -97,6 +97,7 @@
 | `GPU-4601` | Backend Spike and Selection | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4602` | Backend Adapter | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4603` | Launch and Runtime | `G4` | `M` | `BlockedSpec` | — | `` |
+| `GPU-4604` | Differential and Hardware Matrix | `G4` | `M` | `BlockedSpec` | — | `` |
 | `IDE-2301` | IDE document symbols | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2302` | IDE hover | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `LSP-2201` | `` |
 | `IDE-2303` | IDE definition navigation | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `IDE-2302`, `LSP-2101`, `LSP-2102` | `` |
