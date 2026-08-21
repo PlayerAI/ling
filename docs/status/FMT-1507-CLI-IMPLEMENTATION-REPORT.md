@@ -41,7 +41,8 @@ behavior.
 
 ## Tests and evidence
 
-Executed locally on 2026-08-22 against the implementation worktree:
+Executed locally on 2026-08-22 against implementation commit
+`13737c71281f12b266423d855d856fb5f77e2096`:
 
 - `cargo check -p ling-cli --locked --offline`;
 - `cargo test -p ling-cli --locked --offline` (29 tests across library,

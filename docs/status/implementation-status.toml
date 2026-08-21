@@ -3498,7 +3498,7 @@ acceptance = [
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "blocked"
-completed = ""
+completed = "2026-08-22"
 notes = [
   "FMT-1507 is blocked by GAP-FORMATTER-AUTHOR-SOURCE-001, GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no public formatter surface is authorized yet.",
   "The lower-authority execution-plan `zero fmt` spelling is stale; current accepted CLI and source names remain `ling` and `.ling`.",
@@ -3508,7 +3508,7 @@ notes = [
 [[task]]
 id = "FMT-1507-CLI"
 title = "Formatter CLI Preview slice"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -3553,10 +3553,10 @@ acceptance = [
   "The existing parser and formatter rejection boundary remains authoritative; invalid input never publishes partial formatted output.",
   "Targeted CLI, schema, governance, formatting, and diff checks pass; LSP, Workspace Edit, format-on-save, and Semantic Transaction behavior remains deferred to FMT-1507.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "13737c71281f12b266423d855d856fb5f77e2096"
+completion_commit = "13737c71281f12b266423d855d856fb5f77e2096"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "This is the dependency-complete CLI subtask of FMT-1507. The parent FMT-1507 remains BlockedSpec for author-source, LSP transaction, and Semantic Transaction decisions.",
   "The formatter protocol is Preview only and is registered in the protocol and schema inventories; no Stable compatibility promise is made.",
