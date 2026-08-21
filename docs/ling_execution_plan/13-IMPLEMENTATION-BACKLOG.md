@@ -254,7 +254,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FFI-3603` | G3 | Shim Generator | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:445`, `docs/status/FFI-3603-AUTHORITY-AUDIT.md` |
 | `FFI-3604` | G3 | Target Primitive Package | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:460`, `docs/status/FFI-3604-AUTHORITY-AUDIT.md` |
 | `FFI-3605` | G3 | FFI fuzz/sanitizer 套件 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:476`, `docs/status/FFI-3605-AUTHORITY-AUDIT.md` |
-| `DIFF-3701` | G3 | 三方 Harness | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:492` |
+| `DIFF-3701` | G3 | 三方 Harness | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:492`, `docs/status/DIFF-3701-AUTHORITY-AUDIT.md` |
 | `DIFF-3702` | G3 | 已允许差异登记表 | — | Blocked by v0.2/G3 RFC | `07-G3-V0.3-NATIVE.md:512` |
 | `DAP-3601` | G3+ | `zero dap --stdio` | — | Blocked by v0.2/G3 RFC | `05-ZED-EXTENSION.md:526` |
 | `DAP-3602` | G3+ | Zed debugger registration | — | Blocked by v0.2/G3 RFC | `05-ZED-EXTENSION.md:530` |
