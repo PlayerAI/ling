@@ -196,6 +196,7 @@
 | `PROF-5104` | Profile Audit and LSP | `G5` | `M` | `BlockedSpec` | `PROF-5103` | `` |
 | `PROOF-5501` | Proof IR | `G5` | `L` | `BlockedSpec` | `CTR-5405` | `` |
 | `PROOF-5502` | Independent Checker | `G5` | `L` | `BlockedSpec` | `PROOF-5501` | `` |
+| `PROOF-5503` | Assumption Registry | `G5` | `M` | `BlockedSpec` | `PROOF-5502` | `` |
 | `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |
 | `REM-2602` | Transport-neutral envelope | `G2` | `L` | `BlockedSpec` | `REM-2601` | `` |
 | `REM-2603` | Delivery semantics | `G2` | `L` | `BlockedSpec` | `REM-2602` | `` |
