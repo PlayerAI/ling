@@ -114,6 +114,7 @@
 | `PRJ-1108` | Project graph property and manifest fuzz coverage | `G1` | `M` | `Done` | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105`, `PRJ-1106` | `29f9c4465b58c7eff23c227436563d69409b880e` |
 | `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |
 | `REM-2602` | Transport-neutral envelope | `G2` | `L` | `BlockedSpec` | `REM-2601` | `` |
+| `REM-2603` | Delivery semantics | `G2` | `L` | `BlockedSpec` | `REM-2602` | `` |
 | `REP-2501` | Determinism class | `G2` | `L` | `BlockedSpec` | `SUP-2403` | `` |
 | `REP-2502` | Replay log schema | `G2` | `L` | `BlockedSpec` | `REP-2501` | `` |
 | `REP-2503` | Effect recorder | `G2` | `L` | `BlockedSpec` | `EFF-2105`, `REP-2502` | `` |
