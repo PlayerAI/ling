@@ -38,7 +38,7 @@
 | 16 | `LSP-2102` | UTF-16 position 协商 | LineIndex | 与 diagnostics | 中文/emoji/CRLF fixtures |
 | 17 | `ZEXT-3301` | grammar-only Zed 扩展 | TS skeleton | 与 LSP | 本地 Zed 识别/高亮 |
 | 18 | `VM-1202` | Core→bytecode 最小切片 | VM-1201 | 与 verifier | **Done**；Hello Checked Core → 精确 bytes/disassembly golden；decode round-trip 属 VM-1203 |
-| 19 | `VM-1203` | 独立 decoder/verifier | VM-1201 | 与 lowering | malformed fuzz 无 panic |
+| 19 | `VM-1203` | 独立 decoder/verifier | VM-1201 | 与 lowering | **Done**；bounded decoder/verifier、22 个 malformed vectors、arbitrary-byte/fuzz boundary；VM-1204 承接执行 |
 | 20 | `PRJ-1102` | module discovery | PRJ-1101 | 与 VM | deterministic graph |
 | 21 | `INC-1402` | VFS/revision | INC-1401 | 与 VM | overlay/revision tests |
 | 22 | `LSP-2201` | Diagnostic adapter | LSP lifecycle + compiler diagnostics | 与 Zed | stable code/span/related info |
@@ -93,8 +93,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PRJ-1108` | G1/Editor | Project graph fuzz/property | M | Done | `03-G1-V0.1-LIVING.md:140`；见生成式 cycle/path/order/lock properties、manifest fuzz/CI、机器状态与实施报告 |
 | `VM-1201` | G1/Editor | bytecode RFC 与模型 | M | Done | `03-G1-V0.1-LIVING.md:150`；见 RFC-0014、`ling-bytecode` 未验证模型、TEST-VM-0001 corpus、机器状态与实施报告 |
 | `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | L | Done | `03-G1-V0.1-LIVING.md:166`；见 deterministic lowering/encoder/disassembler、Hello exact goldens、机器状态与实施报告 |
-| `VM-1203` | G1/Editor | 独立 decoder/verifier | L | Ready | `03-G1-V0.1-LIVING.md:180`；VM-1201/VM-1202 已完成，下一纵向切片 |
-| `VM-1204` | G1/Editor | VM 基础执行 | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:196` |
+| `VM-1203` | G1/Editor | 独立 decoder/verifier | L | Done | `03-G1-V0.1-LIVING.md:180`；见 bounded decoder、独立 verifier、双语诊断、malformed/fuzz evidence、机器状态与实施报告 |
+| `VM-1204` | G1/Editor | VM 基础执行 | L | Ready | `03-G1-V0.1-LIVING.md:196`；RFC-0014 已 Accepted，VM-1201/VM-1202/VM-1203 与 TEST-VM-0001 已完成，下一纵向切片 |
 | `VM-1205` | G1/Editor | 函数、closure、recursion | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:205` |
 | `VM-1206` | G1/Editor | Record、ADT、match | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:209` |
 | `VM-1207` | G1/Editor | Mutable place 与基础 borrow | — | Blocked by G0/interface | `03-G1-V0.1-LIVING.md:218` |
@@ -379,8 +379,13 @@ updated = "2026-08-20"
 
 [[task]]
 id = "VM-1203"
-state = "Ready"
+state = "Done"
 depends_on = ["VM-1201", "VM-1202"]
+
+[[task]]
+id = "VM-1204"
+state = "Ready"
+depends_on = ["TEST-VM-0001", "VM-1201", "VM-1202", "VM-1203"]
 ```
 
 CI 验证：

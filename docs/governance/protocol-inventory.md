@@ -256,7 +256,7 @@
 - Authority: `RFC-0014`
 - Sources: [`docs/RFC-0014.md`](../RFC-0014.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
-- Notes: VM-1201 and VM-1202 implement the explicitly unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot scalar/direct-call lowering, deterministic writing, debug disassembly, and TEST-VM-0001/golden evidence. The planned-public protocol remains Future until VM-1203 and VM-1204 add independent decoding/verification, executable VerifiedProgram state, and VM evidence.
+- Notes: VM-1201 through VM-1203 implement the unverified data model, typed index/digest domains, fixed tags/opcodes/limits, checked-snapshot scalar/direct-call lowering, deterministic writing, debug disassembly, bounded independent decoding, failure-atomic verification, canonical VerifiedProgramV1 re-encoding, registered bilingual diagnostics, and valid/corrupt/fuzz evidence. The planned-public protocol remains Future until VM-1204 adds verifier-gated execution and VM differential evidence.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

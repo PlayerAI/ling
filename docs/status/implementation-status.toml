@@ -2144,3 +2144,84 @@ notes = [
   "Unicode remains 17.0.0; canonical logical paths require NFC and exact source provenance preserves BOM, CRLF, Unicode, and emoji byte spans.",
   "Generic monomorphization, recursion, control flow, scalar operations/intrinsics, aggregates, mutation, decoding, verification, and execution remain intentionally deferred to their later VM slices.",
 ]
+
+[[task]]
+id = "VM-1203"
+title = "Independent bounded bytecode decoder and verifier"
+state = "Done"
+release = "G1"
+size = "L"
+owner = "Codex"
+branch = "main"
+depends_on = ["TEST-VM-0001", "VM-1201", "VM-1202"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0014.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "Cargo.lock",
+  "README.md",
+  "crates/ling-bytecode/Cargo.toml",
+  "crates/ling-bytecode/src/decode.rs",
+  "crates/ling-bytecode/src/encode.rs",
+  "crates/ling-bytecode/src/error.rs",
+  "crates/ling-bytecode/src/lib.rs",
+  "crates/ling-bytecode/src/lower.rs",
+  "crates/ling-bytecode/src/path.rs",
+  "crates/ling-bytecode/src/verify.rs",
+  "crates/ling-bytecode/tests/decode_verify.rs",
+  "crates/ling-bytecode/tests/support/mod.rs",
+  "crates/ling-bytecode/tests/support/wire.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/ERROR-CODES.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/governance/error-code-lock.toml",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/ling_execution_plan/SHA256SUMS.txt",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/VM-1203-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+  "fuzz/Cargo.lock",
+  "fuzz/Cargo.toml",
+  "fuzz/README.md",
+  "fuzz/corpus/bytecode_bytes/corrupt-magic.hexseed",
+  "fuzz/corpus/bytecode_bytes/valid-hello.hexseed",
+  "fuzz/fuzz_targets/bytecode_bytes.rs",
+  "tests/bytecode/README.md",
+  "tests/bytecode/v1/malformed-cases.tsv",
+]
+acceptance = [
+  "decode_v1 treats all bytes as untrusted and enforces exact envelope, framing, hard limits, and smaller caller limits before slicing or allocation",
+  "verify_v1 is independent from lowering and encoding and is the sole public constructor of immutable VerifiedProgramV1",
+  "verification is failure-atomic and covers canonical tables, indexes/signatures, CFG/reachability/dominance/SSA/types, transitive Effects, module Capabilities, the exact Main.main entry, and complete source-owned source maps",
+  "six registered bilingual L-BYTECODE diagnostic identities expose bounded stable phase, reason, index, and resource facts without changing ling.diagnostic/0.1 framing",
+  "Hello decode/verify/re-encode bytes, direct calls, independent branch/loop artifacts, all 22 malformed vectors, caller limits, and 512 deterministic arbitrary-byte cases pass without panic",
+  "cargo test -p ling-bytecode --all-targets --all-features --locked --offline: 23 passed and 1 VM-1204 differential test explicitly ignored",
+  "cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline: passed",
+  "cargo test --workspace --all-features --locked --offline: passed",
+  "cargo xtask governance check-all: 46 documents, 26 gaps, 21 lifecycle records, 20 protocols, and 82 diagnostic codes passed",
+  "cargo xtask support verify, ci verify, traceability verify, schema gates, seed reproduce, and pre-completion status verify: passed",
+  "execution-plan SHA256SUMS: 27 entries verified and completion status: 33 tasks Done",
+  "cargo fmt --all -- --check and git diff --check: passed",
+  "cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings: passed",
+  "cargo +1.85 check --workspace --all-features --locked --offline: passed",
+  "cargo doc --workspace --all-features --no-deps --locked --offline: passed",
+  "cargo build --workspace --all-features --release --locked --offline: passed",
+]
+verified_against_commit = "e08940ef511cbcb1416e4b32e0c0805601d5c160"
+completion_commit = "e08940ef511cbcb1416e4b32e0c0805601d5c160"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "RFC-0014 is sufficient for this slice; no unresolved semantic or public-protocol decision was implemented through code.",
+  "PROTO-BYTECODE remains planned-public/Future and BACKEND-VM remains Unsupported until VM-1204 provides verifier-gated execution and differential evidence.",
+  "Diagnostic JSON framing, public schemas, source language behavior, CLI behavior, Semantic IDs, ABI/FFI, evaluator behavior, and third-party package versions are unchanged.",
+  "Unicode remains 17.0.0; identifiers use the accepted validation pipeline and source maps retain original UTF-8 byte spans.",
+  "The pinned nightly libFuzzer target builds, but the local Windows host lacks the Visual Studio ASan runtime DLL; sanitizer corpus replay is assigned to the pinned Linux CI job and is not claimed as a passing local run.",
+]
