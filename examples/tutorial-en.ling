@@ -1,0 +1,26 @@
+module Main
+    requires Console.Write
+
+type Person =
+    { name: Text
+      mutable health: Int
+      maxHealth: Int }
+
+let takeDamage damage person =
+    { person with
+        health = max 0 (person.health - damage) }
+
+let statusText person =
+    if person.health == 0 then
+        "dead"
+    else
+        "alive"
+
+let main () =
+    let mutable guanYu =
+        { name = "Guan Yu"
+          health = 100
+          maxHealth = 100 }
+
+    guanYu <- takeDamage 30 guanYu
+    Console.write (statusText guanYu)

@@ -347,6 +347,8 @@ fn seed_examples_check_run_and_emit_semantic_graphs() {
         ("人物.ling", "存活\n", "受到伤害"),
         ("adt-match.ling", "受伤 30\n", "生存状态"),
         ("pipeline.ling", "9\n", "加一"),
+        ("tutorial-zh.ling", "存活\n", "受到伤害"),
+        ("tutorial-en.ling", "alive\n", "takeDamage"),
     ] {
         let path = examples.join(file);
         let checked = Command::new(env!("CARGO_BIN_EXE_ling"))
