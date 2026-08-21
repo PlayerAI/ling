@@ -162,6 +162,7 @@
 | `PLC-4801` | Placement Constraint Model | `G4` | `M` | `BlockedSpec` | — | `` |
 | `PLC-4802` | Static Candidates and Runtime Selection | `G4` | `M` | `BlockedSpec` | `PLC-4801` | `` |
 | `PLC-4803` | Cost Model v0 | `G4` | `M` | `BlockedSpec` | `PLC-4802` | `` |
+| `PLC-4804` | Placement Explain Output | `G4` | `M` | `BlockedSpec` | `PLC-4803` | `` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |
 | `PRJ-1102` | Deterministic module discovery | `G1` | `M` | `Done` | `PRJ-1101` | `f76f4953070b9ae555fce24c7dcc2fbf08a36f7a` |
 | `PRJ-1103` | Package-aware imports and visibility | `G1` | `M` | `Done` | `PRJ-1102`, `PRJ-1104` | `8e98d32f54301dee3f198273cfae3146bbf2846b` |
