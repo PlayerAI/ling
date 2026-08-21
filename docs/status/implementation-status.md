@@ -223,6 +223,7 @@
 | `PROTO-6202` | Reader/Writer Compatibility Tests | `G6` | `L` | `BlockedSpec` | `PROTO-6201` | `` |
 | `PROTO-6203` | Semantic Hash Upgrade Rehearsal | `G6` | `L` | `BlockedSpec` | `PROTO-6202` | `` |
 | `PROTO-6204` | CLI and Exit-Code Freeze | `G6` | `L` | `BlockedSpec` | `PROTO-6203` | `` |
+| `RC-6901` | RC0 Internal Freeze | `G6` | `L` | `BlockedSpec` | `ZED-6804` | `` |
 | `REL-6601` | Fuzz Coverage Inventory | `G6` | `L` | `BlockedSpec` | `COMPAT-6504` | `` |
 | `REL-6602` | Fault Injection | `G6` | `L` | `BlockedSpec` | `REL-6601` | `` |
 | `REL-6603` | Security Audit | `G6` | `L` | `BlockedSpec` | `REL-6602` | `` |
