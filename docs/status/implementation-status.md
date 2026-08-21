@@ -109,6 +109,7 @@
 | `KCHK-4102` | Kernel Effect and Capability checks | `G4` | `L` | `BlockedSpec` | `KCHK-4101` | `` |
 | `KCHK-4103` | Shape, index, and bounds | `G4` | `L` | `BlockedSpec` | `KCHK-4102` | `` |
 | `KCHK-4104` | Alias and parallel-write conflicts | `G4` | `L` | `BlockedSpec` | `KCHK-4103` | `` |
+| `KCHK-4105` | Kernel Core and verifier | `G4` | `L` | `BlockedSpec` | `KCHK-4104` | `` |
 | `LSP-2101` | LSP lifecycle skeleton | `G1` | `S` | `BlockedSpec` | `CLI-1701` | `` |
 | `LSP-2102` | LSP position-encoding negotiation | `G1` | `S` | `BlockedSpec` | `LSP-2101` | `` |
 | `LSP-2103` | LSP open-document overlay | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
