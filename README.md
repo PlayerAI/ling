@@ -122,7 +122,7 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - 局部类型推导、默认不可变、`mutable` 和 `place <- value`；
 - `Pure` 与 `Console.Write` Effect，以及 `Console.Write` Capability；
 - Accepted `ling.manifest/1` reader、显式工程根下的确定性 module discovery、离线递归解析 vendored path dependency 的内容/graph identity、canonical `ling.lock/1` reader/writer 与 Update/Locked 策略，以及库级跨包 import/export visibility 与 package-aware `ling.semantic/0.2`（尚未接入 CLI 工程选择）；
-- Accepted RFC-0014、`ling.bytecode/1.0` 未验证模型、显式 opcode/tag 和资源上限，以及支持 `Unit/Bool/Int/Text`、直接调用、不可变局部绑定、`Console.write` 与 return 的 Checked Core lowering、确定性 encoder 和非契约 debug disassembler；decoder、verifier、VM 与 CLI backend 尚未实现；
+- Accepted RFC-0014、`ling.bytecode/1.0` 未验证模型、显式 opcode/tag 和资源上限，以及支持 `Unit/Bool/Int/Text`、直接调用、不可变局部绑定、`Console.write` 与 return 的 Checked Core lowering、确定性 encoder、bounded decoder、独立 verifier、`VerifiedProgramV1` 边界和非契约 debug disassembler；VM 与 CLI backend 尚未实现；
 - Semantic Graph、稳定 Diagnostic JSON、解释器、REPL、`run`、`check`、`semantic`、`audit`。
 
 第一阶段明确后置：GC Runtime、Native Backend、Ownership/Borrow Checker、Trait、Effect Handler、Task、Actor、Node、Kernel、分布式、GPU、形式证明和包管理器。设计中预留的能力不得以静默占位的方式运行。
@@ -359,7 +359,7 @@ The current Seed implementation covers:
 - local type inference, default immutability, `mutable`, and `place <- value`;
 - `Pure` and `Console.Write` Effects, plus the `Console.Write` Capability;
 - an Accepted `ling.manifest/1` reader, deterministic module discovery under an explicit project root, offline recursive resolution of content-identified vendored path dependencies, a canonical `ling.lock/1` reader/writer with Update/Locked policy, library-level cross-package import/export visibility, and package-aware `ling.semantic/0.2` (not yet integrated with CLI project selection);
-- Accepted RFC-0014, an unverified `ling.bytecode/1.0` model with explicit opcode/tag and resource limits, and Checked Core lowering for `Unit/Bool/Int/Text`, direct calls, immutable local bindings, `Console.write`, and return, together with a deterministic encoder and non-contract debug disassembler; no decoder, verifier, VM, or CLI backend exists yet;
+- Accepted RFC-0014, an unverified `ling.bytecode/1.0` model with explicit opcode/tag and resource limits, and Checked Core lowering for `Unit/Bool/Int/Text`, direct calls, immutable local bindings, `Console.write`, and return, together with a deterministic encoder, bounded decoder, independent verifier, `VerifiedProgramV1` boundary, and non-contract debug disassembler; no VM or CLI backend exists yet;
 - Semantic Graph, stable Diagnostic JSON, an interpreter, a REPL, `run`, `check`, `semantic`, and `audit`.
 
 The first milestone explicitly postpones the GC runtime, native backend, Ownership/Borrow checker, Traits, Effect Handlers, Task, Actor, Node, Kernel, distribution, GPU support, formal proofs, and package management. Reserved features must not silently execute as placeholders.

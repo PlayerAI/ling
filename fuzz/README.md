@@ -15,6 +15,7 @@ Targets:
 - `lexer_utf8`: valid UTF-8 through Source and Lexer/Layout;
 - `parser_utf8`: valid UTF-8 through Source, Parser/CST, and valid-CST AST lowering.
 - `manifest_bytes`: arbitrary bytes through two bounded `ling.toml` version 1 reads with distinct diagnostic source labels; successful semantic models, failure codes/spans, and Diagnostic JSON rendering must remain deterministic.
+- `bytecode_bytes`: arbitrary bytes through the bounded `ling.bytecode/1.0` decoder and independent verifier twice; verified models or structured bilingual diagnostics must be deterministic and diagnostics remain bounded. Checked-in `hex:` seeds preserve exact valid/corrupt binary fixtures in reviewable text.
 
 Run a deterministic corpus smoke pass:
 
@@ -23,6 +24,7 @@ cargo +nightly-2026-08-15 fuzz run source_bytes fuzz/corpus/source_bytes -- -run
 cargo +nightly-2026-08-15 fuzz run lexer_utf8 fuzz/corpus/lexer_utf8 -- -runs=256
 cargo +nightly-2026-08-15 fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256
 cargo +nightly-2026-08-15 fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256
+cargo +nightly-2026-08-15 fuzz run bytecode_bytes fuzz/corpus/bytecode_bytes -- -runs=256
 ```
 
 Long-running jobs must use a separate artifact directory and retain minimized

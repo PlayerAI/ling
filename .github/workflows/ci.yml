@@ -125,6 +125,10 @@ jobs:
         env:
           CARGO_NET_OFFLINE: "true"
         run: cargo fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256
+      - name: Replay bytecode decoder and verifier corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: cargo fuzz run bytecode_bytes fuzz/corpus/bytecode_bytes -- -runs=256
 
   msrv:
     name: Rust 1.85 MSRV

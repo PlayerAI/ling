@@ -607,8 +607,8 @@
     {
       "id": "UNSUP-VM",
       "area": "Execution",
-      "capability": "Bytecode emission, verification, or VM execution",
-      "reason": "VM-1201 provides an explicitly unverified ling.bytecode/1.0 data model and reference corpus only; no encoder, decoder, verifier, executable VerifiedProgram boundary, or VM exists yet.",
+      "capability": "Bytecode VM execution",
+      "reason": "VM-1201 through VM-1203 provide the RFC-0014 model, deterministic writer, bounded decoder, independent verifier, and VerifiedProgramV1 boundary. VM-1204 has not yet added an execution engine or public backend selection.",
       "blockers": [],
       "sources": [
         "docs/RFC-0014.md",

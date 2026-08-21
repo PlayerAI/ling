@@ -6,6 +6,7 @@ registry_schema = "ling.diagnostic-registry/0.1"
 
 [high_water]
 AUDIT = 4
+BYTECODE = 6
 CAP = 3
 ENTRY = 3
 IMPL = 1
@@ -43,6 +44,42 @@ id = "L-AUDIT-0004"
 core_sha256 = "sha256:332ce264f16fd05361d2847af0f764295354f5745d5a8da886e3ae2582d0cd0c"
 retired = false
 facts = ["audit_schema:string:required"]
+
+[[code]]
+id = "L-BYTECODE-0001"
+core_sha256 = "sha256:db5c100474d9253810794a55767b59c92994f62cede3a777839fe42381fe44ba"
+retired = false
+facts = ["offset:integer:required", "phase:string:required", "reason:string:required", "referenced_indices:string[]:optional"]
+
+[[code]]
+id = "L-BYTECODE-0002"
+core_sha256 = "sha256:4bb4074d1ba84191b25054fcc993078a5f29131e7524be8a5a5cab1edf3e1880"
+retired = false
+facts = ["actual:integer:required", "maximum:integer:required", "offset:integer:required", "phase:string:required", "reason:string:required", "referenced_indices:string[]:optional", "resource:string:required"]
+
+[[code]]
+id = "L-BYTECODE-0003"
+core_sha256 = "sha256:78774ec6d2ed935591880a7b8be3a293d7e949684e833f951fb37de2bfbbced5"
+retired = false
+facts = ["offset:integer:required", "phase:string:required", "reason:string:required", "referenced_indices:string[]:optional"]
+
+[[code]]
+id = "L-BYTECODE-0004"
+core_sha256 = "sha256:8b7e608788913446f97080ff643dba445f922307a56f5b158180d62fb6a7ab9e"
+retired = false
+facts = ["offset:integer:required", "phase:string:required", "reason:string:required", "referenced_indices:string[]:optional"]
+
+[[code]]
+id = "L-BYTECODE-0005"
+core_sha256 = "sha256:415b991140ec3555639c3f99e3174d446ae64c9a96bf93801717ff8b55807083"
+retired = false
+facts = ["offset:integer:required", "phase:string:required", "reason:string:required", "referenced_indices:string[]:optional"]
+
+[[code]]
+id = "L-BYTECODE-0006"
+core_sha256 = "sha256:86f140c1145dcecca32342390669b0a6a586b7af927882e16b59d1137642b8d3"
+retired = false
+facts = ["offset:integer:required", "phase:string:required", "reason:string:required", "referenced_indices:string[]:optional"]
 
 [[code]]
 id = "L-CAP-0001"

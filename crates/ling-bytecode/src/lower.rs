@@ -12,7 +12,6 @@ use ling_source::{SourceFile, SourceId, Span};
 use ling_types::{Type, TypeId, TypedProgram};
 use num_bigint::Sign;
 use sha2::{Digest, Sha256};
-use unicode_normalization::UnicodeNormalization;
 
 use crate::{
     Block, BlockIndex, BlockParameter, Capability, Constant, ConstantIndex, DecodeLimits, Effect,
@@ -20,8 +19,6 @@ use crate::{
     ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin,
     SourceSpan, StringIndex, Terminator, TypeIndex, UnverifiedProgram, ValueType,
 };
-
-const MAX_LOGICAL_NAME_BYTES: usize = 4_096;
 
 /// Exact original source bytes and the logical name permitted in bytecode.
 ///
@@ -1354,61 +1351,10 @@ fn constant_key(constant: &Constant) -> Result<ConstantKey, LoweringError> {
 
 fn validate_logical_name(source: &LoweringSource<'_>) -> Result<(), LoweringError> {
     let value = source.logical_name;
-    if value.is_empty() {
-        return Err(invalid_source(source, "logical_name_empty", value));
-    }
-    if value.len() > MAX_LOGICAL_NAME_BYTES {
-        return Err(invalid_source(source, "logical_name_too_long", value));
-    }
-    if value.contains('\0') {
-        return Err(invalid_source(source, "logical_name_contains_nul", value));
-    }
-    if value.starts_with('/') || value.starts_with('\\') || has_windows_drive_prefix(value) {
-        return Err(invalid_source(source, "logical_name_not_relative", value));
-    }
-    if has_uri_scheme(value) {
-        return Err(invalid_source(source, "logical_name_has_uri_scheme", value));
-    }
-    if value.contains('\\') {
-        return Err(invalid_source(source, "logical_name_uses_backslash", value));
-    }
-    for segment in value.split('/') {
-        if segment.is_empty() || matches!(segment, "." | "..") {
-            return Err(invalid_source(
-                source,
-                "logical_name_has_noncanonical_segment",
-                value,
-            ));
-        }
-        if segment.nfc().ne(segment.chars()) {
-            return Err(invalid_source(source, "logical_name_not_nfc", value));
-        }
+    if let Err(reason) = crate::path::validate_logical_name(value) {
+        return Err(invalid_source(source, reason.as_str(), value));
     }
     Ok(())
-}
-
-fn has_windows_drive_prefix(value: &str) -> bool {
-    let bytes = value.as_bytes();
-    bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':'
-}
-
-fn has_uri_scheme(value: &str) -> bool {
-    let mut bytes = value.bytes();
-    let Some(first) = bytes.next() else {
-        return false;
-    };
-    if !first.is_ascii_alphabetic() {
-        return false;
-    }
-    for byte in bytes {
-        if byte == b':' {
-            return true;
-        }
-        if !(byte.is_ascii_alphanumeric() || matches!(byte, b'+' | b'-' | b'.')) {
-            return false;
-        }
-    }
-    false
 }
 
 fn invalid_source(source: &LoweringSource<'_>, reason: &str, logical_name: &str) -> LoweringError {

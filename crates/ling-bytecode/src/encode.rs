@@ -4,7 +4,7 @@ use std::fmt;
 use crate::{
     BYTECODE_MAGIC, Block, Constant, DecodeLimits, FORMAT_VERSION, Function, HEADER_BYTES,
     Instruction, LANGUAGE_VERSION, LoweredProgramV1, NO_INDEX, PackageReference, SourceMapEntry,
-    Terminator, UNICODE_VERSION, UnverifiedProgram,
+    Terminator, UNICODE_VERSION, UnverifiedProgram, VerifiedProgramV1,
 };
 
 /// Failure categories for deterministic bytecode writing.
@@ -79,6 +79,27 @@ pub fn encode_v1(program: &LoweredProgramV1) -> Result<Vec<u8>, EncodingError> {
 /// Encodes canonical bytecode under a caller-supplied limit no larger than the RFC maximum.
 pub fn encode_v1_with_limit(
     program: &LoweredProgramV1,
+    artifact_byte_limit: u64,
+) -> Result<Vec<u8>, EncodingError> {
+    let hard_limit = DecodeLimits::rfc_0014().artifact_bytes();
+    let bytes = encode_model(program.model(), hard_limit)?;
+    let actual =
+        u64::try_from(bytes.len()).map_err(|_| EncodingError::resource(u64::MAX, hard_limit))?;
+    let effective_limit = artifact_byte_limit.min(hard_limit);
+    if actual > effective_limit {
+        return Err(EncodingError::resource(actual, effective_limit));
+    }
+    Ok(bytes)
+}
+
+/// Re-encodes a verified program using the canonical version-1.0 writer.
+pub fn encode_verified_v1(program: &VerifiedProgramV1) -> Result<Vec<u8>, EncodingError> {
+    encode_verified_v1_with_limit(program, DecodeLimits::rfc_0014().artifact_bytes())
+}
+
+/// Re-encodes a verified program under a caller limit capped by RFC-0014.
+pub fn encode_verified_v1_with_limit(
+    program: &VerifiedProgramV1,
     artifact_byte_limit: u64,
 ) -> Result<Vec<u8>, EncodingError> {
     let hard_limit = DecodeLimits::rfc_0014().artifact_bytes();

@@ -198,6 +198,7 @@ dependencies = [
  "ling-source",
  "ling-syntax",
  "ling-types",
+ "ling-unicode",
  "num-bigint",
  "sha2",
  "unicode-normalization",
