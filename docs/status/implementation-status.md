@@ -85,6 +85,7 @@
 | `LSP-2203` | LSP pull diagnostics Preview | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2201` | `` |
 | `LSP-2204` | LSP root-cause and error-storm control | `G1` | `M` | `BlockedSpec` | `LSP-2201`, `LSP-2202` | `` |
 | `LSP-2205` | LSP diagnostic fixtures | `G1` | `M` | `BlockedSpec` | `LSP-2201`, `LSP-2202`, `LSP-2203`, `LSP-2204` | `` |
+| `LSP-2401` | Semantic token taxonomy RFC/decision | `G1` | `M` | `BlockedSpec` | `IDE-2311`, `LSP-2101`, `LSP-2102` | `` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |
 | `PRJ-1102` | Deterministic module discovery | `G1` | `M` | `Done` | `PRJ-1101` | `f76f4953070b9ae555fce24c7dcc2fbf08a36f7a` |
 | `PRJ-1103` | Package-aware imports and visibility | `G1` | `M` | `Done` | `PRJ-1102`, `PRJ-1104` | `8e98d32f54301dee3f198273cfae3146bbf2846b` |

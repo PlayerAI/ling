@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 95 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, and IDE-2311 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 96 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, LSP-2201, LSP-2202, LSP-2203, LSP-2204, LSP-2205, IDE-2301, IDE-2302, IDE-2303, IDE-2304, IDE-2305, IDE-2306, IDE-2307, IDE-2308, IDE-2309, IDE-2310, IDE-2311, and LSP-2401 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -4739,6 +4739,50 @@ notes = [
   "IDE-2311 is BlockedSpec by GAP-INCREMENTAL-CACHE-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2101/LSP-2102, and IDE-2301; RFC-0002 package identity is library authority but no workspace-symbol wire contract exists.",
   "Current semantic/project/source code exposes deterministic graph/package/revision inputs, while broader dependent-query invalidation, workspace scope, result schema, cancellation, and stale-query behavior remain unspecified.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, cache behavior, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2401"
+title = "Semantic token taxonomy RFC/decision"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2311", "LSP-2101", "LSP-2102"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/LSP-2401-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit records the missing standard/custom token taxonomy, modifiers, source mapping, client negotiation, position/version, Semantic ID/provenance, redaction, and protocol lifecycle contracts.",
+  "The audit covers Effect/Capability/resource/custom categories, declarations/mutability/generated modifiers, checked-core versus syntax-error fallback, unknown-client behavior, Unicode/CRLF/BOM, overlap/order, version mismatch, deterministic output, and required fixtures.",
+  "No token taxonomy RFC, protocol registry entry, token generator, custom kind, modifier, diagnostic allocation, Semantic ID change, or placeholder LSP API is added while the authority is absent.",
+  "The future implementation must derive tokens from checked data, preserve source-span/ID truth, redact capabilities explicitly, provide deterministic fallback, and label experimental categories.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "LSP-2401 is BlockedSpec by the missing semantic-token taxonomy/negotiation decision, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, LSP-2101/LSP-2102, and the absence of a semantic-token protocol inventory entry.",
+  "Current semantic and syntax fixtures provide graph/highlight inputs but no accepted typed-token mapping, custom-token stability, client fallback, modifier, or capability redaction contract.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]

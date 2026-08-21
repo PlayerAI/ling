@@ -155,7 +155,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `IDE-2309` | G1/Editor | Code actions | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:316`, `docs/status/IDE-2309-AUTHORITY-AUDIT.md` |
 | `IDE-2310` | G1/Editor | Formatting | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:329`, `docs/status/IDE-2310-AUTHORITY-AUDIT.md` |
 | `IDE-2311` | G1/Editor | Workspace symbols | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:333`, `docs/status/IDE-2311-AUTHORITY-AUDIT.md` |
-| `LSP-2401` | G1/Editor | Token taxonomy RFC/decision | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:339` |
+| `LSP-2401` | G1/Editor | Token taxonomy RFC/decision | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:339`, `docs/status/LSP-2401-AUTHORITY-AUDIT.md` |
 | `LSP-2402` | G1/Editor | Typed token generation | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:370` |
 | `LSP-2403` | G1/Editor | Full 与 delta | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:374` |
 | `LSP-2404` | G1/Editor | Semantic token fixtures | — | Blocked by G0/interface | `04-LSP-IMPLEMENTATION.md:378` |
