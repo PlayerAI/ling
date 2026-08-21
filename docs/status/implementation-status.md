@@ -82,6 +82,7 @@
 | `DIR-4501` | Device IR Schema | `G4` | `L` | `BlockedSpec` | `DBUF-4404` | `` |
 | `DIR-4502` | Kernel Core to Device IR | `G4` | `M` | `BlockedSpec` | `DIR-4501` | `` |
 | `DIR-4503` | Device IR Canonicalization | `G4` | `M` | `BlockedSpec` | `DIR-4502` | `` |
+| `DOC-6701` | Formal Documentation Set | `G6` | `L` | `BlockedSpec` | `REL-6604` | `` |
 | `EFF-2101` | Effect core model freeze | `G2` | `M` | `BlockedSpec` | — | `` |
 | `EFF-2102` | Effect inference and constraint solving | `G2` | `L` | `BlockedSpec` | `EFF-2101` | `` |
 | `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `BlockedSpec` | `EFF-2101`, `EFF-2102` | `` |
