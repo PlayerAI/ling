@@ -297,7 +297,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `BND-5202` | G5 | 循环和递归检查 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:156`, `docs/status/BND-5202-AUTHORITY-AUDIT.md` |
 | `BND-5203` | G5 | 内存预算 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:169`, `docs/status/BND-5203-AUTHORITY-AUDIT.md` |
 | `BND-5204` | G5 | 资源预算诊断 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:184`, `docs/status/BND-5204-AUTHORITY-AUDIT.md` |
-| `NODE-5301` | G5 | Node 语法与语义 | L | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:199` |
+| `NODE-5301` | G5 | Node 语法与语义 | L | BlockedSpec | `09-G5-V0.5-CRITICAL.md:199`, `docs/status/NODE-5301-AUTHORITY-AUDIT.md` |
 | `NODE-5302` | G5 | Node Checked Core | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:226` |
 | `NODE-5303` | G5 | 静态调度 | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:242` |
 | `NODE-5304` | G5 | 虚拟时间参考 Runtime | — | Blocked by v0.4 + RFC | `09-G5-V0.5-CRITICAL.md:254` |
