@@ -355,7 +355,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DOC-6703` | G6 | Tutorial 与中文优先样例 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:417`, `docs/status/DOC-6703-AUTHORITY-AUDIT.md`, `docs/TUTORIAL.md` |
 | `ZED-6801` | G6 | 兼容矩阵 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:430`, `docs/status/ZED-6801-AUTHORITY-AUDIT.md`, `docs/testing/ZED-COMPATIBILITY-MATRIX.md` |
 | `ZED-6802` | G6 | 语言服务器发现/获取 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:442`, `docs/status/ZED-6802-AUTHORITY-AUDIT.md`, `docs/testing/LSP-DISCOVERY-ACQUISITION.md` |
-| `ZED-6803` | G6 | 扩展完整功能验收 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:461` |
+| `ZED-6803` | G6 | 扩展完整功能验收 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:461`, `docs/status/ZED-6803-AUTHORITY-AUDIT.md`, `docs/testing/ZED-EXTENSION-ACCEPTANCE.md` |
 | `ZED-6804` | G6 | DAP 状态 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:473` |
 | `RC-6901` | G6 | RC0 内部冻结 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:479` |
 | `RC-6902` | G6 | RC1 公开验证 | — | Blocked by G1–G5 exits | `10-G6-V1.0-STABILIZATION.md:490` |
