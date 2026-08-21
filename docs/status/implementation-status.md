@@ -83,6 +83,7 @@
 | `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |
 | `EVD-5802` | Independent Verifier | `G5` | `L` | `BlockedSpec` | `EVD-5801` | `` |
 | `EVD-5803` | Reproducible Build Binding | `G5` | `M` | `BlockedSpec` | `EVD-5802` | `` |
+| `EVD-5804` | AI Provenance | `G5` | `M` | `BlockedSpec` | `EVD-5803` | `` |
 | `FFI-3601` | FFI declaration model | `G3` | `M` | `BlockedSpec` | `BACK-3505` | `` |
 | `FFI-3602` | Minimal C ABI interoperability | `G3` | `M` | `BlockedSpec` | `FFI-3601` | `` |
 | `FFI-3603` | FFI shim generator | `G3` | `M` | `BlockedSpec` | `FFI-3602` | `` |
