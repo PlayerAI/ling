@@ -2860,5 +2860,54 @@ completed = "2026-08-21"
 notes = [
   "INC-1404 builds on the INC-1402 VFS and INC-1403 parse/AST query boundary; no placeholder public query crate or third-party query engine was created.",
   "The module graph key tracks canonical module headers and workspace revisions while omitting private source body revisions; resolve keys retain the requested module source key and imported export surfaces.",
-  "INC-1405 type/effect queries is the next target; persistent cache, parallel scheduling, and compiler-facing cancellation remain governed by the open incremental-cache gap.",
+  "INC-1405 type/effect queries is complete; INC-1406 semantic queries is the next executable target. Persistent cache, parallel scheduling, and compiler-facing cancellation remain governed by the open incremental-cache gap.",
+]
+
+[[task]]
+id = "INC-1405"
+title = "Type and effect queries"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1404"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-types/Cargo.toml",
+  "crates/ling-effects/Cargo.toml",
+]
+artifacts = [
+  "Cargo.toml",
+  "Cargo.lock",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/INC-1404-IMPLEMENTATION-REPORT.md",
+  "docs/status/INC-1405-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The internal ling-db type_effect query runs the existing HIR/resolution/type/effect pipeline and publishes an immutable per-module projection of normalized definition types, canonical effects, and capabilities.",
+  "Type and effect failures remain structured bounded TypeError and EffectError arrays; original source spans, bilingual diagnostics, and checked Typed Core authority remain delegated to existing crates.",
+  "Canonical module interface keys separate declaration/import/type shapes from body revisions; the requested module retains its full source key, imported interfaces are transitive, and inferred or effect-bearing public bodies retain source revision evidence.",
+  "Private edits to an explicitly typed effect-free imported body reuse dependents, while explicit and inferred public type changes invalidate importers; no stale public type projection is published.",
+  "No language semantics, diagnostics, schemas, Semantic IDs, CLI/LSP fields, public protocol, persistence format, or parallel scheduler was added.",
+  "cargo test -p ling-db --locked --offline, cargo clippy -p ling-db --all-targets --locked --offline -- -D warnings, cargo test --workspace --locked --offline, cargo fmt --all -- --check, and git diff --check: passed.",
+]
+verified_against_commit = "f9f2512d653f95955e7861953a8e12c3d38e31cc"
+completion_commit = "f9f2512d653f95955e7861953a8e12c3d38e31cc"
+integration_state = "committed"
+completed = "2026-08-21"
+notes = [
+  "The query result is a module-local projection; it does not expose stale unrelated modules from the workspace checker and does not create a public checked-snapshot protocol.",
+  "Interface keys use explicit declaration shapes and conservative source-revision retention for inferred public definitions or effect-bearing bodies; this keeps private annotated pure-body reuse safe without inventing type semantics.",
+  "INC-1406 semantic queries is the next target; full clean/incremental equivalence remains INC-1407 and persistent cache, parallel scheduling, and compiler-facing cancellation remain open gap work.",
 ]
