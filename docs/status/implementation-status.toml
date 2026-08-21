@@ -3547,7 +3547,7 @@ completed = "2026-08-21"
 notes = [
   "`checked_snapshot` is shared by semantic and Audit assertions, keeping the existing AST → HIR → resolver → types → effects → Semantic Graph pipeline as the only semantic authority.",
   "The corpus includes generic core syntax, CRLF/Unicode/comments with Console.Write, and nested block comments; the assertion compares exact canonical Audit Source text.",
-  "Registry count self-tests now expect 28 specification gaps and 79 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, and LSP-2105 tasks).",
+  "Registry count self-tests now expect 28 specification gaps and 80 tasks (63 Done plus the intentionally BlockedSpec FMT-1507, PRJ-1107, TRAIT-1307, TRAIT-1308, TRAIT-1309, CLI-1701, CLI-1702, CLI-1703, CLI-1704, CLI-1705, CLI-1706, LSP-2101, LSP-2102, LSP-2103, LSP-2104, LSP-2105, and LSP-2201 tasks).",
   "FMT-1507 remains BlockedSpec until accepted formatter CLI and LSP/Semantic Transaction decisions define public behavior.",
 ]
 
@@ -4050,6 +4050,47 @@ completed = ""
 notes = [
   "LSP-2105 is BlockedSpec by GAP-INCREMENTAL-CACHE-001, GAP-PROJECT-CLI-INTERFACE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and LSP-2101/LSP-2103; DEC-0019's revisions are internal compiler service evidence.",
   "The current project/VFS/query implementations remain explicit and deterministic; no editor watcher or public reload protocol is claimed.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2201"
+title = "LSP compiler diagnostic adapter"
+state = "BlockedSpec"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2101", "LSP-2102"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "docs/status/LSP-2201-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The audit distinguishes the Preview Ling diagnostic JSON/registry authority from the missing LSP field, range, snapshot, lifecycle, and fix-data adapter contract.",
+  "The audit covers stable code/message/span mapping, related information, severity/tags, experimental repair data, localization, stale results, and deterministic fixtures.",
+  "No LSP adapter, range mapper, diagnostic code, protocol field, Semantic ID change, or placeholder fix surface is added while the authority is absent.",
+  "The future implementation must reuse registered diagnostics and SourceMap byte-span truth with explicitly versioned experimental fields.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "LSP-2201 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and LSP-2101/LSP-2102; PROTO-DIAGNOSTIC-JSON is not an LSP schema.",
+  "The current compiler/CLI diagnostics remain bilingual, registered, and byte-span based; no LSP mapping or new Trait diagnostic is claimed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
