@@ -215,7 +215,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `SUP-2401` | G2 | Supervisor 模型 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:326`, `docs/status/SUP-2401-AUTHORITY-AUDIT.md` |
 | `SUP-2402` | G2 | 重启预算与熔断 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:340`, `docs/status/SUP-2402-AUTHORITY-AUDIT.md` |
 | `SUP-2403` | G2 | 监督测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:355`, `docs/status/SUP-2403-AUTHORITY-AUDIT.md` |
-| `REP-2501` | G2 | Determinism Class | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:369` |
+| `REP-2501` | G2 | Determinism Class | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:369`, `docs/status/REP-2501-AUTHORITY-AUDIT.md` |
 | `REP-2502` | G2 | Replay Log Schema | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:384` |
 | `REP-2503` | G2 | Effect Recorder | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:401` |
 | `REP-2504` | G2 | Replay Player | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:414` |
