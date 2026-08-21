@@ -4,6 +4,7 @@ members = [
     "crates/ling-ast",
     "crates/ling-bytecode",
     "crates/ling-cli",
+    "crates/ling-db",
     "crates/ling-diagnostics",
     "crates/ling-effects",
     "crates/ling-eval",

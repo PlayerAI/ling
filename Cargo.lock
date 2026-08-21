@@ -228,6 +228,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ling-db"
+version = "0.0.1-dev"
+dependencies = [
+ "ling-ast",
+ "ling-source",
+ "ling-syntax",
+]
+
+[[package]]
 name = "ling-diagnostics"
 version = "0.0.1-dev"
 dependencies = [

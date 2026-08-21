@@ -1,0 +1,15 @@
+[package]
+name = "ling-db"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+ling-ast = { path = "../ling-ast" }
+ling-source = { path = "../ling-source" }
+ling-syntax = { path = "../ling-syntax" }
+
+[lints]
+workspace = true
