@@ -208,7 +208,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TASK-2206` | G2 | Task conformance 与压力测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:235`, `docs/status/TASK-2206-AUTHORITY-AUDIT.md` |
 | `ACT-2301` | G2 | Actor 身份与状态隔离 | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:250`, `docs/status/ACT-2301-AUTHORITY-AUDIT.md` |
 | `ACT-2302` | G2 | 消息可发送性检查 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:263`, `docs/status/ACT-2302-AUTHORITY-AUDIT.md` |
-| `ACT-2303` | G2 | 有界 Mailbox 与背压 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:273` |
+| `ACT-2303` | G2 | 有界 Mailbox 与背压 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:273`, `docs/status/ACT-2303-AUTHORITY-AUDIT.md` |
 | `ACT-2304` | G2 | Turn 与重入规则 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:290` |
 | `ACT-2305` | G2 | Actor Runtime | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:300` |
 | `ACT-2306` | G2 | Actor 性质与压力测试 | — | Blocked by v0.1 + RFC | `06-G2-V0.2-CONCURRENT.md:313` |
