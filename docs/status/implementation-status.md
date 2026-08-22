@@ -51,6 +51,7 @@
 | `CBK-5902` | Lowering Validator | `G5` | `L` | `BlockedSpec` | `CBK-5901` | `` |
 | `CBK-5903` | Critical Runtime/Target Package | `G5` | `L` | `BlockedSpec` | `CBK-5902` | `` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
+| `CLI-1701-CATALOG` | Internal current CLI command catalog | `G1` | `S` | `Done` | `FMT-1507-CLI`, `PRJ-1107-CHECK` | `8410aaa4b4ae7508b84a6736015d80ea73444706` |
 | `CLI-1702` | CLI output and exit behavior | `G1` | `M` | `BlockedSpec` | `CLI-1701` | `` |
 | `CLI-1703` | Project initialization command | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
 | `CLI-1704` | Project test command | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
