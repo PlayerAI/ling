@@ -2,10 +2,12 @@
 
 ## Outcome
 
-`EFF-2103-CORE` is `In Progress` under Accepted RFC-0006, DEC-0062, and
-DEC-0063. The child is intentionally bounded to a checked, in-process,
-first-order Handler Core projection. The EFF-2103 parent remains `BlockedSpec`
-for source grammar and full AST/HIR lowering.
+`EFF-2103-CORE` is `Done` under Accepted RFC-0006, DEC-0062, and DEC-0063. The
+child is intentionally bounded to a checked, in-process, first-order Handler
+Core projection. The EFF-2103 parent remains `BlockedSpec` for source grammar
+and full AST/HIR lowering.
+
+Implementation commit: `e1dc5334d15e25e959fa0da6e3462a90210c6fdf`.
 
 ## Normative traceability
 

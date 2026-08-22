@@ -6926,7 +6926,7 @@ notes = [
 [[task]]
 id = "EFF-2103-CORE"
 title = "First-order handler Typed Core projection"
-state = "In Progress"
+state = "Done"
 release = "G2"
 size = "S"
 owner = "Codex"
@@ -6958,12 +6958,12 @@ acceptance = [
   "Never/Once/Many resume-use limits, nested residual construction, exact State handling, unresolved body rejection, and bilingual L-EFFECT-0003 closed-boundary diagnostics are covered by focused tests.",
   "The child is isolated from Seed behavior and adds no handler parser, evaluator, VM instruction, public schema, Semantic ID, or Task/Actor crossing rule.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "e1dc5334d15e25e959fa0da6e3462a90210c6fdf"
+completion_commit = "e1dc5334d15e25e959fa0da6e3462a90210c6fdf"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
-  "The child implements only DEC-0063's checked Core projection; the EFF-2103 parent remains BlockedSpec for source grammar and full AST/HIR lowering.",
+  "The child implements only DEC-0063's checked Core projection; commit e1dc5334d15e25e959fa0da6e3462a90210c6fdf records the code, authority, diagnostics, and focused evidence; the EFF-2103 parent remains BlockedSpec for source grammar and full AST/HIR lowering.",
   "Runtime continuation storage, Fault/cancellation interaction, Audit Source schema, and interpreter/VM differential behavior remain deferred to EFF-2104/2105 and separate authorities.",
 ]
 

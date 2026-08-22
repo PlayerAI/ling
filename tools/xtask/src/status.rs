@@ -1022,6 +1022,6 @@ mod tests {
         let summary = check_repository(&root).expect("repository status is valid");
         assert_eq!(summary.feature_count, 7);
         assert_eq!(summary.task_count, 310);
-        assert_eq!(summary.done_task_count, 105);
+        assert_eq!(summary.done_task_count, 106);
     }
 }

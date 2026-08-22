@@ -7,6 +7,8 @@ projection in `crates/ling-effects/src/handler_core.rs`. It is a checked,
 in-process data boundary only; it does not add source syntax, parser/HIR
 lowering, runtime execution, bytecode, VM behavior, or public protocols.
 
+Milestone commit: `e1dc5334d15e25e959fa0da6e3462a90210c6fdf`
+
 本子切片在 `crates/ling-effects/src/handler_core.rs` 中实现已接受的 DEC-0063
 一阶 Handler Typed Core 投影。它只提供 checked 进程内数据边界，不增加源语法、
 parser/HIR lowering、运行时、字节码、VM 行为或公共协议。
