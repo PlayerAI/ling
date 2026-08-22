@@ -1859,3 +1859,16 @@ covers = ["SUP-2403 bounded supervision test evidence", "deterministic supervisi
 depends_on = ["DEC-0102", "DEC-0101", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0104"
+title = "Internal determinism-class evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0104-determinism-class-evidence.md"
+covers = ["REP-2501 bounded determinism-class evidence", "test-only determinism class vocabulary", "determinism labels without classification/replay semantics"]
+depends_on = ["DEC-0103", "DEC-0102", "DEC-0021", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

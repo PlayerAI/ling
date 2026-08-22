@@ -2740,3 +2740,28 @@ unresolved_alternatives = [
   "Fixture schema and versioning, state-machine transitions, Fault taxonomy, restart/budget/backoff/circuit outcomes, mailbox cleanup, cancellation, deterministic seed/replay, runtime differential comparison, resource limits, privacy, diagnostics, and migration remain open under the supervision gap and SUP-2403.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0104"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0104-determinism-class-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert the four provisional labels and their test-local order.",
+  "Compare equivalent effect rows with different input order and require identical test-only evidence bytes.",
+  "Keep class inference, effect/runtime boundaries, scheduler interleavings, build metadata, Semantic Graph fields, replay headers, privacy, corruption, divergence, cross-process, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public determinism or replay claim is registered.",
+]
+unresolved_alternatives = [
+  "Class names and ordering, declaration/inference, composition, observable equivalence, effect/scheduler boundaries, metadata and graph/header placement, versioning, privacy, corruption, divergence, diagnostics, runtime ABI, and migration remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2501.",
+]
+superseded_by = ""

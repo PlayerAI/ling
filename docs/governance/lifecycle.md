@@ -134,6 +134,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0101` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0101](../decisions/0101-supervisor-observation.md) |
 | `DEC-0102` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0102](../decisions/0102-restart-budget-observation.md) |
 | `DEC-0103` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0103](../decisions/0103-supervision-test-evidence.md) |
+| `DEC-0104` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0104](../decisions/0104-determinism-class-evidence.md) |
 
 ## Migration boundary
 
