@@ -35,6 +35,7 @@
 | `ACT-2301-ACTOR-SYNTAX-REJECTION` | Internal Actor-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `44bb344db86ad8c1039d8a974f5d608c7c1eff9a` |
 | `ACT-2301-IDENTITY-MODEL` | Internal Actor identity/reference model | `G2` | `S` | `Done` | `ACT-2301-ACTOR-SYNTAX-REJECTION` | `4209c9b444b72501731b96fdad2f8832269b406a` |
 | `ACT-2302` | Actor message sendability checking | `G2` | `L` | `BlockedSpec` | `ACT-2301` | `` |
+| `ACT-2302-MESSAGE-SCHEMA-MODEL` | Internal Actor message-schema identity model | `G2` | `S` | `Done` | `ACT-2301-IDENTITY-MODEL` | `dfc5577c80ecf3811014495080aca758df2cf3e9` |
 | `ACT-2303` | Bounded mailbox and backpressure | `G2` | `L` | `BlockedSpec` | `ACT-2302` | `` |
 | `ACT-2304` | Actor turn and reentry rules | `G2` | `L` | `BlockedSpec` | `ACT-2303` | `` |
 | `ACT-2305` | Actor runtime | `G2` | `L` | `BlockedSpec` | `ACT-2304` | `` |
