@@ -5159,3 +5159,27 @@ unresolved_alternatives = [
   "Proof IR/query/certificate versions and canonical forms; input envelope and limits; checker identity/version/configuration and replay; obligation, Contract, Semantic IDs and spans; result states including timeout, unknown, malformed, corrupt, unsupported-version, invalid, and counterexample; kernel/checker independence and soundness; assumptions and TCB scope; cancellation, fail-closed/resource bounds, offline dependency policy, provenance/checksum/signature/redaction/migration; machine-readable result schema and exit codes; diagnostics; fuzz, positive/negative/malformed/deep/timeout/unknown/corruption/Unicode/differential fixtures; protocol inventory and public support remain open under PROOF-5502, PROOF-5501, PROOF-5503, RFC-K505, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing checker authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0201"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0201-assumption-registry-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty assumption-registry categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer registry/schema implementation, identity/lifecycle/review/risk/expiry/proof-effect rules, diagnostics, Evidence Bundle linkage, protocols, and public support until accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing governance records and compiler evidence are not reinterpreted as proof assumptions.",
+  "No assumption registry, schema, reviewer/expiry workflow, proof effect, TCB field, Evidence Bundle, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Assumption identity and canonical record version; description/source/digest/scope/owner/reviewer/expiry/version/risk/affected-obligation fields; stable Contract/Proof/Semantic IDs and spans; proposed/approved/revoked/expired/stale/missing/duplicate/conflicting/out-of-scope/unreviewed/unverifiable/malformed/corrupt semantics; unknown fields and migration; distinction among assumptions, hypotheses, axioms, runtime checks, tests, model checks, solver candidates, and proved facts; TCB/proof effect/optimizer/profile admission; fail-closed policy, provenance/checksum/signature/redaction, Evidence Bundle, diagnostics, positive/negative/expired/revoked/Unicode/differential fixtures, protocol inventory, and public support remain open under PROOF-5503, PROOF-5502, RFC-K505, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing assumption authority.",
+]
+superseded_by = ""

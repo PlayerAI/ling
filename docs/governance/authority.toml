@@ -3120,3 +3120,16 @@ covers = ["PROOF-5502 bounded Independent Checker boundary evidence", "test-only
 depends_on = ["DEC-0199", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0201"
+title = "Internal Assumption Registry boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0201-assumption-registry-boundary-evidence.md"
+covers = ["PROOF-5503 bounded Assumption Registry boundary evidence", "test-only assumption vocabulary", "assumption boundaries without schema/lifecycle/proof semantics"]
+depends_on = ["DEC-0200", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
