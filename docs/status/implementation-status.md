@@ -143,6 +143,7 @@
 | `GPU-4604` | Differential and Hardware Matrix | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4605` | Error Normalization | `G4` | `M` | `BlockedSpec` | — | `` |
 | `IDE-2301` | IDE document symbols | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
+| `IDE-2301-INDEX` | Internal resolved-definition source-order index | `G1` | `S` | `Done` | `INC-1403`, `PRJ-1102` | `cdce9928bb84526f2adefbb0e607c84bb4ac2116` |
 | `IDE-2302` | IDE hover | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `LSP-2201` | `` |
 | `IDE-2303` | IDE definition navigation | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `IDE-2302`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2304` | IDE references | `G1` | `M` | `BlockedSpec` | `IDE-2303`, `LSP-2101`, `LSP-2102` | `` |

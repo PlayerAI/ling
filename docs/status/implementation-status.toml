@@ -5927,6 +5927,58 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2301-INDEX"
+title = "Internal resolved-definition source-order index"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1403", "PRJ-1102"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0073-ide-resolved-definition-index.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/definition_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0073-ide-resolved-definition-index.md",
+  "docs/status/IDE-2301-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2301-INDEX-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0073 authorizes only an in-process immutable index of user definitions already emitted by a validated ResolvedProgram; builtins and Prelude entries are excluded and missing source facts are not synthesized.",
+  "Records preserve resolver DefinitionId, module/name spelling, mutability, logical source name, SourceId, and original UTF-8 Span; no LSP range, hierarchy, URI/version, or selection span is inferred.",
+  "Existing resolver member tables provide deterministic Trait/implementation-member classification and explicit source/span/name/identity ordering makes repeated indexes equal.",
+  "Focused cargo fmt, ling-db tests, and Clippy checks pass; invalid UTF-8 returns QueryError without partial index publication.",
+  "The public IDE-2301 DocumentSymbol target remains BlockedSpec for protocol fields, hierarchy, position conversion, lifecycle, and fixtures.",
+]
+verified_against_commit = "cdce9928bb84526f2adefbb0e607c84bb4ac2116"
+completion_commit = "cdce9928bb84526f2adefbb0e607c84bb4ac2116"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The index is a compiler-query observation over resolver-owned identity and spans; it is not an LSP response or Semantic ID generator.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2301"
 title = "IDE document symbols"
 state = "BlockedSpec"
