@@ -8,9 +8,12 @@ severity/tags, and versioned fix data into LSP diagnostics. Ling's diagnostic
 registry and JSON writer are already a Preview protocol, but no accepted LSP
 adapter defines position conversion, field stability, or fix-data ownership.
 
-No LSP diagnostic adapter, range mapper, related-information policy, severity
-translation, tag mapping, fix-data field, or new diagnostic code was added.
-Existing diagnostic JSON and CLI rendering remain unchanged.
+Accepted DEC-0034 closes only the bounded `LSP-2201-ORDERING` child: an
+internal canonical key over logical names, original UTF-8 byte spans, stable
+code text, and a local tie-breaker. No LSP diagnostic adapter, range mapper,
+related-information policy, severity translation, tag mapping, fix-data field,
+or new diagnostic code was added. Existing diagnostic JSON and CLI rendering
+remain unchanged.
 
 ## Normative traceability
 
@@ -22,6 +25,8 @@ Existing diagnostic JSON and CLI rendering remain unchanged.
   not define LSP `Diagnostic` fields or a reader/adapter.
 - Accepted DEC-0002 requires LSP positions to be an explicitly labeled
   SourceMap projection and forbids changing Span identity.
+- Accepted DEC-0034 fixes only a path-free diagnostic ordering key; it does not
+  authorize LSP position conversion, field mapping, publication, or caps.
 - `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves position/snapshot/version and
   Workspace Edit fields open; `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves
   public semantic protocol lifecycle open.
@@ -36,6 +41,9 @@ The current repository confirms the split boundary:
 - `ling-diagnostics` renders bilingual human/JSON diagnostics with stable codes
   and byte spans, but it has no LSP range, related-information, severity/tag,
   or document-version model.
+- The ordering child is deliberately not wired to `ling-diagnostics` or
+  `LspServer`; it cannot claim adapter, publication, severity, or suppression
+  behavior.
 - `ling-cli` and REPL consume the diagnostic writer; there is no LSP server or
   adapter that can associate a diagnostic with an open-document snapshot.
 - No protocol inventory entry defines an LSP diagnostic schema, fix-data
@@ -74,7 +82,8 @@ made.
 
 ## Intentionally deferred
 
-`LSP-2201` can begin after LSP lifecycle/position/snapshot decisions and an
-adapter schema are Accepted. The implementation must reuse registered Ling
-diagnostics, derive ranges from SourceMap, preserve byte-span truth, and keep
-experimental fix data clearly versioned.
+The parent `LSP-2201` can begin after LSP lifecycle/position/snapshot decisions
+and an adapter schema are Accepted. The implementation must reuse registered
+Ling diagnostics, derive ranges from SourceMap, preserve byte-span truth, and
+keep experimental fix data clearly versioned. The `LSP-2201-ORDERING` child is
+complete only for DEC-0034's internal key.

@@ -22,6 +22,29 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0034"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify file/start-byte/code/end-byte/tie-breaker ordering with Unicode names and CRLF byte offsets.",
+  "Verify repeated sorting is deterministic and the primitive has no positions, severity, facts, repairs, request/version, transport, cap, suppression, or JSON state.",
+]
+compatibility_impact = [
+  "Adds only pub(crate) diagnostic-ordering values; source, language, diagnostics, schemas, Semantic IDs, CLI, wire methods, VM, and Unicode remain unchanged.",
+]
+unresolved_alternatives = [
+  "Public diagnostic field mapping, positions, severity, related information, deduplication, caps, publication, and lifecycle require later Accepted LSP-2201/LSP-2204 authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0033"
 kind = "Decision"
 status = "Accepted"

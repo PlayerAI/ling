@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0034"
+title = "LSP internal diagnostic ordering boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md"
+covers = ["internal LSP diagnostic ordering", "UTF-8 byte-span ordering", "public adapter deferral"]
+depends_on = ["DEC-0001", "DEC-0002", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0033"
 title = "LSP internal byte-accounting boundary"
 kind = "Decision"

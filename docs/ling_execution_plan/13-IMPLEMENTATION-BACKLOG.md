@@ -146,7 +146,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2103-OVERLAY` | G1/Editor | LSP full-text overlay Preview slice | M | Done | Accepted RFC-0023; see `crates/ling-lsp/tests/overlay.rs` and `docs/status/LSP-2103-OVERLAY-IMPLEMENTATION-REPORT.md`; incremental edits and transactions remain in `LSP-2103` |
 | `LSP-2104` | G1/Editor | 增量文本变更 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:170`, `docs/status/LSP-2104-AUTHORITY-AUDIT.md` |
 | `LSP-2105` | G1/Editor | Workspace reload | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:182`, `docs/status/LSP-2105-AUTHORITY-AUDIT.md` |
-| `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:188`, `docs/status/LSP-2201-AUTHORITY-AUDIT.md` |
+| `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | BlockedSpec | Accepted DEC-0034 closes only the internal ordering child; public adapter, positions, fields, and publication remain open; see `docs/status/LSP-2201-AUTHORITY-AUDIT.md` |
+| `LSP-2201-ORDERING` | G1/Editor | Internal canonical diagnostic ordering | S | Done | Accepted DEC-0034; see `crates/ling-lsp/src/diagnostics.rs` and `docs/status/LSP-2201-ORDERING-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `LSP-2202` | G1/Editor | Push diagnostics v0 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:204`, `docs/status/LSP-2202-AUTHORITY-AUDIT.md` |
 | `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:215`, `docs/status/LSP-2203-AUTHORITY-AUDIT.md` |
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:219`, `docs/status/LSP-2204-AUTHORITY-AUDIT.md` |

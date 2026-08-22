@@ -25,6 +25,10 @@ mod scheduler;
 // behavior remains deferred to the parent LSP-2504 contract.
 #[allow(dead_code)]
 mod resource;
+// DEC-0034 is an internal ordering child; diagnostic projection and
+// publication remain deferred to the parent LSP contracts.
+#[allow(dead_code)]
+mod diagnostics;
 
 /// Version marker for the current Preview lifecycle protocol.
 pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";

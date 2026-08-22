@@ -33,7 +33,7 @@
 | `GAP-AUTHOR-SOURCE-LOCALIZATION-001` | `P0` | `Open` | Equivalent localized Author Source keyword views | `FMT-1501`, `FMT-1508`, `IDE-2306` | `RFC-0003` |
 | `GAP-FORMATTER-AUTHOR-SOURCE-001` | `P0` | `Open` | Author Source formatter preservation and normalization boundary | `FMT-1507` | — |
 | `GAP-INCREMENTAL-CACHE-001` | `P0` | `Open` | Incremental query keys, invalidation, persistence, and corruption recovery | `INC-1409` | — |
-| `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2103`, `LSP-2104`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501`, `LSP-2502`, `LSP-2503`, `LSP-2504` | `RFC-0004`, `RFC-0023` |
+| `GAP-LSP-TRANSACTION-PROTOCOL-001` | `P0` | `Open` | LSP position, snapshot, Workspace Edit, and Semantic Transaction boundary | `LSP-2102`, `LSP-2103`, `LSP-2104`, `LSP-2201`, `LSP-2204`, `IDE-2305`, `IDE-2306`, `IDE-2309`, `LSP-2501`, `LSP-2502`, `LSP-2503`, `LSP-2504` | `RFC-0004`, `RFC-0023` |
 | `GAP-SEMANTIC-HASH-LIFECYCLE-001` | `P0` | `Open` | Semantic Hash algorithm, identity upgrade, and invalidation lifecycle | `INC-1406`, `INC-1409`, `GOV-0106` | `RFC-0004` |
 | `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` | `P0` | `Open` | Semantic Graph and Semantic Transaction protocol lifecycle | `GOV-0106`, `INC-1406`, `IDE-2306`, `IDE-2309` | `RFC-0004` |
 | `GAP-BYTECODE-SEMANTICS-001` | `P0` | `Accepted` | Versioned bytecode and verifier observable semantics | `VM-1210` | `RFC-0014`, `RFC-0015`, `RFC-0016`, `RFC-0017`, `RFC-0018`, `RFC-0019`, `RFC-0020` |
