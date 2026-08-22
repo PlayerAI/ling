@@ -2163,3 +2163,26 @@ unresolved_alternatives = [
   "Completion-item handles/lifetimes, documentation/localization, signature grammar, Effect/Capability rendering/redaction, insertion/formatter policy, URI/version/position/snapshot/cancellation/stale behavior, dependency/generated/builtin policy, protocol lifecycle, and migration remain open under IDE-2308 and the registered LSP/semantic/formatter gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0081"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0081-ide-code-action-repair-index.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify code/severity/span and structured Repair kind/changes_semantics/facts, message-text independence, deterministic repeated construction, code/kind lookups, and empty diagnostics.",
+  "Keep action IDs/applicability/preferred state, FixPlan, edits, positions, versions, stale/rollback, cancellation, limits, and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal diagnostic repair observation values/getters; language semantics, registered diagnostic wire schema, Semantic IDs, CLI/LSP behavior, runtime, bytecode, VM, ABI, and Unicode tables remain unchanged.",
+]
+unresolved_alternatives = [
+  "Code-action kind/ID/applicability/capability policy, FixPlan/edit/overlap/atomicity/version/stale/rollback/position/cancellation/limits, formatter/mutation safety, and migration remain open under IDE-2309 and the registered LSP/formatter/semantic gaps.",
+]
+superseded_by = ""

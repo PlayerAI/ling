@@ -13,6 +13,10 @@ No code-action handler, FixPlan schema, diagnostic-to-action registry,
 Workspace Edit, formatter action adapter, diagnostic allocation, or placeholder
 editor surface was added.
 
+The bounded child `IDE-2309-REPAIR-INDEX` only copies existing diagnostic
+codes/spans and structured `Repair` payloads into an internal read-only index.
+It does not derive action IDs, applicability, edits, or protocol responses.
+
 ## Normative traceability
 
 - The execution package is non-normative; its action list does not authorize
@@ -40,6 +44,9 @@ editor surface was added.
 - Parser, resolver, type/effect checks, and `ling-cli` produce structured
   diagnostics with registered codes, but there is no FixPlan/action kind,
   applicability predicate, or diagnostic-to-edit mapping.
+- `ling-diagnostics::DiagnosticRepairIndex` provides deterministic structured
+  repair facts without inspecting `message_zh` or `message_en`; it has no
+  FixPlan, mutation, version, or action policy.
 - `ling-source` and formatter code preserve source spans/revisions, yet no
   atomic multi-file Workspace Edit, snapshot/version precondition, overlap
   policy, rollback, or stale-action response is implemented.

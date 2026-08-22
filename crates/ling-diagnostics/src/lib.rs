@@ -9,6 +9,10 @@ use serde::Serialize;
 use serde::ser::Serializer;
 use serde_json::Value;
 
+mod repair_index;
+
+pub use repair_index::{DiagnosticRepairIndex, DiagnosticRepairObservation};
+
 pub const DIAGNOSTIC_SCHEMA: &str = "ling.diagnostic/0.1";
 
 pub mod codes {
@@ -238,6 +242,21 @@ impl Repair {
         self.facts.insert(name.into(), value.into());
         self
     }
+
+    #[must_use]
+    pub fn kind(&self) -> &str {
+        &self.kind
+    }
+
+    #[must_use]
+    pub const fn changes_semantics(&self) -> bool {
+        self.changes_semantics
+    }
+
+    #[must_use]
+    pub fn facts(&self) -> &BTreeMap<String, Value> {
+        &self.facts
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -312,6 +331,16 @@ impl Diagnostic {
     #[must_use]
     pub const fn primary_span(&self) -> Option<&DiagnosticSpan> {
         self.primary_span.as_ref()
+    }
+
+    #[must_use]
+    pub fn facts(&self) -> &BTreeMap<String, Value> {
+        &self.facts
+    }
+
+    #[must_use]
+    pub fn repairs(&self) -> &[Repair] {
+        &self.repairs
     }
 
     pub fn render_json(&self) -> Result<String, RenderError> {
