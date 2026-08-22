@@ -66,6 +66,7 @@ cargo run --locked --offline -- run examples/pipeline.ling
 cargo test -p ling-cli --test conformance seed_examples_check_run_and_emit_semantic_graphs --locked --offline
 cargo test -p ling-cli --test conformance audit_output_is_deterministic_and_round_trips --locked --offline
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
+cargo xtask examples verify
 ```
 
 Expected observable boundaries are: successful checks have empty stdout and
@@ -88,3 +89,8 @@ offline check, and supported host/profile.
 No example in this inventory introduces placeholder syntax, a future API,
 unaccepted ownership semantics, an unsupported backend, a migration promise,
 or a stale legacy command/source name.
+
+The internal `cargo xtask examples verify` command validates the exact
+two-layer requirement and Seed feature-traceability rows above. It protects
+inventory drift only; it does not run the examples, create a Stable support
+claim, or replace the conformance and process-level evidence listed here.

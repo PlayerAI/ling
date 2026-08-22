@@ -462,6 +462,20 @@ symbol = "rejects_documentation_state_drift"
 feature_ids = ["FTR-SEED-0007"]
 
 [[evidence]]
+id = "EVD-POS-EXAMPLES-MATRIX"
+kind = "Positive"
+path = "tools/xtask/src/examples_matrix.rs"
+symbol = "repository_example_matrix_is_deterministic"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-EXAMPLES-MATRIX-DRIFT"
+kind = "Negative"
+path = "tools/xtask/src/examples_matrix.rs"
+symbol = "rejects_example_requirement_drift"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
 id = "EVD-POS-G0-CI-CONTRACT"
 kind = "Positive"
 path = "tools/xtask/src/ci.rs"

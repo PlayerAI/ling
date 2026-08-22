@@ -14359,6 +14359,7 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
+  "docs/decisions/0046-seed-example-matrix-gate.md",
   "docs/ERROR-CODES.md",
   "docs/SEED-TRACEABILITY.md",
   "docs/SEED-RELEASE-REPORT.md",
@@ -14382,6 +14383,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6702-SEED-IMPLEMENTATION-REPORT.md",
   "docs/testing/EXAMPLE-COVERAGE.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
@@ -14401,6 +14403,52 @@ notes = [
   "DOC-6702 is BlockedSpec because no current feature is Stable and G6 depends on G1-G5 exits before a 1.0 support matrix can freeze the required example layers.",
   "The Seed matrix reuses existing examples, conformance positives/negatives, process-level Semantic checks, and deterministic Audit evidence without inventing syntax or public behavior.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, or public API.",
+]
+
+[[task]]
+id = "DOC-6702-SEED"
+title = "Seed example-matrix drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DOC-6701-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0046-seed-example-matrix-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/EXAMPLE-COVERAGE.md",
+  ".github/workflows/ci.yml",
+]
+artifacts = [
+  "tools/xtask/src/examples_matrix.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/testing/EXAMPLE-COVERAGE.md",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0046-seed-example-matrix-gate.md",
+  "docs/status/DOC-6702-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask examples verify deterministically validates seven two-layer requirements and seven Seed feature-traceability rows with non-empty evidence cells.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, malformed or empty evidence cells, and removal of experimental/anti-placeholder policy phrases.",
+  "The command is included in the governance-authority CI gate and does not run examples, add syntax, or claim Stable feature/support state.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0046 closes only this internal Seed example child; the parent DOC-6702 gate remains BlockedSpec for future Stable capabilities and release evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects example inventory consistency only; current examples and outputs remain Experimental/Preview evidence.",
+  "No example, syntax, API, profile, ownership rule, migration promise, security claim, or placeholder public surface is added.",
 ]
 
 [[task]]

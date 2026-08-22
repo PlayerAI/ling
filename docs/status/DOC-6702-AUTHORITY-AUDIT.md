@@ -19,6 +19,12 @@ expected observable output, accepted authorities, conformance evidence, and
 explicit deferred boundaries. It adds no language syntax, API, protocol,
 profile, ownership rule, backend, or migration behavior.
 
+Accepted `DEC-0046` closes only the bounded `DOC-6702-SEED` child: the
+internal `cargo xtask examples verify` command prevents drift in the seven
+two-layer requirement rows and seven Seed feature-traceability rows. It does
+not run examples or promote the current Experimental/Preview evidence to a
+Stable 1.0 support claim.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:406-415` is a non-normative checklist. It does
@@ -49,6 +55,7 @@ The missing release evidence is a future Stable support matrix, feature-specific
 profile/target policy, complete cross-platform output fixtures, and examples
 for capabilities whose Accepted semantics and implementation do not yet
 exist. Those are G1-G5 dependencies, not gaps to fill with guessed syntax.
+The matrix verifier checks only the inventory and anti-placeholder policy text.
 
 ## Compatibility and deferred work
 
