@@ -1,11 +1,11 @@
 # DEC-0064: Handler source CST projection / Handler 源码 CST 投影
 
-> 状态：Accepted  
-> Status: Accepted  
-> 提出日期：2026-08-22  
-> 决定日期：2026-08-22  
-> Owner role: effect-system-design  
-> 相关 RFC/缺口：`RFC-0006`, `DEC-0063`, `GAP-EFFECT-HANDLER-001`  
+> 状态：Accepted
+> Status: Accepted
+> 提出日期：2026-08-22
+> 决定日期：2026-08-22
+> Owner role: effect-system-design
+> 相关 RFC/缺口：`RFC-0006`, `DEC-0063`, `GAP-EFFECT-HANDLER-001`
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
 This decision authorizes the parser-only source projection for the bounded
@@ -110,4 +110,3 @@ DEC-0063 定义了一阶 checked Handler Core，但明确未规定源语法。�
 
 - Supersedes: `None`
 - Superseded by: `None`
-

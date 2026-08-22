@@ -98,6 +98,7 @@
 | `EFF-2102` | Effect inference and constraint solving | `G2` | `L` | `Done` | `EFF-2101` | `e1827e7ceee6ffba9d40d882119a949d4af65a00` |
 | `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `BlockedSpec` | `EFF-2101`, `EFF-2102` | `` |
 | `EFF-2103-CORE` | First-order handler Typed Core projection | `G2` | `S` | `Done` | `EFF-2101`, `EFF-2102` | `e1dc5334d15e25e959fa0da6e3462a90210c6fdf` |
+| `EFF-2103-SYNTAX` | Handler source CST projection | `G2` | `S` | `Done` | `EFF-2103-CORE` | `73807f551753620b52b685d7aca25c2032ec1a77` |
 | `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `BlockedSpec` | `EFF-2103` | `` |
 | `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `BlockedSpec` | `EFF-2104` | `` |
 | `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |

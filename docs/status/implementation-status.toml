@@ -6968,6 +6968,54 @@ notes = [
 ]
 
 [[task]]
+id = "EFF-2103-SYNTAX"
+title = "Handler source CST projection"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2103-CORE"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0006.md",
+  "docs/decisions/0063-first-order-handler-core.md",
+  "docs/decisions/0064-handler-source-cst-projection.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-syntax/src/cst.rs",
+  "crates/ling-syntax/src/parser.rs",
+  "crates/ling-ast/src/lib.rs",
+  "docs/decisions/0064-handler-source-cst-projection.md",
+  "docs/status/EFF-2103-SYNTAX-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2103-SYNTAX-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0064 authorizes only contextual handle/operation/resume parsing and a lossless HandleExpression/HandlerClause CST projection; AST/HIR and runtime semantics remain deferred.",
+  "The parser preserves Seed identifiers outside the recognized handler shape, original UTF-8 spans, deterministic child order, nested match-with expressions, Unicode, BOM, and CRLF behavior.",
+  "Positive and negative parser tests cover one/multiple clauses, parameter patterns, optional resume marker, indentation, malformed delimiters, and bounded diagnostics.",
+  "ling-ast rejects the experimental CST kind before publication, so no unresolved AST/HIR, evaluator, bytecode, VM, schema, Semantic ID, CLI, or protocol surface is exposed.",
+]
+verified_against_commit = "73807f551753620b52b685d7aca25c2032ec1a77"
+completion_commit = "73807f551753620b52b685d7aca25c2032ec1a77"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The parser-only child is complete; the EFF-2103 parent remains BlockedSpec for accepted AST/HIR lowering, operation signatures, resume typing, effect checking, and source-to-Core integration.",
+  "DEC-0064 intentionally keeps handler spellings contextual and does not reserve Seed identifiers or add a diagnostic, schema, protocol, evaluator, bytecode, VM, or runtime behavior.",
+]
+
+[[task]]
 id = "EFF-2104"
 title = "Interpreter and VM handler execution"
 state = "BlockedSpec"
