@@ -2140,3 +2140,26 @@ unresolved_alternatives = [
   "Completion context grammars, candidate visibility/ranking, type/effect/capability fit, builtins/Prelude/dependency policy, insertion text, formatter interaction, request snapshot/version/position/cancellation/stale behavior, resource limits, protocol lifecycle, and migration remain open under IDE-2307 and the registered LSP/semantic gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0080"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0080-ide-completion-checked-metadata.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify checked definitions and local/parameter bindings, exact Unicode/BOM/CRLF spans, resolver identities, type displays, optional canonical effects/capabilities, repeated equality, and source/identity lookups.",
+  "Preserve absent checked facts and keep resolve handles, documentation, signature, redaction, insertion, position/version, stale, limits, cancellation, and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db checked metadata values and an accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode tables remain unchanged.",
+]
+unresolved_alternatives = [
+  "Completion-item handles/lifetimes, documentation/localization, signature grammar, Effect/Capability rendering/redaction, insertion/formatter policy, URI/version/position/snapshot/cancellation/stale behavior, dependency/generated/builtin policy, protocol lifecycle, and migration remain open under IDE-2308 and the registered LSP/semantic/formatter gaps.",
+]
+superseded_by = ""

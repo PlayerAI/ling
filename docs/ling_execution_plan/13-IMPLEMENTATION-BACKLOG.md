@@ -181,6 +181,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `IDE-2307` | G1/Editor | Completion v0 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:299`, `docs/status/IDE-2307-AUTHORITY-AUDIT.md` |
 | `IDE-2307-SOURCE-INDEX` | G1/Editor | Internal resolver completion-source inventory | S | Done | Accepted `DEC-0079`; see `crates/ling-db/src/completion_source_index.rs` and `docs/status/IDE-2307-SOURCE-INDEX-IMPLEMENTATION-REPORT.md`; public completion remains BlockedSpec |
 | `IDE-2308` | G1/Editor | Completion resolve | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:312`, `docs/status/IDE-2308-AUTHORITY-AUDIT.md` |
+| `IDE-2308-METADATA` | G1/Editor | Internal completion checked-metadata observation | S | Done | Accepted `DEC-0080`; see `crates/ling-db/src/completion_metadata_index.rs` and `docs/status/IDE-2308-METADATA-IMPLEMENTATION-REPORT.md`; public completion resolve remains BlockedSpec |
 | `IDE-2309` | G1/Editor | Code actions | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:316`, `docs/status/IDE-2309-AUTHORITY-AUDIT.md` |
 | `IDE-2310` | G1/Editor | Formatting | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:329`, `docs/status/IDE-2310-AUTHORITY-AUDIT.md` |
 | `IDE-2311` | G1/Editor | Workspace symbols | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:333`, `docs/status/IDE-2311-AUTHORITY-AUDIT.md` |

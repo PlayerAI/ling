@@ -13,6 +13,10 @@ No completion-resolve handler, documentation renderer, signature formatter,
 capability disclosure, insertion-text API, protocol field, or placeholder editor
 surface was added.
 
+The bounded child `IDE-2308-METADATA` only joins existing checked type, Effect
+Row, and module Capability facts to resolver-backed definitions and bindings.
+It does not render, disclose, redact, or insert any completion item.
+
 ## Normative traceability
 
 - The execution package is non-normative; its lazy-loading list does not
@@ -40,6 +44,10 @@ surface was added.
 - `ling-types` and `ling-effects` compute checked signatures, effects, and
   capabilities internally, but expose no completion-resolve item identity,
   display model, or capability-redaction policy.
+- `ling-db::resolved_completion_metadata_index` now preserves optional checked
+  type displays, canonical effects, and module capabilities alongside existing
+  resolver identities and original spans. It has no documentation, signature
+  presentation, redaction, insertion, position, version, or publication policy.
 - `ling-semantic` can project Experimental graph type/effect/capability data,
   but that graph is not a documentation/signature protocol and has no editor
   resolve handle or source provenance contract.

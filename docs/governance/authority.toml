@@ -1547,3 +1547,16 @@ covers = ["IDE-2307 bounded completion-source inventory", "resolver-backed defin
 depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0080"
+title = "Internal completion checked-metadata observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0080-ide-completion-checked-metadata.md"
+covers = ["IDE-2308 bounded completion checked-metadata observation", "existing type/effect/capability facts", "deterministic internal completion metadata"]
+depends_on = ["DEC-0002", "DEC-0010", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
