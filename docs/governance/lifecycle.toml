@@ -4943,3 +4943,27 @@ unresolved_alternatives = [
   "Conformance protocol/version, fixture manifest and oracle; initialization, tick/state/multi-rate/clock/rate/input presence/staleness/order; deadline, overrun, Fault, fallback, restart/safe mode; static schedule/WCET/memory/ABI; reference versus target evidence; event/effect/input/output identity, replay/divergence/corruption/privacy/migration; Node/Actor/Task bridge, ownership/mailbox; Semantic IDs/spans, bilingual diagnostics/facts; positive/negative, initialization, tick/state, multi-rate, stale input, deadline, fallback, restart/safe-mode, replay, schedule, differential, Unicode, migration fixtures; protocol inventory and public status remain open under NODE-5307, NODE-5306, NODE-5305, RFC-K502, GAP-CRITICAL-PROFILE-001, GAP-DETERMINISTIC-REPLAY-001, GAP-STRUCTURED-TASK-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-NATIVE-BACKEND-ABI-001, and missing Node authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0192"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0192-contract-syntax-core-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Contract syntax/Core categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer parser/AST/Core, resolver, effect/purity checking, obligation/status schema, proof/runtime checking, diagnostics, CLI/LSP, and protocol behavior until accepted authority and fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing verifier/compiler invariants and RFC-0019 wording are not reinterpreted as Contract semantics.",
+  "No Contract parser, AST/HIR/Core form, checker, proof adapter, runtime schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Contract grammar/forms/contexts, expression types/precedence/logical and short-circuit behavior, AST/HIR/Core mapping and malformed recovery; purity/totality/effects/capabilities/allocation/termination and restricted assume provenance; obligation/ContractId/DefinitionId identity, canonical bytes, alpha-normalization and semantic diff; status lifecycle and trust levels (Proved, RuntimeChecked, ModelChecked, Tested, Assumed, Unknown, Failed, NotApplicable), timeout and migration; VC/solver/certificate/proof checker and trusted assumptions; runtime-check order/isolation/Fault; diagnostics/facts, profiles/optimization, ownership/Node/Task/Actor, memory/timing, evidence bundles; positive/negative/malformed, Unicode, migration, determinism and differential fixtures; protocol inventory and public status remain open under CTR-5401, NODE-5307, RFC-K503, GAP-CRITICAL-PROFILE-001, GAP-CONTRACT-PROOF-001, and missing authority.",
+]
+superseded_by = ""

@@ -457,6 +457,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `NODE-5307` | G5 | Node conformance | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:288`, `docs/status/NODE-5307-AUTHORITY-AUDIT.md` |
 | `NODE-5307-OBSERVATION` | G5 | Internal Node conformance boundary evidence | S | Done | Accepted `DEC-0191`; see `crates/ling-types/tests/node_conformance_evidence.rs` and `docs/status/NODE-5307-OBSERVATION-IMPLEMENTATION-REPORT.md`; runner/manifest/oracle/runtime semantics remain BlockedSpec |
 | `CTR-5401` | G5 | Contract 语法与 AST/Core | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:304`, `docs/status/CTR-5401-AUTHORITY-AUDIT.md` |
+| `CTR-5401-OBSERVATION` | G5 | Internal Contract syntax/Core boundary evidence | S | Done | Accepted `DEC-0192`; see `crates/ling-types/tests/contract_syntax_core_evidence.rs` and `docs/status/CTR-5401-OBSERVATION-IMPLEMENTATION-REPORT.md`; grammar/Core/proof/runtime semantics remain BlockedSpec |
 | `CTR-5402` | G5 | Contract 状态模型 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:320`, `docs/status/CTR-5402-AUTHORITY-AUDIT.md` |
 | `CTR-5403` | G5 | Runtime Contract Check | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:335`, `docs/status/CTR-5403-AUTHORITY-AUDIT.md` |
 | `CTR-5404` | G5 | Verification Condition Generation | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:347`, `docs/status/CTR-5404-AUTHORITY-AUDIT.md` |

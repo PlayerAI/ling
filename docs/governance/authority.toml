@@ -3003,3 +3003,16 @@ covers = ["NODE-5307 bounded Node conformance boundary evidence", "test-only Nod
 depends_on = ["DEC-0190", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0192"
+title = "Internal Contract syntax/Core boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0192-contract-syntax-core-boundary-evidence.md"
+covers = ["CTR-5401 bounded Contract syntax/Core boundary evidence", "test-only Contract vocabulary", "Contract boundaries without grammar/Core/proof/runtime semantics"]
+depends_on = ["DEC-0191", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

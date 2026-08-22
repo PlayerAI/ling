@@ -222,6 +222,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0189` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0189](../decisions/0189-node-native-runtime-boundary-evidence.md) |
 | `DEC-0190` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0190](../decisions/0190-node-actor-boundary-evidence.md) |
 | `DEC-0191` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0191](../decisions/0191-node-conformance-boundary-evidence.md) |
+| `DEC-0192` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0192](../decisions/0192-contract-syntax-core-boundary-evidence.md) |
 
 ## Migration boundary
 
