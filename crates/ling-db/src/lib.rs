@@ -1682,6 +1682,7 @@ fn expression_has_effect_surface(expression: &ling_hir::Expression) -> bool {
             SequenceElement::Let(binding) => expression_has_effect_surface(&binding.value),
             SequenceElement::Expression(expression) => expression_has_effect_surface(expression),
         }),
+        ExpressionKind::Handle { .. } => true,
         ExpressionKind::If {
             condition,
             then_branch,

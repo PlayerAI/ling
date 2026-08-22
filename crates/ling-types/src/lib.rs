@@ -344,6 +344,7 @@ pub enum TypeErrorKind {
         actual: String,
     },
     UnsupportedTypeSyntax,
+    UnsupportedHandler,
 }
 
 impl TypeError {
@@ -427,6 +428,11 @@ impl TypeError {
                 codes::TYPE_MISMATCH,
                 "当前 Seed 类型语法不支持此注解".to_owned(),
                 "this annotation is not supported by the current Seed type grammar".to_owned(),
+            ),
+            TypeErrorKind::UnsupportedHandler => (
+                codes::UNSUPPORTED_HANDLER,
+                "Handler 尚未具备已检查语义".to_owned(),
+                "handler does not yet have checked semantics".to_owned(),
             ),
         };
         let mut diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
@@ -1960,6 +1966,15 @@ impl Inferencer {
                     self.unify(expected, actual, module, field.span, None);
                 }
                 base_type
+            }
+            hir::ExpressionKind::Handle { .. } => {
+                self.push_error(
+                    module,
+                    expression.span,
+                    TypeErrorKind::UnsupportedHandler,
+                    None,
+                );
+                InferType::Error
             }
         };
         if matches!(value, InferType::TraitMember(_)) {

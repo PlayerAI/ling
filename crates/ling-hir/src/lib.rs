@@ -241,9 +241,24 @@ pub struct Expression {
     pub kind: ExpressionKind,
 }
 
+/// An unresolved operation clause preserved through HIR until a checked
+/// handler contract defines operation lookup, binding scope, and resume type.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct HandlerClause {
+    pub span: Span,
+    pub operation: QualifiedName,
+    pub parameters: Vec<Pattern>,
+    pub resume: Option<Name>,
+    pub body: Expression,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ExpressionKind {
     Sequence(Vec<SequenceElement>),
+    Handle {
+        body: Box<Expression>,
+        clauses: Vec<HandlerClause>,
+    },
     If {
         condition: Box<Expression>,
         then_branch: Box<Expression>,
@@ -875,9 +890,25 @@ impl Lowerer {
                     ExpressionKind::Sequence(lowered)
                 }
             }
-            ast::ExpressionKind::Handle { .. } => {
-                return Err(self.error(LowerErrorKind::UnsupportedHandler, expression.span));
-            }
+            ast::ExpressionKind::Handle { body, clauses } => ExpressionKind::Handle {
+                body: Box::new(self.expression(body)?),
+                clauses: clauses
+                    .iter()
+                    .map(|clause| {
+                        Ok(HandlerClause {
+                            span: clause.span,
+                            operation: qualified_name(&clause.operation),
+                            parameters: clause
+                                .parameters
+                                .iter()
+                                .map(|parameter| self.pattern(parameter))
+                                .collect::<Result<Vec<_>, _>>()?,
+                            resume: clause.resume.as_ref().map(name),
+                            body: self.expression(&clause.body)?,
+                        })
+                    })
+                    .collect::<Result<Vec<_>, LowerError>>()?,
+            },
             ast::ExpressionKind::If {
                 condition,
                 then_branch,
@@ -1215,7 +1246,7 @@ mod tests {
     }
 
     #[test]
-    fn rejects_unchecked_handler_ast_before_hir_publication() {
+    fn lowers_unresolved_handler_ast_into_hir_without_resolution() {
         let source = SourceFile::from_bytes(
             SourceId::new(0),
             "handler.ling",
@@ -1225,9 +1256,15 @@ mod tests {
         let parsed = parse(&source);
         assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
         let ast = lower_ast(&source, &parsed).expect("valid unresolved AST");
-        let error = lower(source.name(), &ast).expect_err("handler needs checked authority");
-        assert_eq!(error.kind, LowerErrorKind::UnsupportedHandler);
-        assert!(error.span.start() < error.span.end());
+        let program = lower(source.name(), &ast).expect("unresolved HIR is data-only");
+        let ExpressionKind::Handle { body, clauses } = &program.definitions[0].value.kind else {
+            panic!("expected HIR handler expression");
+        };
+        assert!(matches!(body.kind, ExpressionKind::Name { .. }));
+        assert_eq!(clauses.len(), 1);
+        assert_eq!(clauses[0].operation.normalized(), "Clock.now");
+        assert!(clauses[0].parameters.is_empty());
+        assert!(clauses[0].body.span.start() < clauses[0].body.span.end());
     }
 
     #[test]

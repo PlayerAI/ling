@@ -4,8 +4,9 @@
 
 `EFF-2103-AST` is complete as a bounded unresolved AST child under Accepted
 DEC-0065. It consumes the DEC-0064 CST shape into explicit span-preserving
-data, while HIR lowering rejects the value. The EFF-2103 parent remains
-`BlockedSpec` for checked operation/effect lowering.
+data. DEC-0066 now permits the data-only HIR projection while retaining
+structured resolver rejection. The EFF-2103 parent remains `BlockedSpec` for
+checked operation/effect lowering.
 
 ## Normative traceability
 
@@ -25,7 +26,8 @@ data, while HIR lowering rejects the value. The EFF-2103 parent remains
   contextual `resume` `Name`, body, and original span/source spelling.
 - Malformed child shapes are rejected through existing structured AST lowering
   errors; no operation is resolved, reordered, or assigned a semantic ID.
-- HIR lowering returns `UnsupportedHandler` before publishing an HIR value.
+- HIR lowering is extended by DEC-0066 only as unresolved data; resolution
+  rejects the HIR value before publishing a `ResolvedProgram`.
 
 ## Deferred
 
@@ -33,4 +35,3 @@ Operation namespace/signatures, binding identity, resume typing/cardinality,
 return/recovery clauses, effect-row checking, checked Handler Core construction,
 Audit Source/Semantic Graph fields, evaluator/VM execution, and Task/Actor
 crossing remain parent or later-task scope.
-

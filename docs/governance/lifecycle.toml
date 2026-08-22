@@ -1787,6 +1787,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0066"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0066-handler-hir-projection.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Lower contextual handler clauses into deterministic HIR data while preserving source order, IDs, original UTF-8 spans, Unicode names, BOM, and CRLF.",
+  "Reject every unresolved HIR handler at resolution with structured bilingual diagnostic L-EFFECT-0004 and publish no ResolvedProgram or references.",
+  "Verify downstream type, Effect, Semantic Graph, evaluator, bytecode, and VM boundaries do not interpret the unresolved variant; ordinary Seed behavior remains unchanged.",
+]
+compatibility_impact = [
+  "Adds an Experimental internal unresolved HIR variant and diagnostic L-EFFECT-0004; non-handler Seed source, schemas, Semantic IDs, public protocols, CLI, LSP, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Operation signatures/namespaces, binding and resume identity, return/recovery clauses, Effect-row checking, nested propagation, State/Fault/cancellation, Task/Actor crossing, and runtime lowering require later Accepted authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0006"
 kind = "RFC"
 status = "Accepted"

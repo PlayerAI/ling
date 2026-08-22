@@ -754,6 +754,9 @@ impl Checker {
                     self.visit_expression(module, &field.value, effects, calls);
                 }
             }
+            // The resolver rejects unresolved handlers before Effect checking;
+            // this branch intentionally does not infer handler semantics.
+            hir::ExpressionKind::Handle { .. } => {}
             hir::ExpressionKind::Name { .. }
             | hir::ExpressionKind::Literal(_)
             | hir::ExpressionKind::Unit => {}

@@ -1365,3 +1365,16 @@ covers = ["EFF-2103-AST unresolved handler expression", "span-preserving handler
 depends_on = ["RFC-0006", "DEC-0063", "DEC-0064"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0066"
+title = "Handler unresolved HIR projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0066-handler-hir-projection.md"
+covers = ["EFF-2103 unresolved handler HIR expression", "resolver rejection gate", "handler diagnostic L-EFFECT-0004"]
+depends_on = ["RFC-0006", "DEC-0063", "DEC-0064", "DEC-0065"]
+supersedes = []
+stable_basis = true

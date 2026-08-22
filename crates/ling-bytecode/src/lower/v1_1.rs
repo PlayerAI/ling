@@ -939,6 +939,9 @@ fn collect_lifted<'a>(
                 }
             }
         }
+        hir::ExpressionKind::Handle { .. } => {
+            return Err(unsupported_module(module, expression.span, "handler"));
+        }
         hir::ExpressionKind::If {
             condition,
             then_branch,
@@ -1367,6 +1370,7 @@ fn collect_declared_bindings(
                 collect_declared_bindings(module, &field.value, output);
             }
         }
+        hir::ExpressionKind::Handle { .. } => {}
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
         | hir::ExpressionKind::Unit => {}
@@ -1631,6 +1635,7 @@ fn collect_free_bindings(
                 )?;
             }
         }
+        hir::ExpressionKind::Handle { .. } => {}
         hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
     }
     Ok(())
@@ -2982,6 +2987,9 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                     self.propagate_mutable_bindings(environment, &local);
                 }
                 result.map_or_else(|| self.emit_constant(expression, Constant::Unit), Ok)
+            }
+            hir::ExpressionKind::Handle { .. } => {
+                Err(unsupported_module(self.module, expression.span, "handler"))
             }
             hir::ExpressionKind::Application {
                 function,
@@ -4980,6 +4988,9 @@ fn collect_type_shapes(
                 collect_type_shapes(snapshot, module, &field.value, builder)?;
             }
         }
+        hir::ExpressionKind::Handle { .. } => {
+            return Err(unsupported_module(module, expression.span, "handler"));
+        }
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
         | hir::ExpressionKind::Unit => {}
@@ -5056,6 +5067,9 @@ fn collect_constants_v1_1(
             if !final_expression {
                 insert_constant(constants, Constant::Unit)?;
             }
+        }
+        hir::ExpressionKind::Handle { .. } => {
+            return Err(unsupported_module(module, expression.span, "handler"));
         }
         hir::ExpressionKind::Application {
             function,

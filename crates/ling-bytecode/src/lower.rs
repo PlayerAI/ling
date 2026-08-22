@@ -715,6 +715,7 @@ impl<'a> FunctionLowerer<'a> {
                     None => self.emit_constant(expression, Constant::Unit),
                 }
             }
+            hir::ExpressionKind::Handle { .. } => Err(self.unsupported(expression.span, "handler")),
             hir::ExpressionKind::Application {
                 function,
                 arguments,
@@ -1202,6 +1203,7 @@ fn collect_text_strings(expression: &hir::Expression, strings: &mut BTreeSet<Str
                 collect_text_strings(&field.value, strings);
             }
         }
+        hir::ExpressionKind::Handle { .. } => {}
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
         | hir::ExpressionKind::Unit => {}
@@ -1297,6 +1299,9 @@ fn collect_constants(
         }
         hir::ExpressionKind::List(_) => {
             return Err(unsupported_at(plan, expression.span, "list"));
+        }
+        hir::ExpressionKind::Handle { .. } => {
+            return Err(unsupported_at(plan, expression.span, "handler"));
         }
     }
     Ok(())

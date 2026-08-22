@@ -305,6 +305,11 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 }
                 Ok(result)
             }
+            hir::ExpressionKind::Handle { .. } => Err(self.fault(
+                module,
+                expression.span,
+                "unresolved handler reached evaluator",
+            )),
             hir::ExpressionKind::If {
                 condition,
                 then_branch,

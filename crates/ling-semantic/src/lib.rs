@@ -3018,6 +3018,9 @@ impl SnapshotBuilder {
                     self.encode_expression(module, element, encoder);
                 }
             }
+            hir::ExpressionKind::Handle { .. } => {
+                unreachable!("unresolved handler reached Semantic Graph encoding")
+            }
         }
     }
 
@@ -3575,6 +3578,9 @@ fn add_expression_nodes(
                 add_expression_nodes(nodes, checked, context, owner, &field.value);
             }
         }
+        hir::ExpressionKind::Handle { .. } => {
+            unreachable!("unresolved handler reached Semantic Graph publication")
+        }
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
         | hir::ExpressionKind::Unit => {}
@@ -3584,6 +3590,9 @@ fn add_expression_nodes(
 fn expression_kind(expression: &hir::ExpressionKind) -> &'static str {
     match expression {
         hir::ExpressionKind::Sequence(_) => "sequence",
+        hir::ExpressionKind::Handle { .. } => {
+            unreachable!("unresolved handler reached Semantic Graph classification")
+        }
         hir::ExpressionKind::If { .. } => "if",
         hir::ExpressionKind::Match { .. } => "match",
         hir::ExpressionKind::Assignment { .. } => "assignment",
@@ -3812,6 +3821,10 @@ fn collect_expression_reference_sources(
                     sources,
                 );
             }
+        }
+        hir::ExpressionKind::Handle { .. } => {
+            // Unresolved handler clauses do not own ReferenceIds and are
+            // rejected before this checked-only projection is called.
         }
         hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
     }

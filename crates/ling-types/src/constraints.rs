@@ -254,6 +254,9 @@ impl Collector {
                     self.visit_expression(module, source_name, &field.value);
                 }
             }
+            // The resolver rejects unresolved handlers before this collector's
+            // obligations are published; do not interpret handler scope here.
+            hir::ExpressionKind::Handle { .. } => {}
             hir::ExpressionKind::Name { .. }
             | hir::ExpressionKind::Literal(_)
             | hir::ExpressionKind::Unit => {}

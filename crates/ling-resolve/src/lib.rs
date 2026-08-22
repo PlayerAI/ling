@@ -613,6 +613,7 @@ pub enum ResolveErrorKind {
     SuspiciousMixedScript { name: String, scripts: Vec<String> },
     ReservedName { name: String },
     MutableTopLevel { name: String },
+    UnsupportedHandler,
 }
 
 impl ResolveError {
@@ -679,6 +680,11 @@ impl ResolveError {
                 codes::INVALID_MODULE,
                 format!("Seed 不允许顶层 mutable binding“{name}”"),
                 format!("Ling Seed does not allow mutable top-level binding `{name}`"),
+            ),
+            ResolveErrorKind::UnsupportedHandler => (
+                codes::UNSUPPORTED_HANDLER,
+                "Handler 尚未具备已检查语义".to_owned(),
+                "handler does not yet have checked semantics".to_owned(),
             ),
         };
         let diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
@@ -1600,6 +1606,13 @@ impl Resolver {
                     self.resolve_expression(module, &field.value, scopes);
                 }
             }
+            hir::ExpressionKind::Handle { .. } => {
+                self.errors.push(ResolveError {
+                    kind: ResolveErrorKind::UnsupportedHandler,
+                    source_name: self.modules[module.0 as usize].hir.source_name.clone(),
+                    span: expression.span,
+                });
+            }
             hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
         }
     }
@@ -2207,6 +2220,34 @@ mod tests {
                 .iter()
                 .any(|error| matches!(error.kind, ResolveErrorKind::ImportCycle { .. }))
         );
+    }
+
+    #[test]
+    fn rejects_unresolved_handler_hir_before_publication() {
+        let program = hir_program(
+            0,
+            "Main.ling",
+            concat!(
+                "module Main\n\n",
+                "let value =\n",
+                "    handle value with\n",
+                "        operation Clock.now() -> 1\n",
+            ),
+        );
+        let errors = resolve(vec![program], "Main").expect_err("handler needs checked semantics");
+        let error = errors
+            .iter()
+            .find(|error| matches!(error.kind, ResolveErrorKind::UnsupportedHandler))
+            .expect("handler rejection");
+        assert_eq!(error.to_diagnostic().code(), codes::UNSUPPORTED_HANDLER);
+        assert!(
+            error
+                .to_diagnostic()
+                .render_json()
+                .expect("diagnostic JSON")
+                .contains("handler does not yet have checked semantics")
+        );
+        assert!(error.span.start() < error.span.end());
     }
 
     #[test]

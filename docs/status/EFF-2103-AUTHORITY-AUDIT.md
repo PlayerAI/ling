@@ -6,9 +6,9 @@
 checked lowering and checking contract. RFC-0006 is Accepted for the
 first-order Effect/Handler model, DEC-0062 is Accepted for row solving,
 DEC-0063 authorizes the bounded `EFF-2103-CORE` checked projection, DEC-0064
-authorizes the parser/CST `EFF-2103-SYNTAX` child, and DEC-0065 authorizes the
-unresolved AST `EFF-2103-AST` child. These children do not make the parent
-complete.
+authorizes the parser/CST `EFF-2103-SYNTAX` child, DEC-0065 authorizes the
+unresolved AST `EFF-2103-AST` child, and DEC-0066 authorizes the unresolved HIR
+projection and resolver gate. These children do not make the parent complete.
 
 ## Normative traceability
 
@@ -27,8 +27,10 @@ complete.
 - DEC-0064 closes only the contextual, lossless parser/CST shape for
   `EFF-2103-SYNTAX`; it explicitly rejects AST/HIR publication and execution.
 - DEC-0065 closes only the span-preserving unresolved AST data shape for
-  `EFF-2103-AST`; HIR lowering rejects it until checked operation/effect
-  semantics are accepted.
+- `EFF-2103-AST` is implemented under DEC-0065; DEC-0066 extends only the
+  AST-to-HIR data boundary and keeps resolution as the first rejecting gate.
+- DEC-0066 closes only unresolved HIR data and the `L-EFFECT-0004` resolver
+  rejection; it does not define checked operation/effect semantics.
 - Task/Actor crossing, runtime continuations, Fault/cancellation behavior,
   Audit Source schema, interpreter/VM ABI, and public protocol migration remain
   outside these authorities.
@@ -41,7 +43,8 @@ complete.
 - The `EFF-2103-SYNTAX` child parses contextual `handle` expressions and
   operation clauses into lossless `HandleExpression`/`HandlerClause` CST nodes.
 - The `EFF-2103-AST` child lowers those nodes into explicit unresolved AST
-  values; HIR lowering rejects them with a structured unsupported-handler error.
+  values, and `EFF-2103-HIR` preserves them through HIR before structured
+  resolver rejection.
 - No checked TypedProgram integration, evaluator, bytecode instruction, VM
   handler stack, or public schema has been added.
 - The existing Seed checker and runtime remain unchanged.
@@ -50,8 +53,8 @@ complete.
 
 An additional Accepted decision must still define, at minimum:
 
-1. exact HIR lowering and checked publication for the AST/CST shapes fixed by
-   DEC-0064 and DEC-0065;
+1. exact checked HIR publication and operation contracts for the AST/CST shapes
+   fixed by DEC-0064 through DEC-0066;
 2. binding identity, lexical scope, operation arguments, return/recovery types,
    resume syntax, source spans, and checked-only publication invariants;
 3. nested propagation, unhandled-effect policy, mutable State/Fault/cancellation

@@ -739,6 +739,7 @@ fn rewrite_expression(
                 rewrite_expression(&mut field.value, mapping, scopes);
             }
         }
+        hir::ExpressionKind::Handle { .. } => {}
         hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
     }
 }
