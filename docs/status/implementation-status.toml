@@ -13852,9 +13852,9 @@ acceptance = [
   "Positive, bare-member, unsatisfied-member, over-application, malformed-witness, ambiguous-selection, semantic-identity, and interpreter/VM differential tests provide current vertical-slice evidence.",
   "Cross-module calls remain deterministic across module presentation order; v1.0/v1.1 aggregate limitations and cross-package fixtures are explicitly deferred protocol scope.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "in_progress"
+verified_against_commit = "0dfb8d5c2d862143b9f91f0f88f2f47635a8cda5"
+completion_commit = "0dfb8d5c2d862143b9f91f0f88f2f47635a8cda5"
+integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "RFC-0021 closes the previously recorded runtime authority gap for the bounded v0.1 static Trait slice; v0.0.1 support claims remain unchanged.",
