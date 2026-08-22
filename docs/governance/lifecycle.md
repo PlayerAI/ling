@@ -60,6 +60,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0028` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0028](../decisions/0028-formatter-cli-contract.md) |
 | `DEC-0029` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0029](../decisions/0029-lsp-position-encoding-projection.md) |
 | `DEC-0030` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0030](../decisions/0030-lsp-request-snapshot-boundary.md) |
+| `DEC-0031` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0031](../decisions/0031-lsp-internal-cancellation-boundary.md) |
 
 ## Migration boundary
 

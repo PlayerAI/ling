@@ -366,6 +366,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0031"
+title = "LSP internal cooperative cancellation boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0031-lsp-internal-cancellation-boundary.md"
+covers = ["internal LSP cooperative cancellation", "monotonic cancellation checkpoints", "VM/LSP cancellation separation"]
+depends_on = ["DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0024"
 title = "Trait obligation collection boundary"
 kind = "Decision"

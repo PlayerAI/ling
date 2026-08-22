@@ -166,6 +166,29 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0031"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0031-lsp-internal-cancellation-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify clone-shared monotonic cancellation, idempotent cancel, and deterministic pre/post-cancel checkpoint results without timing or threads.",
+  "Verify the primitive carries no request ID, document version, VM fault, diagnostic, JSON-RPC response, or partial-result state.",
+]
+compatibility_impact = [
+  "Adds only an internal ling-lsp token; language, diagnostics, schemas, Semantic IDs, CLI, LSP wire methods, VM, bytecode, and Unicode data remain unchanged.",
+]
+unresolved_alternatives = [
+  "JSON-RPC cancellation, compiler/query propagation, request association, publication precedence, deadlines, limits, and migration require later accepted authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0024"
 kind = "Decision"
 status = "Accepted"
