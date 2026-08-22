@@ -12,6 +12,7 @@ pub(crate) enum Command {
     Audit,
     Format,
     Init,
+    Test,
     ProjectCheck,
     Lsp,
 }
@@ -26,6 +27,7 @@ impl Command {
             "audit" => Some(Self::Audit),
             "fmt" => Some(Self::Format),
             "init" => Some(Self::Init),
+            "test" => Some(Self::Test),
             "lsp" => Some(Self::Lsp),
             _ => None,
         }
@@ -40,6 +42,7 @@ impl Command {
             Self::Audit => "audit",
             Self::Format => "fmt",
             Self::Init => "init",
+            Self::Test => "test",
             Self::ProjectCheck => "project check",
             Self::Lsp => "lsp",
         }
@@ -66,13 +69,13 @@ mod tests {
             ("audit", Command::Audit),
             ("fmt", Command::Format),
             ("init", Command::Init),
+            ("test", Command::Test),
             ("lsp", Command::Lsp),
         ] {
             assert_eq!(Command::parse(name), Some(command));
             assert_eq!(command.name(), name);
         }
         assert_eq!(Command::parse("build"), None);
-        assert_eq!(Command::parse("test"), None);
         assert_eq!(Command::ProjectCheck.name(), "project check");
     }
 }

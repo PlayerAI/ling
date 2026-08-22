@@ -1701,9 +1701,9 @@ mod tests {
     #[test]
     fn repository_schema_corpus_is_valid_and_current() {
         let summary = validate_all(repository_root()).expect("schema corpus is valid");
-        assert_eq!(summary.schema_count, 7);
-        assert_eq!(summary.valid_fixture_count, 10);
-        assert_eq!(summary.invalid_fixture_count, 21);
+        assert_eq!(summary.schema_count, 8);
+        assert_eq!(summary.valid_fixture_count, 12);
+        assert_eq!(summary.invalid_fixture_count, 25);
         assert_eq!(summary.canonical_fixture_count, 3);
     }
 
@@ -1712,7 +1712,7 @@ mod tests {
         let summary = compatibility(repository_root(), "N-1", "N")
             .expect("first-version compatibility state is valid");
         assert_eq!(summary.verified_edge_count, 0);
-        assert_eq!(summary.no_previous_version_count, 7);
+        assert_eq!(summary.no_previous_version_count, 8);
     }
 
     #[test]

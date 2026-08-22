@@ -8,6 +8,7 @@ use std::process::ExitCode;
 mod command_catalog;
 mod exit_catalog;
 mod init;
+mod test_runner;
 
 use command_catalog::Command;
 use exit_catalog::{
@@ -81,6 +82,12 @@ fn execute(options: Options) -> u8 {
             options.path.expect("init requires a destination"),
             options.init_name,
             options.init_display_name,
+        );
+    }
+    if options.command == Command::Test {
+        return execute_test(
+            options.format,
+            options.path.expect("test requires an input path"),
         );
     }
     if options.command == Command::ProjectCheck {
@@ -196,6 +203,98 @@ fn execute(options: Options) -> u8 {
         Command::ProjectCheck => unreachable!("handled before project checking"),
         Command::Lsp => unreachable!("handled before compilation"),
         Command::Init => unreachable!("handled before compilation"),
+        Command::Test => unreachable!("handled before test execution"),
+    }
+}
+
+fn execute_test(format: OutputFormat, root: PathBuf) -> u8 {
+    let summary = match test_runner::run(root) {
+        Ok(summary) => summary,
+        Err(test_runner::Failure::Usage(message)) => return invalid_usage(&message),
+        Err(failure @ test_runner::Failure::Io { .. })
+        | Err(failure @ test_runner::Failure::NoCases { .. }) => {
+            let diagnostic = failure
+                .diagnostic()
+                .expect("test discovery failures always have a diagnostic");
+            return emit_diagnostics(
+                &[diagnostic],
+                format,
+                if matches!(failure, test_runner::Failure::NoCases { .. }) {
+                    EXIT_COMPILE_ERROR
+                } else {
+                    EXIT_RUNTIME_FAULT
+                },
+            );
+        }
+        Err(test_runner::Failure::Internal(message)) => {
+            return emit_internal_incident(
+                "test.runner",
+                message,
+                Reproduction::new("ling test"),
+                format,
+            );
+        }
+        Err(test_runner::Failure::Snapshot(message)) => {
+            return emit_snapshot_mismatch(&message, format);
+        }
+    };
+
+    let exit_code = summary.exit_code();
+    let diagnostics = summary.diagnostics();
+    if !diagnostics.is_empty() {
+        let rendered_status = emit_diagnostics(&diagnostics, format, exit_code);
+        if rendered_status != exit_code {
+            return rendered_status;
+        }
+    }
+
+    match format {
+        OutputFormat::Human => {
+            println!(
+                "测试完成 / tests completed: root={} total={} passed={} failed={}",
+                summary.root(),
+                summary.total(),
+                summary.passed(),
+                summary.failed()
+            );
+            exit_code
+        }
+        OutputFormat::Json => {
+            let tests = summary
+                .cases()
+                .iter()
+                .map(|case| {
+                    serde_json::json!({
+                        "name": case.name(),
+                        "status": case.status().as_str(),
+                        "stdout": case.stdout(),
+                    })
+                })
+                .collect::<Vec<_>>();
+            let report = serde_json::json!({
+                "schema": test_runner::TEST_PROTOCOL,
+                "status": summary.status(),
+                "root": summary.root(),
+                "tests": tests,
+                "counts": {
+                    "total": summary.total(),
+                    "passed": summary.passed(),
+                    "failed": summary.failed(),
+                },
+            });
+            match serde_json::to_string(&report) {
+                Ok(rendered) => match write_stdout(format!("{rendered}\n").as_bytes()) {
+                    Ok(()) => exit_code,
+                    Err(error) => emit_host_io_failure("test.stdout", &error, format),
+                },
+                Err(error) => emit_internal_incident(
+                    "test.success-json",
+                    error.to_string(),
+                    Reproduction::new("ling test --format json"),
+                    format,
+                ),
+            }
+        }
     }
 }
 
@@ -1288,7 +1387,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} init [--format human|json] [--name package] [--display-name text] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} test [--format human|json] <file-or-directory>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} init [--format human|json] [--name package] [--display-name text] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
     )
 }
 

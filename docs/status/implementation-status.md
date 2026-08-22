@@ -57,6 +57,7 @@
 | `CLI-1703` | Project initialization command | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
 | `CLI-1703-INIT` | Offline `ling init` scaffold | `G1` | `M` | `Done` | `CLI-1701-CATALOG`, `PRJ-1101` | `8c2ef94e58da75d6c530a4ac60cfbe2eeea11bbf` |
 | `CLI-1704` | Project test command | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
+| `CLI-1704-FILE` | Explicit standalone test-file runner Preview | `G1` | `M` | `In Progress` | `CLI-1701-CATALOG`, `CLI-1702-EXIT` | `` |
 | `CLI-1705` | Semantic query and patch commands | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
 | `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `CLI-1702` | `` |
 | `COMPAT-6501` | Historical Corpus | `G6` | `L` | `BlockedSpec` | `PKG-6404` | `` |

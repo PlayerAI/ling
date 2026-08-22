@@ -17,6 +17,7 @@ pub mod codes {
     pub const SOURCE_READ_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0001");
     pub const PROJECT_LOCK_IO_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0002");
     pub const PROJECT_INIT_IO_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0003");
+    pub const PROJECT_TEST_IO_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0004");
     pub const INVALID_UTF8: DiagnosticCode = DiagnosticCode::new("L-LEX-0001");
     pub const MISPLACED_BOM: DiagnosticCode = DiagnosticCode::new("L-LEX-0002");
     pub const SOURCE_TOO_LARGE: DiagnosticCode = DiagnosticCode::new("L-LEX-0003");
@@ -91,6 +92,7 @@ pub mod codes {
     pub const PRIVATE_PROJECT_MODULE_ACCESS: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0017");
     pub const INVALID_PROJECT_LOCK: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0018");
     pub const PROJECT_LOCK_MISMATCH: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0019");
+    pub const TEST_NO_CASES: DiagnosticCode = DiagnosticCode::new("L-TEST-0001");
     pub const INVALID_BYTECODE_ENVELOPE: DiagnosticCode = DiagnosticCode::new("L-BYTECODE-0001");
     pub const BYTECODE_RESOURCE_LIMIT_EXCEEDED: DiagnosticCode =
         DiagnosticCode::new("L-BYTECODE-0002");

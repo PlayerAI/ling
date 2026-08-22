@@ -68,6 +68,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0036` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0036](../decisions/0036-cli-internal-command-catalog-boundary.md) |
 | `DEC-0037` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0037](../decisions/0037-cli-internal-exit-catalog-boundary.md) |
 | `DEC-0038` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0038](../decisions/0038-cli-init-command.md) |
+| `DEC-0039` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0039](../decisions/0039-cli-test-file-runner.md) |
 
 ## Migration boundary
 

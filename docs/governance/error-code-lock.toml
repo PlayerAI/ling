@@ -11,7 +11,7 @@ CAP = 3
 ENTRY = 3
 IMPL = 1
 INTERNAL = 1
-IO = 3
+IO = 4
 LEX = 12
 MUT = 1
 NAME = 9
@@ -19,6 +19,7 @@ PROJECT = 19
 RUNTIME = 1
 SNAPSHOT = 1
 SYNTAX = 11
+TEST = 1
 TYPE = 11
 
 [[code]]
@@ -146,6 +147,12 @@ id = "L-IO-0003"
 core_sha256 = "sha256:b55ae17f1ff97feeaf22514ab06234dd37ab292bc52a1379022fce23defda62e"
 retired = false
 facts = ["io_kind:string:required", "operation:string:required"]
+
+[[code]]
+id = "L-IO-0004"
+core_sha256 = "sha256:1f18e13d8cf5a08e35d67064c5bdc44ad88fc81c98666e28c9133bc22f602370"
+retired = false
+facts = ["io_kind:string:required", "operation:string:required", "path:string:required"]
 
 [[code]]
 id = "L-LEX-0001"
@@ -452,6 +459,12 @@ id = "L-SYNTAX-0011"
 core_sha256 = "sha256:0c7aca016bd5c5869733033b3f0dbce07d24d76adee5d906c7986cc5384016e6"
 retired = false
 facts = ["maximum_depth:integer:required"]
+
+[[code]]
+id = "L-TEST-0001"
+core_sha256 = "sha256:a3bae43c2b21aa0eeb82a164aa2ae2fdedd3c8a95608803a5500d9da30108ad0"
+retired = false
+facts = ["root:string:required"]
 
 [[code]]
 id = "L-TYPE-0001"

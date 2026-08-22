@@ -4325,6 +4325,7 @@ spec = [
   "docs/RFC-0002.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0039-cli-test-file-runner.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
@@ -4336,10 +4337,9 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit distinguishes repository conformance tests from an unaccepted Ling test convention and records the missing discovery, isolation, event, and exit contracts.",
-  "The audit explicitly rejects stale `zero test` material and unregistered source annotations.",
-  "No test command, annotation syntax, discovery API, event schema, diagnostic allocation, or placeholder help entry is added while the authorities and fixtures are absent.",
-  "The future implementation must reuse checked services and provide deterministic offline project/file fixtures without changing Seed execution semantics.",
+  "The audit distinguishes the unresolved project/workspace test convention from the accepted standalone-file child and records the remaining discovery, isolation, event, and exit contracts.",
+  "The audit explicitly rejects stale names and unregistered source annotations outside DEC-0039's bounded file runner.",
+  "The parent remains without project/workspace test behavior while the child reuses checked services and provides deterministic offline file fixtures.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -4347,8 +4347,67 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "CLI-1704 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001 and CLI-1701; DEC-0003's Rust/conformance runner is implementation evidence, not a user test protocol.",
-  "The current CLI remains limited to the accepted commands and does not invent source-level test annotations or `zero` names.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Accepted DEC-0039 closes only the explicit standalone-file child; project/workspace targets, declarations, filtering, assertions, and event contracts remain open.",
+  "The authority audit preserves Seed behavior and does not change VM, bytecode, Semantic IDs, or Unicode 17.0.0 behavior beyond the bounded checked-pipeline runner.",
+]
+
+[[task]]
+id = "CLI-1704-FILE"
+title = "Explicit standalone test-file runner Preview"
+state = "In Progress"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701-CATALOG", "CLI-1702-EXIT"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0039-cli-test-file-runner.md",
+  "docs/ERROR-CODES.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "schemas/registry.toml",
+  "docs/traceability/registry.toml",
+]
+artifacts = [
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/src/test_runner.rs",
+  "crates/ling-cli/tests/test.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/decisions/0039-cli-test-file-runner.md",
+  "docs/status/CLI-1704-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1704-TEST-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "schemas/test/0.1/schema.json",
+  "schemas/test/0.1/valid",
+  "schemas/test/0.1/invalid",
+  "tests/protocols/test/README.md",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+]
+acceptance = [
+  "The command accepts exactly one explicit .ling file or directory and rejects invalid, empty, non-UTF-8, and symbolic-link inputs without partial output.",
+  "Directory discovery is recursive, symlink-free, slash-normalized, and UTF-8-byte sorted; every selected file runs through the checked compiler/evaluator pipeline in order.",
+  "Console output is captured and the report is deterministic; compile/runtime diagnostics remain bilingual Diagnostic JSON and all cases are attempted.",
+  "ling.test/0.1 is schema-validated, registered as a Preview protocol, and covered by unit/process/schema/protocol evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is bounded by Accepted DEC-0039 and intentionally does not define project manifests, workspace targets, test syntax, assertions, filtering, snapshots, property tests, parallelism, cancellation, or persisted artifacts.",
+  "The parent CLI-1704 remains BlockedSpec for the broader project test contract.",
 ]
 
 [[task]]

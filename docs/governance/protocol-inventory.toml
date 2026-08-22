@@ -24,6 +24,28 @@ authority = ["DEC-0038", "RFC-0002", "DEC-0003", "DEC-0013"]
 notes = ["The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated."]
 
 [[protocol]]
+id = "PROTO-CLI-TEST"
+title = "Ling explicit test-file runner report"
+category = "JSON"
+visibility = "Public"
+current_version = "ling.test/0.1"
+stability = "Preview"
+implemented = true
+public_schema = true
+canonical = false
+producer = ["ling test"]
+consumer = ["shell scripts", "CI jobs", "humans"]
+reader_policy = "Consumers must gate on the exact ling.test/0.1 marker; the current repository provides a writer but no public reader, and unknown core fields are rejected by the schema."
+writer_policy = "On discovery success, emit exactly one report with the requested root operand, sorted logical .ling test names, captured stdout, and total/passed/failed counts; compilation and runtime diagnostics remain Diagnostic JSON on stderr."
+unknown_field_policy = "Reject unknown core fields; project-test, source-declaration, or report extensions require a new accepted decision and protocol version."
+migration_tool = "None; ling.test/0.1 is current-writer-only."
+fixtures = ["crates/ling-cli/tests/test.rs", "schemas/test/0.1/schema.json", "schemas/test/0.1/valid", "schemas/test/0.1/invalid", "tests/protocols/test/README.md"]
+sources = ["docs/decisions/0039-cli-test-file-runner.md", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/test_runner.rs"]
+version_markers = ["ling.test/0.1", "ling test"]
+authority = ["DEC-0039", "DEC-0003", "DEC-0013"]
+notes = ["This is an explicit standalone-file runner. It does not define test syntax, manifest targets, workspace selection, filtering, assertions, snapshots, property tests, parallelism, or cancellation."]
+
+[[protocol]]
 id = "PROTO-CLI"
 title = "Ling command and option surface"
 category = "CLI"
@@ -35,15 +57,15 @@ public_schema = false
 canonical = false
 producer = ["ling executable"]
 consumer = ["humans", "shell scripts", "editor and build integrations"]
-reader_policy = "The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Experimental project check command, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2."
-writer_policy = "Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, project check routes to the locked RFC-0002 graph boundary, lsp --stdio routes to the framed lifecycle server, and no placeholder command is advertised."
+reader_policy = "The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Preview standalone test-file runner, the Experimental project check command, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2."
+writer_policy = "Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, ling test routes to the deterministic standalone-file runner, project check routes to the locked RFC-0002 graph boundary, lsp --stdio routes to the framed lifecycle server, and no unimplemented project/workspace command is advertised."
 unknown_field_policy = "Not field-based: unknown commands, options, formats, and capabilities are rejected."
 migration_tool = "None; incompatible command or option changes require an accepted specification and release migration notes."
 fixtures = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs"]
 sources = ["Cargo.toml", "crates/ling-cli/src/main.rs"]
 version_markers = ["0.0.1-dev"]
 authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "RFC-0004", "RFC-0024"]
-notes = ["The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds the Preview `ling lsp --stdio` launcher and RFC-0024 adds only the Experimental locked project graph check."]
+notes = ["The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds the Preview `ling lsp --stdio` launcher, RFC-0024 adds only the Experimental locked project graph check, and DEC-0039 adds only the Preview standalone-file `ling test` child."]
 
 [[protocol]]
 id = "PROTO-PROJECT-CHECK"

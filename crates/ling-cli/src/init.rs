@@ -219,7 +219,7 @@ fn io_diagnostic(operation: &'static str, kind: io::ErrorKind) -> Diagnostic {
     .with_primary_span(DiagnosticSpan::at("ling init", 0, 0))
 }
 
-fn stable_io_kind(kind: io::ErrorKind) -> &'static str {
+pub(crate) fn stable_io_kind(kind: io::ErrorKind) -> &'static str {
     match kind {
         io::ErrorKind::AlreadyExists => "already_exists",
         io::ErrorKind::NotFound => "not_found",

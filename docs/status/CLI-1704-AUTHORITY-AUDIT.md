@@ -2,16 +2,18 @@
 
 ## Outcome
 
-`CLI-1704` is correctly recorded as `BlockedSpec`. The execution plan
-proposes a `test` command, but the language has no accepted test declaration or
-discovery convention, and no project command contract defines selection,
-fixtures, isolation, output events, or exit behavior. The repository's Rust
-and conformance tests are implementation evidence, not a Ling user test
-protocol.
+`CLI-1704` remains the parent planning row and is still `BlockedSpec` for the
+full project-test surface. Accepted DEC-0039 now closes the bounded
+`CLI-1704-FILE` child: an explicit, offline, standalone `.ling` file runner
+with deterministic discovery, captured output, and a versioned Preview report.
+The repository's Rust and conformance tests remain implementation evidence,
+not a replacement for the deferred project-test convention.
 
-No `ling test` parser branch, annotation syntax, test discovery rule, event
-schema, test runner API, or placeholder help entry was added. The current CLI
-continues to advertise only implemented commands.
+The bounded child adds a `ling test` parser branch, `ling.test/0.1` report,
+standalone file/directory discovery, and checked-pipeline execution. It does
+not add annotations, manifest test targets, workspace selection, filtering,
+assertions, snapshots, property tests, parallelism, cancellation, or a
+project-test API.
 
 ## Normative traceability
 
@@ -26,23 +28,28 @@ continues to advertise only implemented commands.
   and capability/effect boundaries. It has no accepted test declaration,
   isolation, ordering, snapshot, or property-test semantics.
 - `GAP-PROJECT-CLI-INTERFACE-001` leaves project test selection, locked/offline
-  policy, exits, and JSON output open. No protocol inventory entry authorizes a
-  `ling.test` surface.
+  policy, exits, and JSON output open. DEC-0039 authorizes only the explicit
+  standalone-file Preview child, not a project test surface.
+- Accepted DEC-0039 defines the exact file/directory operand rules, sorted
+  discovery, checked execution, captured Console output, report fields,
+  diagnostics, and exit precedence implemented by `CLI-1704-FILE`.
 - The execution plan's stale `zero test` spelling and any proposed annotations
   cannot enter implementation without a higher-authority decision.
 
 ## Current interface evidence
 
-The repository confirms the missing boundary:
+The repository confirms the remaining project boundary:
 
-- `crates/ling-cli/src/main.rs` has no `test` command and its help output does
-  not advertise one.
+- `crates/ling-cli/src/main.rs` advertises only the bounded `ling test` file
+  runner; it does not advertise project/workspace test behavior.
 - `crates/ling-cli/tests/conformance.rs` runs fixed repository fixtures through
   Rust's test harness; it has no user test discovery or project event schema.
 - `tests/conformance/` contains compiler/CLI acceptance fixtures, not a
   versioned source-level test declaration or expected test ordering contract.
 - `ling-project` provides graph/lock validation but no test target inventory,
   package test isolation, or failure aggregation protocol.
+- `crates/ling-cli/src/test_runner.rs` and `crates/ling-cli/tests/test.rs`
+  provide deterministic standalone-file execution and failure evidence.
 
 ## Required authority before implementation
 
@@ -59,25 +66,26 @@ An implementation-ready decision or RFC must define, at minimum:
 5. protocol-inventory updates plus positive, negative, empty, cross-package,
    deterministic, Unicode/CRLF, offline, and migration fixtures.
 
-Until those decisions and fixtures are Accepted, a `test` command would invent
-language syntax or silently establish a test convention that later projects
-could not change compatibly.
+Until a later decision closes the project-test boundary, only DEC-0039's
+explicit standalone-file runner is authorized; it intentionally does not
+invent language syntax or silently establish manifest/workspace test behavior.
 
 ## Evidence and compatibility
 
 This audit was checked against `docs/RFC-0002.md`,
 `docs/decisions/0003-m0-tooling.md`, `docs/decisions/0013-main-and-runtime-failures.md`,
+`docs/decisions/0039-cli-test-file-runner.md`,
 `docs/SEMANTICS.md`, `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`,
 `docs/governance/protocol-inventory.toml`, `docs/governance/gap-register.toml`,
 `crates/ling-cli/src/main.rs`, `crates/ling-cli/tests/conformance.rs`,
 `crates/ling-project`, and `tests/conformance`.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+The child adds only the accepted Preview command/report and `L-IO-0004` /
+`L-TEST-0001`; no Semantic ID, source-span model, bytecode, VM, or Unicode
+17.0.0 behavior changes.
 
 ## Intentionally deferred
 
-`CLI-1704` can begin after an accepted test convention and project CLI
-contract define discovery, isolation, events, and exits. The implementation
-must reuse checked compiler services, remain offline/deterministic, and exclude
-stale `zero` syntax and unregistered annotations.
+The parent `CLI-1704` can continue after an accepted project-test convention
+defines manifest/workspace selection, isolation, events, filtering, and
+assertions. The completed child reuses checked compiler services, remains
+offline/deterministic, and excludes stale names and unregistered annotations.

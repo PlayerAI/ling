@@ -280,6 +280,13 @@ stability = "Preview"
 implemented = true
 
 [[protocol]]
+id = "PROTO-CLI-TEST"
+visibility = "Public"
+version = "ling.test/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-LSP-LIFECYCLE"
 visibility = "Public"
 version = "ling.lsp.lifecycle/0.1"

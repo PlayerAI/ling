@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:test:0.1",
+  "title": "Ling test report JSON 0.1",
+  "type": "object",
+  "required": ["schema", "status", "root", "tests", "counts"],
+  "properties": {
+    "schema": { "const": "ling.test/0.1" },
+    "status": { "enum": ["ok", "failed"] },
+    "root": { "type": "string", "minLength": 1 },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "stdout"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["passed", "compile_failed", "runtime_failed"] },
+          "stdout": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["total", "passed", "failed"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 1 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

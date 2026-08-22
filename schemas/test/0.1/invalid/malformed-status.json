@@ -1,0 +1,9 @@
+{
+  "schema": "ling.test/0.1",
+  "status": "broken",
+  "root": "tests",
+  "tests": [
+    {"name": "a.ling", "status": "passed", "stdout": ""}
+  ],
+  "counts": {"total": 1, "passed": 1, "failed": 0}
+}

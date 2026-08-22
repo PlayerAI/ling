@@ -364,6 +364,20 @@ symbol = "repl_json_writer_matches_schema_corpus"
 feature_ids = ["FTR-SEED-0007"]
 
 [[evidence]]
+id = "EVD-POS-CLI-TEST-RUNNER"
+kind = "Positive"
+path = "crates/ling-cli/tests/test.rs"
+symbol = "test_json_runs_sorted_files_and_reports_runtime_precedence"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-CLI-TEST-EMPTY"
+kind = "Negative"
+path = "crates/ling-cli/tests/test.rs"
+symbol = "test_rejects_empty_selection_with_stable_diagnostic"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0007"]
+
+[[evidence]]
 id = "EVD-POS-G0-CI-CONTRACT"
 kind = "Positive"
 path = "tools/xtask/src/ci.rs"

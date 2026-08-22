@@ -46,6 +46,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0039"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0039-cli-test-file-runner.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run standalone and recursively discovered .ling files; verify deterministic order, captured output, counts, and ling.test/0.1 JSON.",
+  "Run compile-invalid and runtime-fault files together; verify ordered diagnostics, continued execution, and exit precedence.",
+  "Reject invalid operands, empty selections, unknown options, non-UTF-8 names, and symbolic-link traversal without partial output.",
+  "Repeat independent offline processes with CRLF source bytes and validate schema, protocol, diagnostics, and traceability evidence.",
+]
+compatibility_impact = [
+  "Adds Preview ling test file execution, ling.test/0.1, L-IO-0004, and L-TEST-0001 without defining project manifests, test syntax, or workspace behavior.",
+]
+unresolved_alternatives = [
+  "Source declarations, manifest/workspace targets, filtering, assertions, snapshots, property tests, parallelism, cancellation, and persisted reports remain deferred.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

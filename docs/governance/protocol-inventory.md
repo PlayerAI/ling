@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 26 records: 20 current public, 1 internal, 5 Future.
-- Current public stability: 11 Experimental, 9 Preview, 0 Stable.
+- 27 records: 21 current public, 1 internal, 5 Future.
+- Current public stability: 11 Experimental, 10 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -21,6 +21,7 @@
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
+| `PROTO-CLI-TEST` | Public | JSON | `ling.test/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
 | `PROTO-FORMAT-CLI` | Public | JSON | `ling.format/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-LOCKFILE` | Public | JSON | `ling.lock/1` | `Experimental` | yes | yes | 8 |
@@ -47,14 +48,14 @@
 
 - Producer: ling executable
 - Consumer: humans; shell scripts; editor and build integrations
-- Reader policy: The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Experimental project check command, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2.
-- Writer policy: Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, project check routes to the locked RFC-0002 graph boundary, lsp --stdio routes to the framed lifecycle server, and no placeholder command is advertised.
+- Reader policy: The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Preview standalone test-file runner, the Experimental project check command, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2.
+- Writer policy: Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, ling test routes to the deterministic standalone-file runner, project check routes to the locked RFC-0002 graph boundary, lsp --stdio routes to the framed lifecycle server, and no unimplemented project/workspace command is advertised.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
 - Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `RFC-0004`, `RFC-0024`
 - Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
-- Notes: The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds the Preview `ling lsp --stdio` launcher and RFC-0024 adds only the Experimental locked project graph check.
+- Notes: The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds the Preview `ling lsp --stdio` launcher, RFC-0024 adds only the Experimental locked project graph check, and DEC-0039 adds only the Preview standalone-file `ling test` child.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 
@@ -133,6 +134,19 @@
 - Sources: [`docs/decisions/0038-cli-init-command.md`](../decisions/0038-cli-init-command.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/init.rs`](../../crates/ling-cli/src/init.rs)
 - Fixtures: [`crates/ling-cli/tests/init.rs`](../../crates/ling-cli/tests/init.rs), [`tests/protocols/init/README.md`](../../tests/protocols/init/README.md), [`schemas/init/0.1/schema.json`](../../schemas/init/0.1/schema.json), [`schemas/init/0.1/valid`](../../schemas/init/0.1/valid), [`schemas/init/0.1/invalid`](../../schemas/init/0.1/invalid)
 - Notes: The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated.
+
+### `PROTO-CLI-TEST` — Ling explicit test-file runner report
+
+- Producer: ling test
+- Consumer: shell scripts; CI jobs; humans
+- Reader policy: Consumers must gate on the exact ling.test/0.1 marker; the current repository provides a writer but no public reader, and unknown core fields are rejected by the schema.
+- Writer policy: On discovery success, emit exactly one report with the requested root operand, sorted logical .ling test names, captured stdout, and total/passed/failed counts; compilation and runtime diagnostics remain Diagnostic JSON on stderr.
+- Unknown-field policy: Reject unknown core fields; project-test, source-declaration, or report extensions require a new accepted decision and protocol version.
+- Migration tool: None; ling.test/0.1 is current-writer-only.
+- Authority: `DEC-0039`, `DEC-0003`, `DEC-0013`
+- Sources: [`docs/decisions/0039-cli-test-file-runner.md`](../decisions/0039-cli-test-file-runner.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/test_runner.rs`](../../crates/ling-cli/src/test_runner.rs)
+- Fixtures: [`crates/ling-cli/tests/test.rs`](../../crates/ling-cli/tests/test.rs), [`schemas/test/0.1/schema.json`](../../schemas/test/0.1/schema.json), [`schemas/test/0.1/valid`](../../schemas/test/0.1/valid), [`schemas/test/0.1/invalid`](../../schemas/test/0.1/invalid), [`tests/protocols/test/README.md`](../../tests/protocols/test/README.md)
+- Notes: This is an explicit standalone-file runner. It does not define test syntax, manifest targets, workspace selection, filtering, assertions, snapshots, property tests, parallelism, or cancellation.
 
 ### `PROTO-DIAGNOSTIC-JSON` — Structured bilingual Diagnostic JSON
 
