@@ -7016,6 +7016,55 @@ notes = [
 ]
 
 [[task]]
+id = "EFF-2103-AST"
+title = "Handler unresolved AST projection"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2103-SYNTAX"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0006.md",
+  "docs/decisions/0063-first-order-handler-core.md",
+  "docs/decisions/0064-handler-source-cst-projection.md",
+  "docs/decisions/0065-handler-ast-projection.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-ast/src/lib.rs",
+  "crates/ling-ast/tests/snapshots.rs",
+  "crates/ling-hir/src/lib.rs",
+  "docs/decisions/0065-handler-ast-projection.md",
+  "docs/status/EFF-2103-AST-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2103-AST-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0065 authorizes only an unresolved, span-preserving Handle AST and HandlerClause values; HIR/type/effect/runtime semantics remain deferred.",
+  "AST lowering preserves operation qualified names, source order, parameter patterns, optional contextual resume name, clause bodies, original UTF-8 spans, and source spelling without resolution or reordering.",
+  "Malformed child shapes are rejected structurally, and AST positive coverage plus HIR negative coverage prove no unchecked handler value is published to later stages.",
+  "HIR returns a structured UnsupportedHandler error before any evaluator, bytecode, VM, schema, Semantic ID, CLI, LSP, or protocol path can consume the unresolved AST.",
+]
+verified_against_commit = "225cc9fecabcdb1a3274ee6dc576f9120143584c"
+completion_commit = "225cc9fecabcdb1a3274ee6dc576f9120143584c"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The unresolved AST child is complete; EFF-2103 remains BlockedSpec for checked operation signatures, resume typing, Effect-row checking, Typed Core publication, and runtime execution.",
+  "The HIR rejection is an intentional no-unchecked-AST boundary and does not add a diagnostic, schema, Semantic ID, protocol, or public CLI surface.",
+]
+
+[[task]]
 id = "EFF-2104"
 title = "Interpreter and VM handler execution"
 state = "BlockedSpec"
