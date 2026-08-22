@@ -3838,7 +3838,7 @@ notes = [
 [[task]]
 id = "RC-6902-SEED"
 title = "Seed RC1 public-validation inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -3888,10 +3888,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0053 closes only this internal Seed RC1 inventory child; the parent RC-6902 gate remains BlockedSpec for all public validation and release exits.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "056c6afb17fd1e8656b825e2c2a4f70b4173f2d8"
+completion_commit = "056c6afb17fd1e8656b825e2c2a4f70b4173f2d8"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects the RC1 negative boundary only; Seed evidence remains Seed evidence and no public artifact or installation contract is inferred.",
   "No public artifact, package, installer, extension, signature, SBOM, provenance record, issue form, migration executable, network request, system configuration, or placeholder is added.",
