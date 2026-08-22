@@ -2428,3 +2428,29 @@ unresolved_alternatives = [
   "Task grammar, scope ownership, suspension/resume, cancellation propagation, cleanup ordering, Fault aggregation, detach authorization, deterministic scheduling, runtime lowering, and migration remain open under GAP-STRUCTURED-TASK-001 and TASK-2201 through TASK-2206.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0092"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0092-task-state-machine-model.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build a structural model with resume and cleanup/fault-labelled edges and assert deterministic state, live-local, and transition ordering.",
+  "Reject missing entry states, duplicate states or transition IDs, repeated locals, invalid/unknown endpoints, and duplicate structural edges.",
+  "Compare equivalent models with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep actual suspension lowering, continuation liveness, cancellation, cleanup/Fault behavior, bytecode/VM, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled checked-data tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public protocol, state-machine bytecode revision, or v0.2 support claim is registered.",
+]
+unresolved_alternatives = [
+  "State numbering, continuation frame layout, live-local typing, borrow/resource rules across suspension, cancellation/cleanup/Fault semantics, instruction encoding, verifier limits, interpreter/VM equivalence, source-map projection, and migration remain open under GAP-STRUCTURED-TASK-001 and TASK-2202.",
+]
+superseded_by = ""

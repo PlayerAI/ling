@@ -1703,3 +1703,16 @@ covers = ["TASK-2201 bounded internal Task identity graph", "deterministic check
 depends_on = ["DEC-0002", "DEC-0089", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0092"
+title = "Internal Task state-machine identity model"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0092-task-state-machine-model.md"
+covers = ["TASK-2202 bounded internal state-machine identity graph", "deterministic state/edge validation", "structural edge labels without runtime semantics"]
+depends_on = ["DEC-0002", "DEC-0091", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -122,6 +122,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0089` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0089](../decisions/0089-task-syntax-rejection-gate.md) |
 | `DEC-0090` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0090](../decisions/0090-actor-syntax-rejection-gate.md) |
 | `DEC-0091` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0091](../decisions/0091-task-checked-core-model.md) |
+| `DEC-0092` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0092](../decisions/0092-task-state-machine-model.md) |
 
 ## Migration boundary
 

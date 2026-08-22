@@ -11,6 +11,13 @@ use std::fmt;
 
 use ling_source::Span;
 
+mod state_machine;
+
+pub use state_machine::{
+    LocalId, MachineIdentityKind, StateEdgeKind, StateId, StateMachineError, StateMachineModel,
+    StateNode, StateNodeSpec, StateTransition, StateTransitionSpec, TransitionId,
+};
+
 macro_rules! id_type {
     ($name:ident, $doc:literal) => {
         #[doc = $doc]

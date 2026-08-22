@@ -252,6 +252,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TASK-2201-TASK-SYNTAX-REJECTION` | G2 | Internal Task-shaped syntax rejection gate | S | Done | Accepted `DEC-0089`; see `crates/ling-cli/tests/task_boundary.rs` and `docs/status/TASK-2201-REJECTION-GATE-IMPLEMENTATION-REPORT.md`; Task semantics remain BlockedSpec |
 | `TASK-2201-CORE-MODEL` | G2 | Internal Structured Task Checked-Core identity model | S | Done | Accepted `DEC-0091`; see `crates/ling-concurrency/src/lib.rs` and `docs/status/TASK-2201-CORE-MODEL-IMPLEMENTATION-REPORT.md`; source/Core and runtime semantics remain BlockedSpec |
 | `TASK-2202` | G2 | Task 状态机 Lowering | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:182`, `docs/status/TASK-2202-AUTHORITY-AUDIT.md` |
+| `TASK-2202-STATE-MACHINE-MODEL` | G2 | Internal Task state-machine identity model | S | Done | Accepted `DEC-0092`; see `crates/ling-concurrency/src/state_machine.rs` and `docs/status/TASK-2202-STATE-MACHINE-MODEL-IMPLEMENTATION-REPORT.md`; lowering/runtime semantics remain BlockedSpec |
 | `TASK-2203` | G2 | 结构化生命周期 Runtime | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:195`, `docs/status/TASK-2203-AUTHORITY-AUDIT.md` |
 | `TASK-2204` | G2 | 确定性测试调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:207`, `docs/status/TASK-2204-AUTHORITY-AUDIT.md` |
 | `TASK-2205` | G2 | 生产本地调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:221`, `docs/status/TASK-2205-AUTHORITY-AUDIT.md` |

@@ -2,7 +2,9 @@
 
 ## Outcome
 
-`TASK-2202` is correctly recorded as `BlockedSpec`. The G2 plan requires every
+`TASK-2202` is correctly recorded as `BlockedSpec`. Accepted `DEC-0092` closes
+the bounded publish-disabled `TASK-2202-STATE-MACHINE-MODEL` identity-graph
+child only. The G2 plan requires every
 Task suspension point to lower into a versioned state machine carrying live
 locals, continuation state, cancellation, cleanup, Fault, and source-map
 edges, with coverage for repeated suspension, match/loop paths, resource
@@ -11,7 +13,8 @@ the lifecycle and state-machine ABI are not specified.
 
 No Task lowering pass, continuation layout, state-machine bytecode instruction,
 serialization/version marker, cancellation or cleanup edge, source-map rule,
-diagnostic allocation, or placeholder G2 API was added.
+diagnostic allocation, or placeholder G2 API was added; the internal model
+records structural edge labels but does not execute them.
 
 ## Normative traceability
 
@@ -31,6 +34,9 @@ diagnostic allocation, or placeholder G2 API was added.
 - RFC-0020 defines only explicit host VM cancellation for existing verified
   Seed bytecode. It does not authorize Task suspension edges, state-machine
   instructions, cancellation propagation, or cleanup semantics.
+- Accepted `DEC-0092` is intentionally narrower than the missing authority: it
+  validates only opaque state/local/transition identities and deterministic
+  checked-data bytes.
 
 ## Current implementation evidence
 
@@ -38,6 +44,9 @@ diagnostic allocation, or placeholder G2 API was added.
   no Task Core or suspension representation. The current checked boundary
   contains no live-local set, continuation state, cleanup region, or Task
   Fault edge.
+- `ling-concurrency::StateMachineModel` is not connected to the compiler,
+  bytecode, verifier, interpreter, or VM and does not represent executable
+  suspension semantics.
 - `ling-bytecode` has versioned Seed formats and ordinary call/control-flow
   lowering, but no Task state-machine table, continuation serialization,
   suspension opcode, cancellation/cleanup edge, or Task-specific source map.
@@ -86,11 +95,12 @@ and the current syntax, AST, HIR, types, effects, bytecode, evaluator, and VM
 crates.
 
 No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
+public source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`TASK-2202` can begin only after TASK-2201 and an Accepted RFC-0008 (or
+The bounded `TASK-2202-STATE-MACHINE-MODEL` child is complete under
+`DEC-0092`. Public `TASK-2202` can begin only after TASK-2201 and an Accepted RFC-0008 (or
 replacement) resolve `GAP-STRUCTURED-TASK-001` and define a versioned
 state-machine/continuation ABI. The future lowering must consume checked Task
 Core only, preserve live values and source identity, make every cancellation,
