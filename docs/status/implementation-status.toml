@@ -8743,6 +8743,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/TASK-2204-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2204-SCHEDULER-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2204-SCHEDULER-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0094-task-scheduler-observation-trace.md",
+  "crates/ling-concurrency/src/scheduler.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -8752,6 +8761,7 @@ acceptance = [
   "The audit covers nested scopes, multiple wake orders, virtual timeouts, cancellation before/after effects, cleanup and Fault races, bounded exploration, repeated seeds, malformed/oversized traces, deterministic output, Unicode/CRLF/BOM spans, and interpreter/VM differential fixtures.",
   "No Task scheduler, virtual-clock type, seed-to-order algorithm, wake queue, interleaving explorer, trace schema, scheduler diagnostic, production API, or placeholder G2 surface is added while the authority is absent.",
   "The future scheduler must drive checked Task Core only, use reproducible bounded seeds and virtual time, export a versioned test-only trace, and prove cancellation/cleanup/interpreter/VM equivalence without making production scheduling order semantic.",
+  "Accepted DEC-0094 authorizes only the publish-disabled scheduler observation child; it does not authorize queue execution, virtual time, seed mapping, wake order, interleaving, replay, or production scheduling behavior.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -8761,6 +8771,58 @@ notes = [
   "TASK-2204 is BlockedSpec by TASK-2201/TASK-2202/TASK-2203, GAP-STRUCTURED-TASK-001, absent RFC-C202/RFC-0008, and missing Task test-scheduler, virtual-clock, interleaving, trace, and replay authority; DEC-0019/DEC-0021 apply only to internal compiler queries.",
   "The current compiler query scheduler is an internal immutable-query boundary; ling-eval/ling-vm have no Task scopes, suspension queues, virtual clock, child tokens, or lifecycle trace.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, traces, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "TASK-2204-SCHEDULER-OBSERVATION"
+title = "Internal Task scheduler observation trace"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TASK-2203-LIFECYCLE-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0093-task-lifecycle-observation-trace.md",
+  "docs/decisions/0094-task-scheduler-observation-trace.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/src/scheduler.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/decisions/0094-task-scheduler-observation-trace.md",
+  "docs/status/TASK-2204-SCHEDULER-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2204-SCHEDULER-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0094 authorizes only publish-disabled scheduler observations; no scheduling semantics are claimed.",
+  "SchedulerObservationTrace validates nonzero trace/event/scope/task identities and duplicate-free event IDs; observations are stored deterministically by event identity.",
+  "Observation labels are evidence only, source spans are evidence only, and canonical bytes are path-free and independent of source evidence and input order.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "078e106fff68a0f28e2f05fd8c8c6bda83637e61"
+completion_commit = "078e106fff68a0f28e2f05fd8c8c6bda83637e61"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is a data-only boundary under DEC-0094; TASK-2204 remains BlockedSpec for executable queue, clock, seed, wake, interleaving, replay, and scheduler behavior.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, schema, Semantic ID, CLI/LSP command, public protocol, runtime, worker, or Unicode behavior was added.",
 ]
 
 [[task]]
