@@ -163,6 +163,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0130` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0130](../decisions/0130-native-ir-lowering-boundary-evidence.md) |
 | `DEC-0131` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0131](../decisions/0131-native-ir-verifier-boundary-evidence.md) |
 | `DEC-0132` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0132](../decisions/0132-native-backend-selection-boundary-evidence.md) |
+| `DEC-0133` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0133](../decisions/0133-native-codegen-boundary-evidence.md) |
 
 ## Migration boundary
 

@@ -2236,3 +2236,16 @@ covers = ["BACK-3501 bounded Native backend selection boundary evidence", "test-
 depends_on = ["DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0133"
+title = "Internal Native codegen boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0133-native-codegen-boundary-evidence.md"
+covers = ["BACK-3502 bounded Native codegen boundary evidence", "test-only codegen vocabulary", "codegen boundaries without emission/artifact/diagnostic/build semantics"]
+depends_on = ["DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
