@@ -113,6 +113,7 @@
 | `DIR-4502` | Kernel Core to Device IR | `G4` | `M` | `BlockedSpec` | `DIR-4501` | `` |
 | `DIR-4502-OBSERVATION` | Internal Kernel-to-Device lowering boundary evidence | `G4` | `S` | `Done` | `DIR-4501-OBSERVATION` | `a1d7301bb7773242369d077a6c473fcdd78cccf0` |
 | `DIR-4503` | Device IR Canonicalization | `G4` | `M` | `BlockedSpec` | `DIR-4502` | `` |
+| `DIR-4503-OBSERVATION` | Internal Device IR canonicalization boundary evidence | `G4` | `S` | `Done` | `DIR-4502-OBSERVATION` | `de0d14b41b1c77e4eb81379d181cafcafbdf63f5` |
 | `DOC-6701` | Formal Documentation Set | `G6` | `L` | `BlockedSpec` | `REL-6604` | `` |
 | `DOC-6701-SEED` | Seed documentation-inventory drift gate | `G6` | `S` | `Done` | `REL-6604-SEED` | `77a905bbac64aaa7e9b6a56f8952a045d2760d87` |
 | `DOC-6702` | Two-layer Examples | `G6` | `M` | `BlockedSpec` | `DOC-6701` | `` |
