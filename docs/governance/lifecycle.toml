@@ -4055,3 +4055,27 @@ unresolved_alternatives = [
   "Manifest/fixture identity and versioning; source bytes and `.ling` mapping; profiles/targets, inputs/outputs/Faults/traces; vector/matrix/filter/reduction/histogram/atomic cases; bounds/alias/numeric/determinism; positive/negative/property/corruption/migration/Unicode/source-map fixtures; exact/tolerance comparison; CPU/device differential; diagnostics, host exclusion, protocol inventory, and public corpus status remain open under CPU-4203, CPU-4201/4202, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0155"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0155-simd-legality-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty SIMD legality boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer legality proofs, target negotiation, fallback equivalence, numeric modes, diagnostics, migration, differential, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No vectorizer, vector IR, fallback behavior, target registry, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Iteration/dependence and effect/shape/bounds/alias/ownership proofs; alignment/width/tail/overflow; strict/relaxed FP and reduction order; target-feature identity/negotiation; fallback permission/reason/equivalence; canonical proof facts, provenance, fixtures, diagnostics, CPU/SIMD differential, Native IR/ABI, target backends, protocol inventory, and public legality status remain open under SIMD-4301, CPU-4201 through CPU-4203, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""

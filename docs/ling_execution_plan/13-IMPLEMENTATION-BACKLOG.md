@@ -383,6 +383,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CPU-4203` | G4 | Kernel Corpus | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:167`, `docs/status/CPU-4203-AUTHORITY-AUDIT.md` |
 | `CPU-4203-OBSERVATION` | G4 | Internal Kernel corpus boundary evidence | S | Done | Accepted `DEC-0154`; see `crates/ling-types/tests/kernel_corpus_evidence.rs` and `docs/status/CPU-4203-OBSERVATION-IMPLEMENTATION-REPORT.md`; Kernel corpus semantics remain BlockedSpec |
 | `SIMD-4301` | G4 | 向量化合法性分析 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:183`, `docs/status/SIMD-4301-AUTHORITY-AUDIT.md` |
+| `SIMD-4301-OBSERVATION` | G4 | Internal SIMD legality boundary evidence | S | Done | Accepted `DEC-0155`; see `crates/ling-types/tests/simd_legality_evidence.rs` and `docs/status/SIMD-4301-OBSERVATION-IMPLEMENTATION-REPORT.md`; SIMD legality/fallback semantics remain BlockedSpec |
 | `SIMD-4302` | G4 | Portable SIMD IR | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:198`, `docs/status/SIMD-4302-AUTHORITY-AUDIT.md` |
 | `SIMD-4303` | G4 | SIMD Differential | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:210`, `docs/status/SIMD-4303-AUTHORITY-AUDIT.md` |
 | `DBUF-4401` | G4 | Device 类型与 Capability | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:223`, `docs/status/DBUF-4401-AUTHORITY-AUDIT.md` |

@@ -185,6 +185,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0152` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0152](../decisions/0152-cpu-scalar-reference-boundary-evidence.md) |
 | `DEC-0153` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0153](../decisions/0153-cpu-reference-trace-boundary-evidence.md) |
 | `DEC-0154` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0154](../decisions/0154-kernel-corpus-boundary-evidence.md) |
+| `DEC-0155` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0155](../decisions/0155-simd-legality-boundary-evidence.md) |
 
 ## Migration boundary
 

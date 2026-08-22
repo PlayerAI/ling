@@ -2522,3 +2522,16 @@ covers = ["CPU-4203 bounded Kernel corpus boundary evidence", "test-only Kernel 
 depends_on = ["DEC-0153", "DEC-0152", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0155"
+title = "Internal SIMD legality boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0155-simd-legality-boundary-evidence.md"
+covers = ["SIMD-4301 bounded SIMD legality boundary evidence", "test-only SIMD legality/fallback vocabulary", "legality boundaries without Kernel/Native/backend semantics"]
+depends_on = ["DEC-0154", "DEC-0152", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
