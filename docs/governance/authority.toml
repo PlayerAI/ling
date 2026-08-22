@@ -1794,3 +1794,16 @@ covers = ["ACT-2304 bounded turn observation", "deterministic turn identities", 
 depends_on = ["DEC-0097", "DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0099"
+title = "Internal Actor runtime observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0099-actor-runtime-observation.md"
+covers = ["ACT-2305 bounded runtime observation", "deterministic runtime observation identities", "lifecycle labels without runtime/ABI semantics"]
+depends_on = ["DEC-0098", "DEC-0097", "DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -129,6 +129,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0096` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0096](../decisions/0096-actor-message-schema-identity.md) |
 | `DEC-0097` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0097](../decisions/0097-actor-mailbox-observation.md) |
 | `DEC-0098` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0098](../decisions/0098-actor-turn-observation.md) |
+| `DEC-0099` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0099](../decisions/0099-actor-runtime-observation.md) |
 
 ## Migration boundary
 

@@ -13,6 +13,12 @@ No Actor runtime crate, spawn/stop API, mailbox implementation, envelope
 schema, dispatcher, lifecycle event, registry, scheduler integration,
 diagnostic, protocol, or placeholder G2 API was added.
 
+Accepted `DEC-0099` now authorizes the bounded child
+`ACT-2305-RUNTIME-OBSERVATION`, which records only immutable runtime
+observation identities and structural lifecycle labels. It does not close the
+spawn, stop, dispatch, Fault, registry, scheduler, ABI, or runtime gaps
+described below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its “minimal local runtime” list
