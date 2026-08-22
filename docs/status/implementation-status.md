@@ -90,7 +90,7 @@
 | `DOC-6701` | Formal Documentation Set | `G6` | `L` | `BlockedSpec` | `REL-6604` | `` |
 | `DOC-6701-SEED` | Seed documentation-inventory drift gate | `G6` | `S` | `Done` | `REL-6604-SEED` | `77a905bbac64aaa7e9b6a56f8952a045d2760d87` |
 | `DOC-6702` | Two-layer Examples | `G6` | `M` | `BlockedSpec` | `DOC-6701` | `` |
-| `DOC-6702-SEED` | Seed example-matrix drift gate | `G6` | `S` | `In Progress` | `DOC-6701-SEED` | `` |
+| `DOC-6702-SEED` | Seed example-matrix drift gate | `G6` | `S` | `Done` | `DOC-6701-SEED` | `dab9a240c3f83c3e671449b318ca9425df57df32` |
 | `DOC-6703` | Bilingual Chinese-first Tutorial | `G6` | `M` | `BlockedSpec` | `DOC-6702` | `` |
 | `EFF-2101` | Effect core model freeze | `G2` | `M` | `BlockedSpec` | — | `` |
 | `EFF-2102` | Effect inference and constraint solving | `G2` | `L` | `BlockedSpec` | `EFF-2101` | `` |

@@ -14408,7 +14408,7 @@ notes = [
 [[task]]
 id = "DOC-6702-SEED"
 title = "Seed example-matrix drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14442,10 +14442,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0046 closes only this internal Seed example child; the parent DOC-6702 gate remains BlockedSpec for future Stable capabilities and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "dab9a240c3f83c3e671449b318ca9425df57df32"
+completion_commit = "dab9a240c3f83c3e671449b318ca9425df57df32"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects example inventory consistency only; current examples and outputs remain Experimental/Preview evidence.",
   "No example, syntax, API, profile, ownership rule, migration promise, security claim, or placeholder public surface is added.",
