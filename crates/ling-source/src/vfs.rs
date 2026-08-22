@@ -387,6 +387,16 @@ impl VirtualFileSystem {
         snapshots
     }
 
+    /// Returns the latest session-local revision allocated by this VFS.
+    ///
+    /// The value is an internal observation boundary for immutable request
+    /// capture. It is not a client document version, Semantic ID, serialized
+    /// cache key, or cross-process identity.
+    #[must_use]
+    pub const fn revision(&self) -> Revision {
+        Revision(self.next_revision)
+    }
+
     /// Publishes a package manifest, config, profile, or target revision.
     pub fn set_workspace_input(
         &mut self,

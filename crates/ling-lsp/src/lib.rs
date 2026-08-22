@@ -9,7 +9,7 @@ use std::collections::BTreeMap;
 use std::fmt;
 use std::io::{self, BufRead, BufReader, BufWriter, Read, Write};
 
-pub use ling_source::PositionEncoding;
+pub use ling_source::{FileOrigin, PositionEncoding, Revision};
 use ling_source::{
     SourceId, VfsError, VirtualFileSystem, negotiate_position_encoding, validate_logical_name,
 };
@@ -88,6 +88,129 @@ pub struct DocumentView {
     open: bool,
     writable: bool,
     text: String,
+}
+
+/// An owned, immutable view of one visible document captured for in-process
+/// analysis. It intentionally exposes no session-local `SourceId`.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RequestDocument {
+    uri: String,
+    logical_name: String,
+    revision: Revision,
+    origin: FileOrigin,
+    open: bool,
+    client_version: Option<i64>,
+    bytes: Box<[u8]>,
+}
+
+impl RequestDocument {
+    /// Returns the exact path-free URI supplied by the editor or host.
+    #[must_use]
+    pub fn uri(&self) -> &str {
+        &self.uri
+    }
+
+    /// Returns the canonical logical source name used by the VFS.
+    #[must_use]
+    pub fn logical_name(&self) -> &str {
+        &self.logical_name
+    }
+
+    /// Returns the session-local VFS revision visible at capture time.
+    #[must_use]
+    pub const fn revision(&self) -> Revision {
+        self.revision
+    }
+
+    /// Returns whether the visible bytes came from an editor overlay or disk.
+    #[must_use]
+    pub const fn origin(&self) -> FileOrigin {
+        self.origin
+    }
+
+    /// Returns whether the document was open at capture time.
+    #[must_use]
+    pub const fn is_open(&self) -> bool {
+        self.open
+    }
+
+    /// Returns the client version for an open document, or `None` for a
+    /// disk-only/closed document.
+    #[must_use]
+    pub const fn client_version(&self) -> Option<i64> {
+        self.client_version
+    }
+
+    /// Returns the exact immutable UTF-8 bytes captured from the visible VFS
+    /// layer.
+    #[must_use]
+    pub fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+}
+
+/// Errors raised when an internal request snapshot cannot be captured
+/// atomically.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum RequestSnapshotError {
+    /// A tracked document no longer has its VFS entry.
+    MissingDocument { uri: String },
+}
+
+impl fmt::Display for RequestSnapshotError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::MissingDocument { uri } => {
+                write!(formatter, "tracked document is missing from the VFS: {uri}")
+            }
+        }
+    }
+}
+
+impl std::error::Error for RequestSnapshotError {}
+
+/// An immutable, path-free capture of the visible LSP document set.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RequestSnapshot {
+    state: LifecycleState,
+    position_encoding: PositionEncoding,
+    revision: Revision,
+    documents: Box<[RequestDocument]>,
+}
+
+impl RequestSnapshot {
+    /// Returns the lifecycle state at capture time.
+    #[must_use]
+    pub const fn state(&self) -> LifecycleState {
+        self.state
+    }
+
+    /// Returns the negotiated position encoding at capture time.
+    #[must_use]
+    pub const fn position_encoding(&self) -> PositionEncoding {
+        self.position_encoding
+    }
+
+    /// Returns the latest session-local VFS revision observed at capture.
+    #[must_use]
+    pub const fn revision(&self) -> Revision {
+        self.revision
+    }
+
+    /// Returns documents in deterministic URI order.
+    #[must_use]
+    pub fn documents(&self) -> &[RequestDocument] {
+        &self.documents
+    }
+
+    /// Returns one captured document by its path-free URI.
+    #[must_use]
+    pub fn document(&self, uri: &str) -> Option<&RequestDocument> {
+        self.documents
+            .binary_search_by(|document| document.uri().cmp(uri))
+            .ok()
+            .map(|index| &self.documents[index])
+    }
 }
 
 impl DocumentView {
@@ -310,6 +433,36 @@ impl LspServer {
             open: record.open,
             writable: record.writable,
             text,
+        })
+    }
+
+    /// Captures the complete visible document set as an owned immutable value.
+    ///
+    /// This is an internal analysis boundary, not a JSON-RPC method. The
+    /// server can continue publishing later VFS changes after this method
+    /// returns without mutating the captured bytes.
+    pub fn capture_request_snapshot(&self) -> Result<RequestSnapshot, RequestSnapshotError> {
+        let mut documents = Vec::with_capacity(self.documents.len());
+        for (uri, record) in &self.documents {
+            let snapshot = self
+                .vfs
+                .snapshot(record.file)
+                .ok_or_else(|| RequestSnapshotError::MissingDocument { uri: uri.clone() })?;
+            documents.push(RequestDocument {
+                uri: uri.clone(),
+                logical_name: snapshot.logical_name().to_owned(),
+                revision: snapshot.revision(),
+                origin: snapshot.origin(),
+                open: record.open,
+                client_version: record.open.then_some(record.version),
+                bytes: snapshot.bytes().into(),
+            });
+        }
+        Ok(RequestSnapshot {
+            state: self.state,
+            position_encoding: self.position_encoding,
+            revision: self.vfs.revision(),
+            documents: documents.into_boxed_slice(),
         })
     }
 

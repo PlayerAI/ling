@@ -5571,14 +5571,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/LSP-2501-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2501-SNAPSHOT-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing request snapshot identity/contents, client-version versus VFS/query/semantic revisions, immutability, publication, cancellation, limits, stale handling, and protocol lifecycle contracts.",
-  "The audit covers URI/FileId, project/profile/toolchain/Unicode/dependency inputs, overlay/disk races, duplicate/non-monotonic versions, concurrent readers/writers, stale results, diagnostics, full/delta bases, Workspace Edits, Unicode/CRLF/BOM, deterministic identity, cancellation, and isolation fixtures.",
-  "The audit distinguishes DEC-0019 internal immutable VFS/query revisions from the missing public LSP request snapshot and document-version protocol.",
-  "No LSP snapshot type, document-version validator, request handler, stale-result policy, diagnostic allocation, protocol schema, or placeholder CompilerHost API is added while the authority is absent.",
+  "The audit records the remaining public request snapshot identity/contents, client-version versus VFS/query/semantic revisions, publication, cancellation, limits, stale handling, and protocol lifecycle contracts.",
+  "Accepted DEC-0030 and child LSP-2501-SNAPSHOT provide only internal immutable visible-document capture; the parent remains blocked for public CompilerHost/query behavior.",
+  "The audit distinguishes DEC-0019 internal immutable VFS/query revisions and DEC-0030 capture values from the missing public request snapshot and document-version protocol.",
+  "No JSON-RPC snapshot method, stale-result policy, diagnostic allocation, protocol schema, or placeholder CompilerHost API is added while the public authority is absent.",
   "The future implementation must capture one immutable, explicitly versioned input set per request, publish only associated results, and keep internal revisions separate from client versions.",
 ]
 verified_against_commit = ""
@@ -5586,9 +5587,58 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2501 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2103/LSP-2104, and the missing CompilerHost/AnalysisSnapshot public boundary; DEC-0019 remains internal evidence only.",
-  "ling-source and ling-db provide immutable internal snapshots/revisions, but no client document version, URI/FileId binding, request context, stale publication rule, or LSP protocol inventory entry exists.",
+  "LSP-2501 remains BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2103/LSP-2104, and the missing CompilerHost/AnalysisSnapshot public boundary; DEC-0030 authorizes only the internal child.",
+  "ling-source and ling-lsp now provide an owned immutable RequestSnapshot for the visible document set, but no public client request identity, URI/FileId binding, request context, stale publication rule, or LSP protocol inventory entry exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2501-SNAPSHOT"
+title = "Internal immutable LSP request snapshot capture"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1402", "LSP-2102-NEGOTIATION", "LSP-2103-OVERLAY"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0030-lsp-request-snapshot-boundary.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-source/src/vfs.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/request_snapshot.rs",
+  "docs/status/LSP-2501-SNAPSHOT-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2501-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "capture_request_snapshot returns an owned immutable visible-document set in deterministic URI order without a JSON-RPC response.",
+  "Each captured document preserves exact bytes, logical name, disk/overlay origin, open state, optional client version, and session-local VFS revision without exposing SourceId or host paths.",
+  "Snapshot state and negotiated position encoding are retained; later edits, disk publication, and close operations cannot mutate an earlier capture.",
+  "Client document versions remain distinct from VFS revisions, and invariant failure returns no partial snapshot or diagnostic/protocol claim.",
+  "Focused LSP snapshot tests, formatting, and clippy pass; public request identity, CompilerHost/query inputs, cancellation, stale publication, Workspace Edits, and Semantic Transactions remain deferred.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working-tree"
+completed = "2026-08-22"
+notes = [
+  "This child closes only DEC-0030's internal capture boundary; parent LSP-2501 remains BlockedSpec for the public analysis/request protocol.",
+  "The snapshot API is an internal Rust value and is intentionally absent from the public protocol inventory and support matrix.",
 ]
 
 [[task]]

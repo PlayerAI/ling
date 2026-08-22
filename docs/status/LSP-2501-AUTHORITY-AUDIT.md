@@ -2,16 +2,17 @@
 
 ## Outcome
 
-`LSP-2501` is correctly recorded as `BlockedSpec`. The execution plan requires
-each request to capture an immutable `AnalysisSnapshot` and document version,
-and requires long-running work not to hold a host write lock. The repository
-has an accepted internal VFS/revision boundary, but no accepted LSP request
-snapshot identity, document-version contract, publication rule, or
-`CompilerHost`/`AnalysisSnapshot` API.
+`LSP-2501` remains correctly recorded as `BlockedSpec` for the full public
+request-snapshot and analysis contract. Accepted DEC-0030 authorizes and child
+`LSP-2501-SNAPSHOT` implements only an internal immutable capture boundary:
+visible documents, overlay origin, client-version separation, negotiated
+encoding, and session-local VFS revisions. The repository still has no
+accepted public LSP request identity, publication rule, or
+`CompilerHost`/semantic `AnalysisSnapshot` API.
 
-No LSP snapshot type, document-version validator, request handler, stale-result
-policy, diagnostic allocation, protocol schema, or placeholder compiler host
-was added.
+No JSON-RPC snapshot method, document-version validator beyond the existing
+RFC-0023 overlay checks, stale-result policy, diagnostic allocation, protocol
+schema, or placeholder compiler host was added.
 
 ## Normative traceability
 
@@ -21,6 +22,9 @@ was added.
   overlay boundaries, query dependencies, invalidation, and cancellation. It
   explicitly does not define an LSP request, document version, JSON-RPC field,
   or editor lifecycle.
+- Accepted DEC-0030 defines only the in-process `ling-lsp` capture value and
+  explicitly leaves public request identity, analysis/query inputs, and
+  publication semantics unresolved.
 - DEC-0002 keeps original UTF-8 bytes and `SourceId + Span` authoritative. A
   request adapter must derive any editor position from an explicit SourceMap;
   it must not replace compiler spans with document-version metadata.
@@ -35,63 +39,59 @@ was added.
 ## Current interface evidence
 
 - `ling-source` provides immutable `FileSnapshot` and `WorkspaceSnapshot`
-  values, overlay/disk precedence, and deterministic session-local revisions.
-  These are internal VFS inputs, not client document versions or a request
-  snapshot protocol.
+  values, overlay/disk precedence, and deterministic session-local revisions;
+  the `LSP-2501-SNAPSHOT` child now captures these into an owned, path-free
+  `RequestSnapshot`. These remain internal VFS inputs, not a client protocol.
 - `ling-db` and the checked compiler pipeline can retain internal query/source
-  revisions, but there is no public `CompilerHost`, `AnalysisSnapshot`, URI to
-  `FileId` binding, request context, or snapshot publication boundary.
+  revisions, but there is no public `CompilerHost`, semantic
+  `AnalysisSnapshot`, URI-to-`FileId` binding, request context, or result
+  publication boundary.
 - The current CLI compiles a path or in-memory source per invocation; no LSP
-  server pins a request to source, project, profile, toolchain, Unicode, or
-  dependency inputs while another revision is published.
-- No fixture covers edits during analysis, stale-result rejection, duplicate or
-  non-monotonic document versions, overlay/disk races, dependency snapshots,
-  concurrent readers/writers, cancellation, limits, or deterministic snapshot
-  identity.
+  server pins a request to project, profile, toolchain, Unicode, or dependency
+  inputs while another revision is published.
+- The child fixture covers immutable capture across edits/close, deterministic
+  ordering, origin, and client-version/VFS-revision separation. No fixture yet
+  covers public edits during analysis, stale-result rejection, duplicate or
+  non-monotonic document versions, dependency snapshots, cancellation,
+  limits, or public deterministic snapshot identity.
 
-## Required authority before implementation
+## Required authority before parent implementation
 
-An Accepted RFC or decision must define, at minimum:
+An Accepted RFC or decision must still define, at minimum:
 
-1. request snapshot identity and contents, including URI/logical `FileId`,
-   project/package scope, visible overlay, compiler profile, target,
-   toolchain, language and Unicode versions, and dependency/config inputs;
+1. public request snapshot identity and contents, including URI/logical
+   `FileId`, project/package scope, compiler profile, target, toolchain,
+   language/Unicode versions, and dependency/config inputs;
 2. the distinction between client document version, VFS revision, query
    revision, and semantic snapshot identity, including monotonicity,
    duplicate/unknown versions, open/closed state, and disk races;
-3. immutable capture and lifetime rules, ownership/read-lock behavior, writer
-   publication, cancellation/deadline interaction, memory/retention limits,
-   and the guarantee that long work cannot observe a partially published
-   source or hold a host write lock;
-4. response association and stale handling: required version/snapshot fields,
-   reject/ignore/replace behavior, errors, diagnostics, full/delta bases,
-   Workspace Edits, and cross-file/dependency consistency;
-5. JSON-RPC/request schemas, capability negotiation, protocol inventory,
-   Stable versus Experimental fields, migration/versioning, and executable
-   positive/negative fixtures for races, stale/duplicate versions, Unicode,
-   CRLF/BOM, deterministic identities, cancellation, limits, and isolation.
+3. immutable capture lifetime, cancellation/deadline interaction,
+   memory/retention limits, and publication guarantees;
+4. response association and stale handling, errors, diagnostics, full/delta
+   bases, Workspace Edits, and cross-file/dependency consistency; and
+5. JSON-RPC/request schemas, capability negotiation, protocol lifecycle,
+   migration/versioning, and executable race/isolation fixtures.
 
-Until these decisions are Accepted, a request could publish analysis for the
-wrong editor revision, conflate an internal revision with a client version, or
-expose host locking and cache behavior as an accidental public contract.
+Until those decisions are Accepted, a public request could publish analysis for
+the wrong editor revision or expose internal cache and locking behavior.
 
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0002, DEC-0019,
-`docs/ling_execution_plan/01-REPOSITORY-AND-COMPILER-ARCHITECTURE.md`,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-source`, `crates/ling-db`, and the current compiler/CLI tests.
+`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0002, DEC-0019, DEC-0030,
+RFC-0004, RFC-0023, the execution plan, governance registries, `ling-source`,
+`ling-lsp`, `ling-db`, and the child integration tests.
 
 No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+source-span, runtime, or Unicode 17.0.0 behavior changed. The child adds no
+wire protocol or support-matrix claim.
 
 ## Intentionally deferred
 
-`LSP-2501` can begin after LSP URI/open-document and incremental-change
+The `LSP-2501-SNAPSHOT` child is complete under DEC-0030. The parent
+`LSP-2501` remains blocked until LSP URI/open-document and incremental-change
 decisions, the compiler-host/analysis-snapshot boundary, and LSP/Semantic
-Transaction lifecycle rules are Accepted. The future implementation must
-capture one immutable, explicitly versioned input set per request, publish
-only results associated with that set, and keep internal revisions separate
-from public client versions.
+Transaction lifecycle rules are Accepted. Future work must capture one
+immutable, explicitly versioned input set per request, publish only results
+associated with that set, and keep internal revisions separate from public
+client versions.
