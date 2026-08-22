@@ -2,10 +2,11 @@
 
 ## Outcome
 
-`IDE-2301` is correctly recorded as `BlockedSpec`. The execution plan asks for
-document symbols from a semantic index. Ling has internal HIR/Semantic Graph
-and Semantic ID machinery, but no accepted LSP document-symbol schema fixes
-node kinds, hierarchy, ranges, URI/version association, or field lifecycle.
+`IDE-2301` remains correctly recorded as `BlockedSpec` for its public editor
+surface. Accepted DEC-0073 closes only the bounded `IDE-2301-INDEX` child: an
+in-process deterministic inventory of resolver-owned user definitions and
+original spans. The decision does not fix an LSP document-symbol schema, node
+kinds, hierarchy, ranges, URI/version association, or field lifecycle.
 
 No document-symbol handler, symbol-kind mapping, hierarchy projection,
 location conversion, or placeholder editor API was added.
@@ -14,6 +15,9 @@ location conversion, or placeholder editor API was added.
 
 - Accepted DEC-0012 defines path-free Semantic IDs and canonical bytes, not an
   LSP symbol request/response or presentation-range projection.
+- Accepted DEC-0073 authorizes only the internal resolved-definition index;
+  existing resolver IDs and spans are copied without creating presentation
+  ranges or a new identity rule.
 - `docs/LANGUAGE.md` and `docs/SEMANTICS.md` describe Semantic Graph nodes,
   stable identity, and source relationships, but do not freeze LSP symbol
   kinds, nesting, selection, or document lifecycle fields.
@@ -28,8 +32,9 @@ location conversion, or placeholder editor API was added.
 The current repository confirms the missing boundary:
 
 - `ling-semantic` emits canonical graph fragments/JSON and internal IDs, while
-  `ling-db` indexes modules/definitions for compiler queries; neither exposes
-  LSP symbol kinds, hierarchical `DocumentSymbol` nodes, or URI locations.
+  `ling-db` now exposes the bounded resolver-owned definition inventory for
+  compiler queries; neither exposes LSP symbol kinds, hierarchical
+  `DocumentSymbol` nodes, or URI locations.
 - `ling-source` preserves byte spans, but no accepted position adapter maps
   them to editor ranges or document versions.
 - No fixture covers symbol nesting, duplicate display names, Unicode names,
@@ -67,7 +72,8 @@ made.
 
 ## Intentionally deferred
 
-`IDE-2301` can begin after the LSP lifecycle/position and Semantic Graph
-projection decisions are Accepted. The implementation must derive locations
+The bounded `IDE-2301-INDEX` child is complete under DEC-0073. The public
+`IDE-2301` implementation can begin only after LSP lifecycle/position and
+Semantic Graph projection decisions are Accepted. It must derive locations
 from approved source maps, preserve Semantic IDs, and keep compiler graph
 identity separate from presentation details.

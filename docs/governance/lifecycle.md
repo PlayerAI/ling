@@ -103,6 +103,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0070` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0070](../decisions/0070-lsp-position-edit-projection.md) |
 | `DEC-0071` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0071](../decisions/0071-lsp-workspace-state-snapshot.md) |
 | `DEC-0072` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0072](../decisions/0072-lsp-diagnostic-span-projection.md) |
+| `DEC-0073` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0073](../decisions/0073-ide-resolved-definition-index.md) |
 
 ## Migration boundary
 

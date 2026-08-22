@@ -25,6 +25,12 @@ use ling_source::{
 use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
 
+mod definition_index;
+
+pub use definition_index::{
+    ResolvedDefinitionIndex, ResolvedDefinitionKind, ResolvedDefinitionSymbol,
+};
+
 const LANGUAGE_VERSION: (u16, u16, u16) = (0, 1, 0);
 const UNICODE_VERSION: (u8, u8, u8) = (17, 0, 0);
 const QUERY_SCHEMA_VERSION: u16 = 1;
@@ -879,6 +885,21 @@ impl CompilerDb {
             self.resolved_modules.insert(key, Ok(module.clone()));
         }
         result
+    }
+
+    /// Builds an immutable source-order inventory from the validated resolver
+    /// result. This is an internal compiler observation, not an LSP response.
+    pub fn resolved_definition_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<ResolvedDefinitionIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
+        Ok(Arc::new(ResolvedDefinitionIndex::from_resolved(&resolved)))
     }
 
     /// Type-checks and effect-checks one module against the current resolved
@@ -2253,6 +2274,64 @@ mod tests {
         assert_eq!(graph.edges()[0].from(), "Main");
         assert_eq!(graph.edges()[0].to(), "Lib");
         assert!(Arc::ptr_eq(&graph, &db.module_graph().unwrap()));
+    }
+
+    #[test]
+    fn resolved_definition_index_preserves_original_spans_and_source_order() {
+        let mut db = CompilerDb::new();
+        let source = "\u{feff}module Main\r\n\r\nlet 人物 = 1\r\ntype Choice =\r\n    | First\r\n    | Second\r\n";
+        let file = file(
+            db.set_disk_snapshot("unicode/Main.ling", source.as_bytes().to_vec())
+                .unwrap(),
+        );
+
+        let index = db
+            .resolved_definition_index(file)
+            .expect("valid source resolves");
+        let repeated = db
+            .resolved_definition_index(file)
+            .expect("repeated index resolves");
+        assert_eq!(&*index, &*repeated);
+        assert_eq!(
+            index
+                .symbols()
+                .iter()
+                .map(ResolvedDefinitionSymbol::name_source)
+                .collect::<Vec<_>>(),
+            ["人物", "Choice", "First", "Second"]
+        );
+        assert_eq!(
+            index
+                .symbols()
+                .iter()
+                .map(|symbol| symbol.kind().as_str())
+                .collect::<Vec<_>>(),
+            ["value", "type", "constructor", "constructor"]
+        );
+
+        let bytes = db.vfs.snapshot(file).expect("source snapshot exists");
+        for symbol in index.symbols() {
+            assert_eq!(symbol.source_name(), "unicode/Main.ling");
+            assert_eq!(symbol.span().source(), file);
+            let start = symbol.span().start().get() as usize;
+            let end = symbol.span().end().get() as usize;
+            assert_eq!(
+                std::str::from_utf8(&bytes.bytes()[start..end]).unwrap(),
+                symbol.name_source()
+            );
+        }
+        assert_eq!(index.source_symbols("unicode/Main.ling").len(), 4);
+        assert!(index.definition("missing-definition-id").is_none());
+    }
+
+    #[test]
+    fn resolved_definition_index_does_not_publish_after_source_failure() {
+        let mut db = CompilerDb::new();
+        let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
+        assert!(matches!(
+            db.resolved_definition_index(file),
+            Err(QueryError::InvalidSource { .. })
+        ));
     }
 
     #[test]

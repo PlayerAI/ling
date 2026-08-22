@@ -167,6 +167,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:219`, `docs/status/LSP-2204-AUTHORITY-AUDIT.md` |
 | `LSP-2205` | G1/Editor | Diagnostic fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:227`, `docs/status/LSP-2205-AUTHORITY-AUDIT.md` |
 | `IDE-2301` | G1/Editor | Document symbols | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:244`, `docs/status/IDE-2301-AUTHORITY-AUDIT.md` |
+| `IDE-2301-INDEX` | G1/Editor | Internal resolved-definition source-order index | S | Done | Accepted `DEC-0073`; see `crates/ling-db/src/definition_index.rs` and `docs/status/IDE-2301-INDEX-IMPLEMENTATION-REPORT.md`; public DocumentSymbol behavior remains BlockedSpec in `IDE-2301` |
 | `IDE-2302` | G1/Editor | Hover | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:248`, `docs/status/IDE-2302-AUTHORITY-AUDIT.md` |
 | `IDE-2303` | G1/Editor | Go to definition/declaration/type definition | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:262`, `docs/status/IDE-2303-AUTHORITY-AUDIT.md` |
 | `IDE-2304` | G1/Editor | References | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:266`, `docs/status/IDE-2304-AUTHORITY-AUDIT.md` |

@@ -1456,3 +1456,16 @@ covers = ["LSP-2201 bounded diagnostic span projection", "original-byte to expli
 depends_on = ["DEC-0002", "DEC-0029", "DEC-0034", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0073"
+title = "Internal resolved-definition index"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0073-ide-resolved-definition-index.md"
+covers = ["IDE-2301 bounded resolved-definition index", "resolver-owned source spans", "deterministic internal definition inventory"]
+depends_on = ["DEC-0012", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

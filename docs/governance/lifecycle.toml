@@ -1978,3 +1978,27 @@ unresolved_alternatives = [
   "Severity/tag mapping, related information, localization, Fact/repair schemas, URI/version association, freshness, publication, cancellation, suppression, root-cause grouping, and lifecycle remain open under the LSP-2201/LSP-2204 parents and registered gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0073"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0073-ide-resolved-definition-index.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build Unicode, BOM, and CRLF indexes and compare exact original bytes, resolver SourceId values, source order, and ordinary/type/constructor/member classifications.",
+  "Repeat construction from equal resolved results and verify equality, explicit logical/source/span/name/identity ordering, and source-local lookup.",
+  "Reject invalid source input without publishing an index; keep LSP ranges, hierarchy, URI/version, positions, cancellation, publication, and JSON-RPC fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db definition-index values and an accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "LSP symbol kinds, hierarchy, full/selection ranges, URI/version/snapshot and generated/dependency policy, position encoding, documentation, cancellation, rename/reference linkage, and protocol migration remain IDE-2301 parent work under the registered LSP and semantic lifecycle gaps.",
+]
+superseded_by = ""
