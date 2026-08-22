@@ -199,6 +199,7 @@
 | `LSP-2204` | LSP root-cause and error-storm control | `G1` | `M` | `BlockedSpec` | `LSP-2201`, `LSP-2202` | `` |
 | `LSP-2205` | LSP diagnostic fixtures | `G1` | `M` | `BlockedSpec` | `LSP-2201`, `LSP-2202`, `LSP-2203`, `LSP-2204` | `` |
 | `LSP-2401` | Semantic token taxonomy RFC/decision | `G1` | `M` | `BlockedSpec` | `IDE-2311`, `LSP-2101`, `LSP-2102` | `` |
+| `LSP-2401-LEXICAL-SOURCE` | Internal lexical token source index | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP` | `135bfb07bb8f824f1ab119b5e0f765c674d6f294` |
 | `LSP-2402` | Typed semantic-token generation | `G1` | `L` | `BlockedSpec` | `LSP-2101`, `LSP-2102`, `LSP-2401` | `` |
 | `LSP-2403` | Semantic token full and delta transport | `G1` | `L` | `BlockedSpec` | `LSP-2401`, `LSP-2402` | `` |
 | `LSP-2404` | Semantic-token fixture corpus | `G1` | `M` | `BlockedSpec` | `LSP-2401`, `LSP-2402`, `LSP-2403` | `` |
