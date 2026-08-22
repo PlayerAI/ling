@@ -17207,10 +17207,10 @@ acceptance = [
   "cargo test -p ling-types --test backend_adapter_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "e93888bd62fa4dee6ba4f934cd2ab24a0c0ff0a9"
+completion_commit = "e93888bd62fa4dee6ba4f934cd2ab24a0c0ff0a9"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0166; GPU-4602 remains BlockedSpec for adapter ABI, DeviceBinary/cache, target/runtime, protocol, and support claims.",
   "No backend adapter, Device IR/DeviceBinary model, runtime handle, target package, dependency, capability API, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",

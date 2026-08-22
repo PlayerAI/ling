@@ -177,6 +177,7 @@
 | `GPU-4601` | Backend Spike and Selection | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4601-OBSERVATION` | Internal backend spike and selection boundary evidence | `G4` | `S` | `Done` | `DIR-4503-OBSERVATION` | `d67668549aa436367f19792ddaf10e6968d9e9e4` |
 | `GPU-4602` | Backend Adapter | `G4` | `M` | `BlockedSpec` | — | `` |
+| `GPU-4602-OBSERVATION` | Internal backend adapter boundary evidence | `G4` | `S` | `Done` | `GPU-4601-OBSERVATION` | `e93888bd62fa4dee6ba4f934cd2ab24a0c0ff0a9` |
 | `GPU-4603` | Launch and Runtime | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4604` | Differential and Hardware Matrix | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4605` | Error Normalization | `G4` | `M` | `BlockedSpec` | — | `` |
