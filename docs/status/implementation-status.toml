@@ -8948,6 +8948,15 @@ artifacts = [
   "docs/status/ACT-2301-ACTOR-SYNTAX-REJECTION-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2301-ACTOR-SYNTAX-REJECTION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0090-actor-syntax-rejection-gate.md",
+  "docs/status/ACT-2301-IDENTITY-MODEL-AUTHORITY-AUDIT.md",
+  "docs/status/ACT-2301-IDENTITY-MODEL-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0095-actor-identity-reference-model.md",
+  "crates/ling-concurrency/src/actor.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -8957,6 +8966,7 @@ acceptance = [
   "The audit covers identity stability/reuse, multiple turns, nested/recursive sends, state isolation, mutable-borrow escape, await reentry, cancellation/Fault cleanup, message ownership, local/remote separation, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM differential fixtures.",
   "No Actor syntax, ActorTypeId/ActorId model, ActorRef type, state-isolation checker, turn runtime, borrow rule, serialization schema, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
   "The future implementation must lower only accepted Actor syntax to checked Core, enforce turn-local state and Sendable messages, keep local/remote identity distinct, and publish interpreter/VM and isolation evidence before Actor execution is exposed.",
+  "Accepted DEC-0095 authorizes only the publish-disabled identity/reference child; it does not authorize Actor syntax, turns, state isolation, borrow/sendability, mailbox, serialization, scheduler, or runtime behavior.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -9017,6 +9027,58 @@ completed = "2026-08-22"
 notes = [
   "This bounded child is complete under DEC-0090; public ACT-2301 remains BlockedSpec for Actor grammar, identity, turn, state isolation, message ownership, mailbox, supervision, remote delivery, runtime, and interpreter/VM authority.",
   "The negative fixture reuses L-SYNTAX-0010 and current UTF-8 source spans; it does not reserve actor as a lexer keyword or claim Actor support.",
+]
+
+[[task]]
+id = "ACT-2301-IDENTITY-MODEL"
+title = "Internal Actor identity/reference model"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ACT-2301-ACTOR-SYNTAX-REJECTION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0090-actor-syntax-rejection-gate.md",
+  "docs/decisions/0095-actor-identity-reference-model.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/src/actor.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/decisions/0095-actor-identity-reference-model.md",
+  "docs/status/ACT-2301-IDENTITY-MODEL-AUTHORITY-AUDIT.md",
+  "docs/status/ACT-2301-IDENTITY-MODEL-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0095 authorizes only publish-disabled Actor identity/reference evidence; no Actor semantics are claimed.",
+  "ActorIdentityModel validates nonzero type/actor/reference identities, duplicate-free identity sets, known actor types, and known reference targets; values are stored deterministically.",
+  "Local and Remote labels remain structural observations, source spans are evidence only, and canonical bytes are path-free and independent of source evidence and input order.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "4209c9b444b72501731b96fdad2f8832269b406a"
+completion_commit = "4209c9b444b72501731b96fdad2f8832269b406a"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is a data-only boundary under DEC-0095; ACT-2301 remains BlockedSpec for Actor syntax, turn/state isolation, borrow/sendability, mailbox, serialization, scheduler, runtime, and interpreter/VM behavior.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, schema, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, or Unicode behavior was added.",
 ]
 
 [[task]]
