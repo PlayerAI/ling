@@ -477,6 +477,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PROOF-5503` | G5 | 假设注册表 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:412`, `docs/status/PROOF-5503-AUTHORITY-AUDIT.md` |
 | `PROOF-5503-OBSERVATION` | G5 | Internal Assumption Registry boundary evidence | S | Done | Accepted `DEC-0201`; see `crates/ling-types/tests/assumption_registry_evidence.rs` and `docs/status/PROOF-5503-OBSERVATION-IMPLEMENTATION-REPORT.md`; schema/lifecycle/proof semantics remain BlockedSpec |
 | `MC-5601` | G5 | 有限状态投影 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:431`, `docs/status/MC-5601-AUTHORITY-AUDIT.md` |
+| `MC-5601-OBSERVATION` | G5 | Internal Finite-State Projection boundary evidence | S | Done | Accepted `DEC-0202`; see `crates/ling-concurrency/tests/finite_state_projection_evidence.rs` and `docs/status/MC-5601-OBSERVATION-IMPLEMENTATION-REPORT.md`; concurrency/projection/model-check semantics remain BlockedSpec |
 | `MC-5602` | G5 | 探索引擎 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:446`, `docs/status/MC-5602-AUTHORITY-AUDIT.md` |
 | `MC-5603` | G5 | 报告语义 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:458`, `docs/status/MC-5603-AUTHORITY-AUDIT.md` |
 | `MC-5604` | G5 | Replay Counterexample | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:471`, `docs/status/MC-5604-AUTHORITY-AUDIT.md` |

@@ -232,6 +232,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0199` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0199](../decisions/0199-proof-ir-boundary-evidence.md) |
 | `DEC-0200` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0200](../decisions/0200-independent-checker-boundary-evidence.md) |
 | `DEC-0201` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0201](../decisions/0201-assumption-registry-boundary-evidence.md) |
+| `DEC-0202` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0202](../decisions/0202-finite-state-projection-boundary-evidence.md) |
 
 ## Migration boundary
 

@@ -3133,3 +3133,16 @@ covers = ["PROOF-5503 bounded Assumption Registry boundary evidence", "test-only
 depends_on = ["DEC-0200", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0202"
+title = "Internal Finite-State Projection boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0202-finite-state-projection-boundary-evidence.md"
+covers = ["MC-5601 bounded Finite-State Projection boundary evidence", "test-only projection vocabulary", "projection boundaries without concurrency/model-check semantics"]
+depends_on = ["DEC-0201", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
