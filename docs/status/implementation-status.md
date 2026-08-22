@@ -138,6 +138,7 @@
 | `GC-3303` | Managed Native and FFI boundary | `G3` | `L` | `BlockedSpec` | `GC-3302` | `` |
 | `GC-3303-OBSERVATION` | Internal Managed/Native/FFI boundary evidence | `G3` | `S` | `Done` | `GC-3302-OBSERVATION` | `51c82b24903732216837255389bc97a89d35143b` |
 | `GC-3304` | Managed profile checks | `G3` | `M` | `BlockedSpec` | `GC-3303` | `` |
+| `GC-3304-OBSERVATION` | Internal Managed Profile boundary evidence | `G3` | `S` | `Done` | `GC-3303-OBSERVATION` | `37363046e2020c6e5e47093edbf2e85133d201fd` |
 | `GOV-0101` | 建立规范权威索引 | `G0` | `S` | `Done` | `BASE-0001` | `7bba2adf9104d7d7f96c7ef50343647f649e229e` |
 | `GOV-0102` | 规范缺口台账 | `G0` | `M` | `Done` | `GOV-0101` | `c147b5c02532b61e23df46f6cb25251d8c94dd7d` |
 | `GOV-0103` | RFC 与 decision 生命周期 | `G0` | `S` | `Done` | `GOV-0101` | `4876a0328d994121fb32c10b3f2a25e3ce11e5ff` |

@@ -12765,6 +12765,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/GC-3304-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3304-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3304-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0128-managed-profile-boundary-evidence.md",
+  "crates/ling-types/tests/managed_profile_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12774,6 +12782,7 @@ acceptance = [
   "The audit covers legal and rejected profile combinations, `no_gc` propagation, Managed allocation, Native-Island boundaries, Critical boundedness and runtime faults, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No profile checker, `no_gc` keyword, Managed capability, Native-Island schema, runtime assertion, profile diagnostic, public protocol, or placeholder G3 API is added while RFC-N303/RFC-N304/RFC-N305/RFC-N306/RFC-0012 and RFC-0007 authority are absent.",
   "The future implementation must preserve Seed support, consume accepted types and checked Core only, make profile and target inputs explicit, keep host timing/allocation non-semantic, and publish profile, diagnostic, boundedness, and interpreter/VM/Native evidence before exposing v0.3 behavior.",
+  "Accepted DEC-0128 authorizes only test-only Managed Profile and no_gc boundary vocabulary; it does not close Profile syntax, manifests, capability propagation, allocation, Native-Island, Critical, diagnostic, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12783,6 +12792,64 @@ notes = [
   "GC-3304 is BlockedSpec by GC-3301 through GC-3303, absent RFC-N303/RFC-N304/RFC-N305/RFC-N306/RFC-0012 and RFC-0007, GAP-OWNERSHIP-MODEL-001, GAP-NATIVE-BACKEND-ABI-001, and GAP-CRITICAL-PROFILE-001.",
   "The current workspace has no profile checker, `no_gc` form, Managed capability, Native-Island schema, Critical runtime assertion, profile-specific Fault, or profile evidence protocol; v0.0.1 reserves these features and rejects silent placeholders.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "GC-3304-OBSERVATION"
+title = "Internal Managed Profile boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GC-3303-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "docs/decisions/0127-managed-ffi-boundary-evidence.md",
+  "docs/decisions/0128-managed-profile-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/managed_profile_evidence.rs",
+  "docs/decisions/0128-managed-profile-boundary-evidence.md",
+  "docs/status/GC-3304-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3304-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0128 authorizes only test-only Managed Profile and no_gc boundary evidence; no Profile syntax, manifest, capability, no_gc checker, allocation restriction, Native-Island schema, Critical assertion, diagnostic, or runtime semantics are claimed.",
+  "The test-local inventory covers forty-four provisional boundaries for Profile identity/version/manifest/inheritance, Explore/Native-Island/Critical matrix, no_gc annotation and transitive call/closure/generic/import/callback/Task/Actor/FFI rules, allocation/safepoint/Resource Drop, dynamic/reflection and boundedness restrictions, capabilities, Native transitions, pin/handle/ABI, cross-Profile calls/transfers, Critical timing/target/security, pre-execution rejection, runtime assertions, diagnostics, migration, support matrix, projections, Semantic IDs, Unicode spans, and differential evidence with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no Profile, no_gc, capability, diagnostic, protocol, or runtime API is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "37363046e2020c6e5e47093edbf2e85133d201fd"
+completion_commit = "37363046e2020c6e5e47093edbf2e85133d201fd"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0128; GC-3304 remains BlockedSpec for Profile identity/versioning, feature legality, no_gc, Managed allocation, Native Islands, Critical restrictions, assertions/Faults, diagnostics, migration, and differential contracts.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
