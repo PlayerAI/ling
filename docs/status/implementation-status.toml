@@ -20679,6 +20679,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0197-contract-optimizer-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -20687,6 +20688,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/CTR-5406-AUTHORITY-AUDIT.md",
+  "docs/decisions/0197-contract-optimizer-boundary-evidence.md",
+  "docs/status/CTR-5406-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5406-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/tests/contract_optimizer_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -20706,6 +20711,71 @@ notes = [
   "The repository has no Contract-aware optimizer, pass contract, proof/assumption reader, optimization metadata schema, or optimized/unoptimized semantic differential fixtures; Seed lowering and VM verification remain unchanged.",
   "The audit does not reinterpret Draft Contract/optimization notes, roadmap gates, internal query scheduling, bytecode lowering, or Rust optimization as Ling optimizer semantics and creates no pass placeholder.",
   "The audit adds no public protocol, dependency, optimizer, runtime, schema, diagnostic, or placeholder API; Contract-aware optimizer rules remain deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "CTR-5406-OBSERVATION"
+title = "Internal Contract optimizer boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CTR-5405-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0015.md",
+  "docs/RFC-0016.md",
+  "docs/RFC-0017.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0196-solver-proof-checker-boundary-evidence.md",
+  "docs/decisions/0197-contract-optimizer-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/contract_optimizer_evidence.rs",
+  "docs/decisions/0197-contract-optimizer-boundary-evidence.md",
+  "docs/status/CTR-5406-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5406-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0197 authorizes only test-local Contract optimizer boundary evidence; no optimizer pass, trust/admission model, transformation contract, proof reader, diagnostic, CLI, or support claim is made.",
+  "Inventory covers sixty optimizer status/admission, transformation/preservation, invalidation, proof/evidence, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no optimizer, proof, transformation, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test contract_optimizer_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "d80ddc0aaf2dd13152c407085b81f70e10a52b19"
+completion_commit = "d80ddc0aaf2dd13152c407085b81f70e10a52b19"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0197; CTR-5406 remains BlockedSpec for status trust/admission, transformations/preservation, invalidation, proof/evidence, diagnostics, CLI/editor integration, and support claims.",
+  "No optimizer pass, safety-check elimination, proof/assumption reader, schema, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
