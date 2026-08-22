@@ -19159,6 +19159,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0184-resource-budget-diagnostics-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -19167,6 +19168,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/BND-5204-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5204-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5204-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0184-resource-budget-diagnostics-boundary-evidence.md",
+  "crates/ling-types/tests/resource_budget_diagnostics_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -19186,6 +19195,63 @@ notes = [
   "The repository has no budget fact producer, contributor/provenance engine, Critical checker, budget-specific diagnostic allocation, or accepted transformation transaction; existing diagnostics and VM Runtime Faults remain their current Preview/host-safety contracts.",
   "The audit does not reinterpret optional Diagnostic Facts or Repair fields as an accepted budget schema, does not allocate a new code, and does not create a FixPlan or editor/CLI route.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; resource-budget diagnostics remain deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "BND-5204-OBSERVATION"
+title = "Internal resource-budget diagnostic boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BND-5203-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0183-memory-budgets-boundary-evidence.md",
+  "docs/decisions/0184-resource-budget-diagnostics-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/resource_budget_diagnostics_evidence.rs",
+  "docs/decisions/0184-resource-budget-diagnostics-boundary-evidence.md",
+  "docs/status/BND-5204-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5204-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0184 authorizes only test-local resource-budget diagnostic boundary evidence; no budget fact, diagnostic code, schema, proof, provenance, repair, transaction, dependency, target, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty diagnostic fact/proof/provenance, schema/migration, repair/transaction, compatibility, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no fact, code, schema, repair, transaction, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test resource_budget_diagnostics_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "375ae71c51129051e7049e2379cd489833f0e6fd"
+completion_commit = "375ae71c51129051e7049e2379cd489833f0e6fd"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0184; BND-5204 remains BlockedSpec for budget facts, code/schema allocation, proof/provenance, localization/migration, repairs, transactions, CLI/LSP integration, and support claims.",
+  "No budget diagnostic code, schema field, fact producer, Typed-Core state, Repair, Workspace Edit, Semantic Transaction, dependency, target package, manifest, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "NODE-5301"

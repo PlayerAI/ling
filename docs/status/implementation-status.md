@@ -64,6 +64,7 @@
 | `BND-5203` | Memory Budget Analysis | `G5` | `M` | `BlockedSpec` | `BND-5202` | `` |
 | `BND-5203-OBSERVATION` | Internal memory-budget boundary evidence | `G5` | `S` | `Done` | `BND-5202-OBSERVATION` | `a4a63c8443db52946029b9cee3a742216831038b` |
 | `BND-5204` | Resource Budget Diagnostics | `G5` | `M` | `BlockedSpec` | `BND-5203` | `` |
+| `BND-5204-OBSERVATION` | Internal resource-budget diagnostic boundary evidence | `G5` | `S` | `Done` | `BND-5203-OBSERVATION` | `375ae71c51129051e7049e2379cd489833f0e6fd` |
 | `CBK-5901` | Trusted Compiler Route Decision | `G5` | `L` | `BlockedSpec` | `EVD-5804` | `` |
 | `CBK-5902` | Lowering Validator | `G5` | `L` | `BlockedSpec` | `CBK-5901` | `` |
 | `CBK-5903` | Critical Runtime/Target Package | `G5` | `L` | `BlockedSpec` | `CBK-5902` | `` |
