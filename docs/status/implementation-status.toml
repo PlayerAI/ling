@@ -4789,6 +4789,7 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/ERROR-CODES.md",
+  "docs/decisions/0035-lsp-internal-diagnostic-batch-boundary.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -4796,12 +4797,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/LSP-2202-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The audit records the missing publishDiagnostics trigger, debounce/cancellation, snapshot/version, stale-result replacement, clear semantics, and related-file contracts.",
   "The audit covers diagnostic adapter dependencies, syntax/workspace timing, deterministic ordering, edit bursts, stale results, and required fixtures.",
+  "Accepted DEC-0035 closes only the internal immutable diagnostic-batch child; the parent remains blocked for public publication behavior.",
   "No publisher, scheduler, version field, protocol entry, diagnostic allocation, Semantic ID change, or placeholder LSP handler is added while the authority is absent.",
   "The future implementation must publish snapshot-associated results and replace/clear atomically without making host timing Ling semantics.",
 ]
@@ -4810,9 +4813,52 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2202 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2103, and LSP-2201; current diagnostic JSON remains a CLI/REPL Preview writer.",
-  "The current compiler and diagnostic registry remain unchanged; no push publication or stale-result policy is claimed.",
+  "LSP-2202 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2103, and LSP-2201; DEC-0035 is internal only and current diagnostic JSON remains a CLI/REPL Preview writer.",
+  "The current compiler and diagnostic registry remain unchanged; the DEC-0035 batch is not wired to LSP and no push publication or stale-result policy is claimed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2202-BATCH"
+title = "Internal immutable diagnostic batch"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2201-ORDERING", "LSP-2501-SNAPSHOT"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md",
+  "docs/decisions/0035-lsp-internal-diagnostic-batch-boundary.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-lsp/src/diagnostic_batch.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2202-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "DiagnosticBatch is pub(crate), owns opaque IDs with DEC-0034 ordering keys, and returns an immutable boxed slice on finish.",
+  "Finish sorts canonically, retains equal keys distinctly in insertion order, and performs no deduplication, suppression, truncation, conversion, serialization, or publication.",
+  "The batch has no request/version, position, cancellation, timer, snapshot, clear/replace, diagnostic-allocation, or host-memory state.",
+  "Focused ling-lsp tests cover empty batches, canonical ordering, duplicate/equal-key stability, and repeated immutable output; parent public diagnostics remain deferred.",
+]
+verified_against_commit = "15f8461582281ae1f9e99250ca6288a8b2d5f3b4"
+completion_commit = "15f8461582281ae1f9e99250ca6288a8b2d5f3b4"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child implements only DEC-0035's internal immutable collection; LSP-2202 remains BlockedSpec for public publish/trigger/version/clear behavior.",
+  "The batch is intentionally not added to the protocol inventory or support matrix and does not allocate diagnostics or alter source-span identity.",
 ]
 
 [[task]]
