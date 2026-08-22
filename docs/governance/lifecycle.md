@@ -230,6 +230,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0197` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0197](../decisions/0197-contract-optimizer-boundary-evidence.md) |
 | `DEC-0198` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0198](../decisions/0198-contract-lsp-zed-boundary-evidence.md) |
 | `DEC-0199` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0199](../decisions/0199-proof-ir-boundary-evidence.md) |
+| `DEC-0200` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0200](../decisions/0200-independent-checker-boundary-evidence.md) |
 
 ## Migration boundary
 

@@ -3107,3 +3107,16 @@ covers = ["PROOF-5501 bounded Proof IR boundary evidence", "test-only Proof IR v
 depends_on = ["DEC-0198", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0200"
+title = "Internal Independent Checker boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0200-independent-checker-boundary-evidence.md"
+covers = ["PROOF-5502 bounded Independent Checker boundary evidence", "test-only checker vocabulary", "checker boundaries without parser/kernel/result semantics"]
+depends_on = ["DEC-0199", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
