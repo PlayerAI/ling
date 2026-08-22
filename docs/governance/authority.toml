@@ -2730,3 +2730,16 @@ covers = ["ACC-4701 bounded accelerator-plugin interface boundary evidence", "te
 depends_on = ["DEC-0169", "DEC-0168", "DEC-0167", "DEC-0166", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0171"
+title = "Internal experimental accelerator-adapter boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0171-experimental-accelerator-adapter-boundary-evidence.md"
+covers = ["ACC-4702 bounded Experimental accelerator-adapter boundary evidence", "test-only Experimental adapter vocabulary", "Experimental boundaries without adapter/support semantics"]
+depends_on = ["DEC-0170", "DEC-0169", "DEC-0168", "DEC-0167", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

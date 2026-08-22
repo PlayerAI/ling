@@ -201,6 +201,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0168` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0168](../decisions/0168-differential-hardware-matrix-boundary-evidence.md) |
 | `DEC-0169` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0169](../decisions/0169-error-normalization-boundary-evidence.md) |
 | `DEC-0170` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0170](../decisions/0170-accelerator-plugin-interface-boundary-evidence.md) |
+| `DEC-0171` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0171](../decisions/0171-experimental-accelerator-adapter-boundary-evidence.md) |
 
 ## Migration boundary
 

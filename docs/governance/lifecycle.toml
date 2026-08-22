@@ -4439,3 +4439,27 @@ unresolved_alternatives = [
   "Verified Device IR/Kernel input and validation; plugin ABI/version negotiation and declaration schema; supported ops/types, shape/layout, numeric modes and determinism; device capabilities, capability/target/cache identity and invalidation; fallback/rejection, Fault propagation, diagnostics; resource ownership, cleanup and cancellation; host/frontend/plugin isolation; loading and trust boundary; dependencies, signatures, provenance, license, offline build, sandbox; Experimental/Supported/Unsupported lifecycle; positive, negative, malformed, migration, source-map/Unicode, determinism, cache, capability, fallback, security and differential fixtures; diagnostic and host/path/address/timestamp/driver/debug exclusion, protocol inventory, and public plugin status remain open under ACC-4701, GPU-4601 through GPU-4605, DIR-4501 through DIR-4503, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0171"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0171-experimental-accelerator-adapter-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Experimental-adapter boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer adapter implementation, package/target/cache/runtime/Fault paths, Experimental lifecycle and limitations, trust/supply-chain controls, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No TPU/NPU adapter, plugin package, graph bridge, dependency, target/support entry, cache/runtime API, diagnostic, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Experimental status and verified Device IR/Kernel input; plugin ABI and capability/target identity; shape/layout/numeric/determinism/resource/synchronization/Fault/fallback/cache contracts; limitation set, evidence, reproducibility, promotion/deprecation/revocation/removal; frontend/vendor graph/isolation; trust, dependencies, signatures, provenance, licenses, offline builds, sandbox; positive/negative/malformed/migration/capability/cache/security/source-map/Unicode/determinism/differential/lifecycle fixtures; diagnostics, host/path/address/timestamp/driver/debug exclusion, public support exclusion, protocol inventory, and adapter status remain open under ACC-4702, ACC-4701, GPU-4601 through GPU-4605, DIR-4501 through DIR-4503, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""
