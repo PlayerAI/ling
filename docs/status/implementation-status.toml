@@ -18586,6 +18586,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0179-profile-composition-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -18595,6 +18596,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/PROF-5103-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5103-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5103-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0179-profile-composition-boundary-evidence.md",
+  "crates/ling-types/tests/profile_composition_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -18611,9 +18620,64 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "PROF-5103 is BlockedSpec by PROF-5102, open GAP-CRITICAL-PROFILE-001 and GAP-SEMANTIC-HASH-LIFECYCLE-001, absent RFC-K501/RFC-0012 composition authority, and unresolved G2/G3/G4 profile inputs.",
-  "The repository has no profile layer model, merge algebra, conflict classifier, effective-profile canonicalizer, profile digest, or profile-aware ProgramId/build/cache integration under crates or tests.",
+  "The repository has no profile layer model, merge algebra, conflict classifier, effective-profile canonicalizer, profile digest, or profile-aware ProgramId/build/cache integration; the observation adds only bounded test-local composition evidence.",
   "DEC-0012 remains the only Semantic ID authority; the audit does not add profile fields to canonical bytes or infer precedence from the plan's one-line proposal.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; composition remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "PROF-5103-OBSERVATION"
+title = "Internal Profile Composition boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROF-5102-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0178-forbidden-capability-boundary-evidence.md",
+  "docs/decisions/0179-profile-composition-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/profile_composition_evidence.rs",
+  "docs/decisions/0179-profile-composition-boundary-evidence.md",
+  "docs/status/PROF-5103-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5103-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0179 authorizes only test-local Profile Composition boundary evidence; no schema, algebra, digest, identity change, dependency, target, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty provisional boundaries for layers, profile policies, field/default/unknown handling, merge operators and precedence, conflicts and constraints, canonical effective identity, build/cache/Program/Semantic Graph relation, configuration/scope, diagnostics, and fixtures.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no schema, merge, digest, identity, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test profile_composition_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "Test-only under DEC-0179; PROF-5103 remains BlockedSpec for profile schema, merge/precedence/conflict algebra, effective-profile serialization, identity/build/cache integration, diagnostics, migration, CLI/editor integration, and support claims.",
+  "No profile composition API, effective-profile schema, digest, Program ID change, dependency, target package, manifest, diagnostic, CLI/LSP option, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "PROF-5104"

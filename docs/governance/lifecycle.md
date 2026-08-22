@@ -209,6 +209,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0176` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0176](../decisions/0176-device-binary-cache-boundary-evidence.md) |
 | `DEC-0177` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0177](../decisions/0177-critical-profile-boundary-evidence.md) |
 | `DEC-0178` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0178](../decisions/0178-forbidden-capability-boundary-evidence.md) |
+| `DEC-0179` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0179](../decisions/0179-profile-composition-boundary-evidence.md) |
 
 ## Migration boundary
 
