@@ -5746,6 +5746,7 @@ spec = [
   "docs/ERROR-CODES.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0032-lsp-internal-scheduling-boundary.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -5753,12 +5754,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/LSP-2503-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2503-SCHEDULER-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The audit records the missing event triggers, debounce/coalescing, logical versus wall-clock timing, priority/fairness, budgets, revision supersession, cancellation, publication, diagnostics, and protocol lifecycle contracts.",
   "The audit distinguishes DEC-0019/DEC-0021 internal deterministic query scheduling from the missing LSP event, queue, freshness, and result-publication protocol.",
+  "Accepted DEC-0032 closes only the internal deterministic ordering child; the parent remains blocked for public scheduling behavior.",
   "The audit covers edit bursts, timer coalescing, priority inversion/starvation, new-revision cancellation, stale results, concurrent requests, workspace/index throttling, diagnostics clear/replace, Unicode/CRLF/BOM, deterministic scheduling, and migration fixtures.",
   "No debounce timer, priority queue, scheduler policy, stale-result publisher, cancellation integration, diagnostic allocation, protocol schema, or placeholder LSP service is added while the authority is absent.",
   "The future implementation must coalesce revisions explicitly, prioritize interactive work without starvation, cancel superseded analysis, publish only current snapshot results, and keep scheduling timing out of Ling semantics.",
@@ -5768,9 +5771,52 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2503 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2202, LSP-2501, LSP-2502, and the missing LSP event/scheduling contract; DEC-0021 is internal only.",
-  "ling-db provides internal deterministic query scheduling and ling-diagnostics provides checked diagnostic facts, but no LSP debounce, priority, stale replacement, or publication protocol exists.",
+  "LSP-2503 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2202, LSP-2501, LSP-2502, and the missing LSP event/scheduling contract; DEC-0021 and DEC-0032 are internal only.",
+  "ling-db provides internal deterministic query scheduling and ling-diagnostics provides checked diagnostic facts; the DEC-0032 queue is not wired to LSP and no debounce, fairness, stale replacement, or publication protocol exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2503-SCHEDULER"
+title = "Internal deterministic LSP work ordering"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2501-SNAPSHOT", "LSP-2502-CANCELLATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0032-lsp-internal-scheduling-boundary.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-lsp/src/scheduler.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "docs/status/LSP-2503-SCHEDULER-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2503-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "InternalWorkQueue is pub(crate), stores opaque IDs only, and orders Interactive before Analysis before Background with FIFO sequence within each priority.",
+  "Queue operations are deterministic in-process data operations and do not spawn workers, sleep, inspect host timing/CPU, execute work, or serialize state.",
+  "Duplicate identifiers remain independent, clear preserves local sequence monotonicity, and sequence exhaustion is typed rather than wrapping.",
+  "Focused ling-lsp tests cover priority/FIFO order, duplicate IDs, clear behavior, and sequence determinism; parent public scheduling remains deferred.",
+]
+verified_against_commit = "bca5b93faeaf582c00cdd0d39b52fb2f741c9ccd"
+completion_commit = "bca5b93faeaf582c00cdd0d39b52fb2f741c9ccd"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child implements only DEC-0032's internal queue; LSP-2503 remains BlockedSpec for public debounce, fairness, freshness, cancellation, and publication.",
+  "The queue is intentionally not added to the protocol inventory or support matrix and does not change compiler, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode behavior.",
 ]
 
 [[task]]

@@ -176,6 +176,7 @@
 | `LSP-2502` | LSP request cancellation | `G1` | `L` | `BlockedSpec` | `INC-1401`, `LSP-2501` | `` |
 | `LSP-2502-CANCELLATION` | Internal cooperative LSP cancellation token | `G1` | `S` | `Done` | `INC-1401`, `LSP-2501-SNAPSHOT` | `132fcc9073bebf2a5e49716bc61048248cc4305a` |
 | `LSP-2503` | LSP debounce and priority scheduling | `G1` | `L` | `BlockedSpec` | `LSP-2103`, `LSP-2104`, `LSP-2202`, `LSP-2501`, `LSP-2502` | `` |
+| `LSP-2503-SCHEDULER` | Internal deterministic LSP work ordering | `G1` | `S` | `Done` | `LSP-2501-SNAPSHOT`, `LSP-2502-CANCELLATION` | `bca5b93faeaf582c00cdd0d39b52fb2f741c9ccd` |
 | `LSP-2504` | LSP memory and resource limits | `G1` | `L` | `BlockedSpec` | `LSP-2201`, `LSP-2501`, `LSP-2502`, `LSP-2503` | `` |
 | `MC-5601` | Finite-State Projection | `G5` | `L` | `BlockedSpec` | `BND-5204`, `NODE-5307`, `PROOF-5503` | `` |
 | `MC-5602` | Exploration Engine | `G5` | `L` | `BlockedSpec` | `MC-5601` | `` |
