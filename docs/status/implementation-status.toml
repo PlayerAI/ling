@@ -4068,7 +4068,7 @@ notes = [
 [[task]]
 id = "RC-6904-SEED"
 title = "Seed RC2/final change-control inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -4114,10 +4114,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0055 closes only this internal Seed RC2 inventory child; the parent RC-6904 gate remains BlockedSpec for change approval and Final release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "b8660b524e103b615f9df332b55b4da8b3638c8b"
+completion_commit = "b8660b524e103b615f9df332b55b4da8b3638c8b"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects the RC2 blocker-only/no-claim boundary only; current Seed tests and audits remain non-candidate evidence.",
   "No source fix, blocker status, risk acceptance, candidate, tag, artifact, reviewer decision, network request, system configuration, or placeholder is added.",

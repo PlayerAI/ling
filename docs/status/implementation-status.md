@@ -250,7 +250,7 @@
 | `RC-6903` | Independent Verification | `G6` | `L` | `BlockedSpec` | `RC-6902` | `` |
 | `RC-6903-SEED` | Seed RC3 independent-verification inventory drift gate | `G6` | `S` | `Done` | `RC-6902-SEED` | `c782b771b0c72c8cf7cbdcbfa3ab64a6cd001774` |
 | `RC-6904` | RC2 / Final Change Control | `G6` | `L` | `BlockedSpec` | `RC-6903` | `` |
-| `RC-6904-SEED` | Seed RC2/final change-control inventory drift gate | `G6` | `S` | `In Progress` | `RC-6903-SEED` | `` |
+| `RC-6904-SEED` | Seed RC2/final change-control inventory drift gate | `G6` | `S` | `Done` | `RC-6903-SEED` | `b8660b524e103b615f9df332b55b4da8b3638c8b` |
 | `RC-6905` | v1.0 Release Artifacts | `G6` | `L` | `BlockedSpec` | `RC-6904` | `` |
 | `REL-6601` | Fuzz Coverage Inventory | `G6` | `L` | `BlockedSpec` | `COMPAT-6504` | `` |
 | `REL-6601-SEED` | Seed fuzz inventory and corpus drift gate | `G6` | `S` | `Done` | `FMT-1506`, `GOV-0110`, `PRJ-1108`, `VM-1210` | `97a628311f50742730ba043131878d205f0f47d2` |
