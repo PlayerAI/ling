@@ -14514,7 +14514,7 @@ notes = [
 [[task]]
 id = "DOC-6703-SEED"
 title = "Seed bilingual tutorial coverage drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14554,10 +14554,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0047 closes only this internal Seed tutorial child; the parent DOC-6703 gate remains BlockedSpec for Stable localization policy and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "9f3386bab5c8f06c7ce76ac0ab5c66f8b8695ca4"
+completion_commit = "9f3386bab5c8f06c7ce76ac0ab5c66f8b8695ca4"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects bilingual tutorial inventory and source/document markers only; tutorial execution and observed outputs remain existing Seed evidence.",
   "No syntax, localized alias, API, profile, ownership rule, migration promise, security claim, or placeholder public surface is added.",
