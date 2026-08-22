@@ -26,10 +26,15 @@ use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
 
 mod definition_index;
+mod reference_index;
 mod typed_definition_index;
 
 pub use definition_index::{
     ResolvedDefinitionIndex, ResolvedDefinitionKind, ResolvedDefinitionSymbol,
+};
+pub use reference_index::{
+    ResolvedReferenceBindingTarget, ResolvedReferenceDefinitionTarget, ResolvedReferenceEntry,
+    ResolvedReferenceIndex, ResolvedReferenceTarget, ResolvedReferenceTargetKind,
 };
 pub use typed_definition_index::{TypedDefinitionIndex, TypedDefinitionSymbol};
 
@@ -902,6 +907,21 @@ impl CompilerDb {
             .ok_or(QueryError::UnknownFile { file })?;
         let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
         Ok(Arc::new(ResolvedDefinitionIndex::from_resolved(&resolved)))
+    }
+
+    /// Builds an immutable source/module-order inventory of resolved
+    /// references and their resolver-owned targets. This is not navigation.
+    pub fn resolved_reference_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<ResolvedReferenceIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
+        Ok(Arc::new(ResolvedReferenceIndex::from_resolved(&resolved)))
     }
 
     /// Builds an immutable source-order observation of checked user
@@ -2347,6 +2367,64 @@ mod tests {
         let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
         assert!(matches!(
             db.resolved_definition_index(file),
+            Err(QueryError::InvalidSource { .. })
+        ));
+    }
+
+    #[test]
+    fn resolved_reference_index_preserves_targets_and_source_spans() {
+        let mut db = CompilerDb::new();
+        let source = "\u{feff}module Main\r\n\r\nlet helper = 1\r\n\r\nlet main () = helper\r\n";
+        let file = file(
+            db.set_disk_snapshot("unicode/Main.ling", source.as_bytes().to_vec())
+                .unwrap(),
+        );
+
+        let index = db
+            .resolved_reference_index(file)
+            .expect("valid source resolves references");
+        let repeated = db
+            .resolved_reference_index(file)
+            .expect("repeated references resolve");
+        assert_eq!(&*index, &*repeated);
+        assert!(!index.entries().is_empty());
+        assert_eq!(
+            index.source_entries("unicode/Main.ling").len(),
+            index.entries().len()
+        );
+
+        let helper_reference = index
+            .entries()
+            .iter()
+            .find(|entry| {
+                matches!(
+                    entry.target(),
+                    ResolvedReferenceTarget::Definition(target) if target.name() == Some("helper")
+                )
+            })
+            .expect("helper reference is indexed");
+        assert_eq!(helper_reference.source_name(), "unicode/Main.ling");
+        assert_eq!(helper_reference.source_module(), "Main");
+        let ResolvedReferenceTarget::Definition(target) = helper_reference.target() else {
+            unreachable!("helper target is a definition");
+        };
+        assert_eq!(target.source_name(), Some("unicode/Main.ling"));
+        let target_span = target.span().expect("helper has a source span");
+        let bytes = db.vfs.snapshot(file).expect("source snapshot exists");
+        let start = target_span.start().get() as usize;
+        let end = target_span.end().get() as usize;
+        assert_eq!(
+            std::str::from_utf8(&bytes.bytes()[start..end]).unwrap(),
+            "helper"
+        );
+    }
+
+    #[test]
+    fn resolved_reference_index_does_not_publish_after_source_failure() {
+        let mut db = CompilerDb::new();
+        let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
+        assert!(matches!(
+            db.resolved_reference_index(file),
             Err(QueryError::InvalidSource { .. })
         ));
     }

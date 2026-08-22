@@ -1482,3 +1482,16 @@ covers = ["IDE-2302 bounded typed-definition observation", "checked type/effect/
 depends_on = ["DEC-0012", "DEC-0019", "DEC-0060", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0075"
+title = "Internal resolved-reference index"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0075-ide-resolved-reference-index.md"
+covers = ["IDE-2303 bounded resolved-reference target index", "resolver reference keys and target spans", "deterministic internal navigation source"]
+depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

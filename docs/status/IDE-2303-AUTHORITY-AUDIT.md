@@ -4,13 +4,15 @@
 
 `IDE-2303` is correctly recorded as `BlockedSpec`. The execution plan assumes a
 `ResolvedRef -> DefinitionId -> SourceOrigin` pipeline and requires navigation
-to user, dependency, generated, primitive, and type definitions. The repository
-has internal resolution, Semantic Graph identity, source spans, and project
-discovery, but it has no accepted definition-navigation request/response,
-source-origin, URI, or snapshot contract.
+to user, dependency, generated, primitive, and type definitions. Accepted
+`DEC-0075` closes only the bounded internal `IDE-2303-REFERENCE-INDEX`
+observation. The repository still has no accepted definition-navigation
+request/response, source-origin, URI, or snapshot contract.
 
 No definition handler, location adapter, virtual-document policy, dependency
-read-only API, protocol field, or placeholder editor surface was added.
+read-only API, protocol field, or placeholder editor surface was added. The
+child exposes only resolver reference keys and existing target facts inside
+`ling-db`.
 
 ## Normative traceability
 
@@ -35,8 +37,9 @@ read-only API, protocol field, or placeholder editor surface was added.
 ## Current interface evidence
 
 - `ling-resolve` and the checked compiler pipeline retain internal references,
-  definition identities, and source spans, but expose no public navigation
-  request or response model.
+  definition identities, and source spans. `ling-db::ResolvedReferenceIndex`
+  now joins those facts, but exposes no public navigation request or response
+  model.
 - `ling-semantic` emits deterministic graph definitions and references with
   Semantic IDs and module/origin metadata, but no editor ranges, URI mapping,
   source provenance, declaration/type-definition distinction, or virtual
@@ -73,19 +76,29 @@ implementation details, or claim unsupported Trait semantics.
 ## Evidence and compatibility
 
 This audit was checked against `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
-`docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, `0019-incremental-query-boundary`, RFC-0005,
+`docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012,
+`docs/decisions/0075-ide-resolved-reference-index.md`,
+`0019-incremental-query-boundary`, RFC-0005,
 `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the `ling-resolve`, `ling-semantic`, `ling-source`, and `ling-project`
-crates.
+and the `ling-resolve`, `ling-semantic`, `ling-source`, `ling-project`, and
+`ling-db/src/reference_index.rs` crates.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+The child adds only internal resolver-observation values; no compiler language,
+interpreter, VM, bytecode, diagnostic, schema, Semantic ID, runtime, or
+Unicode 17.0.0 behavior changed.
+
+## Accepted bounded child
+
+`IDE-2303-REFERENCE-INDEX` is `Done` under `DEC-0075`. It preserves absent
+definition metadata rather than inventing locations, and its acceptance
+evidence is recorded in
+`docs/status/IDE-2303-REFERENCE-INDEX-IMPLEMENTATION-REPORT.md`.
 
 ## Intentionally deferred
 
-`IDE-2303` can begin after LSP transaction/position, Semantic Graph lifecycle,
-and source-origin/navigation decisions are Accepted. The implementation must
-consume checked resolution, preserve byte-span and Semantic ID truth, expose
-dependency/generated targets only under explicit policy, and label any
-experimental fields.
+The parent `IDE-2303` can begin after LSP transaction/position, Semantic Graph
+lifecycle, and source-origin/navigation decisions are Accepted. Any future
+implementation must consume checked resolution, preserve byte-span and
+Semantic ID truth, expose dependency/generated targets only under explicit
+policy, and label any experimental fields.

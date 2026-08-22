@@ -171,6 +171,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `IDE-2302` | G1/Editor | Hover | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:248`, `docs/status/IDE-2302-AUTHORITY-AUDIT.md` |
 | `IDE-2302-TYPED-INDEX` | G1/Editor | Internal typed-definition observation | S | Done | Accepted `DEC-0074`; see `crates/ling-db/src/typed_definition_index.rs` and `docs/status/IDE-2302-TYPED-INDEX-IMPLEMENTATION-REPORT.md`; public hover behavior remains BlockedSpec in `IDE-2302` |
 | `IDE-2303` | G1/Editor | Go to definition/declaration/type definition | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:262`, `docs/status/IDE-2303-AUTHORITY-AUDIT.md` |
+| `IDE-2303-REFERENCE-INDEX` | G1/Editor | Internal resolved-reference target index | S | Done | Accepted `DEC-0075`; see `crates/ling-db/src/reference_index.rs` and `docs/status/IDE-2303-REFERENCE-INDEX-IMPLEMENTATION-REPORT.md`; public navigation behavior remains BlockedSpec in `IDE-2303` |
 | `IDE-2304` | G1/Editor | References | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:266`, `docs/status/IDE-2304-AUTHORITY-AUDIT.md` |
 | `IDE-2305` | G1/Editor | Prepare rename | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:270`, `docs/status/IDE-2305-AUTHORITY-AUDIT.md` |
 | `IDE-2306` | G1/Editor | Rename | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:283`, `docs/status/IDE-2306-AUTHORITY-AUDIT.md` |

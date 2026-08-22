@@ -2025,3 +2025,26 @@ unresolved_alternatives = [
   "Hover target selection, expression-level inference, display/localization/Markdown policy, Trait witnesses, URI/version/snapshot binding, position encoding, limits, cancellation, stale publication, protocol negotiation, and migration remain open under IDE-2302 and the registered LSP/semantic lifecycle gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0075"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0075-ide-resolved-reference-index.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify user-definition, builtin, Prelude, local-binding, imported, Unicode, BOM, CRLF, target spans, source lookup, and deterministic repeated reference observations.",
+  "Preserve absent definition metadata without locations and reject invalid source without partial publication; keep request positions, URI/version, dependency policy, and navigation fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db resolver-reference observation values and an accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Reference source-span lookup, request positions, URI/version/snapshot binding, declaration/type-definition policy, aliases, builtins/Prelude/primitives, generated/dependency documents, limits, cancellation, stale publication, protocol negotiation, and migration remain open under IDE-2303 and the registered LSP/semantic lifecycle gaps.",
+]
+superseded_by = ""
