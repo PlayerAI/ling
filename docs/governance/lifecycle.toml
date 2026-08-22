@@ -1592,3 +1592,27 @@ unresolved_alternatives = [
   "Minimal diffs, range formatting, URI/version and position projection, stale-edit guards, Workspace Edit serialization, format-on-save, and Semantic Transaction lifecycle require later accepted formatter/LSP authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0058"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0058-locked-project-snapshot-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Load the checked-in locked project twice and assert snapshot, manifest, graph, lock, graph identity, and canonical lock bytes are equal.",
+  "Assert locked loading leaves existing lock bytes unchanged and publishes no partial snapshot on graph/lock failure.",
+  "Verify the API contains no workspace, run/test/build, artifact, network, compiler, evaluation, CLI, or protocol state.",
+]
+compatibility_impact = [
+  "Adds only an in-process ling-project value and function layered over RFC-0002; manifest, graph, lock, diagnostics, schemas, Semantic IDs, CLI, runtime, protocols, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Compiler-host source loading, workspace/member selection, semantic checking, incremental revisions, project run/test/build, artifacts, registry/network, publication, and Stable project CLI contracts remain later PRJ-1107 authority.",
+]
+superseded_by = ""

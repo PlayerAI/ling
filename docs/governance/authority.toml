@@ -1248,3 +1248,16 @@ covers = ["in-process formatter edit value", "original UTF-8 whole-document repl
 depends_on = ["DEC-0002", "DEC-0023", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0058"
+title = "Locked project snapshot boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0058-locked-project-snapshot-boundary.md"
+covers = ["read-only locked project snapshot", "manifest/graph/lock ownership", "PRJ-1107-LOAD evidence"]
+depends_on = ["RFC-0002", "RFC-0024", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

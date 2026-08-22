@@ -3,6 +3,7 @@
 mod discovery;
 mod lockfile;
 mod package_graph;
+mod workspace;
 
 use std::collections::BTreeMap;
 use std::error::Error;
@@ -28,6 +29,7 @@ pub use package_graph::{
     DependencyGraphFailure, PackageDependencyEdge, PackageGraph, PackageGraphId, PackageIdentity,
     PackageSourceId, ResolvedPackage, resolve_package_graph,
 };
+pub use workspace::{LockedProject, load_locked_project};
 
 /// Exact project-manifest filename fixed by RFC-0002.
 pub const MANIFEST_FILE_NAME: &str = "ling.toml";
