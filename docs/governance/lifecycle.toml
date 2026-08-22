@@ -4487,3 +4487,27 @@ unresolved_alternatives = [
   "Hard/soft constraints; device/topology/capability identity; buffer/address-space ownership and transfer; remote boundaries; numeric/effect/Fault preservation; availability, cost and deterministic tie-breaking; rejection/fallback legality and user intent; explain/replay/decision/cache schemas; provenance, versioning, migration, corruption and privacy; host/driver exclusions; fixtures, diagnostics, protocol inventory, and public Placement status remain open under PLC-4801, PLC-4802, ACC-4702, ACC-4701, DIR-4501 through DIR-4503, GPU-4601 through GPU-4605, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing RFC-H405 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0173"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0173-placement-selection-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty selection boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer candidate filtering, artifact preparation, runtime matching, policy/cost choice, decision/replay/cache behavior, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No selector, replay protocol, dependency, target package, cache/runtime API, diagnostic, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Static legality and verified artifacts; capability/target/toolchain/topology identity; runtime availability and remote facts; policy/cost precedence and deterministic choice; fallback/rejection/conflict/missing-device/cancellation/resource/Fault behavior; Critical/Strict/Native profiles and fixed placement; decision/replay/stale/migration/explain/cache schemas; provenance/privacy and host/driver exclusions; fixtures, diagnostics, protocol inventory, and public selection status remain open under PLC-4802, PLC-4801, ACC-4702, ACC-4701, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing RFC-H405 authority.",
+]
+superseded_by = ""

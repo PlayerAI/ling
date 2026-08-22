@@ -203,6 +203,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0170` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0170](../decisions/0170-accelerator-plugin-interface-boundary-evidence.md) |
 | `DEC-0171` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0171](../decisions/0171-experimental-accelerator-adapter-boundary-evidence.md) |
 | `DEC-0172` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0172](../decisions/0172-placement-constraint-boundary-evidence.md) |
+| `DEC-0173` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0173](../decisions/0173-placement-selection-boundary-evidence.md) |
 
 ## Migration boundary
 

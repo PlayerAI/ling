@@ -2756,3 +2756,16 @@ covers = ["PLC-4801 bounded Placement-constraint boundary evidence", "test-only 
 depends_on = ["DEC-0171", "DEC-0170", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0173"
+title = "Internal placement-selection boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0173-placement-selection-boundary-evidence.md"
+covers = ["PLC-4802 bounded Placement-selection boundary evidence", "test-only selector vocabulary", "selection boundaries without runtime/replay semantics"]
+depends_on = ["DEC-0172", "DEC-0171", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
