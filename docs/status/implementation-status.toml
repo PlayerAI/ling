@@ -4497,7 +4497,7 @@ notes = [
 [[task]]
 id = "CLI-1706-HELP"
 title = "Truthful implemented-command help fixture"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "S"
 owner = "Codex"
@@ -4529,10 +4529,10 @@ acceptance = [
   "An unknown future query command remains exit class 2 with empty stdout and usage text on stderr; no new diagnostic, schema, completion script, or command is introduced.",
   "Focused CLI tests and the repository governance/status checks pass offline and preserve compiler, runtime, diagnostics, Semantic IDs, and Unicode 17.0.0 behavior.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "27c5f1d58a3add59abc87b0cf4dc29128d7be226"
+completion_commit = "27c5f1d58a3add59abc87b0cf4dc29128d7be226"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "Accepted DEC-0040 closes only this internal help-truth fixture; CLI-1706 remains BlockedSpec for shell completion, future command/option inventories, help lifecycle, and compatibility policy.",
   "The fixture intentionally checks semantic coverage rather than exact help bytes, locale, line wrapping, shell quoting, aliases, generated scripts, or snapshots.",
