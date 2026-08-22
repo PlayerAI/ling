@@ -88,6 +88,7 @@
 | `DIR-4502` | Kernel Core to Device IR | `G4` | `M` | `BlockedSpec` | `DIR-4501` | `` |
 | `DIR-4503` | Device IR Canonicalization | `G4` | `M` | `BlockedSpec` | `DIR-4502` | `` |
 | `DOC-6701` | Formal Documentation Set | `G6` | `L` | `BlockedSpec` | `REL-6604` | `` |
+| `DOC-6701-SEED` | Seed documentation-inventory drift gate | `G6` | `S` | `In Progress` | `REL-6604-SEED` | `` |
 | `DOC-6702` | Two-layer Examples | `G6` | `M` | `BlockedSpec` | `DOC-6701` | `` |
 | `DOC-6703` | Bilingual Chinese-first Tutorial | `G6` | `M` | `BlockedSpec` | `DOC-6702` | `` |
 | `EFF-2101` | Effect core model freeze | `G2` | `M` | `BlockedSpec` | — | `` |

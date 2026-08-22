@@ -195,6 +195,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0045"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0045-seed-documentation-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask docs verify and assert twelve formal-set rows with four Future / Unsupported states.",
+  "Mutate an isolated manual row or remove a policy phrase and verify the gate fails closed.",
+  "Run governance, status, traceability, and documentation-link checks without treating the inventory gate as generated manual content.",
+  "Repeat independent processes and verify no source, semantic, diagnostic, schema, protocol, support, or release-state output is generated.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask documentation validator and CI preflight; no future manual, source, language, diagnostic, schema, protocol, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "Manual content, generated-doc tooling, future examples, migration/deprecation guidance, editor/LSP documentation, and security/disclosure operations remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

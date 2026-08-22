@@ -20,6 +20,11 @@ The inventory therefore records each manual's current source, state, and
 boundary. It does not fill future chapters with invented syntax, APIs,
 protocol schemas, examples, support claims, or stale command names.
 
+Accepted `DEC-0045` closes only the bounded `DOC-6701-SEED` child: the
+internal `cargo xtask docs verify` command prevents drift in the twelve-row
+formal-set inventory and its anti-promotion policy text. It does not generate
+manuals or promote any future state to a G6 documentation sign-off.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:389-404` is a non-normative documentation
@@ -47,6 +52,8 @@ The Seed set includes `LANGUAGE.md`, `SEMANTICS.md`, `ERROR-CODES.md`, RFCs and
 decisions, package/lock/effect/VM/formatter reports, governance registries,
 Tree-sitter grammar documentation, and the new reliability/security/performance
 audits.
+`cargo xtask docs verify` checks only the deterministic manual/state inventory
+and the policy phrases that keep future chapters and stale names explicit.
 
 The future manuals remain planning/status evidence only. No stable Task,
 Actor, Replay, Native, FFI, Kernel, Device, Critical, proof/evidence, LSP,

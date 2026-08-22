@@ -51,8 +51,10 @@ The documentation inventory is checked together with the repository registries:
 cargo xtask governance check-all
 cargo run -p xtask --locked --offline -- status verify
 cargo xtask traceability verify --release v0.0.1
+cargo xtask docs verify
 ```
 
 These gates validate links, lifecycle/status/protocol/schema/diagnostic drift,
 and Seed traceability. They do not turn future manuals into implemented
-features.
+features. The documentation command validates the exact formal-set rows and
+the anti-promotion policy text; it does not generate or claim a future manual.
