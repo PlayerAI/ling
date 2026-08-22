@@ -2041,3 +2041,16 @@ covers = ["MEM-3104 bounded Managed-graph and island boundary evidence", "test-o
 depends_on = ["DEC-0116", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0118"
+title = "Internal Place and Move-analysis boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0118-place-move-boundary-evidence.md"
+covers = ["OWN-3201 bounded Place/Move-analysis boundary evidence", "test-only Place/Move vocabulary", "ownership boundaries without dataflow/lifetime semantics"]
+depends_on = ["DEC-0117", "DEC-0009", "RFC-0017", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
