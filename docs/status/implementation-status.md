@@ -99,6 +99,7 @@
 | `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `BlockedSpec` | `EFF-2101`, `EFF-2102` | `` |
 | `EFF-2103-AST` | Handler unresolved AST projection | `G2` | `S` | `Done` | `EFF-2103-SYNTAX` | `225cc9fecabcdb1a3274ee6dc576f9120143584c` |
 | `EFF-2103-CORE` | First-order handler Typed Core projection | `G2` | `S` | `Done` | `EFF-2101`, `EFF-2102` | `e1dc5334d15e25e959fa0da6e3462a90210c6fdf` |
+| `EFF-2103-HIR` | Handler unresolved HIR projection | `G2` | `S` | `Done` | `EFF-2103-AST` | `fa988aab85a96d3e7c257c630b84acb985639064` |
 | `EFF-2103-SYNTAX` | Handler source CST projection | `G2` | `S` | `Done` | `EFF-2103-CORE` | `73807f551753620b52b685d7aca25c2032ec1a77` |
 | `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `BlockedSpec` | `EFF-2103` | `` |
 | `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `BlockedSpec` | `EFF-2104` | `` |

@@ -7065,6 +7065,70 @@ notes = [
 ]
 
 [[task]]
+id = "EFF-2103-HIR"
+title = "Handler unresolved HIR projection"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2103-AST"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0006.md",
+  "docs/decisions/0063-first-order-handler-core.md",
+  "docs/decisions/0064-handler-source-cst-projection.md",
+  "docs/decisions/0065-handler-ast-projection.md",
+  "docs/decisions/0066-handler-hir-projection.md",
+  "docs/ERROR-CODES.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-hir/src/lib.rs",
+  "crates/ling-resolve/src/lib.rs",
+  "crates/ling-types/src/lib.rs",
+  "crates/ling-types/src/constraints.rs",
+  "crates/ling-effects/src/lib.rs",
+  "crates/ling-semantic/src/lib.rs",
+  "crates/ling-eval/src/lib.rs",
+  "crates/ling-bytecode/src/lower.rs",
+  "crates/ling-bytecode/src/lower/v1_1.rs",
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-cli/src/session.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/ERROR-CODES.md",
+  "docs/governance/error-code-lock.toml",
+  "docs/decisions/0066-handler-hir-projection.md",
+  "docs/status/EFF-2103-HIR-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2103-HIR-IMPLEMENTATION-REPORT.md",
+  "docs/status/EFF-2103-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0066 authorizes only unresolved handler HIR data and the resolver rejection gate; checked operation/effect semantics remain deferred.",
+  "HIR preserves clause order, operation qualified names, parameter patterns, optional resume names, bodies, local IDs, and original UTF-8 spans without operation/resume references.",
+  "Resolver rejects unresolved handlers with structured ResolveErrorKind::UnsupportedHandler and registered bilingual L-EFFECT-0004 without publishing a ResolvedProgram or handler references.",
+  "Downstream type, Effect, Semantic Graph, evaluator, bytecode, database, and CLI helper branches do not interpret unresolved handlers; ordinary Seed behavior remains unchanged.",
+  "cargo test -p ling-hir -p ling-resolve --all-targets --offline passes; cargo check --workspace --all-targets --offline passes.",
+]
+verified_against_commit = "fa988aab85a96d3e7c257c630b84acb985639064"
+completion_commit = "fa988aab85a96d3e7c257c630b84acb985639064"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The HIR child is complete under DEC-0066; EFF-2103 remains BlockedSpec for checked operation signatures, resume typing, Effect-row checking, Typed Core publication, and runtime execution.",
+  "L-EFFECT-0004 is emitted only when experimental unresolved handler HIR reaches resolution; no handler runtime, bytecode opcode, schema, Semantic ID, CLI command, LSP protocol, or migration is claimed.",
+]
+
+[[task]]
 id = "EFF-2104"
 title = "Interpreter and VM handler execution"
 state = "BlockedSpec"
