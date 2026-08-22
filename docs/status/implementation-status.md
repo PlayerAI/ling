@@ -275,6 +275,7 @@
 | `LSP-2504` | LSP memory and resource limits | `G1` | `L` | `BlockedSpec` | `LSP-2201`, `LSP-2501`, `LSP-2502`, `LSP-2503` | `` |
 | `LSP-2504-BYTE-ACCOUNTING` | Internal deterministic LSP UTF-8 byte accounting | `G1` | `S` | `Done` | `LSP-2501-SNAPSHOT`, `LSP-2502-CANCELLATION`, `LSP-2503-SCHEDULER` | `2bf9ea77d87716138920201116c8849f4625c2e3` |
 | `MC-5601` | Finite-State Projection | `G5` | `L` | `BlockedSpec` | `BND-5204`, `NODE-5307`, `PROOF-5503` | `` |
+| `MC-5601-OBSERVATION` | Internal Finite-State Projection boundary evidence | `G5` | `S` | `Done` | `PROOF-5503-OBSERVATION` | `7ff487b1fe6f886fa664c68a006dbb0a185f73ec` |
 | `MC-5602` | Exploration Engine | `G5` | `L` | `BlockedSpec` | `MC-5601` | `` |
 | `MC-5603` | Model-Check Report Semantics | `G5` | `M` | `BlockedSpec` | `MC-5602` | `` |
 | `MC-5604` | Replay Counterexample | `G5` | `L` | `BlockedSpec` | `MC-5603` | `` |
