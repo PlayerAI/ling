@@ -14335,10 +14335,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "6f26f86a4c5281068c57e3a1d242fbcd918f3ac6"
+completion_commit = "6f26f86a4c5281068c57e3a1d242fbcd918f3ac6"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0141; FFI-3605 remains BlockedSpec for fuzz harness, sanitizer/toolchain, crash/coverage/resource bounds, security, provenance, cross-target/compiler, diagnostics, and public protocol decisions.",
   "No parser, AST/HIR/Checked Core node, fuzz target, sanitizer configuration, native dependency, unsafe code, generated corpus, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
