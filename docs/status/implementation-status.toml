@@ -20318,6 +20318,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0194-contract-runtime-check-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -20326,6 +20327,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/CTR-5403-AUTHORITY-AUDIT.md",
+  "docs/decisions/0194-contract-runtime-check-boundary-evidence.md",
+  "docs/status/CTR-5403-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5403-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/tests/contract_runtime_check_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -20345,6 +20350,67 @@ notes = [
   "The repository has no Contract evaluator/runtime hook, profile gate, Contract Fault, L-CONTRACT diagnostic, status/evidence schema, or runtime Contract fixtures; existing VM checks consume verified Seed Core and normalize only accepted host failures.",
   "The audit does not reinterpret Draft ContractViolation text, RFC-0018 host preflight, RFC-0019 differential events, or RFC-0020 cancellation as runtime Contract semantics and creates no evaluator or hook placeholder.",
   "The audit adds no public protocol, dependency, runtime, schema, diagnostic, or placeholder API; Runtime Contract Check remains deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "CTR-5403-OBSERVATION"
+title = "Internal Contract runtime-check boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CTR-5402-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0193-contract-status-model-boundary-evidence.md",
+  "docs/decisions/0194-contract-runtime-check-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/contract_runtime_check_evidence.rs",
+  "docs/decisions/0194-contract-runtime-check-boundary-evidence.md",
+  "docs/status/CTR-5403-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5403-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0194 authorizes only test-local Contract runtime-check boundary evidence; no evaluator, runtime hook, check order, effect isolation, Fault, profile, diagnostic, CLI, or support claim is made.",
+  "Inventory covers sixty Contract runtime-check input, assertion-boundary, effect, Fault/status, profile, evidence, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no evaluator, Fault, profile, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test contract_runtime_check_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "69e594c9d10f56fe397453e0c79cbd4479101f55"
+completion_commit = "69e594c9d10f56fe397453e0c79cbd4479101f55"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0194; CTR-5403 remains BlockedSpec for checked Contract Core, evaluator/runtime hook, timing/order, effect isolation, Fault/status, profile controls, evidence, diagnostics, CLI/editor integration, and support claims.",
+  "No Contract evaluator, runtime hook, check implementation, profile switch, Fault, schema, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
