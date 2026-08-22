@@ -12650,6 +12650,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/GC-3303-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3303-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3303-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0127-managed-ffi-boundary-evidence.md",
+  "crates/ling-concurrency/tests/managed_ffi_boundary_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12659,6 +12667,7 @@ acceptance = [
   "The audit covers stale handles, nested pins, callback roots, thread attach/detach, collection during FFI, reentry/cancellation/fault, foreign transfer/cleanup, sanitizer/target behavior, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No Managed handle, pinning API, raw-pointer wrapper, callback-root registry, thread-attachment protocol, FFI ownership mode, ABI schema, diagnostic, public protocol, or placeholder G3 API is added while RFC-N303/RFC-N304/RFC-N305/RFC-N306 and RFC-0007 authority are absent.",
   "The future implementation must preserve Seed value semantics, consume accepted types and checked Core only, keep addresses and host allocation non-semantic, and publish handle, pinning, FFI, ABI, Profile, sanitizer, and interpreter/VM/Native evidence before exposing v0.3 behavior.",
+  "Accepted DEC-0127 authorizes only test-only Managed/Native/FFI boundary vocabulary; it does not close handle, pin, callback, thread, ownership, ABI, FFI, collection, Profile, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12668,6 +12677,64 @@ notes = [
   "GC-3303 is BlockedSpec by GC-3301/GC-3302, absent RFC-N303/RFC-N304/RFC-N305/RFC-N306 and RFC-0007, GAP-OWNERSHIP-MODEL-001, and GAP-NATIVE-BACKEND-ABI-001.",
   "The current workspace has no Managed handle, pinning, Native backend, ABI, FFI, callback-root, or thread-attachment crate; Rust references, addresses, and host objects are not a Ling boundary contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "GC-3303-OBSERVATION"
+title = "Internal Managed/Native/FFI boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GC-3302-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0121-borrow-await-turn-boundary-evidence.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "docs/decisions/0127-managed-ffi-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/tests/managed_ffi_boundary_evidence.rs",
+  "docs/decisions/0127-managed-ffi-boundary-evidence.md",
+  "docs/status/GC-3303-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3303-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0127 authorizes only test-only Managed/Native/FFI boundary evidence; no handle, pinning, raw-pointer, callback, thread-attachment, foreign-ownership, ABI, FFI, collection-during-call, Profile, diagnostic, or runtime semantics are claimed.",
+  "The test-local inventory covers forty-three provisional boundaries for pin/unpin/nesting, handle table/generation/stale handles, raw-pointer and borrowed-view restrictions, callback roots/thread attachment, Value/Managed/Resource/opaque ownership and transfer/release, cleanup/finalizer separation, collection during FFI and callback behavior, Task/Actor invariants, ABI/target/unwind/capability/TCB, FFI schema versioning, Profiles, differential evidence, Unicode spans, determinism, and sanitizer/security evidence with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no handle, pointer, ABI, FFI schema, diagnostic, protocol, or runtime API is added.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "51c82b24903732216837255389bc97a89d35143b"
+completion_commit = "51c82b24903732216837255389bc97a89d35143b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0127; GC-3303 remains BlockedSpec for handles, pinning, callbacks, thread attachment, foreign ownership, ABI/FFI, collection during FFI, cleanup/finalization, Profiles, and differential contracts.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

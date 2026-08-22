@@ -136,6 +136,7 @@
 | `GC-3302` | First Managed collector | `G3` | `L` | `BlockedSpec` | `GC-3301` | `` |
 | `GC-3302-OBSERVATION` | Internal Managed collector boundary evidence | `G3` | `S` | `Done` | `GC-3301-OBSERVATION` | `fc0e9a503d33ea89d9a0372745e22d3bb58ea2e1` |
 | `GC-3303` | Managed Native and FFI boundary | `G3` | `L` | `BlockedSpec` | `GC-3302` | `` |
+| `GC-3303-OBSERVATION` | Internal Managed/Native/FFI boundary evidence | `G3` | `S` | `Done` | `GC-3302-OBSERVATION` | `51c82b24903732216837255389bc97a89d35143b` |
 | `GC-3304` | Managed profile checks | `G3` | `M` | `BlockedSpec` | `GC-3303` | `` |
 | `GOV-0101` | 建立规范权威索引 | `G0` | `S` | `Done` | `BASE-0001` | `7bba2adf9104d7d7f96c7ef50343647f649e229e` |
 | `GOV-0102` | 规范缺口台账 | `G0` | `M` | `Done` | `GOV-0101` | `c147b5c02532b61e23df46f6cb25251d8c94dd7d` |
