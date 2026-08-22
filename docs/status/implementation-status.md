@@ -313,6 +313,7 @@
 | `REP-2505` | Replay privacy, trimming, and corruption | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504` | `` |
 | `REP-2505-OBSERVATION` | Internal replay privacy and integrity boundary evidence | `G2` | `S` | `Done` | `REP-2504-OBSERVATION` | `4d8c485ab390c616369736750680985688f831cb` |
 | `REP-2506` | Cross-process replay acceptance | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504`, `REP-2505` | `` |
+| `REP-2506-OBSERVATION` | Internal cross-process replay acceptance boundary evidence | `G2` | `S` | `Done` | `REP-2505-OBSERVATION` | `b24983f1807307a48b0e2c2a063702a6a43fff72` |
 | `SIMD-4301` | Vectorization Legality Analysis | `G4` | `M` | `BlockedSpec` | `CPU-4203` | `` |
 | `SIMD-4302` | Portable SIMD IR | `G4` | `M` | `BlockedSpec` | `SIMD-4301` | `` |
 | `SIMD-4303` | SIMD Differential | `G4` | `M` | `BlockedSpec` | `SIMD-4302` | `` |
