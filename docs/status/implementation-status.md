@@ -251,6 +251,7 @@
 | `OWN-3203` | Region inference | `G3` | `L` | `BlockedSpec` | `OWN-3202` | `` |
 | `OWN-3203-OBSERVATION` | Internal region-inference boundary evidence | `G3` | `S` | `Done` | `OWN-3202-OBSERVATION` | `31f6c7ea06fe727ade85e9c07fce13a3f6174b47` |
 | `OWN-3204` | Borrow across await and Actor turns | `G3` | `L` | `BlockedSpec` | `ACT-2304`, `OWN-3203` | `` |
+| `OWN-3204-OBSERVATION` | Internal cross-suspension and Actor-turn boundary evidence | `G3` | `S` | `Done` | `OWN-3203-OBSERVATION` | `e32aaca6f789c48a386d6476d9138e1b41267f73` |
 | `OWN-3205` | Drop-order lowering | `G3` | `L` | `BlockedSpec` | `MEM-3103`, `OWN-3204` | `` |
 | `OWN-3206` | Ownership diagnostics and repairs | `G3` | `L` | `BlockedSpec` | `OWN-3201`, `OWN-3202`, `OWN-3203`, `OWN-3204`, `OWN-3205` | `` |
 | `OWN-3207` | Negative corpus and property tests | `G3` | `L` | `BlockedSpec` | `OWN-3201`, `OWN-3202`, `OWN-3203`, `OWN-3204`, `OWN-3205`, `OWN-3206` | `` |

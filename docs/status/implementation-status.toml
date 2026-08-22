@@ -11965,6 +11965,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/OWN-3204-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3204-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3204-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0121-borrow-await-turn-boundary-evidence.md",
+  "crates/ling-concurrency/tests/borrow_await_turn_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -11974,6 +11982,7 @@ acceptance = [
   "The audit covers stack/turn-local escape, pinned fields, Actor reentry, message borrow rejection, cancellation/drop, Unicode/CRLF/BOM spans, deterministic diagnostics, interleaving/replay, and interpreter/VM/Native differential fixtures.",
   "No cross-await borrow checker, pinned state-machine field, Actor-turn lifetime rule, message borrow gate, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-0009/RFC-N302/RFC-N303 authority is absent.",
   "The future implementation must preserve accepted Seed behavior, consume accepted types and checked Core only, make pinned/owned state explicit, and publish suspension, cancellation, interleaving, state-invariant, message, diagnostic, and interpreter/VM/Native evidence before exposing cross-await borrowing.",
+  "Accepted DEC-0121 authorizes only test-only cross-suspension and Actor-turn boundary vocabulary; it does not close await, pinning, reentry, sendability, cancellation, diagnostics, or FFI gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -11983,6 +11992,59 @@ notes = [
   "OWN-3204 is BlockedSpec by OWN-3203, ACT-2304, absent RFC-N302/RFC-N303/RFC-0009, GAP-ACTOR-AWAIT-REENTRY-001, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, and unresolved suspension, Actor reentry, borrow, lifetime, sendability, and FFI contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM are synchronous and have no await/suspension Core, Task/Actor runtime, pinned state-machine lowering, cross-turn lifetime checker, remote message borrow gate, or cleanup/cancellation integration; host VM cancellation is unrelated.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Seed Place lowering, future suspension/borrow semantics, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3204-OBSERVATION"
+title = "Internal cross-suspension and Actor-turn boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3203-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md",
+  "docs/decisions/0120-region-inference-boundary-evidence.md",
+  "docs/decisions/0121-borrow-await-turn-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/tests/borrow_await_turn_evidence.rs",
+  "docs/decisions/0121-borrow-await-turn-boundary-evidence.md",
+  "docs/status/OWN-3204-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3204-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0121 authorizes only test-only cross-suspension and Actor-turn boundary evidence; no await, suspension, pinning, reentry, sendability, lifetime, or diagnostic semantics are claimed.",
+  "The test-local inventory covers thirty-seven provisional boundaries for stack/turn-local borrows, suspension/await, pinned/owned state-machine fields, Actor turn/reentry, remote message borrow/sendability, copy/shorten/move/split-state fixes, cancellation/timeout/Drop/Fault/partial initialization, Region/Borrow/Resource/Managed, Task/Actor, cross-package/FFI/Native, Capability/security, diagnostics, projections, spans, interleaving/replay, differential evidence, and Seed migration with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no suspension Core, state-machine lowering, cross-turn checker, public protocol, or stale zero command is added.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "e32aaca6f789c48a386d6476d9138e1b41267f73"
+completion_commit = "e32aaca6f789c48a386d6476d9138e1b41267f73"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0121; OWN-3204 remains BlockedSpec for await, suspension, pinning, Actor reentry, message sendability, cancellation/Drop, diagnostics, FFI, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior is unchanged.",
 ]
 
 [[task]]
