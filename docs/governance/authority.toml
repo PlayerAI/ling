@@ -2470,3 +2470,16 @@ covers = ["KCHK-4104 bounded Kernel alias/parallel-write boundary evidence", "te
 depends_on = ["DEC-0149", "DEC-0147", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0151"
+title = "Internal Kernel Core/verifier boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0151-kernel-core-verifier-boundary-evidence.md"
+covers = ["KCHK-4105 bounded Kernel Core/verifier boundary evidence", "test-only Kernel Core/verifier vocabulary", "verifier boundaries without Kernel/device/backend semantics"]
+depends_on = ["DEC-0150", "DEC-0147", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

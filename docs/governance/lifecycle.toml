@@ -3959,3 +3959,27 @@ unresolved_alternatives = [
   "Alias/borrow identity and scope; disjoint/overlap/range/shape/index/bounds proofs; parallel read/write conflicts; address spaces, buffer ownership, synchronization, race/determinism, Typed Core/verifier, CPU/device evidence, diagnostics, migration, protocol inventory, and backend support remain open under KCHK-4104, KCHK-4101/4103, GAP-KERNEL-DEVICE-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0151"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0151-kernel-core-verifier-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Kernel Core/verifier boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer Core grammar, verifier semantics, canonical serialization, source maps, diagnostics, migration, CPU/device differential, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Kernel Core schema, verifier proof, backend, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Core node grammar; Typed Core/verifier trust boundary; witness identity; effect/capability, shape/bounds, alias/race, ownership/resource, profile/target/device, and determinism rules; canonical bytes, source maps, migration, resource limits, CPU/device evidence, diagnostics, protocol inventory, and backend support remain open under KCHK-4105, KCHK-4101 through KCHK-4104, GAP-KERNEL-DEVICE-001, and missing authority.",
+]
+superseded_by = ""

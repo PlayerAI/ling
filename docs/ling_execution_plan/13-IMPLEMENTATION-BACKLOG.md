@@ -375,6 +375,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `KCHK-4104` | G4 | Alias 和并行写冲突 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:113`, `docs/status/KCHK-4104-AUTHORITY-AUDIT.md` |
 | `KCHK-4104-OBSERVATION` | G4 | Internal Kernel alias/parallel-write boundary evidence | S | Done | Accepted `DEC-0150`; see `crates/ling-types/tests/kernel_alias_parallel_write_evidence.rs` and `docs/status/KCHK-4104-OBSERVATION-IMPLEMENTATION-REPORT.md`; alias/race/ownership semantics remain BlockedSpec |
 | `KCHK-4105` | G4 | Kernel Core 与 Verifier | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:124`, `docs/status/KCHK-4105-AUTHORITY-AUDIT.md` |
+| `KCHK-4105-OBSERVATION` | G4 | Internal Kernel Core/verifier boundary evidence | S | Done | Accepted `DEC-0151`; see `crates/ling-types/tests/kernel_core_verifier_evidence.rs` and `docs/status/KCHK-4105-OBSERVATION-IMPLEMENTATION-REPORT.md`; Kernel Core/verifier semantics remain BlockedSpec |
 | `CPU-4201` | G4 | Scalar Reference Backend | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:137`, `docs/status/CPU-4201-AUTHORITY-AUDIT.md` |
 | `CPU-4202` | G4 | Reference Trace | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:153`, `docs/status/CPU-4202-AUTHORITY-AUDIT.md` |
 | `CPU-4203` | G4 | Kernel Corpus | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:167`, `docs/status/CPU-4203-AUTHORITY-AUDIT.md` |
