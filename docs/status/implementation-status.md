@@ -330,6 +330,7 @@
 | `PROF-5101` | Machine-Readable Critical Profile | `G5` | `M` | `BlockedSpec` | `PLC-4805` | `` |
 | `PROF-5101-OBSERVATION` | Internal Critical Profile boundary evidence | `G5` | `S` | `Done` | `PLC-4805-OBSERVATION` | `f01ee509850941a633e6aeff7fb0d0d8fec4e4e4` |
 | `PROF-5102` | Forbidden Capability Checks | `G5` | `M` | `BlockedSpec` | `PROF-5101` | `` |
+| `PROF-5102-OBSERVATION` | Internal forbidden-capability boundary evidence | `G5` | `S` | `Done` | `PROF-5101-OBSERVATION` | `737b3390ee7e499cc060191f719c72ce39f6c971` |
 | `PROF-5103` | Profile Composition | `G5` | `M` | `BlockedSpec` | `PROF-5102` | `` |
 | `PROF-5104` | Profile Audit and LSP | `G5` | `M` | `BlockedSpec` | `PROF-5103` | `` |
 | `PROOF-5501` | Proof IR | `G5` | `L` | `BlockedSpec` | `CTR-5405` | `` |

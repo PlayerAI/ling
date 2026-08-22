@@ -18559,10 +18559,10 @@ acceptance = [
   "cargo test -p ling-types --test forbidden_capability_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "737b3390ee7e499cc060191f719c72ce39f6c971"
+completion_commit = "737b3390ee7e499cc060191f719c72ce39f6c971"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0178; PROF-5102 remains BlockedSpec for capability/effect policy, checker phase, transitive/bounds/topology/numeric/Fault/FFI semantics, diagnostics, CLI/editor integration, and support claims.",
   "No checker, profile policy, dependency, target package, manifest, diagnostic, CLI/LSP option, runtime, or Unicode behavior was added.",
