@@ -17010,6 +17010,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0165-backend-spike-selection-boundary-evidence.md",
   "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -17019,6 +17020,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/GPU-4601-AUTHORITY-AUDIT.md",
+  "docs/status/GPU-4601-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GPU-4601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0165-backend-spike-selection-boundary-evidence.md",
+  "crates/ling-types/tests/backend_spike_selection_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -17038,6 +17047,61 @@ notes = [
   "The repository has no GPU backend, Device IR consumer, target package, capability discovery, driver/toolchain probe, hardware matrix, benchmark harness, or GPU fixture under crates or tests.",
   "The audit does not turn a plan candidate or benchmark result into a public backend protocol and does not reuse current scalar VM/bytecode contracts as a device ABI.",
   "The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; the plan remains non-normative.",
+]
+[[task]]
+id = "GPU-4601-OBSERVATION"
+title = "Internal backend spike and selection boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DIR-4503-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0164-device-ir-canonicalization-boundary-evidence.md",
+  "docs/decisions/0165-backend-spike-selection-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/backend_spike_selection_evidence.rs",
+  "docs/decisions/0165-backend-spike-selection-boundary-evidence.md",
+  "docs/status/GPU-4601-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GPU-4601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0165 authorizes only test-local backend spike and selection boundary evidence; no backend choice, dependency, target package, probe, benchmark, capability API, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty provisional boundaries for candidate paths, verified artifact/Device IR/Kernel boundaries, target/profile/capability/features/fallback/rejection, platform/API/source-debug/numeric/determinism/synchronization/transfer/Fault/resource/launch/ABI, toolchain/driver/hardware/CI/license/reproducibility/cache/maintenance/benchmark, differential and malformed/Unicode/migration fixtures, support statuses, diagnostics, host exclusions, and protocol.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no backend selection, target, dependency, benchmark, diagnostic, support, or public protocol authority.",
+  "cargo test -p ling-types --test backend_spike_selection_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "Test-only under DEC-0165; GPU-4601 remains BlockedSpec for technology selection, backend support, ABI/runtime, protocol, and target claims.",
+  "No backend crate, dependency, target package, driver/toolchain probe, benchmark, capability API, diagnostic, support-matrix transition, CLI/LSP command, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "GPU-4602"

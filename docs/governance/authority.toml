@@ -2652,3 +2652,16 @@ covers = ["DIR-4503 bounded Device IR canonicalization boundary evidence", "test
 depends_on = ["DEC-0163", "DEC-0162", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0165"
+title = "Internal backend spike and selection boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0165-backend-spike-selection-boundary-evidence.md"
+covers = ["GPU-4601 bounded backend spike and selection boundary evidence", "test-only backend candidate and evaluation vocabulary", "backend selection boundaries without Kernel/Device/runtime/ABI semantics"]
+depends_on = ["DEC-0164", "DEC-0163", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

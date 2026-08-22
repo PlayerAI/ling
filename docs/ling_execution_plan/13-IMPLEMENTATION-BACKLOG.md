@@ -403,6 +403,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DIR-4503` | G4 | Device IR Canonicalization | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:317`, `docs/status/DIR-4503-AUTHORITY-AUDIT.md` |
 | `DIR-4503-OBSERVATION` | G4 | Internal Device IR canonicalization boundary evidence | S | Done | Accepted `DEC-0164`; see `crates/ling-types/tests/device_ir_canonicalization_evidence.rs` and `docs/status/DIR-4503-OBSERVATION-IMPLEMENTATION-REPORT.md`; canonicalization semantics remain BlockedSpec |
 | `GPU-4601` | G4 | Backend Spike 与选择 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:328`, `docs/status/GPU-4601-AUTHORITY-AUDIT.md` |
+| `GPU-4601-OBSERVATION` | G4 | Internal backend spike and selection boundary evidence | S | Done | Accepted `DEC-0165`; see `crates/ling-types/tests/backend_spike_selection_evidence.rs` and `docs/status/GPU-4601-OBSERVATION-IMPLEMENTATION-REPORT.md`; backend selection remains BlockedSpec |
 | `GPU-4602` | G4 | Backend Adapter | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:351`, `docs/status/GPU-4602-AUTHORITY-AUDIT.md` |
 | `GPU-4603` | G4 | Launch 与 Runtime | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:365`, `docs/status/GPU-4603-AUTHORITY-AUDIT.md` |
 | `GPU-4604` | G4 | 差分和硬件矩阵 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:378`, `docs/status/GPU-4604-AUTHORITY-AUDIT.md` |

@@ -4295,3 +4295,27 @@ unresolved_alternatives = [
   "Device IR schema and identity; node/block/operation/dependency ordering; constant pools and integer/float/opaque/shape/layout encodings; numeric, effect, ownership, synchronization, Fault, and capability fields; source maps and Semantic IDs; target-independent versus target-specialization inputs; feature profiles and unsupported targets; extension, unknown-field, corruption, redaction, version, and migration policy; determinism, Unicode/source-map fixtures, diagnostics, host/driver exclusion, protocol inventory, and public canonicalization status remain open under DIR-4501/4502, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0165"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0165-backend-spike-selection-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty backend spike and selection boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer candidate selection, target/capability identity, toolchain/driver probing, benchmarks, support-status transitions, ABI/runtime behavior, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No backend crate, dependency, target package, toolchain probe, benchmark, capability API, diagnostic, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Candidate path and version; verified input artifact and Device IR/Kernel boundary; target identity/profile and capability discovery; required/optional features, unsupported-target, fallback and rejection policy; platform/API, source/debug, numeric/determinism, synchronization, transfer, Fault, resource, launch and ABI behavior; toolchain/driver identity, hardware/CI, license, reproducibility, cache identity, maintenance and benchmark evidence; CPU/GPU differential and malformed/Unicode/migration fixtures; Experimental/Preview/Supported transitions; diagnostics, timestamp/address/path/driver redaction, protocol inventory, and public backend status remain open under GPU-4601, DIR-4501 through DIR-4503, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""

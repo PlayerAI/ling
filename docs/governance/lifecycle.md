@@ -195,6 +195,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0162` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0162](../decisions/0162-device-ir-schema-boundary-evidence.md) |
 | `DEC-0163` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0163](../decisions/0163-kernel-device-lowering-boundary-evidence.md) |
 | `DEC-0164` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0164](../decisions/0164-device-ir-canonicalization-boundary-evidence.md) |
+| `DEC-0165` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0165](../decisions/0165-backend-spike-selection-boundary-evidence.md) |
 
 ## Migration boundary
 
