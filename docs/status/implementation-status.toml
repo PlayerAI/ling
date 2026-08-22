@@ -5632,9 +5632,9 @@ acceptance = [
   "Client document versions remain distinct from VFS revisions, and invariant failure returns no partial snapshot or diagnostic/protocol claim.",
   "Focused LSP snapshot tests, formatting, and clippy pass; public request identity, CompilerHost/query inputs, cancellation, stale publication, Workspace Edits, and Semantic Transactions remain deferred.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working-tree"
+verified_against_commit = "64eb8e858f87bc4f5896bbb8ac00f53afc48c97d"
+completion_commit = "64eb8e858f87bc4f5896bbb8ac00f53afc48c97d"
+integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "This child closes only DEC-0030's internal capture boundary; parent LSP-2501 remains BlockedSpec for the public analysis/request protocol.",
