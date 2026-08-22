@@ -14370,6 +14370,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0189-node-native-runtime-boundary-evidence.md",
   "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -19741,6 +19742,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/NODE-5305-AUTHORITY-AUDIT.md",
+  "docs/decisions/0189-node-native-runtime-boundary-evidence.md",
+  "docs/status/NODE-5305-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5305-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/tests/node_native_runtime_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -19760,6 +19765,67 @@ notes = [
   "The repository has no Native IR/backend, ABI or target package, timer/watchdog runtime, static-memory package, safe-state lifecycle, startup/shutdown model, or Native Node fixtures; Native remains explicitly unsupported.",
   "The audit does not reinterpret Seed VM limits, mutable-place lowering, or host effects as Native ABI, timer, watchdog, ownership, or hard-real-time guarantees and creates no Native placeholder.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; Native Node runtime work remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "NODE-5305-OBSERVATION"
+title = "Internal Node Native-runtime boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["NODE-5304-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0188-node-virtual-time-runtime-boundary-evidence.md",
+  "docs/decisions/0189-node-native-runtime-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/node_native_runtime_evidence.rs",
+  "docs/decisions/0189-node-native-runtime-boundary-evidence.md",
+  "docs/status/NODE-5305-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5305-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0189 authorizes only test-local Native Node runtime boundary evidence; no Native IR/backend, ABI/layout, ownership/memory, target, timer/watchdog, lifecycle, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty Native Node runtime, ABI/layout, ownership/static-memory, timing/lifecycle, target/evidence, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no backend, ABI, target, runtime, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test node_native_runtime_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "d08d51178f99c511c4a21fa4c4aa97a17b19b02a"
+completion_commit = "d08d51178f99c511c4a21fa4c4aa97a17b19b02a"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0189; NODE-5305 remains BlockedSpec for Native IR/ABI, target, ownership/drop, static memory, timer/watchdog, lifecycle, diagnostics, CLI/editor integration, and support claims.",
+  "No Native backend, runtime, ABI/target binding, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 [[task]]
 id = "NODE-5306"

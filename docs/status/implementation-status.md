@@ -294,6 +294,7 @@
 | `NODE-5304` | Virtual-Time Reference Runtime | `G5` | `M` | `BlockedSpec` | `NODE-5303` | `` |
 | `NODE-5304-OBSERVATION` | Internal Node virtual-time runtime boundary evidence | `G5` | `S` | `Done` | `NODE-5303-OBSERVATION` | `39e00c566f57f4433051e0f8e04db73e1ed8c1b3` |
 | `NODE-5305` | Native Node Runtime | `G5` | `L` | `BlockedSpec` | `NODE-5304` | `` |
+| `NODE-5305-OBSERVATION` | Internal Node Native-runtime boundary evidence | `G5` | `S` | `Done` | `NODE-5304-OBSERVATION` | `d08d51178f99c511c4a21fa4c4aa97a17b19b02a` |
 | `NODE-5306` | Node and Actor Boundary | `G5` | `M` | `BlockedSpec` | `NODE-5305` | `` |
 | `NODE-5307` | Node Conformance | `G5` | `M` | `BlockedSpec` | `NODE-5306` | `` |
 | `OWN-3201` | Place and Move analysis | `G3` | `L` | `BlockedSpec` | `MEM-3104` | `` |
