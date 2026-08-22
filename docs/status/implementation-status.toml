@@ -20198,6 +20198,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0193-contract-status-model-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -20207,6 +20208,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/CTR-5402-AUTHORITY-AUDIT.md",
+  "docs/decisions/0193-contract-status-model-boundary-evidence.md",
+  "docs/status/CTR-5402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/tests/contract_status_model_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -20226,6 +20231,67 @@ notes = [
   "The repository has no Contract status enum or propagation path in AST/HIR/Core/Graph/Audit/Evidence, no Contract status schema or fixtures, and no L-CONTRACT diagnostic allocation; existing governance status is task/feature metadata only.",
   "The audit does not reinterpret Draft SEMANTICS/LANGUAGE states, implementation-status registries, or VM differential evidence as a Contract lifecycle and creates no enum or schema placeholder.",
   "The audit adds no public protocol, dependency, runtime, schema, diagnostic, or placeholder API; Contract status work remains deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "CTR-5402-OBSERVATION"
+title = "Internal Contract status-model boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CTR-5401-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0192-contract-syntax-core-boundary-evidence.md",
+  "docs/decisions/0193-contract-status-model-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/contract_status_model_evidence.rs",
+  "docs/decisions/0193-contract-status-model-boundary-evidence.md",
+  "docs/status/CTR-5402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0193 authorizes only test-local Contract status-model boundary evidence; no status enum, transition table, aggregation rule, schema, projection, diagnostic, CLI, or support claim is made.",
+  "Inventory covers sixty Contract status, identity, evidence, lifecycle, projection, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no lifecycle, schema, propagation, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test contract_status_model_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "32eaee6e2e15857fb8ba5a9d0fc99b251e45bab8"
+completion_commit = "32eaee6e2e15857fb8ba5a9d0fc99b251e45bab8"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0193; CTR-5402 remains BlockedSpec for status vocabulary/lifecycle, identity/provenance/trust, evidence schema, Graph/Audit propagation, UI/diagnostics, CLI/editor integration, and support claims.",
+  "No Contract status enum, transition/aggregation implementation, schema, renderer, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
