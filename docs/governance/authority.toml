@@ -2665,3 +2665,16 @@ covers = ["GPU-4601 bounded backend spike and selection boundary evidence", "tes
 depends_on = ["DEC-0164", "DEC-0163", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0166"
+title = "Internal backend adapter boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0166-backend-adapter-boundary-evidence.md"
+covers = ["GPU-4602 bounded backend adapter boundary evidence", "test-only backend adapter vocabulary", "adapter boundaries without Device IR/runtime/ABI semantics"]
+depends_on = ["DEC-0165", "DEC-0164", "DEC-0163", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

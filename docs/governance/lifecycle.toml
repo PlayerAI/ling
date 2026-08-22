@@ -4319,3 +4319,27 @@ unresolved_alternatives = [
   "Candidate path and version; verified input artifact and Device IR/Kernel boundary; target identity/profile and capability discovery; required/optional features, unsupported-target, fallback and rejection policy; platform/API, source/debug, numeric/determinism, synchronization, transfer, Fault, resource, launch and ABI behavior; toolchain/driver identity, hardware/CI, license, reproducibility, cache identity, maintenance and benchmark evidence; CPU/GPU differential and malformed/Unicode/migration fixtures; Experimental/Preview/Supported transitions; diagnostics, timestamp/address/path/driver redaction, protocol inventory, and public backend status remain open under GPU-4601, DIR-4501 through DIR-4503, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0166"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0166-backend-adapter-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty backend adapter boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer adapter ABI, DeviceBinary/cache schema, ownership/lifetime, transfer visibility, queue/launch/synchronization, capability negotiation, Fault and cleanup behavior, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No adapter trait, Device IR or DeviceBinary API, runtime handle, target package, dependency, capability API, diagnostic, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Adapter input trust boundary and verified Device IR; compile and target-spec identity; DeviceBinary schema, canonical bytes, ownership, corruption, migration, cache identity/invalidation; buffer allocation/ownership, transfer visibility, queue ordering, launch dimensions, workgroup limits, synchronization scope; capability query/identity, required/optional and unsupported features, fallback/rejection; Fault classes, device loss, cancellation, resource limits, cleanup; vendor/front-end isolation, toolchain/driver identity, numeric/determinism, source maps, UTF-8 spans and Semantic IDs; positive/negative/malformed/migration/lifecycle/differential fixtures; diagnostics, host/driver/path/address/timestamp redaction, protocol inventory, and public adapter status remain open under GPU-4602, GPU-4601, DIR-4501 through DIR-4503, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""
