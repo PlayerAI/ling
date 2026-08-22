@@ -9668,6 +9668,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/SUP-2401-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2401-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2401-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0101-supervisor-observation.md",
+  "crates/ling-concurrency/src/supervisor.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -9675,6 +9684,7 @@ acceptance = [
   "The audit records the missing supervisor/child ownership and state machine, restart/stop/escalate strategies, child lifetime classes, budgets/windows, state restore, parent Fault channel, mailbox/cancellation, diagnostics, protocol, resource, and migration contracts.",
   "The audit distinguishes SEMANTICS/LANGUAGE/ROADMAP high-level supervision requirements and host-only runtime Fault/cancellation from the absent Accepted RFC-C204 authority, and preserves the checked-only evaluation boundary.",
   "The audit covers single/multiple/repeated child Faults, each restart strategy and lifetime class, budget exhaustion, state-restore failure, parent shutdown, mailbox cleanup, concurrent failures, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM/runtime differential fixtures.",
+  "Accepted DEC-0101 authorizes only the publish-disabled Supervisor-observation child; it does not close child ownership, strategy, restart budget, state restore, Fault channel, runtime, or shutdown gaps.",
   "No Supervisor type, child specification, restart strategy, escalation API, Fault channel, state snapshot protocol, diagnostic allocation, public protocol, or placeholder G2 API is added while the authority is absent.",
   "The future implementation must consume accepted types and checked Core only, publish a versioned Supervisor state machine and Fault channel, enforce bounded restart/resource behavior, and provide recovery, cleanup, and interpreter/VM evidence before supervision is exposed.",
 ]
@@ -9686,6 +9696,64 @@ notes = [
   "SUP-2401 is BlockedSpec by ACT-2301 through ACT-2306, absent RFC-C204/RFC-0009, GAP-ACTOR-MAILBOX-SUPERVISOR-001, and unresolved Supervisor identity/strategy/lifecycle/Fault contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Supervisor, child registry, restart budget, state snapshot/restore, escalation channel, lifecycle event schema, or public supervision protocol; Seed runtime Faults are not supervisor Faults.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Supervisor, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "SUP-2401-OBSERVATION"
+title = "Internal Supervisor observation"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ACT-2306-PROPERTY-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0095-actor-identity-reference-model.md",
+  "docs/decisions/0096-actor-message-schema-identity.md",
+  "docs/decisions/0097-actor-mailbox-observation.md",
+  "docs/decisions/0098-actor-turn-observation.md",
+  "docs/decisions/0099-actor-runtime-observation.md",
+  "docs/decisions/0100-actor-property-observation.md",
+  "docs/decisions/0101-supervisor-observation.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/src/supervisor.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/decisions/0101-supervisor-observation.md",
+  "docs/status/SUP-2401-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2401-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0101 authorizes only publish-disabled Supervisor observations; no supervision or recovery semantics are claimed.",
+  "SupervisorObservationModel validates nonzero observation/actor identities and duplicate-free observations; observations are sorted deterministically.",
+  "Supervision labels are observations only, with no child/restart/strategy/budget/state-restore/Fault semantics; source spans are evidence only; canonical bytes are path-free.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "c29d95c7bc7b926c92757b2c32fccf960500e421"
+completion_commit = "c29d95c7bc7b926c92757b2c32fccf960500e421"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is a data-only boundary under DEC-0101; SUP-2401 remains BlockedSpec for child ownership, strategies, restart budgets, state restore, Fault channels, runtime, and interpreter/VM behavior.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, or Unicode behavior was added.",
 ]
 
 [[task]]
