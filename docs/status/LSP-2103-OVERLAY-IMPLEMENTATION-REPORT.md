@@ -46,8 +46,14 @@ Transactions.
 - Overlay tests cover workspace disk/overlay races, dependency read-only
   rejection, stale versions, temporary-file removal, URI rejection, ranged
   change rejection, response suppression, and deterministic document views.
-- Full workspace, governance, status, CI-contract, formatting, Clippy, and diff
-  gates are run for the milestone commit before completion evidence is filled.
+- Full workspace, governance, status, CI-contract, support-matrix, formatting,
+  Clippy, and diff gates passed after implementation commit
+  `6cedec3e09f8112b28cde1c12dca514dae4191e4`:
+  `cargo test --workspace --locked --offline --quiet`,
+  `cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings`,
+  `cargo fmt --all -- --check`, `git diff --check`,
+  `xtask governance check-all`, `xtask status verify`, `xtask ci verify`, and
+  `xtask support verify`.
 
 ## Compatibility and deferrals
 

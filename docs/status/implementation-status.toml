@@ -4493,9 +4493,9 @@ acceptance = [
   "Workspace disk updates remain hidden by an open overlay, close reveals the latest disk layer, untitled files are removed, and document views are deterministic by URI.",
   "No incremental range, diagnostics, compiler query, Workspace Edit, Semantic Transaction, bytecode, VM, CLI, or Unicode contract changes are claimed.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working-tree"
+verified_against_commit = "6cedec3e09f8112b28cde1c12dca514dae4191e4"
+completion_commit = "6cedec3e09f8112b28cde1c12dca514dae4191e4"
+integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "Bounded full-text overlay slice completed under RFC-0023; parent LSP-2103 remains BlockedSpec for incremental synchronization and transaction/query semantics.",
