@@ -277,6 +277,7 @@
 | `MC-5601` | Finite-State Projection | `G5` | `L` | `BlockedSpec` | `BND-5204`, `NODE-5307`, `PROOF-5503` | `` |
 | `MC-5601-OBSERVATION` | Internal Finite-State Projection boundary evidence | `G5` | `S` | `Done` | `PROOF-5503-OBSERVATION` | `7ff487b1fe6f886fa664c68a006dbb0a185f73ec` |
 | `MC-5602` | Exploration Engine | `G5` | `L` | `BlockedSpec` | `MC-5601` | `` |
+| `MC-5602-OBSERVATION` | Internal Exploration Engine boundary evidence | `G5` | `S` | `Done` | `MC-5601-OBSERVATION` | `19a64ffc75edbe47f3e65d6b36f2183575270c95` |
 | `MC-5603` | Model-Check Report Semantics | `G5` | `M` | `BlockedSpec` | `MC-5602` | `` |
 | `MC-5604` | Replay Counterexample | `G5` | `L` | `BlockedSpec` | `MC-5603` | `` |
 | `MEM-3101` | Type classification model | `G3` | `M` | `BlockedSpec` | — | `` |

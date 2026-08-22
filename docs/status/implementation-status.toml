@@ -21417,6 +21417,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0203-exploration-engine-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -21425,6 +21426,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/MC-5602-AUTHORITY-AUDIT.md",
+  "docs/decisions/0203-exploration-engine-boundary-evidence.md",
+  "docs/status/MC-5602-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MC-5602-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-concurrency/tests/exploration_engine_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -21444,6 +21449,67 @@ notes = [
   "The repository has no model-checker engine, finite-state work queue, canonical state hash, deterministic BFS/DFS implementation, partial-order reduction, counterexample schema, or exploration fixtures; existing graph and differential traversals are unrelated.",
   "The audit does not reinterpret execution-plan algorithms, RFC-0019 differential evidence, or repository graph cycles as model-check semantics and creates no engine placeholder.",
   "The audit adds no public protocol, dependency, model, runtime, schema, diagnostic, CLI, or placeholder API; Exploration Engine remains deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "MC-5602-OBSERVATION"
+title = "Internal Exploration Engine boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["MC-5601-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0202-finite-state-projection-boundary-evidence.md",
+  "docs/decisions/0203-exploration-engine-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/tests/exploration_engine_evidence.rs",
+  "docs/decisions/0203-exploration-engine-boundary-evidence.md",
+  "docs/status/MC-5602-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MC-5602-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0203 authorizes only test-local Exploration Engine boundary evidence; no engine, state hash, traversal/reduction semantics, result schema, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty exploration, state/hash, traversal/reduction, bound/resource, result, provenance, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no engine, state-hash, result, diagnostic, or public protocol authority.",
+  "cargo test -p ling-concurrency --test exploration_engine_evidence --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "19a64ffc75edbe47f3e65d6b36f2183575270c95"
+completion_commit = "19a64ffc75edbe47f3e65d6b36f2183575270c95"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0203; MC-5602 remains BlockedSpec for engine/state hash, traversal/reduction semantics, resource/result/counterexample schemas, diagnostics, protocols, and support claims.",
+  "No engine, state hash, reduction, schema, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
