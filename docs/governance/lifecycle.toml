@@ -4751,3 +4751,27 @@ unresolved_alternatives = [
   "Memory units and object/layout rules; allocation, ownership, regions, borrowing, sharing, aliasing, alignment and drop timing; Value/Managed/Resource/Device memory; static/stack/arena/buffer accounting; transient peaks, control-flow joins, recursion, cancellation and worst-case paths; queue/mailbox/task/actor/backpressure/device placement; proof, estimate, assumption, unknown, overflow, unsupported and target-mismatch states; target ABI/compiler identity, migration, cache/replay identity; runtime guards, out-of-memory, queue overflow, device allocation failure and fallback policy; logical versus host-safety guarantees; bilingual diagnostics and source facts; positive/negative/boundary/ownership/queue-target/determinism/differential fixtures; protocol inventory and public status remain open under BND-5203, GAP-CRITICAL-PROFILE-001, GAP-OWNERSHIP-MODEL-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-NATIVE-BACKEND-ABI-001, GAP-KERNEL-DEVICE-001, and missing RFC-K504 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0184"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0184-resource-budget-diagnostics-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty resource-budget diagnostic boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer fact production, diagnostic codes/schema, proof and provenance, repairs, transactions, CLI/LSP, migration, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing Preview Facts/Repairs and VM Runtime Faults are not reinterpreted as resource-budget semantics.",
+  "No budget diagnostic code, schema field, fact producer, FixPlan, Workspace Edit, Semantic Transaction, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Budget/usage/contributor field types and units; proof/estimate/assumption/unknown/overflow/unsupported/target-mismatch states; target/compiler and path/provenance identity; contributor ordering and diagnostic size limits; bilingual code allocation, Facts, severity, localization, schema version and migration; Preview container compatibility; Repair versus transformation; Workspace Edit, Semantic Transaction, snapshot/version, stale-result, cancellation, confirmation, rollback, ownership/effect/resource/source-map preservation; checked Typed Core and Critical/BND dependencies; positive, negative, boundary, unknown-assumption, provenance, localization, target-migration, transaction, repair-equivalence, Unicode, determinism and differential fixtures; protocol inventory and public status remain open under BND-5204, BND-5203, GAP-CRITICAL-PROFILE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-PROJECT-CLI-INTERFACE-001, and missing RFC-K504 authority.",
+]
+superseded_by = ""

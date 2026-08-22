@@ -441,6 +441,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `BND-5203` | G5 | 内存预算 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:169`, `docs/status/BND-5203-AUTHORITY-AUDIT.md` |
 | `BND-5203-OBSERVATION` | G5 | Internal memory-budget boundary evidence | S | Done | Accepted `DEC-0183`; see `crates/ling-types/tests/memory_budgets_evidence.rs` and `docs/status/BND-5203-OBSERVATION-IMPLEMENTATION-REPORT.md`; analyzer/model/target semantics remain BlockedSpec |
 | `BND-5204` | G5 | 资源预算诊断 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:184`, `docs/status/BND-5204-AUTHORITY-AUDIT.md` |
+| `BND-5204-OBSERVATION` | G5 | Internal resource-budget diagnostic boundary evidence | S | Done | Accepted `DEC-0184`; see `crates/ling-types/tests/resource_budget_diagnostics_evidence.rs` and `docs/status/BND-5204-OBSERVATION-IMPLEMENTATION-REPORT.md`; fact/schema/transaction semantics remain BlockedSpec |
 | `NODE-5301` | G5 | Node 语法与语义 | L | BlockedSpec | `09-G5-V0.5-CRITICAL.md:199`, `docs/status/NODE-5301-AUTHORITY-AUDIT.md` |
 | `NODE-5302` | G5 | Node Checked Core | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:226`, `docs/status/NODE-5302-AUTHORITY-AUDIT.md` |
 | `NODE-5303` | G5 | 静态调度 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:242`, `docs/status/NODE-5303-AUTHORITY-AUDIT.md` |

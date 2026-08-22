@@ -2899,3 +2899,16 @@ covers = ["BND-5203 bounded memory-budget boundary evidence", "test-only memory-
 depends_on = ["DEC-0182", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0184"
+title = "Internal resource-budget diagnostic boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0184-resource-budget-diagnostics-boundary-evidence.md"
+covers = ["BND-5204 bounded resource-budget diagnostic boundary evidence", "test-only resource-budget diagnostic vocabulary", "diagnostic boundaries without fact/schema/transaction semantics"]
+depends_on = ["DEC-0183", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
