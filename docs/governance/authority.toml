@@ -3016,3 +3016,16 @@ covers = ["CTR-5401 bounded Contract syntax/Core boundary evidence", "test-only 
 depends_on = ["DEC-0191", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0193"
+title = "Internal Contract status-model boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0193-contract-status-model-boundary-evidence.md"
+covers = ["CTR-5402 bounded Contract status-model boundary evidence", "test-only Contract status vocabulary", "status boundaries without lifecycle/schema/propagation semantics"]
+depends_on = ["DEC-0192", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
