@@ -2714,3 +2714,29 @@ unresolved_alternatives = [
   "Budget scope and units, time/logical windows, persistence, backoff and jitter, restart transitions, circuit states, concurrent Fault handling, mailbox/Task interaction, provenance/privacy, query authorization, replay, runtime ABI, and migration remain open under the supervision/replay gaps and SUP-2402.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0103"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0103-supervision-test-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert that all seven planned scenario names are present and each has at least one structural observation.",
+  "Compare forward and reversed fixture insertion order and require identical path-free canonical observation bytes.",
+  "Cover every Supervisor observation label as vocabulary without assigning runtime meaning or expected recovery outcomes.",
+  "Keep runtime traces, fixture schemas, Fault outcomes, cleanup policy, stress, replay, differential, and migration fixtures deferred to the parent authority.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public supervision, restart, mailbox, or Actor behavior claim is registered.",
+]
+unresolved_alternatives = [
+  "Fixture schema and versioning, state-machine transitions, Fault taxonomy, restart/budget/backoff/circuit outcomes, mailbox cleanup, cancellation, deterministic seed/replay, runtime differential comparison, resource limits, privacy, diagnostics, and migration remain open under the supervision gap and SUP-2403.",
+]
+superseded_by = ""

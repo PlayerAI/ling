@@ -1846,3 +1846,16 @@ covers = ["SUP-2402 bounded restart-budget observation", "deterministic budget o
 depends_on = ["DEC-0101", "DEC-0100", "DEC-0099", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0103"
+title = "Internal supervision test evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0103-supervision-test-evidence.md"
+covers = ["SUP-2403 bounded supervision test evidence", "deterministic supervision scenario fixtures", "supervision vocabulary without execution/outcome semantics"]
+depends_on = ["DEC-0102", "DEC-0101", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
