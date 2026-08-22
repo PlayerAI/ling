@@ -1616,3 +1616,27 @@ unresolved_alternatives = [
   "Compiler-host source loading, workspace/member selection, semantic checking, incremental revisions, project run/test/build, artifacts, registry/network, publication, and Stable project CLI contracts remain later PRJ-1107 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0059"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0059-trait-ide-projection-lookups.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact witness/member identity hits and misses without mutating the projection.",
+  "Verify repeated Trait/member identities retain the original witness/member projection order and first-match behavior is deterministic.",
+  "Verify no JSON, program identity, source span, diagnostic, runtime, protocol, or Unicode behavior changes.",
+]
+compatibility_impact = [
+  "Adds only read-only ling-semantic methods over the existing Experimental x-ling-trait-ide extension; language, schemas, diagnostics, Semantic IDs, CLI, protocols, bytecode, VM, package data, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "LSP/JSON-RPC queries, document versions, positions, Workspace Edits, Semantic Transactions, rename, diagnostics, repairs, generic Trait queries, and Stable 1.0 editor compatibility remain later TRAIT-1308 authority.",
+]
+superseded_by = ""

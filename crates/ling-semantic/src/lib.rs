@@ -180,6 +180,64 @@ pub struct SemanticTraitIdeProjection {
     pub witnesses: Vec<SemanticTraitWitness>,
 }
 
+impl SemanticTraitIdeProjection {
+    /// Returns witnesses for a Trait identity in canonical projection order.
+    ///
+    /// The projection is already selected and immutable; this helper only
+    /// filters its records and never reruns Trait resolution.
+    pub fn witnesses_by_trait_id<'a>(
+        &'a self,
+        trait_id: &'a str,
+    ) -> impl Iterator<Item = &'a SemanticTraitWitness> + 'a {
+        self.witnesses
+            .iter()
+            .filter(move |witness| witness.trait_id == trait_id)
+    }
+
+    /// Returns the first witness for an implementation identity.
+    ///
+    /// Reader validation rejects malformed graph data before consumers use
+    /// it. For directly constructed values, the first projection-order match
+    /// keeps this read-only helper deterministic without inventing a new
+    /// uniqueness or selection rule.
+    #[must_use]
+    pub fn witness_by_implementation_id(
+        &self,
+        implementation_id: &str,
+    ) -> Option<&SemanticTraitWitness> {
+        self.witnesses
+            .iter()
+            .find(|witness| witness.implementation_id == implementation_id)
+    }
+
+    /// Returns members for a Trait definition identity in projection order.
+    pub fn members_by_trait_definition_id<'a>(
+        &'a self,
+        trait_definition_id: &'a str,
+    ) -> impl Iterator<Item = &'a SemanticTraitMember> + 'a {
+        self.witnesses
+            .iter()
+            .flat_map(|witness| witness.members.iter())
+            .filter(move |member| member.trait_definition_id == trait_definition_id)
+    }
+
+    /// Returns the first member for an implementation definition identity.
+    ///
+    /// As with [`Self::witness_by_implementation_id`], this is a deterministic
+    /// read over the existing projection and does not perform validation or
+    /// selection.
+    #[must_use]
+    pub fn member_by_implementation_definition_id(
+        &self,
+        implementation_definition_id: &str,
+    ) -> Option<&SemanticTraitMember> {
+        self.witnesses
+            .iter()
+            .flat_map(|witness| witness.members.iter())
+            .find(|member| member.implementation_definition_id == implementation_definition_id)
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SemanticTraitWitness {
     pub trait_id: String,
@@ -4116,6 +4174,81 @@ mod tests {
         assert_ne!(
             snapshot.trait_ide().unwrap().witnesses[0].members[0].trait_source,
             alternate_name.trait_ide().unwrap().witnesses[0].members[0].trait_source
+        );
+    }
+
+    #[test]
+    fn trait_ide_projection_lookups_are_read_only_and_projection_ordered() {
+        let snapshot = snapshot(concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main () = Renderable.render { name = \"Ling\" }\n",
+        ));
+        let projection = snapshot.trait_ide().expect("Trait projection");
+        let witness = &projection.witnesses[0];
+        let member = &witness.members[0];
+
+        assert_eq!(
+            projection
+                .witnesses_by_trait_id(&witness.trait_id)
+                .map(|candidate| candidate.implementation_id.as_str())
+                .collect::<Vec<_>>(),
+            vec![witness.implementation_id.as_str()]
+        );
+        assert_eq!(
+            projection
+                .witness_by_implementation_id(&witness.implementation_id)
+                .map(|candidate| candidate.trait_id.as_str()),
+            Some(witness.trait_id.as_str())
+        );
+        assert!(projection.witness_by_implementation_id("missing").is_none());
+        assert_eq!(
+            projection
+                .members_by_trait_definition_id(&member.trait_definition_id)
+                .map(|candidate| candidate.implementation_definition_id.as_str())
+                .collect::<Vec<_>>(),
+            vec![member.implementation_definition_id.as_str()]
+        );
+        assert_eq!(
+            projection
+                .member_by_implementation_definition_id(&member.implementation_definition_id)
+                .map(|candidate| candidate.name.as_str()),
+            Some(member.name.as_str())
+        );
+        assert!(
+            projection
+                .member_by_implementation_definition_id("missing")
+                .is_none()
+        );
+
+        let mut duplicate = witness.clone();
+        duplicate.obligation_order = witness.obligation_order + 1;
+        duplicate.implementation_id.push_str("-second");
+        duplicate.members[0]
+            .implementation_definition_id
+            .push_str("-second");
+        let mut ordered = projection.clone();
+        ordered.witnesses.push(duplicate);
+        assert_eq!(
+            ordered
+                .witnesses_by_trait_id(&witness.trait_id)
+                .map(|candidate| candidate.implementation_id.as_str())
+                .collect::<Vec<_>>(),
+            vec![
+                witness.implementation_id.as_str(),
+                ordered.witnesses[1].implementation_id.as_str()
+            ]
+        );
+        assert_eq!(
+            ordered
+                .member_by_implementation_definition_id(&member.implementation_definition_id)
+                .unwrap()
+                .implementation_definition_id,
+            member.implementation_definition_id
         );
     }
 

@@ -1261,3 +1261,16 @@ covers = ["read-only locked project snapshot", "manifest/graph/lock ownership", 
 depends_on = ["RFC-0002", "RFC-0024", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0059"
+title = "Trait projection read-only lookups"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0059-trait-ide-projection-lookups.md"
+covers = ["read-only Trait projection identity lookups", "TRAIT-1308-QUERY evidence"]
+depends_on = ["RFC-0022", "DEC-0027", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
