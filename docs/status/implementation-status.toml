@@ -14302,7 +14302,7 @@ notes = [
 [[task]]
 id = "DOC-6701-SEED"
 title = "Seed documentation-inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14336,10 +14336,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0045 closes only this internal Seed inventory child; the parent DOC-6701 gate remains BlockedSpec for future manuals and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "77a905bbac64aaa7e9b6a56f8952a045d2760d87"
+completion_commit = "77a905bbac64aaa7e9b6a56f8952a045d2760d87"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects inventory consistency only; future manuals remain explicit Future / Unsupported or other bounded states.",
   "No documentation generator, source example, command, protocol, migration promise, security claim, or placeholder public API is added.",
