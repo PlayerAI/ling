@@ -252,7 +252,7 @@
 | `REL-6603` | Security Audit | `G6` | `L` | `BlockedSpec` | `REL-6602` | `` |
 | `REL-6603-SEED` | Seed security-audit matrix drift gate | `G6` | `S` | `Done` | `REL-6602-SEED` | `d96bea813fb6576ef3212cbffeb478d9829210ec` |
 | `REL-6604` | Performance Baseline | `G6` | `L` | `BlockedSpec` | `REL-6603` | `` |
-| `REL-6604-SEED` | Seed performance-matrix drift gate | `G6` | `S` | `In Progress` | `REL-6603-SEED` | `` |
+| `REL-6604-SEED` | Seed performance-matrix drift gate | `G6` | `S` | `Done` | `REL-6603-SEED` | `1177fdf133de670ad039aac64aa1c8add92ab249` |
 | `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |
 | `REM-2602` | Transport-neutral envelope | `G2` | `L` | `BlockedSpec` | `REM-2601` | `` |
 | `REM-2603` | Delivery semantics | `G2` | `L` | `BlockedSpec` | `REM-2602` | `` |

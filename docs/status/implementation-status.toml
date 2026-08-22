@@ -14203,7 +14203,7 @@ notes = [
 [[task]]
 id = "REL-6604-SEED"
 title = "Seed performance-matrix drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14238,10 +14238,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0044 closes only this internal Seed matrix child; the parent REL-6604 gate remains BlockedSpec for future performance authority and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "1177fdf133de670ad039aac64aa1c8add92ab249"
+completion_commit = "1177fdf133de670ad039aac64aa1c8add92ab249"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects plan-coverage inventory consistency only; the existing timing harness remains opt-in measurement evidence and no threshold is inferred.",
   "No benchmark dependency, absolute threshold, memory/IO claim, unsupported backend harness, public protocol, or placeholder is added.",
