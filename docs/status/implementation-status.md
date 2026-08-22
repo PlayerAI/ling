@@ -205,6 +205,7 @@
 | `KCHK-4102` | Kernel Effect and Capability checks | `G4` | `L` | `BlockedSpec` | `KCHK-4101` | `` |
 | `KCHK-4102-OBSERVATION` | Internal Kernel Effect and Capability boundary evidence | `G4` | `S` | `Done` | `KCHK-4101-OBSERVATION` | `4248facc2fe1fef95e20eda30e1ef6bffc593b4a` |
 | `KCHK-4103` | Shape, index, and bounds | `G4` | `L` | `BlockedSpec` | `KCHK-4102` | `` |
+| `KCHK-4103-OBSERVATION` | Internal Kernel shape/index/bounds boundary evidence | `G4` | `S` | `Done` | `KCHK-4102-OBSERVATION` | `c85823812120f41b65db093900f96077fbdecf20` |
 | `KCHK-4104` | Alias and parallel-write conflicts | `G4` | `L` | `BlockedSpec` | `KCHK-4103` | `` |
 | `KCHK-4105` | Kernel Core and verifier | `G4` | `L` | `BlockedSpec` | `KCHK-4104` | `` |
 | `LSP-2101` | LSP lifecycle skeleton | `G1` | `S` | `BlockedSpec` | `CLI-1701` | `` |
