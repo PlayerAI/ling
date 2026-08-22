@@ -118,6 +118,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0053"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0053-seed-rc1-public-validation-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc1 verify offline and assert nine criteria with four BlockedSpec, two Unsupported, three partial states, and eight release-audit marker files.",
+  "Mutate a criterion row/state, policy phrase, evidence cell, or linked audit marker and verify the gate fails closed.",
+  "Run cargo xtask ci verify and locked governance, status, support, and traceability checks without treating the inventory as public validation or artifact verification.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask RC1 inventory validator and CI preflight; no language, runtime, diagnostic, schema, protocol, dependency, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "Public artifacts/acquisition, signatures/SBOM/provenance, Zed packaging, sample/migration manifests, issue ownership, schema reset, and Stable support remain future release authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0038"
 kind = "Decision"
 status = "Accepted"

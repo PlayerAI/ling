@@ -388,6 +388,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ZED-6804` | G6 | DAP 状态 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:473`, `docs/status/ZED-6804-AUTHORITY-AUDIT.md`, `docs/testing/DAP-STATUS.md` |
 | `RC-6901-SEED` | G6 | Seed RC0 internal-freeze inventory drift gate | S | Done | Accepted DEC-0052; see `cargo xtask rc0 verify`, `docs/testing/RC0-INTERNAL-FREEZE.md`, and `docs/status/RC-6901-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `RC-6901` | G6 | RC0 内部冻结 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:479`, `docs/status/RC-6901-AUTHORITY-AUDIT.md`, `docs/testing/RC0-INTERNAL-FREEZE.md` |
+| `RC-6902-SEED` | G6 | Seed RC1 public-validation inventory drift gate | S | In Progress | Accepted DEC-0053; see `cargo xtask rc1 verify`, `docs/testing/RC1-PUBLIC-VALIDATION.md`, and `docs/status/RC-6902-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `RC-6902` | G6 | RC1 公开验证 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:490`, `docs/status/RC-6902-AUTHORITY-AUDIT.md`, `docs/testing/RC1-PUBLIC-VALIDATION.md` |
 | `RC-6903` | G6 | 独立验证 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:502`, `docs/status/RC-6903-AUTHORITY-AUDIT.md`, `docs/testing/RC3-INDEPENDENT-VERIFICATION.md` |
 | `RC-6904` | G6 | RC2 / Final | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:514`, `docs/status/RC-6904-AUTHORITY-AUDIT.md`, `docs/testing/RC2-FINAL-CHANGE-CONTROL.md` |

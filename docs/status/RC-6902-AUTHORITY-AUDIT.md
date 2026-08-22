@@ -47,6 +47,13 @@ checksum/signature/SBOM/provenance verification, clean installation, accepted
 Zed/LSP packaging, versioned sample projects, general migration tests, issue
 templates and response ownership, and a schema-change candidate reset rule.
 
+The bounded `RC-6902-SEED` child is now protected by
+`cargo xtask rc1 verify`. That internal command checks the exact nine criteria,
+their documented `BlockedSpec`, `Unsupported`, and partial states, the
+no-publication boundary, and eight linked audit-marker files. It validates
+inventory drift only and does not create any of the missing public-release
+evidence.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

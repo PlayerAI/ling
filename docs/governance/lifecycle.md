@@ -82,6 +82,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0050` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0050](../decisions/0050-seed-zed-extension-acceptance-inventory-gate.md) |
 | `DEC-0051` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0051](../decisions/0051-seed-dap-status-inventory-gate.md) |
 | `DEC-0052` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0052](../decisions/0052-seed-rc0-internal-freeze-inventory-gate.md) |
+| `DEC-0053` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0053](../decisions/0053-seed-rc1-public-validation-inventory-gate.md) |
 
 ## Migration boundary
 

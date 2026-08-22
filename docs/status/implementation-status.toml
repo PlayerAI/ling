@@ -3836,6 +3836,68 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6902-SEED"
+title = "Seed RC1 public-validation inventory drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6901-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0053-seed-rc1-public-validation-inventory-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6501-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6603-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6804-AUTHORITY-AUDIT.md",
+  "docs/SEED-RELEASE-REPORT.md",
+  "docs/testing/RC0-INTERNAL-FREEZE.md",
+  "docs/testing/RC1-PUBLIC-VALIDATION.md",
+  "docs/testing/SECURITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/rc1_validation.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0053-seed-rc1-public-validation-inventory-gate.md",
+  "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/testing/RC1-PUBLIC-VALIDATION.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc1 verify deterministically validates nine RC1 criteria: four BlockedSpec, two Unsupported, and three partial states with non-empty evidence and required-exit cells and eight linked audit files.",
+  "The verifier fails closed on duplicate/missing/unexpected criteria, state drift, missing no-publication markers, missing audit markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate and does not publish, download, install, sign, migrate, manage issues, create a schema reset, or claim public RC1 support.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0053 closes only this internal Seed RC1 inventory child; the parent RC-6902 gate remains BlockedSpec for all public validation and release exits.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects the RC1 negative boundary only; Seed evidence remains Seed evidence and no public artifact or installation contract is inferred.",
+  "No public artifact, package, installer, extension, signature, SBOM, provenance record, issue form, migration executable, network request, system configuration, or placeholder is added.",
+]
+
+[[task]]
 id = "RC-6902"
 title = "RC1 Public Validation"
 state = "BlockedSpec"

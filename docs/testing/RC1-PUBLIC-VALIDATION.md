@@ -33,11 +33,18 @@ These offline commands validate repository registries and Seed traceability;
 they do not publish artifacts or establish RC1:
 
 ```text
+cargo xtask rc1 verify
 cargo run -p xtask --locked --offline -- status verify
 cargo run -p xtask --locked --offline -- governance check-all
 cargo run -p xtask --locked --offline -- support verify
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 ```
+
+`cargo xtask rc1 verify` deterministically checks the exact nine criteria,
+their `BlockedSpec`, `Unsupported`, and partial Seed/repository states, the
+no-publication boundary, and eight linked audit-marker files. It is an
+inventory check only; it does not publish, download, install, sign, migrate,
+or otherwise establish public RC1 support.
 
 No package registry, download URL, installer, Zed package, issue tracker,
 signing service, network request, or system configuration was exercised. The
