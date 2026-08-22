@@ -2457,3 +2457,16 @@ covers = ["KCHK-4103 bounded Kernel shape/index/bounds boundary evidence", "test
 depends_on = ["DEC-0148", "DEC-0147", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0150"
+title = "Internal Kernel alias/parallel-write boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0150-kernel-alias-parallel-write-boundary-evidence.md"
+covers = ["KCHK-4104 bounded Kernel alias/parallel-write boundary evidence", "test-only alias/borrow/conflict vocabulary", "alias boundaries without ownership/race/device semantics"]
+depends_on = ["DEC-0149", "DEC-0147", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
