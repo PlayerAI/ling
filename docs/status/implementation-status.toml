@@ -3563,6 +3563,59 @@ notes = [
 ]
 
 [[task]]
+id = "FMT-1507-EDIT"
+title = "Deterministic formatter whole-document edit projection"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1506"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/decisions/0057-formatter-in-process-edit-projection.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-format/src/edit.rs",
+  "crates/ling-format/src/lib.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/status.rs",
+  "docs/decisions/0057-formatter-in-process-edit-projection.md",
+  "docs/status/FMT-1507-EDIT-IMPLEMENTATION-REPORT.md",
+  "docs/status/FMT-1507-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0057 authorizes only an in-process FormatEdit value and one whole-document original-byte replacement.",
+  "Changed valid sources produce the exact original UTF-8 byte range and replacement; unchanged, invalid, and rejected sources produce no edit.",
+  "The implementation has no URI, version, position, Workspace Edit, JSON-RPC, diagnostic, transaction, or source-mutation surface.",
+  "Focused format, test, clippy, diff, and governance checks pass; the FMT-1507 parent remains BlockedSpec for public LSP/transaction behavior.",
+]
+verified_against_commit = "e33f8496de369b8fc6364007a59a0a1fb4ca9e9f"
+completion_commit = "e33f8496de369b8fc6364007a59a0a1fb4ca9e9f"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This bounded in-process child is complete under DEC-0057; the FMT-1507 parent remains BlockedSpec for public LSP, Workspace Edit, range-formatting, format-on-save, and Semantic Transaction authority.",
+  "The edit range uses the accepted original UTF-8 byte-span unit and delegates candidate acceptance to the existing formatter publication boundary.",
+]
+
+[[task]]
 id = "FMT-1508"
 title = "Audit Source separation"
 state = "Done"

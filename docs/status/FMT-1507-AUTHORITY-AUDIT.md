@@ -2,11 +2,11 @@
 
 ## Outcome
 
-FMT-1507 is correctly recorded as `BlockedSpec`. The execution plan lists a
-formatter command, stdin with a logical filename, check mode, document/range
-formatting, format-on-save, and a JSON report, but the accepted authority does
-not define those public behaviors. No formatter CLI command, LSP edit API,
-range protocol, format-on-save hook, or JSON report schema was added.
+FMT-1507 is correctly recorded as `BlockedSpec`. The bounded CLI preview is
+authorized by DEC-0028, and DEC-0057 now supplies an in-process whole-document
+edit value. The accepted authority still does not define the public LSP edit,
+range protocol, format-on-save hook, or Semantic Transaction behavior required
+by the parent task.
 
 The current public CLI is `ling`; the lower-authority plan spelling `zero fmt`
 is stale and is not propagated. The existing `PROTO-CLI` inventory entry remains
@@ -24,6 +24,10 @@ new public protocol.
   canonical Audit Source rendering. The in-process formatter remains available
   only through the accepted library boundary already implemented by FMT-1502
   through FMT-1506.
+- `DEC-0057` authorizes only `FormatEdit`/`format_core_edit`: one original
+  UTF-8 byte-range replacement or no edit. It does not authorize an LSP
+  `TextEdit`, `WorkspaceEdit`, URI, document version, position encoding, or
+  transaction.
 - `docs/SEMANTICS.md` and `docs/LANGUAGE.md` fix the public executable name to
   `ling` and the source extension to `.ling`; the execution-plan `zero` spelling
   cannot override them.
@@ -45,17 +49,18 @@ assumptions:
   transaction fields, reader/writer compatibility, and schema migration.
 
 The lower-authority plan is therefore not sufficient authorization for changing
-CLI behavior or creating a public protocol. This audit intentionally makes no
-semantic choice and adds no experimental marker to implementation code because
-there is no implementation surface to isolate.
+public CLI/LSP behavior or creating a public protocol. The internal edit
+projection is isolated by DEC-0057 and adds no wire or semantic behavior.
 
 ## Tests and evidence
 
-No runtime or public-interface tests were added because there is no accepted
-observable contract to test. The audit itself was checked against:
+The bounded children provide focused tests for the accepted CLI report and
+in-process edit value; no public LSP tests were added. The audit itself was
+checked against:
 
 - the current `crates/ling-cli/src/main.rs` parser and `PROTO-CLI` inventory;
 - `DEC-0003`, `DEC-0015`, and accepted `DEC-0023` clauses;
+- accepted `DEC-0028` and `DEC-0057` clauses;
 - the `ling`/`.ling` requirements in `docs/SEMANTICS.md` and `docs/LANGUAGE.md`;
 - the three registered specification gaps listed above.
 

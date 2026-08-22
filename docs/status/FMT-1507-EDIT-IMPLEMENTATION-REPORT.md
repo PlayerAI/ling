@@ -9,6 +9,8 @@ no edit. The parent `FMT-1507` task remains `BlockedSpec`: this slice does not
 implement LSP methods, Workspace Edits, range formatting, format-on-save, or
 Semantic Transactions.
 
+Implementation commit: `e33f8496de369b8fc6364007a59a0a1fb4ca9e9f`.
+
 ## Normative traceability
 
 - Accepted `DEC-0057` §§1–4 authorizes the `FormatEdit` value and
@@ -24,6 +26,8 @@ Semantic Transactions.
 
 - Added `crates/ling-format/src/edit.rs` with `FormatEdit`,
   `FormatEditError`, and `format_core_edit`.
+- Updated the repository governance/status count assertions so the new
+  Accepted decision and Done task remain covered by aggregate tests.
 - The implementation delegates candidate acceptance to the existing
   `format_core_with_disposition` boundary and emits exactly one replacement
   over the original source bytes when needed.
@@ -57,4 +61,3 @@ Minimal diffs, range formatting, URI and document-version association,
 position encoding, stale-edit guards, `TextEdit`/`WorkspaceEdit` serialization,
 format-on-save, public LSP publication, and Semantic Transaction lifecycle
 remain deferred to the blocked parent and its registered specification gaps.
-
