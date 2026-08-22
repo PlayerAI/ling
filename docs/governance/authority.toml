@@ -1950,3 +1950,16 @@ covers = ["REM-2601 bounded RemoteRef and endpoint boundary evidence", "test-onl
 depends_on = ["DEC-0109", "DEC-0095", "DEC-0096", "DEC-0010", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0111"
+title = "Internal transport-neutral envelope boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0111-transport-neutral-envelope-boundary-evidence.md"
+covers = ["REM-2602 bounded transport-neutral envelope boundary evidence", "test-only envelope field vocabulary", "envelope boundaries without wire/transport semantics"]
+depends_on = ["DEC-0110", "DEC-0096", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

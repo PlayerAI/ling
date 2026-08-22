@@ -2921,3 +2921,29 @@ unresolved_alternatives = [
   "Remote identity allocation/reuse, local/remote equality, endpoint discovery and trust, protocol negotiation, capability-token lifecycle, serialization, network/send Effects, delivery/Fault semantics, incarnation/liveness, partition/retry/order, migration, diagnostics, resource limits, runtime ABI, and transport behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2601.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0111"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0111-transport-neutral-envelope-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all eighteen provisional envelope boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep canonical field encoding, required/optional/extension rules, version negotiation, identity/schema binding, deadline/cancellation units, delivery and retry semantics, payload/checksum bytes, authentication, resources, diagnostics, migration, partition, security, cross-process, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public envelope, serializer, or remote protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Canonical bytes and field encoding, extension/version negotiation, identity and schema binding, deadline/cancellation units, delivery/retry/order, payload serialization/checksum, authentication/privacy, resource limits, diagnostics, migration, transport adapters, runtime ABI, and cross-process behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2602.",
+]
+superseded_by = ""
