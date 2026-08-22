@@ -332,6 +332,7 @@
 | `PROF-5102` | Forbidden Capability Checks | `G5` | `M` | `BlockedSpec` | `PROF-5101` | `` |
 | `PROF-5102-OBSERVATION` | Internal forbidden-capability boundary evidence | `G5` | `S` | `Done` | `PROF-5101-OBSERVATION` | `3c6a27a0afed8a503c312358cff6dc85d7760514` |
 | `PROF-5103` | Profile Composition | `G5` | `M` | `BlockedSpec` | `PROF-5102` | `` |
+| `PROF-5103-OBSERVATION` | Internal Profile Composition boundary evidence | `G5` | `S` | `Done` | `PROF-5102-OBSERVATION` | `2edc80e7e24e9479ebb2e7c6a9367143c5ecd109` |
 | `PROF-5104` | Profile Audit and LSP | `G5` | `M` | `BlockedSpec` | `PROF-5103` | `` |
 | `PROOF-5501` | Proof IR | `G5` | `L` | `BlockedSpec` | `CTR-5405` | `` |
 | `PROOF-5502` | Independent Checker | `G5` | `L` | `BlockedSpec` | `PROOF-5501` | `` |

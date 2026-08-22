@@ -18671,10 +18671,10 @@ acceptance = [
   "cargo test -p ling-types --test profile_composition_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "2edc80e7e24e9479ebb2e7c6a9367143c5ecd109"
+completion_commit = "2edc80e7e24e9479ebb2e7c6a9367143c5ecd109"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0179; PROF-5103 remains BlockedSpec for profile schema, merge/precedence/conflict algebra, effective-profile serialization, identity/build/cache integration, diagnostics, migration, CLI/editor integration, and support claims.",
   "No profile composition API, effective-profile schema, digest, Program ID change, dependency, target package, manifest, diagnostic, CLI/LSP option, runtime, or Unicode behavior was added.",
