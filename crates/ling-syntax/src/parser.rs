@@ -3,7 +3,7 @@ use ling_source::{SourceFile, Span};
 
 use crate::cst::{CstNode, NodeKind, SyntaxTree};
 use crate::lexer::{LexError, lex};
-use crate::token::{Token, TokenKind};
+use crate::token::{Token, TokenKind, TokenValue};
 
 const MAX_PARSE_DEPTH: usize = 512;
 
@@ -887,6 +887,11 @@ impl<'tokens> Parser<'tokens> {
         let start = self.position;
         match self.current_kind() {
             TokenKind::Identifier => {
+                if self.is_contextual("handle") {
+                    if let Some(handler) = self.parse_handle_expression() {
+                        return handler;
+                    }
+                }
                 self.bump_any();
                 CstNode::new(NodeKind::NameExpression, start..self.position, Vec::new())
             }
@@ -1022,6 +1027,77 @@ impl<'tokens> Parser<'tokens> {
         CstNode::new(NodeKind::ListExpression, start..self.position, children)
     }
 
+    /// Parses the experimental, parser-only handler projection authorized by
+    /// DEC-0064. A failed shape probe restores both cursor and diagnostics so
+    /// contextual identifiers remain ordinary Seed names.
+    fn parse_handle_expression(&mut self) -> Option<CstNode> {
+        let saved_position = self.position;
+        let saved_errors = self.errors.len();
+        let start = self.position;
+        if !self.eat_contextual("handle") {
+            return None;
+        }
+
+        let body = self.parse_non_assignment_expression();
+        if !self.at(TokenKind::With) {
+            self.position = saved_position;
+            self.errors.truncate(saved_errors);
+            return None;
+        }
+        self.bump(TokenKind::With);
+        if !self.eat_newlines(false) {
+            self.unexpected(&[TokenKind::Newline], "handler clauses");
+        }
+        if !self.eat(TokenKind::Indent) {
+            self.unexpected(&[TokenKind::Indent], "handler clauses");
+        }
+        self.eat_newlines(false);
+
+        let mut children = vec![body];
+        let mut clause_count = 0;
+        while self.is_contextual("operation") && !self.at(TokenKind::Dedent) {
+            children.push(self.parse_handler_clause());
+            clause_count += 1;
+            self.eat_newlines(false);
+        }
+        if clause_count == 0 {
+            self.unexpected(&[TokenKind::Identifier], "handler clauses");
+        }
+        self.expect(TokenKind::Dedent, "handler clauses");
+        Some(CstNode::new(
+            NodeKind::HandleExpression,
+            start..self.position,
+            children,
+        ))
+    }
+
+    fn parse_handler_clause(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect_contextual("operation", "handler operation clause");
+        children.push(self.parse_qualified_name("handler operation name"));
+        self.expect(TokenKind::LeftParen, "handler operation parameters");
+        if !self.at(TokenKind::RightParen) {
+            loop {
+                children.push(self.parse_pattern("handler operation parameter"));
+                if !self.eat(TokenKind::Comma) {
+                    break;
+                }
+                if self.at(TokenKind::RightParen) {
+                    break;
+                }
+                if self.is_contextual("resume") {
+                    self.bump_any();
+                    break;
+                }
+            }
+        }
+        self.expect(TokenKind::RightParen, "handler operation parameters");
+        self.expect(TokenKind::RightArrow, "handler operation clause");
+        children.push(self.parse_body_expression("handler operation body"));
+        CstNode::new(NodeKind::HandlerClause, start..self.position, children)
+    }
+
     fn begin_operator_continuation(&mut self, context: &'static str) -> bool {
         if !self.at(TokenKind::Newline) && !self.at(TokenKind::SoftNewline) {
             return false;
@@ -1135,6 +1211,29 @@ impl<'tokens> Parser<'tokens> {
 
     fn current_token(&self) -> &Token {
         &self.tokens[self.next_nontrivia_index(self.position)]
+    }
+
+    fn is_contextual(&self, spelling: &str) -> bool {
+        matches!(
+            self.current_token().value(),
+            Some(TokenValue::Identifier(identifier))
+                if identifier.identifier().normalized() == spelling
+        )
+    }
+
+    fn eat_contextual(&mut self, spelling: &str) -> bool {
+        if self.current_kind() == TokenKind::Identifier && self.is_contextual(spelling) {
+            self.bump_any();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn expect_contextual(&mut self, spelling: &'static str, context: &'static str) {
+        if !self.eat_contextual(spelling) {
+            self.unexpected(&[TokenKind::Identifier], context);
+        }
     }
 
     fn next_nontrivia_index(&self, mut index: usize) -> usize {
@@ -1320,6 +1419,36 @@ mod tests {
         ));
 
         assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+    }
+
+    #[test]
+    fn parses_experimental_handler_cst_without_reserving_contextual_names() {
+        let parsed = parse_text(
+            "let main value =\n    handle value with\n        operation Clock.now() -> 1\n        operation Random.next(seed, resume) -> seed\n\nlet handle = 1\nlet use_handle = handle\n",
+        );
+
+        assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+        let declarations = parsed.tree().root().children();
+        let let_body = declarations[0].children().last().expect("let body");
+        let handler = let_body.children().first().expect("handler expression");
+        assert_eq!(handler.kind(), NodeKind::HandleExpression);
+        assert_eq!(handler.children().len(), 3);
+        assert_eq!(handler.children()[1].kind(), NodeKind::HandlerClause);
+        assert_eq!(handler.children()[2].kind(), NodeKind::HandlerClause);
+        assert_eq!(declarations[1].kind(), NodeKind::LetDeclaration);
+        assert_eq!(declarations[2].kind(), NodeKind::LetDeclaration);
+    }
+
+    #[test]
+    fn rejects_incomplete_experimental_handler_shapes() {
+        for source in [
+            "let value =\n    handle value with\n",
+            "let value =\n    handle value with\n        operation Clock.now() 1\n",
+        ] {
+            let parsed = parse_text(source);
+            assert!(!parsed.is_valid(), "unexpectedly accepted `{source}`");
+            assert!(parsed.parse_errors().len() < 8);
+        }
     }
 
     #[test]

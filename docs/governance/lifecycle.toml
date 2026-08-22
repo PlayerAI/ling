@@ -1738,6 +1738,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0064"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0064-handler-source-cst-projection.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Parse one and multiple operation clauses, indented bodies, nested match-with expressions, Unicode names, BOM, and CRLF while asserting exact CST child order and original spans.",
+  "Reject missing delimiters, indentation, clauses, qualified names, parameter lists, arrows, and bodies with bounded parser errors.",
+  "Verify contextual handle/operation/resume bindings remain valid outside the recognized handler shape and AST lowering rejects the experimental CST kind.",
+  "Repeat independent parsing and compare deterministic token/CST projections without exposing host paths, allocation order, or debug formatting.",
+]
+compatibility_impact = [
+  "Adds only an Experimental parser/CST node kind; Seed source, existing diagnostics, Semantic IDs, schemas, CLI, LSP, bytecode, VM, protocols, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Operation signatures, binding identity, resume typing, return/recovery clauses, effect checking, nested propagation, State/Fault/cancellation, Task/Actor crossing, AST/HIR lowering, and runtime execution require later Accepted authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0006"
 kind = "RFC"
 status = "Accepted"

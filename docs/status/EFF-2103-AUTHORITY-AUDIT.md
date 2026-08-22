@@ -3,10 +3,11 @@
 ## Outcome
 
 `EFF-2103` remains `BlockedSpec` for the complete `handle`/`with operation`
-source grammar and AST/HIR lowering contract. RFC-0006 is Accepted for the
-first-order Effect/Handler model, DEC-0062 is Accepted for row solving, and
-DEC-0063 authorizes only the bounded `EFF-2103-CORE` checked in-process
-projection. The child does not make the parent complete.
+AST/HIR lowering and checking contract. RFC-0006 is Accepted for the
+first-order Effect/Handler model, DEC-0062 is Accepted for row solving,
+DEC-0063 authorizes the bounded `EFF-2103-CORE` checked projection, and
+DEC-0064 authorizes only the parser/CST `EFF-2103-SYNTAX` child. Neither child
+makes the parent complete.
 
 ## Normative traceability
 
@@ -22,6 +23,8 @@ projection. The child does not make the parent complete.
 - DEC-0063 closes only the checked first-order Core container, clause body
   identities, resume-use invariant, and explicit closed-boundary residual
   diagnostic for `EFF-2103-CORE`.
+- DEC-0064 closes only the contextual, lossless parser/CST shape for
+  `EFF-2103-SYNTAX`; it explicitly rejects AST/HIR publication and execution.
 - Task/Actor crossing, runtime continuations, Fault/cancellation behavior,
   Audit Source schema, interpreter/VM ABI, and public protocol migration remain
   outside these authorities.
@@ -31,15 +34,19 @@ projection. The child does not make the parent complete.
 - The child `EFF-2103-CORE` implements `HandlerCore`, canonical clauses,
   residual-row computation, resume-use validation, source-span evidence, and
   `L-EFFECT-0003` closed-boundary diagnostics in `ling-effects`.
-- No source parser, AST/HIR handler node, TypedProgram integration, evaluator,
-  bytecode instruction, VM handler stack, or public schema has been added.
+- The `EFF-2103-SYNTAX` child now parses a contextual `handle` expression and
+  operation clauses into lossless `HandleExpression`/`HandlerClause` CST nodes;
+  the AST lowerer rejects that experimental node before publication.
+- No AST/HIR handler node, TypedProgram integration, evaluator, bytecode
+  instruction, VM handler stack, or public schema has been added.
 - The existing Seed checker and runtime remain unchanged.
 
 ## Required authority before parent completion
 
 An additional Accepted decision must still define, at minimum:
 
-1. source grammar and exact AST/HIR lowering for `handle` and operation clauses;
+1. exact AST/HIR lowering and checked publication for the parser shape fixed by
+   DEC-0064;
 2. binding identity, lexical scope, operation arguments, return/recovery types,
    resume syntax, source spans, and checked-only publication invariants;
 3. nested propagation, unhandled-effect policy, mutable State/Fault/cancellation

@@ -221,6 +221,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EFF-2102` | G2 | Effect 推导和约束求解 | L | Done | `06-G2-V0.2-CONCURRENT.md:105`, `DEC-0062`, `docs/status/EFF-2102-AUTHORITY-AUDIT.md`, `docs/status/EFF-2102-IMPLEMENTATION-REPORT.md` |
 | `EFF-2103` | G2 | Handler Typed Core 表示 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:115`, `docs/status/EFF-2103-AUTHORITY-AUDIT.md` |
 | `EFF-2103-CORE` | G2 | First-order handler Typed Core projection | S | Done | Accepted `DEC-0063`; see `docs/status/EFF-2103-CORE-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for source syntax/lowering |
+| `EFF-2103-SYNTAX` | G2 | Handler source CST projection | S | Done | Accepted `DEC-0064`; see `docs/status/EFF-2103-SYNTAX-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for AST/HIR lowering and checking |
 | `EFF-2104` | G2 | 解释器与 VM Handler 执行 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:131`, `docs/status/EFF-2104-AUTHORITY-AUDIT.md` |
 | `EFF-2105` | G2 | Effect fuzz/property tests | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:143`, `docs/status/EFF-2105-AUTHORITY-AUDIT.md` |
 | `TASK-2201` | G2 | Task 语法与 Checked Core | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:158`, `docs/status/TASK-2201-AUTHORITY-AUDIT.md` |

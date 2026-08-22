@@ -1261,6 +1261,25 @@ mod tests {
     }
 
     #[test]
+    fn rejects_parser_only_handler_cst_before_ast_publication() {
+        let source = SourceFile::from_bytes(
+            SourceId::new(1),
+            "handler.ling",
+            b"let value =\n    handle value with\n        operation Clock.now() -> 1\n".to_vec(),
+        )
+        .expect("valid UTF-8");
+        let parsed = parse(&source);
+        assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+
+        let error = lower(&source, &parsed).expect_err("handler CST is parser-only");
+        assert_eq!(
+            error.kind(),
+            &LowerErrorKind::UnexpectedNode(NodeKind::HandleExpression)
+        );
+        assert!(error.span().is_some());
+    }
+
+    #[test]
     fn lowers_trait_impl_and_generic_constraint_items() {
         let program = lower_text(
             r#"trait Renderable<'a> =

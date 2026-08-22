@@ -1339,3 +1339,16 @@ covers = ["v0.2 experimental EffectId and EffectLabel", "closed/open Effect rows
 depends_on = ["DEC-0010", "DEC-0012", "RFC-0005", "SEMANTICS", "LANGUAGE", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0064"
+title = "Handler source CST projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0064-handler-source-cst-projection.md"
+covers = ["EFF-2103-SYNTAX contextual handler grammar", "lossless Handler/HandlerClause CST projection", "checked-only parser boundary"]
+depends_on = ["RFC-0006", "DEC-0063"]
+supersedes = []
+stable_basis = true
