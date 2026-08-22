@@ -175,6 +175,7 @@
 | `GOV-0109` | 发布状态机器可读化 | `G0` | `S` | `Done` | `GOV-0108` | `695e40eb6310ba1dcb36580f5feb63b4301ab656` |
 | `GOV-0110` | G0 CI 门禁 | `G0` | `M` | `Done` | `GOV-0101`, `GOV-0102`, `GOV-0103`, `GOV-0104`, `GOV-0105`, `GOV-0106`, `GOV-0107`, `GOV-0108`, `GOV-0109` | `a7f2b03270f0e4a163cd8f927cd56475c5062daf` |
 | `GPU-4601` | Backend Spike and Selection | `G4` | `M` | `BlockedSpec` | — | `` |
+| `GPU-4601-OBSERVATION` | Internal backend spike and selection boundary evidence | `G4` | `S` | `Done` | `DIR-4503-OBSERVATION` | `d67668549aa436367f19792ddaf10e6968d9e9e4` |
 | `GPU-4602` | Backend Adapter | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4603` | Launch and Runtime | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4604` | Differential and Hardware Matrix | `G4` | `M` | `BlockedSpec` | — | `` |
