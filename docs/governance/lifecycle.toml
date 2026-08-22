@@ -2354,3 +2354,27 @@ unresolved_alternatives = [
   "Checked handler operation signatures, binding/resume typing, nested propagation, continuation storage, runtime Fault/State/cancellation, interpreter behavior, bytecode/VM ABI, differential equivalence, syntax stabilization, and migration remain open under EFF-2103 through EFF-2105 and registered Effect gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0089"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0089-task-syntax-rejection-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compile a module followed by a Task-shaped top-level declaration through ling-cli and assert L-SYNTAX-0010, bilingual JSON fields, and the original task byte span.",
+  "Assert no checked snapshot is returned; keep Task grammar, lifecycle, suspension, cancellation, cleanup, runtime, scheduler, bytecode, VM, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds one internal negative CLI fixture and no lexer keyword, grammar, AST/HIR/Core, diagnostic allocation, schema, Semantic ID, runtime, bytecode, VM, ABI, dependency, or Unicode 17.0.0 behavior.",
+  "Reuses the existing L-SYNTAX-0010 parser diagnostic and current UTF-8 byte-span projection.",
+]
+unresolved_alternatives = [
+  "Task grammar, scope identity, parent/child ownership, suspension frames, cancellation propagation, cleanup ordering, Fault aggregation, detach authority, deterministic scheduling, runtime lowering, public protocols, and migration remain open under TASK-2201 through TASK-2206 and GAP-STRUCTURED-TASK-001.",
+]
+superseded_by = ""

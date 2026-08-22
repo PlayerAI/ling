@@ -1664,3 +1664,16 @@ covers = ["EFF-2104 bounded unresolved-handler execution rejection gate", "exist
 depends_on = ["RFC-0006", "DEC-0063", "DEC-0066", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0089"
+title = "Structured Task syntax rejection gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0089-task-syntax-rejection-gate.md"
+covers = ["TASK-2201 bounded Task-shaped syntax rejection gate", "existing L-SYNTAX-0010 parser boundary", "checked-only negative Task evidence"]
+depends_on = ["DEC-0001", "DEC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

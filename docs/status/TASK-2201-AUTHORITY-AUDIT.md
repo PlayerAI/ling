@@ -2,14 +2,17 @@
 
 ## Outcome
 
-`TASK-2201` is correctly recorded as `BlockedSpec`. The G2 plan proposes a
-minimal `task`/`scope`/`let!`/`return` surface and requires Checked Core fields
+`TASK-2201` is correctly recorded as `BlockedSpec`. Accepted `DEC-0089` now
+closes the bounded `TASK-2201-TASK-SYNTAX-REJECTION` evidence child without
+adding a Task grammar. The G2 plan proposes a minimal `task`/`scope`/`let!`/`return` surface and requires Checked Core fields
 for scope identity, parent/child relation, spawn/join, suspension points,
 cancellation, cleanup, and optionally capability-gated detach. The syntax,
 lifecycle, cancellation, suspension, Fault aggregation, and detach contracts
 are not accepted.
 
-No Task grammar, AST/HIR/Typed Core node, task type checker, suspension
+The rejection child proves only that a Task-shaped top-level declaration is
+rejected by the existing bilingual syntax diagnostic before checked snapshot
+publication. No Task grammar, AST/HIR/Typed Core node, task type checker, suspension
 representation, cancellation token field, cleanup region, detach capability,
 diagnostic allocation, or placeholder G2 API was added.
 
@@ -34,6 +37,9 @@ diagnostic allocation, or placeholder G2 API was added.
 - RFC-0020 accepts only host-owned VM cancellation for the existing Seed
   bytecode entry point. It does not define source Task cancellation,
   structured cleanup, suspension, or child Fault propagation.
+- Accepted `DEC-0089` reuses `L-SYNTAX-0010` for negative Task-syntax evidence
+  only; it does not reserve a lexer keyword or authorize any positive Task
+  semantics.
 
 ## Current implementation evidence
 
@@ -49,6 +55,8 @@ diagnostic allocation, or placeholder G2 API was added.
 - Existing VM cancellation is an explicit host-control boundary and cannot be
   reused as source-level Task semantics. No Task conformance, differential,
   scheduler, resource-cleanup, or migration fixture exists.
+- `crates/ling-cli/tests/task_boundary.rs` is the bounded negative fixture; it
+  asserts the original `task` byte span and no checked snapshot.
 
 ## Required authority before implementation
 
@@ -88,12 +96,15 @@ RFC-0001, RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 and the current syntax, AST, HIR, types, effects, evaluator, bytecode, and VM
 crates.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
+No compiler, interpreter, VM, bytecode, diagnostic registry, schema,
+Semantic ID, source-span contract, runtime, scheduler, or Unicode 17.0.0
+behavior changed. The bounded rejection child adds offline test and decision
+evidence only.
 
 ## Intentionally deferred
 
-`TASK-2201` can begin only after an Accepted RFC-0008 (or replacement), a
+The bounded `TASK-2201-TASK-SYNTAX-REJECTION` child is complete under
+`DEC-0089`. Public `TASK-2201` can begin only after an Accepted RFC-0008 (or replacement), a
 resolved `GAP-STRUCTURED-TASK-001`, and the required EFF-2103 handler/Core
 authority. The future implementation must lower only accepted Task syntax to
 checked Typed Core, make every suspension and cleanup edge explicit, preserve

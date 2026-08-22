@@ -249,6 +249,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EFF-2104-REJECTION-GATE` | G2 | Internal unresolved-handler execution rejection gate | S | Done | Accepted `DEC-0088`; see `crates/ling-cli/tests/handler_boundary.rs` and `docs/status/EFF-2104-REJECTION-GATE-IMPLEMENTATION-REPORT.md`; handler runtime remains BlockedSpec |
 | `EFF-2105` | G2 | Effect fuzz/property tests | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:143`, `docs/status/EFF-2105-AUTHORITY-AUDIT.md` |
 | `TASK-2201` | G2 | Task 语法与 Checked Core | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:158`, `docs/status/TASK-2201-AUTHORITY-AUDIT.md` |
+| `TASK-2201-TASK-SYNTAX-REJECTION` | G2 | Internal Task-shaped syntax rejection gate | S | Done | Accepted `DEC-0089`; see `crates/ling-cli/tests/task_boundary.rs` and `docs/status/TASK-2201-REJECTION-GATE-IMPLEMENTATION-REPORT.md`; Task semantics remain BlockedSpec |
 | `TASK-2202` | G2 | Task 状态机 Lowering | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:182`, `docs/status/TASK-2202-AUTHORITY-AUDIT.md` |
 | `TASK-2203` | G2 | 结构化生命周期 Runtime | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:195`, `docs/status/TASK-2203-AUTHORITY-AUDIT.md` |
 | `TASK-2204` | G2 | 确定性测试调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:207`, `docs/status/TASK-2204-AUTHORITY-AUDIT.md` |
