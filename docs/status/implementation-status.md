@@ -99,6 +99,7 @@
 | `DBUF-4401` | Device Types and Capability | `G4` | `M` | `BlockedSpec` | `SIMD-4303` | `` |
 | `DBUF-4401-OBSERVATION` | Internal Device capability boundary evidence | `G4` | `S` | `Done` | `SIMD-4303-OBSERVATION` | `70f1246ace41008ffa355e9f29adf5d76f04c735` |
 | `DBUF-4402` | Buffer Ownership | `G4` | `M` | `BlockedSpec` | `DBUF-4401` | `` |
+| `DBUF-4402-OBSERVATION` | Internal Buffer ownership boundary evidence | `G4` | `S` | `Done` | `DBUF-4401-OBSERVATION` | `c38e5bf24ec017fd4c15ac9bf443947a10b8e57c` |
 | `DBUF-4403` | Transfer Effect | `G4` | `M` | `BlockedSpec` | `DBUF-4402` | `` |
 | `DBUF-4404` | Device Synchronization Model | `G4` | `M` | `BlockedSpec` | `DBUF-4403` | `` |
 | `DIFF-3701` | Interpreter/VM/Native differential harness | `G3` | `L` | `BlockedSpec` | `FFI-3605` | `` |
