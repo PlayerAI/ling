@@ -155,6 +155,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0122` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0122](../decisions/0122-drop-order-boundary-evidence.md) |
 | `DEC-0123` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0123](../decisions/0123-ownership-diagnostic-boundary-evidence.md) |
 | `DEC-0124` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0124](../decisions/0124-ownership-corpus-boundary-evidence.md) |
+| `DEC-0125` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0125](../decisions/0125-managed-object-model-boundary-evidence.md) |
 
 ## Migration boundary
 

@@ -3285,3 +3285,29 @@ unresolved_alternatives = [
   "Legal/illegal oracle semantics, domain invariants, generators/shrinking, state-machine/interleaving, failure/cancellation/restart, deterministic seeds, resource limits, host-failure separation, expected diagnostics/repairs, Unicode spans, migration, and interpreter/VM/Native differential semantics remain open under GAP-OWNERSHIP-MODEL-001, GAP-ACTOR-AWAIT-REENTRY-001, OWN-3207, and missing RFC-N306/RFC-N303/RFC-0007 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0125"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0125-managed-object-model-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all forty provisional Managed object-model boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep object layout, reachability, collection, barrier ordering, weak/finalizer behavior, OOM classification, Profile/FFI rules, diagnostics, and differential semantics deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed tests, source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No object-model diagnostic, schema, Semantic ID, or public protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Object layout and metadata versioning, logical versus pointer identity, root lifetimes, cycle handling, barrier memory ordering, weak-reference and finalization policy, OOM recovery, Profile/FFI/pinning behavior, diagnostics, migration, and interpreter/VM/Native differential semantics remain open under GC-3301, GAP-OWNERSHIP-MODEL-001, and missing RFC-N303/RFC-0007 authority.",
+]
+superseded_by = ""

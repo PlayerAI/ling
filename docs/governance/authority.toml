@@ -2132,3 +2132,16 @@ covers = ["OWN-3207 bounded ownership corpus/property boundary evidence", "test-
 depends_on = ["DEC-0123", "DEC-0122", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0125"
+title = "Internal Managed object-model boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0125-managed-object-model-boundary-evidence.md"
+covers = ["GC-3301 bounded Managed object-model boundary evidence", "test-only object-model vocabulary", "object-model boundaries without runtime/identity/collector semantics"]
+depends_on = ["DEC-0124", "DEC-0117", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
