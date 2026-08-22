@@ -964,3 +964,27 @@ unresolved_alternatives = [
   "URI-to-path resolution, document synchronization, Workspace Edits, Semantic Transactions, snapshot/version guards, cancellation, and stable migration remain future specifications.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0032"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0032-lsp-internal-scheduling-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify canonical Interactive/Analysis/Background ordering and FIFO order within each priority.",
+  "Verify repeated queues produce identical output without timing, worker, transport, request, revision, or result state.",
+  "Verify duplicate identifiers, clear behavior, and sequence exhaustion are deterministic and non-wrapping.",
+]
+compatibility_impact = [
+  "Adds only pub(crate) ling-lsp ordering values; source, language, diagnostics, schemas, Semantic IDs, CLI, wire methods, VM, and Unicode remain unchanged.",
+]
+unresolved_alternatives = [
+  "Debounce, event triggers, fairness, starvation bounds, worker budgets, supersession, cancellation precedence, publication, and protocol lifecycle require a later Accepted LSP-2503 decision.",
+]
+superseded_by = ""

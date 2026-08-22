@@ -9,9 +9,11 @@ requests that do not wait for unrelated workspace builds. No accepted LSP
 event, scheduling, debounce, freshness, fairness, or publication contract
 defines those observable choices.
 
-No debounce timer, priority queue, scheduler policy, stale-result publisher,
-cancellation integration, diagnostic allocation, protocol schema, or
-placeholder LSP service was added.
+Accepted DEC-0032 closes only the bounded `LSP-2503-SCHEDULER` child: an
+internal deterministic priority/FIFO ordering queue over opaque work IDs. No
+debounce timer, public priority queue, scheduler policy, stale-result
+publisher, cancellation integration, diagnostic allocation, protocol schema,
+or placeholder LSP service was added.
 
 ## Normative traceability
 
@@ -22,6 +24,9 @@ placeholder LSP service was added.
   cancellation at publication boundaries. Accepted DEC-0021 defines
   deterministic bounded parallelism for internal pure query jobs. Both
   explicitly keep LSP fields and public protocols out of scope.
+- Accepted DEC-0032 defines only local `Interactive`/`Analysis`/`Background`
+  ordering and FIFO sequencing for an unconnected internal queue; it leaves
+  event timing, fairness, freshness, and publication out of scope.
 - Existing diagnostic semantics and `PROTO-DIAGNOSTIC-JSON` define checked
   diagnostic facts, not `didOpen`/`didChange` triggers, debounce intervals,
   priority classes, or stale replacement.
@@ -44,6 +49,9 @@ placeholder LSP service was added.
   workspace indexing, cancellation, and dependency work share queues or
   budgets, and no implementation can prove that a new revision suppresses all
   older analysis.
+- The scheduler child is deliberately not wired to `LspServer`; it cannot
+  claim debounce, fairness, supersession, cancellation association, or editor
+  latency behavior.
 - No fixture covers edit bursts, timer coalescing, priority inversion or
   starvation, new-revision cancellation, stale results, concurrent requests,
   workspace/index throttling, Unicode/CRLF/BOM, or deterministic scheduling
@@ -87,8 +95,10 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`LSP-2503` can begin after LSP snapshot/version, cancellation, diagnostics,
-overlay/change, and Semantic Transaction lifecycle decisions are Accepted.
-The future implementation must coalesce revisions explicitly, prioritize
-interactive work without starvation, cancel superseded analysis, publish only
-current snapshot results, and keep scheduling timing out of Ling semantics.
+The parent `LSP-2503` can begin after LSP snapshot/version, cancellation,
+diagnostics, overlay/change, and Semantic Transaction lifecycle decisions are
+Accepted. The future implementation must coalesce revisions explicitly,
+prioritize interactive work without starvation, cancel superseded analysis,
+publish only current snapshot results, and keep scheduling timing out of Ling
+semantics. The `LSP-2503-SCHEDULER` child is complete only for the internal
+ordering primitive authorized by DEC-0032.

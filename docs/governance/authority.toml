@@ -910,3 +910,16 @@ covers = ["compiler", "interpreter", "CLI"]
 depends_on = ["CONFORMANCE"]
 supersedes = []
 stable_basis = false
+
+[[document]]
+id = "DEC-0032"
+title = "LSP internal deterministic work ordering boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0032-lsp-internal-scheduling-boundary.md"
+covers = ["internal LSP work ordering", "logical priority/FIFO sequencing", "public scheduling deferral"]
+depends_on = ["DEC-0021", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

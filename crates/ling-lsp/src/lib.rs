@@ -17,6 +17,11 @@ use ling_source::{
 };
 use serde_json::{Map, Value, json};
 
+// DEC-0032 is an internal child boundary; transport/server wiring remains
+// deferred until the parent LSP scheduling contract is Accepted.
+#[allow(dead_code)]
+mod scheduler;
+
 /// Version marker for the current Preview lifecycle protocol.
 pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";
 /// Version marker for the full-text document overlay Preview extension.
