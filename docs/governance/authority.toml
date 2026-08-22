@@ -1872,3 +1872,16 @@ covers = ["REP-2501 bounded determinism-class evidence", "test-only determinism 
 depends_on = ["DEC-0103", "DEC-0102", "DEC-0021", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0105"
+title = "Internal replay-schema field evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0105-replay-schema-field-evidence.md"
+covers = ["REP-2502 bounded replay-schema field evidence", "test-only replay field vocabulary", "replay labels without wire/payload/runtime semantics"]
+depends_on = ["DEC-0104", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

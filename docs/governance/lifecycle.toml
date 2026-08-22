@@ -2765,3 +2765,29 @@ unresolved_alternatives = [
   "Class names and ordering, declaration/inference, composition, observable equivalence, effect/scheduler boundaries, metadata and graph/header placement, versioning, privacy, corruption, divergence, diagnostics, runtime ABI, and migration remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2501.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0105"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0105-replay-schema-field-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert that all thirteen proposed fields are present in local order.",
+  "Compare forward and reversed field insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate field vocabulary.",
+  "Keep payload types, event identity, ordering, checksums, schema versions, migration, privacy/redaction, corruption, divergence, cross-process, differential, and runtime replay fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only vocabulary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public replay or protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Canonical envelope and field types, event IDs, ordering and identity rules, checksum/integrity, class/toolchain/profile/schema metadata, payload framing, migration, privacy/redaction, corruption, divergence, diagnostics, resource limits, and runtime ABI remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2502.",
+]
+superseded_by = ""
