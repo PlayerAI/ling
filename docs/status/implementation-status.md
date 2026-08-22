@@ -181,6 +181,7 @@
 | `LSP-2105` | LSP workspace reload | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2103`, `PRJ-1107` | `` |
 | `LSP-2105-WORKSPACE-SNAPSHOT` | Bounded internal workspace-state snapshot | `G1` | `S` | `Done` | `INC-1402`, `LSP-2103-OVERLAY` | `60566b4cd547c1969c0deec512f11f59069e2e7c` |
 | `LSP-2201` | LSP compiler diagnostic adapter | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
+| `LSP-2201-DIAGNOSTIC-POSITION` | Bounded internal diagnostic span projection | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2201-ORDERING` | `e66669142f5b8720a39157532edd77b8bc46269a` |
 | `LSP-2201-ORDERING` | Internal canonical diagnostic ordering | `G1` | `S` | `Done` | `LSP-2102-NEGOTIATION`, `LSP-2102-SOURCE-MAP` | `9bf092f0fe6fa0c0cabc371c42392d78ad3d3d53` |
 | `LSP-2202` | LSP push diagnostics v0 | `G1` | `M` | `BlockedSpec` | `LSP-2103`, `LSP-2201` | `` |
 | `LSP-2202-BATCH` | Internal immutable diagnostic batch | `G1` | `S` | `Done` | `LSP-2201-ORDERING`, `LSP-2501-SNAPSHOT` | `15f8461582281ae1f9e99250ca6288a8b2d5f3b4` |
