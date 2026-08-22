@@ -481,6 +481,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `MC-5602` | G5 | 探索引擎 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:446`, `docs/status/MC-5602-AUTHORITY-AUDIT.md` |
 | `MC-5602-OBSERVATION` | G5 | Internal Exploration Engine boundary evidence | S | Done | Accepted `DEC-0203`; see `crates/ling-concurrency/tests/exploration_engine_evidence.rs` and `docs/status/MC-5602-OBSERVATION-IMPLEMENTATION-REPORT.md`; state-hash/reduction/result semantics remain BlockedSpec |
 | `MC-5603` | G5 | 报告语义 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:458`, `docs/status/MC-5603-AUTHORITY-AUDIT.md` |
+| `MC-5603-OBSERVATION` | G5 | Internal Model-Check Report boundary evidence | S | Done | Accepted `DEC-0204`; see `crates/ling-concurrency/tests/model_check_report_evidence.rs` and `docs/status/MC-5603-OBSERVATION-IMPLEMENTATION-REPORT.md`; result/counterexample/protocol semantics remain BlockedSpec |
 | `MC-5604` | G5 | Replay Counterexample | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:471`, `docs/status/MC-5604-AUTHORITY-AUDIT.md` |
 | `TIM-5701` | G5 | Timing IR 与 Path | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:477`, `docs/status/TIM-5701-AUTHORITY-AUDIT.md` |
 | `TIM-5702` | G5 | 测量与静态分析分离 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:489`, `docs/status/TIM-5702-AUTHORITY-AUDIT.md` |

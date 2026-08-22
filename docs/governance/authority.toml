@@ -3159,3 +3159,16 @@ covers = ["MC-5602 bounded Exploration Engine boundary evidence", "test-only exp
 depends_on = ["DEC-0202", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0204"
+title = "Internal Model-Check Report boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0204-model-check-report-boundary-evidence.md"
+covers = ["MC-5603 bounded Model-Check Report boundary evidence", "test-only report vocabulary", "report boundaries without result/counterexample/protocol semantics"]
+depends_on = ["DEC-0203", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

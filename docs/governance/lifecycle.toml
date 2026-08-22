@@ -5231,3 +5231,27 @@ unresolved_alternatives = [
   "Projected-model and canonical state/event bytes; state-hash algorithm, version, collision behavior, deduplication and visited-set identity; transition/event ordering, BFS/DFS work queues and tie-breaking; partial-order reduction independence/soundness and reduction-off behavior; depth/step/state/queue/time/memory bounds, cancellation, timeout/resource exhaustion and incomplete/unknown/invalid/malformed/corrupt behavior; result states, counterexample/replay linkage, stable IDs/spans, provenance/checksum/redaction, bounded non-proof wording, assumptions/profile admission, diagnostics, positive/negative/interleaving/reduction/hash-collision/bound-edge/timeout/memory/determinism/replay/Unicode/differential fixtures, protocol inventory, and public support remain open under MC-5602, MC-5601, MC-5603, MC-5604, RFC-K506, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing exploration authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0204"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0204-model-check-report-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty model-check report categories and local order; compare forward/reverse opaque bytes; reject duplicates; require bounded absence, non-proof, and prohibited-safety-claim markers together.",
+  "Defer report/result/counterexample schemas, exit semantics, diagnostics, protocols, and public support until accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing diagnostics and differential reports are not reinterpreted as model-check reports.",
+  "No report enum/schema, result semantics, counterexample payload, exit-code contract, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Versioned report schema and canonical bytes; result validity for CounterexampleFound/NoCounterexampleWithinBounds/Inconclusive/InvalidModel, invalid property, timeout/memory/resource exhaustion, unknown/malformed/corrupt/unsupported-version and fail-closed behavior; model/property/bound/assumption/counterexample/replay/Semantic IDs and source spans; scheduler/time configuration, explored counts and resource disclosure; tool identity, provenance/checksum/signature/redaction, unknown fields/migration and deterministic ordering; counterexample/replay/proof/evidence linkage; independent verification, diagnostics/exit codes, positive/negative and every result-state/bound/counterexample/malformed/Unicode/differential fixture; protocol inventory and public support remain open under MC-5603, MC-5602, MC-5604, RFC-K506, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing report authority.",
+]
+superseded_by = ""
