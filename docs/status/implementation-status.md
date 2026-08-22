@@ -90,6 +90,7 @@
 | `CPU-4203` | Kernel Corpus | `G4` | `M` | `BlockedSpec` | `CPU-4202` | `` |
 | `CPU-4203-OBSERVATION` | Internal Kernel corpus boundary evidence | `G4` | `S` | `Done` | `CPU-4202-OBSERVATION` | `3c1d02592f40ecf9273721062419f9852484d0f8` |
 | `CTR-5401` | Contract Syntax and AST/Core | `G5` | `M` | `BlockedSpec` | `NODE-5307` | `` |
+| `CTR-5401-OBSERVATION` | Internal Contract syntax/Core boundary evidence | `G5` | `S` | `Done` | `NODE-5307-OBSERVATION` | `f26ca7329a439ac29f60372b2dfe87da0c102461` |
 | `CTR-5402` | Contract Status Model | `G5` | `M` | `BlockedSpec` | `CTR-5401` | `` |
 | `CTR-5403` | Runtime Contract Check | `G5` | `M` | `BlockedSpec` | `CTR-5402` | `` |
 | `CTR-5404` | Verification Condition Generation | `G5` | `L` | `BlockedSpec` | `CTR-5403` | `` |

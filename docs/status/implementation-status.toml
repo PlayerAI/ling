@@ -20079,6 +20079,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0192-contract-syntax-core-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -20087,6 +20088,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/CTR-5401-AUTHORITY-AUDIT.md",
+  "docs/decisions/0192-contract-syntax-core-boundary-evidence.md",
+  "docs/status/CTR-5401-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5401-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/tests/contract_syntax_core_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -20106,6 +20111,67 @@ notes = [
   "The repository has no Contract parser/Core forms, obligation checker, runtime assertion path, proof/status schema, L-CONTRACT diagnostic allocation, public Contract protocol, or Contract fixtures; existing verifier invariants are internal host safety only.",
   "The audit does not reinterpret Draft SEMANTICS/LANGUAGE examples, DEC-0012 ContractId inputs, or RFC-0019 differential-contract wording as accepted Contract semantics and creates no parser or schema placeholder.",
   "The audit adds no public protocol, dependency, runtime, schema, diagnostic, or placeholder API; Contract syntax and AST/Core work remains deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "CTR-5401-OBSERVATION"
+title = "Internal Contract syntax/Core boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["NODE-5307-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0191-node-conformance-boundary-evidence.md",
+  "docs/decisions/0192-contract-syntax-core-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/contract_syntax_core_evidence.rs",
+  "docs/decisions/0192-contract-syntax-core-boundary-evidence.md",
+  "docs/status/CTR-5401-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5401-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0192 authorizes only test-local Contract syntax/Core boundary evidence; no parser, AST/Core form, checker, proof/status schema, runtime check, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty Contract claim, expression, purity/effect, identity, status/proof, runtime, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no parser, Core, proof, runtime, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test contract_syntax_core_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "f26ca7329a439ac29f60372b2dfe87da0c102461"
+completion_commit = "f26ca7329a439ac29f60372b2dfe87da0c102461"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0192; CTR-5401 remains BlockedSpec for grammar/Core, effect/purity, obligation identity, status/proof, runtime checks, diagnostics, CLI/editor integration, and support claims.",
+  "No Contract parser, AST/HIR/Core form, checker, runtime, schema, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
