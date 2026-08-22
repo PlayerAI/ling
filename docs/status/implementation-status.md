@@ -311,6 +311,7 @@
 | `PLC-4802` | Static Candidates and Runtime Selection | `G4` | `M` | `BlockedSpec` | `PLC-4801` | `` |
 | `PLC-4802-OBSERVATION` | Internal Placement-selection boundary evidence | `G4` | `S` | `Done` | `PLC-4801-OBSERVATION` | `f721a38c61befd3e9bc10f5fcabdbd0f723f7e9d` |
 | `PLC-4803` | Cost Model v0 | `G4` | `M` | `BlockedSpec` | `PLC-4802` | `` |
+| `PLC-4803-OBSERVATION` | Internal Cost Model boundary evidence | `G4` | `S` | `Done` | `PLC-4802-OBSERVATION` | `22b490bbcc3800b8527cc0d85bbc14c9ba34a9d1` |
 | `PLC-4804` | Placement Explain Output | `G4` | `M` | `BlockedSpec` | `PLC-4803` | `` |
 | `PLC-4805` | Device Binary Cache | `G4` | `M` | `BlockedSpec` | `PLC-4804` | `` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |

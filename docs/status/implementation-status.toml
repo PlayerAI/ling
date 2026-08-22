@@ -18106,10 +18106,10 @@ acceptance = [
   "cargo test -p ling-types --test cost_model_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "22b490bbcc3800b8527cc0d85bbc14c9ba34a9d1"
+completion_commit = "22b490bbcc3800b8527cc0d85bbc14c9ba34a9d1"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0174; PLC-4803 remains BlockedSpec for units, estimator, calibration, uncertainty, policy, profiles, replay/cache, diagnostics, and support claims.",
   "No cost model, dependency, target package, manifest, benchmark API, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",
