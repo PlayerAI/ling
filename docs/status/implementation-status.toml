@@ -14959,6 +14959,7 @@ spec = [
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
   "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/decisions/0147-kernel-capability-matrix-boundary-evidence.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/authority.toml",
@@ -14967,6 +14968,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/KCHK-4101-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4101-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4101-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0147-kernel-capability-matrix-boundary-evidence.md",
+  "crates/ling-types/tests/kernel_capability_matrix_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14976,6 +14985,7 @@ acceptance = [
   "The audit covers machine-readable matrix golden files, canonical bytes, Graph/Audit projection, UTF-8 source maps, positive and negative capability fixtures, bounds/alias/race/numeric/determinism tests, CPU-reference and device-differential evidence, migration, and unsupported-target behavior.",
   "No Kernel syntax, matrix schema, checker pass, Graph field, diagnostic allocation, Device Buffer API, backend, dependency, toolchain, CLI command, editor integration, public protocol, or placeholder API is added while GAP-KERNEL-DEVICE-001 remains Open.",
   "The future implementation must consume checked Typed Core or a verified derivative only, preserve Semantic IDs and original UTF-8 spans, use bilingual L-<DOMAIN>-<NUMBER> diagnostics, retain Unicode 17.0.0 behavior, and keep host/device details out of Ling semantics.",
+  "Accepted DEC-0147 authorizes only test-local Kernel capability-matrix boundary evidence; it does not close matrix/checker/verifier semantics, Graph/Audit projections, CPU reference, Device IR/backends, numeric determinism, diagnostics, protocol integration, or support claims.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14987,6 +14997,62 @@ notes = [
   "The gap register requires an Accepted Kernel authority and CPU reference corpus before implementation. The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Native, memory categories, ownership, diagnostics, schemas, Semantic IDs, source spans, support claims, or Unicode 17.0.0 behavior.",
 ]
+[[task]]
+id = "KCHK-4101-OBSERVATION"
+title = "Internal Kernel capability-matrix boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DAP-3603-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md",
+  "docs/decisions/0147-kernel-capability-matrix-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/kernel_capability_matrix_evidence.rs",
+  "docs/decisions/0147-kernel-capability-matrix-boundary-evidence.md",
+  "docs/status/KCHK-4101-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4101-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0147 authorizes only test-local Kernel capability-matrix boundary evidence; no Kernel syntax, schema, checker, Graph field, capability decision, Device Buffer API, backend, diagnostic, dependency, protocol, or support claim is made.",
+  "The test-local inventory covers sixty provisional boundaries for matrix schema/identifiers/conditions/rejections/profile/target/provenance, Graph/Audit/canonical/migration/order, value/layout/ADT/Managed/Resource/allocation/recursion/loops/calls/dispatch, Effect/Capability and forbidden effects, Device/Buffer/address/alias/race/bounds/overflow, numeric/reduction/target/fallback, Typed Core/verifier, UTF-8/diagnostics/Unicode, fixtures/reference/differential evidence, host exclusions, protocol inventory, public schema, facts, and version compatibility.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no Kernel, checker, capability, Device, diagnostic, Semantic ID, backend, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0147; KCHK-4101 remains BlockedSpec for matrix/schema, checker/verifier, Graph/Audit, CPU reference, Device IR/backends, numeric determinism, diagnostics, protocol integration, and support claims.",
+  "No parser, AST/HIR/Checked Core node, Kernel syntax, matrix schema, checker, Graph/Audit projection, Device Buffer API, backend, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
+]
+
 [[task]]
 id = "KCHK-4102"
 title = "Kernel Effect and Capability checks"

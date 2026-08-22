@@ -2418,3 +2418,16 @@ covers = ["DAP-3603 bounded staged-debugger capability boundary evidence", "test
 depends_on = ["DEC-0145", "DEC-0144", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0147"
+title = "Internal Kernel capability-matrix boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0147-kernel-capability-matrix-boundary-evidence.md"
+covers = ["KCHK-4101 bounded Kernel capability-matrix boundary evidence", "test-only Kernel matrix vocabulary", "Kernel boundaries without checker/device/backend semantics"]
+depends_on = ["DEC-0146", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
