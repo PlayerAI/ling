@@ -1274,3 +1274,16 @@ covers = ["read-only Trait projection identity lookups", "TRAIT-1308-QUERY evide
 depends_on = ["RFC-0022", "DEC-0027", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0060"
+title = "Seed Effect row snapshot"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0060-seed-effect-row-snapshot.md"
+covers = ["Seed closed EffectRow canonical snapshot", "EFF-2101-SEED-ROW evidence"]
+depends_on = ["DEC-0010", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

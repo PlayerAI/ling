@@ -1640,3 +1640,27 @@ unresolved_alternatives = [
   "LSP/JSON-RPC queries, document versions, positions, Workspace Edits, Semantic Transactions, rename, diagnostics, repairs, generic Trait queries, and Stable 1.0 editor compatibility remain later TRAIT-1308 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0060"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0060-seed-effect-row-snapshot.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify mixed Seed rows produce deterministic canonical names independent of insertion order and display spelling.",
+  "Verify duplicate labels remain one entry, pure rows produce an empty snapshot, and repeated snapshots compare equal.",
+  "Verify no paths, host state, allocator identity, future row-variable/handler fields, or wire/schema behavior are projected.",
+]
+compatibility_impact = [
+  "Adds only an in-process ling-effects value over DEC-0010's accepted Seed Effect/State boundary; source, diagnostics, Semantic IDs, schemas, CLI, runtime, bytecode, VM, protocols, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Effect IDs, open/closed rows, operation signatures, polymorphic inference, handlers, resume rules, State masking, Task/Actor effects, v0.2 diagnostics, and migration remain later EFF-2101 authority.",
+]
+superseded_by = ""

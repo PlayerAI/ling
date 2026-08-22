@@ -71,6 +71,39 @@ impl EffectRow {
     fn extend(&mut self, other: &Self) {
         self.0.extend(other.0.iter().cloned());
     }
+
+    /// Projects the current Seed closed row into canonical, path-free names.
+    ///
+    /// This is an in-process observation of the existing row only. It does not
+    /// introduce open rows, row variables, handlers, or Effect selection.
+    #[must_use]
+    pub fn seed_snapshot(&self) -> SeedEffectRowSnapshot {
+        SeedEffectRowSnapshot {
+            canonical_names: self.canonical_names().into_boxed_slice(),
+        }
+    }
+}
+
+/// Deterministic in-process projection of a Seed closed Effect row.
+///
+/// The snapshot carries only canonical effect identities. It intentionally
+/// omits display spelling, source paths, host state, and future v0.2 row
+/// variables or handler metadata.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SeedEffectRowSnapshot {
+    canonical_names: Box<[String]>,
+}
+
+impl SeedEffectRowSnapshot {
+    #[must_use]
+    pub fn canonical_names(&self) -> &[String] {
+        &self.canonical_names
+    }
+
+    #[must_use]
+    pub fn is_pure(&self) -> bool {
+        self.canonical_names.is_empty()
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -1207,5 +1240,31 @@ mod tests {
         });
         assert_eq!(canonical.names(), ["State<A>", "State<Z>"]);
         assert_eq!(canonical.canonical_names(), ["State<a>", "State<z>"]);
+    }
+
+    #[test]
+    fn seed_effect_row_snapshot_is_canonical_and_path_free() {
+        let mut row = EffectRow::default();
+        row.insert(Effect::State {
+            display: "Readable display".to_owned(),
+            identity: "z-state".to_owned(),
+        });
+        row.insert(Effect::ConsoleWrite);
+        row.insert(Effect::State {
+            display: "Other display".to_owned(),
+            identity: "a-state".to_owned(),
+        });
+
+        let snapshot = row.seed_snapshot();
+        assert_eq!(
+            snapshot.canonical_names(),
+            ["Console.Write", "State<a-state>", "State<z-state>"]
+        );
+        assert!(!snapshot.is_pure());
+        assert_eq!(row.seed_snapshot(), snapshot);
+
+        let pure = EffectRow::default().seed_snapshot();
+        assert!(pure.is_pure());
+        assert!(pure.canonical_names().is_empty());
     }
 }
