@@ -1612,3 +1612,16 @@ covers = ["LSP-2401 bounded lexical token source inventory", "existing lexer tok
 depends_on = ["DEC-0002", "DEC-0019", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0085"
+title = "Internal checked-token identity observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0085-lsp-checked-token-identity-observation.md"
+covers = ["LSP-2402 bounded checked-token identity observation", "exact lexical/checked definition span join", "deterministic internal typed-token source"]
+depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -26,6 +26,7 @@ use ling_source::{
 use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
 
+mod checked_token_source_index;
 mod completion_metadata_index;
 mod completion_source_index;
 mod definition_index;
@@ -36,6 +37,7 @@ mod rename_identifier;
 mod token_source_index;
 mod typed_definition_index;
 
+pub use checked_token_source_index::{CheckedTokenSource, CheckedTokenSourceIndex};
 pub use completion_metadata_index::{ResolvedCompletionMetadata, ResolvedCompletionMetadataIndex};
 pub use completion_source_index::{
     ResolvedCompletionSource, ResolvedCompletionSourceIdentity, ResolvedCompletionSourceIndex,
@@ -69,6 +71,7 @@ pub enum QueryKind {
     LineIndex,
     Tokens,
     TokenSourceIndex,
+    CheckedTokenSourceIndex,
     Parse,
     Ast,
     Hir,
@@ -690,6 +693,7 @@ pub struct CompilerDb {
         Result<Arc<ling_semantic::ProjectProgramSnapshot>, ProjectSnapshotError>,
     >,
     token_source_indexes: BTreeMap<QueryKey, Result<Arc<TokenSourceIndex>, String>>,
+    checked_token_source_indexes: BTreeMap<QueryKey, Arc<CheckedTokenSourceIndex>>,
     semantic_fragments: BTreeMap<String, Arc<SemanticModuleFragment>>,
     trace: Vec<QueryEvent>,
 }
@@ -716,6 +720,7 @@ impl CompilerDb {
             semantic_snapshots: BTreeMap::new(),
             project_semantic_snapshots: BTreeMap::new(),
             token_source_indexes: BTreeMap::new(),
+            checked_token_source_indexes: BTreeMap::new(),
             semantic_fragments: BTreeMap::new(),
             trace: Vec::new(),
         }
@@ -855,6 +860,34 @@ impl CompilerDb {
         }
         self.record(QueryKind::TokenSourceIndex, &snapshot, QueryOutcome::Miss);
         result.map_err(|message| QueryError::TokenSourceIndex { message })
+    }
+
+    /// Joins lexical source entries with exact checked definition facts. This
+    /// is an internal identity observation, not semantic-token generation or
+    /// an editor presentation model.
+    pub fn checked_token_source_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<CheckedTokenSourceIndex>, QueryError> {
+        let (key, snapshot, _) = self.source(file)?;
+        if let Some(cached) = self.checked_token_source_indexes.get(&key).cloned() {
+            self.record(
+                QueryKind::CheckedTokenSourceIndex,
+                &snapshot,
+                QueryOutcome::Hit,
+            );
+            return Ok(cached);
+        }
+        let lexical = self.token_source_index(file)?;
+        let typed = self.typed_definition_index(file)?;
+        let index = Arc::new(CheckedTokenSourceIndex::from_indexes(&lexical, &typed));
+        self.checked_token_source_indexes.insert(key, index.clone());
+        self.record(
+            QueryKind::CheckedTokenSourceIndex,
+            &snapshot,
+            QueryOutcome::Miss,
+        );
+        Ok(index)
     }
 
     /// Returns the lossless parse result, including bounded syntax errors.
@@ -2255,6 +2288,45 @@ mod tests {
         assert_eq!(&bytes.bytes()[start..end], "人物".as_bytes());
         assert!(db.trace().iter().any(|event| {
             event.kind() == QueryKind::TokenSourceIndex && event.outcome() == QueryOutcome::Hit
+        }));
+    }
+
+    #[test]
+    fn checked_token_source_index_joins_definition_facts_without_presentation() {
+        let mut db = CompilerDb::new();
+        let file = file(
+            db.set_disk_snapshot(
+                "checked/Main.ling",
+                b"module Main\n\nlet helper = 1\n\nlet main () = helper\n".to_vec(),
+            )
+            .unwrap(),
+        );
+
+        let first = db
+            .checked_token_source_index(file)
+            .expect("checked token source index builds");
+        let repeated = db
+            .checked_token_source_index(file)
+            .expect("checked token source index repeats");
+        assert!(Arc::ptr_eq(&first, &repeated));
+        assert_eq!(first.source_name(), "checked/Main.ling");
+        let helper = first
+            .entries()
+            .iter()
+            .find(|entry| entry.token().text() == "helper")
+            .expect("helper token is present");
+        assert!(helper.definition_id().is_some());
+        assert_eq!(helper.type_display(), Some("Int"));
+        assert_eq!(helper.effects(), Some([].as_slice()));
+        assert!(
+            first
+                .entries()
+                .iter()
+                .any(|entry| { entry.token().text() == "main" && entry.definition_id().is_some() })
+        );
+        assert!(db.trace().iter().any(|event| {
+            event.kind() == QueryKind::CheckedTokenSourceIndex
+                && event.outcome() == QueryOutcome::Hit
         }));
     }
 

@@ -191,6 +191,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2401` | G1/Editor | Token taxonomy RFC/decision | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:339`, `docs/status/LSP-2401-AUTHORITY-AUDIT.md` |
 | `LSP-2401-LEXICAL-SOURCE` | G1/Editor | Internal lexical token source index | S | Done | Accepted `DEC-0084`; see `crates/ling-db/src/token_source_index.rs` and `docs/status/LSP-2401-LEXICAL-SOURCE-IMPLEMENTATION-REPORT.md`; public semantic-token taxonomy remains BlockedSpec |
 | `LSP-2402` | G1/Editor | Typed token generation | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:370`, `docs/status/LSP-2402-AUTHORITY-AUDIT.md` |
+| `LSP-2402-CHECKED-IDENTITY` | G1/Editor | Internal checked-token identity observation | S | Done | Accepted `DEC-0085`; see `crates/ling-db/src/checked_token_source_index.rs` and `docs/status/LSP-2402-CHECKED-IDENTITY-IMPLEMENTATION-REPORT.md`; public typed semantic-token generation remains BlockedSpec |
 | `LSP-2403` | G1/Editor | Full 与 delta | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:374`, `docs/status/LSP-2403-AUTHORITY-AUDIT.md` |
 | `LSP-2404` | G1/Editor | Semantic token fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:378`, `docs/status/LSP-2404-AUTHORITY-AUDIT.md` |
 | `LSP-2501` | G1/Editor | Request snapshot | — | BlockedSpec | Accepted DEC-0030 closes only the internal immutable capture child; public request identity, CompilerHost/query inputs, cancellation, stale publication, and protocol lifecycle remain open; see `docs/status/LSP-2501-AUTHORITY-AUDIT.md` |

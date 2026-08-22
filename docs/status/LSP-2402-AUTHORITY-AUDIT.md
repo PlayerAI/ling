@@ -11,6 +11,9 @@ binding, or semantic-token protocol.
 
 No typed-token generator, syntax-error fallback adapter, source marker,
 protocol field, diagnostic allocation, or placeholder LSP surface was added.
+Accepted DEC-0085 and the bounded `LSP-2402-CHECKED-IDENTITY` child now add
+only an exact join between lexical tokens and existing checked definition
+facts; public typed-token generation remains blocked.
 
 ## Normative traceability
 
@@ -25,6 +28,11 @@ protocol field, diagnostic allocation, or placeholder LSP surface was added.
 - DEC-0012 fixes Semantic IDs/canonical bytes. The registered Semantic Graph
   projections are Experimental and do not define typed-token output or source
   provenance labels.
+- Accepted DEC-0085 authorizes only
+  `CompilerDb::checked_token_source_index`: it joins an existing lexical token
+  with a checked definition when source name and original UTF-8 span are exact,
+  preserving existing Definition ID/type/effect/capability facts without
+  defining presentation categories or fallback states.
 - `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` and
   `GAP-LSP-TRANSACTION-PROTOCOL-001` leave token/graph field stability,
   snapshot/version, stale handling, and migration open. LSP-2401's taxonomy
@@ -46,6 +54,9 @@ protocol field, diagnostic allocation, or placeholder LSP surface was added.
   generic/effect/capability categories, Unicode/CRLF/BOM spans, shadowing,
   deterministic order, stale versions, or the prohibition on unchecked AST
   interpretation.
+- The checked-identity child does not classify references or non-definition
+  tokens and has no fallback, position, version, legend, modifier, or transport
+  fields.
 
 ## Required authority before implementation
 
@@ -76,19 +87,22 @@ belong to the requested document version.
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, RFC-0005,
+DEC-0085,
 `docs/decisions/0027-trait-checked-core-dictionary-witness.md`,
 `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and the `ling-syntax`, `ling-types`, `ling-effects`, `ling-semantic`, and
 `ling-source` crates.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+Only the internal checked-token identity observation changed; no compiler
+language semantics, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
+public source-span projection, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`LSP-2402` can begin after LSP-2401 taxonomy, position/version, Semantic Graph
-lifecycle, and fallback-source decisions are Accepted. The future
+The bounded checked-identity child is complete under DEC-0085. Public
+`LSP-2402` can begin only after LSP-2401 taxonomy, position/version, Semantic
+Graph lifecycle, and fallback-source decisions are Accepted. The future
 implementation must consume checked Typed Core/Resolved HIR, mark parsed
 fallback explicitly, preserve source-span/identity truth, and reject unchecked
 AST interpretation.

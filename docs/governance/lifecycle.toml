@@ -2257,3 +2257,27 @@ unresolved_alternatives = [
   "Semantic-token taxonomy/precedence, declaration/use classification, modifiers, legends, position/version binding, snapshots, negotiation, full/delta transport, stale/cancellation/resource policy, lifecycle, and migration remain LSP-2401 through LSP-2404 and registered gap work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0085"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0085-lsp-checked-token-identity-observation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Join Unicode/BOM/CRLF definition spans and compare source order, existing Definition IDs, type text, effects, capabilities, and empty optional facts.",
+  "Repeat the same checked source and compare immutable equality and cache reuse; edit a definition and verify the query key invalidates the old join.",
+  "Verify identifiers and literals without exact definition spans carry no fabricated facts; keep references, precedence, modifiers, positions, versions, negotiation, cancellation, and transport deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db observation values and an accessor over existing lexer and checked-definition indexes; language, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Checked HIR/Core source precedence, reference identity mapping, semantic-token categories/modifiers/legends, capability redaction, position/version binding, snapshots, negotiation, full/delta transport, stale/cancellation policy, lifecycle, and migration remain LSP-2402 through LSP-2404 and registered gaps.",
+]
+superseded_by = ""
