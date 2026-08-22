@@ -354,6 +354,7 @@
 | `PROF-5104` | Profile Audit and LSP | `G5` | `M` | `BlockedSpec` | `PROF-5103` | `` |
 | `PROF-5104-OBSERVATION` | Internal Profile Audit/LSP boundary evidence | `G5` | `S` | `Done` | `PROF-5103-OBSERVATION` | `7578bdaebbc65043696c4a0cc582258598864f2c` |
 | `PROOF-5501` | Proof IR | `G5` | `L` | `BlockedSpec` | `CTR-5405` | `` |
+| `PROOF-5501-OBSERVATION` | Internal Proof IR boundary evidence | `G5` | `S` | `Done` | `CTR-5407-OBSERVATION` | `defaa5f97ea9c406c5f7012412dc8e0ec6f0c4a3` |
 | `PROOF-5502` | Independent Checker | `G5` | `L` | `BlockedSpec` | `PROOF-5501` | `` |
 | `PROOF-5503` | Assumption Registry | `G5` | `M` | `BlockedSpec` | `PROOF-5502` | `` |
 | `PROTO-6201` | Protocol Registry | `G6` | `L` | `BlockedSpec` | `STAB-6103` | `` |

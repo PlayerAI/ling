@@ -20930,6 +20930,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0199-proof-ir-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -20938,6 +20939,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/PROOF-5501-AUTHORITY-AUDIT.md",
+  "docs/decisions/0199-proof-ir-boundary-evidence.md",
+  "docs/status/PROOF-5501-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROOF-5501-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/tests/proof_ir_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -20957,6 +20962,70 @@ notes = [
   "The repository has no proof IR, certificate/query decoder, proof kernel, assumption registry, source-to-proof mapper, or proof fixtures; the internal Trait solver, bytecode verifier, and Checked Core dictionary witness are unrelated Seed/type/invariant boundaries.",
   "The audit does not reinterpret execution-plan bullets, Draft Contract/TCB sketches, Trait obligations, bytecode verifier invariants, or VM evidence as a proof calculus and creates no proof placeholder.",
   "The audit adds no public protocol, dependency, proof, runtime, schema, diagnostic, or placeholder API; Proof IR remains deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "PROOF-5501-OBSERVATION"
+title = "Internal Proof IR boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CTR-5407-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0015.md",
+  "docs/RFC-0016.md",
+  "docs/RFC-0017.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0198-contract-lsp-zed-boundary-evidence.md",
+  "docs/decisions/0199-proof-ir-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/proof_ir_evidence.rs",
+  "docs/decisions/0199-proof-ir-boundary-evidence.md",
+  "docs/status/PROOF-5501-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROOF-5501-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0199 authorizes only test-local Proof IR boundary evidence; no grammar, parser, certificate, kernel, checker, assumption registry, Contract translation, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty Proof IR, term/theorem/axiom, provenance, Contract/Typed-Core, checking, evidence, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no Proof IR, parser, kernel, checker, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test proof_ir_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "defaa5f97ea9c406c5f7012412dc8e0ec6f0c4a3"
+completion_commit = "defaa5f97ea9c406c5f7012412dc8e0ec6f0c4a3"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0199; PROOF-5501 remains BlockedSpec for proof grammar, representation, parser, certificates, kernel/checker, assumptions, Contract translation, diagnostics, evidence protocol, and support claims.",
+  "No Proof IR grammar, parser, certificate/query format, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
