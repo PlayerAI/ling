@@ -12305,6 +12305,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/OWN-3207-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3207-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3207-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0124-ownership-corpus-boundary-evidence.md",
+  "crates/ling-types/tests/ownership_corpus_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12314,6 +12322,7 @@ acceptance = [
   "The audit covers use-after-move, double Drop, mutable alias, partial move, match/loop/closure, cancellation, Task/Actor, FFI transfer, region escape, automatic-borrow ambiguity, diagnostics/repairs, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No future ownership corpus, property generator, fuzz target, expected diagnostic, error-code allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N306 and Task/Actor/Native/FFI authority are absent.",
   "The future implementation must preserve existing Seed tests, consume accepted types and checked Core only, make generators and seeds deterministic, and publish negative, property, fuzz, interleaving, diagnostic, Profile, and interpreter/VM/Native evidence before claiming v0.3 ownership coverage.",
+  "Accepted DEC-0124 authorizes only test-only ownership corpus/property boundary vocabulary; it does not close legal/illegal outcomes, generators, shrinking, diagnostics, fuzzing, or differential gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12323,6 +12332,62 @@ notes = [
   "OWN-3207 is BlockedSpec by OWN-3201 through OWN-3206, absent RFC-N306/RFC-0007, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, GAP-STRUCTURED-TASK-001, GAP-ACTOR-AWAIT-REENTRY-001, and GAP-NATIVE-BACKEND-ABI-001.",
   "Current repository has Seed conformance, VM differential, diagnostic, parser, project property, and fuzz coverage, but no Resource/Managed/Move/Borrow/Region checker or authoritative future ownership corpus; no future ownership diagnostic oracle or property generator exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, existing test oracles, future ownership corpus, fuzz targets, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3207-OBSERVATION"
+title = "Internal ownership corpus and property boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3206-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md",
+  "docs/decisions/0122-drop-order-boundary-evidence.md",
+  "docs/decisions/0123-ownership-diagnostic-boundary-evidence.md",
+  "docs/decisions/0124-ownership-corpus-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/ownership_corpus_evidence.rs",
+  "docs/decisions/0124-ownership-corpus-boundary-evidence.md",
+  "docs/status/OWN-3207-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3207-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0124 authorizes only test-only ownership corpus/property boundary evidence; no legal/illegal oracle, generator, shrinking, fuzz, diagnostic, property, or ownership semantics are claimed.",
+  "The test-local inventory covers thirty-six provisional boundaries for legal/illegal oracle, Value/Managed/Resource/Copy/Move/Borrow/Region/Drop/alias/partial move, match/loop/closure/Fault/cancellation/Task/Actor/await, FFI transfer, automatic borrow, public lifetime, Profile, generator/shrinking/bounds, interleaving/failure/restart, deterministic seeds/resource limits, host-failure separation, diagnostics/repairs, Unicode spans, deterministic ordering, differentials, migration, and Seed preservation with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no ownership corpus, generator, fuzz target, expected diagnostic, public protocol, or stale zero command is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "a905fc3d8efd7a04d39767a02c662de2d8bf4a5f"
+completion_commit = "a905fc3d8efd7a04d39767a02c662de2d8bf4a5f"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0124; OWN-3207 remains BlockedSpec for ownership outcomes, generators, shrinking, fuzzing, diagnostics, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed tests remain unchanged.",
 ]
 
 [[task]]

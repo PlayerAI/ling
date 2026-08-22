@@ -257,6 +257,7 @@
 | `OWN-3206` | Ownership diagnostics and repairs | `G3` | `L` | `BlockedSpec` | `OWN-3201`, `OWN-3202`, `OWN-3203`, `OWN-3204`, `OWN-3205` | `` |
 | `OWN-3206-OBSERVATION` | Internal ownership-diagnostic and repair boundary evidence | `G3` | `S` | `Done` | `OWN-3205-OBSERVATION` | `6088923b9b8cc1accea7f7283784ac9ef2cd428c` |
 | `OWN-3207` | Negative corpus and property tests | `G3` | `L` | `BlockedSpec` | `OWN-3201`, `OWN-3202`, `OWN-3203`, `OWN-3204`, `OWN-3205`, `OWN-3206` | `` |
+| `OWN-3207-OBSERVATION` | Internal ownership corpus and property boundary evidence | `G3` | `S` | `Done` | `OWN-3206-OBSERVATION` | `a905fc3d8efd7a04d39767a02c662de2d8bf4a5f` |
 | `PKG-6401` | Package Publication Protocol | `G6` | `L` | `BlockedSpec` | `STD-6303` | `` |
 | `PKG-6402` | Hermetic Build | `G6` | `L` | `BlockedSpec` | `PKG-6401` | `` |
 | `PKG-6403` | Registry Minimum Implementation or Deferment Strategy | `G6` | `L` | `BlockedSpec` | `PKG-6402` | `` |
