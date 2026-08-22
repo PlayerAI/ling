@@ -2275,3 +2275,16 @@ covers = ["BACK-3504 bounded Native optimization boundary evidence", "test-only 
 depends_on = ["DEC-0134", "DEC-0133", "DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0136"
+title = "Internal Native reproducible-build boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0136-native-reproducible-build-boundary-evidence.md"
+covers = ["BACK-3505 bounded Native reproducible-build boundary evidence", "test-only reproducibility vocabulary", "build boundaries without toolchain/artifact/provenance/release semantics"]
+depends_on = ["DEC-0135", "DEC-0134", "DEC-0133", "DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
