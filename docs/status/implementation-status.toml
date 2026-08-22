@@ -3723,7 +3723,7 @@ notes = [
 [[task]]
 id = "RC-6901-SEED"
 title = "Seed RC0 internal-freeze inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -3774,10 +3774,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0052 closes only this internal Seed RC0 inventory child; the parent RC-6901 gate remains BlockedSpec for all release exits.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "dc0f2e5ca98b9c705b9932267011c246058db4ec"
+completion_commit = "dc0f2e5ca98b9c705b9932267011c246058db4ec"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects the RC0 negative boundary only; the v0.0.1 Seed report remains distinct from a v1.0 candidate and all release evidence remains deferred.",
   "No release tag, artifact, signature, SBOM, issue disposition, network request, system configuration, or placeholder release API is added.",
