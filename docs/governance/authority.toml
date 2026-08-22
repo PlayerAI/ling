@@ -2496,3 +2496,16 @@ covers = ["CPU-4201 bounded CPU scalar-reference boundary evidence", "test-only 
 depends_on = ["DEC-0151", "DEC-0150", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0153"
+title = "Internal CPU reference-trace boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0153-cpu-reference-trace-boundary-evidence.md"
+covers = ["CPU-4202 bounded CPU reference-trace boundary evidence", "test-only reference-trace vocabulary", "trace boundaries without Kernel execution/protocol semantics"]
+depends_on = ["DEC-0152", "DEC-0151", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

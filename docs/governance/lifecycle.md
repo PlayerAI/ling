@@ -183,6 +183,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0150` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0150](../decisions/0150-kernel-alias-parallel-write-boundary-evidence.md) |
 | `DEC-0151` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0151](../decisions/0151-kernel-core-verifier-boundary-evidence.md) |
 | `DEC-0152` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0152](../decisions/0152-cpu-scalar-reference-boundary-evidence.md) |
+| `DEC-0153` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0153](../decisions/0153-cpu-reference-trace-boundary-evidence.md) |
 
 ## Migration boundary
 

@@ -1,0 +1,30 @@
+# CPU-4202-OBSERVATION Implementation Report
+
+## Scope
+
+This child implements Accepted `DEC-0153` as test-only CPU reference-trace
+boundary evidence. It does not add trace events, a serializer, a test-mode
+CLI, a runtime hook, a differential runner, a diagnostic, or a public
+protocol.
+
+## Implemented
+
+- Test-local inventory for sixty CPU reference-trace boundaries.
+- Explicit local ordering and duplicate rejection.
+- Deterministic opaque evidence bytes for forward/reverse insertion order.
+
+## Verification
+
+- `cargo fmt --all`
+- `cargo test -p ling-types --test cpu_reference_trace_evidence --locked --offline`
+- `cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings`
+
+The full workspace gates and milestone commit binding remain required.
+
+## Compatibility and handoff
+
+Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime,
+bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged. Public
+`CPU-4202` remains `BlockedSpec` for trace events, serialization, CLI/runtime
+integration, redaction/limits, differential evidence, migration, protocol
+integration, and support claims.

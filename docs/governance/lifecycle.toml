@@ -4007,3 +4007,27 @@ unresolved_alternatives = [
   "Verified input and work-item model; map/index/conditional/loop/buffer and reduction semantics; shape/bounds/alias/race, ownership/resource, numeric/tolerance, cancellation, Fault, canonical output/trace, diagnostics, fixtures, migration, CPU/device differential, target rejection, protocol inventory, and backend support remain open under CPU-4201, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0153"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0153-cpu-reference-trace-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty CPU reference-trace boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer event meanings, ordering, sampling, redaction, limits, canonical serialization, diagnostics, migration, differential, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No trace format, CLI, backend, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Event identity/order/payload and observation points; work-item/index and buffer/view identity; operation/reduction/atomic/barrier/Fault semantics; provenance, numeric/determinism, sampling, event/byte limits, truncation, redaction, canonicalization, corruption, migration, fixtures, CPU/device differential, diagnostics, protocol inventory, and public trace status remain open under CPU-4202, CPU-4201, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, and missing authority.",
+]
+superseded_by = ""
