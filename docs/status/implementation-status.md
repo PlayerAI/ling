@@ -313,6 +313,7 @@
 | `PLC-4803` | Cost Model v0 | `G4` | `M` | `BlockedSpec` | `PLC-4802` | `` |
 | `PLC-4803-OBSERVATION` | Internal Cost Model boundary evidence | `G4` | `S` | `Done` | `PLC-4802-OBSERVATION` | `22b490bbcc3800b8527cc0d85bbc14c9ba34a9d1` |
 | `PLC-4804` | Placement Explain Output | `G4` | `M` | `BlockedSpec` | `PLC-4803` | `` |
+| `PLC-4804-OBSERVATION` | Internal Placement-explain boundary evidence | `G4` | `S` | `Done` | `PLC-4803-OBSERVATION` | `5845160677d8d01d1e7035b1ff1ad106c5744630` |
 | `PLC-4805` | Device Binary Cache | `G4` | `M` | `BlockedSpec` | `PLC-4804` | `` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |
 | `PRJ-1102` | Deterministic module discovery | `G1` | `M` | `Done` | `PRJ-1101` | `f76f4953070b9ae555fce24c7dcc2fbf08a36f7a` |
