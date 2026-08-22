@@ -6781,6 +6781,53 @@ notes = [
 ]
 
 [[task]]
+id = "EFF-2101-SEED-ROW"
+title = "Seed EffectRow canonical snapshot"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = []
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0060-seed-effect-row-snapshot.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-effects/src/lib.rs",
+  "docs/decisions/0060-seed-effect-row-snapshot.md",
+  "docs/status/EFF-2101-SEED-ROW-IMPLEMENTATION-REPORT.md",
+  "docs/status/EFF-2101-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0060 authorizes only a read-only snapshot of the existing DEC-0010 Seed closed EffectRow.",
+  "The snapshot exposes deduplicated canonical effect names and pure-row state, independent of insertion order and display spelling.",
+  "Focused ling-effects tests cover mixed rows, duplicate elimination, pure rows, repeated equality, and path-free canonical output.",
+  "No open/closed row variable, EffectId, handler, State masking, new label, diagnostic, schema, protocol, runtime, VM, or v0.2 support claim is added; parent EFF-2101 remains BlockedSpec.",
+]
+verified_against_commit = "fb949ce2b28fc73a1668806952c3f8e790cd6d7a"
+completion_commit = "fb949ce2b28fc73a1668806952c3f8e790cd6d7a"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is the accepted-Seed canonical observation only; it does not implement the RFC-C201/RFC-0006 Effect model.",
+  "The snapshot omits display spelling, paths, host state, allocator identity, row variables, handler metadata, and protocol fields.",
+]
+
+[[task]]
 id = "EFF-2102"
 title = "Effect inference and constraint solving"
 state = "BlockedSpec"

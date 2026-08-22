@@ -8,6 +8,8 @@ signatures, handler inputs and recovery types, explicit Capability separation,
 canonical ordering, a Semantic Graph schema, and examples for `Clock`,
 `Random`, `Console`, `State<T>`, `Task`, and `ActorSend<T>`. Its declared
 dependency `RFC-C201` is not present as an accepted repository authority.
+The bounded child `EFF-2101-SEED-ROW`, authorized by DEC-0060, adds only a
+canonical in-process snapshot of the existing Seed closed row.
 
 No open-row or handler model, new Effect/Capability label, `EffectId`, schema
 field, diagnostic allocation, Semantic ID rule, or placeholder G2 crate/API was
@@ -38,6 +40,9 @@ added.
 - `ling-effects` implements the Seed `EffectRow` as a deterministic set of
   `Console.Write` and parameterized `State` effects, propagates effects through
   the checked call graph, and checks the existing Capability closure.
+- `EffectRow::seed_snapshot` exposes only deduplicated canonical names and
+  pure-row state through `SeedEffectRowSnapshot`; it does not add a v0.2 row
+  variable, handler, label, or wire/schema field.
 - The current checker has no `EffectId`, row-variable constraints,
   open/closed-row distinction, user-defined operations, handler AST/Typed Core,
   resume multiplicity, effect discharge, or unhandled-handler failure model.
@@ -83,15 +88,17 @@ This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/RFC-0001.md`, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and `crates/ling-effects`/`crates/ling-semantic`.
+and `crates/ling-effects`/`crates/ling-semantic`, including the bounded
+`EFF-2101-SEED-ROW` report.
 
 No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
 source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`EFF-2101` can begin after v0.1 exit criteria, RFC-0006 (or an accepted
-replacement), and the structured Task/Actor effect authorities are Accepted.
+`EFF-2101-SEED-ROW` is complete under DEC-0060. The parent `EFF-2101` can
+begin after v0.1 exit criteria, RFC-0006 (or an accepted replacement), and the
+structured Task/Actor effect authorities are Accepted.
 The future implementation must extend the Seed checker from an explicit
 accepted model, preserve canonical deterministic rows, keep Capability
 authorization separate, and provide checked Typed Core plus differential

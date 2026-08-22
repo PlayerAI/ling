@@ -9,6 +9,8 @@ v0.0.1 closed `EffectRow`. The parent `EFF-2101` task remains `BlockedSpec` for
 the v0.2 Effect model because open rows, handlers, State masking, and related
 concurrency authorities are not accepted.
 
+Implementation commit: `fb949ce2b28fc73a1668806952c3f8e790cd6d7a`.
+
 ## Normative traceability
 
 - Accepted DEC-0010 governs the Seed `Console.Write`, `State<T>`, capability,
