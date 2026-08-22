@@ -14574,10 +14574,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "c85e5a8b7f874e1cde3306f7b8a098f7919f1101"
+completion_commit = "c85e5a8b7f874e1cde3306f7b8a098f7919f1101"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0143; DIFF-3702 remains BlockedSpec for registry schema/reader, fail-closed/conflict/expiry policy, allowed predicates, equivalence, numeric/replay/cleanup/scheduling/FFI/target semantics, protocol integration, and cross-target/compiler evidence.",
   "No parser, AST/HIR/Checked Core node, differential harness, allowed-difference registry, comparison predicate, backend exemption, Native adapter, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",

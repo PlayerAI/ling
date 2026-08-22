@@ -97,6 +97,7 @@
 | `DIFF-3701` | Interpreter/VM/Native differential harness | `G3` | `L` | `BlockedSpec` | `FFI-3605` | `` |
 | `DIFF-3701-OBSERVATION` | Internal differential-harness boundary evidence | `G3` | `S` | `Done` | `FFI-3605-OBSERVATION` | `4d43fa0a3ed9144494b82bdc0dbb3e15ab2daf47` |
 | `DIFF-3702` | Allowed-difference registry | `G3` | `M` | `BlockedSpec` | `DIFF-3701` | `` |
+| `DIFF-3702-OBSERVATION` | Internal allowed-difference registry boundary evidence | `G3` | `S` | `Done` | `DIFF-3701-OBSERVATION` | `c85e5a8b7f874e1cde3306f7b8a098f7919f1101` |
 | `DIR-4501` | Device IR Schema | `G4` | `L` | `BlockedSpec` | `DBUF-4404` | `` |
 | `DIR-4502` | Kernel Core to Device IR | `G4` | `M` | `BlockedSpec` | `DIR-4501` | `` |
 | `DIR-4503` | Device IR Canonicalization | `G4` | `M` | `BlockedSpec` | `DIR-4502` | `` |
