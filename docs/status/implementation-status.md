@@ -241,6 +241,7 @@
 | `NIR-3401` | Native IR design | `G3` | `L` | `BlockedSpec` | `GC-3304` | `` |
 | `NIR-3401-OBSERVATION` | Internal Native IR design boundary evidence | `G3` | `S` | `Done` | `GC-3304-OBSERVATION` | `7192361d50163d96946cb7ab2e3f3daf4f670d9d` |
 | `NIR-3402` | Core to Native IR lowering | `G3` | `L` | `BlockedSpec` | `NIR-3401` | `` |
+| `NIR-3402-OBSERVATION` | Internal Native IR lowering boundary evidence | `G3` | `S` | `Done` | `NIR-3401-OBSERVATION` | `ebe22cf01a670c58686a829b476ff6e106599441` |
 | `NIR-3403` | Native IR verifier | `G3` | `M` | `BlockedSpec` | `NIR-3402` | `` |
 | `NODE-5301` | Node Syntax and Semantics | `G5` | `L` | `BlockedSpec` | `BND-5204` | `` |
 | `NODE-5302` | Node Checked Core | `G5` | `M` | `BlockedSpec` | `NODE-5301` | `` |

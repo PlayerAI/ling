@@ -12999,6 +12999,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/NIR-3402-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0130-native-ir-lowering-boundary-evidence.md",
+  "crates/ling-types/tests/native_ir_lowering_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -13008,6 +13016,7 @@ acceptance = [
   "The audit covers unsupported-form rejection, effect/Fault/cleanup paths, deterministic lowering and serialization, source/Unicode/CRLF/BOM spans, target/ABI boundaries, and per-slice interpreter/VM/Native differential fixtures.",
   "No lowering pass, NIR instruction use, native target, ABI adapter, differential protocol, diagnostic, public API, or placeholder G3 crate is added while NIR-3401 and RFC-N304/RFC-0011 plus dependent memory/ownership/Managed/FFI/Task authority are absent.",
   "The future implementation must preserve Seed behavior, consume checked Typed Core only, reject unauthorized forms before execution, keep host layout/timing non-semantic, and publish semantic-preservation, target, ABI, and interpreter/VM/Native evidence before exposing v0.3 lowering.",
+  "Accepted DEC-0130 authorizes only test-only Core-to-Native IR lowering boundary vocabulary; it does not close mappings, translation, ABI, diagnostics, differential, or Native code-generation contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13017,6 +13026,67 @@ notes = [
   "NIR-3402 is BlockedSpec by NIR-3401, absent RFC-N304/RFC-0011 and dependent RFC-N301/RFC-N302/RFC-N303/RFC-N305/RFC-N306, and the open Native/ownership/Task gaps.",
   "The current workspace has no Native IR or lowering pass; existing Seed Typed Core and ling-bytecode VM lowering remain unchanged and no Native differential harness exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "NIR-3402-OBSERVATION"
+title = "Internal Native IR lowering boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["NIR-3401-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "docs/decisions/0127-managed-ffi-boundary-evidence.md",
+  "docs/decisions/0128-managed-profile-boundary-evidence.md",
+  "docs/decisions/0129-native-ir-design-boundary-evidence.md",
+  "docs/decisions/0130-native-ir-lowering-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/native_ir_lowering_evidence.rs",
+  "docs/decisions/0130-native-ir-lowering-boundary-evidence.md",
+  "docs/status/NIR-3402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0130 authorizes only test-only Core-to-Native IR lowering boundary evidence; no lowering pass, NIR instruction, native target, ABI adapter, diagnostic, differential protocol, or backend semantics are claimed.",
+  "The test-local inventory covers forty-six provisional boundaries for the nine planned slices, Checked-Core-only input and unsupported-form rejection, evaluation/representation, memory/borrow/alias/ownership, cleanup/Drop/allocation/GC, Effects/capabilities, Fault/cancellation, source/Semantic IDs, ABI/targets/Profiles/FFI/reentry/runtime library, migration/versioning, deterministic serialization/malformed input, interpreter/VM/Native differential evidence, host/target/nondeterminism exclusions, diagnostics, Unicode spans, bounds, unresolved-AST/HIR rejection, and Seed compatibility with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no lowering, Native IR, ABI, differential, diagnostic, protocol, or code-generation API is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "ebe22cf01a670c58686a829b476ff6e106599441"
+completion_commit = "ebe22cf01a670c58686a829b476ff6e106599441"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0130; NIR-3402 remains BlockedSpec for Core-to-NIR mappings, representation, ownership/cleanup, Effects/Fault, Managed/Resource/Task/Actor operations, ABI/targets, diagnostics, differential evidence, and Native code generation.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
