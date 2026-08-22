@@ -13997,10 +13997,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "a632900b083762a745a6138629074be182ab2a2d"
+completion_commit = "a632900b083762a745a6138629074be182ab2a2d"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0138; FFI-3602 remains BlockedSpec for C representation/layout, calling/linker, span/callback/handle/allocator safety, ownership/lifetime, Error/Fault, target/profile, schema, and cross-target decisions.",
   "No parser/importer, AST/HIR/Checked Core node, layout verifier, compiler/linker probe, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",

@@ -124,6 +124,7 @@
 | `FFI-3601` | FFI declaration model | `G3` | `M` | `BlockedSpec` | `BACK-3505` | `` |
 | `FFI-3601-OBSERVATION` | Internal FFI declaration boundary evidence | `G3` | `S` | `Done` | `BACK-3505-OBSERVATION` | `d254184a0f8a3e123e746c1c2f34973756ff6ba0` |
 | `FFI-3602` | Minimal C ABI interoperability | `G3` | `M` | `BlockedSpec` | `FFI-3601` | `` |
+| `FFI-3602-OBSERVATION` | Internal C ABI interoperability boundary evidence | `G3` | `S` | `Done` | `FFI-3601-OBSERVATION` | `a632900b083762a745a6138629074be182ab2a2d` |
 | `FFI-3603` | FFI shim generator | `G3` | `M` | `BlockedSpec` | `FFI-3602` | `` |
 | `FFI-3604` | Target Primitive Package | `G3` | `M` | `BlockedSpec` | `FFI-3603` | `` |
 | `FFI-3605` | FFI fuzz and sanitizer suite | `G3` | `M` | `BlockedSpec` | `FFI-3604` | `` |
