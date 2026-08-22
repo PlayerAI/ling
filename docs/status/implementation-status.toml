@@ -4447,9 +4447,9 @@ acceptance = [
   "The implementation consumes the ling-source PositionEncoding boundary and does not expose SourceId, host paths, revisions, diagnostics, edits, or transaction state.",
   "No language semantics, diagnostic allocation, schema, Semantic ID, bytecode, VM, CLI, or Unicode 17.0.0 behavior changes are claimed.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working-tree"
+verified_against_commit = "39755afad13db66b429967fe61f20f66a4aea699"
+completion_commit = "39755afad13db66b429967fe61f20f66a4aea699"
+integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "This is the dependency-complete initialize negotiation slice of LSP-2102; the parent remains BlockedSpec for document/snapshot and transaction semantics.",

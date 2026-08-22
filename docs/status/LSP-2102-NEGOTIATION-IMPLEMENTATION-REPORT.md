@@ -46,10 +46,22 @@ bytecode, VM, CLI command set, package identity, or Unicode 17.0.0 data
 changed. Negotiation is process-local and deterministic; client order is the
 only selection input, and unknown labels never change the UTF-16 fallback.
 
+## Verification
+
+The focused negotiation tests and repository gates passed after implementation
+commit `39755afad13db66b429967fe61f20f66a4aea699`:
+
+- `cargo test -p ling-lsp --test position_encoding --locked --offline`
+- `cargo fmt --all -- --check`
+- `cargo clippy --workspace --all-targets --all-features --locked --offline -- -D warnings`
+- `cargo test --workspace --locked --offline --quiet`
+- `xtask governance check-all`, `xtask status verify`, `xtask ci verify`, and
+  `xtask support verify`
+- `git diff --check`
+
 ## Deferred work
 
 Incremental/range edits, document URI mapping, version and snapshot
 preconditions, stale-result and cancellation policy, diagnostics, Workspace
 Edits, and Semantic Transactions remain governed by the parent LSP/semantic
 protocol gaps. No Stable 1.0 editor claim is made.
-
