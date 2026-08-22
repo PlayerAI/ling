@@ -203,6 +203,7 @@
 | `KCHK-4101` | Kernel allowed capability matrix | `G4` | `M` | `BlockedSpec` | — | `` |
 | `KCHK-4101-OBSERVATION` | Internal Kernel capability-matrix boundary evidence | `G4` | `S` | `Done` | `DAP-3603-OBSERVATION` | `dfae551210f494cd67dd2815901de833132db952` |
 | `KCHK-4102` | Kernel Effect and Capability checks | `G4` | `L` | `BlockedSpec` | `KCHK-4101` | `` |
+| `KCHK-4102-OBSERVATION` | Internal Kernel Effect and Capability boundary evidence | `G4` | `S` | `Done` | `KCHK-4101-OBSERVATION` | `4248facc2fe1fef95e20eda30e1ef6bffc593b4a` |
 | `KCHK-4103` | Shape, index, and bounds | `G4` | `L` | `BlockedSpec` | `KCHK-4102` | `` |
 | `KCHK-4104` | Alias and parallel-write conflicts | `G4` | `L` | `BlockedSpec` | `KCHK-4103` | `` |
 | `KCHK-4105` | Kernel Core and verifier | `G4` | `L` | `BlockedSpec` | `KCHK-4104` | `` |
