@@ -329,6 +329,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `GC-3303` | G3 | Managed 与 Native/FFI 边界 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:271`, `docs/status/GC-3303-AUTHORITY-AUDIT.md` |
 | `GC-3303-OBSERVATION` | G3 | Internal Managed/Native/FFI boundary evidence | S | Done | Accepted `DEC-0127`; see `crates/ling-concurrency/tests/managed_ffi_boundary_evidence.rs` and `docs/status/GC-3303-OBSERVATION-IMPLEMENTATION-REPORT.md`; interop/ABI/FFI semantics remain BlockedSpec |
 | `GC-3304` | G3 | Profile 检查 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:282`, `docs/status/GC-3304-AUTHORITY-AUDIT.md` |
+| `GC-3304-OBSERVATION` | G3 | Internal Managed Profile boundary evidence | S | Done | Accepted `DEC-0128`; see `crates/ling-types/tests/managed_profile_evidence.rs` and `docs/status/GC-3304-OBSERVATION-IMPLEMENTATION-REPORT.md`; Profile/no_gc semantics remain BlockedSpec |
 | `NIR-3401` | G3 | Native IR 设计 | L | BlockedSpec | `07-G3-V0.3-NATIVE.md:291`, `docs/status/NIR-3401-AUTHORITY-AUDIT.md` |
 | `NIR-3402` | G3 | Core → Native IR Lowering | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:308`, `docs/status/NIR-3402-AUTHORITY-AUDIT.md` |
 | `NIR-3403` | G3 | IR Verifier | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:324`, `docs/status/NIR-3403-AUTHORITY-AUDIT.md` |

@@ -3363,3 +3363,29 @@ unresolved_alternatives = [
   "Handle representation and generation lifetime, pinning and movement, borrowed-view validity, callback roots and thread attachment, foreign ownership modes, ABI/calling convention/target packages, unwind/reentry and collection during FFI, Profile/no-GC restrictions, diagnostics, migration, security, and interpreter/VM/Native differential semantics remain open under GC-3303, GC-3302, GC-3301, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, and missing RFC-N303/RFC-N304/RFC-N305/RFC-N306/RFC-0007 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0128"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0128-managed-profile-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all forty-four provisional Profile and no_gc boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep Profile syntax/manifests, capability and no_gc propagation, allocation/boundedness, Native-Island transitions, Critical restrictions, assertions/Faults, diagnostics, migration, and differential semantics deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed tests, source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Profile, no_gc, capability, diagnostic, Semantic ID, or public protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Profile identity/versioning and manifests, feature legality and inheritance, no_gc syntax/propagation, Managed allocation and safepoints, Native-Island transitions, Critical boundedness/timing/Fault/security, diagnostics, support matrix, migration, and interpreter/VM/Native differential semantics remain open under GC-3304, GC-3303, GC-3302, GC-3301, GAP-CRITICAL-PROFILE-001, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, and missing RFC-0012/RFC-N303/RFC-N304/RFC-N305/RFC-N306/RFC-0007 authority.",
+]
+superseded_by = ""
