@@ -25,12 +25,17 @@ use ling_source::{
 use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
 
+mod completion_source_index;
 mod definition_index;
 mod reference_index;
 mod reference_span_index;
 mod rename_identifier;
 mod typed_definition_index;
 
+pub use completion_source_index::{
+    ResolvedCompletionSource, ResolvedCompletionSourceIdentity, ResolvedCompletionSourceIndex,
+    ResolvedCompletionSourceKind,
+};
 pub use definition_index::{
     ResolvedDefinitionIndex, ResolvedDefinitionKind, ResolvedDefinitionSymbol,
 };
@@ -962,6 +967,23 @@ impl CompilerDb {
             .ok_or(QueryError::UnknownFile { file })?;
         let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
         Ok(Arc::new(ResolvedReferenceSpanIndex::from_resolved(
+            &resolved,
+        )))
+    }
+
+    /// Builds an immutable inventory of resolver-backed names for future
+    /// completion analysis. This is not a completion response or edit.
+    pub fn resolved_completion_source_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<ResolvedCompletionSourceIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
+        Ok(Arc::new(ResolvedCompletionSourceIndex::from_resolved(
             &resolved,
         )))
     }
@@ -2467,6 +2489,16 @@ mod tests {
         let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
         assert!(matches!(
             db.resolved_reference_index(file),
+            Err(QueryError::InvalidSource { .. })
+        ));
+    }
+
+    #[test]
+    fn resolved_completion_source_index_does_not_publish_after_source_failure() {
+        let mut db = CompilerDb::new();
+        let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
+        assert!(matches!(
+            db.resolved_completion_source_index(file),
             Err(QueryError::InvalidSource { .. })
         ));
     }

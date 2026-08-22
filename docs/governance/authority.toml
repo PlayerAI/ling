@@ -1534,3 +1534,16 @@ covers = ["IDE-2306 bounded rename reference-span observation", "original UTF-8 
 depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0079"
+title = "Internal completion-source inventory"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0079-ide-completion-source-inventory.md"
+covers = ["IDE-2307 bounded completion-source inventory", "resolver-backed definition/binding/import sources", "deterministic internal completion source"]
+depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

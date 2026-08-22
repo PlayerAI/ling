@@ -13,6 +13,11 @@ contract.
 No completion handler, candidate ranking, insertion-text API, protocol field,
 capability disclosure, or placeholder editor surface was added.
 
+The bounded child `IDE-2307-SOURCE-INDEX` only copies resolver-backed
+definitions, bindings, and resolved import aliases into an internal read-only
+source inventory. It does not classify a completion context, filter or rank
+candidates, or apply an edit.
+
 ## Normative traceability
 
 - The execution package is non-normative; its context list and ordering rule do
@@ -38,6 +43,10 @@ capability disclosure, or placeholder editor surface was added.
 
 - `ling-resolve` exposes internal scopes, definitions, references, and module
   resolution; it has no completion context or candidate model.
+- `ling-db::resolved_completion_source_index` now records resolver-backed user
+  definitions, local bindings, and resolved import aliases with exact original
+  UTF-8 spans and existing identities. It has no visibility, ranking,
+  insertion-text, position, version, or publication policy.
 - `ling-types` and `ling-effects` compute checked information internally, but
   no public candidate-to-type/effect/capability presentation policy exists.
 - `ling-source` preserves byte spans and revisions, but no negotiated editor

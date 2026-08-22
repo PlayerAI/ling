@@ -2117,3 +2117,26 @@ unresolved_alternatives = [
   "Rename identity/target/relation/alias policy, Unicode name acceptance, temporary snapshots, multi-file edits, DefinitionId migration, URI/version/position/cancellation/stale/rollback/protocol lifecycle remain open under IDE-2306 and the registered rename/LSP/semantic gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0079"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0079-ide-completion-source-inventory.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify user definitions, local/parameter bindings, explicit import aliases, Unicode, BOM, CRLF, exact original spans, resolver identities, repeated equality, and source/module/name lookups.",
+  "Keep completion contexts, visibility, ranking, insertion text, positions, versions, stale behavior, limits, cancellation, and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db completion-source inventory values and an accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode tables remain unchanged.",
+]
+unresolved_alternatives = [
+  "Completion context grammars, candidate visibility/ranking, type/effect/capability fit, builtins/Prelude/dependency policy, insertion text, formatter interaction, request snapshot/version/position/cancellation/stale behavior, resource limits, protocol lifecycle, and migration remain open under IDE-2307 and the registered LSP/semantic gaps.",
+]
+superseded_by = ""
