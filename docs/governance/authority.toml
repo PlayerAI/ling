@@ -3068,3 +3068,16 @@ covers = ["CTR-5405 bounded Solver/Proof Checker boundary evidence", "test-only 
 depends_on = ["DEC-0195", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0197"
+title = "Internal Contract optimizer boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0197-contract-optimizer-boundary-evidence.md"
+covers = ["CTR-5406 bounded Contract optimizer boundary evidence", "test-only optimizer vocabulary", "optimizer boundaries without trust/admission/transformation semantics"]
+depends_on = ["DEC-0196", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
