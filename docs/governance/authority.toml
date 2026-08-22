@@ -80,6 +80,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0042"
+title = "Seed fault-matrix drift gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0042-seed-fault-matrix-gate.md"
+covers = ["Seed fault matrix", "fault evidence drift gate"]
+depends_on = ["DEC-0022", "RFC-0002", "RFC-0020", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0037"
 title = "CLI internal exit catalog boundary"
 kind = "Decision"

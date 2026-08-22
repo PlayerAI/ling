@@ -46,6 +46,12 @@ bilingual messages.
 
 ## Reproduction evidence
 
+The scenario/state table is checked for drift by the internal governance gate:
+
+```text
+cargo xtask fault verify
+```
+
 The implemented Seed checks are run by the normal locked offline suite:
 
 ```text

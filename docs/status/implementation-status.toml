@@ -13957,6 +13957,7 @@ spec = [
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
   "docs/decisions/0022-disposable-persistent-query-cache.md",
+  "docs/decisions/0042-seed-fault-matrix-gate.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -13972,6 +13973,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/REL-6602-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6602-SEED-IMPLEMENTATION-REPORT.md",
   "docs/testing/FAULT-INJECTION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
@@ -13981,7 +13983,7 @@ acceptance = [
   "The matrix links cache corruption, lock failure-atomicity, and implemented VM resource-limit evidence without claiming an OS crash or unavailable runtime protocol.",
   "The deterministic fault policy records injection point, recovery outcome, cleanup, compatibility, bounded resources, replay input, cross-process expectations, and triage ownership.",
   "The audit preserves Future/Experimental/Unsupported network, device, Actor, replay, proof/evidence, and LSP boundaries and records the G1-G5 release dependency.",
-  "No fault-injection command, network adapter, device simulator, Actor API, replay/proof/evidence decoder, LSP server, diagnostic allocation, or placeholder public surface is added.",
+  "No fault-injection command, network adapter, device simulator, Actor API, replay/proof/evidence decoder, LSP server, diagnostic allocation, or placeholder public surface is added; DEC-0042 closes only the internal Seed matrix child.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13991,6 +13993,50 @@ notes = [
   "REL-6602 is BlockedSpec because the G6 gate depends on G1-G5 exits and no accepted recovery/fault protocol exists for disk/process/remote/device/Actor/replay/proof/evidence/LSP scenarios.",
   "Existing cache corruption, lock transaction, and VM resource tests remain the only Seed-level executable evidence; the matrix does not reinterpret them as a general crash or distributed-system contract.",
   "The audit changes no source semantics, public protocol, diagnostic/schema version, package/lock behavior, CLI, editor integration, dependency, or runtime API and preserves deterministic/offline boundaries.",
+]
+
+[[task]]
+id = "REL-6602-SEED"
+title = "Seed fault-matrix drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REL-6601-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0042-seed-fault-matrix-gate.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/FAULT-INJECTION.md",
+  ".github/workflows/ci.yml",
+]
+artifacts = [
+  "tools/xtask/src/fault.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/testing/FAULT-INJECTION.md",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0042-seed-fault-matrix-gate.md",
+  "docs/status/REL-6602-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask fault verify deterministically validates eleven documented scenarios with one Covered, two Partial, and eight Deferred states.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, and missing deterministic fault-policy phrases.",
+  "The command is included in the existing Seed reproducibility CI gate and does not inject faults or claim crash, sanitizer, or cross-platform release evidence.",
+  "Focused xtask, CI-contract, workspace-test, governance, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "Accepted DEC-0042 closes only this internal Seed matrix gate; REL-6602 remains BlockedSpec for release-level fault seams and future recovery protocols.",
+  "The verifier protects inventory consistency only; the existing Seed tests and later accepted fault seams remain execution evidence.",
 ]
 
 [[task]]

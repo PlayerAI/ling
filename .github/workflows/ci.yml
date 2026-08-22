@@ -44,6 +44,7 @@ jobs:
               cargo test --package ling-cli --test conformance output_is_deterministic --locked --offline
           - name: seed-reproducibility
             command: |
+              cargo xtask fault verify
               cargo xtask fuzz verify
               cargo run --package unicode-gen --locked --offline
               git diff --exit-code -- crates/ling-unicode/src/generated.rs editors/tree-sitter-ling/src/unicode-identifiers.generated.js

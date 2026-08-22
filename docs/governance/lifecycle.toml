@@ -120,6 +120,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0042"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0042-seed-fault-matrix-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask fault verify and assert eleven rows with one Covered, two Partial, and eight Deferred states.",
+  "Mutate an isolated matrix row and verify missing or changed states fail closed.",
+  "Run existing locked Seed fault tests without treating the matrix gate as crash or sanitizer evidence.",
+  "Repeat independent processes and verify no language, runtime, diagnostic, schema, protocol, support, or release-state output is generated.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask documentation validator and CI preflight; no fault injector, recovery API, diagnostic, protocol, or language behavior changes.",
+]
+unresolved_alternatives = [
+  "Portable crash/write seams, network/device/Actor/replay/proof/LSP recovery, crash retention, and cross-platform fault oracles remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

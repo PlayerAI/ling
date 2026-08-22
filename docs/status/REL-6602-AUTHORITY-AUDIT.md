@@ -8,7 +8,8 @@
 
 ## Decision
 
-`REL-6602` is `BlockedSpec` as a release-completion task. The checklist mixes
+`REL-6602` is `BlockedSpec` as a release-completion task. Accepted DEC-0042
+closes only the bounded `REL-6602-SEED` documentation drift gate. The checklist mixes
 implemented Seed persistence/cache boundaries with future network, device,
 Actor, replay, proof/evidence, and language-server systems. There is no
 accepted fault protocol defining the injection point, retry/rollback/commit
@@ -78,7 +79,11 @@ allocation, schema, package/lock behavior, CLI, editor protocol, dependency,
 or public API. It preserves `ling`/`.ling`, original UTF-8 spans, Unicode
 17.0.0, deterministic ordering, and offline builds.
 
+The completed child adds only `cargo xtask fault verify`, which validates the
+eleven documented scenario names/states and required policy phrases; it does
+not inject faults or change any state.
+
 No network adapter, device simulator, Actor restart API, replay/proof/evidence
 decoder, LSP server, fault-injection CLI, or placeholder public surface is
 added. The future scenarios remain deferred until their authorities and
-executable evidence are Accepted.
+executable evidence are Accepted; the parent remains blocked.
