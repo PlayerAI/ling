@@ -1781,3 +1781,16 @@ covers = ["ACT-2303 bounded mailbox observation", "deterministic mailbox identit
 depends_on = ["DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0098"
+title = "Internal Actor turn observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0098-actor-turn-observation.md"
+covers = ["ACT-2304 bounded turn observation", "deterministic turn identities", "turn vocabulary labels without await/reentry semantics"]
+depends_on = ["DEC-0097", "DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -2584,3 +2584,29 @@ unresolved_alternatives = [
   "Capacity units and bounds, queue ownership and quotas, typed send outcomes, Wait suspension, overflow and coalescing semantics, ordering/fairness, cancellation and shutdown, supervision/Fault, local/remote delivery, schema identity, runtime ABI, and migration remain open under the Actor gaps and ACT-2303.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0098"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0098-actor-turn-observation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build observations with optional owners and every structural label and assert deterministic turn-identity ordering.",
+  "Reject zero identities and duplicate turn identities before publication.",
+  "Compare equivalent models with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep await, reentry, state guards, self-send, watchdog, cancellation, supervision, scheduler, runtime, stress, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled checked-data tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public turn protocol, Actor behavior, or v0.2 support claim is registered.",
+]
+unresolved_alternatives = [
+  "Turn lifecycle, await suspension, reentry policy, state-version/borrow guards, self-send ordering, cancellation and Fault cleanup, watchdog observability, scheduler/replay interaction, local/remote behavior, runtime ABI, and migration remain open under the Actor gaps and ACT-2304.",
+]
+superseded_by = ""

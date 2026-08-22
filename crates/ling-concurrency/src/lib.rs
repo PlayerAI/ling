@@ -17,6 +17,7 @@ mod mailbox;
 mod message;
 mod scheduler;
 mod state_machine;
+mod turn;
 
 pub use actor::{
     ActorId, ActorIdentityError, ActorIdentityKind, ActorIdentityModel, ActorInstance,
@@ -42,6 +43,10 @@ pub use scheduler::{
 pub use state_machine::{
     LocalId, MachineIdentityKind, StateEdgeKind, StateId, StateMachineError, StateMachineModel,
     StateNode, StateNodeSpec, StateTransition, StateTransitionSpec, TransitionId,
+};
+pub use turn::{
+    TurnId, TurnIdentityKind, TurnObservation, TurnObservationError, TurnObservationKind,
+    TurnObservationModel, TurnObservationSpec,
 };
 
 macro_rules! id_type {

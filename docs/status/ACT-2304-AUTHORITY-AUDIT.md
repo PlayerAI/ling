@@ -14,6 +14,12 @@ No turn state machine, reentry guard, state-version token, await lowering,
 self-send path, watchdog, scheduler hook, diagnostic, or placeholder G2 API
 was added.
 
+Accepted `DEC-0098` now authorizes the bounded child
+`ACT-2304-TURN-OBSERVATION`, which records only immutable turn identities and
+structural vocabulary labels. It does not close the await, reentry, state
+guard, self-send, watchdog, scheduler, supervision, or runtime gaps described
+below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its alternatives and high-risk
