@@ -309,6 +309,7 @@
 | `PLC-4801` | Placement Constraint Model | `G4` | `M` | `BlockedSpec` | — | `` |
 | `PLC-4801-OBSERVATION` | Internal Placement-constraint boundary evidence | `G4` | `S` | `Done` | `ACC-4702-OBSERVATION` | `74011d062b0f63647f902111e24d310d74fb3976` |
 | `PLC-4802` | Static Candidates and Runtime Selection | `G4` | `M` | `BlockedSpec` | `PLC-4801` | `` |
+| `PLC-4802-OBSERVATION` | Internal Placement-selection boundary evidence | `G4` | `S` | `Done` | `PLC-4801-OBSERVATION` | `f721a38c61befd3e9bc10f5fcabdbd0f723f7e9d` |
 | `PLC-4803` | Cost Model v0 | `G4` | `M` | `BlockedSpec` | `PLC-4802` | `` |
 | `PLC-4804` | Placement Explain Output | `G4` | `M` | `BlockedSpec` | `PLC-4803` | `` |
 | `PLC-4805` | Device Binary Cache | `G4` | `M` | `BlockedSpec` | `PLC-4804` | `` |

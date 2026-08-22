@@ -17994,10 +17994,10 @@ acceptance = [
   "cargo test -p ling-types --test placement_selection_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "f721a38c61befd3e9bc10f5fcabdbd0f723f7e9d"
+completion_commit = "f721a38c61befd3e9bc10f5fcabdbd0f723f7e9d"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0173; PLC-4802 remains BlockedSpec for filtering, runtime selection, policy/cost, profiles, replay, cache, diagnostics, and support claims.",
   "No selector, dependency, target package, manifest, replay API, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",
