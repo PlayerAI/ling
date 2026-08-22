@@ -1930,3 +1930,27 @@ unresolved_alternatives = [
   "Negotiation, URI/document identity, version/stale-result checks, VFS publication, JSON-RPC didChange, Workspace Edits, range transactions, and public compatibility remain LSP-2104 parent work under GAP-LSP-TRANSACTION-PROTOCOL-001.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0071"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0071-lsp-workspace-state-snapshot.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Capture files and workspace inputs inserted in different orders and assert canonical logical-name and WorkspaceInput ordering.",
+  "Capture disk and overlay layers, mutate the VFS afterward, and compare the earlier immutable snapshot byte-for-byte and revision-for-revision.",
+  "Repeat empty, source-only, input-only, and mixed captures over Unicode, BOM, CRLF, and exact UTF-8 bytes; keep watcher, reload, stale-result, URI/version, and LSP fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only an internal ling-source workspace-state value and ling-db accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Workspace roots, watcher/event sources, coalescing, graph rebuild scope, failure-atomic publication, stale results, document versions, and public LSP schemas remain open under the registered project, cache, transaction, and semantic-lifecycle gaps.",
+]
+superseded_by = ""

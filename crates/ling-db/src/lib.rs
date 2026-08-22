@@ -20,7 +20,7 @@ use ling_resolve::{ResolveError, ResolvedModule, ResolvedProgram, resolve};
 use ling_semantic::{self, ProgramSnapshot};
 use ling_source::{
     ChangeEvent, FileOrigin, FileSnapshot, InputChange, LexicalOffset, Revision, SourceError,
-    SourceId, VfsError, VirtualFileSystem, WorkspaceInput,
+    SourceId, VfsError, VirtualFileSystem, WorkspaceInput, WorkspaceStateSnapshot,
 };
 use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
@@ -678,6 +678,13 @@ impl CompilerDb {
     #[must_use]
     pub const fn vfs(&self) -> &VirtualFileSystem {
         &self.vfs
+    }
+
+    /// Captures the visible source and workspace-input state for one
+    /// deterministic in-process compiler observation boundary.
+    #[must_use]
+    pub fn workspace_snapshot(&self) -> WorkspaceStateSnapshot {
+        self.vfs.workspace_snapshot()
     }
 
     pub fn set_disk_snapshot(
@@ -1940,6 +1947,28 @@ mod tests {
             .unwrap();
         let _ = db.parse(file).unwrap();
         assert_eq!(parse_events(&db, file)[0].outcome(), QueryOutcome::Miss);
+    }
+
+    #[test]
+    fn workspace_snapshot_captures_inputs_and_visible_sources() {
+        let mut db = CompilerDb::new();
+        let file = file(
+            db.set_disk_snapshot("Main.ling", b"let main () = ()\n".to_vec())
+                .unwrap(),
+        );
+        db.open_overlay(file, b"let main () = ()\n".to_vec())
+            .unwrap();
+        db.set_workspace_input(WorkspaceInput::Config, b"config-v1".to_vec())
+            .unwrap();
+
+        let snapshot = db.workspace_snapshot();
+        assert_eq!(snapshot.file(file).unwrap().origin(), FileOrigin::Overlay);
+        assert_eq!(snapshot.file(file).unwrap().bytes(), b"let main () = ()\n");
+        assert_eq!(
+            snapshot.input(WorkspaceInput::Config).unwrap().bytes(),
+            b"config-v1"
+        );
+        assert_eq!(snapshot.revision(), db.vfs().revision());
     }
 
     #[test]

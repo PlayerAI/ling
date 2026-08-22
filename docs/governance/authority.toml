@@ -1430,3 +1430,16 @@ covers = ["LSP-2104 bounded position-edit projection", "explicit UTF-8/16/32 com
 depends_on = ["DEC-0029", "DEC-0069", "RFC-0023", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0071"
+title = "Internal workspace-state snapshot"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0071-lsp-workspace-state-snapshot.md"
+covers = ["LSP-2105 bounded workspace-state snapshot", "immutable VFS source/input capture", "canonical workspace observation"]
+depends_on = ["DEC-0019", "RFC-0004", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

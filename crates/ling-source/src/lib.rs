@@ -9,7 +9,7 @@ pub use position::{
 };
 pub use vfs::{
     ChangeEvent, FileOrigin, FileSnapshot, InputChange, Revision, VfsError, VirtualFileSystem,
-    WorkspaceInput, WorkspaceSnapshot, validate_logical_name,
+    WorkspaceInput, WorkspaceSnapshot, WorkspaceStateSnapshot, validate_logical_name,
 };
 
 use std::error::Error;

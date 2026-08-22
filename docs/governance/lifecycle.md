@@ -101,6 +101,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0068` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0068](../decisions/0068-trait-termination-corpus.md) |
 | `DEC-0069` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0069](../decisions/0069-lsp-utf8-edit-primitive.md) |
 | `DEC-0070` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0070](../decisions/0070-lsp-position-edit-projection.md) |
+| `DEC-0071` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0071](../decisions/0071-lsp-workspace-state-snapshot.md) |
 
 ## Migration boundary
 

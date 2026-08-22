@@ -104,6 +104,51 @@ impl WorkspaceSnapshot {
     }
 }
 
+/// An immutable, deterministic capture of the visible workspace state.
+///
+/// This is an in-process compiler boundary only. It contains the visible
+/// source layer, non-source workspace inputs, and the session-local revision
+/// high-water mark; it does not represent an LSP workspace notification,
+/// filesystem watcher event, or serialized protocol message.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct WorkspaceStateSnapshot {
+    revision: Revision,
+    files: Box<[FileSnapshot]>,
+    inputs: Box<[WorkspaceSnapshot]>,
+}
+
+impl WorkspaceStateSnapshot {
+    /// Returns the session-local revision observed for this capture.
+    #[must_use]
+    pub const fn revision(&self) -> Revision {
+        self.revision
+    }
+
+    /// Returns visible source files in canonical logical-name order.
+    #[must_use]
+    pub fn files(&self) -> &[FileSnapshot] {
+        &self.files
+    }
+
+    /// Returns present workspace inputs in their canonical enum order.
+    #[must_use]
+    pub fn inputs(&self) -> &[WorkspaceSnapshot] {
+        &self.inputs
+    }
+
+    /// Finds a captured source file by its session-local identity.
+    #[must_use]
+    pub fn file(&self, id: SourceId) -> Option<&FileSnapshot> {
+        self.files.iter().find(|snapshot| snapshot.id() == id)
+    }
+
+    /// Finds a captured workspace input by kind.
+    #[must_use]
+    pub fn input(&self, kind: WorkspaceInput) -> Option<&WorkspaceSnapshot> {
+        self.inputs.iter().find(|snapshot| snapshot.kind() == kind)
+    }
+}
+
 /// The visible consequence of a file update.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ChangeEvent {
@@ -385,6 +430,33 @@ impl VirtualFileSystem {
                 .then_with(|| left.id().cmp(&right.id()))
         });
         snapshots
+    }
+
+    /// Captures the visible files and workspace inputs atomically from this
+    /// immutable VFS view.
+    ///
+    /// The returned collections are canonical and owned, so later VFS
+    /// mutations cannot change a previously captured workspace state. This is
+    /// deliberately an internal snapshot boundary; it does not publish a
+    /// reload notification or prescribe watcher behavior.
+    #[must_use]
+    pub fn workspace_snapshot(&self) -> WorkspaceStateSnapshot {
+        let files = self.snapshots().into_boxed_slice();
+        let inputs = self
+            .inputs
+            .iter()
+            .map(|(&kind, entry)| WorkspaceSnapshot {
+                kind,
+                revision: entry.revision,
+                bytes: entry.bytes.clone(),
+            })
+            .collect::<Vec<_>>()
+            .into_boxed_slice();
+        WorkspaceStateSnapshot {
+            revision: self.revision(),
+            files,
+            inputs,
+        }
     }
 
     /// Returns the latest session-local revision allocated by this VFS.
@@ -678,5 +750,60 @@ mod tests {
             other => panic!("expected Added, got {other:?}"),
         };
         assert!(second > first);
+    }
+
+    #[test]
+    fn workspace_state_snapshot_is_canonical_and_immutable() {
+        let mut vfs = VirtualFileSystem::new();
+        let z_file = match vfs
+            .set_disk_snapshot("z/Main.ling", b"disk".to_vec())
+            .unwrap()
+        {
+            ChangeEvent::Added { file, .. } => file,
+            other => panic!("expected Added, got {other:?}"),
+        };
+        let a_file = match vfs.set_disk_snapshot("a/Main.ling", b"a".to_vec()).unwrap() {
+            ChangeEvent::Added { file, .. } => file,
+            other => panic!("expected Added, got {other:?}"),
+        };
+        vfs.open_overlay(z_file, b"editor".to_vec()).unwrap();
+        vfs.set_workspace_input(WorkspaceInput::Config, b"config".to_vec())
+            .unwrap();
+        vfs.set_workspace_input(WorkspaceInput::PackageManifest, b"manifest".to_vec())
+            .unwrap();
+
+        let captured = vfs.workspace_snapshot();
+        assert_eq!(captured.revision(), vfs.revision());
+        assert_eq!(
+            captured
+                .files()
+                .iter()
+                .map(FileSnapshot::logical_name)
+                .collect::<Vec<_>>(),
+            ["a/Main.ling", "z/Main.ling"]
+        );
+        assert_eq!(captured.file(z_file).unwrap().bytes(), b"editor");
+        assert_eq!(captured.file(a_file).unwrap().bytes(), b"a");
+        assert_eq!(
+            captured
+                .inputs()
+                .iter()
+                .map(WorkspaceSnapshot::kind)
+                .collect::<Vec<_>>(),
+            [WorkspaceInput::PackageManifest, WorkspaceInput::Config]
+        );
+        assert_eq!(
+            captured
+                .input(WorkspaceInput::PackageManifest)
+                .unwrap()
+                .bytes(),
+            b"manifest"
+        );
+
+        let expected = captured.clone();
+        vfs.set_disk_snapshot("b/Main.ling", b"b".to_vec()).unwrap();
+        vfs.set_workspace_input(WorkspaceInput::Profile, b"profile".to_vec())
+            .unwrap();
+        assert_eq!(captured, expected);
     }
 }
