@@ -2587,3 +2587,16 @@ covers = ["DBUF-4402 bounded Buffer ownership boundary evidence", "test-only Buf
 depends_on = ["DEC-0158", "DEC-0150", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0160"
+title = "Internal Transfer Effect boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0160-transfer-effect-boundary-evidence.md"
+covers = ["DBUF-4403 bounded Transfer Effect boundary evidence", "test-only Transfer Effect vocabulary", "transfer boundaries without Device/ownership/synchronization semantics"]
+depends_on = ["DEC-0159", "DEC-0158", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
