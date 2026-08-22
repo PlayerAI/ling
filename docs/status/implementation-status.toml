@@ -1,6 +1,6 @@
 schema_version = 2
 feature_schema_version = 1
-updated = "2026-08-21"
+updated = "2026-08-22"
 authority = "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md"
 plan_root = "docs/ling_execution_plan"
 recommended_plan_root = "docs/execution"
@@ -13946,9 +13946,9 @@ acceptance = [
   "Graphs without Trait witnesses retain their existing JSON shape; no LSP wire, diagnostics, repairs, CLI, bytecode, VM, or Unicode contract changes.",
   "Full TRAIT-1308 hover/completion/rename/repair/LSP transaction work remains explicitly deferred to the parent task.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working-tree"
+verified_against_commit = "61ea00d8c19c6c5caa51461d4cffb8d2993e59d0"
+completion_commit = "61ea00d8c19c6c5caa51461d4cffb8d2993e59d0"
+integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "Bounded projection slice completed under RFC-0022; parent TRAIT-1308 remains BlockedSpec for the full editor protocol.",

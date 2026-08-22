@@ -48,9 +48,14 @@ surface and does not gain a v0.0.1 or Stable 1.0 support claim.
   rejection.
 - `cargo check -p ling-semantic --locked --offline` passed after the bounded
   implementation was added.
-- Repository governance, status, formatting, Clippy, and workspace evidence
-  are recorded only after the corresponding commands are run for this
-  milestone; no unexecuted CI or platform result is claimed here.
+- `cargo test --workspace --locked --offline --quiet`: passed (including the
+  15 semantic unit tests, 5 project snapshot tests, and 92 xtask tests; one
+  repository test remains explicitly ignored by its existing fixture policy).
+- `cargo clippy --workspace --all-targets --all-features --locked --offline --
+  -D warnings`, `cargo fmt --all -- --check`, and `git diff --check` passed.
+- `target\\debug\\xtask.exe governance check-all`, `status verify`, and `ci
+  verify` passed: 66 governance documents, 28 gaps, 41 lifecycle records, 23
+  protocols, 82 diagnostic codes, and 274 implementation tasks (68 Done).
 
 ## Compatibility and traceability
 

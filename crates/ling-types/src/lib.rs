@@ -971,16 +971,13 @@ impl Inferencer {
             } => {
                 let info = self.resolved.definition(&definition);
                 let name = info
-                    .map(|info| {
-                        let local = match info.origin {
-                            ling_resolve::DefinitionOrigin::User { module: owner }
-                                if owner != module =>
-                            {
-                                format!("{}.{}", info.module_name, info.name)
-                            }
-                            _ => info.name.clone(),
-                        };
-                        local
+                    .map(|info| match info.origin {
+                        ling_resolve::DefinitionOrigin::User { module: owner }
+                            if owner != module =>
+                        {
+                            format!("{}.{}", info.module_name, info.name)
+                        }
+                        _ => info.name.clone(),
                     })
                     .unwrap_or_else(|| definition.to_string());
                 if arguments.is_empty() {
