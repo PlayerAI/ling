@@ -2938,3 +2938,16 @@ covers = ["NODE-5302 bounded Node Checked Core boundary evidence", "test-only No
 depends_on = ["DEC-0185", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0187"
+title = "Internal Node static-scheduling boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0187-node-static-scheduling-boundary-evidence.md"
+covers = ["NODE-5303 bounded Node static-scheduling boundary evidence", "test-only scheduling vocabulary", "schedule boundaries without graph/bridge/WCET/manifest semantics"]
+depends_on = ["DEC-0186", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

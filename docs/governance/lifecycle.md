@@ -217,6 +217,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0184` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0184](../decisions/0184-resource-budget-diagnostics-boundary-evidence.md) |
 | `DEC-0185` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0185](../decisions/0185-node-syntax-semantics-boundary-evidence.md) |
 | `DEC-0186` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0186](../decisions/0186-node-checked-core-boundary-evidence.md) |
+| `DEC-0187` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0187](../decisions/0187-node-static-scheduling-boundary-evidence.md) |
 
 ## Migration boundary
 

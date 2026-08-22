@@ -4823,3 +4823,27 @@ unresolved_alternatives = [
   "Core schema/version; port types and identities; state cells, tick transitions, clock/period/deadline; dependency edges, feedback delay, instantaneous cycles, fixed points and proof; graph identity/order/canonical bytes; source spans and Semantic IDs; ownership/mutability/aliasing, initialization, presence, sampling/commit, visibility, restart/cancellation; Effect/Capability/Task/Actor/Kernel/Device/FFI relations; Fault/Contract, resource/recursion/mailbox bounds; target/WCET/compiler/evidence identity; unknown/unsupported graphs; bilingual diagnostics and facts; graph/cycle/fixed-point/state/clock/Fault/target/migration/Unicode/differential fixtures; protocol inventory and public status remain open under NODE-5302, NODE-5301, GAP-CRITICAL-PROFILE-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-OWNERSHIP-MODEL-001, GAP-NATIVE-BACKEND-ABI-001, GAP-KERNEL-DEVICE-001, and missing RFC-K502 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0187"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0187-node-static-scheduling-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Node static-scheduling boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer graph/schedule analysis, bridges, schedulability/WCET, manifest, diagnostics, CLI/LSP, and runtime protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; internal query scheduling and VM limits are not reinterpreted as Node scheduling semantics.",
+  "No Node scheduler, multi-rate bridge, WCET engine, manifest schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Graph/node/edge identity and topological/legal-cycle order; cycle breaks; clock/rate/period/phase; multi-rate bridge interpolation/decimation, buffering/backpressure/loss/state ownership; priority, release/deadline, jitter, preemption/cooperative execution, admission/schedulability/WCET; target/compiler, interrupt/cache/bus assumptions; release/overrun, Fault, cancellation, restart/recovery/fallback; replay/determinism; manifest version/migration; Critical Profile, Task/Actor, Kernel/Device, memory/queue bounds; unknown schedulability, unsupported bridge, target mismatch; bilingual diagnostics and facts; graph/schedule, rate/clock, bridge, cycle, deadline, target, virtual-clock, replay, Unicode and differential fixtures; protocol inventory and public status remain open under NODE-5303, NODE-5302, GAP-CRITICAL-PROFILE-001, GAP-STRUCTURED-TASK-001, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-DETERMINISTIC-REPLAY-001, and missing RFC-K502 authority.",
+]
+superseded_by = ""
