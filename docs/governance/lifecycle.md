@@ -226,6 +226,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0193` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0193](../decisions/0193-contract-status-model-boundary-evidence.md) |
 | `DEC-0194` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0194](../decisions/0194-contract-runtime-check-boundary-evidence.md) |
 | `DEC-0195` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0195](../decisions/0195-contract-vc-boundary-evidence.md) |
+| `DEC-0196` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0196](../decisions/0196-solver-proof-checker-boundary-evidence.md) |
 
 ## Migration boundary
 

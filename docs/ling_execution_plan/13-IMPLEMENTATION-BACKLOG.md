@@ -465,6 +465,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CTR-5404` | G5 | Verification Condition Generation | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:347`, `docs/status/CTR-5404-AUTHORITY-AUDIT.md` |
 | `CTR-5404-OBSERVATION` | G5 | Internal Contract VC boundary evidence | S | Done | Accepted `DEC-0195`; see `crates/ling-types/tests/contract_vc_evidence.rs` and `docs/status/CTR-5404-OBSERVATION-IMPLEMENTATION-REPORT.md`; proof grammar/translation/soundness remain BlockedSpec |
 | `CTR-5405` | G5 | Solver/Proof Checker Adapter | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:360`, `docs/status/CTR-5405-AUTHORITY-AUDIT.md` |
+| `CTR-5405-OBSERVATION` | G5 | Internal Solver/Proof Checker boundary evidence | S | Done | Accepted `DEC-0196`; see `crates/ling-types/tests/solver_proof_checker_evidence.rs` and `docs/status/CTR-5405-OBSERVATION-IMPLEMENTATION-REPORT.md`; query/certificate/checker/TCB semantics remain BlockedSpec |
 | `CTR-5406` | G5 | 优化器使用 Contract 的规则 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:371`, `docs/status/CTR-5406-AUTHORITY-AUDIT.md` |
 | `CTR-5407` | G5 | Contract LSP/Zed | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:375`, `docs/status/CTR-5407-AUTHORITY-AUDIT.md` |
 | `PROOF-5501` | G5 | Proof IR | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:386`, `docs/status/PROOF-5501-AUTHORITY-AUDIT.md` |
