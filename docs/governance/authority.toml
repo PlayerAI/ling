@@ -2808,3 +2808,16 @@ covers = ["PLC-4805 bounded Device Binary Cache boundary evidence", "test-only d
 depends_on = ["DEC-0175", "DEC-0022", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0177"
+title = "Internal Critical Profile boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0177-critical-profile-boundary-evidence.md"
+covers = ["PROF-5101 bounded Critical Profile boundary evidence", "test-only Critical Profile vocabulary", "profile boundaries without schema/proof semantics"]
+depends_on = ["DEC-0176", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

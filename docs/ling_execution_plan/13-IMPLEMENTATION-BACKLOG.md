@@ -427,6 +427,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PLC-4805` | G4 | 设备二进制缓存 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:495`, `docs/status/PLC-4805-AUTHORITY-AUDIT.md` |
 | `PLC-4805-OBSERVATION` | G4 | Internal Device Binary Cache boundary evidence | S | Done | Accepted `DEC-0176`; see `crates/ling-types/tests/device_binary_cache_evidence.rs` and `docs/status/PLC-4805-OBSERVATION-IMPLEMENTATION-REPORT.md`; cache/Device IR semantics remain BlockedSpec |
 | `PROF-5101` | G5 | 机器可读 Profile | M | BlockedSpec | `09-G5-V0.5-CRITICAL.md:77`, `docs/status/PROF-5101-AUTHORITY-AUDIT.md` |
+| `PROF-5101-OBSERVATION` | G5 | Internal Critical Profile boundary evidence | S | Done | Accepted `DEC-0177`; see `crates/ling-types/tests/critical_profile_evidence.rs` and `docs/status/PROF-5101-OBSERVATION-IMPLEMENTATION-REPORT.md`; profile schema/proof semantics remain BlockedSpec |
 | `PROF-5102` | G5 | 禁止能力检查 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:108`, `docs/status/PROF-5102-AUTHORITY-AUDIT.md` |
 | `PROF-5103` | G5 | Profile Composition | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:122`, `docs/status/PROF-5103-AUTHORITY-AUDIT.md` |
 | `PROF-5104` | G5 | Profile Audit 与 LSP | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:126`, `docs/status/PROF-5104-AUTHORITY-AUDIT.md` |

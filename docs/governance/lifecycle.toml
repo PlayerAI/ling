@@ -4583,3 +4583,27 @@ unresolved_alternatives = [
   "Program/Semantic ID and Device IR/backend/target/runtime/driver/numeric/Profile/compiler-option identity; canonical artifact bytes and validation; capability, signatures, verification, trust, permissions, isolation, publication, concurrency, eviction, limits, disposable/portable policy; hit/miss, corruption/unknown/ABI/capability/environment/options failures; safe recompile, migration, privacy, unstable-host exclusions; fixtures, diagnostics, protocol inventory, and public cache status remain open under PLC-4805, PLC-4804, PLC-4803, PLC-4802, PLC-4801, DEC-0022, GAP-INCREMENTAL-CACHE-001, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0177"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0177-critical-profile-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Critical Profile boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer profile schema/reader/writer, selection/composition, checker/proof semantics, diagnostics, CLI/editor integration, and support behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Critical Profile format, parser, CLI option, dependency, target package, checker/proof API, diagnostic, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Schema/version/lifecycle, language/spec/compiler/stdlib/target/scheduler identity; effect/capability/memory/numeric/concurrency/FFI policies; verification requirements, forbidden capabilities and Assumed/Unknown/Proved state; canonical fields/defaults/unknown handling; migration/composition/override/conflict and project/CLI precedence; Semantic ID/reproducibility/evidence binding; obligations/non-claims; privacy and unstable-host exclusions; fixtures, diagnostics, protocol inventory, and public Critical status remain open under PROF-5101, PROF-5102, GAP-CRITICAL-PROFILE-001, GAP-KERNEL-DEVICE-001, and missing RFC-K501/RFC-0012 authority.",
+]
+superseded_by = ""
