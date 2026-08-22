@@ -98,6 +98,7 @@
 | `CTR-5404` | Verification Condition Generation | `G5` | `L` | `BlockedSpec` | `CTR-5403` | `` |
 | `CTR-5404-OBSERVATION` | Internal Contract VC boundary evidence | `G5` | `S` | `Done` | `CTR-5403-OBSERVATION` | `e8c3a94a4b85fe3ce4b55816f109b99672591d32` |
 | `CTR-5405` | Solver/Proof Checker Adapter | `G5` | `L` | `BlockedSpec` | `CTR-5404` | `` |
+| `CTR-5405-OBSERVATION` | Internal Solver/Proof Checker boundary evidence | `G5` | `S` | `Done` | `CTR-5404-OBSERVATION` | `f1bfe47d79e7a34b3fa46e2e61f31993009f28a0` |
 | `CTR-5406` | Contract-aware optimizer rules | `G5` | `M` | `BlockedSpec` | `CTR-5405` | `` |
 | `CTR-5407` | Contract LSP/Zed | `G5` | `L` | `BlockedSpec` | `CTR-5406`, `LSP-2205` | `` |
 | `DAP-3601` | Debugger stdio adapter | `G3+` | `L` | `BlockedSpec` | `DIFF-3702` | `` |
