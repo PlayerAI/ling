@@ -286,6 +286,7 @@
 | `NIR-3403` | Native IR verifier | `G3` | `M` | `BlockedSpec` | `NIR-3402` | `` |
 | `NIR-3403-OBSERVATION` | Internal Native IR verifier boundary evidence | `G3` | `S` | `Done` | `NIR-3402-OBSERVATION` | `138a8671c22a7a8e04376b7b0440f2ab6f532ef7` |
 | `NODE-5301` | Node Syntax and Semantics | `G5` | `L` | `BlockedSpec` | `BND-5204` | `` |
+| `NODE-5301-OBSERVATION` | Internal Node syntax/semantics boundary evidence | `G5` | `S` | `Done` | `BND-5204-OBSERVATION` | `157e3cf79e6d35af6eae4568b55138f97257c1f4` |
 | `NODE-5302` | Node Checked Core | `G5` | `M` | `BlockedSpec` | `NODE-5301` | `` |
 | `NODE-5303` | Static Node Scheduling | `G5` | `M` | `BlockedSpec` | `NODE-5302` | `` |
 | `NODE-5304` | Virtual-Time Reference Runtime | `G5` | `M` | `BlockedSpec` | `NODE-5303` | `` |

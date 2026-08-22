@@ -19273,6 +19273,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0185-node-syntax-semantics-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -19281,6 +19282,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/NODE-5301-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5301-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5301-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0185-node-syntax-semantics-boundary-evidence.md",
+  "crates/ling-types/tests/node_syntax_semantics_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -19300,6 +19309,62 @@ notes = [
   "The repository implements only the v0.0.1 Seed Core; Node is explicitly reserved and has no parser, Typed Core lowering, logical clock, scheduler, timing model, or fixtures.",
   "The audit does not reinterpret Node sketches or VM limits as accepted syntax, real-time guarantees, deadline semantics, or target support, and does not create a `node` placeholder.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; Node work remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "NODE-5301-OBSERVATION"
+title = "Internal Node syntax/semantics boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BND-5204-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0184-resource-budget-diagnostics-boundary-evidence.md",
+  "docs/decisions/0185-node-syntax-semantics-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/node_syntax_semantics_evidence.rs",
+  "docs/decisions/0185-node-syntax-semantics-boundary-evidence.md",
+  "docs/status/NODE-5301-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5301-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0185 authorizes only test-local Node syntax/semantics boundary evidence; no node grammar, Core form, runtime, clock, scheduler, timing, Fault, dependency, target, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty Node syntax/semantics, ports/state/timing/clock/composition, target evidence, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no parser, Core, clock, scheduler, runtime, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test node_syntax_semantics_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "157e3cf79e6d35af6eae4568b55138f97257c1f4"
+completion_commit = "157e3cf79e6d35af6eae4568b55138f97257c1f4"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0185; NODE-5301 remains BlockedSpec for grammar/Core/runtime, ports/state/tick/clock, scheduling/WCET, deadline/overrun/Fault, resource/ownership/concurrency, diagnostics, CLI/editor integration, and support claims.",
+  "No node parser, NodeStep Core variant, scheduler, timing model, target schema, runtime, dependency, diagnostic, CLI/LSP action, or Unicode behavior was added.",
 ]
 [[task]]
 id = "NODE-5302"
