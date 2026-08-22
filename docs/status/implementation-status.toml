@@ -11528,6 +11528,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/MEM-3104-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3104-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3104-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0117-managed-island-boundary-evidence.md",
+  "crates/ling-types/tests/managed_island_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -11537,6 +11545,7 @@ acceptance = [
   "The audit covers illegal edges, island escape, root loss, cycles, pinning, borrowed-view expiry, concurrency, FFI, serialization, OOM, cleanup, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No Managed type/graph, island root, edge rule, pinning/borrowed-view type, GC/finalization policy, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N301 authority is absent.",
   "The future implementation must preserve Seed Value semantics, consume accepted types and checked Core only, make roots and cross-island transfers explicit, and publish Managed graph, OOM, pinning, borrowed-view, Profile, FFI, and interpreter/VM/Native evidence before exposing v0.3 behavior.",
+  "Accepted DEC-0117 authorizes only test-only Managed-graph and island boundary vocabulary; it does not close graph, collection, pinning, transfer, isolation, diagnostic, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -11546,6 +11555,59 @@ notes = [
   "MEM-3104 is BlockedSpec by MEM-3101 through MEM-3103, absent RFC-N301/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved Managed graph/root, island, collection, pinning, borrowing, concurrency, OOM, and FFI contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Managed type, identity, graph/root, collector/finalizer, pinning API, borrowed view, cross-thread/Actor/FFI bridge, sharing policy, or OOM/Fault boundary; Rust references and allocations are not Ling Managed semantics.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory kind, Value layout, Resource, Managed, island, ownership, Native ABI, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "MEM-3104-OBSERVATION"
+title = "Internal Managed-graph and island boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["MEM-3103-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0116-resource-drop-boundary-evidence.md",
+  "docs/decisions/0117-managed-island-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/managed_island_evidence.rs",
+  "docs/decisions/0117-managed-island-boundary-evidence.md",
+  "docs/status/MEM-3104-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3104-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0117 authorizes only test-only Managed-graph and island boundary evidence; no reference, graph, collection, pinning, transfer, or isolation semantics are claimed.",
+  "The test-local inventory covers thirty-eight provisional boundaries for Managed identity/graph, edges, roots/reachability/cycles, sharing/equality/serialization, collection/OOM, pinning/views, concurrency/transfer, Native/Target/Profile/security, projections, diagnostics, spans, differentials, deterministic observability, and island escape with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no Managed type, graph, root, collector, pinning API, borrowed view, public protocol, or stale zero command is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "778228b810ef690b43a7eb7ce3d3b76dafdb4aeb"
+completion_commit = "778228b810ef690b43a7eb7ce3d3b76dafdb4aeb"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0117; MEM-3104 remains BlockedSpec for Managed graphs, roots, collection/OOM, pinning/views, concurrency/transfer, isolation/security, diagnostics, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added.",
 ]
 
 [[task]]

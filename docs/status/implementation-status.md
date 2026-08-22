@@ -233,6 +233,7 @@
 | `MEM-3103` | Resource definition and Drop contract | `G3` | `L` | `BlockedSpec` | `MEM-3102` | `` |
 | `MEM-3103-OBSERVATION` | Internal Resource and Drop boundary evidence | `G3` | `S` | `Done` | `MEM-3102-OBSERVATION` | `339e7ff12d67f19c2d99a025353103bb809e87db` |
 | `MEM-3104` | Managed types and island boundaries | `G3` | `L` | `BlockedSpec` | `MEM-3103` | `` |
+| `MEM-3104-OBSERVATION` | Internal Managed-graph and island boundary evidence | `G3` | `S` | `Done` | `MEM-3103-OBSERVATION` | `778228b810ef690b43a7eb7ce3d3b76dafdb4aeb` |
 | `NIR-3401` | Native IR design | `G3` | `L` | `BlockedSpec` | `GC-3304` | `` |
 | `NIR-3402` | Core to Native IR lowering | `G3` | `L` | `BlockedSpec` | `NIR-3401` | `` |
 | `NIR-3403` | Native IR verifier | `G3` | `M` | `BlockedSpec` | `NIR-3402` | `` |
