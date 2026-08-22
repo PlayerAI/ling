@@ -162,6 +162,7 @@
 | `IDE-2309-REPAIR-INDEX` | Internal structured diagnostic repair index | `G1` | `S` | `Done` | `IDE-2308-METADATA` | `fa54770a8ab71dd93eb6c0a7239153851d0c9593` |
 | `IDE-2310` | IDE formatting | `G1` | `M` | `BlockedSpec` | `FMT-1507`, `LSP-2102` | `` |
 | `IDE-2311` | IDE workspace symbols | `G1` | `L` | `BlockedSpec` | `IDE-2301`, `LSP-2101`, `LSP-2102` | `` |
+| `IDE-2311-SOURCE-LOOKUPS` | Internal exact workspace-symbol source lookups | `G1` | `S` | `Done` | `IDE-2301-INDEX` | `bf44203af7d2548b768b496c5bf09b0eb3452731` |
 | `INC-1401` | Incremental query boundary ADR | `G1` | `M` | `Done` | `GOV-0110` | `dcb3fc5c148d0b90a3481a736113c4551a35cf17` |
 | `INC-1402` | VFS and revision boundary | `G1` | `M` | `Done` | `INC-1401` | `5c341078f3430a6fa1585fcaaf30d472dba7512f` |
 | `INC-1403` | Parse queries | `G1` | `M` | `Done` | `INC-1402` | `a73e5c7150cce3fb86da5d48508158e7e1637f40` |

@@ -6845,6 +6845,61 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2311-SOURCE-LOOKUPS"
+title = "Internal exact workspace-symbol source lookups"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2301-INDEX"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0073-ide-resolved-definition-index.md",
+  "docs/decisions/0082-ide-workspace-symbol-lookups.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/definition_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0082-ide-workspace-symbol-lookups.md",
+  "docs/status/IDE-2311-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2311-SOURCE-LOOKUPS-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0082 authorizes only exact read-only module/name lookups over existing resolver definition inventory entries; no workspace search or protocol policy is invented.",
+  "Lookups retain resolver DefinitionId, module/name/source facts, kind, mutability, and original UTF-8 spans; missing keys are empty and no identity is synthesized.",
+  "Result order is the existing deterministic source/span/kind/name/identity order and repeated equal inputs remain equal without query or protocol state.",
+  "Focused cargo fmt, ling-db tests, and clippy pass; exact hits, missing keys, Unicode/BOM/CRLF spans, and deterministic ordering are covered.",
+  "Public IDE-2311 workspace symbols remain BlockedSpec for scope, taxonomy, search/ranking, package/dependency/generated policy, positions, versions, limits, truncation, cancellation, stale behavior, and protocol semantics.",
+]
+verified_against_commit = "bf44203af7d2548b768b496c5bf09b0eb3452731"
+completion_commit = "bf44203af7d2548b768b496c5bf09b0eb3452731"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The methods are source evidence for future workspace-symbol analysis, not a workspace query, search engine, result list, position projection, or protocol schema.",
+  "No new DefinitionId, Semantic ID, diagnostic allocation, wire schema, cache policy, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2311"
 title = "IDE workspace symbols"
 state = "BlockedSpec"
