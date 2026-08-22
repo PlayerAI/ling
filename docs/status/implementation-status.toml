@@ -18699,6 +18699,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0180-profile-audit-lsp-boundary-evidence.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -18709,6 +18710,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/PROF-5104-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5104-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5104-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0180-profile-audit-lsp-boundary-evidence.md",
+  "crates/ling-types/tests/profile_audit_lsp_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -18725,9 +18734,66 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "PROF-5104 is BlockedSpec by PROF-5103, GAP-CRITICAL-PROFILE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and absent accepted Profile/RFC-K501/RFC-0012 authority.",
-  "The repository has no Profile checker/audit command, explanation report, profile diagnostic mapper, or profile-aware LSP service; ling-db's Profile input is internal cache/revision state only.",
+  "The repository has no Profile checker/audit command, explanation report, profile diagnostic mapper, or profile-aware LSP service; ling-db's Profile input is internal cache/revision state only, and the observation adds only bounded test-local audit/LSP evidence.",
   "The plan's `zero` command examples are stale; the audit preserves `ling` and `.ling` and does not copy stale names into CLI, fixtures, schemas, or editor integration.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; Profile audit/LSP work remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "PROF-5104-OBSERVATION"
+title = "Internal Profile Audit/LSP boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROF-5103-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0179-profile-composition-boundary-evidence.md",
+  "docs/decisions/0180-profile-audit-lsp-boundary-evidence.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/profile_audit_lsp_evidence.rs",
+  "docs/decisions/0180-profile-audit-lsp-boundary-evidence.md",
+  "docs/status/PROF-5104-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5104-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0180 authorizes only test-local Profile Audit/LSP boundary evidence; no checker, report schema, `ling` command, diagnostic, LSP method, dependency, protocol, or support claim is made.",
+  "Inventory covers sixty provisional boundaries for audit/explanation facts, Effects/capabilities/unbounded sources, profile/target identity, Semantic IDs and UTF-8 spans, diagnostics, CLI selection/formats/status, LSP lifecycle/version/position/cancellation/stale publication, source mapping, quick-fix safety, and fixtures.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no checker, report, CLI, diagnostic, LSP, or public protocol authority.",
+  "cargo test -p ling-types --test profile_audit_lsp_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "Test-only under DEC-0180; PROF-5104 remains BlockedSpec for Profile checker/report semantics, CLI lifecycle, diagnostics, LSP/editor integration, migration, quick fixes, and support claims.",
+  "No stale `zero` command, `ling` profile route, LSP method, schema, dependency, diagnostic, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "BND-5201"

@@ -2847,3 +2847,16 @@ covers = ["PROF-5103 bounded Profile Composition boundary evidence", "test-only 
 depends_on = ["DEC-0178", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0180"
+title = "Internal Profile Audit/LSP boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0180-profile-audit-lsp-boundary-evidence.md"
+covers = ["PROF-5104 bounded Profile Audit/LSP boundary evidence", "test-only profile audit and LSP vocabulary", "audit boundaries without checker/CLI/protocol semantics"]
+depends_on = ["DEC-0179", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
