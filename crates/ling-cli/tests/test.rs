@@ -10,10 +10,8 @@ struct TempRoot(PathBuf);
 impl TempRoot {
     fn new() -> Self {
         let sequence = SEQUENCE.fetch_add(1, Ordering::Relaxed);
-        let path = std::env::temp_dir().join(format!(
-            "ling-cli-test-{}-{sequence}",
-            std::process::id()
-        ));
+        let path =
+            std::env::temp_dir().join(format!("ling-cli-test-{}-{sequence}", std::process::id()));
         fs::create_dir_all(&path).expect("test root is creatable");
         Self(path)
     }
@@ -61,7 +59,10 @@ fn test_json_runs_sorted_files_and_reports_runtime_precedence() {
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(report["schema"], "ling.test/0.1");
     assert_eq!(report["status"], "failed");
-    assert_eq!(report["counts"], serde_json::json!({"total": 3, "passed": 1, "failed": 2}));
+    assert_eq!(
+        report["counts"],
+        serde_json::json!({"total": 3, "passed": 1, "failed": 2})
+    );
     assert_eq!(report["tests"][0]["name"], "a-compile.ling");
     assert_eq!(report["tests"][0]["status"], "compile_failed");
     assert_eq!(report["tests"][1]["name"], "m-runtime.ling");

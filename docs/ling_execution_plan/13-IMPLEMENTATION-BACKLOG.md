@@ -138,7 +138,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CLI-1703` | G1/Editor | `init` | — | BlockedSpec | Accepted DEC-0038 closes only the bounded init child; broader project CLI behavior remains open; see `docs/status/CLI-1703-AUTHORITY-AUDIT.md` |
 | `CLI-1703-INIT` | G1/Editor | Offline `ling init` scaffold | M | Done | Accepted DEC-0038; see `crates/ling-cli/src/init.rs`, `schemas/init/0.1/`, and `docs/status/CLI-1703-INIT-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `CLI-1704` | G1/Editor | `test` | — | BlockedSpec | Accepted DEC-0039 closes only the standalone-file child; project/workspace test behavior remains in `GAP-PROJECT-CLI-INTERFACE-001`; see `docs/status/CLI-1704-AUTHORITY-AUDIT.md` |
-| `CLI-1704-FILE` | G1/Editor | Explicit standalone test-file runner Preview | M | In Progress | Accepted DEC-0039; see `crates/ling-cli/src/test_runner.rs`, `schemas/test/0.1/`, and `docs/status/CLI-1704-TEST-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `CLI-1704-FILE` | G1/Editor | Explicit standalone test-file runner Preview | M | Done | Accepted DEC-0039; verified/committed as `72d85d7de77f188b0706acde7a559169d4ac149e`; see `crates/ling-cli/src/test_runner.rs`, `schemas/test/0.1/`, and `docs/status/CLI-1704-TEST-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `CLI-1705` | G1/Editor | `query/patch` | — | BlockedSpec | `03-G1-V0.1-LIVING.md:478`, `docs/status/CLI-1705-AUTHORITY-AUDIT.md` |
 | `CLI-1706` | G1/Editor | Shell completion 与 help fixtures | — | BlockedSpec | `03-G1-V0.1-LIVING.md:482`, `docs/status/CLI-1706-AUTHORITY-AUDIT.md` |
 | `LSP-2101` | G1/Editor | 初始化与生命周期 | S | BlockedSpec | `04-LSP-IMPLEMENTATION.md:137`, `docs/status/LSP-2101-AUTHORITY-AUDIT.md` |

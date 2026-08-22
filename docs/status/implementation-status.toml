@@ -4354,7 +4354,7 @@ notes = [
 [[task]]
 id = "CLI-1704-FILE"
 title = "Explicit standalone test-file runner Preview"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -4401,10 +4401,10 @@ acceptance = [
   "Console output is captured and the report is deterministic; compile/runtime diagnostics remain bilingual Diagnostic JSON and all cases are attempted.",
   "ling.test/0.1 is schema-validated, registered as a Preview protocol, and covered by unit/process/schema/protocol evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "72d85d7de77f188b0706acde7a559169d4ac149e"
+completion_commit = "72d85d7de77f188b0706acde7a559169d4ac149e"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "This child is bounded by Accepted DEC-0039 and intentionally does not define project manifests, workspace targets, test syntax, assertions, filtering, snapshots, property tests, parallelism, cancellation, or persisted artifacts.",
   "The parent CLI-1704 remains BlockedSpec for the broader project test contract.",

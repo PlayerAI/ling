@@ -184,7 +184,7 @@ pub(crate) fn run(root: PathBuf) -> Result<Summary, Failure> {
     let mut cases = Vec::with_capacity(files.len());
     let mut failure = FailureClass::None;
     for file in files {
-        let mut case = match compile_path(&file.path) {
+        let case = match compile_path(&file.path) {
             Ok(compiled) => match locate_main(compiled.snapshot.checked()) {
                 Ok(main) => {
                     let mut console = MemoryConsole::default();
