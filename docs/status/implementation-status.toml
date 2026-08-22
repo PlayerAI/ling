@@ -18334,10 +18334,10 @@ acceptance = [
   "cargo test -p ling-types --test device_binary_cache_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "295350a636fc26d819ea9d2a439c5364be0aa493"
+completion_commit = "295350a636fc26d819ea9d2a439c5364be0aa493"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0176; PLC-4805 remains BlockedSpec for Device IR/backend artifacts, cache key/namespace, trust/lifecycle, safe recompile, migration, diagnostics, and support claims; DEC-0022 remains unchanged.",
   "No device-binary cache, dependency, target package, manifest, signature API, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",

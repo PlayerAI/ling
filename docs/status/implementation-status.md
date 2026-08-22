@@ -315,6 +315,7 @@
 | `PLC-4804` | Placement Explain Output | `G4` | `M` | `BlockedSpec` | `PLC-4803` | `` |
 | `PLC-4804-OBSERVATION` | Internal Placement-explain boundary evidence | `G4` | `S` | `Done` | `PLC-4803-OBSERVATION` | `5845160677d8d01d1e7035b1ff1ad106c5744630` |
 | `PLC-4805` | Device Binary Cache | `G4` | `M` | `BlockedSpec` | `PLC-4804` | `` |
+| `PLC-4805-OBSERVATION` | Internal Device Binary Cache boundary evidence | `G4` | `S` | `Done` | `PLC-4804-OBSERVATION` | `295350a636fc26d819ea9d2a439c5364be0aa493` |
 | `PRJ-1101` | Minimal project manifest | `G1` | `M` | `Done` | — | `80f46bcf3d175eeb6402bf6267085cb905a5dbcf` |
 | `PRJ-1102` | Deterministic module discovery | `G1` | `M` | `Done` | `PRJ-1101` | `f76f4953070b9ae555fce24c7dcc2fbf08a36f7a` |
 | `PRJ-1103` | Package-aware imports and visibility | `G1` | `M` | `Done` | `PRJ-1102`, `PRJ-1104` | `8e98d32f54301dee3f198273cfae3146bbf2846b` |
