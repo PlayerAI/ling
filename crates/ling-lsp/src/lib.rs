@@ -8,6 +8,8 @@
 use std::collections::BTreeMap;
 use std::fmt;
 use std::io::{self, BufRead, BufReader, BufWriter, Read, Write};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 pub use ling_source::{FileOrigin, PositionEncoding, Revision};
 use ling_source::{
@@ -212,6 +214,68 @@ impl RequestSnapshot {
             .map(|index| &self.documents[index])
     }
 }
+
+/// A clone-shared, monotonic cancellation signal for in-process analysis.
+///
+/// This token carries no JSON-RPC request ID, document version, deadline, or
+/// result state. It is deliberately separate from VM host cancellation.
+#[derive(Clone, Debug)]
+pub struct CancellationToken {
+    cancelled: Arc<AtomicBool>,
+}
+
+impl Default for CancellationToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CancellationToken {
+    /// Creates an active token.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            cancelled: Arc::new(AtomicBool::new(false)),
+        }
+    }
+
+    /// Requests cancellation. Repeated calls are idempotent.
+    pub fn cancel(&self) {
+        self.cancelled.store(true, Ordering::Release);
+    }
+
+    /// Returns whether cancellation has been requested.
+    #[must_use]
+    pub fn is_cancelled(&self) -> bool {
+        self.cancelled.load(Ordering::Acquire)
+    }
+
+    /// Checks the cooperative cancellation checkpoint.
+    pub fn check(&self) -> Result<(), CancellationError> {
+        if self.is_cancelled() {
+            Err(CancellationError::Cancelled)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+/// The typed result of an internal LSP cancellation checkpoint.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CancellationError {
+    /// The shared token has been cancelled.
+    Cancelled,
+}
+
+impl fmt::Display for CancellationError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Cancelled => formatter.write_str("LSP analysis was cancelled"),
+        }
+    }
+}
+
+impl std::error::Error for CancellationError {}
 
 impl DocumentView {
     /// Returns the exact URI supplied by the editor.

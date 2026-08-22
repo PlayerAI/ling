@@ -168,7 +168,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2404` | G1/Editor | Semantic token fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:378`, `docs/status/LSP-2404-AUTHORITY-AUDIT.md` |
 | `LSP-2501` | G1/Editor | Request snapshot | — | BlockedSpec | Accepted DEC-0030 closes only the internal immutable capture child; public request identity, CompilerHost/query inputs, cancellation, stale publication, and protocol lifecycle remain open; see `docs/status/LSP-2501-AUTHORITY-AUDIT.md` |
 | `LSP-2501-SNAPSHOT` | G1/Editor | Internal immutable request snapshot capture | S | Done | Accepted DEC-0030; see `crates/ling-lsp/tests/request_snapshot.rs` and `docs/status/LSP-2501-SNAPSHOT-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for the public analysis boundary |
-| `LSP-2502` | G1/Editor | Cancellation | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:388`, `docs/status/LSP-2502-AUTHORITY-AUDIT.md` |
+| `LSP-2502` | G1/Editor | Cancellation | — | BlockedSpec | Accepted DEC-0031 closes only the internal cooperative-token child; public `$/cancelRequest`, compiler propagation, and result publication remain open; see `docs/status/LSP-2502-AUTHORITY-AUDIT.md` |
+| `LSP-2502-CANCELLATION` | G1/Editor | Internal cooperative cancellation token | S | Done | Accepted DEC-0031; see `crates/ling-lsp/tests/cancellation.rs` and `docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for public cancellation |
 | `LSP-2503` | G1/Editor | Debounce 与优先级 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:395`, `docs/status/LSP-2503-AUTHORITY-AUDIT.md` |
 | `LSP-2504` | G1/Editor | Memory/resource limits | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:403`, `docs/status/LSP-2504-AUTHORITY-AUDIT.md` |
 | `TS-3101` | G1/Editor | Grammar 规范映射表 | S | Done | `05-ZED-EXTENSION.md:154`；见 `docs/grammar-map.md`、机器状态与实施报告 |

@@ -5664,14 +5664,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/LSP-2502-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing JSON-RPC cancellation method, request-ID lifecycle, propagation/checkpoints, partial-result suppression, publication precedence, cleanup, and protocol lifecycle contracts.",
-  "The audit distinguishes DEC-0019 internal cooperative query cancellation and RFC-0020 VM cancellation from the missing compiler/LSP request protocol.",
-  "The audit covers pre-start, mid-query, dependency, result-ready, stale, duplicate/unknown/late request IDs, partial Workspace Edits, diagnostics/tokens, cache publication, Unicode/CRLF/BOM, deterministic cleanup, and migration fixtures.",
-  "No LSP cancellation handler, request token, compiler cancellation API, partial-result suppression mechanism, diagnostic allocation, protocol schema, or placeholder server is added while the authority is absent.",
+  "The audit records the missing public JSON-RPC cancellation method, request-ID lifecycle, propagation, partial-result suppression, publication precedence, cleanup, and protocol lifecycle contracts.",
+  "Accepted DEC-0031 and child LSP-2502-CANCELLATION provide only an internal cooperative token; the parent remains blocked for public/compiler behavior.",
+  "The audit distinguishes DEC-0019 internal cancellation and RFC-0020 VM cancellation from the missing compiler/LSP request protocol.",
+  "No JSON-RPC cancellation handler, public request token, compiler cancellation API, partial-result suppression mechanism, diagnostic allocation, protocol schema, or placeholder server is added while the authority is absent.",
   "The future implementation must propagate cancellation cooperatively, publish no partial checked result or Workspace Edit, keep VM cancellation separate, and make state transitions deterministic.",
 ]
 verified_against_commit = ""
@@ -5679,9 +5680,54 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2502 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2501, and DEC-0019's explicit separation of compiler/LSP cancellation; RFC-0020 applies only to VM host control.",
-  "No LSP transport, request scheduler, compiler cancellation token, partial-result cache, Workspace Edit publisher, or cancellation protocol inventory entry exists.",
+  "LSP-2502 remains BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2501, and DEC-0019's explicit separation of compiler/LSP cancellation; DEC-0031 authorizes only the internal child and RFC-0020 applies only to VM host control.",
+  "ling-lsp now provides an internal clone-shared cancellation token, but no LSP transport, request scheduler, compiler cancellation result, partial-result cache, Workspace Edit publisher, or cancellation protocol inventory entry exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2502-CANCELLATION"
+title = "Internal cooperative LSP cancellation token"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1401", "LSP-2501-SNAPSHOT"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0031-lsp-internal-cancellation-boundary.md",
+  "docs/RFC-0020.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/cancellation.rs",
+  "docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2502-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "CancellationToken is clone-shared, monotonic, idempotent, non-blocking, and exposes deterministic is_cancelled/check operations.",
+  "The typed checkpoint result carries no request ID, document version, snapshot identity, deadline, diagnostic, JSON-RPC response, or Workspace Edit state.",
+  "The token is separate from RFC-0020 VM cancellation and does not add a transport handler, scheduler, compiler query API, or public protocol claim.",
+  "Focused cancellation tests cover pre-cancel success, clone propagation, repeated cancellation, typed errors, and independent-token isolation.",
+  "Public JSON-RPC cancellation, compiler propagation, result precedence, partial-result suppression, deadlines, limits, and migration remain deferred to parent LSP-2502.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working-tree"
+completed = "2026-08-22"
+notes = [
+  "This child closes only DEC-0031's internal cooperative token; parent LSP-2502 remains BlockedSpec for public/compiler cancellation.",
+  "The token is an internal Rust value and is intentionally absent from the public protocol inventory and support matrix.",
 ]
 
 [[task]]
