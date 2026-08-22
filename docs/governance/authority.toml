@@ -2678,3 +2678,16 @@ covers = ["GPU-4602 bounded backend adapter boundary evidence", "test-only backe
 depends_on = ["DEC-0165", "DEC-0164", "DEC-0163", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0167"
+title = "Internal launch and runtime boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0167-launch-runtime-boundary-evidence.md"
+covers = ["GPU-4603 bounded launch and runtime boundary evidence", "test-only launch/runtime vocabulary", "runtime boundaries without Device IR/adapter/ABI semantics"]
+depends_on = ["DEC-0166", "DEC-0165", "DEC-0164", "DEC-0163", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

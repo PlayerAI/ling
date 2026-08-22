@@ -4343,3 +4343,27 @@ unresolved_alternatives = [
   "Adapter input trust boundary and verified Device IR; compile and target-spec identity; DeviceBinary schema, canonical bytes, ownership, corruption, migration, cache identity/invalidation; buffer allocation/ownership, transfer visibility, queue ordering, launch dimensions, workgroup limits, synchronization scope; capability query/identity, required/optional and unsupported features, fallback/rejection; Fault classes, device loss, cancellation, resource limits, cleanup; vendor/front-end isolation, toolchain/driver identity, numeric/determinism, source maps, UTF-8 spans and Semantic IDs; positive/negative/malformed/migration/lifecycle/differential fixtures; diagnostics, host/driver/path/address/timestamp redaction, protocol inventory, and public adapter status remain open under GPU-4602, GPU-4601, DIR-4501 through DIR-4503, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0167"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0167-launch-runtime-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty launch/runtime boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer discovery, capability matching, module loading, binding, launch, queue/synchronization, device loss, cleanup, metrics/explain, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No device runtime, scheduler, discovery API, module loader, buffer/queue handle, dependency, target package, metrics schema, diagnostic, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Runtime and ABI boundary; device discovery and stable identity; capability matching and feature versions; module loading and binary validation; buffer binding/layout/ownership; launch dimensions and workgroup/grid limits; queue submission/order, synchronization and visibility; cancellation, device loss, Fault, cleanup on success/Error/Fault, resource budgets; metrics/explain stability, replayability and diagnostic-only fields; host/vendor isolation, target/toolchain/driver identity, numeric/determinism, source maps, UTF-8 spans and Semantic IDs; unsupported hardware, fallback/rejection; positive, negative, discovery, capability, corruption, binding, launch, synchronization, device-loss, cleanup, cancellation, resource, Unicode, migration, and differential fixtures; diagnostics, host/driver/path/address/timestamp/debug redaction, protocol inventory, and public runtime status remain open under GPU-4603, GPU-4601/4602, DIR-4501 through DIR-4503, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""
