@@ -2305,3 +2305,28 @@ unresolved_alternatives = [
   "Document URI/version binding, snapshot lifetime, semantic-token taxonomy/fallback, position encoding, result-ID retention, full/delta base validation, stale/cancellation/limits, negotiation, protocol inventory, and migration remain open under LSP-2401 through LSP-2404, LSP-2501/LSP-2502, and registered gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0087"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0087-lsp-checked-token-source-fixtures.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run the Unicode/BOM/CRLF fixture and compare exact original-byte slices and monotonic source spans.",
+  "Run the revision fixture twice without edits, then after an edit; compare pointer reuse, old-object immutability, and strictly newer VFS revision.",
+  "Keep semantic-token taxonomy, positions, versions, fallback, full/delta, result IDs, transport, cancellation, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal tests; language semantics, diagnostics, schemas, Semantic IDs, CLI/LSP behavior, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 data remain unchanged.",
+  "The fixtures use original UTF-8 spans and existing VFS revision rules and do not create a serialized fixture schema or public protocol inventory entry.",
+]
+unresolved_alternatives = [
+  "Versioned semantic-token fixture schema, legend/modifier mapping, typed versus parsed fallback, position encoding, document versions, full/delta equivalence, result-ID/base handling, stale/cancellation/limits, protocol inventory, and migration remain open under LSP-2401 through LSP-2404, LSP-2501/LSP-2502, and registered gaps.",
+]
+superseded_by = ""

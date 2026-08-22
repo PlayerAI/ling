@@ -11,7 +11,9 @@ fixture schema that can make those expected outputs normative.
 
 No semantic-token fixture corpus, expected token output, protocol schema,
 diagnostic allocation, Semantic ID change, or placeholder LSP surface was
-added.
+added. Accepted DEC-0087 and the bounded `LSP-2404-CHECKED-SOURCE-FIXTURES`
+child add only compiler-owned evidence for original bytes, spans, source order,
+and VFS revision invalidation; public semantic-token fixtures remain blocked.
 
 ## Normative traceability
 
@@ -33,6 +35,8 @@ added.
   compatibility, stale rejection, and migration open.
 - DEC-0019 defines an internal incremental-query boundary and explicitly does
   not authorize a public LSP request, position encoding, or protocol field.
+- Accepted DEC-0087 authorizes only internal checked-token source fixtures; no
+  expected semantic-token output or fixture wire schema is defined.
 
 ## Current fixture evidence
 
@@ -50,6 +54,9 @@ added.
 - No fixture proves error-region fallback, rejects unchecked-AST-derived
   tokens, compares full and delta results, validates non-overlap/order, or
   fixes deterministic bytes and result-ID behavior.
+- The checked-source fixture child covers BOM/CRLF/Unicode original-byte
+  slices, source order, cache reuse, and revision invalidation without adding
+  token categories or protocol fields.
 
 ## Required authority before implementation
 
@@ -90,6 +97,7 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
+The bounded checked-source fixture child is complete under DEC-0087. Public
 `LSP-2404` can begin after LSP-2401 taxonomy, LSP-2402 generation, LSP-2403
 transport, LSP-2501/LSP-2502 snapshot and cancellation decisions, and the
 Semantic Graph lifecycle contract are Accepted. The future fixture corpus must

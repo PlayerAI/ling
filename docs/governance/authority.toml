@@ -1638,3 +1638,16 @@ covers = ["LSP-2403 bounded checked-token snapshot identity", "existing SourceId
 depends_on = ["DEC-0019", "DEC-0071", "DEC-0084", "DEC-0085", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0087"
+title = "Internal checked-token source fixture corpus"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0087-lsp-checked-token-source-fixtures.md"
+covers = ["LSP-2404 bounded checked-token source fixtures", "Unicode/BOM/CRLF/original-byte evidence", "deterministic internal revision invalidation fixtures"]
+depends_on = ["DEC-0002", "DEC-0019", "DEC-0071", "DEC-0084", "DEC-0085", "DEC-0086", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
