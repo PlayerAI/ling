@@ -1352,3 +1352,16 @@ covers = ["EFF-2103-SYNTAX contextual handler grammar", "lossless Handler/Handle
 depends_on = ["RFC-0006", "DEC-0063"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0065"
+title = "Handler AST projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0065-handler-ast-projection.md"
+covers = ["EFF-2103-AST unresolved handler expression", "span-preserving handler clauses", "HIR rejection boundary"]
+depends_on = ["RFC-0006", "DEC-0063", "DEC-0064"]
+supersedes = []
+stable_basis = true

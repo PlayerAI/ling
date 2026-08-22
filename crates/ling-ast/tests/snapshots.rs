@@ -296,6 +296,27 @@ fn render_expression(output: &mut String, expression: &Expression, depth: usize)
                 }
             }
         }
+        ExpressionKind::Handle { body, clauses } => {
+            line(output, depth, "handle", expression.span);
+            render_expression(output, body, depth + 1);
+            for clause in clauses {
+                let operation = clause
+                    .operation
+                    .segments
+                    .iter()
+                    .map(|segment| segment.normalized.as_str())
+                    .collect::<Vec<_>>()
+                    .join(".");
+                line_with(output, depth + 1, "handler_clause", clause.span, &operation);
+                for parameter in &clause.parameters {
+                    render_pattern(output, parameter, depth + 2, "parameter");
+                }
+                if let Some(resume) = &clause.resume {
+                    render_name(output, resume, depth + 2, "resume");
+                }
+                render_expression(output, &clause.body, depth + 2);
+            }
+        }
         ExpressionKind::If {
             condition,
             then_branch,

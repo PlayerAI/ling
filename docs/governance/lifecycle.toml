@@ -1763,6 +1763,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0065"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0065-handler-ast-projection.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Lower one and multiple contextual handler clauses, parameter patterns, resume markers, nested bodies, Unicode names, BOM, and CRLF while asserting exact AST fields and original spans.",
+  "Reject malformed CST child shapes without fabricating operation or resume identities; verify source order and deterministic unresolved data.",
+  "Verify HIR lowering rejects the unresolved handler AST with a structured error and no evaluator, bytecode, VM, schema, Semantic ID, or protocol path consumes it.",
+]
+compatibility_impact = [
+  "Adds an Experimental unresolved AST variant and internal HIR rejection; non-handler Seed source, diagnostics, schemas, CLI, LSP, bytecode, VM, protocols, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Operation signatures/namespaces, binding identity, resume typing, return/recovery clauses, Effect checking, checked Core publication, State/Fault/cancellation, Task/Actor crossing, and execution require later Accepted authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0006"
 kind = "RFC"
 status = "Accepted"

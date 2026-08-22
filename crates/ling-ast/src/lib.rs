@@ -162,6 +162,18 @@ pub enum PatternAtom {
     Comma,
 }
 
+/// An unresolved operation clause preserved by the experimental handler AST
+/// projection. Operation lookup and resume typing belong to a later checked
+/// Core boundary.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct HandlerClause {
+    pub span: Span,
+    pub operation: QualifiedName,
+    pub parameters: Vec<Pattern>,
+    pub resume: Option<Name>,
+    pub body: Expression,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Expression {
     pub span: Span,
@@ -171,6 +183,10 @@ pub struct Expression {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ExpressionKind {
     Sequence(Vec<SequenceElement>),
+    Handle {
+        body: Box<Expression>,
+        clauses: Vec<HandlerClause>,
+    },
     If {
         condition: Box<Expression>,
         then_branch: Box<Expression>,
@@ -736,6 +752,22 @@ impl<'input> Lowerer<'input> {
                     })
                     .collect::<Result<Vec<_>, _>>()?,
             ),
+            NodeKind::HandleExpression => {
+                let (body, clauses) = node
+                    .children()
+                    .split_first()
+                    .ok_or_else(|| self.missing_child(node, "handler body"))?;
+                if clauses.is_empty() {
+                    return Err(self.missing_child(node, "handler operation clause"));
+                }
+                ExpressionKind::Handle {
+                    body: Box::new(self.expression(body)?),
+                    clauses: clauses
+                        .iter()
+                        .map(|clause| self.handler_clause(clause))
+                        .collect::<Result<Vec<_>, _>>()?,
+                }
+            }
             NodeKind::IfExpression => {
                 let [condition, then_branch, else_branch] = self.three_children(node, "if")?;
                 ExpressionKind::If {
@@ -869,6 +901,41 @@ impl<'input> Lowerer<'input> {
             kind => return Err(self.unexpected(node, kind)),
         };
         Ok(Expression { span, kind })
+    }
+
+    fn handler_clause(&self, node: &CstNode) -> Result<HandlerClause, LowerError> {
+        self.expect_kind(node, NodeKind::HandlerClause)?;
+        let children = node.children();
+        if children.len() < 2 {
+            return Err(self.missing_child(node, "handler operation clause"));
+        }
+        let operation = self.qualified_name(&children[0])?;
+        let body_node = children
+            .last()
+            .ok_or_else(|| self.missing_child(node, "handler operation body"))?;
+        let body = self.expression(body_node)?;
+        let parameter_nodes = &children[1..children.len() - 1];
+        if parameter_nodes
+            .iter()
+            .any(|child| child.kind() != NodeKind::Pattern)
+        {
+            return Err(self.unexpected(node, NodeKind::HandlerClause));
+        }
+        let parameters = parameter_nodes
+            .iter()
+            .map(|parameter| self.pattern(parameter))
+            .collect::<Result<Vec<_>, _>>()?;
+        let resume = self
+            .unclaimed_contextual_token(node, body_node, "resume")
+            .map(|token| self.name(token))
+            .transpose()?;
+        Ok(HandlerClause {
+            span: self.node_span(node)?,
+            operation,
+            parameters,
+            resume,
+            body,
+        })
     }
 
     fn match_case(&self, node: &CstNode) -> Result<MatchCase, LowerError> {
@@ -1046,6 +1113,39 @@ impl<'input> Lowerer<'input> {
             .iter()
             .filter(|token| !token.kind().is_trivia() && !token.kind().is_layout())
             .collect()
+    }
+
+    fn unclaimed_contextual_token(
+        &self,
+        node: &CstNode,
+        body: &CstNode,
+        spelling: &str,
+    ) -> Option<&'input Token> {
+        let child_ranges = node
+            .children()
+            .iter()
+            .map(CstNode::token_range)
+            .collect::<Vec<_>>();
+        let range = node.token_range();
+        let body_start = body.token_range().start;
+        self.tree.tokens()[range.start..body_start]
+            .iter()
+            .enumerate()
+            .map(|(offset, token)| (range.start + offset, token))
+            .filter(|(index, _)| {
+                !child_ranges
+                    .iter()
+                    .any(|child| child.start <= *index && *index < child.end)
+            })
+            .map(|(_, token)| token)
+            .find(|token| {
+                token.kind() == TokenKind::Identifier
+                    && matches!(
+                        token.value(),
+                        Some(TokenValue::Identifier(identifier))
+                            if identifier.identifier().normalized() == spelling
+                    )
+            })
     }
 
     fn two_children<'node>(
@@ -1261,7 +1361,7 @@ mod tests {
     }
 
     #[test]
-    fn rejects_parser_only_handler_cst_before_ast_publication() {
+    fn lowers_handler_cst_into_unresolved_ast_without_hir_publication() {
         let source = SourceFile::from_bytes(
             SourceId::new(1),
             "handler.ling",
@@ -1271,12 +1371,26 @@ mod tests {
         let parsed = parse(&source);
         assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
 
-        let error = lower(&source, &parsed).expect_err("handler CST is parser-only");
-        assert_eq!(
-            error.kind(),
-            &LowerErrorKind::UnexpectedNode(NodeKind::HandleExpression)
-        );
-        assert!(error.span().is_some());
+        let program = lower(&source, &parsed).expect("accepted AST projection");
+        let Item::Let(declaration) = &program.items[0] else {
+            panic!("expected let declaration");
+        };
+        let ExpressionKind::Sequence(elements) = &declaration.value.kind else {
+            panic!("expected layout sequence");
+        };
+        let SequenceElement::Expression(expression) = &elements[0] else {
+            panic!("expected handler expression");
+        };
+        let ExpressionKind::Handle { body, clauses } = &expression.kind else {
+            panic!("expected handler AST");
+        };
+        assert!(matches!(body.kind, ExpressionKind::Name(_)));
+        assert_eq!(clauses.len(), 1);
+        assert_eq!(clauses[0].operation.segments[0].normalized, "Clock");
+        assert_eq!(clauses[0].operation.segments[1].normalized, "now");
+        assert!(clauses[0].parameters.is_empty());
+        assert!(clauses[0].resume.is_none());
+        assert!(clauses[0].span.start() < clauses[0].span.end());
     }
 
     #[test]

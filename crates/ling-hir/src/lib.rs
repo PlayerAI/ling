@@ -369,6 +369,7 @@ pub enum LowerErrorKind {
     InvalidTopLevelBinding,
     InvalidPattern,
     InvalidAssignmentPlace,
+    UnsupportedHandler,
 }
 
 impl fmt::Display for LowerError {
@@ -383,6 +384,9 @@ impl fmt::Display for LowerError {
             LowerErrorKind::InvalidPattern => "the pattern is not supported by Ling Seed",
             LowerErrorKind::InvalidAssignmentPlace => {
                 "the left side of assignment is not a syntactic place"
+            }
+            LowerErrorKind::UnsupportedHandler => {
+                "handler AST requires an accepted checked lowering contract"
             }
         };
         formatter.write_str(message)
@@ -871,6 +875,9 @@ impl Lowerer {
                     ExpressionKind::Sequence(lowered)
                 }
             }
+            ast::ExpressionKind::Handle { .. } => {
+                return Err(self.error(LowerErrorKind::UnsupportedHandler, expression.span));
+            }
             ast::ExpressionKind::If {
                 condition,
                 then_branch,
@@ -1205,6 +1212,22 @@ mod tests {
         };
         assert_eq!(place.root.normalized, "person");
         assert_eq!(place.fields[0].normalized, "health");
+    }
+
+    #[test]
+    fn rejects_unchecked_handler_ast_before_hir_publication() {
+        let source = SourceFile::from_bytes(
+            SourceId::new(0),
+            "handler.ling",
+            b"let value =\n    handle value with\n        operation Clock.now() -> 1\n".to_vec(),
+        )
+        .expect("valid source");
+        let parsed = parse(&source);
+        assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+        let ast = lower_ast(&source, &parsed).expect("valid unresolved AST");
+        let error = lower(source.name(), &ast).expect_err("handler needs checked authority");
+        assert_eq!(error.kind, LowerErrorKind::UnsupportedHandler);
+        assert!(error.span.start() < error.span.end());
     }
 
     #[test]

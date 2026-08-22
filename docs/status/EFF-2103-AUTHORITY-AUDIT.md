@@ -3,11 +3,12 @@
 ## Outcome
 
 `EFF-2103` remains `BlockedSpec` for the complete `handle`/`with operation`
-AST/HIR lowering and checking contract. RFC-0006 is Accepted for the
+checked lowering and checking contract. RFC-0006 is Accepted for the
 first-order Effect/Handler model, DEC-0062 is Accepted for row solving,
-DEC-0063 authorizes the bounded `EFF-2103-CORE` checked projection, and
-DEC-0064 authorizes only the parser/CST `EFF-2103-SYNTAX` child. Neither child
-makes the parent complete.
+DEC-0063 authorizes the bounded `EFF-2103-CORE` checked projection, DEC-0064
+authorizes the parser/CST `EFF-2103-SYNTAX` child, and DEC-0065 authorizes the
+unresolved AST `EFF-2103-AST` child. These children do not make the parent
+complete.
 
 ## Normative traceability
 
@@ -25,6 +26,9 @@ makes the parent complete.
   diagnostic for `EFF-2103-CORE`.
 - DEC-0064 closes only the contextual, lossless parser/CST shape for
   `EFF-2103-SYNTAX`; it explicitly rejects AST/HIR publication and execution.
+- DEC-0065 closes only the span-preserving unresolved AST data shape for
+  `EFF-2103-AST`; HIR lowering rejects it until checked operation/effect
+  semantics are accepted.
 - Task/Actor crossing, runtime continuations, Fault/cancellation behavior,
   Audit Source schema, interpreter/VM ABI, and public protocol migration remain
   outside these authorities.
@@ -34,19 +38,20 @@ makes the parent complete.
 - The child `EFF-2103-CORE` implements `HandlerCore`, canonical clauses,
   residual-row computation, resume-use validation, source-span evidence, and
   `L-EFFECT-0003` closed-boundary diagnostics in `ling-effects`.
-- The `EFF-2103-SYNTAX` child now parses a contextual `handle` expression and
-  operation clauses into lossless `HandleExpression`/`HandlerClause` CST nodes;
-  the AST lowerer rejects that experimental node before publication.
-- No AST/HIR handler node, TypedProgram integration, evaluator, bytecode
-  instruction, VM handler stack, or public schema has been added.
+- The `EFF-2103-SYNTAX` child parses contextual `handle` expressions and
+  operation clauses into lossless `HandleExpression`/`HandlerClause` CST nodes.
+- The `EFF-2103-AST` child lowers those nodes into explicit unresolved AST
+  values; HIR lowering rejects them with a structured unsupported-handler error.
+- No checked TypedProgram integration, evaluator, bytecode instruction, VM
+  handler stack, or public schema has been added.
 - The existing Seed checker and runtime remain unchanged.
 
 ## Required authority before parent completion
 
 An additional Accepted decision must still define, at minimum:
 
-1. exact AST/HIR lowering and checked publication for the parser shape fixed by
-   DEC-0064;
+1. exact HIR lowering and checked publication for the AST/CST shapes fixed by
+   DEC-0064 and DEC-0065;
 2. binding identity, lexical scope, operation arguments, return/recovery types,
    resume syntax, source spans, and checked-only publication invariants;
 3. nested propagation, unhandled-effect policy, mutable State/Fault/cancellation

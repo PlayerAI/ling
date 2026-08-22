@@ -61,11 +61,12 @@ DEC-0063 定义了一阶 checked Handler Core，但明确未规定源语法。�
 
 4. **Checked-only boundary.** The parser MUST preserve the original UTF-8
    token spans and MUST return bounded syntax errors for malformed forms. The
-   AST lowerer MUST continue to reject this new CST kind until an additional
-   Accepted decision defines binding identity, operation signatures, resume
-   typing, return/recovery clauses, effect-row checking, and AST/HIR lowering.
-   No evaluator, bytecode, VM, Semantic Graph field, or protocol may consume
-   this CST projection.
+   AST lowerer MUST reject this new CST kind until an Accepted AST decision
+   (currently DEC-0065) defines its data-only projection. Even after that
+   projection, binding identity, operation signatures, resume typing,
+   return/recovery clauses, effect-row checking, and checked Core publication
+   require their own authority. No evaluator, bytecode, VM, Semantic Graph
+   field, or protocol may consume this CST projection directly.
 
 5. **Compatibility and determinism.** Contextual recognition MUST be
    deterministic, independent of host paths, allocation order, map order, or
