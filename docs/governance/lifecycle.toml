@@ -2402,3 +2402,29 @@ unresolved_alternatives = [
   "Actor grammar, identity scope/reuse, turn/reentry, state isolation, Sendability, mailbox/backpressure, supervision, remote delivery, runtime/VM ABI, public protocols, and migration remain open under ACT-2301 through ACT-2306 and the registered Actor gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0091"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0091-task-checked-core-model.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build nested TaskCore root/child data with deterministic task and suspension ordering, source-span evidence, and optional detach evidence.",
+  "Reject zero identities, missing/parented roots, duplicate tasks or suspension points, unknown parents, parent cycles, and incomplete detach evidence before publication.",
+  "Compare equivalent identity graphs with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep source syntax, Typed-Core publication, cancellation/cleanup execution, scheduler, Fault, bytecode/VM, protocol, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only a publish-disabled internal workspace crate and unit tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public protocol, Task syntax, or v0.2 support claim is registered.",
+]
+unresolved_alternatives = [
+  "Task grammar, scope ownership, suspension/resume, cancellation propagation, cleanup ordering, Fault aggregation, detach authorization, deterministic scheduling, runtime lowering, and migration remain open under GAP-STRUCTURED-TASK-001 and TASK-2201 through TASK-2206.",
+]
+superseded_by = ""

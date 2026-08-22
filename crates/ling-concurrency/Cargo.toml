@@ -1,0 +1,14 @@
+[package]
+name = "ling-concurrency"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+ling-source = { path = "../ling-source" }
+
+[lints]
+workspace = true

@@ -4,7 +4,9 @@
 
 `TASK-2201` is correctly recorded as `BlockedSpec`. Accepted `DEC-0089` now
 closes the bounded `TASK-2201-TASK-SYNTAX-REJECTION` evidence child without
-adding a Task grammar. The G2 plan proposes a minimal `task`/`scope`/`let!`/`return` surface and requires Checked Core fields
+adding a Task grammar, and Accepted `DEC-0091` closes the separate
+publish-disabled `TASK-2201-CORE-MODEL` identity-graph child. The G2 plan
+proposes a minimal `task`/`scope`/`let!`/`return` surface and requires Checked Core fields
 for scope identity, parent/child relation, spawn/join, suspension points,
 cancellation, cleanup, and optionally capability-gated detach. The syntax,
 lifecycle, cancellation, suspension, Fault aggregation, and detach contracts
@@ -12,8 +14,10 @@ are not accepted.
 
 The rejection child proves only that a Task-shaped top-level declaration is
 rejected by the existing bilingual syntax diagnostic before checked snapshot
-publication. No Task grammar, AST/HIR/Typed Core node, task type checker, suspension
-representation, cancellation token field, cleanup region, detach capability,
+publication. The Core-model child validates only nonzero checked identities,
+parent/child acyclicity, suspension identity uniqueness, optional detach
+evidence, and path-free canonical bytes. No Task grammar, AST/HIR/typed-program
+integration, task type checker, runtime cancellation or cleanup semantics,
 diagnostic allocation, or placeholder G2 API was added.
 
 ## Normative traceability
@@ -40,12 +44,17 @@ diagnostic allocation, or placeholder G2 API was added.
 - Accepted `DEC-0089` reuses `L-SYNTAX-0010` for negative Task-syntax evidence
   only; it does not reserve a lexer keyword or authorize any positive Task
   semantics.
+- Accepted `DEC-0091` authorizes only the publish-disabled `ling-concurrency`
+  identity graph; source spans are evidence and no identity graph field grants
+  detach, cancellation, scheduling, or runtime authority.
 
 ## Current implementation evidence
 
 - `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` have
   no `task`, `scope`, `let!`, `spawn`, `join`, `await`, or Task lifecycle node;
   the current grammar and type pipeline implement the Seed subset only.
+- `ling-concurrency::TaskCore` is an internal checked-data graph only; it is not
+  connected to `TypedProgram`, `ProgramSnapshot`, the parser, or the evaluator.
 - `ling-types::TypedProgram` and the current checked Core boundary contain no
   scope/parent identity, child registration, suspension continuation,
   cancellation token, cleanup region, or detach capability.
@@ -97,14 +106,15 @@ and the current syntax, AST, HIR, types, effects, evaluator, bytecode, and VM
 crates.
 
 No compiler, interpreter, VM, bytecode, diagnostic registry, schema,
-Semantic ID, source-span contract, runtime, scheduler, or Unicode 17.0.0
-behavior changed. The bounded rejection child adds offline test and decision
-evidence only.
+Semantic ID, public source-span contract, runtime, scheduler, or Unicode 17.0.0
+behavior changed. The two bounded children add only an offline negative
+fixture and an internal checked-data model.
 
 ## Intentionally deferred
 
 The bounded `TASK-2201-TASK-SYNTAX-REJECTION` child is complete under
-`DEC-0089`. Public `TASK-2201` can begin only after an Accepted RFC-0008 (or replacement), a
+`DEC-0089`, and `TASK-2201-CORE-MODEL` is complete under `DEC-0091`. Public
+`TASK-2201` can begin only after an Accepted RFC-0008 (or replacement), a
 resolved `GAP-STRUCTURED-TASK-001`, and the required EFF-2103 handler/Core
 authority. The future implementation must lower only accepted Task syntax to
 checked Typed Core, make every suspension and cleanup edge explicit, preserve

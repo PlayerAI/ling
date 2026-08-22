@@ -1690,3 +1690,16 @@ covers = ["ACT-2301 bounded Actor-shaped syntax rejection gate", "existing L-SYN
 depends_on = ["DEC-0001", "DEC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0091"
+title = "Internal Structured Task Checked-Core model"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0091-task-checked-core-model.md"
+covers = ["TASK-2201 bounded internal Task identity graph", "deterministic checked-data validation", "source-span evidence without public Task semantics"]
+depends_on = ["DEC-0002", "DEC-0089", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

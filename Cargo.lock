@@ -237,6 +237,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "ling-concurrency"
+version = "0.0.1-dev"
+dependencies = [
+ "ling-source",
+]
+
+[[package]]
 name = "ling-db"
 version = "0.0.1-dev"
 dependencies = [
