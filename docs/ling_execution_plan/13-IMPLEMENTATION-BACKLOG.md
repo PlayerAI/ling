@@ -256,6 +256,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TASK-2205` | G2 | 生产本地调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:221`, `docs/status/TASK-2205-AUTHORITY-AUDIT.md` |
 | `TASK-2206` | G2 | Task conformance 与压力测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:235`, `docs/status/TASK-2206-AUTHORITY-AUDIT.md` |
 | `ACT-2301` | G2 | Actor 身份与状态隔离 | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:250`, `docs/status/ACT-2301-AUTHORITY-AUDIT.md` |
+| `ACT-2301-ACTOR-SYNTAX-REJECTION` | G2 | Internal Actor-shaped syntax rejection gate | S | Done | Accepted `DEC-0090`; see `crates/ling-cli/tests/actor_boundary.rs` and `docs/status/ACT-2301-ACTOR-SYNTAX-REJECTION-IMPLEMENTATION-REPORT.md`; Actor semantics remain BlockedSpec |
 | `ACT-2302` | G2 | 消息可发送性检查 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:263`, `docs/status/ACT-2302-AUTHORITY-AUDIT.md` |
 | `ACT-2303` | G2 | 有界 Mailbox 与背压 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:273`, `docs/status/ACT-2303-AUTHORITY-AUDIT.md` |
 | `ACT-2304` | G2 | Turn 与重入规则 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:290`, `docs/status/ACT-2304-AUTHORITY-AUDIT.md` |

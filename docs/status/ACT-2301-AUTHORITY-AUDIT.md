@@ -2,14 +2,18 @@
 
 ## Outcome
 
-`ACT-2301` is correctly recorded as `BlockedSpec`. The G2 plan proposes
+`ACT-2301` is correctly recorded as `BlockedSpec`. Accepted `DEC-0090` now
+closes the bounded `ACT-2301-ACTOR-SYNTAX-REJECTION` evidence child without
+adding Actor grammar. The G2 plan proposes
 `ActorTypeId`, runtime `ActorId`, typed `ActorRef<Message>`, turn-local state
 mutation, prohibition of borrowing `&mut state` to outside code, and a strict
 separation between local ActorRef serialization and RemoteRef. The Actor
 identity, turn, state, message-ownership, reentry, and remote-boundary
 contracts are not accepted.
 
-No Actor syntax, ActorTypeId/ActorId model, ActorRef type, state-isolation
+The rejection child proves only that an Actor-shaped top-level declaration is
+rejected by the existing bilingual syntax diagnostic before checked snapshot
+publication. No Actor syntax, ActorTypeId/ActorId model, ActorRef type, state-isolation
 checker, turn runtime, borrow rule, serialization schema, diagnostic
 allocation, or placeholder G2 API was added.
 
@@ -34,6 +38,9 @@ allocation, or placeholder G2 API was added.
   Capability authorization, not Actor-owned state, turn boundaries, or
   ActorRef identity. RFC-0020 defines only host VM cancellation and cannot be
   generalized to Actor turns.
+- Accepted `DEC-0090` reuses `L-SYNTAX-0010` for negative Actor-syntax
+  evidence only; it does not reserve a lexer keyword or authorize positive
+  Actor semantics.
 
 ## Current implementation evidence
 
@@ -50,6 +57,8 @@ allocation, or placeholder G2 API was added.
   references, state mutation outside a turn, `&mut` escape, await reentry,
   message ownership, local/remote serialization separation, or differential
   Actor execution.
+- `crates/ling-cli/tests/actor_boundary.rs` is the bounded negative fixture;
+  it asserts the original `actor` byte span and no checked snapshot.
 
 ## Required authority before implementation
 
@@ -90,12 +99,13 @@ RFC-0001, RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 and the current syntax, AST, HIR, types, effects, evaluator, bytecode, VM,
 diagnostic, and schema crates.
 
-No compiler, interpreter, VM, bytecode, Actor runtime, diagnostic, schema,
+No compiler, interpreter, VM, bytecode, Actor runtime, diagnostic registry, schema,
 Semantic ID, source-span, scheduler, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`ACT-2301` can begin only after Accepted RFC-C203/RFC-0009 (or replacement),
+The bounded `ACT-2301-ACTOR-SYNTAX-REJECTION` child is complete under
+`DEC-0090`. Public `ACT-2301` can begin only after Accepted RFC-C203/RFC-0009 (or replacement),
 resolution of the Actor reentry, mailbox/supervision, and remote-delivery gaps,
 and the required Task/Effect boundaries. The future implementation must lower
 only accepted Actor syntax to checked Core, enforce turn-local state and

@@ -1677,3 +1677,16 @@ covers = ["TASK-2201 bounded Task-shaped syntax rejection gate", "existing L-SYN
 depends_on = ["DEC-0001", "DEC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0090"
+title = "Actor syntax rejection gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0090-actor-syntax-rejection-gate.md"
+covers = ["ACT-2301 bounded Actor-shaped syntax rejection gate", "existing L-SYNTAX-0010 parser boundary", "checked-only negative Actor evidence"]
+depends_on = ["DEC-0001", "DEC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

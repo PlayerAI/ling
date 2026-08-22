@@ -2378,3 +2378,27 @@ unresolved_alternatives = [
   "Task grammar, scope identity, parent/child ownership, suspension frames, cancellation propagation, cleanup ordering, Fault aggregation, detach authority, deterministic scheduling, runtime lowering, public protocols, and migration remain open under TASK-2201 through TASK-2206 and GAP-STRUCTURED-TASK-001.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0090"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0090-actor-syntax-rejection-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compile a module followed by an Actor-shaped top-level declaration through ling-cli and assert L-SYNTAX-0010, bilingual JSON fields, and the original actor byte span.",
+  "Assert no checked snapshot is returned; keep Actor grammar, identity, state isolation, mailbox, supervision, remote delivery, runtime, bytecode, VM, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds one internal negative CLI fixture and no lexer keyword, grammar, AST/HIR/Core, diagnostic allocation, schema, Semantic ID, runtime, bytecode, VM, ABI, dependency, or Unicode 17.0.0 behavior.",
+  "Reuses the existing L-SYNTAX-0010 parser diagnostic and current UTF-8 byte-span projection.",
+]
+unresolved_alternatives = [
+  "Actor grammar, identity scope/reuse, turn/reentry, state isolation, Sendability, mailbox/backpressure, supervision, remote delivery, runtime/VM ABI, public protocols, and migration remain open under ACT-2301 through ACT-2306 and the registered Actor gaps.",
+]
+superseded_by = ""
