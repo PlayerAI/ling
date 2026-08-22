@@ -2288,3 +2288,16 @@ covers = ["BACK-3505 bounded Native reproducible-build boundary evidence", "test
 depends_on = ["DEC-0135", "DEC-0134", "DEC-0133", "DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0137"
+title = "Internal FFI declaration boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0137-ffi-declaration-boundary-evidence.md"
+covers = ["FFI-3601 bounded FFI declaration boundary evidence", "test-only FFI declaration vocabulary", "declaration boundaries without syntax/ABI/ownership/target semantics"]
+depends_on = ["DEC-0136", "DEC-0124", "DEC-0117", "DEC-0009", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

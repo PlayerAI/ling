@@ -347,6 +347,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `BACK-3505` | G3 | Reproducible Native Build | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:393`, `docs/status/BACK-3505-AUTHORITY-AUDIT.md` |
 | `BACK-3505-OBSERVATION` | G3 | Internal Native reproducible-build boundary evidence | S | Done | Accepted `DEC-0136`; see `crates/ling-types/tests/native_reproducible_build_evidence.rs` and `docs/status/BACK-3505-OBSERVATION-IMPLEMENTATION-REPORT.md`; build/artifact/provenance/release semantics remain BlockedSpec |
 | `FFI-3601` | G3 | FFI 声明模型 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:411`, `docs/status/FFI-3601-AUTHORITY-AUDIT.md` |
+| `FFI-3601-OBSERVATION` | G3 | Internal FFI declaration boundary evidence | S | Done | Accepted `DEC-0137`; see `crates/ling-types/tests/ffi_declaration_evidence.rs` and `docs/status/FFI-3601-OBSERVATION-IMPLEMENTATION-REPORT.md`; declaration/ABI/ownership semantics remain BlockedSpec |
 | `FFI-3602` | G3 | C ABI 最小互操作 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:431`, `docs/status/FFI-3602-AUTHORITY-AUDIT.md` |
 | `FFI-3603` | G3 | Shim Generator | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:445`, `docs/status/FFI-3603-AUTHORITY-AUDIT.md` |
 | `FFI-3604` | G3 | Target Primitive Package | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:460`, `docs/status/FFI-3604-AUTHORITY-AUDIT.md` |

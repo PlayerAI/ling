@@ -13810,6 +13810,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/FFI-3601-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3601-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0137-ffi-declaration-boundary-evidence.md",
+  "crates/ling-types/tests/ffi_declaration_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -13819,6 +13827,7 @@ acceptance = [
   "The audit covers positive and negative declaration/type fixtures, ABI/layout and foreign-compiler conformance, ownership and callback cases, capability/profile/target rejection, schema migration, sanitizer/fuzz, cross-target, and deterministic evidence without unverified claims.",
   "No FFI syntax, AST/HIR/Checked Core node, ABI schema, foreign symbol resolver, target package, raw-pointer surface, diagnostic allocation, dependency, toolchain, public protocol implementation, or placeholder API is added while RFC-N305, RFC-0007, RFC-0011, and PROTO-ABI authority are absent.",
   "The future implementation must preserve v0.0.1 Seed behavior, consume verified declarations only, keep Rust/host ABI and addresses outside Ling semantics, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before exposing FFI.",
+  "Accepted DEC-0137 authorizes only test-local FFI declaration-boundary evidence; it does not close declaration grammar, ABI/layout, ownership/lifetime, callback/thread/reentry, Error/Fault, target/profile/capability, schema, or cross-target contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13828,6 +13837,61 @@ notes = [
   "FFI-3601 is BlockedSpec by GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, absent RFC-N305/RFC-0007/RFC-0011, and the unimplemented PROTO-ABI registry entry.",
   "The current workspace has no FFI declaration syntax, ABI schema, foreign symbol resolver, Target Primitive Package, linker adapter, or executable FFI boundary; the v0.0.1 Seed compiler, interpreter, and VM remain unchanged.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "FFI-3601-OBSERVATION"
+title = "Internal FFI declaration boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BACK-3505-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0136-native-reproducible-build-boundary-evidence.md",
+  "docs/decisions/0137-ffi-declaration-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/ffi_declaration_evidence.rs",
+  "docs/decisions/0137-ffi-declaration-boundary-evidence.md",
+  "docs/status/FFI-3601-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0137 authorizes only test-local FFI declaration-boundary evidence; no declaration syntax, ABI schema, foreign symbol resolver, raw-pointer surface, target package, diagnostic, dependency, toolchain, public protocol, or executable call is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for declaration identity/name/symbol, ABI/version, arguments/results/layout/representation, target/profile/capability, ownership/borrow/mutability/Resource/Managed/allocator/pointer/span/nullability/encoding, callback/thread/reentry/blocking/cancellation, Error/Fault/unwind/handles/symbol versioning, source spans/Semantic IDs/view separation, grammar/AST/HIR/Checked Core/verified lowering, diagnostics/Unicode/unsupported forms, deterministic schema/version/migration, provenance/TCB, sanitizer/fuzz, cross-target evidence, and Seed compatibility.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no syntax, ABI, Semantic ID, diagnostic, target, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0137; FFI-3601 remains BlockedSpec for declaration grammar, ABI/layout, ownership/lifetime, callback/thread/reentry, Error/Fault, Capability/Profile/Target, schema, and cross-target decisions.",
+  "No parser, AST/HIR/Checked Core node, resolver, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

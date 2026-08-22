@@ -3597,3 +3597,29 @@ unresolved_alternatives = [
   "Toolchain/linker/target/environment/library/options/lock input closure; source/Core/NIR/Profile identity; artifact/object/executable/debug/symbol identity; path/timestamp/build-ID/section/symbol/compression/archive policy; versioned difference manifests; byte/manifest comparison; clean/repeat/offline/cross-host/target reproduction; tamper/missing input; provenance/license/TCB; cache/release; Semantic ID/source-span/performance separation; bounds, metadata, host exclusions, Unicode, diagnostics, unsupported input, migration, security, differential, schema, and toolchain optionality remain open under BACK-3505, BACK-3504, BACK-3503, BACK-3502, BACK-3501, NIR-3403, NIR-3402, NIR-3401, GAP-NATIVE-BACKEND-ABI-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, and missing RFC-N306/RFC-N304/RFC-N303/RFC-0007 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0137"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0137-ffi-declaration-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty provisional FFI declaration boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical opaque evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep grammar, declaration identity, ABI/layout, ownership/lifetime, callback/thread/reentry, Error/Fault, target/profile/capability, schema, diagnostics, sanitizer/fuzz, and cross-target behavior deferred until the required authorities are Accepted.",
+]
+compatibility_impact = [
+  "Adds only test-local boundary evidence. Accepted Seed tests, source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No FFI syntax, ABI, target, ownership, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Declaration grammar and view projection; ABI/version/layout/endianness and calling convention; symbol/version/mangling; ownership/borrow/Resource/Managed and allocator rules; pointer/span/nullability/encoding; callback lifetime, thread/reentry, blocking, cancellation; Error/Fault/unwind; Capability/Profile/Target; schema and migration; provenance/TCB; diagnostics, Unicode, security, offline, sanitizer/fuzz, cross-target, differential, and public protocol rules remain open under FFI-3601, FFI-3602, FFI-3603, FFI-3604, FFI-3605, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, and missing RFC-N305/RFC-0007/RFC-0011 authority.",
+]
+superseded_by = ""

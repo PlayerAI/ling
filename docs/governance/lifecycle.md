@@ -167,6 +167,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0134` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0134](../decisions/0134-native-runtime-abi-boundary-evidence.md) |
 | `DEC-0135` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0135](../decisions/0135-native-optimization-boundary-evidence.md) |
 | `DEC-0136` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0136](../decisions/0136-native-reproducible-build-boundary-evidence.md) |
+| `DEC-0137` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0137](../decisions/0137-ffi-declaration-boundary-evidence.md) |
 
 ## Migration boundary
 
