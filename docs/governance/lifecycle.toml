@@ -2999,3 +2999,29 @@ unresolved_alternatives = [
   "Transport interface, loopback and TCP/QUIC adapters, framing/codec ownership, decoder limits, Capability isolation, endpoint/version negotiation, Typed Fault mapping, timeout/disconnect/partition, backpressure/cancellation, loopback/network equivalence, security, diagnostics, migration, runtime ABI, and cross-process behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2604.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0114"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0114-security-resource-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-one provisional security and resource boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep quota/accounting, decoder/schema behavior, authentication, authorization, Capability issuance/attenuation/revocation, privacy, replay/rate guarantees, transport equivalence, diagnostics, migration, fuzzing, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public security, quota, or remote protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Resource accounting and quota scope, decoder limits, host versus Profile policy, trust roots, credential and Capability lifecycle, endpoint binding, privacy, replay/rate semantics, schema/version failure, Fault mapping, transport/runtime ownership, diagnostics, migration, fuzz corpus, and cross-process behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2605.",
+]
+superseded_by = ""

@@ -299,6 +299,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REM-2604` | G2 | 最小参考传输 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:497`, `docs/status/REM-2604-AUTHORITY-AUDIT.md` |
 | `REM-2604-OBSERVATION` | G2 | Internal reference-transport boundary evidence | S | Done | Accepted `DEC-0113`; see `crates/ling-concurrency/tests/remote_transport_evidence.rs` and `docs/status/REM-2604-OBSERVATION-IMPLEMENTATION-REPORT.md`; transport/codec/Capability/Fault semantics remain BlockedSpec |
 | `REM-2605` | G2 | 安全与资源限制 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:506`, `docs/status/REM-2605-AUTHORITY-AUDIT.md` |
+| `REM-2605-OBSERVATION` | G2 | Internal security and resource boundary evidence | S | Done | Accepted `DEC-0114`; see `crates/ling-concurrency/tests/remote_security_resource_evidence.rs` and `docs/status/REM-2605-OBSERVATION-IMPLEMENTATION-REPORT.md`; quota/authentication/authorization/replay/schema/runtime semantics remain BlockedSpec |
 | `MEM-3101` | G3 | 类型分类模型 | M | BlockedSpec | `07-G3-V0.3-NATIVE.md:67`, `docs/status/MEM-3101-AUTHORITY-AUDIT.md` |
 | `MEM-3101-SEED-VALUE` | G3 | Seed completed-type Value classification | S | Done | Accepted DEC-0061; see `docs/status/MEM-3101-SEED-VALUE-IMPLEMENTATION-REPORT.md`; Managed/Resource model remains in `MEM-3101` |
 | `MEM-3102` | G3 | Value 布局与 Copy/Move | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:88`, `docs/status/MEM-3102-AUTHORITY-AUDIT.md` |

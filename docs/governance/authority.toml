@@ -1989,3 +1989,16 @@ covers = ["REM-2604 bounded reference-transport boundary evidence", "test-only t
 depends_on = ["DEC-0112", "DEC-0111", "DEC-0110", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0114"
+title = "Internal security and resource boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0114-security-resource-boundary-evidence.md"
+covers = ["REM-2605 bounded security/resource boundary evidence", "test-only security/resource vocabulary", "security/resource boundaries without quota/protocol/runtime semantics"]
+depends_on = ["DEC-0113", "DEC-0010", "DEC-0012", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -144,6 +144,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0111` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0111](../decisions/0111-transport-neutral-envelope-boundary-evidence.md) |
 | `DEC-0112` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0112](../decisions/0112-remote-delivery-boundary-evidence.md) |
 | `DEC-0113` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0113](../decisions/0113-reference-transport-boundary-evidence.md) |
+| `DEC-0114` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0114](../decisions/0114-security-resource-boundary-evidence.md) |
 
 ## Migration boundary
 
