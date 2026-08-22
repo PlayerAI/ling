@@ -4012,9 +4012,9 @@ acceptance = [
   "Positive offline-lock, missing-lock, deterministic-repeat, path-independence, nonmutation, and invalid-argument integration tests pass.",
   "No semantic compilation, run/test/build, artifact, diagnostic allocation, Semantic ID, language, bytecode, VM, or Unicode 17.0.0 behavior is claimed.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working-tree"
+verified_against_commit = "b37ab47f268e83e8c2c39931f5ddd0a311dbf4aa"
+completion_commit = "b37ab47f268e83e8c2c39931f5ddd0a311dbf4aa"
+integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "This child closes only the RFC-0024 locked graph-check slice; parent PRJ-1107 remains BlockedSpec for the rest of project CLI integration.",
