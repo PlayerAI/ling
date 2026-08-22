@@ -8,6 +8,11 @@ range conversion, ordered batch application, LineIndex updates, version and
 boundary rejection, and equivalence with full replacement. The repository has
 no accepted LSP change schema or adapter contract for those operations.
 
+Accepted `DEC-0069` now authorizes the bounded `LSP-2104-UTF8-EDITS` child. That
+child implements only immutable source-layer byte-range application and its
+tests; it does not close the parent public LSP, position, version, VFS, or
+transaction boundary.
+
 No incremental-change parser, range application API, LSP version validator,
 partial-edit transaction, or placeholder server was added. Existing VFS full
 snapshot and compiler incremental-query behavior remains unchanged.
@@ -34,8 +39,11 @@ The current repository confirms the missing boundary:
 - `ling-db` proves clean versus incremental query results equivalent after
   source replacement, but its compiler query input is already a validated
   snapshot rather than a JSON-RPC edit batch.
-- No code defines range interpretation across UTF-8/UTF-16, change ordering,
-  atomic failure, stale-version response, or the required LSP fixtures.
+- `ling-source` now provides `Utf8Edit` and ordered immutable application under
+  `DEC-0069`; the primitive rejects scalar/CRLF interior boundaries and
+  revalidates every resulting snapshot without publishing it to the VFS.
+- No public adapter defines range interpretation across UTF-8/UTF-16, client
+  change ordering, stale-version response, or the required LSP fixtures.
 
 ## Required authority before implementation
 
@@ -52,9 +60,10 @@ An implementation-ready decision or RFC must define, at minimum:
 5. positive, negative, multi-edit, full-equivalence, stale/duplicate version,
    invalid-boundary, Unicode/CRLF/BOM, deterministic, and migration fixtures.
 
-Until those decisions and fixtures are Accepted, applying incremental ranges
-would risk partial VFS mutation, stale semantic results, or a position unit
-that conflicts with DEC-0002.
+Until the remaining public decisions and fixtures are Accepted, adapting the
+source primitive to LSP ranges would risk partial VFS mutation, stale semantic
+results, or a position unit that conflicts with DEC-0002. The bounded child is
+therefore evidence only, not completion of the parent.
 
 ## Evidence and compatibility
 
@@ -64,13 +73,15 @@ This audit was checked against `docs/decisions/0019-incremental-query-boundary.m
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 `crates/ling-source/src/vfs.rs`, `crates/ling-source/src/lib.rs`, and
 `crates/ling-db/src/lib.rs`.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+The bounded child adds no public protocol behavior; no diagnostic allocation,
+schema, Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0
+claim is made. See `docs/status/LSP-2104-UTF8-EDITS-AUTHORITY-AUDIT.md` and
+`docs/status/LSP-2104-UTF8-EDITS-IMPLEMENTATION-REPORT.md` for its evidence.
 
 ## Intentionally deferred
 
-`LSP-2104` can begin after the LSP position/overlay/version contract is
-Accepted. The implementation must apply each change batch atomically, preserve
-full-replacement equivalence, reject stale/invalid ranges before publication,
-and keep compiler byte spans authoritative.
+The full `LSP-2104` target can begin after the LSP position/overlay/version
+contract is Accepted. The public implementation must apply each change batch
+atomically, preserve full-replacement equivalence, reject stale/invalid ranges
+before publication, and keep compiler byte spans authoritative. The
+`LSP-2104-UTF8-EDITS` source-only child is complete under `DEC-0069`.

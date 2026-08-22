@@ -50,6 +50,47 @@ impl ByteOffset {
     }
 }
 
+/// One in-process replacement over the original UTF-8 byte snapshot.
+///
+/// The range is half-open and is interpreted against the source snapshot that
+/// is current when the edit is applied. This value deliberately carries no
+/// URI, document version, negotiated position, or transport information.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Utf8Edit {
+    start: ByteOffset,
+    end: ByteOffset,
+    replacement: Vec<u8>,
+}
+
+impl Utf8Edit {
+    /// Creates a replacement over the original UTF-8 byte range `[start, end)`.
+    /// Range and replacement validation is performed by `SourceFile` so a
+    /// caller can construct a value before attempting an atomic application.
+    #[must_use]
+    pub fn new(start: ByteOffset, end: ByteOffset, replacement: impl Into<Vec<u8>>) -> Self {
+        Self {
+            start,
+            end,
+            replacement: replacement.into(),
+        }
+    }
+
+    #[must_use]
+    pub const fn start(&self) -> ByteOffset {
+        self.start
+    }
+
+    #[must_use]
+    pub const fn end(&self) -> ByteOffset {
+        self.end
+    }
+
+    #[must_use]
+    pub fn replacement(&self) -> &[u8] {
+        &self.replacement
+    }
+}
+
 /// A byte offset in the BOM-free, LF-normalized lexical view.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct LexicalOffset(u32);
@@ -414,6 +455,79 @@ impl SourceFile {
         self.original.into_bytes()
     }
 
+    /// Applies one UTF-8 byte-range replacement and returns a new source
+    /// snapshot.
+    ///
+    /// The original source is immutable: invalid ranges, non-character
+    /// boundaries, invalid replacement text, and oversized results return an
+    /// error without producing a partially updated snapshot. This is an
+    /// in-process source primitive, not an LSP edit or transaction API.
+    pub fn apply_utf8_edit(&self, edit: &Utf8Edit) -> Result<Self, SourceEditError> {
+        self.apply_utf8_edits(std::slice::from_ref(edit))
+    }
+
+    /// Applies edits in the supplied order, validating each edit against the
+    /// snapshot produced by the preceding edit. The operation is atomic from
+    /// the caller's perspective because `self` is never mutated and no
+    /// intermediate snapshot is returned on failure.
+    pub fn apply_utf8_edits(&self, edits: &[Utf8Edit]) -> Result<Self, SourceEditError> {
+        let mut current = self.clone();
+        for edit in edits {
+            current = current.apply_one_utf8_edit(edit)?;
+        }
+        Ok(current)
+    }
+
+    fn apply_one_utf8_edit(&self, edit: &Utf8Edit) -> Result<Self, SourceEditError> {
+        if edit.start > edit.end {
+            return Err(SourceEditError::ReversedRange {
+                start: edit.start,
+                end: edit.end,
+            });
+        }
+
+        let source_len = self.original.len();
+        let start = edit.start.get() as usize;
+        let end = edit.end.get() as usize;
+        if start > source_len {
+            return Err(SourceEditError::OffsetOutOfBounds {
+                offset: edit.start,
+                source_len: ByteOffset::new(
+                    u32::try_from(source_len).expect("source length is bounded"),
+                ),
+            });
+        }
+        if end > source_len {
+            return Err(SourceEditError::OffsetOutOfBounds {
+                offset: edit.end,
+                source_len: ByteOffset::new(
+                    u32::try_from(source_len).expect("source length is bounded"),
+                ),
+            });
+        }
+        if !is_edit_boundary(&self.original, start) {
+            return Err(SourceEditError::NotCharacterBoundary { offset: edit.start });
+        }
+        if !is_edit_boundary(&self.original, end) {
+            return Err(SourceEditError::NotCharacterBoundary { offset: edit.end });
+        }
+
+        let retained_len = source_len - (end - start);
+        let maximum = u32::MAX as usize;
+        if retained_len > maximum || edit.replacement.len() > maximum - retained_len {
+            return Err(SourceEditError::ResultTooLarge);
+        }
+        let result_len = retained_len + edit.replacement.len();
+        let original = self.original.as_bytes();
+        let mut bytes = Vec::with_capacity(result_len);
+        bytes.extend_from_slice(&original[..start]);
+        bytes.extend_from_slice(&edit.replacement);
+        bytes.extend_from_slice(&original[end..]);
+
+        debug_assert_eq!(bytes.len(), result_len);
+        Self::from_bytes(self.id, self.name.clone(), bytes).map_err(SourceEditError::InvalidSource)
+    }
+
     #[must_use]
     pub fn lexical_text(&self) -> &str {
         &self.lexical
@@ -488,6 +602,70 @@ impl fmt::Display for SourceError {
 }
 
 impl Error for SourceError {}
+
+/// Failure while applying an in-process UTF-8 source edit.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum SourceEditError {
+    ReversedRange {
+        start: ByteOffset,
+        end: ByteOffset,
+    },
+    OffsetOutOfBounds {
+        offset: ByteOffset,
+        source_len: ByteOffset,
+    },
+    NotCharacterBoundary {
+        offset: ByteOffset,
+    },
+    ResultTooLarge,
+    InvalidSource(SourceError),
+}
+
+impl fmt::Display for SourceEditError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::ReversedRange { start, end } => write!(
+                formatter,
+                "UTF-8 edit range starts at byte {} but ends at byte {}",
+                start.get(),
+                end.get()
+            ),
+            Self::OffsetOutOfBounds { offset, source_len } => write!(
+                formatter,
+                "UTF-8 edit byte offset {} exceeds source length {}",
+                offset.get(),
+                source_len.get()
+            ),
+            Self::NotCharacterBoundary { offset } => write!(
+                formatter,
+                "UTF-8 edit byte offset {} is not a character boundary",
+                offset.get()
+            ),
+            Self::ResultTooLarge => {
+                formatter.write_str("UTF-8 edit result exceeds the u32 source limit")
+            }
+            Self::InvalidSource(error) => write!(formatter, "edited source is invalid: {error}"),
+        }
+    }
+}
+
+impl Error for SourceEditError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::InvalidSource(error) => Some(error),
+            _ => None,
+        }
+    }
+}
+
+fn is_edit_boundary(original: &str, offset: usize) -> bool {
+    if !original.is_char_boundary(offset) {
+        return false;
+    }
+
+    let bytes = original.as_bytes();
+    !(offset > 0 && offset < bytes.len() && bytes[offset - 1] == b'\r' && bytes[offset] == b'\n')
+}
 
 fn normalize_newlines(original: &str, content_start: usize) -> (String, Vec<ByteOffset>) {
     let mut lexical = String::with_capacity(original.len() - content_start);
@@ -636,5 +814,150 @@ mod tests {
                 offset: ByteOffset::new(1)
             }
         );
+    }
+
+    #[test]
+    fn applies_unicode_edit_without_normalizing_original_bytes() {
+        let source = SourceFile::from_bytes(
+            SOURCE_ID,
+            "edit.ling",
+            "\u{feff}人物 = 😀\r\n".as_bytes().to_vec(),
+        )
+        .unwrap();
+        let original = source.original_text().as_bytes();
+        let start = original
+            .windows("人物".len())
+            .position(|window| window == "人物".as_bytes())
+            .unwrap();
+        let edited = source
+            .apply_utf8_edit(&Utf8Edit::new(
+                ByteOffset::new(start as u32),
+                ByteOffset::new((start + "人物".len()) as u32),
+                "将军".as_bytes().to_vec(),
+            ))
+            .unwrap();
+
+        assert_eq!(edited.id(), SOURCE_ID);
+        assert_eq!(edited.name(), "edit.ling");
+        assert_eq!(edited.original_text(), "\u{feff}将军 = 😀\r\n");
+        assert_eq!(edited.lexical_text(), "将军 = 😀\n");
+        assert!(edited.had_bom());
+    }
+
+    #[test]
+    fn applies_edits_in_order_and_matches_full_replacement() {
+        let source =
+            SourceFile::from_bytes(SOURCE_ID, "edit.ling", b"alpha beta".to_vec()).unwrap();
+        let edits = [
+            Utf8Edit::new(ByteOffset::new(0), ByteOffset::new(5), b"one".to_vec()),
+            Utf8Edit::new(ByteOffset::new(4), ByteOffset::new(8), b"two".to_vec()),
+        ];
+
+        let edited = source.apply_utf8_edits(&edits).unwrap();
+        let expected = SourceFile::from_bytes(SOURCE_ID, "edit.ling", b"one two".to_vec()).unwrap();
+        assert_eq!(edited, expected);
+    }
+
+    #[test]
+    fn rejects_reversed_out_of_bounds_and_non_boundary_ranges_atomically() {
+        let source =
+            SourceFile::from_bytes(SOURCE_ID, "edit.ling", "人物".as_bytes().to_vec()).unwrap();
+
+        assert_eq!(
+            source
+                .apply_utf8_edit(&Utf8Edit::new(
+                    ByteOffset::new(2),
+                    ByteOffset::new(1),
+                    Vec::new(),
+                ))
+                .unwrap_err(),
+            SourceEditError::ReversedRange {
+                start: ByteOffset::new(2),
+                end: ByteOffset::new(1),
+            }
+        );
+        assert!(matches!(
+            source
+                .apply_utf8_edit(&Utf8Edit::new(
+                    ByteOffset::new(0),
+                    ByteOffset::new(7),
+                    Vec::new(),
+                ))
+                .unwrap_err(),
+            SourceEditError::OffsetOutOfBounds { .. }
+        ));
+        assert_eq!(
+            source
+                .apply_utf8_edit(&Utf8Edit::new(
+                    ByteOffset::new(1),
+                    ByteOffset::new(2),
+                    Vec::new(),
+                ))
+                .unwrap_err(),
+            SourceEditError::NotCharacterBoundary {
+                offset: ByteOffset::new(1)
+            }
+        );
+        let crlf = SourceFile::from_bytes(SOURCE_ID, "edit.ling", b"a\r\nb".to_vec()).unwrap();
+        assert_eq!(
+            crlf.apply_utf8_edit(&Utf8Edit::new(
+                ByteOffset::new(2),
+                ByteOffset::new(2),
+                Vec::new(),
+            ))
+            .unwrap_err(),
+            SourceEditError::NotCharacterBoundary {
+                offset: ByteOffset::new(2)
+            }
+        );
+        assert_eq!(source.original_text(), "人物");
+    }
+
+    #[test]
+    fn rejects_invalid_replacement_without_publishing_a_partial_batch() {
+        let source = SourceFile::from_bytes(SOURCE_ID, "edit.ling", b"ab".to_vec()).unwrap();
+        let edits = [
+            Utf8Edit::new(ByteOffset::new(0), ByteOffset::new(1), b"x".to_vec()),
+            Utf8Edit::new(ByteOffset::new(0), ByteOffset::new(1), vec![0xff]),
+        ];
+
+        assert!(matches!(
+            source.apply_utf8_edits(&edits).unwrap_err(),
+            SourceEditError::InvalidSource(SourceError::InvalidUtf8 { .. })
+        ));
+        assert_eq!(source.original_text(), "ab");
+    }
+
+    #[test]
+    fn rejects_a_replacement_that_moves_the_bom() {
+        let source = SourceFile::from_bytes(SOURCE_ID, "edit.ling", b"ab".to_vec()).unwrap();
+        assert!(matches!(
+            source
+                .apply_utf8_edit(&Utf8Edit::new(
+                    ByteOffset::new(1),
+                    ByteOffset::new(1),
+                    "\u{feff}".as_bytes().to_vec(),
+                ))
+                .unwrap_err(),
+            SourceEditError::InvalidSource(SourceError::MisplacedByteOrderMark { .. })
+        ));
+    }
+
+    #[test]
+    fn full_replacement_rebuilds_the_same_validated_snapshot() {
+        let source =
+            SourceFile::from_bytes(SOURCE_ID, "edit.ling", "\u{feff}旧\r\n".as_bytes().to_vec())
+                .unwrap();
+        let replacement = "\u{feff}新\r\n".as_bytes().to_vec();
+        let edited = source
+            .apply_utf8_edit(&Utf8Edit::new(
+                ByteOffset::new(0),
+                ByteOffset::new(source.original_text().len() as u32),
+                replacement.clone(),
+            ))
+            .unwrap();
+        let expected = SourceFile::from_bytes(SOURCE_ID, "edit.ling", replacement).unwrap();
+
+        assert_eq!(edited, expected);
     }
 }

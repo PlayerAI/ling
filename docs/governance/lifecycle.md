@@ -99,6 +99,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0066` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0066](../decisions/0066-handler-hir-projection.md) |
 | `DEC-0067` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0067](../decisions/0067-effect-model-property-corpus.md) |
 | `DEC-0068` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0068](../decisions/0068-trait-termination-corpus.md) |
+| `DEC-0069` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0069](../decisions/0069-lsp-utf8-edit-primitive.md) |
 
 ## Migration boundary
 

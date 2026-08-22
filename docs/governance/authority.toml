@@ -1404,3 +1404,16 @@ covers = ["EFF-2105 bounded Effect model property corpus", "canonical row/solver
 depends_on = ["RFC-0006", "DEC-0062"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0069"
+title = "LSP internal UTF-8 edit primitive"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0069-lsp-utf8-edit-primitive.md"
+covers = ["LSP-2104 bounded UTF-8 edit application", "ordered atomic source edit batch", "CRLF/BOM/scalar boundary validation"]
+depends_on = ["DEC-0002", "DEC-0019", "DEC-0029", "RFC-0023", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

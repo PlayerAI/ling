@@ -1882,3 +1882,27 @@ unresolved_alternatives = [
   "Production HIR integration, performance metrics, resource budgets, cancellation, and public Trait evidence remain TRAIT-1309 parent work requiring separate authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0069"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0069-lsp-utf8-edit-primitive.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Apply partial and full replacements over Unicode, BOM, CRLF, and final-newline inputs and compare exact bytes, lexical text, source identity, and rebuilt maps.",
+  "Apply ordered edits and compare with the equivalent full replacement; reject reversed, out-of-bounds, scalar-interior, CRLF-interior, invalid UTF-8/BOM, and failed-later edits atomically.",
+  "Repeat the same edit sequence and compare immutable SourceFile values; keep public LSP, JSON, version, VFS, and transaction fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only an in-process ling-source edit value, typed error, and immutable transformation; language, diagnostics, schemas, Semantic IDs, protocols, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Negotiated positions, URI/version checks, VFS publication, stale results, JSON-RPC didChange, Workspace Edits, range transactions, and public compatibility remain LSP-2104 parent work under GAP-LSP-TRANSACTION-PROTOCOL-001.",
+]
+superseded_by = ""
