@@ -356,6 +356,7 @@
 | `PROOF-5501` | Proof IR | `G5` | `L` | `BlockedSpec` | `CTR-5405` | `` |
 | `PROOF-5501-OBSERVATION` | Internal Proof IR boundary evidence | `G5` | `S` | `Done` | `CTR-5407-OBSERVATION` | `defaa5f97ea9c406c5f7012412dc8e0ec6f0c4a3` |
 | `PROOF-5502` | Independent Checker | `G5` | `L` | `BlockedSpec` | `PROOF-5501` | `` |
+| `PROOF-5502-OBSERVATION` | Internal Independent Checker boundary evidence | `G5` | `S` | `Done` | `PROOF-5501-OBSERVATION` | `657d3a63eea75b45708aa91aa7806e16ced03e68` |
 | `PROOF-5503` | Assumption Registry | `G5` | `M` | `BlockedSpec` | `PROOF-5502` | `` |
 | `PROTO-6201` | Protocol Registry | `G6` | `L` | `BlockedSpec` | `STAB-6103` | `` |
 | `PROTO-6202` | Reader/Writer Compatibility Tests | `G6` | `L` | `BlockedSpec` | `PROTO-6201` | `` |
