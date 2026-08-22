@@ -7145,6 +7145,61 @@ notes = [
 ]
 
 [[task]]
+id = "LSP-2402-CHECKED-IDENTITY"
+title = "Internal checked-token identity observation"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2401-LEXICAL-SOURCE"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0084-lsp-lexical-token-source-index.md",
+  "docs/decisions/0085-lsp-checked-token-identity-observation.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/checked_token_source_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0085-lsp-checked-token-identity-observation.md",
+  "docs/status/LSP-2402-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2402-CHECKED-IDENTITY-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2402-CHECKED-IDENTITY-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0085 authorizes only an exact source-name/original-span join; semantic-token taxonomy, modifiers, fallback, positions, versions, negotiation, and transport remain deferred.",
+  "Entries retain existing Definition ID, canonical type text, effect names, and capability names only for exact definition spans; unmatched tokens carry no fabricated checked facts.",
+  "The query preserves source order, uses the existing QueryKey, caches immutable results, and introduces no new identity, category, position, version, or public protocol field.",
+  "Focused ling-db coverage verifies a checked source, exact helper/main definition observations, canonical Int/effect facts, source identity, and cache reuse.",
+  "Full format, tests, clippy, CI, governance, status, and diff gates pass without changing language semantics, diagnostics, schemas, Semantic IDs, runtime, VM, ABI, dependencies, or Unicode 17.0.0 data.",
+]
+verified_against_commit = "bbb0786453b8fefee974b4137b47587ff636c60c"
+completion_commit = "bbb0786453b8fefee974b4137b47587ff636c60c"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This bounded child is complete under DEC-0085; public LSP-2402 remains BlockedSpec for taxonomy, fallback-source, position/version, negotiation, and transport contracts.",
+  "The index is an internal checked-identity observation, not semantic-token generation, a legend/modifier model, an LSP range list, or a protocol schema.",
+]
+
+[[task]]
 id = "LSP-2403"
 title = "Semantic token full and delta transport"
 state = "BlockedSpec"

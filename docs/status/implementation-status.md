@@ -201,6 +201,7 @@
 | `LSP-2401` | Semantic token taxonomy RFC/decision | `G1` | `M` | `BlockedSpec` | `IDE-2311`, `LSP-2101`, `LSP-2102` | `` |
 | `LSP-2401-LEXICAL-SOURCE` | Internal lexical token source index | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP` | `135bfb07bb8f824f1ab119b5e0f765c674d6f294` |
 | `LSP-2402` | Typed semantic-token generation | `G1` | `L` | `BlockedSpec` | `LSP-2101`, `LSP-2102`, `LSP-2401` | `` |
+| `LSP-2402-CHECKED-IDENTITY` | Internal checked-token identity observation | `G1` | `S` | `Done` | `LSP-2401-LEXICAL-SOURCE` | `bbb0786453b8fefee974b4137b47587ff636c60c` |
 | `LSP-2403` | Semantic token full and delta transport | `G1` | `L` | `BlockedSpec` | `LSP-2401`, `LSP-2402` | `` |
 | `LSP-2404` | Semantic-token fixture corpus | `G1` | `M` | `BlockedSpec` | `LSP-2401`, `LSP-2402`, `LSP-2403` | `` |
 | `LSP-2501` | LSP request snapshot | `G1` | `L` | `BlockedSpec` | `INC-1401`, `INC-1402`, `LSP-2103`, `LSP-2104` | `` |
