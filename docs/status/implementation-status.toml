@@ -15843,10 +15843,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "3c1d02592f40ecf9273721062419f9852484d0f8"
+completion_commit = "3c1d02592f40ecf9273721062419f9852484d0f8"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0154; CPU-4203 remains BlockedSpec for fixtures, manifests, expected outputs, Fault/trace snapshots, differential evidence, migration, protocol integration, and support claims.",
   "No parser, AST/HIR/Checked Core node, Kernel source fixture, corpus manifest, expected-output snapshot, corpus runner, differential runner, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",

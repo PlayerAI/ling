@@ -82,6 +82,7 @@
 | `CPU-4202` | Reference Trace | `G4` | `M` | `BlockedSpec` | `CPU-4201` | `` |
 | `CPU-4202-OBSERVATION` | Internal CPU reference-trace boundary evidence | `G4` | `S` | `Done` | `CPU-4201-OBSERVATION` | `cbdf4d64da02f41d6f7ef21df528b17e77136cfb` |
 | `CPU-4203` | Kernel Corpus | `G4` | `M` | `BlockedSpec` | `CPU-4202` | `` |
+| `CPU-4203-OBSERVATION` | Internal Kernel corpus boundary evidence | `G4` | `S` | `Done` | `CPU-4202-OBSERVATION` | `3c1d02592f40ecf9273721062419f9852484d0f8` |
 | `CTR-5401` | Contract Syntax and AST/Core | `G5` | `M` | `BlockedSpec` | `NODE-5307` | `` |
 | `CTR-5402` | Contract Status Model | `G5` | `M` | `BlockedSpec` | `CTR-5401` | `` |
 | `CTR-5403` | Runtime Contract Check | `G5` | `M` | `BlockedSpec` | `CTR-5402` | `` |
