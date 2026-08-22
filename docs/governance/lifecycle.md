@@ -159,6 +159,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0126` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0126](../decisions/0126-managed-collector-boundary-evidence.md) |
 | `DEC-0127` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0127](../decisions/0127-managed-ffi-boundary-evidence.md) |
 | `DEC-0128` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0128](../decisions/0128-managed-profile-boundary-evidence.md) |
+| `DEC-0129` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0129](../decisions/0129-native-ir-design-boundary-evidence.md) |
 
 ## Migration boundary
 

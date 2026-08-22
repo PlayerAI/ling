@@ -2184,3 +2184,16 @@ covers = ["GC-3304 bounded Managed Profile boundary evidence", "test-only Profil
 depends_on = ["DEC-0127", "DEC-0126", "DEC-0125", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0129"
+title = "Internal Native IR design boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0129-native-ir-design-boundary-evidence.md"
+covers = ["NIR-3401 bounded Native IR design boundary evidence", "test-only Native IR vocabulary", "IR boundaries without instruction/ABI/serialization/lowering semantics"]
+depends_on = ["DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
