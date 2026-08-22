@@ -13118,6 +13118,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/NIR-3403-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3403-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3403-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0131-native-ir-verifier-boundary-evidence.md",
+  "crates/ling-types/tests/native_ir_verifier_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -13127,6 +13135,7 @@ acceptance = [
   "The audit covers valid/invalid CFG/SSA/types/cleanup/ABI/source IDs, adversarial and oversized input, safe rejection, deterministic diagnostics, Unicode/CRLF/BOM spans, fuzz/property evidence, and interpreter/VM/Native differential fixtures.",
   "No verifier crate, validation schema, malformed-IR diagnostic, IR parser, public protocol, or placeholder G3 API is added while NIR-3401/NIR-3402 and RFC-N304/RFC-0011 plus dependent memory/ownership/Managed/FFI authority are absent.",
   "The future implementation must preserve Seed behavior, consume checked Typed Core only, never execute unchecked IR, bound verification resources, keep host UB impossible, and publish verifier soundness, security, ABI, and differential evidence before exposing v0.3 Native behavior.",
+  "Accepted DEC-0131 authorizes only test-only Native IR verifier boundary vocabulary; it does not close NIR parsing, CFG/SSA/type/ownership/cleanup/ABI validation, backend-neutral operations, diagnostics, or execution isolation.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13136,6 +13145,68 @@ notes = [
   "NIR-3403 is BlockedSpec by NIR-3401/NIR-3402, absent RFC-N304/RFC-0011 and dependent RFC-N301/RFC-N302/RFC-N303/RFC-N305/RFC-N306, GAP-NATIVE-BACKEND-ABI-001, and GAP-OWNERSHIP-MODEL-001.",
   "The current workspace has no Native IR parser/verifier or ABI validator; existing source/Typed Core validation and bytecode/VM paths remain unchanged and no future IR input is accepted.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "NIR-3403-OBSERVATION"
+title = "Internal Native IR verifier boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["NIR-3402-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "docs/decisions/0127-managed-ffi-boundary-evidence.md",
+  "docs/decisions/0128-managed-profile-boundary-evidence.md",
+  "docs/decisions/0129-native-ir-design-boundary-evidence.md",
+  "docs/decisions/0130-native-ir-lowering-boundary-evidence.md",
+  "docs/decisions/0131-native-ir-verifier-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/native_ir_verifier_evidence.rs",
+  "docs/decisions/0131-native-ir-verifier-boundary-evidence.md",
+  "docs/status/NIR-3403-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3403-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0131 authorizes only test-only Native IR verifier boundary evidence; no verifier, parser, NIR schema, diagnostic, ABI validator, execution path, backend operation set, or public protocol is claimed.",
+  "The test-local inventory covers forty-four provisional boundaries for blocks/control flow, phi/SSA, type consistency, Resource/Managed/borrow facts, cleanup/Drop/Fault/Effect edges, ABI/calling convention, source IDs/spans, references, backend neutrality, malformed/version/structural rejection, deterministic diagnostics, safe bounds, Unicode spans, Semantic IDs, differential evidence, and migration compatibility with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and has no validation, execution, ABI, diagnostic, or protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "138a8671c22a7a8e04376b7b0440f2ab6f532ef7"
+completion_commit = "138a8671c22a7a8e04376b7b0440f2ab6f532ef7"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0131; NIR-3403 remains BlockedSpec for NIR grammar/parser limits, CFG/SSA/types, ownership/cleanup, ABI, source-ID mapping, backend-neutral operations, diagnostics, security, differential verification, and Native execution.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
