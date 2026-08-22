@@ -5486,6 +5486,58 @@ notes = [
 ]
 
 [[task]]
+id = "LSP-2105-WORKSPACE-SNAPSHOT"
+title = "Bounded internal workspace-state snapshot"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["INC-1402", "LSP-2103-OVERLAY"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0004.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-source/src/lib.rs",
+  "crates/ling-source/src/vfs.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
+  "docs/status/LSP-2105-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2105-WORKSPACE-SNAPSHOT-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2105-WORKSPACE-SNAPSHOT-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0071 authorizes only an immutable compiler-owned workspace-state capture; no watcher, reload notification, URI/version, JSON-RPC, or public LSP behavior is inferred.",
+  "VirtualFileSystem::workspace_snapshot and CompilerDb::workspace_snapshot capture visible source files, workspace inputs, exact bytes, origins, per-input revisions, and the session high-water revision in canonical order.",
+  "Focused tests cover deterministic ordering, overlay visibility, lookups, Unicode/BOM/CRLF-safe owned bytes, and immutability after later VFS mutation.",
+  "cargo fmt --all -- --check, cargo test -p ling-source -p ling-db --all-targets --locked --offline (25 and 21 tests), cargo clippy -p ling-source -p ling-db --all-targets --locked --offline -- -D warnings, and cargo xtask governance check-all pass.",
+  "The public LSP-2105 target remains BlockedSpec for watcher, workspace identity, event coalescing, reload publication, stale-result, and protocol fixtures.",
+]
+verified_against_commit = "60566b4cd547c1969c0deec512f11f59069e2e7c"
+completion_commit = "60566b4cd547c1969c0deec512f11f59069e2e7c"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The bounded compiler observation child is complete under DEC-0071; the public LSP-2105 workspace-reload target remains BlockedSpec and no protocol-inventory entry is added.",
+]
+
+[[task]]
 id = "LSP-2105"
 title = "LSP workspace reload"
 state = "BlockedSpec"

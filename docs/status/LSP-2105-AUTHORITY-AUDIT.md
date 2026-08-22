@@ -7,11 +7,13 @@ server to react to manifest/source changes, advance project graph revisions for
 configuration/lock/dependency changes, and avoid treating every file event as a
 full rebuild. The compiler already has internal revision and invalidation
 boundaries, but no accepted LSP workspace notification or project reload
-contract exposes them.
+contract exposes them. Accepted DEC-0071 now authorizes the bounded internal
+`LSP-2105-WORKSPACE-SNAPSHOT` child, without closing the public parent.
 
 No filesystem watcher, workspace reload notification, manifest/lock watcher,
-project revision API, stale-result handler, or placeholder LSP service was
-added. Existing compiler/VFS revision behavior remains unchanged.
+project reload protocol, stale-result handler, or placeholder LSP service was
+added. The child adds only an immutable compiler-owned workspace-state capture;
+existing query/VFS revision behavior remains unchanged.
 
 ## Normative traceability
 
@@ -34,8 +36,10 @@ added. Existing compiler/VFS revision behavior remains unchanged.
 The current repository confirms the split boundary:
 
 - `ling-source` and `ling-db` track immutable source/project input revisions
-  and invalidate dependent queries deterministically; they do not own OS
-  watchers, LSP workspace folders, or notification acknowledgements.
+  and invalidate dependent queries deterministically. The bounded child now
+  captures visible files, workspace inputs, and the session revision in
+  canonical owned collections; these crates still do not own OS watchers, LSP
+  workspace folders, or notification acknowledgements.
 - `ling-project` reads explicit manifests/locks and builds deterministic graphs;
   it has no accepted editor reload service or policy for partially changed
   dependency trees.
@@ -65,17 +69,19 @@ silently publish stale semantics or rebuild too broadly.
 ## Evidence and compatibility
 
 This audit was checked against `docs/decisions/0019-incremental-query-boundary.md`,
+`docs/decisions/0071-lsp-workspace-state-snapshot.md`,
 `docs/RFC-0002.md`, `docs/SEMANTICS.md`, `docs/ROADMAP-1.0.md`,
 `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 `crates/ling-source`, `crates/ling-db`, and `crates/ling-project`.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+Only the internal immutable snapshot boundary changed; no public protocol
+behavior changed, and no diagnostic allocation, schema, Semantic ID,
+source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is made.
 
 ## Intentionally deferred
 
-`LSP-2105` can begin after the project reload, LSP lifecycle, and incremental
-cache contracts are Accepted. The implementation should coalesce events into
-explicit immutable revisions, invalidate only affected queries, and reject
-stale results without exposing host watcher details as Ling semantics.
+The bounded snapshot child is complete under DEC-0071. The public `LSP-2105`
+target can begin only after project reload, LSP lifecycle, and incremental
+cache contracts are Accepted; that future implementation must coalesce events
+into explicit immutable revisions, invalidate only affected queries, and
+reject stale results without exposing host watcher details as Ling semantics.
