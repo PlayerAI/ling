@@ -304,6 +304,7 @@
 | `REM-2603` | Delivery semantics | `G2` | `L` | `BlockedSpec` | `REM-2602` | `` |
 | `REM-2603-OBSERVATION` | Internal remote-delivery boundary evidence | `G2` | `S` | `Done` | `REM-2602-OBSERVATION` | `cbfd4592fd499bd09722936caa597cccbd10f172` |
 | `REM-2604` | Minimal reference transport | `G2` | `L` | `BlockedSpec` | `REM-2603` | `` |
+| `REM-2604-OBSERVATION` | Internal reference-transport boundary evidence | `G2` | `S` | `Done` | `REM-2603-OBSERVATION` | `529e13a8e3e3017346cc0deb816c74a7a3036c30` |
 | `REM-2605` | Security and resource limits | `G2` | `L` | `BlockedSpec` | `REM-2604` | `` |
 | `REP-2501` | Determinism class | `G2` | `L` | `BlockedSpec` | `SUP-2403` | `` |
 | `REP-2501-OBSERVATION` | Internal determinism-class evidence | `G2` | `S` | `Done` | `SUP-2403-OBSERVATION` | `0d3d11d9be50790c35ac014b33318d3966b10464` |
