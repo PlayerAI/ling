@@ -229,6 +229,7 @@
 | `MEM-3101` | Type classification model | `G3` | `M` | `BlockedSpec` | — | `` |
 | `MEM-3101-SEED-VALUE` | Seed completed-type Value classification | `G3` | `S` | `Done` | — | `c64ceb9101190d630125d3a7b6e1ede150c01488` |
 | `MEM-3102` | Value layout and Copy/Move | `G3` | `L` | `BlockedSpec` | `MEM-3101` | `` |
+| `MEM-3102-OBSERVATION` | Internal Value-layout and Copy/Move boundary evidence | `G3` | `S` | `Done` | `MEM-3101-SEED-VALUE` | `6f5d2c1da186151ce36c0c67a3f3410424ae48b4` |
 | `MEM-3103` | Resource definition and Drop contract | `G3` | `L` | `BlockedSpec` | `MEM-3102` | `` |
 | `MEM-3104` | Managed types and island boundaries | `G3` | `L` | `BlockedSpec` | `MEM-3103` | `` |
 | `NIR-3401` | Native IR design | `G3` | `L` | `BlockedSpec` | `GC-3304` | `` |

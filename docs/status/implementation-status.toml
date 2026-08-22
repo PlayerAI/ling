@@ -11308,6 +11308,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/MEM-3102-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3102-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3102-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0115-memory-layout-copy-move-boundary-evidence.md",
+  "crates/ling-types/tests/memory_layout_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -11317,6 +11325,7 @@ acceptance = [
   "The audit covers move/use-after-move diagnostics, cleanup/failure/cancellation/Actor boundaries, optimization equivalence, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No Value layout, Copy/Move trait, implicit-copy rule, move checker, ABI field, padding/endianness behavior, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N301 authority is absent.",
   "The future implementation must preserve Seed Value behavior, consume accepted types and checked Core only, keep optimization unobservable, and publish copy/move, representation, serialization, Profile, and interpreter/VM/Native evidence before exposing v0.3 layout behavior.",
+  "Accepted DEC-0115 authorizes only test-only Value-layout and Copy/Move boundary vocabulary; it does not close memory-kind, ownership, layout, ABI, serialization, diagnostic, or optimization gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -11326,6 +11335,59 @@ notes = [
   "MEM-3102 is BlockedSpec by MEM-3101, absent RFC-N301/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved Copy/Move, representation, ABI, serialization, identity, and optimization-boundary contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have value semantics without future Copy/Move traits, ownership checker, layout contract, inline/stack policy, padding/endianness schema, or Native ABI; Rust Copy/allocation/layout/order remain non-semantic.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory kind, Value layout, Copy/Move rule, ownership, Native ABI, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "MEM-3102-OBSERVATION"
+title = "Internal Value-layout and Copy/Move boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["MEM-3101-SEED-VALUE"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0008-seed-value-restriction.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0061-seed-type-value-classification.md",
+  "docs/decisions/0115-memory-layout-copy-move-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/memory_layout_evidence.rs",
+  "docs/decisions/0115-memory-layout-copy-move-boundary-evidence.md",
+  "docs/status/MEM-3102-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3102-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0115 authorizes only test-only Value-layout and Copy/Move boundary evidence; no layout, ownership, ABI, or optimization semantics are claimed.",
+  "The test-local inventory covers thirty-seven provisional boundaries for Value representation, Copy/Move, implicit operations, closure/aggregate/generic/Trait/Resource interactions, equality/hash/serialization, projections, layout/ABI, ownership, diagnostics, Profiles, differentials, spans, and migration with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no memory kind, layout type, Copy/Move trait, ownership checker, serializer, public protocol, or stale zero command is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "6f5d2c1da186151ce36c0c67a3f3410424ae48b4"
+completion_commit = "6f5d2c1da186151ce36c0c67a3f3410424ae48b4"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0115; MEM-3102 remains BlockedSpec for memory kinds, Copy/Move, ownership, layout/serialization, Native ABI, Profiles, diagnostics, optimization, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added.",
 ]
 
 [[task]]
