@@ -1599,3 +1599,16 @@ covers = ["PRJ-1107 bounded locked-project semantic snapshot", "internal package
 depends_on = ["RFC-0002", "DEC-0058", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0084"
+title = "Internal lexical token source index"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0084-lsp-lexical-token-source-index.md"
+covers = ["LSP-2401 bounded lexical token source inventory", "existing lexer token kinds and original spans", "deterministic internal semantic-token source"]
+depends_on = ["DEC-0002", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

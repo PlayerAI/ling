@@ -2233,3 +2233,27 @@ unresolved_alternatives = [
   "Project/workspace selection, general compiler-host lifecycle, incremental invalidation, public project semantic-check commands, run/test/build behavior, artifacts, exits, machine output, network policy, and protocol publication remain PRJ-1107 and GAP-PROJECT-CLI-INTERFACE-001 work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0084"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0084-lsp-lexical-token-source-index.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Index ASCII, Chinese, BOM, CRLF, comments, layout, literal, delimiter, error, and EOF tokens and compare exact original bytes and source order.",
+  "Repeat the same VFS revision and compare immutable equality and cache reuse; edit the source and verify the index changes with the source query key.",
+  "Preserve lexical-error visibility without publishing semantic tokens or repairing invalid source; keep positions, versions, URI, limits, cancellation, and transport fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db token observations and a typed projection error over the existing lexer; language, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Semantic-token taxonomy/precedence, declaration/use classification, modifiers, legends, position/version binding, snapshots, negotiation, full/delta transport, stale/cancellation/resource policy, lifecycle, and migration remain LSP-2401 through LSP-2404 and registered gap work.",
+]
+superseded_by = ""

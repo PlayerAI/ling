@@ -114,6 +114,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0081` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0081](../decisions/0081-ide-code-action-repair-index.md) |
 | `DEC-0082` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0082](../decisions/0082-ide-workspace-symbol-lookups.md) |
 | `DEC-0083` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0083](../decisions/0083-prj-locked-project-semantic-snapshot.md) |
+| `DEC-0084` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0084](../decisions/0084-lsp-lexical-token-source-index.md) |
 
 ## Migration boundary
 

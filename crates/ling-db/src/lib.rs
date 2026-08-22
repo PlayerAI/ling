@@ -33,6 +33,7 @@ mod project_snapshot;
 mod reference_index;
 mod reference_span_index;
 mod rename_identifier;
+mod token_source_index;
 mod typed_definition_index;
 
 pub use completion_metadata_index::{ResolvedCompletionMetadata, ResolvedCompletionMetadataIndex};
@@ -54,6 +55,7 @@ pub use reference_span_index::{ResolvedReferenceSpan, ResolvedReferenceSpanIndex
 pub use rename_identifier::{
     RenameIdentifierObservation, RenameIdentifierStatus, observe_rename_identifier,
 };
+pub use token_source_index::{TokenSource, TokenSourceIndex, TokenSourceIndexError};
 pub use typed_definition_index::{TypedDefinitionIndex, TypedDefinitionSymbol};
 
 const LANGUAGE_VERSION: (u16, u16, u16) = (0, 1, 0);
@@ -66,6 +68,7 @@ pub enum QueryKind {
     SourceBytes,
     LineIndex,
     Tokens,
+    TokenSourceIndex,
     Parse,
     Ast,
     Hir,
@@ -486,6 +489,9 @@ pub enum QueryError {
     ProjectSnapshot {
         error: ProjectSnapshotError,
     },
+    TokenSourceIndex {
+        message: String,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -541,6 +547,9 @@ impl fmt::Display for QueryError {
                 write!(formatter, "semantic snapshot failed: {message}")
             }
             Self::ProjectSnapshot { error } => error.fmt(formatter),
+            Self::TokenSourceIndex { message } => {
+                write!(formatter, "token source index failed: {message}")
+            }
         }
     }
 }
@@ -680,6 +689,7 @@ pub struct CompilerDb {
         ProjectSemanticKey,
         Result<Arc<ling_semantic::ProjectProgramSnapshot>, ProjectSnapshotError>,
     >,
+    token_source_indexes: BTreeMap<QueryKey, Result<Arc<TokenSourceIndex>, String>>,
     semantic_fragments: BTreeMap<String, Arc<SemanticModuleFragment>>,
     trace: Vec<QueryEvent>,
 }
@@ -705,6 +715,7 @@ impl CompilerDb {
             type_effects: BTreeMap::new(),
             semantic_snapshots: BTreeMap::new(),
             project_semantic_snapshots: BTreeMap::new(),
+            token_source_indexes: BTreeMap::new(),
             semantic_fragments: BTreeMap::new(),
             trace: Vec::new(),
         }
@@ -816,6 +827,34 @@ impl CompilerDb {
         self.tokens.insert(key, tokens.clone());
         self.record(QueryKind::Tokens, &snapshot, QueryOutcome::Miss);
         Ok(tokens)
+    }
+
+    /// Builds an immutable original-byte lexical inventory for one source.
+    /// This is a source observation for future semantic-token analysis, not an
+    /// LSP semantic-token legend, range response, or protocol value.
+    pub fn token_source_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<TokenSourceIndex>, QueryError> {
+        let (key, snapshot, source) = self.source(file)?;
+        if let Some(cached) = self.token_source_indexes.get(&key).cloned() {
+            self.record(QueryKind::TokenSourceIndex, &snapshot, QueryOutcome::Hit);
+            return cached.map_err(|message| QueryError::TokenSourceIndex { message });
+        }
+        let lexed = self.tokens(file)?;
+        let result = TokenSourceIndex::from_lexed(
+            source.id(),
+            snapshot.logical_name().to_owned(),
+            source.original_text(),
+            &lexed,
+        )
+        .map(Arc::new)
+        .map_err(|error| error.to_string());
+        if let Ok(index) = &result {
+            self.token_source_indexes.insert(key, Ok(index.clone()));
+        }
+        self.record(QueryKind::TokenSourceIndex, &snapshot, QueryOutcome::Miss);
+        result.map_err(|message| QueryError::TokenSourceIndex { message })
     }
 
     /// Returns the lossless parse result, including bounded syntax errors.
@@ -2182,6 +2221,41 @@ mod tests {
             .trace()
             .iter()
             .any(|event| event.kind() == QueryKind::Ast && event.outcome() == QueryOutcome::Hit));
+    }
+
+    #[test]
+    fn token_source_index_preserves_original_spelling_and_reuses_results() {
+        let mut db = CompilerDb::new();
+        let source = "\u{feff}module Main\r\n\r\nlet 人物 = 1\r\n";
+        let file = file(
+            db.set_disk_snapshot("unicode/Main.ling", source.as_bytes().to_vec())
+                .unwrap(),
+        );
+
+        let first = db
+            .token_source_index(file)
+            .expect("valid source has a lexical index");
+        let repeated = db
+            .token_source_index(file)
+            .expect("repeated lexical index is deterministic");
+        assert!(Arc::ptr_eq(&first, &repeated));
+        assert!(first.is_valid());
+        assert_eq!(first.source(), file);
+        assert_eq!(first.source_name(), "unicode/Main.ling");
+
+        let person = first
+            .tokens()
+            .iter()
+            .find(|token| token.text() == "人物")
+            .expect("Chinese identifier is retained");
+        assert_eq!(person.kind().name(), "identifier");
+        let bytes = db.vfs.snapshot(file).expect("source snapshot exists");
+        let start = usize::try_from(person.span().start().get()).unwrap();
+        let end = usize::try_from(person.span().end().get()).unwrap();
+        assert_eq!(&bytes.bytes()[start..end], "人物".as_bytes());
+        assert!(db.trace().iter().any(|event| {
+            event.kind() == QueryKind::TokenSourceIndex && event.outcome() == QueryOutcome::Hit
+        }));
     }
 
     #[test]

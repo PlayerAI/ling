@@ -11,6 +11,9 @@ fallback behavior.
 
 No token taxonomy RFC, protocol registry entry, token generator, custom token
 kind, modifier, diagnostic allocation, or placeholder LSP surface was added.
+Accepted DEC-0084 and the bounded `LSP-2401-LEXICAL-SOURCE` child now add only
+an internal source-order inventory of existing lexer kinds, original spans, and
+source spelling; the public taxonomy remains blocked.
 
 ## Normative traceability
 
@@ -25,6 +28,11 @@ kind, modifier, diagnostic allocation, or placeholder LSP surface was added.
 - DEC-0012 fixes Semantic IDs/canonical bytes. The registered
   `PROTO-SEMANTIC-GRAPH-JSON` projections are Experimental and do not define a
   semantic-token taxonomy or `semanticId` token disclosure.
+- Accepted DEC-0084 authorizes only `CompilerDb::token_source_index`: it
+  preserves existing lexer `TokenKind`, original UTF-8 `Span`, source spelling,
+  source order, and lexical-error visibility. It explicitly does not define a
+  semantic-token category, legend, modifier, position projection, negotiation,
+  or transport.
 - `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves graph/transaction field
   stability, compatibility, stale handling, and migration open;
   `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves editor position/version and
@@ -45,6 +53,9 @@ kind, modifier, diagnostic allocation, or placeholder LSP surface was added.
   or fixture covers standard/custom mappings, unknown custom kinds, effect/
   capability disclosure, Semantic IDs, generated/error-recovery regions,
   Unicode/CRLF/BOM, ordering, or migration.
+- The new lexical-source index is an internal compiler observation only; it is
+  not an LSP range list and does not reinterpret layout, trivia, error, or EOF
+  tokens as semantic categories.
 
 ## Required authority before implementation
 
@@ -75,19 +86,22 @@ or become an irreversible client compatibility surface.
 
 This audit was checked against `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
 `docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, RFC-0005,
+DEC-0084,
 `docs/decisions/0027-trait-checked-core-dictionary-witness.md`,
 `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and the `ling-semantic`, `ling-source`, `ling-syntax`, and editor fixture
 directories.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+Only the internal `ling-db` lexical-source observation changed; no compiler
+language semantics, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
+public source-span projection, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`LSP-2401` can begin after the token taxonomy, position/version, Semantic Graph
-lifecycle, and client negotiation decisions are Accepted. The future
+The bounded lexical-source child is complete under DEC-0084. Public
+`LSP-2401` can begin only after the token taxonomy, position/version, Semantic
+Graph lifecycle, and client negotiation decisions are Accepted. The future
 implementation must derive tokens from checked data, preserve source-span and
 identity truth, redact capabilities explicitly, provide deterministic fallback,
 and label experimental categories.
