@@ -2301,3 +2301,16 @@ covers = ["FFI-3601 bounded FFI declaration boundary evidence", "test-only FFI d
 depends_on = ["DEC-0136", "DEC-0124", "DEC-0117", "DEC-0009", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0138"
+title = "Internal C ABI interoperability boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0138-c-abi-interoperability-boundary-evidence.md"
+covers = ["FFI-3602 bounded C ABI interoperability boundary evidence", "test-only C ABI vocabulary", "C ABI boundaries without layout/linker/ownership semantics"]
+depends_on = ["DEC-0137", "DEC-0136", "DEC-0134", "DEC-0124", "DEC-0117", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

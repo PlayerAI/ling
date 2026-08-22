@@ -349,6 +349,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FFI-3601` | G3 | FFI 声明模型 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:411`, `docs/status/FFI-3601-AUTHORITY-AUDIT.md` |
 | `FFI-3601-OBSERVATION` | G3 | Internal FFI declaration boundary evidence | S | Done | Accepted `DEC-0137`; see `crates/ling-types/tests/ffi_declaration_evidence.rs` and `docs/status/FFI-3601-OBSERVATION-IMPLEMENTATION-REPORT.md`; declaration/ABI/ownership semantics remain BlockedSpec |
 | `FFI-3602` | G3 | C ABI 最小互操作 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:431`, `docs/status/FFI-3602-AUTHORITY-AUDIT.md` |
+| `FFI-3602-OBSERVATION` | G3 | Internal C ABI interoperability boundary evidence | S | Done | Accepted `DEC-0138`; see `crates/ling-types/tests/ffi_c_abi_evidence.rs` and `docs/status/FFI-3602-OBSERVATION-IMPLEMENTATION-REPORT.md`; C layout/linker/ownership semantics remain BlockedSpec |
 | `FFI-3603` | G3 | Shim Generator | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:445`, `docs/status/FFI-3603-AUTHORITY-AUDIT.md` |
 | `FFI-3604` | G3 | Target Primitive Package | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:460`, `docs/status/FFI-3604-AUTHORITY-AUDIT.md` |
 | `FFI-3605` | G3 | FFI fuzz/sanitizer 套件 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:476`, `docs/status/FFI-3605-AUTHORITY-AUDIT.md` |
