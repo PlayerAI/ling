@@ -3957,6 +3957,66 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6903-SEED"
+title = "Seed RC3 independent-verification inventory drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6902-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0054-seed-rc3-independent-verification-inventory-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6903-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6603-AUTHORITY-AUDIT.md",
+  "docs/SEED-RELEASE-REPORT.md",
+  "docs/testing/RC3-INDEPENDENT-VERIFICATION.md",
+  "docs/testing/SECURITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/rc3_verification.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0054-seed-rc3-independent-verification-inventory-gate.md",
+  "docs/status/RC-6903-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6903-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/testing/RC3-INDEPENDENT-VERIFICATION.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc3 verify deterministically validates seven RC3 checks: three BlockedSpec and four partial Seed states with non-empty evidence and required-independent-exit cells and seven linked audit files.",
+  "The verifier fails closed on duplicate/missing/unexpected checks, state drift, missing no-independent-sign-off markers, missing audit markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate and does not build a tag, verify an artifact, contact a reviewer, create an evidence bundle, make a Go/No-Go decision, or claim independent support.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0054 closes only this internal Seed RC3 readiness child; the parent RC-6903 gate remains BlockedSpec for independent verification and release sign-off.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects the RC3 no-independent-sign-off boundary only; Seed self-validation remains repository validation and not independent evidence.",
+  "No tag, artifact, evidence bundle, reviewer identity, signature, issue status, network request, system configuration, or placeholder is added.",
+]
+
+[[task]]
 id = "RC-6903"
 title = "Independent Verification"
 state = "BlockedSpec"

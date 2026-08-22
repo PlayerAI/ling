@@ -93,6 +93,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0054"
+title = "Seed RC3 independent-verification inventory gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0054-seed-rc3-independent-verification-inventory-gate.md"
+covers = ["internal RC3 readiness inventory", "no-independent-sign-off boundary", "RC-6903-SEED evidence"]
+depends_on = ["ROADMAP-1.0", "DEC-0053", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0038"
 title = "CLI init command"
 kind = "Decision"

@@ -248,6 +248,7 @@
 | `RC-6902` | RC1 Public Validation | `G6` | `L` | `BlockedSpec` | `RC-6901` | `` |
 | `RC-6902-SEED` | Seed RC1 public-validation inventory drift gate | `G6` | `S` | `Done` | `RC-6901-SEED` | `056c6afb17fd1e8656b825e2c2a4f70b4173f2d8` |
 | `RC-6903` | Independent Verification | `G6` | `L` | `BlockedSpec` | `RC-6902` | `` |
+| `RC-6903-SEED` | Seed RC3 independent-verification inventory drift gate | `G6` | `S` | `In Progress` | `RC-6902-SEED` | `` |
 | `RC-6904` | RC2 / Final Change Control | `G6` | `L` | `BlockedSpec` | `RC-6903` | `` |
 | `RC-6905` | v1.0 Release Artifacts | `G6` | `L` | `BlockedSpec` | `RC-6904` | `` |
 | `REL-6601` | Fuzz Coverage Inventory | `G6` | `L` | `BlockedSpec` | `COMPAT-6504` | `` |

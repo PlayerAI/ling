@@ -142,6 +142,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0054"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0054-seed-rc3-independent-verification-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc3 verify offline and assert seven checks with three BlockedSpec, four partial Seed states, and seven release-audit marker files.",
+  "Mutate a check row/state, policy phrase, evidence cell, or linked audit marker and verify the gate fails closed.",
+  "Run cargo xtask ci verify and locked governance, status, support, and traceability checks without treating the inventory as independent verification or a Go/No-Go decision.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask RC3 readiness validator and CI preflight; no language, runtime, diagnostic, schema, protocol, dependency, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "Candidate identity/immutability, reviewer independence, clean environment, artifact/provenance verification, candidate-wide conformance, TCB/security review, evidence retention, rerun, and sign-off remain future release authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0038"
 kind = "Decision"
 status = "Accepted"

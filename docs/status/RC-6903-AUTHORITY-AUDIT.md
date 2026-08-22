@@ -48,6 +48,13 @@ independent clean build, artifact/provenance verification, candidate-wide
 conformance and corruption corpus, TCB/unsafe/FFI review, reproducible
 representative evidence, and a signed tag/hash/manifest comparison.
 
+The bounded `RC-6903-SEED` child is now protected by
+`cargo xtask rc3 verify`. That internal command checks the exact seven checks,
+their documented `BlockedSpec` or partial Seed states, the
+no-independent-sign-off boundary, and seven linked audit-marker files. It
+validates inventory drift only and does not create any independent evidence or
+Go/No-Go decision.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

@@ -41,11 +41,18 @@ The following commands validate repository consistency only; they do not
 constitute RC3 independent verification:
 
 ```text
+cargo xtask rc3 verify
 cargo run -p xtask --locked --offline -- status verify
 cargo run -p xtask --locked --offline -- governance check-all
 cargo run -p xtask --locked --offline -- support verify
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 ```
+
+`cargo xtask rc3 verify` deterministically checks the exact seven checks,
+their `BlockedSpec` or partial Seed states, the no-independent-sign-off
+boundary, and seven linked audit-marker files. It is a readiness inventory
+only; it does not build a tag, verify artifacts, contact a reviewer, or make a
+Go/No-Go decision.
 
 No tag was built, no artifact was published, no external reviewer or service
 was contacted, and no network or system configuration was changed by this
