@@ -3753,3 +3753,29 @@ unresolved_alternatives = [
   "Engine/input identity; observation points and event scheduling; value/Fault/effect/resource/actor/mailbox/cancellation traces; host-output exclusions; normalization of text/numeric/aggregate/closure/console/failures; unsupported, malformed, limits; corpus/property/replay; canonical/deterministic/cross-process/target/compiler runs; classification/allowed differences; diagnostics, Unicode, schema migration, and public protocol rules remain open under DIFF-3701, DIFF-3702, FFI-3605, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, and missing Native/differential authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0143"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0143-allowed-difference-registry-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty provisional allowed-difference boundaries and their test-local order.",
+  "Compare forward and reversed insertion order and require identical opaque evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep registry parsing, fail-closed behavior, entry predicates, conflict and expiry handling, equivalence, numeric/replay/cleanup/scheduling/FFI/target semantics, and public protocol behavior deferred until the required authorities are Accepted.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed tests, source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No allowed difference, backend exemption, registry, comparison result, diagnostic, dependency, toolchain, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Registry schema and entry identity; authority/source/scope/predicate; review, expiry, migration, and provenance; fail-closed and conflict policy; performance, addresses, timing, allocation, cleanup/GC, scheduling; numeric precision, rounding, NaN, signed zero, overflow, endianness, tolerance; replay/effect log, event order, concurrency; FFI/target variation; fixtures, cross-target/property/fuzz evidence; diagnostics, Unicode, Semantic IDs, and public protocol remain open under DIFF-3702, DIFF-3701, FFI-3605, GAP-NATIVE-BACKEND-ABI-001, GAP-NUMERIC-CHECKED-FAULT-001, GAP-DETERMINISTIC-REPLAY-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, and missing Native/ABI/evidence authority.",
+]
+superseded_by = ""

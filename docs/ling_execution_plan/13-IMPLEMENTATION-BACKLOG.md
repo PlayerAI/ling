@@ -359,6 +359,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DIFF-3701` | G3 | 三方 Harness | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:492`, `docs/status/DIFF-3701-AUTHORITY-AUDIT.md` |
 | `DIFF-3701-OBSERVATION` | G3 | Internal differential-harness boundary evidence | S | Done | Accepted `DEC-0142`; see `crates/ling-types/tests/differential_harness_evidence.rs` and `docs/status/DIFF-3701-OBSERVATION-IMPLEMENTATION-REPORT.md`; engine/equivalence semantics remain BlockedSpec |
 | `DIFF-3702` | G3 | 已允许差异登记表 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:512`, `docs/status/DIFF-3702-AUTHORITY-AUDIT.md` |
+| `DIFF-3702-OBSERVATION` | G3 | Internal allowed-difference registry boundary evidence | S | Done | Accepted `DEC-0143`; see `crates/ling-types/tests/allowed_difference_registry_evidence.rs` and `docs/status/DIFF-3702-OBSERVATION-IMPLEMENTATION-REPORT.md`; registry/equivalence semantics remain BlockedSpec |
 | `DAP-3601` | G3+ | `zero dap --stdio` | — | BlockedSpec | `05-ZED-EXTENSION.md:526`, `docs/status/DAP-3601-AUTHORITY-AUDIT.md` |
 | `DAP-3602` | G3+ | Zed debugger registration | — | BlockedSpec | `05-ZED-EXTENSION.md:530`, `docs/status/DAP-3602-AUTHORITY-AUDIT.md` |
 | `DAP-3603` | G3+ | 能力阶段 | — | BlockedSpec | `05-ZED-EXTENSION.md:538`, `docs/status/DAP-3603-AUTHORITY-AUDIT.md` |

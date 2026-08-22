@@ -2366,3 +2366,16 @@ covers = ["DIFF-3701 bounded differential-harness boundary evidence", "test-only
 depends_on = ["DEC-0141", "DEC-0140", "DEC-0139", "DEC-0138", "DEC-0137", "DEC-0109", "DEC-0009", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0143"
+title = "Internal allowed-difference registry boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0143-allowed-difference-registry-boundary-evidence.md"
+covers = ["DIFF-3702 bounded allowed-difference registry boundary evidence", "test-only allowed-difference vocabulary", "registry boundaries without equivalence/backend-exception semantics"]
+depends_on = ["DEC-0142", "DEC-0141", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

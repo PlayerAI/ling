@@ -14488,6 +14488,7 @@ spec = [
   "docs/RFC-0001.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
+  "docs/decisions/0143-allowed-difference-registry-boundary-evidence.md",
   "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -14496,6 +14497,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DIFF-3702-AUTHORITY-AUDIT.md",
+  "docs/status/DIFF-3702-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIFF-3702-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0143-allowed-difference-registry-boundary-evidence.md",
+  "crates/ling-types/tests/allowed_difference_registry_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14505,6 +14514,7 @@ acceptance = [
   "The audit covers positive and negative difference entries, unknown/expired/overlapping/contradictory rejection, numeric/NaN and replay equivalence, cleanup/GC/scheduling/FFI/target cases, deterministic cross-process/offline behavior, cross-target/property/fuzz evidence, and schema migration without unverified claims.",
   "No allowed-difference schema or entry, backend exemption, comparison predicate, registry reader, Native adapter, diagnostic allocation, dependency, toolchain, public protocol implementation, or placeholder API is added while Native/FFI/ownership authority, GAP-NUMERIC-CHECKED-FAULT-001, GAP-DETERMINISTIC-REPLAY-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, PROTO-ABI, and PROTO-EVIDENCE are unresolved.",
   "The future implementation must preserve current checked Interpreter–VM differential behavior, keep host timing/addresses/allocation/debug details outside Ling semantics, fail closed for unknown differences, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before permitting backend differences.",
+  "Accepted DEC-0143 authorizes only test-local allowed-difference boundary evidence; it does not close registry parsing, equivalence, backend exemptions, conflict/expiry policy, numeric/replay/cleanup/scheduling/FFI/target semantics, protocol integration, or cross-target/compiler evidence.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14514,6 +14524,63 @@ notes = [
   "DIFF-3702 is BlockedSpec by DIFF-3701, GAP-NATIVE-BACKEND-ABI-001, GAP-NUMERIC-CHECKED-FAULT-001, GAP-DETERMINISTIC-REPLAY-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, absent Native/FFI/ownership RFCs, and the unimplemented PROTO-ABI/PROTO-EVIDENCE boundaries.",
   "The current workspace has no Native backend, three-engine harness, allowed-difference registry, or machine-readable comparison exemption; accepted RFC-0018/RFC-0019 continue to govern only the experimental checked Interpreter–VM differential path.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "DIFF-3702-OBSERVATION"
+title = "Internal allowed-difference registry boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DIFF-3701-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/decisions/0142-differential-harness-boundary-evidence.md",
+  "docs/decisions/0143-allowed-difference-registry-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/allowed_difference_registry_evidence.rs",
+  "docs/decisions/0143-allowed-difference-registry-boundary-evidence.md",
+  "docs/status/DIFF-3702-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIFF-3702-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0143 authorizes only test-local allowed-difference boundary evidence; no registry, entry, reader, predicate, backend exemption, Native adapter, numeric/replay rule, diagnostic, dependency, protocol, or executable exception is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for schema/entry identity/authority/source/engine/target/profile scope, observable field/predicate/rationale/status/owner/review/expiry/migration/version/provenance/tamper, fail-closed rejection, host observations, cleanup/scheduling, numeric/replay, FFI/target variation, fixtures, deterministic evidence, diagnostics/Unicode/Semantic IDs, public-protocol exclusion, reader boundaries, and DIFF-3701 integration.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no registry, equivalence, backend-exemption, diagnostic, Semantic ID, Native, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0143; DIFF-3702 remains BlockedSpec for registry schema/reader, fail-closed/conflict/expiry policy, allowed predicates, equivalence, numeric/replay/cleanup/scheduling/FFI/target semantics, protocol integration, and cross-target/compiler evidence.",
+  "No parser, AST/HIR/Checked Core node, differential harness, allowed-difference registry, comparison predicate, backend exemption, Native adapter, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

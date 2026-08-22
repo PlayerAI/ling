@@ -173,6 +173,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0140` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0140](../decisions/0140-target-primitive-package-boundary-evidence.md) |
 | `DEC-0141` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0141](../decisions/0141-ffi-fuzz-sanitizer-boundary-evidence.md) |
 | `DEC-0142` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0142](../decisions/0142-differential-harness-boundary-evidence.md) |
+| `DEC-0143` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0143](../decisions/0143-allowed-difference-registry-boundary-evidence.md) |
 
 ## Migration boundary
 
