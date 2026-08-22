@@ -320,6 +320,7 @@
 | `ZED-6801` | Zed Compatibility Matrix | `G6` | `M` | `BlockedSpec` | `DOC-6703` | `` |
 | `ZED-6801-SEED` | Seed Zed compatibility-matrix drift gate | `G6` | `S` | `Done` | `DOC-6703-SEED` | `3ed4af01362d2a0e906acd40cff863237e355303` |
 | `ZED-6802` | Language-server Discovery and Acquisition | `G6` | `L` | `BlockedSpec` | `ZED-6801` | `` |
+| `ZED-6802-SEED` | Seed language-server discovery inventory drift gate | `G6` | `S` | `In Progress` | `ZED-6801-SEED` | `` |
 | `ZED-6803` | Full Zed Extension Acceptance | `G6` | `L` | `BlockedSpec` | `ZED-6802` | `` |
 | `ZED-6804` | DAP Status | `G6` | `M` | `BlockedSpec` | `ZED-6803` | `` |
 | `ZQ-3201` | Syntax highlighting queries | `G1` | `S` | `Done` | `TS-3108` | `77aab24ff8160e1535ea15b67d5302c1a4bb3fc8` |

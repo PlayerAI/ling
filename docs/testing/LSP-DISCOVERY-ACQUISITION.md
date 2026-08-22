@@ -1,16 +1,18 @@
 # ZED-6802 Language-Server Discovery and Acquisition
 
 Status: boundary inventory (2026-08-22). This document records what is and is
-not implemented for language-server discovery. It is not an installer design,
-download manifest, or public command contract.
+not implemented for language-server discovery and acquisition. It is not an
+installer design, download manifest, or public command contract.
 
 ## Current state
 
-The repository contains no LSP crate, language-server executable, Zed
-extension package, release artifact, download manifest, checksum/signature
-registry, or accepted discovery protocol. `UNSUP-LSP-EDITOR` in the support
-matrix explicitly covers this absence. The local Tree-sitter grammar is an
-editor parser only and is not a language server.
+The repository contains no dedicated discovery/acquisition implementation,
+distributed language-server release artifact, Zed extension package, download
+manifest, checksum/signature registry, or accepted discovery protocol.
+`UNSUP-LSP-EDITOR` in the support matrix explicitly covers this absence. The
+existing Preview `ling lsp --stdio` lifecycle is not an acquisition source,
+and the local Tree-sitter grammar is an editor parser only, not a language
+server.
 
 Accordingly, all discovery/acquisition rows are `Unavailable` or `Not
 established`. No setting key, PATH name, URL, protocol field, diagnostic code,
@@ -62,11 +64,14 @@ The following checks establish only the negative boundary:
 cargo run -p xtask --locked --offline -- governance check-all
 cargo run -p xtask --locked --offline -- status verify
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
+cargo xtask lsp verify
 ```
 
-The Zed compatibility matrix records the local Tree-sitter package and the
-Windows cache-lock limitation of its npm verification. No language-server
-discovery test is claimed because there is no executable or protocol to test.
+The internal `cargo xtask lsp verify` command checks this inventory only. The
+Zed compatibility matrix records the local Tree-sitter package and the Windows
+cache-lock limitation of its npm verification. No language-server discovery
+test is claimed because there is no acquisition executable or protocol to
+test.
 
 ## Completion gate
 

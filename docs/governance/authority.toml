@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0049"
+title = "Seed language-server discovery inventory gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0049-seed-lsp-discovery-inventory-gate.md"
+covers = ["internal language-server discovery/acquisition inventory", "negative boundary and security requirements", "ZED-6802-SEED evidence"]
+depends_on = ["RFC-0004", "DEC-0048", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0038"
 title = "CLI init command"
 kind = "Decision"

@@ -7,12 +7,14 @@
 
 ## Decision
 
-`ZED-6802` remains `BlockedSpec`. There is no LSP executable, Zed extension,
-release artifact, accepted discovery key, PATH contract, download manifest,
-checksum/signature registry, or public installation/error protocol. The
-inventory records each planned source as `Unavailable` or `Not established`
-and states the security rules that a future Accepted decision must fix before
-any network or process operation exists.
+`ZED-6802` remains `BlockedSpec`. There is no dedicated discovery/acquisition
+implementation, distributed language-server release artifact, Zed extension,
+accepted discovery key, PATH contract, download manifest, checksum/signature
+registry, or public installation/error protocol. The existing Preview
+`ling lsp --stdio` lifecycle is not an acquisition source. The inventory
+records each planned source as `Unavailable` or `Not established` and states
+the security rules that a future Accepted decision must fix before any network
+or process operation exists.
 
 The compiler CLI and Tree-sitter grammar are not treated as language-server
 fallbacks. No setting, URL, schema, diagnostic, or installer is created merely
@@ -43,6 +45,10 @@ release, and failure guidance to the current repository state. It specifies
 future HTTPS, version selection, checksum/signature, atomic-install,
 no-execution-before-verification, override, offline, redaction, and bounded
 process requirements without claiming any of them are implemented.
+
+The internal `cargo xtask lsp verify` command protects the four-row inventory
+and rejects state drift or stale legacy names; it does not create a public LSP
+setting, installer, download URL, executable, or protocol.
 
 The missing evidence is an Accepted discovery and provenance decision, a
 versioned LSP binary/protocol, public diagnostics and install schema, secure

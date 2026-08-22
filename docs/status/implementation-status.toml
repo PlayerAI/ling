@@ -14675,6 +14675,63 @@ notes = [
 ]
 
 [[task]]
+id = "ZED-6802-SEED"
+title = "Seed language-server discovery inventory drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ZED-6801-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0049-seed-lsp-discovery-inventory-gate.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
+  "docs/testing/LSP-DISCOVERY-ACQUISITION.md",
+]
+artifacts = [
+  "tools/xtask/src/lsp_discovery.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0049-seed-lsp-discovery-inventory-gate.md",
+  "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6802-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/testing/LSP-DISCOVERY-ACQUISITION.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask lsp verify deterministically validates four discovery sources, two Unavailable states, and two Not established states with non-empty evidence/authority cells.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, missing security/no-placeholder markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate and does not search PATH, read settings, access a registry, download or execute binaries, install packages, allocate public diagnostics, or define LSP/Zed behavior.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0049 closes only this internal Seed inventory child; the parent ZED-6802 gate remains BlockedSpec for real discovery/acquisition authority and artifacts.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "The verifier protects the negative discovery/acquisition boundary only; the existing Preview ling lsp --stdio lifecycle is not an acquisition source.",
+  "No setting, executable identity, release URL, checksum/signature registry, installer, network request, system configuration, or placeholder public API is added.",
+]
+
+[[task]]
 id = "ZED-6802"
 title = "Language-server Discovery and Acquisition"
 state = "BlockedSpec"
@@ -14698,6 +14755,7 @@ spec = [
   "docs/status/ZED-6801-AUTHORITY-AUDIT.md",
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
   "docs/testing/LSP-DISCOVERY-ACQUISITION.md",
+  "docs/decisions/0049-seed-lsp-discovery-inventory-gate.md",
 ]
 artifacts = [
   "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
@@ -14717,7 +14775,7 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "ZED-6802 is BlockedSpec because no LSP executable, Zed extension, discovery key, release artifact, provenance manifest, or public installation/error protocol exists.",
+  "ZED-6802 is BlockedSpec because no dedicated discovery/acquisition implementation, Zed extension, discovery key, release artifact, provenance manifest, or public installation/error protocol exists; the Preview ling lsp --stdio lifecycle is not an acquisition source.",
   "The inventory is negative-boundary and security evidence only; future process/network behavior requires accepted protocol, diagnostic, and provenance decisions before implementation.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor protocol, dependencies, or public API and performs no external network mutation.",
 ]
