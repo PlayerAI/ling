@@ -197,7 +197,7 @@ mod tests {
     #[test]
     fn rejects_priority_state_drift() {
         let matrix = "## Required priority matrix\n| Planned source | Current repository evidence | State | Required authority before implementation |\n| --- | --- | --- | --- |\n| PATH lookup | evidence | Not established | authority |\n## Security and operational contract\n";
-        let errors = validate(&matrix);
+        let errors = validate(matrix);
         assert!(
             errors
                 .iter()
