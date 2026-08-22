@@ -11638,6 +11638,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/OWN-3201-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3201-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3201-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0118-place-move-boundary-evidence.md",
+  "crates/ling-types/tests/place_move_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -11647,6 +11655,7 @@ acceptance = [
   "The audit covers first/second move, partial move, invalid projection, branch/loop join, destructuring, closure capture, boundary escape, Unicode/CRLF/BOM spans, deterministic diagnostics, and interpreter/VM/Native differential fixtures.",
   "No future move/borrow dataflow, place form, ownership state, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N302 authority is absent; accepted Seed Place behavior is unchanged.",
   "The future implementation must preserve accepted Seed Place behavior, consume accepted types and checked Core only, avoid Rust ownership leakage, and publish dataflow, diagnostics, lifetime, boundary, and interpreter/VM/Native evidence before exposing v0.3 ownership behavior.",
+  "Accepted DEC-0118 authorizes only test-only Place and Move-analysis boundary vocabulary; it does not close ownership judgments, dataflow, lifetimes, diagnostics, suspension, FFI, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -11656,6 +11665,60 @@ notes = [
   "OWN-3201 is BlockedSpec by MEM-3101 through MEM-3104, absent RFC-N302/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved move/borrow, dataflow, lifetime, suspension, Actor, and FFI contracts.",
   "Current implementation provides only accepted Seed mutable-place lowering (RFC-0017/DEC-0009); it has no general move/borrow/borrow_mut Core, partial-move state, ownership fixed-point solver, closure capture, Task/Actor transfer analysis, or future diagnostic contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Seed Place lowering, future ownership analysis, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3201-OBSERVATION"
+title = "Internal Place and Move-analysis boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["MEM-3104-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0117-managed-island-boundary-evidence.md",
+  "docs/decisions/0118-place-move-boundary-evidence.md",
+  "docs/RFC-0017.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/place_move_evidence.rs",
+  "docs/decisions/0118-place-move-boundary-evidence.md",
+  "docs/status/OWN-3201-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3201-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0118 authorizes only test-only Place and Move-analysis boundary evidence; no ownership judgments, dataflow, lifetime, or diagnostic semantics are claimed.",
+  "The test-local inventory covers thirty-four provisional boundaries for places/projections, move/copy/borrow, initialization/partial moves, closure/aggregate/generic forms, joins, errors/cancellation, Task/Actor/suspension, Resource/Managed, lifetime/region, FFI/Native, projections, diagnostics, spans, differentials, deterministic termination, and Seed migration with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no future Typed Core place, move/borrow state, dataflow solver, public protocol, or stale zero command is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "1c6528e25fd0b8908cc8b3be5db873a3d2132d0b"
+completion_commit = "1c6528e25fd0b8908cc8b3be5db873a3d2132d0b"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0118; OWN-3201 remains BlockedSpec for ownership judgments, dataflow/fixed points, lifetimes, diagnostics, suspension/Actor boundaries, FFI, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed Place behavior is unchanged.",
 ]
 
 [[task]]

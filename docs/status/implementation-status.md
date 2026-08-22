@@ -245,6 +245,7 @@
 | `NODE-5306` | Node and Actor Boundary | `G5` | `M` | `BlockedSpec` | `NODE-5305` | `` |
 | `NODE-5307` | Node Conformance | `G5` | `M` | `BlockedSpec` | `NODE-5306` | `` |
 | `OWN-3201` | Place and Move analysis | `G3` | `L` | `BlockedSpec` | `MEM-3104` | `` |
+| `OWN-3201-OBSERVATION` | Internal Place and Move-analysis boundary evidence | `G3` | `S` | `Done` | `MEM-3104-OBSERVATION` | `1c6528e25fd0b8908cc8b3be5db873a3d2132d0b` |
 | `OWN-3202` | Borrow exclusivity | `G3` | `L` | `BlockedSpec` | `OWN-3201` | `` |
 | `OWN-3203` | Region inference | `G3` | `L` | `BlockedSpec` | `OWN-3202` | `` |
 | `OWN-3204` | Borrow across await and Actor turns | `G3` | `L` | `BlockedSpec` | `ACT-2304`, `OWN-3203` | `` |
