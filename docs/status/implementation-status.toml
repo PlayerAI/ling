@@ -12076,6 +12076,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/OWN-3205-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3205-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3205-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0122-drop-order-boundary-evidence.md",
+  "crates/ling-effects/tests/drop_order_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12085,6 +12093,7 @@ acceptance = [
   "The audit covers cleanup and drop-order diagnostics, branch/loop/early-exit/`?`/Error/Fault/cancellation/partial-init, panic/unwind rejection, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM/Native differential fixtures.",
   "No Cleanup Core, implicit Drop insertion, drop-order rule, partial-initialization cleanup, cancellation cleanup, drop-failure mapping, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N304 authority is absent.",
   "The future implementation must preserve accepted Seed behavior, consume accepted types and checked Core only, make cleanup deterministic and bounded, and publish drop-order, failure, cancellation, Profile, FFI, and interpreter/VM/Native evidence before exposing v0.3 cleanup behavior.",
+  "Accepted DEC-0122 authorizes only test-only Drop-order and cleanup boundary vocabulary; it does not close Resource ownership, Cleanup Core, failure, cancellation, diagnostics, or FFI gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12094,6 +12103,62 @@ notes = [
   "OWN-3205 is BlockedSpec by MEM-3103, OWN-3204, absent RFC-N304/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved Resource/Drop, cleanup, failure, cancellation, Effect/Fault, and FFI contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Resource type or ownership checker, Cleanup Core, implicit Drop operation, cleanup CFG, partial-initialization state, drop order, cancellation/Actor termination cleanup, or Resource Drop Effect/Fault; Rust Drop/unwinding is not Ling semantics.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Seed Place lowering, future Resource/Drop semantics, Cleanup Core, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3205-OBSERVATION"
+title = "Internal Drop-order and cleanup boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3204-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0011-seed-builtins.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0016-repl-session-semantics.md",
+  "docs/decisions/0116-resource-drop-boundary-evidence.md",
+  "docs/decisions/0121-borrow-await-turn-boundary-evidence.md",
+  "docs/decisions/0122-drop-order-boundary-evidence.md",
+  "docs/RFC-0018.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-effects/tests/drop_order_evidence.rs",
+  "docs/decisions/0122-drop-order-boundary-evidence.md",
+  "docs/status/OWN-3205-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3205-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0122 authorizes only test-only Drop-order and cleanup boundary evidence; no Resource, Drop, Cleanup Core, failure, cancellation, or diagnostic semantics are claimed.",
+  "The test-local inventory covers forty-one provisional boundaries for Resource/ownership, Move/Borrow/Region, implicit/explicit Drop, aggregate/control-flow order, partial initialization/replacement, Cleanup Core, returns/errors/Faults, cancellation/termination, panic/unwind rejection, idempotence/partial cleanup/failure aggregation, Effects/Faults/bounds, Managed, Capability/network, Native/FFI, Profile/Critical, migration, deterministic optimization, diagnostics, projections, spans, differentials, and Seed migration with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no Resource/Drop Core, cleanup lowering, public protocol, or stale zero command is added.",
+  "cargo test -p ling-effects --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-effects --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "c7c6e1727c9feece56a07c7623c6501d92048615"
+completion_commit = "c7c6e1727c9feece56a07c7623c6501d92048615"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0122; OWN-3205 remains BlockedSpec for Resource ownership, Drop order, Cleanup Core, cancellation/failure, diagnostics, FFI, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior is unchanged.",
 ]
 
 [[task]]

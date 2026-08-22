@@ -253,6 +253,7 @@
 | `OWN-3204` | Borrow across await and Actor turns | `G3` | `L` | `BlockedSpec` | `ACT-2304`, `OWN-3203` | `` |
 | `OWN-3204-OBSERVATION` | Internal cross-suspension and Actor-turn boundary evidence | `G3` | `S` | `Done` | `OWN-3203-OBSERVATION` | `e32aaca6f789c48a386d6476d9138e1b41267f73` |
 | `OWN-3205` | Drop-order lowering | `G3` | `L` | `BlockedSpec` | `MEM-3103`, `OWN-3204` | `` |
+| `OWN-3205-OBSERVATION` | Internal Drop-order and cleanup boundary evidence | `G3` | `S` | `Done` | `OWN-3204-OBSERVATION` | `c7c6e1727c9feece56a07c7623c6501d92048615` |
 | `OWN-3206` | Ownership diagnostics and repairs | `G3` | `L` | `BlockedSpec` | `OWN-3201`, `OWN-3202`, `OWN-3203`, `OWN-3204`, `OWN-3205` | `` |
 | `OWN-3207` | Negative corpus and property tests | `G3` | `L` | `BlockedSpec` | `OWN-3201`, `OWN-3202`, `OWN-3203`, `OWN-3204`, `OWN-3205`, `OWN-3206` | `` |
 | `PKG-6401` | Package Publication Protocol | `G6` | `L` | `BlockedSpec` | `STD-6303` | `` |
