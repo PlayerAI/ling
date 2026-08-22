@@ -5207,3 +5207,27 @@ unresolved_alternatives = [
   "Checked Task/Actor/Node source and Core model; state variables/types/values; mailbox/queue semantics and bounds; transitions, scheduler choices/fairness, Fault/restart identity, time abstraction, external inputs, and ownership; property language and explicit depth/state/time/memory bounds; canonical state identity, stable IDs/spans and state hashing; projection relation and soundness/non-proof wording; ModelChecked/bounded-evidence status; assumptions/profile admission; deterministic/resource/timeout/memory/unknown/incomplete/malformed/corrupt/migration behavior; counterexample and replay linkage; provenance/checksum/redaction; diagnostics; interleaving, Fault/restart, Unicode and differential fixtures; protocol inventory and public support remain open under MC-5601, MC-5602, MC-5603, MC-5604, RFC-K506, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing model-check authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0203"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0203-exploration-engine-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty exploration-engine categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer engine/state-hash implementation, traversal/reduction semantics, resource/result/counterexample schemas, diagnostics, protocols, and public support until accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing graph traversals and differential tests are not reinterpreted as model checking.",
+  "No exploration engine, state hash, BFS/DFS work queue, partial-order reduction, result/counterexample schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Projected-model and canonical state/event bytes; state-hash algorithm, version, collision behavior, deduplication and visited-set identity; transition/event ordering, BFS/DFS work queues and tie-breaking; partial-order reduction independence/soundness and reduction-off behavior; depth/step/state/queue/time/memory bounds, cancellation, timeout/resource exhaustion and incomplete/unknown/invalid/malformed/corrupt behavior; result states, counterexample/replay linkage, stable IDs/spans, provenance/checksum/redaction, bounded non-proof wording, assumptions/profile admission, diagnostics, positive/negative/interleaving/reduction/hash-collision/bound-edge/timeout/memory/determinism/replay/Unicode/differential fixtures, protocol inventory, and public support remain open under MC-5602, MC-5601, MC-5603, MC-5604, RFC-K506, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing exploration authority.",
+]
+superseded_by = ""

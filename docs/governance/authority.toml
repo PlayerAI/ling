@@ -3146,3 +3146,16 @@ covers = ["MC-5601 bounded Finite-State Projection boundary evidence", "test-onl
 depends_on = ["DEC-0201", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0203"
+title = "Internal Exploration Engine boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0203-exploration-engine-boundary-evidence.md"
+covers = ["MC-5602 bounded Exploration Engine boundary evidence", "test-only exploration vocabulary", "exploration boundaries without state-hash/reduction/result semantics"]
+depends_on = ["DEC-0202", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
