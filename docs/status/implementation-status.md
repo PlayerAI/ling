@@ -179,6 +179,7 @@
 | `GPU-4602` | Backend Adapter | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4602-OBSERVATION` | Internal backend adapter boundary evidence | `G4` | `S` | `Done` | `GPU-4601-OBSERVATION` | `e93888bd62fa4dee6ba4f934cd2ab24a0c0ff0a9` |
 | `GPU-4603` | Launch and Runtime | `G4` | `M` | `BlockedSpec` | — | `` |
+| `GPU-4603-OBSERVATION` | Internal launch and runtime boundary evidence | `G4` | `S` | `Done` | `GPU-4602-OBSERVATION` | `f41c2bc0a5277c7d51fd2c3050b721b9103bcd15` |
 | `GPU-4604` | Differential and Hardware Matrix | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4605` | Error Normalization | `G4` | `M` | `BlockedSpec` | — | `` |
 | `IDE-2301` | IDE document symbols | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |

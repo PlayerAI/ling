@@ -17319,10 +17319,10 @@ acceptance = [
   "cargo test -p ling-types --test launch_runtime_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "f41c2bc0a5277c7d51fd2c3050b721b9103bcd15"
+completion_commit = "f41c2bc0a5277c7d51fd2c3050b721b9103bcd15"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0167; GPU-4603 remains BlockedSpec for discovery, runtime scheduling, launch, cleanup, metrics/explain, protocol, and support claims.",
   "No device runtime, scheduler, discovery API, module loader, buffer/queue handle, dependency, target package, metrics schema, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",
