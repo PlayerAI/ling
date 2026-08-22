@@ -18446,10 +18446,10 @@ acceptance = [
   "cargo test -p ling-types --test critical_profile_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "f01ee509850941a633e6aeff7fb0d0d8fec4e4e4"
+completion_commit = "f01ee509850941a633e6aeff7fb0d0d8fec4e4e4"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0177; PROF-5101 remains BlockedSpec for profile schema/lifecycle, policy, checker/proof, diagnostics, CLI/editor integration, evidence bundles, and support claims.",
   "No Critical Profile format, dependency, target package, manifest, checker API, diagnostic, CLI/LSP option, runtime, or Unicode behavior was added.",

@@ -328,6 +328,7 @@
 | `PRJ-1107-SEMANTIC-SNAPSHOT` | Internal locked-project semantic snapshot | `G1` | `M` | `Done` | `PRJ-1103`, `PRJ-1107-LOAD` | `026555cad800dd660fc550408d300fffd3c7af68` |
 | `PRJ-1108` | Project graph property and manifest fuzz coverage | `G1` | `M` | `Done` | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105`, `PRJ-1106` | `29f9c4465b58c7eff23c227436563d69409b880e` |
 | `PROF-5101` | Machine-Readable Critical Profile | `G5` | `M` | `BlockedSpec` | `PLC-4805` | `` |
+| `PROF-5101-OBSERVATION` | Internal Critical Profile boundary evidence | `G5` | `S` | `Done` | `PLC-4805-OBSERVATION` | `f01ee509850941a633e6aeff7fb0d0d8fec4e4e4` |
 | `PROF-5102` | Forbidden Capability Checks | `G5` | `M` | `BlockedSpec` | `PROF-5101` | `` |
 | `PROF-5103` | Profile Composition | `G5` | `M` | `BlockedSpec` | `PROF-5102` | `` |
 | `PROF-5104` | Profile Audit and LSP | `G5` | `M` | `BlockedSpec` | `PROF-5103` | `` |
