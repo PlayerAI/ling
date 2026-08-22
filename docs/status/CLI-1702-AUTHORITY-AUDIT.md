@@ -9,9 +9,10 @@ language selection, color, quiet/verbose controls, and one output contract
 across future project, formatter, query, patch, and test commands; those
 extensions do not have accepted semantics or fixtures.
 
-No new flag, localization mode, color policy, quiet/verbose behavior,
-diagnostic code, output schema, or exit class was added. Existing `ling`
-output and exit behavior remains unchanged.
+Accepted DEC-0037 closes only the bounded `CLI-1702-EXIT` child: the existing
+exit constants are centralized internally. No new flag, localization mode,
+color policy, quiet/verbose behavior, diagnostic code, output schema, or exit
+class was added. Existing `ling` output and exit behavior remains unchanged.
 
 ## Normative traceability
 
@@ -49,6 +50,8 @@ The current repository confirms the accepted subset:
 - The current CLI inventory deliberately advertises only implemented commands;
   adding output switches before their command contracts would make a Preview
   protocol appear stable by accident.
+- The DEC-0037 catalog owns numeric constants only; command handlers retain all
+  output, diagnostics, and exit-selection logic.
 
 ## Required authority before implementation
 
@@ -85,7 +88,9 @@ made.
 
 ## Intentionally deferred
 
-`CLI-1702` can begin after the command model and per-command contracts are
-Accepted. The first implementation should preserve the existing exit classes
-and machine-readable fields, add only registered options, and prove stdout,
-stderr, locale, TTY, and redirected-output behavior with fixtures.
+The parent `CLI-1702` can begin after the command model and per-command
+contracts are Accepted. The first implementation should preserve the existing
+exit classes and machine-readable fields, add only registered options, and
+prove stdout, stderr, locale, TTY, and redirected-output behavior with
+fixtures. The `CLI-1702-EXIT` child is complete only for DEC-0037's internal
+numeric catalog.

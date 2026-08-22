@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0037"
+title = "CLI internal exit catalog boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0037-cli-internal-exit-catalog-boundary.md"
+covers = ["internal CLI exit codes", "Seed exit mapping", "future error deferral"]
+depends_on = ["DEC-0013", "DEC-0036", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0036"
 title = "CLI internal command catalog boundary"
 kind = "Decision"

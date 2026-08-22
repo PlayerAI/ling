@@ -6,8 +6,13 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 mod command_catalog;
+mod exit_catalog;
 
 use command_catalog::Command;
+use exit_catalog::{
+    EXIT_COMPILE_ERROR, EXIT_INTERNAL_ERROR, EXIT_INVALID_USAGE, EXIT_RUNTIME_FAULT,
+    EXIT_SNAPSHOT_MISMATCH, EXIT_SUCCESS,
+};
 use ling_cli::incident::{InternalIncident, Reproduction};
 use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
 use ling_cli::{CompileFailure, compile_path};
@@ -22,13 +27,6 @@ use ling_project::{
 use ling_unicode::UNICODE_VERSION;
 
 const CLI_NAME: &str = "ling";
-const EXIT_SUCCESS: u8 = 0;
-const EXIT_COMPILE_ERROR: u8 = 1;
-const EXIT_INVALID_USAGE: u8 = 2;
-const EXIT_RUNTIME_FAULT: u8 = 4;
-const EXIT_INTERNAL_ERROR: u8 = 5;
-const EXIT_SNAPSHOT_MISMATCH: u8 = 6;
-
 fn main() -> ExitCode {
     ExitCode::from(run(env::args_os().skip(1).collect()))
 }

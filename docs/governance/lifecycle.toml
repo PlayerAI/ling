@@ -22,6 +22,29 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0037"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0037-cli-internal-exit-catalog-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify current exit values 0, 1, 2, 4, 5, and 6 and retain their category distinctions.",
+  "Run existing CLI output/JSON/REPL/formatter/project/LSP fixtures and verify no future flag, schema, diagnostic, retry, or exit category is introduced.",
+]
+compatibility_impact = [
+  "Adds only an internal exit-constant module; source, language, diagnostics, schemas, Semantic IDs, protocol inventory, runtime, VM, and Unicode remain unchanged.",
+]
+unresolved_alternatives = [
+  "Unified output, project/formatter/query/patch failure, structured response, retry, and future command exit contracts require later Accepted CLI authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0036"
 kind = "Decision"
 status = "Accepted"
