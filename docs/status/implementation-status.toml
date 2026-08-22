@@ -6603,6 +6603,60 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2308-METADATA"
+title = "Internal completion checked-metadata observation"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2307-SOURCE-INDEX"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0080-ide-completion-checked-metadata.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/completion_metadata_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0080-ide-completion-checked-metadata.md",
+  "docs/status/IDE-2308-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2308-METADATA-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0080 authorizes only immutable checked observations for resolver-backed user definitions and local/parameter bindings; no completion presentation policy is invented.",
+  "Entries preserve existing resolver identity, module/name/source/span facts, and optional checked type display, canonical effects, and canonical capabilities without placeholders.",
+  "Deterministic source/module/span/name/kind/identity ordering and source/name/identity lookups make repeated equal CheckedProgram inputs equal without protocol or cache state.",
+  "Focused cargo fmt, ling-db tests, and clippy pass; checked definition/binding facts, optional-field preservation, identity lookup, repeated construction, and invalid-source non-publication are covered.",
+  "The public IDE-2308 completion-resolve target remains BlockedSpec for handles, documentation, signatures, capability rendering/redaction, insertion, snapshots, versions, stale behavior, and protocol semantics.",
+]
+verified_against_commit = "c528bf7bd7292ff681b41bb4e274ba417f84cdbd"
+completion_commit = "c528bf7bd7292ff681b41bb4e274ba417f84cdbd"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The index is checked compiler evidence for future completion resolution, not a completion item, documentation/signature renderer, capability disclosure, insertion edit, or Semantic ID migration.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2308"
 title = "IDE completion resolve"
 state = "BlockedSpec"
