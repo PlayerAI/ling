@@ -10,6 +10,8 @@ remains `BlockedSpec` for the full IDE/LSP surface; this slice does not claim
 hover, completion, rename, repairs, diagnostics, or a Stable 1.0 editor
 protocol.
 
+Implementation commit: `feb2be24fc78abc73010f283e830d3844f49b303`.
+
 ## Normative traceability
 
 - Accepted RFC-0022 §§1–8 continues to govern the optional projection,

@@ -112,6 +112,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TRAIT-1307` | G1/Editor | Interpreter/VM lowering | L | Done | Accepted RFC-0021; see `docs/status/TRAIT-1307-AUTHORITY-AUDIT.md`, `docs/status/TRAIT-1307-IMPLEMENTATION-REPORT.md`, and `03-G1-V0.1-LIVING.md:304` |
 | `TRAIT-1308` | G1/Editor | IDE 支持 | — | BlockedSpec | `03-G1-V0.1-LIVING.md:308`, `docs/status/TRAIT-1308-AUTHORITY-AUDIT.md` |
 | `TRAIT-1308-PROJECTION` | G1/Editor | Trait Semantic Graph projection | M | Done | Accepted RFC-0022; see `docs/status/TRAIT-1308-PROJECTION-IMPLEMENTATION-REPORT.md`; full LSP/rename/repair surface remains in `TRAIT-1308` |
+| `TRAIT-1308-QUERY` | G1/Editor | Trait projection read-only lookups | S | Done | Accepted DEC-0059; see `docs/status/TRAIT-1308-QUERY-IMPLEMENTATION-REPORT.md`; full LSP/rename/repair surface remains in `TRAIT-1308` |
 | `TRAIT-1309` | G1/Editor | 性能与终止 | — | BlockedSpec | `03-G1-V0.1-LIVING.md:316`, `docs/status/TRAIT-1309-AUTHORITY-AUDIT.md` |
 | `INC-1401` | G1/Editor | Query boundary ADR | M | Done | DEC-0019；见 `docs/decisions/0019-incremental-query-boundary.md` 与实施报告 |
 | `INC-1402` | G1/Editor | VFS 与 revision | M | Done | DEC-0019；见 `crates/ling-source/src/vfs.rs` 的 immutable snapshot、overlay、workspace revision 与 change-dedup 测试及实施报告 |

@@ -3,11 +3,13 @@
 ## Outcome
 
 `TRAIT-1308` remains `BlockedSpec` for the full IDE/LSP surface. Accepted
-RFC-0022 authorizes and the child task `TRAIT-1308-PROJECTION` implements only a
-bounded, data-only `x-ling-trait-ide` extension on the existing Semantic Graph.
-It exposes checked dictionary-witness identities and original source spans; it
-does not implement hover, go-to implementation/trait, completion,
-identity-preserving rename, repairs, or LSP transactions.
+RFC-0022 authorizes and the child tasks `TRAIT-1308-PROJECTION` and
+`TRAIT-1308-QUERY` implement only a bounded, data-only `x-ling-trait-ide`
+extension and read-only identity lookups on the existing Semantic Graph. They
+expose checked dictionary-witness identities, original source spans, and
+projection-order access; they do not implement hover, go-to
+implementation/trait, completion, identity-preserving rename, repairs, or LSP
+transactions.
 
 No IDE adapter, LSP request/response method, public Trait diagnostic,
 placeholder repair, or Stable 1.0 editor claim was added. Existing v0.0.1 Seed
@@ -38,7 +40,8 @@ language and editor behavior remains unchanged.
 
 ## Current interface evidence
 
-The current repository confirms that only the bounded graph projection exists:
+The current repository confirms that only the bounded graph projection and its
+read-only lookup boundary exist:
 
 - `ling-types::checked_core` now supplies the immutable witness consumed by
   `ling-semantic`; `ProgramSnapshot` and `ProjectProgramSnapshot` optionally
@@ -46,6 +49,10 @@ The current repository confirms that only the bounded graph projection exists:
   source spans.
 - The projection is data-only. It does not define callable method-slot
   requests, hover rendering, completion ranking, rename edits, or repair facts.
+- `TRAIT-1308-QUERY` adds only in-process filters over the validated projection:
+  Trait/implementation witness lookups and Trait/implementation member
+  lookups. It does not re-run selection, revalidate data, mutate the graph, or
+  define a wire request.
 - The v0.0.1 support matrix is unchanged; the v0.1 static Trait slice is an
   accepted implementation boundary and is not a claim that the full editor
   protocol exists.
@@ -83,6 +90,8 @@ not authorize.
 This audit was checked against `docs/RFC-0005.md`,
 `docs/RFC-0022.md`,
 `docs/decisions/0027-trait-checked-core-dictionary-witness.md`,
+`docs/decisions/0059-trait-ide-projection-lookups.md`,
+`docs/status/TRAIT-1308-QUERY-IMPLEMENTATION-REPORT.md`,
 `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
 `docs/governance/gap-register.toml`,
 `docs/governance/protocol-inventory.toml`,
@@ -94,8 +103,10 @@ contract changed.
 
 ## Intentionally deferred
 
-The child projection is complete under RFC-0022. The parent `TRAIT-1308`
-remains deferred until the full method identity/query surface, diagnostic
-registry, LSP/Semantic Transaction contracts, and their fixtures are Accepted.
-Any follow-on implementation must consume the projected immutable witness and
-must not re-run Trait selection or invent repair behavior.
+The child projection and its read-only lookup boundary are complete under
+RFC-0022 and DEC-0059 (implementation commit
+`feb2be24fc78abc73010f283e830d3844f49b303`). The parent `TRAIT-1308` remains deferred until the full
+method identity/query surface, diagnostic registry, LSP/Semantic Transaction
+contracts, and their fixtures are Accepted. Any follow-on implementation must
+consume the projected immutable witness and must not re-run Trait selection or
+invent repair behavior.

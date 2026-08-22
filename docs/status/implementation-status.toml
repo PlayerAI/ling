@@ -15650,6 +15650,55 @@ notes = [
 ]
 
 [[task]]
+id = "TRAIT-1308-QUERY"
+title = "Trait projection read-only lookups"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1308-PROJECTION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/RFC-0022.md",
+  "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/decisions/0059-trait-ide-projection-lookups.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-semantic/src/lib.rs",
+  "docs/decisions/0059-trait-ide-projection-lookups.md",
+  "docs/status/TRAIT-1308-QUERY-IMPLEMENTATION-REPORT.md",
+  "docs/status/TRAIT-1308-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0059 authorizes only read-only identity lookup over the validated RFC-0022 projection.",
+  "Trait and member collection helpers preserve projection order; first-match helpers are deterministic and do not mutate, revalidate, reselect, or synthesize records.",
+  "Focused semantic tests cover exact hits, misses, repeated identities, and projection-order behavior.",
+  "No LSP/JSON-RPC method, document state, URI/position/version field, transaction, diagnostic, repair, CLI, bytecode, VM, Semantic ID, or Unicode behavior is added; parent TRAIT-1308 remains BlockedSpec.",
+]
+verified_against_commit = "feb2be24fc78abc73010f283e830d3844f49b303"
+completion_commit = "feb2be24fc78abc73010f283e830d3844f49b303"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The lookup boundary consumes the immutable x-ling-trait-ide records and does not rerun Trait selection.",
+  "Methods are in-process only; protocol, transaction, diagnostic, rename, repair, and Stable 1.0 editor behavior remain deferred to TRAIT-1308.",
+]
+
+[[task]]
 id = "TRAIT-1309"
 title = "Trait solver performance and termination"
 state = "BlockedSpec"
