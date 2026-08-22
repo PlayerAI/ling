@@ -10,6 +10,10 @@ Source projections. This is the foundation of the v0.3 ownership and native
 ABI model, but RFC-N301 is absent and no accepted memory-model RFC authorizes
 those semantics.
 
+The bounded child `MEM-3101-SEED-VALUE`, authorized by DEC-0061, records only
+the existing Seed completed-type `Value` classification and does not unblock
+the future memory model.
+
 No memory-kind type, kind constraint, copy/move rule, layout/identity
 classification, graph field, diagnostic, protocol, or placeholder G3 API was
 added.
@@ -47,6 +51,9 @@ added.
   kind constraint, ownership/region checker, layout contract, Resource drop
   operation, native backend, or kind projection in Checked Core, Semantic
   Graph, or Audit Source. The Seed checker and VM use value semantics only.
+- `Type::seed_type_class` exposes `SeedTypeClass::Value` for completed Seed
+  forms and returns no class for unresolved variables or error sentinels; it
+  adds no Managed/Resource or ownership information.
 - Existing primitive, tuple, record, variant, array, closure, Effect, and
   Capability handling is authorized Seed behavior, not evidence for future
   memory classification. Rust ownership, allocation, enum layout, and hash
@@ -104,7 +111,8 @@ Semantic ID, source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`MEM-3101` can begin only after RFC-0007 (or an accepted replacement) defines
+`MEM-3101-SEED-VALUE` is complete under DEC-0061. The parent `MEM-3101` can
+begin only after RFC-0007 (or an accepted replacement) defines
 the memory-kind model and after the ownership, region, drop, Managed, Native,
 and FFI dependencies agree on its Checked Core and public projections. The
 future implementation must preserve Seed Value semantics, consume accepted

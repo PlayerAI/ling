@@ -8269,6 +8269,54 @@ notes = [
 ]
 
 [[task]]
+id = "MEM-3101-SEED-VALUE"
+title = "Seed completed-type Value classification"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = []
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0008-seed-value-restriction.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0061-seed-type-value-classification.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-types/src/lib.rs",
+  "docs/decisions/0061-seed-type-value-classification.md",
+  "docs/status/MEM-3101-SEED-VALUE-IMPLEMENTATION-REPORT.md",
+  "docs/status/MEM-3101-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0061 authorizes only the existing Seed completed-type Value classification.",
+  "Primitive, aggregate, nominal, function, variant, and collection forms classify as Value; unresolved variables and error sentinels return no class.",
+  "Focused ling-types tests cover completed forms, unresolved variables, error sentinels, and deterministic repeated calls.",
+  "No Managed/Resource kind, ownership, borrowing, layout, identity, serialization, profile, ABI, FFI, diagnostic, schema, or protocol behavior is added; parent MEM-3101 remains BlockedSpec.",
+]
+verified_against_commit = "c64ceb9101190d630125d3a7b6e1ede150c01488"
+completion_commit = "c64ceb9101190d630125d3a7b6e1ede150c01488"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child records only the accepted Seed value boundary; it does not implement RFC-N301/RFC-0007 memory semantics.",
+  "No Rust layout, allocation, pointer, host state, ownership, or future memory-kind information is exposed.",
+]
+
+[[task]]
 id = "MEM-3102"
 title = "Value layout and Copy/Move"
 state = "BlockedSpec"

@@ -9,6 +9,8 @@
 `BlockedSpec` because the Value/Managed/Resource model, ownership, and Native
 authorities are not accepted.
 
+Implementation commit: `c64ceb9101190d630125d3a7b6e1ede150c01488`.
+
 ## Normative traceability
 
 - Accepted DEC-0008 and DEC-0009 govern Seed value restriction, copy semantics,

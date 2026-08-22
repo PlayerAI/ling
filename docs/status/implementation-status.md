@@ -196,6 +196,7 @@
 | `MC-5603` | Model-Check Report Semantics | `G5` | `M` | `BlockedSpec` | `MC-5602` | `` |
 | `MC-5604` | Replay Counterexample | `G5` | `L` | `BlockedSpec` | `MC-5603` | `` |
 | `MEM-3101` | Type classification model | `G3` | `M` | `BlockedSpec` | — | `` |
+| `MEM-3101-SEED-VALUE` | Seed completed-type Value classification | `G3` | `S` | `Done` | — | `c64ceb9101190d630125d3a7b6e1ede150c01488` |
 | `MEM-3102` | Value layout and Copy/Move | `G3` | `L` | `BlockedSpec` | `MEM-3101` | `` |
 | `MEM-3103` | Resource definition and Drop contract | `G3` | `L` | `BlockedSpec` | `MEM-3102` | `` |
 | `MEM-3104` | Managed types and island boundaries | `G3` | `L` | `BlockedSpec` | `MEM-3103` | `` |
