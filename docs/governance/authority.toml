@@ -2795,3 +2795,16 @@ covers = ["PLC-4804 bounded Placement-explain boundary evidence", "test-only exp
 depends_on = ["DEC-0174", "DEC-0173", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0176"
+title = "Internal device-binary-cache boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0176-device-binary-cache-boundary-evidence.md"
+covers = ["PLC-4805 bounded Device Binary Cache boundary evidence", "test-only device cache vocabulary", "cache boundaries without Device IR/backend semantics"]
+depends_on = ["DEC-0175", "DEC-0022", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
