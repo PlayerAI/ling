@@ -3198,3 +3198,16 @@ covers = ["TIM-5701 bounded Timing IR and Path boundary evidence", "test-only ti
 depends_on = ["DEC-0205", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0207"
+title = "Internal timing-analysis separation boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0207-timing-analysis-separation-boundary-evidence.md"
+covers = ["TIM-5702 bounded timing-analysis separation boundary evidence", "test-only measurement/static-analysis vocabulary", "timing-result boundaries without status/WCET semantics"]
+depends_on = ["DEC-0206", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

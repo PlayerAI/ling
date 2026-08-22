@@ -237,6 +237,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0204` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0204](../decisions/0204-model-check-report-boundary-evidence.md) |
 | `DEC-0205` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0205](../decisions/0205-replay-counterexample-boundary-evidence.md) |
 | `DEC-0206` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0206](../decisions/0206-timing-ir-path-boundary-evidence.md) |
+| `DEC-0207` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0207](../decisions/0207-timing-analysis-separation-boundary-evidence.md) |
 
 ## Migration boundary
 
