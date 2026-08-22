@@ -86,6 +86,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0054` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0054](../decisions/0054-seed-rc3-independent-verification-inventory-gate.md) |
 | `DEC-0055` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0055](../decisions/0055-seed-rc2-final-change-control-inventory-gate.md) |
 | `DEC-0056` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0056](../decisions/0056-seed-v1-release-artifact-inventory-gate.md) |
+| `DEC-0057` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0057](../decisions/0057-formatter-in-process-edit-projection.md) |
 
 ## Migration boundary
 

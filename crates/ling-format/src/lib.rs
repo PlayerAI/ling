@@ -2,10 +2,12 @@
 
 mod author;
 mod comments;
+mod edit;
 mod format_ir;
 
 pub use author::{FormatDisposition, FormatResult, format_core, format_core_with_disposition};
 pub use comments::{CommentAttachment, CommentKind, CommentPlacement};
+pub use edit::{FormatEdit, FormatEditError, format_core_edit};
 pub use format_ir::{
     FORMAT_IR_SCHEMA, FormatDocument, FormatIrBuildError, FormatIrBuildErrorKind, FormatNode,
     FormatToken, build_format_ir,

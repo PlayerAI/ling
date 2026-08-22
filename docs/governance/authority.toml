@@ -1235,3 +1235,16 @@ covers = ["internal LSP work ordering", "logical priority/FIFO sequencing", "pub
 depends_on = ["DEC-0021", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0057"
+title = "Formatter in-process edit projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0057-formatter-in-process-edit-projection.md"
+covers = ["in-process formatter edit value", "original UTF-8 whole-document replacement", "FMT-1507-EDIT evidence"]
+depends_on = ["DEC-0002", "DEC-0023", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
