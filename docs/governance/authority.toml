@@ -509,6 +509,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0021"
+title = "Static Trait Dictionary Call Boundary"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0021.md"
+covers = ["static Trait.member calls", "witness-bound member slots", "interpreter/VM direct-call lowering"]
+depends_on = ["DEC-0026", "DEC-0027", "RFC-0005", "RFC-0014", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

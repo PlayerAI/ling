@@ -13812,7 +13812,7 @@ notes = [
 [[task]]
 id = "TRAIT-1307"
 title = "Trait interpreter and VM dictionary lowering"
-state = "BlockedSpec"
+state = "In Progress"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -13825,29 +13825,41 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/RFC-0005.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/RFC-0021.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-resolve/src/lib.rs",
+  "crates/ling-types/src/lib.rs",
+  "crates/ling-types/src/checked_core.rs",
+  "crates/ling-effects/src/lib.rs",
+  "crates/ling-semantic/src/lib.rs",
+  "crates/ling-eval/src/lib.rs",
+  "crates/ling-bytecode/src/lower/v1_1.rs",
+  "crates/ling-vm/tests/execution.rs",
   "docs/status/TRAIT-1307-AUTHORITY-AUDIT.md",
+  "docs/status/TRAIT-1307-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The missing interpreter/VM dictionary contract is recorded with direct references to RFC-0005 §4 and DEC-0027.",
-  "The audit identifies the absent CheckedProgram/Semantic Graph integration, executable member-slot identity, interpreter call convention, and versioned bytecode/verifier contract.",
-  "No backend re-runs Trait selection, adds a placeholder public API, changes v0.0.1 Seed execution, allocates diagnostics, or claims an unaccepted bytecode protocol.",
-  "The next executable source file is explicitly identified as crates/ling-eval/src/lib.rs, with VM and bytecode work deferred until their accepted authority exists.",
+  "RFC-0021 is Accepted and records the static interpreter/VM dictionary boundary with direct references to RFC-0005 §4 and DEC-0027.",
+  "TypedProgram and CheckedProgram carry immutable witness/member identity; semantic Program identity includes canonical witness bytes and implementation bodies.",
+  "Interpreter dispatch and verified v1.2 direct-call/partial-application lowering consume checked implementation IDs without backend candidate search.",
+  "Positive, bare-member, unsatisfied-member, semantic-identity, and interpreter/VM differential tests provide current vertical-slice evidence.",
+  "Remaining ambiguous/malformed-witness, cross-module determinism, and v1.0/v1.1 aggregate evidence is explicitly tracked as deferred.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "in_progress"
 completed = ""
 notes = [
-  "TRAIT-1307 is BlockedSpec by GAP-TRAIT-COHERENCE-001 and RFC-0005's explicit deferral of current bytecode/runtime changes.",
-  "The current Seed checker rejects Trait-bearing programs, and DEC-0027 does not expose callable method definitions; implementing runtime behavior would invent semantics.",
-  "The authority audit preserves the next-file ordering without changing compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "RFC-0021 closes the previously recorded runtime authority gap for the bounded v0.1 static Trait slice; v0.0.1 support claims remain unchanged.",
+  "Current tests cover a concrete nominal receiver, a two-argument member, partial application, checked rejection, canonical witness identity, and verified v1.2 VM parity.",
+  "No new bytecode wire revision, public diagnostic code, schema marker, host capability, or Unicode 17.0.0 data was added.",
+  "Do not mark Done until the deferred conformance and malformed-witness evidence is added and all governance/status gates pass.",
 ]
 
 [[task]]

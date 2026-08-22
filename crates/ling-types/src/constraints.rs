@@ -1,9 +1,9 @@
 //! Internal first-slice collection of RFC-0005 trait obligations.
 //!
 //! This module deliberately stops before name resolution, coherence, solving,
-//! or dictionary construction.  The normal type-checking entry point uses the
-//! collected result only to keep unresolved Trait programs out of executable
-//! Typed Core until those later stages are implemented.
+//! or dictionary construction. The normal type-checking entry point uses the
+//! collected result to reject only unresolved generic obligations; concrete
+//! member-call obligations are collected by the RFC-0021 checker boundary.
 
 use ling_hir as hir;
 use ling_resolve::{BindingKey, DefinitionId, ModuleId, ResolvedProgram};
@@ -136,32 +136,6 @@ pub(crate) fn collect_obligations(
         });
         Err(collector.errors)
     }
-}
-
-/// Returns the source locations of Trait declarations and implementations.
-///
-/// Trait items have no obligation vector of their own, but they are still
-/// outside the executable Seed type-checking boundary until the later stages
-/// construct and discharge their dictionaries.
-pub(crate) fn trait_item_spans(resolved: &ResolvedProgram) -> Vec<(String, Span)> {
-    let mut spans = Vec::new();
-    for module in resolved.modules() {
-        spans.extend(
-            module
-                .hir
-                .traits
-                .iter()
-                .map(|declaration| (module.hir.source_name.clone(), declaration.span)),
-        );
-        spans.extend(
-            module
-                .hir
-                .impls
-                .iter()
-                .map(|declaration| (module.hir.source_name.clone(), declaration.span)),
-        );
-    }
-    spans
 }
 
 struct Collector {
@@ -522,7 +496,7 @@ mod tests {
     }
 
     #[test]
-    fn check_keeps_trait_items_and_unresolved_obligations_out_of_typed_core() {
+    fn check_keeps_unresolved_generic_obligations_out_of_typed_core() {
         let program = resolved(concat!(
             "module Main\n\n",
             "trait Renderable<'a> =\n",
@@ -530,7 +504,7 @@ mod tests {
             "let show<'a> requires { Renderable<'a> } value = value\n",
         ));
         let errors = crate::check(program).expect_err("Trait support is not executable yet");
-        assert_eq!(errors.len(), 2);
+        assert_eq!(errors.len(), 1);
         assert!(
             errors
                 .iter()

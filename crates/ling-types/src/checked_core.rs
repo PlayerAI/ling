@@ -1,11 +1,13 @@
 //! Internal RFC-0005 Checked Core dictionary witness lowering.
 //!
 //! This module consumes immutable solver selections and turns them into an
-//! immutable witness table. It never performs candidate selection, and the
-//! public Seed checker does not expose or execute this table yet.
+//! immutable witness table. It never performs candidate selection. The table
+//! is attached to `TypedProgram` and consumed by the checked interpreter and
+//! bytecode lowerer through the RFC-0021 static Trait boundary.
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use ling_resolve::{DefinitionId, ResolvedProgram};
 use ling_source::Span;
 
 use crate::coherence::{self, CoherenceIndex, ImplId, TraitId};
@@ -13,13 +15,31 @@ use crate::constraints::{ConstraintType, ObligationOrigin};
 use crate::solver::SolvedObligation;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) struct DictionaryMember {
+pub struct DictionaryMember {
     pub(crate) ordinal: usize,
     pub(crate) name: String,
+    pub(crate) definition: DefinitionId,
+}
+
+impl DictionaryMember {
+    #[must_use]
+    pub const fn ordinal(&self) -> usize {
+        self.ordinal
+    }
+
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    #[must_use]
+    pub const fn definition(&self) -> &DefinitionId {
+        &self.definition
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) struct DictionaryWitness {
+pub struct DictionaryWitness {
     pub(crate) obligation_order: usize,
     pub(crate) trait_id: TraitId,
     pub(crate) impl_id: ImplId,
@@ -28,14 +48,63 @@ pub(crate) struct DictionaryWitness {
     pub(crate) origin: ObligationOrigin,
 }
 
+impl DictionaryWitness {
+    #[must_use]
+    pub const fn obligation_order(&self) -> usize {
+        self.obligation_order
+    }
+
+    #[must_use]
+    pub fn trait_name(&self) -> &str {
+        &self.trait_id.name
+    }
+
+    #[must_use]
+    pub fn members(&self) -> &[DictionaryMember] {
+        &self.members
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) struct DictionaryTable {
+pub struct DictionaryTable {
     witnesses: Vec<DictionaryWitness>,
+}
+
+/// Backend-facing selection for one checked `Trait.member` application.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TraitMemberCall {
+    pub(crate) witness_index: usize,
+    pub(crate) member_ordinal: usize,
+    pub(crate) implementation: DefinitionId,
+}
+
+impl TraitMemberCall {
+    #[must_use]
+    pub const fn witness_index(&self) -> usize {
+        self.witness_index
+    }
+
+    #[must_use]
+    pub const fn member_ordinal(&self) -> usize {
+        self.member_ordinal
+    }
+
+    #[must_use]
+    pub const fn implementation(&self) -> &DefinitionId {
+        &self.implementation
+    }
 }
 
 impl DictionaryTable {
     #[must_use]
-    pub(crate) fn witnesses(&self) -> &[DictionaryWitness] {
+    pub(crate) const fn empty() -> Self {
+        Self {
+            witnesses: Vec::new(),
+        }
+    }
+
+    #[must_use]
+    pub fn witnesses(&self) -> &[DictionaryWitness] {
         &self.witnesses
     }
 
@@ -45,7 +114,7 @@ impl DictionaryTable {
     /// metadata for diagnostics, not semantic identity. Length-prefixed UTF-8
     /// fields avoid delimiter ambiguity without depending on host formatting.
     #[must_use]
-    pub(crate) fn canonical_bytes(&self) -> Vec<u8> {
+    pub fn canonical_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
         bytes.extend_from_slice(b"ling.checked-core.dictionary/0\0");
         append_usize(&mut bytes, self.witnesses.len());
@@ -60,6 +129,7 @@ impl DictionaryTable {
             for member in &witness.members {
                 append_usize(&mut bytes, member.ordinal);
                 append_string(&mut bytes, &member.name);
+                append_string(&mut bytes, member.definition.as_str());
             }
         }
         bytes
@@ -101,6 +171,7 @@ pub(crate) enum DictionaryLoweringErrorKind {
 pub(crate) fn lower_dictionary_witnesses(
     selections: &[SolvedObligation],
     index: &CoherenceIndex,
+    resolved: &ResolvedProgram,
 ) -> Result<DictionaryTable, Vec<DictionaryLoweringError>> {
     let implementations = index
         .impls
@@ -189,15 +260,37 @@ pub(crate) fn lower_dictionary_witnesses(
             continue;
         }
 
-        let members = selection
+        let Some(members) = selection
             .member_names
             .iter()
             .enumerate()
-            .map(|(ordinal, name)| DictionaryMember {
-                ordinal,
-                name: name.clone(),
+            .map(|(ordinal, name)| {
+                resolved
+                    .impl_members()
+                    .values()
+                    .find(|member| {
+                        member.module == selection.impl_id.module
+                            && member.impl_ordinal == selection.impl_id.ordinal
+                            && member.member_name == *name
+                    })
+                    .map(|member| DictionaryMember {
+                        ordinal,
+                        name: name.clone(),
+                        definition: member.definition.clone(),
+                    })
             })
-            .collect();
+            .collect::<Option<Vec<_>>>()
+        else {
+            errors.push(DictionaryLoweringError {
+                source_name: selection.origin.source_name.clone(),
+                span: selection.origin.span,
+                kind: DictionaryLoweringErrorKind::MemberMismatch {
+                    selected: selection.member_names.clone(),
+                    indexed: Vec::new(),
+                },
+            });
+            continue;
+        };
         witnesses.push(DictionaryWitness {
             obligation_order: selection.obligation_order,
             trait_id: selection.trait_id.clone(),
@@ -308,8 +401,9 @@ mod tests {
 
     #[test]
     fn lowers_identity_member_order_and_origin() {
-        let (_program, index, selections) = selection_fixture();
-        let table = lower_dictionary_witnesses(&selections, &index).expect("dictionary table");
+        let (program, index, selections) = selection_fixture();
+        let table =
+            lower_dictionary_witnesses(&selections, &index, &program).expect("dictionary table");
         assert_eq!(table.witnesses().len(), 1);
         let witness = &table.witnesses()[0];
         assert_eq!(witness.trait_id.name, "Renderable");
@@ -328,10 +422,11 @@ mod tests {
 
     #[test]
     fn rejects_duplicate_or_unknown_selection_without_reselecting() {
-        let (_program, index, selections) = selection_fixture();
+        let (program, index, selections) = selection_fixture();
         let mut duplicate = selections.clone();
         duplicate.push(selections[0].clone());
-        let errors = lower_dictionary_witnesses(&duplicate, &index).expect_err("duplicate order");
+        let errors =
+            lower_dictionary_witnesses(&duplicate, &index, &program).expect_err("duplicate order");
         assert!(errors.iter().any(|error| matches!(
             error.kind,
             DictionaryLoweringErrorKind::DuplicateObligationOrder { order: 0 }
@@ -339,7 +434,8 @@ mod tests {
 
         let mut unknown = selections;
         unknown[0].impl_id.ordinal = unknown[0].impl_id.ordinal.saturating_add(1);
-        let errors = lower_dictionary_witnesses(&unknown, &index).expect_err("unknown impl");
+        let errors =
+            lower_dictionary_witnesses(&unknown, &index, &program).expect_err("unknown impl");
         assert!(errors.iter().any(|error| matches!(
             error.kind,
             DictionaryLoweringErrorKind::UnknownImplementation { .. }
@@ -348,13 +444,13 @@ mod tests {
 
     #[test]
     fn canonical_bytes_exclude_origin_presentation_and_remain_repeatable() {
-        let (_program, index, selections) = selection_fixture();
-        let first = lower_dictionary_witnesses(&selections, &index)
+        let (program, index, selections) = selection_fixture();
+        let first = lower_dictionary_witnesses(&selections, &index, &program)
             .expect("first table")
             .canonical_bytes();
         let mut changed_origin = selections;
         changed_origin[0].origin.source_name = "different-host-path.ling".to_owned();
-        let second = lower_dictionary_witnesses(&changed_origin, &index)
+        let second = lower_dictionary_witnesses(&changed_origin, &index, &program)
             .expect("second table")
             .canonical_bytes();
         assert_eq!(first, second);
@@ -362,10 +458,11 @@ mod tests {
 
     #[test]
     fn rejects_receiver_and_member_identity_mismatches() {
-        let (_program, index, selections) = selection_fixture();
+        let (program, index, selections) = selection_fixture();
         let mut receiver = selections.clone();
         receiver[0].receiver = ConstraintType::Named("Other".to_owned());
-        let errors = lower_dictionary_witnesses(&receiver, &index).expect_err("receiver mismatch");
+        let errors =
+            lower_dictionary_witnesses(&receiver, &index, &program).expect_err("receiver mismatch");
         assert!(errors.iter().any(|error| matches!(
             error.kind,
             DictionaryLoweringErrorKind::ReceiverMismatch { .. }
@@ -373,7 +470,8 @@ mod tests {
 
         let mut members = selections;
         members[0].member_names.reverse();
-        let errors = lower_dictionary_witnesses(&members, &index).expect_err("member mismatch");
+        let errors =
+            lower_dictionary_witnesses(&members, &index, &program).expect_err("member mismatch");
         assert!(errors.iter().any(|error| matches!(
             error.kind,
             DictionaryLoweringErrorKind::MemberMismatch { .. }

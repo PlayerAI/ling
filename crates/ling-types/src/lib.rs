@@ -23,6 +23,8 @@ mod solver;
 #[allow(dead_code)]
 mod checked_core;
 
+pub use checked_core::{DictionaryMember, DictionaryTable, DictionaryWitness, TraitMemberCall};
+
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct TypeId(u32);
 
@@ -173,6 +175,8 @@ pub struct TypedProgram {
     integers: BTreeMap<ExpressionKey, BigInt>,
     records: BTreeMap<DefinitionId, RecordInfo>,
     variants: BTreeMap<DefinitionId, VariantInfo>,
+    dictionary: DictionaryTable,
+    trait_member_calls: BTreeMap<ExpressionKey, TraitMemberCall>,
     warnings: Vec<Diagnostic>,
 }
 
@@ -240,6 +244,16 @@ impl TypedProgram {
     #[must_use]
     pub fn variants(&self) -> &BTreeMap<DefinitionId, VariantInfo> {
         &self.variants
+    }
+
+    #[must_use]
+    pub const fn dictionary(&self) -> &DictionaryTable {
+        &self.dictionary
+    }
+
+    #[must_use]
+    pub fn trait_member_call(&self, key: ExpressionKey) -> Option<&TraitMemberCall> {
+        self.trait_member_calls.get(&key)
     }
 
     #[must_use]
@@ -445,15 +459,11 @@ impl Error for TypeError {}
 
 /// Infers all Seed types and validates assignment places.
 pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> {
-    let mut trait_errors = constraints::trait_item_spans(&resolved)
-        .into_iter()
-        .map(|(source_name, span)| TypeError {
-            kind: TypeErrorKind::UnsupportedTypeSyntax,
-            source_name,
-            span,
-            restriction_reason: None,
-        })
-        .collect::<Vec<_>>();
+    // RFC-0021 makes concrete, witness-resolved Trait members executable.  A
+    // declaration by itself is therefore no longer an unsupported type
+    // construct; unresolved generic obligations remain outside this bounded
+    // slice and are still rejected before Typed Core publication.
+    let mut trait_errors = Vec::new();
     match constraints::collect_obligations(&resolved) {
         Ok(obligations) => {
             trait_errors.extend(obligations.into_iter().map(|obligation| TypeError {
@@ -472,14 +482,20 @@ pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> 
             }))
         }
     }
-    if let Err(coherence_errors) = coherence::build_index(&resolved) {
-        trait_errors.extend(coherence_errors.into_iter().map(|error| TypeError {
-            kind: TypeErrorKind::UnsupportedTypeSyntax,
-            source_name: error.source_name,
-            span: error.span,
-            restriction_reason: None,
-        }));
-    }
+    let coherence = match coherence::build_index(&resolved) {
+        Ok(index) => Some(index),
+        Err(coherence_errors) => {
+            trait_errors.extend(coherence_errors.into_iter().map(|error| TypeError {
+                kind: TypeErrorKind::UnsupportedTypeSyntax,
+                source_name: error.source_name,
+                span: error.span,
+                restriction_reason: None,
+            }));
+            // Keep the deterministic error path below; the index is not
+            // usable when coherence validation failed.
+            None
+        }
+    };
     if !trait_errors.is_empty() {
         trait_errors.sort_by(|left, right| {
             (
@@ -495,7 +511,11 @@ pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> 
         });
         return Err(trait_errors);
     }
-    Inferencer::new(resolved).run()
+    Inferencer::new(
+        resolved,
+        coherence.expect("coherence errors returned above"),
+    )
+    .run()
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -519,6 +539,7 @@ enum InferType {
         definition: DefinitionId,
         arguments: Vec<Self>,
     },
+    TraitMember(DefinitionId),
     Variable(u32),
     Error,
 }
@@ -561,8 +582,19 @@ struct InternalVariant {
     constructors: BTreeMap<String, DefinitionId>,
 }
 
+#[derive(Clone)]
+struct PendingTraitCall {
+    key: ExpressionKey,
+    member: DefinitionId,
+    receiver: InferType,
+    module: ModuleId,
+    span: Span,
+    owner: DefinitionId,
+}
+
 struct Inferencer {
     resolved: ResolvedProgram,
+    coherence: coherence::CoherenceIndex,
     next_variable: u32,
     substitutions: BTreeMap<u32, InferType>,
     restricted_variables: BTreeMap<u32, &'static str>,
@@ -580,13 +612,18 @@ struct Inferencer {
     errors: Vec<TypeError>,
     warnings: Vec<Diagnostic>,
     current_module: ModuleId,
+    current_owner: Option<DefinitionId>,
+    pending_trait_calls: Vec<PendingTraitCall>,
+    used_trait_member_expressions: BTreeSet<ExpressionKey>,
+    trait_member_spans: BTreeMap<ExpressionKey, Span>,
 }
 
 impl Inferencer {
-    fn new(resolved: ResolvedProgram) -> Self {
+    fn new(resolved: ResolvedProgram, coherence: coherence::CoherenceIndex) -> Self {
         let current_module = resolved.entry();
         Self {
             resolved,
+            coherence,
             next_variable: 0,
             substitutions: BTreeMap::new(),
             restricted_variables: BTreeMap::new(),
@@ -604,6 +641,10 @@ impl Inferencer {
             errors: Vec::new(),
             warnings: Vec::new(),
             current_module,
+            current_owner: None,
+            pending_trait_calls: Vec::new(),
+            used_trait_member_expressions: BTreeSet::new(),
+            trait_member_spans: BTreeMap::new(),
         }
     }
 
@@ -614,7 +655,25 @@ impl Inferencer {
         self.predeclare_values();
         self.infer_definitions();
         self.check_equality_constraints();
+        self.reject_bare_trait_members();
 
+        if !self.errors.is_empty() {
+            self.errors.sort_by(|left, right| {
+                (
+                    &left.source_name,
+                    left.span.start(),
+                    format!("{:?}", left.kind),
+                )
+                    .cmp(&(
+                        &right.source_name,
+                        right.span.start(),
+                        format!("{:?}", right.kind),
+                    ))
+            });
+            return Err(self.errors);
+        }
+
+        let (dictionary, trait_member_calls) = self.lower_trait_calls();
         if !self.errors.is_empty() {
             self.errors.sort_by(|left, right| {
                 (
@@ -752,8 +811,205 @@ impl Inferencer {
             integers: self.integers,
             records,
             variants,
+            dictionary,
+            trait_member_calls,
             warnings: self.warnings,
         })
+    }
+
+    fn reject_bare_trait_members(&mut self) {
+        let bare = self
+            .trait_member_spans
+            .iter()
+            .filter(|(key, _)| !self.used_trait_member_expressions.contains(key))
+            .map(|(key, span)| (key.module(), *span))
+            .collect::<Vec<_>>();
+        for (module, span) in bare {
+            self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+        }
+    }
+
+    fn lower_trait_calls(&mut self) -> (DictionaryTable, BTreeMap<ExpressionKey, TraitMemberCall>) {
+        if self.pending_trait_calls.is_empty() {
+            return (DictionaryTable::empty(), BTreeMap::new());
+        }
+
+        let obligations = self
+            .pending_trait_calls
+            .iter()
+            .enumerate()
+            .filter_map(|(source_order, pending)| {
+                let member = self.resolved.trait_member(&pending.member)?;
+                let source_name = self
+                    .resolved
+                    .module(pending.module)
+                    .map(|module| module.hir.source_name.clone())
+                    .unwrap_or_else(|| member.source_name.clone());
+                let trait_name = if member.module == pending.module {
+                    member.trait_name.clone()
+                } else {
+                    self.resolved
+                        .module(member.module)
+                        .map(|module| {
+                            format!(
+                                "{}.{}",
+                                module.hir.module.name.normalized(),
+                                member.trait_name
+                            )
+                        })
+                        .unwrap_or_else(|| member.trait_name.clone())
+                };
+                Some(constraints::Obligation {
+                    module: pending.module,
+                    owner: constraints::ObligationOwner::Definition(pending.owner.clone()),
+                    trait_name,
+                    arguments: vec![self.constraint_type(&pending.receiver)],
+                    origin: constraints::ObligationOrigin {
+                        source_name,
+                        span: pending.span,
+                        parent: None,
+                    },
+                    source_order,
+                })
+            })
+            .collect::<Vec<_>>();
+
+        let selections = match solver::solve_obligations(
+            &self.resolved,
+            &self.coherence,
+            &obligations,
+            &BTreeMap::new(),
+        ) {
+            Ok(selections) => selections,
+            Err(errors) => {
+                self.errors
+                    .extend(errors.into_iter().map(|error| TypeError {
+                        kind: TypeErrorKind::UnsupportedTypeSyntax,
+                        source_name: error.source_name,
+                        span: error.span,
+                        restriction_reason: None,
+                    }));
+                return (DictionaryTable::empty(), BTreeMap::new());
+            }
+        };
+
+        let dictionary = match checked_core::lower_dictionary_witnesses(
+            &selections,
+            &self.coherence,
+            &self.resolved,
+        ) {
+            Ok(dictionary) => dictionary,
+            Err(errors) => {
+                self.errors
+                    .extend(errors.into_iter().map(|error| TypeError {
+                        kind: TypeErrorKind::UnsupportedTypeSyntax,
+                        source_name: error.source_name,
+                        span: error.span,
+                        restriction_reason: None,
+                    }));
+                return (DictionaryTable::empty(), BTreeMap::new());
+            }
+        };
+
+        let witness_indices = dictionary
+            .witnesses()
+            .iter()
+            .enumerate()
+            .map(|(index, witness)| (witness.obligation_order(), index))
+            .collect::<BTreeMap<_, _>>();
+        let selections_by_order = selections
+            .iter()
+            .map(|selection| (selection.obligation_order, selection))
+            .collect::<BTreeMap<_, _>>();
+        let mut calls = BTreeMap::new();
+        let pending_calls = self.pending_trait_calls.clone();
+        for (order, pending) in pending_calls.iter().enumerate() {
+            let Some(selection) = selections_by_order.get(&order) else {
+                continue;
+            };
+            let Some(witness_index) = witness_indices.get(&order).copied() else {
+                continue;
+            };
+            let Some(member) = self.resolved.trait_member(&pending.member) else {
+                continue;
+            };
+            let Some(witness_member) = dictionary.witnesses()[witness_index]
+                .members()
+                .iter()
+                .find(|candidate| candidate.name() == member.member_name)
+            else {
+                self.push_error(
+                    pending.module,
+                    pending.span,
+                    TypeErrorKind::UnsupportedTypeSyntax,
+                    None,
+                );
+                continue;
+            };
+            debug_assert_eq!(selection.obligation_order, order);
+            calls.insert(
+                pending.key,
+                TraitMemberCall {
+                    witness_index,
+                    member_ordinal: witness_member.ordinal(),
+                    implementation: witness_member.definition().clone(),
+                },
+            );
+        }
+        (dictionary, calls)
+    }
+
+    fn constraint_type(&self, value: &InferType) -> constraints::ConstraintType {
+        match self.apply(value.clone()) {
+            InferType::Record {
+                definition,
+                arguments,
+            }
+            | InferType::Variant {
+                definition,
+                arguments,
+            } => {
+                let name = self
+                    .resolved
+                    .definition(&definition)
+                    .map(|info| info.name.clone())
+                    .unwrap_or_else(|| definition.to_string());
+                if arguments.is_empty() {
+                    constraints::ConstraintType::Named(name)
+                } else {
+                    constraints::ConstraintType::Applied {
+                        name,
+                        arguments: arguments
+                            .iter()
+                            .map(|argument| self.constraint_type(argument))
+                            .collect(),
+                    }
+                }
+            }
+            InferType::List(element) => constraints::ConstraintType::Applied {
+                name: "List".to_owned(),
+                arguments: vec![self.constraint_type(&element)],
+            },
+            InferType::Variable(variable) => {
+                constraints::ConstraintType::Variable(format!("t{variable}"))
+            }
+            InferType::Unit => constraints::ConstraintType::Named("Unit".to_owned()),
+            InferType::Bool => constraints::ConstraintType::Named("Bool".to_owned()),
+            InferType::Int => constraints::ConstraintType::Named("Int".to_owned()),
+            InferType::Float64 => constraints::ConstraintType::Named("f64".to_owned()),
+            InferType::Text => constraints::ConstraintType::Named("Text".to_owned()),
+            InferType::Tuple(elements) => constraints::ConstraintType::Named(format!(
+                "({})",
+                elements
+                    .iter()
+                    .map(|element| display_infer(element, &self.resolved))
+                    .collect::<Vec<_>>()
+                    .join(" * ")
+            )),
+            InferType::Function { .. } | InferType::TraitMember(_) | InferType::Error => {
+                constraints::ConstraintType::Named(display_infer(value, &self.resolved))
+            }
+        }
     }
 
     fn seed_builtins(&mut self) {
@@ -1268,6 +1524,18 @@ impl Inferencer {
                 self.inferred_definitions.insert(id, variable);
             }
         }
+        let member_ids = self
+            .resolved
+            .impl_members()
+            .keys()
+            .cloned()
+            .collect::<Vec<_>>();
+        for member_id in member_ids {
+            let variable = self.fresh();
+            self.definitions
+                .insert(member_id.clone(), Scheme::mono(variable.clone()));
+            self.inferred_definitions.insert(member_id, variable);
+        }
     }
 
     fn infer_definitions(&mut self) {
@@ -1282,6 +1550,7 @@ impl Inferencer {
                 else {
                     continue;
                 };
+                let previous_owner = self.current_owner.replace(id.clone());
                 let parameter_types = definition
                     .parameters
                     .iter()
@@ -1339,8 +1608,112 @@ impl Inferencer {
                 };
                 self.definitions.insert(id.clone(), scheme);
                 self.inferred_definitions.insert(id, inferred);
+                self.current_owner = previous_owner;
+            }
+
+            for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
+                let receiver = self.type_syntax(module.id, &implementation.receiver);
+                for (member_ordinal, definition) in implementation.members.iter().enumerate() {
+                    let Some(id) = self
+                        .resolved
+                        .impl_members()
+                        .values()
+                        .find(|member| {
+                            member.module == module.id
+                                && member.impl_ordinal == impl_ordinal
+                                && member.member_ordinal == member_ordinal
+                        })
+                        .map(|member| member.definition.clone())
+                    else {
+                        continue;
+                    };
+                    let previous_owner = self.current_owner.replace(id.clone());
+                    let parameter_types = definition
+                        .parameters
+                        .iter()
+                        .enumerate()
+                        .map(|(index, pattern)| {
+                            let value = if index == 0 {
+                                receiver.clone()
+                            } else {
+                                self.fresh()
+                            };
+                            self.bind_pattern(module.id, pattern, value.clone());
+                            value
+                        })
+                        .collect::<Vec<_>>();
+                    let body = self.infer_expression(module.id, &definition.value);
+                    let inferred = if parameter_types.is_empty() {
+                        body
+                    } else {
+                        function(parameter_types, body)
+                    };
+                    if let Some(expected) = self.impl_member_type(
+                        module.id,
+                        &implementation.trait_name,
+                        &definition.name.normalized,
+                        receiver.clone(),
+                    ) {
+                        self.unify(expected, inferred.clone(), module.id, definition.span, None);
+                    }
+                    let inferred = self.apply(inferred);
+                    self.definitions
+                        .insert(id.clone(), Scheme::mono(inferred.clone()));
+                    self.inferred_definitions.insert(id, inferred);
+                    self.current_owner = previous_owner;
+                }
             }
         }
+    }
+
+    fn impl_member_type(
+        &mut self,
+        _module: ModuleId,
+        trait_name: &hir::QualifiedName,
+        member_name: &str,
+        receiver: InferType,
+    ) -> Option<InferType> {
+        let normalized_trait = trait_name.normalized();
+        let trait_short_name = normalized_trait
+            .rsplit('.')
+            .next()
+            .unwrap_or(normalized_trait.as_str());
+        let (trait_module, trait_parameter_names, signature) =
+            self.resolved.modules().iter().find_map(|candidate| {
+                candidate
+                    .hir
+                    .traits
+                    .iter()
+                    .find(|trait_declaration| trait_declaration.name.normalized == trait_short_name)
+                    .map(|declaration| {
+                        (
+                            candidate.id,
+                            declaration
+                                .parameters
+                                .iter()
+                                .map(|parameter| parameter.normalized.clone())
+                                .collect::<Vec<_>>(),
+                            declaration
+                                .members
+                                .iter()
+                                .find(|member| member.name.normalized == member_name)
+                                .map(|member| member.signature.clone()),
+                        )
+                    })
+            })?;
+        let signature = signature?;
+        let mut parameters = BTreeMap::new();
+        for (index, parameter) in trait_parameter_names.iter().enumerate() {
+            parameters.insert(
+                parameter.clone(),
+                if index == 0 {
+                    receiver.clone()
+                } else {
+                    self.fresh()
+                },
+            );
+        }
+        Some(self.type_syntax_with_parameters(trait_module, &signature, &parameters))
     }
 
     fn infer_expression(&mut self, module: ModuleId, expression: &hir::Expression) -> InferType {
@@ -1409,7 +1782,19 @@ impl Inferencer {
                     .iter()
                     .map(|argument| self.infer_expression(module, argument))
                     .collect::<Vec<_>>();
-                self.infer_application(callable, argument_types, module, expression.span)
+                if let InferType::TraitMember(member) = callable {
+                    self.used_trait_member_expressions
+                        .insert(ExpressionKey::new(module, function.id));
+                    self.infer_trait_member_application(
+                        member,
+                        argument_types,
+                        module,
+                        expression.span,
+                        key,
+                    )
+                } else {
+                    self.infer_application(callable, argument_types, module, expression.span)
+                }
             }
             hir::ExpressionKind::Projection {
                 reference,
@@ -1539,8 +1924,65 @@ impl Inferencer {
                 base_type
             }
         };
+        if matches!(value, InferType::TraitMember(_)) {
+            self.trait_member_spans.insert(key, expression.span);
+        }
         self.inferred_expressions.insert(key, value.clone());
         value
+    }
+
+    fn infer_trait_member_application(
+        &mut self,
+        member: DefinitionId,
+        arguments: Vec<InferType>,
+        module: ModuleId,
+        span: Span,
+        key: ExpressionKey,
+    ) -> InferType {
+        let Some(info) = self.resolved.trait_member(&member).cloned() else {
+            self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+            return InferType::Error;
+        };
+        let Some(trait_declaration) = self
+            .resolved
+            .module(info.module)
+            .and_then(|module| {
+                module
+                    .hir
+                    .traits
+                    .iter()
+                    .find(|declaration| declaration.name.normalized == info.trait_name)
+            })
+            .cloned()
+        else {
+            self.push_error(module, span, TypeErrorKind::UnsupportedTypeSyntax, None);
+            return InferType::Error;
+        };
+        let declaration_parameters = trait_declaration
+            .parameters
+            .iter()
+            .map(|parameter| (parameter.normalized.clone(), self.fresh()))
+            .collect::<BTreeMap<_, _>>();
+        let callable =
+            self.type_syntax_with_parameters(info.module, &info.signature, &declaration_parameters);
+        let result = self.infer_application(callable, arguments.clone(), module, span);
+        if let Some(receiver) = arguments.first() {
+            let owner = self.current_owner.clone().unwrap_or_else(|| {
+                self.resolved
+                    .definition_id(module, "main")
+                    .cloned()
+                    .unwrap_or_else(|| member.clone())
+            });
+            self.pending_trait_calls.push(PendingTraitCall {
+                key,
+                member,
+                receiver: receiver.clone(),
+                module,
+                span,
+                owner,
+            });
+        }
+        result
     }
 
     fn infer_local(&mut self, module: ModuleId, binding: &hir::LocalBinding) {
@@ -2370,6 +2812,17 @@ impl Inferencer {
                 }
             }
             InferType::Error => InferType::Error,
+            InferType::TraitMember(member) => {
+                self.push_error(
+                    module,
+                    span,
+                    TypeErrorKind::NotCallable {
+                        actual: format!("Trait member {member}"),
+                    },
+                    restriction_reason,
+                );
+                InferType::Error
+            }
             actual => {
                 self.push_error(
                     module,
@@ -2386,11 +2839,16 @@ impl Inferencer {
 
     fn reference_type(&mut self, target: &ReferenceTarget) -> InferType {
         match target {
-            ReferenceTarget::Definition(definition) => self
-                .definitions
-                .get(definition)
-                .cloned()
-                .map_or(InferType::Error, |scheme| self.instantiate(&scheme)),
+            ReferenceTarget::Definition(definition) => {
+                if self.resolved.trait_member(definition).is_some() {
+                    InferType::TraitMember(definition.clone())
+                } else {
+                    self.definitions
+                        .get(definition)
+                        .cloned()
+                        .map_or(InferType::Error, |scheme| self.instantiate(&scheme))
+                }
+            }
             ReferenceTarget::Binding(binding) => self
                 .bindings
                 .get(binding)
@@ -3054,7 +3512,9 @@ impl Inferencer {
                     })
                 })
             }),
-            InferType::Function { .. } | InferType::Variable(_) => false,
+            InferType::Function { .. } | InferType::TraitMember(_) | InferType::Variable(_) => {
+                false
+            }
         }
     }
 
@@ -3128,6 +3588,7 @@ fn collect_free_variables(value: &InferType, output: &mut BTreeSet<u32>) {
         | InferType::Int
         | InferType::Float64
         | InferType::Text
+        | InferType::TraitMember(_)
         | InferType::Error => {}
     }
 }
@@ -3181,6 +3642,7 @@ fn replace_variables(value: &InferType, replacements: &BTreeMap<u32, InferType>)
                 .map(|argument| replace_variables(argument, replacements))
                 .collect(),
         },
+        InferType::TraitMember(definition) => InferType::TraitMember(definition.clone()),
         value => value.clone(),
     }
 }
@@ -3230,6 +3692,7 @@ fn intern_type(
                 .map(|argument| intern_type(argument, arena, index))
                 .collect(),
         },
+        InferType::TraitMember(_) => Type::Error,
         InferType::Variable(variable) => Type::Variable(*variable),
         InferType::Error => Type::Error,
     };
@@ -3304,6 +3767,7 @@ fn display_infer(value: &InferType, resolved: &ResolvedProgram) -> String {
                 )
             }
         }
+        InferType::TraitMember(definition) => format!("<trait-member:{definition}>"),
         InferType::Variable(variable) => format!("'t{variable}"),
         InferType::Error => "<error>".to_owned(),
     }
@@ -3436,6 +3900,75 @@ mod tests {
             .expect("main definition");
         let main_type = typed.definition_type(main).expect("main type");
         assert_eq!(typed.arena().display(main_type), "Unit -> Unit");
+    }
+
+    #[test]
+    fn resolves_concrete_trait_member_call_into_checked_dictionary() {
+        let typed = check(resolved(concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main () = Renderable.render { name = \"Ling\" }\n",
+        )))
+        .expect("a concrete Trait member call type-checks");
+        assert_eq!(typed.dictionary().witnesses().len(), 1);
+        let main = typed
+            .resolved()
+            .definition_id(typed.resolved().entry(), "main")
+            .expect("main definition");
+        let expression = typed
+            .expression_types()
+            .keys()
+            .copied()
+            .find(|key| typed.trait_member_call(*key).is_some())
+            .expect("Trait call expression is recorded");
+        let call = typed
+            .trait_member_call(expression)
+            .expect("Trait call mapping");
+        assert!(
+            typed
+                .resolved()
+                .impl_member(call.implementation())
+                .is_some()
+        );
+        assert_eq!(
+            typed
+                .arena()
+                .display(typed.definition_type(main).expect("main type")),
+            "Unit -> Text"
+        );
+    }
+
+    #[test]
+    fn rejects_bare_and_unsatisfied_trait_members_before_typed_core() {
+        let bare = check(resolved(concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "let value = Renderable.render\n",
+        )))
+        .expect_err("bare Trait members are not runtime values");
+        assert!(
+            bare.iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::UnsupportedTypeSyntax))
+        );
+
+        let unsatisfied = check(resolved(concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "let value = Renderable.render { name = \"Ling\" }\n",
+        )))
+        .expect_err("a Trait call without an implementation is unsatisfied");
+        assert!(
+            unsatisfied
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::UnsupportedTypeSyntax))
+        );
     }
 
     #[test]

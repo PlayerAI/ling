@@ -1,8 +1,8 @@
 //! Internal RFC-0005 first-slice obligation solver.
 //!
 //! This module deliberately stops at immutable selection evidence. It does not
-//! construct dictionaries, alter inference substitutions, or make Trait syntax
-//! executable through the public type-checking entry point.
+//! alter inference substitutions or perform runtime dispatch; RFC-0021 lowers
+//! its selections into the checked dictionary boundary.
 
 use std::collections::{BTreeMap, BTreeSet};
 

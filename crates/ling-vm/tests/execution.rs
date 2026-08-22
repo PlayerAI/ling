@@ -168,6 +168,34 @@ fn vm_matches_the_checked_interpreter_for_hello_and_direct_calls() {
 }
 
 #[test]
+fn vm_matches_the_checked_interpreter_for_static_trait_member_dispatch() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "trait Renderable<'a> =\n",
+        "    render: 'a -> Text -> Text\n\n",
+        "type Item = { name: Text }\n\n",
+        "impl Renderable Item =\n",
+        "    let render item suffix = suffix\n\n",
+        "let main () =\n",
+        "    let render = Renderable.render { name = \"Ling\" }\n",
+        "    Console.write (render \"Ling\")\n",
+    );
+    let fixture = fixture("trait-dispatch.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("interpreter executes Trait dispatch");
+
+    let program = verified_v1_2(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host).expect("v1.2 VM executes Trait dispatch");
+    assert_eq!(vm_console.output, interpreter_console.output(), "v1.2");
+    assert_eq!(interpreter_console.output(), "Ling\n");
+}
+
+#[test]
 fn vm_executes_every_scalar_operator_and_both_branch_directions() {
     for take_false_branch in [false, true] {
         let program = decode_and_verify_v1(&wire::scalar_artifact(false, take_false_branch, false))

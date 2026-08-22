@@ -1,85 +1,80 @@
-# TRAIT-1307 Authority Audit: Interpreter/VM dictionary lowering
+# TRAIT-1307 Authority and Implementation Report
 
 ## Outcome
 
-TRAIT-1307 is correctly recorded as `BlockedSpec`. The next implementation
-file named by the execution plan is `crates/ling-eval/src/lib.rs`, but the
-repository does not yet have an accepted runtime-facing dictionary contract.
-Implementing a dictionary lookup, method slot, or VM operand now would make a
-backend choose semantics that the accepted authorities deliberately leave
-open.
+TRAIT-1307 is now `In Progress`. The missing runtime boundary is authorized by
+Accepted RFC-0021, which closes the implementation seam left by RFC-0005 §4
+and DEC-0027. The current vertical slice is deliberately static and bounded:
+the checker selects a concrete nominal implementation, attaches an immutable
+witness/member mapping, and both runtime backends consume that mapping without
+candidate search.
 
-No evaluator API, VM API, bytecode field/opcode, public Trait diagnostic, or
-placeholder method table was added. Existing Seed execution remains unchanged.
+The task is not complete. IDE projection, generic/blanket implementations,
+serialized dictionary formats, and the remaining negative/determinism fixture
+matrix are intentionally deferred.
 
 ## Normative traceability
 
-- Accepted RFC-0005 §4.1 requires every successful selection to lower to an
-  immutable witness and requires later backends to consume that witness
-  without re-running Trait selection.
-- Accepted RFC-0005 §4.2 requires the resolved witness to be part of the
-  checked semantic projection and forbids unresolved obligations in executable
-  Typed Core.
-- Accepted RFC-0005 compatibility clauses state that the RFC makes no current
-  bytecode or runtime change; any bytecode witness encoding requires a separate
-  accepted, versioned contract.
-- Accepted DEC-0027 intentionally keeps the witness module crate-private and
-  explicitly leaves `TypedProgram`, the Semantic Graph, interpreter/VM
-  calling convention, and method-slot representation to later work.
-- `docs/SEMANTICS.md` still excludes Trait execution from the v0.0.1 Seed
-  surface, so this task cannot make Trait-bearing source executable as a side
-  effect of backend work.
+- RFC-0005 §1.5 and §2 authorize the restricted Trait declaration, impl,
+  coherence, and concrete selection shape.
+- RFC-0005 §4.1–§4.2 require immutable witness lowering and forbid unresolved
+  obligations in executable Typed Core.
+- DEC-0027 defines the internal dictionary witness data and canonical identity
+  boundary.
+- RFC-0021 §1–§8 accepts the static `Trait.member` call boundary, deterministic
+  implementation-member identities, interpreter dispatch, existing direct-call
+  bytecode lowering, and semantic identity inclusion.
+- SEMANTICS.md §6.8 and LANGUAGE.md §6.4 remain the higher-authority v0.0.1
+  support boundary; RFC-0021 does not claim a v0.0.1 Stable feature.
 
-## Current interface evidence
+## Implemented evidence
 
-The current repository confirms the missing boundary:
+- `ling-resolve` indexes deterministic Trait-member and implementation-member
+  `DefinitionId` values and resolves local/imported qualified member names.
+- `ling-types` selects concrete calls, rejects bare or unsatisfied members,
+  attaches `DictionaryTable` and `TraitMemberCall` records to `TypedProgram`,
+  and exposes the same immutable mapping through `CheckedProgram`.
+- `ling-effects` tracks implementation-member effects and static member calls
+  in capability propagation.
+- `ling-semantic` includes canonical witness bytes and implementation-member
+  bodies in Program identity inputs.
+- `ling-eval` dispatches through the checked implementation identity and faults
+  if an unchecked bare member reaches runtime.
+- v1.2 bytecode lowering includes implementation members in the function table,
+  lowers full and partial static member calls to existing `Call`/
+  `CallClosure` instructions, and skips the non-runtime projection shape.
+- `crates/ling-vm/tests/execution.rs` compares the checked interpreter with the
+  independently verified v1.2 VM for a two-argument member and partial
+  application.
 
-- `ling-types::check` rejects Trait items and obligations with the existing
-  Seed `UnsupportedTypeSyntax` boundary.
-- `ling-effects::CheckedProgram` and `ling-semantic::ProgramSnapshot` carry no
-  dictionary table or witness identity.
-- `ling-eval::execute_main` accepts only a checked `ProgramSnapshot`; the
-  evaluator has no Trait-call HIR or checked-core operation to lower.
-- `ling-types::checked_core` records selected Trait/impl/receiver/member-name
-  identity, but it does not identify executable method definitions or slots.
-- `ling-bytecode::ProgramParts` has no dictionary table or instruction, and
-  `ling-vm` executes only independently verified bytecode. Adding a wire field
-  would require a new accepted bytecode revision and verifier evidence.
+## Verification performed
 
-## Required authority before implementation
+- `cargo test -p ling-types --locked --offline` — 36 tests passed.
+- `cargo test -p ling-effects --locked --offline` — 9 tests passed.
+- `cargo test -p ling-semantic --locked --offline` — 12 unit tests and 5
+  project tests passed.
+- `cargo test -p ling-vm --test execution --locked --offline` — 22 tests
+  passed, including Trait interpreter/VM differential execution.
+- `cargo fmt --all` completed successfully.
 
-An implementation-ready decision or RFC must define, at minimum:
+## Compatibility and determinism
 
-1. how the witness is attached to `TypedProgram`, `CheckedProgram`, and the
-   Semantic Graph, including the program/identity binding;
-2. how each ordered member maps to a checked executable definition or method
-   slot (member names alone are not callable definitions);
-3. the interpreter dictionary environment and call convention, including
-   lifetime, lookup failure, and source-span projection;
-4. the versioned bytecode representation, verifier rules, VM handoff, and
-   compatibility behavior; and
-5. positive, negative, deterministic, and interpreter/VM differential
-   fixtures for selected, missing, ambiguous, and mismatched witnesses.
-
-Until those decisions are Accepted, changing `crates/ling-eval/src/lib.rs`,
-`crates/ling-bytecode/src/model.rs`, or `crates/ling-vm/src/execute.rs` would
-either re-run selection, expose an invented ABI, or claim execution that the
-Seed support matrix does not authorize.
-
-## Evidence and compatibility
-
-The audit was checked against `crates/ling-eval/src/lib.rs`,
-`crates/ling-effects/src/lib.rs`, `crates/ling-semantic/src/lib.rs`,
-`crates/ling-types/src/checked_core.rs`,
-`crates/ling-bytecode/src/model.rs`, `crates/ling-bytecode/src/lib.rs`,
-`crates/ling-vm/src/lib.rs`, RFC-0005, and DEC-0027. No code or public
-protocol behavior changed; no diagnostic allocation, schema, Semantic ID,
-source-span, bytecode, VM, or Unicode 17.0.0 claim is made.
+- No bytecode wire revision, opcode, schema marker, diagnostic code, host
+  capability, or Unicode table changed.
+- Existing direct-call verifier rules remain in force; the selected
+  implementation `DefinitionId` is resolved before lowering.
+- Witness canonical bytes contain Trait/impl/member identity and omit source
+  paths, spans, allocation details, and hash-map order.
+- Original UTF-8 spans remain the diagnostic source of truth.
 
 ## Intentionally deferred
 
-TRAIT-1307 can start after the runtime dictionary and bytecode authority is
-Accepted. The next executable source file remains
-`crates/ling-eval/src/lib.rs`; its first change should consume the approved
-immutable witness rather than search the coherence index. VM and bytecode
-changes must follow the separately versioned bytecode decision.
+- unknown-member, ambiguous-impl, malformed-witness, and over-application
+  differential fixtures beyond the current checked rejection coverage;
+- cross-module package conformance and module-input-order reproducibility;
+- v1.0/v1.1 aggregate limitations and any new bytecode serialization;
+- generic receiver substitution, blanket impls, trait objects, associated
+  types, default methods, specialization, and IDE/LSP projections.
+
+TRAIT-1307 may be marked `Done` only after the deferred evidence is added and
+the governance/status/support registries are regenerated and verified.

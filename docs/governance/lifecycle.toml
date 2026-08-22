@@ -477,6 +477,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0021"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0021.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify concrete Trait.member calls, multi-argument calls, partial application, and interpreter/verified-VM logical equivalence.",
+  "Reject unknown members, generic or unresolved receivers, ambiguous implementations, malformed witnesses, and over-application deterministically with original UTF-8 spans.",
+  "Compare member DefinitionIds, witness canonical bytes, checked identity, and direct-call lowering across process, module-order, CRLF/BOM, Unicode, and hash-seed variations.",
+]
+compatibility_impact = [
+  "Adds only the experimental v0.1 static Trait.member call boundary; v0.0.1, existing bytecode wire revisions, diagnostics, public JSON schemas, CLI/LSP protocols, ABI/FFI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Serialized dictionary tables, generic dictionary threading, blanket implementations, implicit receivers, dynamic dispatch, and trait objects require separate accepted authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

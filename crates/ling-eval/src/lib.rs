@@ -362,11 +362,22 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 function,
                 arguments,
             } => {
-                let callable = self.eval_expression(module, function, environment)?;
                 let mut values = Vec::with_capacity(arguments.len());
                 for argument in arguments {
                     values.push(self.eval_expression(module, argument, environment)?);
                 }
+                let key = ExpressionKey::new(module, expression.id);
+                if let Some(call) = self
+                    .snapshot
+                    .checked()
+                    .typed()
+                    .trait_member_call(key)
+                    .cloned()
+                {
+                    let callable = self.definition_value(call.implementation())?;
+                    return self.apply(callable, values, expression.span);
+                }
+                let callable = self.eval_expression(module, function, environment)?;
                 self.apply(callable, values, expression.span)
             }
             hir::ExpressionKind::Projection {
@@ -580,11 +591,17 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
 
     fn definition_value(&mut self, definition: &DefinitionId) -> Result<Value, RuntimeFault> {
         let resolved = self.snapshot.checked().typed().resolved();
-        let info = resolved.definition(definition).ok_or_else(|| {
+        let info = resolved.definition(definition).cloned().ok_or_else(|| {
             self.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
                 invariant: "definition is absent",
             })
         })?;
+        if resolved.trait_member(definition).is_some() {
+            return Err(self.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
+                invariant: "bare Trait member reached evaluation",
+            }));
+        }
+        let implementation_member = resolved.impl_member(definition).cloned();
         match info.origin {
             DefinitionOrigin::Builtin(builtin) => Ok(Value::Builtin {
                 builtin,
@@ -599,6 +616,32 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 let resolved_module = resolved
                     .module(module)
                     .expect("resolved definition module exists");
+                if let Some(member) = implementation_member {
+                    let implementation = resolved_module
+                        .hir
+                        .impls
+                        .get(member.impl_ordinal)
+                        .and_then(|implementation| {
+                            implementation.members.get(member.member_ordinal)
+                        })
+                        .ok_or_else(|| {
+                            self.fault(
+                                module,
+                                resolved_module.hir.span,
+                                "implementation member body is absent",
+                            )
+                        })?;
+                    return if implementation.parameters.is_empty() {
+                        self.eval_expression(module, &implementation.value, &mut Environment::new())
+                    } else {
+                        Ok(Value::Closure(Box::new(Closure {
+                            module,
+                            parameters: implementation.parameters.clone(),
+                            body: implementation.value.clone(),
+                            environment: Environment::new(),
+                        })))
+                    };
+                }
                 if info.kind == DefinitionKind::Constructor {
                     if let Some(value) = self.constructor_value(definition) {
                         return Ok(value);
@@ -1421,5 +1464,23 @@ mod tests {
         let mut console = MemoryConsole::default();
         execute_main(&snapshot, &main, &mut console).expect("record pattern executes");
         assert_eq!(console.output(), "7\n");
+    }
+
+    #[test]
+    fn concrete_trait_member_dispatch_executes_selected_impl_body() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main () = Console.write (Renderable.render { name = \"Ling\" })\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("Trait member dispatch executes");
+        assert_eq!(console.output(), "Ling\n");
     }
 }

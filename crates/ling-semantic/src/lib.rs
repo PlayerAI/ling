@@ -1929,6 +1929,10 @@ impl SnapshotBuilder {
         encoder.string(LANGUAGE_VERSION);
         encoder.string(self.mode.schema());
         encoder.string(&ling_unicode::UNICODE_VERSION.to_string());
+        let dictionary = self.checked.typed().dictionary();
+        if !dictionary.witnesses().is_empty() {
+            encoder.bytes(&dictionary.canonical_bytes());
+        }
         if self.mode == IdentityMode::Project {
             let project = self
                 .checked
@@ -2385,6 +2389,23 @@ impl SnapshotBuilder {
                     encoder.u8(0);
                     encoder.bool(value.recursive);
                     encoder.bool(value.mutable);
+                    encoder.u32(u32::try_from(value.parameters.len()).unwrap_or(u32::MAX));
+                    for pattern in &value.parameters {
+                        self.encode_pattern(module, pattern, encoder);
+                    }
+                    self.encode_expression(module, &value.value, encoder);
+                } else if let Some(member) = typed.resolved().impl_member(definition) {
+                    let value = resolved_module
+                        .hir
+                        .impls
+                        .get(member.impl_ordinal)
+                        .and_then(|implementation| {
+                            implementation.members.get(member.member_ordinal)
+                        })
+                        .expect("implementation member body exists");
+                    encoder.u8(3);
+                    encoder.u32(u32::try_from(member.impl_ordinal).unwrap_or(u32::MAX));
+                    encoder.u32(u32::try_from(member.member_ordinal).unwrap_or(u32::MAX));
                     encoder.u32(u32::try_from(value.parameters.len()).unwrap_or(u32::MAX));
                     for pattern in &value.parameters {
                         self.encode_pattern(module, pattern, encoder);
@@ -3602,6 +3623,29 @@ mod tests {
         assert_eq!(first.json(), second.json());
         assert_eq!(first.program_id(), second.program_id());
         assert!(first.json().contains("\"schema\":\"ling.semantic/0.1\""));
+    }
+
+    #[test]
+    fn trait_witness_identity_is_part_of_semantic_program_identity() {
+        let first_source = concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main () = Renderable.render { name = \"Ling\" }\n",
+        );
+        let second_source = first_source.replace("item.name", "\"Other\"");
+        let first = snapshot(first_source);
+        let repeat = snapshot(first_source);
+        let second = snapshot(&second_source);
+        assert_eq!(
+            first.checked().dictionary().canonical_bytes(),
+            repeat.checked().dictionary().canonical_bytes()
+        );
+        assert_eq!(first.program_id(), repeat.program_id());
+        assert_ne!(first.program_id(), second.program_id());
     }
 
     #[test]

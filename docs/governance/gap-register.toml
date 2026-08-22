@@ -196,8 +196,8 @@ priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["TRAIT-1307"]
 observable_behavior = "Programs cannot predict which Trait implementations are legal or selected across packages, how ambiguity terminates, or how a selected instance reaches Checked Core."
-authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0005"]
-candidate_rfcs = ["RFC-0005"]
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0005", "RFC-0021"]
+candidate_rfcs = ["RFC-0005", "RFC-0021"]
 source_items = ["SEMANTICS-31.3", "RFC-0001-22:RFC-0005", "ROADMAP-5.2:trait", "RFC-0005"]
 options = [
   "Adopt a deliberately restricted global coherence and orphan model with explicit dictionary lowering.",
@@ -206,8 +206,8 @@ options = [
 irreversible_consequences = ["Coherence and orphan rules determine cross-package compatibility and whether later implementations are breaking changes."]
 required_evidence = ["positive", "negative", "migration", "cross-package", "termination", "determinism"]
 owner_role = "type-system-design"
-next_action = "Complete TRAIT-1307 against Accepted RFC-0005 and DEC-0027, then add the required cross-package and interpreter/VM differential conformance corpus."
-resolution = ["RFC-0005"]
+next_action = "Complete TRAIT-1307 against Accepted RFC-0005, DEC-0027, and RFC-0021, then add the required cross-package, malformed-witness, and interpreter/VM differential conformance corpus."
+resolution = ["RFC-0005", "RFC-0021"]
 superseded_by = ""
 observed_markers = []
 

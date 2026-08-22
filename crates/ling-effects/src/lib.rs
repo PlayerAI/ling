@@ -10,7 +10,7 @@ use ling_resolve::{
     BindingKey, Builtin, DefinitionId, DefinitionOrigin, ExpressionKey, ModuleId, ReferenceTarget,
 };
 use ling_source::Span;
-use ling_types::{Type, TypeId, TypedProgram};
+use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Effect {
@@ -137,6 +137,16 @@ impl CheckedProgram {
     #[must_use]
     pub const fn typed(&self) -> &TypedProgram {
         &self.typed
+    }
+
+    #[must_use]
+    pub const fn dictionary(&self) -> &DictionaryTable {
+        self.typed.dictionary()
+    }
+
+    #[must_use]
+    pub fn trait_member_call(&self, key: ExpressionKey) -> Option<&TraitMemberCall> {
+        self.typed.trait_member_call(key)
     }
 
     #[must_use]
@@ -471,6 +481,30 @@ impl Checker {
                     self.connect_alias(callable, module.id, &definition.value);
                 }
             }
+            for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
+                for (member_ordinal, definition) in implementation.members.iter().enumerate() {
+                    let Some(id) = self
+                        .typed
+                        .resolved()
+                        .impl_members()
+                        .values()
+                        .find(|member| {
+                            member.module == module.id
+                                && member.impl_ordinal == impl_ordinal
+                                && member.member_ordinal == member_ordinal
+                        })
+                        .map(|member| member.definition.clone())
+                    else {
+                        continue;
+                    };
+                    let callable = Callable::Definition(id);
+                    self.register_parameters(callable.clone(), module.id, &definition.parameters);
+                    self.collect_callable_body(callable.clone(), module.id, &definition.value);
+                    if definition.parameters.is_empty() {
+                        self.connect_alias(callable, module.id, &definition.value);
+                    }
+                }
+            }
         }
         for definition in self.typed.resolved().definitions().values() {
             let mut effects = EffectRow::default();
@@ -600,6 +634,12 @@ impl Checker {
                 arguments,
             } => {
                 self.visit_expression(module, function, effects, calls);
+                if let Some(call) = self
+                    .typed
+                    .trait_member_call(ExpressionKey::new(module, expression.id))
+                {
+                    calls.insert(Callable::Definition(call.implementation().clone()));
+                }
                 if let Some((callee, applied)) = self.expression_callable_state(module, function) {
                     let target = if applied > 0 {
                         self.value_callable(module, function)
@@ -812,13 +852,19 @@ impl Checker {
                     });
                 }
             }
-            let uses_console = module.hir.definitions.iter().any(|definition| {
-                self.typed
-                    .resolved()
-                    .definition_id(module.id, &definition.name.normalized)
-                    .and_then(|id| definition_effects.get(id))
-                    .is_some_and(|row| row.0.contains(&Effect::ConsoleWrite))
-            });
+            let uses_console = self
+                .typed
+                .resolved()
+                .definitions()
+                .values()
+                .filter(|definition| {
+                    matches!(
+                        definition.origin,
+                        DefinitionOrigin::User { module: owner } if owner == module.id
+                    )
+                })
+                .filter_map(|definition| definition_effects.get(&definition.id))
+                .any(|row| row.0.contains(&Effect::ConsoleWrite));
             if uses_console && !declared.contains(&Capability::ConsoleWrite) {
                 self.errors.push(EffectError {
                     kind: EffectErrorKind::MissingCapability {

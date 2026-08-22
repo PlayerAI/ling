@@ -267,6 +267,34 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                     },
                 );
             }
+            for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
+                for (member_ordinal, definition) in implementation.members.iter().enumerate() {
+                    let id = resolved
+                        .impl_members()
+                        .values()
+                        .find(|member| {
+                            member.module == module.id
+                                && member.impl_ordinal == impl_ordinal
+                                && member.member_ordinal == member_ordinal
+                        })
+                        .map(|member| member.definition.clone())
+                        .ok_or_else(|| {
+                            invalid_module(
+                                module,
+                                definition.span,
+                                "implementation member has no resolved DefinitionId",
+                            )
+                        })?;
+                    named.insert(
+                        id.clone(),
+                        NamedPlan {
+                            id,
+                            module,
+                            definition,
+                        },
+                    );
+                }
+            }
         }
         let mut locals = BTreeMap::new();
         let mut local_bindings = BTreeMap::new();
@@ -290,6 +318,24 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                     &mut order,
                     ordinals.entry(module.id).or_default(),
                 )?;
+            }
+            for implementation in &module.hir.impls {
+                for definition in &implementation.members {
+                    for pattern in &definition.parameters {
+                        collect_pattern_order(module.id, pattern, &mut binding_order, &mut order);
+                    }
+                    collect_lifted(
+                        snapshot,
+                        module,
+                        &definition.value,
+                        &mut locals,
+                        &mut local_bindings,
+                        &mut builtins,
+                        &mut binding_order,
+                        &mut order,
+                        ordinals.entry(module.id).or_default(),
+                    )?;
+                }
             }
         }
 
@@ -423,6 +469,12 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             for definition in &module.hir.definitions {
                 string_set.insert(definition.name.normalized.clone());
                 collect_text_strings(&definition.value, &mut string_set);
+            }
+            for implementation in &module.hir.impls {
+                for definition in &implementation.members {
+                    string_set.insert(definition.name.normalized.clone());
+                    collect_text_strings(&definition.value, &mut string_set);
+                }
             }
             for declaration in &module.hir.types {
                 string_set.insert(declaration.name.normalized.clone());
@@ -4215,6 +4267,65 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             arguments.len(),
             self.owner.limits.arguments_per_operation(),
         )?;
+        if let Some(call) = self
+            .owner
+            .snapshot
+            .checked()
+            .typed()
+            .trait_member_call(ExpressionKey::new(self.module.id, expression.id))
+            .cloned()
+        {
+            let values = self.lower_arguments(arguments, environment)?;
+            let signature = self
+                .owner
+                .named_signatures
+                .get(call.implementation())
+                .ok_or_else(|| {
+                    invalid_module(
+                        self.module,
+                        expression.span,
+                        "Trait implementation member signature is absent",
+                    )
+                })?;
+            if arguments.len() == signature.parameters.len() {
+                let destination = self.new_register(expression.span)?;
+                self.push_instruction(
+                    Instruction::Call {
+                        destination,
+                        function: self.owner.function_indices[call.implementation()],
+                        arguments: values,
+                    },
+                    expression.span,
+                )?;
+                return Ok(destination);
+            }
+            if arguments.len() > signature.parameters.len() {
+                return Err(invalid_module(
+                    self.module,
+                    expression.span,
+                    "Trait member call arity exceeds implementation signature",
+                ));
+            }
+            let callee = self.new_register(function.span)?;
+            self.push_instruction(
+                Instruction::MakeClosure {
+                    destination: callee,
+                    function: self.owner.function_indices[call.implementation()],
+                    captures: Vec::new(),
+                },
+                function.span,
+            )?;
+            let destination = self.new_register(expression.span)?;
+            self.push_instruction(
+                Instruction::CallClosure {
+                    destination,
+                    callee,
+                    arguments: values,
+                },
+                expression.span,
+            )?;
+            return Ok(destination);
+        }
         let target = simple_reference_target(self.owner.snapshot, self.module.id, function)?;
         if let Some(ReferenceTarget::Definition(definition)) = &target {
             let info = self
@@ -4731,6 +4842,18 @@ fn simple_reference_target(
         .cloned())
 }
 
+fn is_trait_member_reference(
+    snapshot: &ProgramSnapshot,
+    module: ModuleId,
+    expression: &hir::Expression,
+) -> Result<bool, LoweringError> {
+    Ok(matches!(
+        simple_reference_target(snapshot, module, expression)?,
+        Some(ReferenceTarget::Definition(ref definition))
+            if snapshot.checked().typed().resolved().trait_member(definition).is_some()
+    ))
+}
+
 fn builtin_instruction(
     builtin: Builtin,
     destination: RegisterIndex,
@@ -4769,6 +4892,11 @@ fn collect_type_shapes(
     builder: &mut TypeTableBuilder,
 ) -> Result<(), LoweringError> {
     let typed = snapshot.checked().typed();
+    if is_trait_member_reference(snapshot, module.id, expression)? {
+        // The checked call mapping lowers the member directly; the
+        // projection is not an independent runtime value.
+        return Ok(());
+    }
     let value = typed
         .expression_type(ExpressionKey::new(module.id, expression.id))
         .ok_or_else(|| invalid_module(module, expression.span, "expression type is absent"))?;
@@ -4867,6 +4995,9 @@ fn collect_constants_v1_1(
     constants: &mut BTreeMap<ConstantKey, Constant>,
     aggregate_mode: bool,
 ) -> Result<(), LoweringError> {
+    if is_trait_member_reference(snapshot, module.id, expression)? {
+        return Ok(());
+    }
     let value = snapshot
         .checked()
         .typed()

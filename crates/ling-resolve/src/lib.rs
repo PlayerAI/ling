@@ -278,6 +278,37 @@ pub struct DefinitionInfo {
     pub span: Option<Span>,
 }
 
+/// Resolved identity and signature metadata for a declared Trait member.
+///
+/// Trait members are not inserted into ordinary module value scope. They are
+/// indexed separately so a qualified `Trait.member` expression can retain a
+/// stable definition identity without pretending that the member is a free
+/// top-level function.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TraitMemberInfo {
+    pub definition: DefinitionId,
+    pub module: ModuleId,
+    pub trait_name: String,
+    pub member_name: String,
+    pub ordinal: usize,
+    pub signature: hir::TypeSyntax,
+    pub source_name: String,
+    pub span: Span,
+}
+
+/// Resolved identity metadata for an implementation member body.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ImplMemberInfo {
+    pub definition: DefinitionId,
+    pub module: ModuleId,
+    pub impl_ordinal: usize,
+    pub member_ordinal: usize,
+    pub trait_name: String,
+    pub member_name: String,
+    pub source_name: String,
+    pub span: Span,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BindingInfo {
     pub key: BindingKey,
@@ -434,6 +465,8 @@ pub struct ResolvedProgram {
     pattern_constructors: BTreeMap<PatternKey, DefinitionId>,
     builtins: BTreeMap<Builtin, DefinitionId>,
     prelude: BTreeMap<PreludeDefinition, DefinitionId>,
+    trait_members: BTreeMap<DefinitionId, TraitMemberInfo>,
+    impl_members: BTreeMap<DefinitionId, ImplMemberInfo>,
     project: Option<ResolvedProject>,
 }
 
@@ -467,6 +500,26 @@ impl ResolvedProgram {
     #[must_use]
     pub fn definition(&self, id: &DefinitionId) -> Option<&DefinitionInfo> {
         self.definitions.get(id)
+    }
+
+    #[must_use]
+    pub fn trait_member(&self, id: &DefinitionId) -> Option<&TraitMemberInfo> {
+        self.trait_members.get(id)
+    }
+
+    #[must_use]
+    pub fn trait_members(&self) -> &BTreeMap<DefinitionId, TraitMemberInfo> {
+        &self.trait_members
+    }
+
+    #[must_use]
+    pub fn impl_member(&self, id: &DefinitionId) -> Option<&ImplMemberInfo> {
+        self.impl_members.get(id)
+    }
+
+    #[must_use]
+    pub fn impl_members(&self) -> &BTreeMap<DefinitionId, ImplMemberInfo> {
+        &self.impl_members
     }
 
     #[must_use]
@@ -809,6 +862,8 @@ struct Resolver {
     pattern_constructors: BTreeMap<PatternKey, DefinitionId>,
     builtins: BTreeMap<Builtin, DefinitionId>,
     prelude: BTreeMap<PreludeDefinition, DefinitionId>,
+    trait_members: BTreeMap<DefinitionId, TraitMemberInfo>,
+    impl_members: BTreeMap<DefinitionId, ImplMemberInfo>,
     errors: Vec<ResolveError>,
 }
 
@@ -885,6 +940,8 @@ impl Resolver {
             pattern_constructors: BTreeMap::new(),
             builtins: BTreeMap::new(),
             prelude: BTreeMap::new(),
+            trait_members: BTreeMap::new(),
+            impl_members: BTreeMap::new(),
             errors: Vec::new(),
         }
     }
@@ -923,6 +980,8 @@ impl Resolver {
                 pattern_constructors: self.pattern_constructors,
                 builtins: self.builtins,
                 prelude: self.prelude,
+                trait_members: self.trait_members,
+                impl_members: self.impl_members,
                 project: self.project,
             })
         } else {
@@ -1209,6 +1268,106 @@ impl Resolver {
                     }
                 }
             }
+            for declaration in &module.hir.traits {
+                for (ordinal, member) in declaration.members.iter().enumerate() {
+                    let qualified_name =
+                        format!("{}.{}", declaration.name.normalized, member.name.normalized);
+                    let id = self.make_definition_id(
+                        "trait-member",
+                        module.package.as_ref(),
+                        &module_name,
+                        &qualified_name,
+                    );
+                    self.definitions
+                        .entry(id.clone())
+                        .or_insert_with(|| DefinitionInfo {
+                            id: id.clone(),
+                            package: module.package.clone(),
+                            module_name: module_name.clone(),
+                            name: qualified_name,
+                            name_source: format!(
+                                "{}.{}",
+                                declaration.name.source, member.name.source
+                            ),
+                            name_skeleton: format!(
+                                "{}.{}",
+                                declaration.name.skeleton, member.name.skeleton
+                            ),
+                            name_scripts: declaration
+                                .name
+                                .scripts
+                                .iter()
+                                .chain(member.name.scripts.iter())
+                                .cloned()
+                                .collect(),
+                            name_suspicious_mixed_script: declaration.name.suspicious_mixed_script
+                                || member.name.suspicious_mixed_script,
+                            kind: DefinitionKind::Value,
+                            origin: DefinitionOrigin::User { module: module.id },
+                            mutable: false,
+                            source_name: Some(module.hir.source_name.clone()),
+                            span: Some(member.span),
+                        });
+                    self.trait_members.insert(
+                        id.clone(),
+                        TraitMemberInfo {
+                            definition: id,
+                            module: module.id,
+                            trait_name: declaration.name.normalized.clone(),
+                            member_name: member.name.normalized.clone(),
+                            ordinal,
+                            signature: member.signature.clone(),
+                            source_name: module.hir.source_name.clone(),
+                            span: member.span,
+                        },
+                    );
+                }
+            }
+            for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
+                let trait_name = implementation.trait_name.normalized();
+                for (member_ordinal, member) in implementation.members.iter().enumerate() {
+                    let qualified_name = format!(
+                        "{}#{}::{}",
+                        trait_name, impl_ordinal, member.name.normalized
+                    );
+                    let id = self.make_definition_id(
+                        "impl-member",
+                        module.package.as_ref(),
+                        &module_name,
+                        &qualified_name,
+                    );
+                    self.definitions
+                        .entry(id.clone())
+                        .or_insert_with(|| DefinitionInfo {
+                            id: id.clone(),
+                            package: module.package.clone(),
+                            module_name: module_name.clone(),
+                            name: qualified_name,
+                            name_source: member.name.source.clone(),
+                            name_skeleton: member.name.skeleton.clone(),
+                            name_scripts: member.name.scripts.clone(),
+                            name_suspicious_mixed_script: member.name.suspicious_mixed_script,
+                            kind: DefinitionKind::Value,
+                            origin: DefinitionOrigin::User { module: module.id },
+                            mutable: member.mutable,
+                            source_name: Some(module.hir.source_name.clone()),
+                            span: Some(member.span),
+                        });
+                    self.impl_members.insert(
+                        id.clone(),
+                        ImplMemberInfo {
+                            definition: id,
+                            module: module.id,
+                            impl_ordinal,
+                            member_ordinal,
+                            trait_name: trait_name.clone(),
+                            member_name: member.name.normalized.clone(),
+                            source_name: module.hir.source_name.clone(),
+                            span: member.span,
+                        },
+                    );
+                }
+            }
             self.module_definitions.insert(module.id, scope);
         }
     }
@@ -1304,13 +1463,23 @@ impl Resolver {
             let module_id = self.modules[index].id;
             let definitions = self.modules[index].hir.definitions.clone();
             for definition in &definitions {
-                let mut scopes = vec![Scope::default()];
-                for parameter in &definition.parameters {
-                    self.bind_pattern(module_id, parameter, true, &mut scopes);
+                self.resolve_definition_body(module_id, definition);
+            }
+            let impls = self.modules[index].hir.impls.clone();
+            for implementation in &impls {
+                for definition in &implementation.members {
+                    self.resolve_definition_body(module_id, definition);
                 }
-                self.resolve_expression(module_id, &definition.value, &mut scopes);
             }
         }
+    }
+
+    fn resolve_definition_body(&mut self, module: ModuleId, definition: &hir::Definition) {
+        let mut scopes = vec![Scope::default()];
+        for parameter in &definition.parameters {
+            self.bind_pattern(module, parameter, true, &mut scopes);
+        }
+        self.resolve_expression(module, &definition.value, &mut scopes);
     }
 
     fn resolve_expression(
@@ -1519,6 +1688,22 @@ impl Resolver {
         }
         if segments.len() == 2 {
             let current = &self.modules[module.0 as usize];
+            if let Some(id) = self
+                .trait_members
+                .values()
+                .find(|member| {
+                    member.module == module
+                        && member.trait_name == segments[0].normalized
+                        && member.member_name == segments[1].normalized
+                })
+                .map(|member| member.definition.clone())
+            {
+                self.references.insert(
+                    ReferenceKey::new(module, reference),
+                    ReferenceTarget::Definition(id),
+                );
+                return true;
+            }
             if let Some(imported) = current.imports.get(&segments[0].normalized) {
                 if let Some(id) = self
                     .module_definitions
@@ -1528,6 +1713,27 @@ impl Resolver {
                     self.references.insert(
                         ReferenceKey::new(module, reference),
                         ReferenceTarget::Definition(id.clone()),
+                    );
+                    return true;
+                }
+            }
+        }
+        if segments.len() == 3 {
+            let current = &self.modules[module.0 as usize];
+            if let Some(imported) = current.imports.get(&segments[0].normalized) {
+                if let Some(id) = self
+                    .trait_members
+                    .values()
+                    .find(|member| {
+                        member.module == *imported
+                            && member.trait_name == segments[1].normalized
+                            && member.member_name == segments[2].normalized
+                    })
+                    .map(|member| member.definition.clone())
+                {
+                    self.references.insert(
+                        ReferenceKey::new(module, reference),
+                        ReferenceTarget::Definition(id),
                     );
                     return true;
                 }
