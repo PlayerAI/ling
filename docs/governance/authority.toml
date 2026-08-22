@@ -2704,3 +2704,16 @@ covers = ["GPU-4604 bounded differential and hardware-matrix boundary evidence",
 depends_on = ["DEC-0167", "DEC-0166", "DEC-0165", "DEC-0164", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0169"
+title = "Internal error-normalization boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0169-error-normalization-boundary-evidence.md"
+covers = ["GPU-4605 bounded error-normalization boundary evidence", "test-only Fault/category/vendor vocabulary", "error boundaries without GPU diagnostic/Fault semantics"]
+depends_on = ["DEC-0168", "DEC-0167", "DEC-0013", "DEC-0001", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

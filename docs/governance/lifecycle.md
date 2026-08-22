@@ -199,6 +199,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0166` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0166](../decisions/0166-backend-adapter-boundary-evidence.md) |
 | `DEC-0167` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0167](../decisions/0167-launch-runtime-boundary-evidence.md) |
 | `DEC-0168` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0168](../decisions/0168-differential-hardware-matrix-boundary-evidence.md) |
+| `DEC-0169` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0169](../decisions/0169-error-normalization-boundary-evidence.md) |
 
 ## Migration boundary
 

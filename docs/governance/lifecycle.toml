@@ -4391,3 +4391,27 @@ unresolved_alternatives = [
   "CPU reference and GPU oracle relation; checked artifact and Kernel/Device IR boundary; input corpus, seed, work-item and reduction ordering; numeric mode, precision, rounding, NaN/signed-zero, overflow, tolerance, exact equality and Fault equivalence; canonical combination identity for OS/device/vendor/architecture/runtime/driver/backend compiler/toolchain/features/layout/limits; known limitations, provenance, expiry, evidence bundle and reproducibility; Unsupported/Experimental/Preview/Stable lifecycle, fallback/rejection; positive/negative/determinism/malformed/source-map/Unicode/differential/cross-target/resource/Fault/migration fixtures; diagnostics, local-machine, path/address/timestamp/driver-text redaction, protocol inventory, and public matrix status remain open under GPU-4604, GPU-4601 through GPU-4603, DIR-4501 through DIR-4503, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0169"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0169-error-normalization-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty error-normalization boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer Fault taxonomy, category precedence, code allocation, vendor parsing, structured facts, redaction, migration, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No GPU error category, public code, vendor-log parser, Fault mapper, dependency, diagnostic schema, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Fault taxonomy and provenance across source/verifier/compiler/runtime/backend/device/resource/cancellation/host; category precedence for UnsupportedFeature, DeviceUnavailable, CompileFailure, LaunchFailure, OutOfDeviceMemory, DeviceLost, NumericModeUnsupported; retryability, cancellation and severity; source spans, UTF-8, Semantic IDs, structured facts and bilingual rendering; error-code registry/lock, redaction and vendor detail, unknown vendor events; numeric/capability mismatch, malformed modules, queue/synchronization/cleanup failures, migration and determinism; positive/negative/malformed/corrupt-vendor/bilingual/source-map/Unicode/redaction/determinism/migration/cross-backend fixtures; diagnostics, host/driver/path/address/timestamp/debug exclusion, protocol inventory, and public normalization status remain open under GPU-4605, GPU-4601 through GPU-4604, DIR-4501 through DIR-4503, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""
