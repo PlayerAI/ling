@@ -2483,3 +2483,16 @@ covers = ["KCHK-4105 bounded Kernel Core/verifier boundary evidence", "test-only
 depends_on = ["DEC-0150", "DEC-0147", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0152"
+title = "Internal CPU scalar-reference boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0152-cpu-scalar-reference-boundary-evidence.md"
+covers = ["CPU-4201 bounded CPU scalar-reference boundary evidence", "test-only scalar reference vocabulary", "scalar boundaries without Kernel execution/differential semantics"]
+depends_on = ["DEC-0151", "DEC-0150", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

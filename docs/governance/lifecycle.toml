@@ -3983,3 +3983,27 @@ unresolved_alternatives = [
   "Core node grammar; Typed Core/verifier trust boundary; witness identity; effect/capability, shape/bounds, alias/race, ownership/resource, profile/target/device, and determinism rules; canonical bytes, source maps, migration, resource limits, CPU/device evidence, diagnostics, protocol inventory, and backend support remain open under KCHK-4105, KCHK-4101 through KCHK-4104, GAP-KERNEL-DEVICE-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0152"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0152-cpu-scalar-reference-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty CPU scalar-reference boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer scalar Kernel execution, numeric modes, Fault mapping, canonical output, differential equivalence, diagnostics, migration, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No CPU backend, oracle, reduction, Fault, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Verified input and work-item model; map/index/conditional/loop/buffer and reduction semantics; shape/bounds/alias/race, ownership/resource, numeric/tolerance, cancellation, Fault, canonical output/trace, diagnostics, fixtures, migration, CPU/device differential, target rejection, protocol inventory, and backend support remain open under CPU-4201, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, and missing authority.",
+]
+superseded_by = ""
