@@ -15,9 +15,10 @@ use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
 mod v2;
 
 pub use v2::{
-    EffectId, EffectIdError, EffectLabel, EffectOperation, EffectOperationError, EffectRowModel,
-    EffectRowTail, EffectRowUnionError, EffectTypeRef, EffectTypeRefError, HandlerClause,
-    HandlerClauseError, HandlerContract, HandlerContractError, ResumeMode, RowVariableId,
+    EFFECT_GRAPH_EXTENSION_VERSION, EffectGraphProjection, EffectId, EffectIdError, EffectLabel,
+    EffectOperation, EffectOperationError, EffectRowModel, EffectRowTail, EffectRowUnionError,
+    EffectTypeRef, EffectTypeRefError, HandlerClause, HandlerClauseError, HandlerContract,
+    HandlerContractError, ResumeMode, RowVariableId,
 };
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]

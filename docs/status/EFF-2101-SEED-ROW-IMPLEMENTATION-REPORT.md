@@ -4,10 +4,9 @@
 
 **Status: Done (bounded Seed-only snapshot slice).**
 
-`ling-effects` now exposes a deterministic in-process snapshot of the existing
-v0.0.1 closed `EffectRow`. The parent `EFF-2101` task remains `BlockedSpec` for
-the v0.2 Effect model because open rows, handlers, State masking, and related
-concurrency authorities are not accepted.
+`ling-effects` exposes a deterministic in-process snapshot of the existing
+v0.0.1 closed `EffectRow`. The later RFC-0006 v0.2 model is now implemented by
+the parent `EFF-2101`; this report remains limited to the Seed child.
 
 Implementation commit: `fb949ce2b28fc73a1668806952c3f8e790cd6d7a`.
 
@@ -43,6 +42,7 @@ Implementation commit: `fb949ce2b28fc73a1668806952c3f8e790cd6d7a`.
 
 No source syntax, checked semantics, diagnostics, Semantic IDs, Audit Source,
 schemas, CLI, runtime, bytecode, VM, protocols, or Unicode 17.0.0 behavior
-changed. Open/closed rows, Effect IDs, row-variable constraints, operation
-signatures, handlers, resume rules, State masking, Task/Actor labels, and v0.2
-diagnostics remain deferred to the blocked `EFF-2101` parent.
+changed by this Seed child. Open/closed rows, Effect IDs, row-variable
+constraints, operation signatures, handlers, resume rules, State masking,
+Task/Actor labels, and v0.2 diagnostics are governed by RFC-0006 and the
+subsequent EFF targets, not by DEC-0060.

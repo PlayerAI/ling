@@ -271,7 +271,7 @@ pub enum EffectRowTail {
 }
 
 /// A sorted, duplicate-free Effect label set plus a closed or open tail.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct EffectRowModel {
     labels: Box<[EffectLabel]>,
     tail: EffectRowTail,
@@ -588,7 +588,7 @@ impl fmt::Display for HandlerClauseError {
 impl Error for HandlerClauseError {}
 
 /// A lexical first-order handler contract and its declared residual row.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct HandlerContract {
     clauses: Box<[HandlerClause]>,
     residual: EffectRowModel,
@@ -650,6 +650,88 @@ impl HandlerContract {
             });
         }
         Ok(self.residual.clone())
+    }
+}
+
+/// Versioned in-process projection shape for a future Semantic Graph
+/// extension. This is not a wire protocol and does not alter Seed JSON.
+pub const EFFECT_GRAPH_EXTENSION_VERSION: &str = "ling.effect/0.1";
+
+/// Canonical Effect model values consumed by a later graph adapter.
+///
+/// The projection owns no source paths, spans, host capabilities, allocation
+/// identities, or runtime state. Its canonical bytes are suitable as a stable
+/// graph-input boundary once a separate public schema authority is accepted.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct EffectGraphProjection {
+    rows: Box<[EffectRowModel]>,
+    operations: Box<[EffectOperation]>,
+    handlers: Box<[HandlerContract]>,
+}
+
+impl EffectGraphProjection {
+    /// Builds a sorted, duplicate-free in-process projection.
+    #[must_use]
+    pub fn new(
+        rows: impl IntoIterator<Item = EffectRowModel>,
+        operations: impl IntoIterator<Item = EffectOperation>,
+        handlers: impl IntoIterator<Item = HandlerContract>,
+    ) -> Self {
+        let mut rows = rows.into_iter().collect::<Vec<_>>();
+        rows.sort();
+        rows.dedup();
+        let mut operations = operations.into_iter().collect::<Vec<_>>();
+        operations.sort();
+        operations.dedup();
+        let mut handlers = handlers.into_iter().collect::<Vec<_>>();
+        handlers.sort();
+        handlers.dedup();
+        Self {
+            rows: rows.into_boxed_slice(),
+            operations: operations.into_boxed_slice(),
+            handlers: handlers.into_boxed_slice(),
+        }
+    }
+
+    #[must_use]
+    pub fn schema(&self) -> &'static str {
+        EFFECT_GRAPH_EXTENSION_VERSION
+    }
+
+    #[must_use]
+    pub fn rows(&self) -> &[EffectRowModel] {
+        &self.rows
+    }
+
+    #[must_use]
+    pub fn operations(&self) -> &[EffectOperation] {
+        &self.operations
+    }
+
+    #[must_use]
+    pub fn handlers(&self) -> &[HandlerContract] {
+        &self.handlers
+    }
+
+    /// Serializes the model into deterministic length-delimited graph bytes.
+    #[must_use]
+    pub fn canonical_bytes(&self) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        push_field(&mut bytes, EFFECT_GRAPH_EXTENSION_VERSION.as_bytes());
+        for row in &self.rows {
+            push_field(&mut bytes, &row.canonical_bytes());
+        }
+        for operation in &self.operations {
+            push_field(&mut bytes, operation.canonical_name().as_bytes());
+        }
+        for handler in &self.handlers {
+            for clause in handler.clauses() {
+                push_field(&mut bytes, clause.label().canonical_name().as_bytes());
+                push_field(&mut bytes, clause.operation().canonical_name().as_bytes());
+            }
+            push_field(&mut bytes, &handler.residual().canonical_bytes());
+        }
+        bytes
     }
 }
 
@@ -730,6 +812,16 @@ mod tests {
                 .is_err()
         );
         assert_eq!(EffectRowModel::pure().canonical_name(), "{}");
+
+        let caller_row = EffectRowModel::open([], RowVariableId::new(7));
+        let callback_row = EffectRowModel::closed([EffectLabel::clock()]);
+        assert_eq!(
+            caller_row
+                .union(&callback_row)
+                .expect("polymorphic caller row is preserved")
+                .canonical_name(),
+            "{Clock|ρ7}"
+        );
     }
 
     #[test]
@@ -785,5 +877,46 @@ mod tests {
         ]);
         let right = EffectRowModel::closed([EffectLabel::clock(), EffectLabel::random()]);
         assert_eq!(left.canonical_bytes(), right.canonical_bytes());
+    }
+
+    #[test]
+    fn reserved_labels_and_graph_projection_are_versioned_and_deterministic() {
+        let labels = [
+            EffectLabel::clock(),
+            EffectLabel::random(),
+            EffectLabel::console_write(),
+            EffectLabel::state(type_ref("Int")),
+            EffectLabel::task(),
+            EffectLabel::actor_send(type_ref("Message")),
+        ];
+        let row = EffectRowModel::closed(labels.clone());
+        assert_eq!(
+            row.canonical_names(),
+            [
+                "ActorSend<Message>",
+                "Clock",
+                "Console.Write",
+                "Random",
+                "State<Int>",
+                "Task",
+            ]
+        );
+
+        let clock = EffectLabel::clock();
+        let clock_operation = operation(&EffectId::new("Clock").expect("clock id"), "now");
+        let clause = HandlerClause::new(clock, clock_operation.clone()).expect("clock clause");
+        let handler = HandlerContract::for_input(&row, [clause]).expect("handler contract");
+        let first = EffectGraphProjection::new(
+            [row.clone(), EffectRowModel::pure()],
+            [clock_operation.clone()],
+            [handler.clone()],
+        );
+        let second =
+            EffectGraphProjection::new([EffectRowModel::pure(), row], [clock_operation], [handler]);
+        assert_eq!(first.schema(), EFFECT_GRAPH_EXTENSION_VERSION);
+        assert_eq!(first.canonical_bytes(), second.canonical_bytes());
+        assert_eq!(first.rows().len(), 2);
+        assert_eq!(first.operations().len(), 1);
+        assert_eq!(first.handlers().len(), 1);
     }
 }
