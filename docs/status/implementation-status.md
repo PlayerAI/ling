@@ -163,6 +163,7 @@
 | `LSP-2104` | LSP incremental text changes | `G1` | `M` | `BlockedSpec` | `LSP-2102`, `LSP-2103` | `` |
 | `LSP-2105` | LSP workspace reload | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2103`, `PRJ-1107` | `` |
 | `LSP-2201` | LSP compiler diagnostic adapter | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
+| `LSP-2201-ORDERING` | Internal canonical diagnostic ordering | `G1` | `S` | `Done` | `LSP-2102-NEGOTIATION`, `LSP-2102-SOURCE-MAP` | `9bf092f0fe6fa0c0cabc371c42392d78ad3d3d53` |
 | `LSP-2202` | LSP push diagnostics v0 | `G1` | `M` | `BlockedSpec` | `LSP-2103`, `LSP-2201` | `` |
 | `LSP-2203` | LSP pull diagnostics Preview | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2201` | `` |
 | `LSP-2204` | LSP root-cause and error-storm control | `G1` | `M` | `BlockedSpec` | `LSP-2201`, `LSP-2202` | `` |
