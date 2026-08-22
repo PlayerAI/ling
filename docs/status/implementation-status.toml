@@ -14625,7 +14625,7 @@ notes = [
 [[task]]
 id = "ZED-6801-SEED"
 title = "Seed Zed compatibility-matrix drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14665,10 +14665,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0048 closes only this internal Seed editor-inventory child; the parent ZED-6801 gate remains BlockedSpec for actual Zed/LSP artifacts and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "3ed4af01362d2a0e906acd40cff863237e355303"
+completion_commit = "3ed4af01362d2a0e906acd40cff863237e355303"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects compatibility inventory and package markers only; Tree-sitter execution and the documented Windows cache-lock limitation remain existing evidence.",
   "No Zed extension, LSP executable, binary acquisition, protocol, schema, migration promise, or placeholder public surface is added.",
