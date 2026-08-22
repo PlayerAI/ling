@@ -2249,3 +2249,16 @@ covers = ["BACK-3502 bounded Native codegen boundary evidence", "test-only codeg
 depends_on = ["DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0134"
+title = "Internal Native runtime ABI boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0134-native-runtime-abi-boundary-evidence.md"
+covers = ["BACK-3503 bounded Native runtime ABI boundary evidence", "test-only runtime ABI vocabulary", "ABI boundaries without layout/runtime/compatibility/public-ABI semantics"]
+depends_on = ["DEC-0133", "DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0009", "DEC-0012", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

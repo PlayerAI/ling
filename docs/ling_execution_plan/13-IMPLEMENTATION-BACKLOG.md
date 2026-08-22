@@ -341,6 +341,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `BACK-3502` | G3 | Baseline Codegen | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:352`, `docs/status/BACK-3502-AUTHORITY-AUDIT.md` |
 | `BACK-3502-OBSERVATION` | G3 | Internal Native codegen boundary evidence | S | Done | Accepted `DEC-0133`; see `crates/ling-types/tests/native_codegen_evidence.rs` and `docs/status/BACK-3502-OBSERVATION-IMPLEMENTATION-REPORT.md`; emission/artifact/diagnostic/build semantics remain BlockedSpec |
 | `BACK-3503` | G3 | Runtime ABI | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:365`, `docs/status/BACK-3503-AUTHORITY-AUDIT.md` |
+| `BACK-3503-OBSERVATION` | G3 | Internal Native runtime ABI boundary evidence | S | Done | Accepted `DEC-0134`; see `crates/ling-types/tests/native_runtime_abi_evidence.rs` and `docs/status/BACK-3503-OBSERVATION-IMPLEMENTATION-REPORT.md`; ABI/layout/runtime/public-ABI semantics remain BlockedSpec |
 | `BACK-3504` | G3 | 基础优化与验证 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:380`, `docs/status/BACK-3504-AUTHORITY-AUDIT.md` |
 | `BACK-3505` | G3 | Reproducible Native Build | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:393`, `docs/status/BACK-3505-AUTHORITY-AUDIT.md` |
 | `FFI-3601` | G3 | FFI 声明模型 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:411`, `docs/status/FFI-3601-AUTHORITY-AUDIT.md` |
