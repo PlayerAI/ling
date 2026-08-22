@@ -71,6 +71,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0040"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0040-cli-help-truth-fixture.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run --help and -h and verify the implemented command set is exposed without stale planned commands.",
+  "Run an unknown future command and verify exit class 2, empty stdout, and usage text on stderr.",
+  "Repeat the fixture offline without changing source, Semantic IDs, diagnostics, schemas, or generated public artifacts.",
+]
+compatibility_impact = [
+  "Adds only an internal catalog test helper and process fixtures; no command, option, protocol, diagnostic, schema, or help-byte compatibility promise is introduced.",
+]
+unresolved_alternatives = [
+  "Full command/option inventories, shell completion and quoting, locale/order guarantees, generated scripts, deprecated-command policy, and help snapshots remain future Accepted work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

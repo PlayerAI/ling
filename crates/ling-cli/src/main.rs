@@ -1782,6 +1782,24 @@ mod tests {
     }
 
     #[test]
+    fn help_mentions_only_the_implemented_command_catalog() {
+        let help = usage();
+        for command in Command::all() {
+            assert!(
+                help.contains(command.name()),
+                "help is missing implemented command `{}`",
+                command.name()
+            );
+        }
+        for stale in ["build", "query", "patch", "zero", ".zero"] {
+            assert!(
+                !help.contains(stale),
+                "help advertises stale command `{stale}`"
+            );
+        }
+    }
+
+    #[test]
     fn repl_completion_ignores_delimiters_in_text_and_comments() {
         assert!(delimiters_closed("\"(\" // [\n/* { } */\n"));
         assert!(!delimiters_closed("sum [1; 2"));

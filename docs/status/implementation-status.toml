@@ -4466,6 +4466,7 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0040-cli-help-truth-fixture.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
@@ -4473,13 +4474,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/CLI-1706-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1706-HELP-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The audit records the current truthful Preview help surface and distinguishes it from the unaccepted command/flag/exit inventory and shell completion contract.",
   "The missing help lifecycle, locale/order, shell quoting, generated-script, deprecated-command, and deterministic fixture rules are identified with direct authority references.",
-  "No completion generator, script, help snapshot, command registry, diagnostic allocation, or placeholder entry is added while the CLI contracts are absent.",
+  "No completion generator, script, help snapshot, public command registry, diagnostic allocation, or placeholder entry is added while the CLI contracts are absent.",
   "The future implementation must generate only from the accepted command registry and keep help truthful without making help bytes a semantic authority.",
 ]
 verified_against_commit = ""
@@ -4490,6 +4492,50 @@ notes = [
   "CLI-1706 is BlockedSpec downstream of CLI-1701 and CLI-1702; PROTO-CLI currently inventories only implemented commands and rejects unknown options.",
   "No shell-specific completion or stale `zero` command is advertised by the current CLI; completion remains a future Preview surface.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "CLI-1706-HELP"
+title = "Truthful implemented-command help fixture"
+state = "In Progress"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701-CATALOG", "CLI-1702-EXIT"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0036-cli-internal-command-catalog-boundary.md",
+  "docs/decisions/0040-cli-help-truth-fixture.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+]
+artifacts = [
+  "crates/ling-cli/src/command_catalog.rs",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/tests/help.rs",
+  "docs/decisions/0040-cli-help-truth-fixture.md",
+  "docs/status/CLI-1706-HELP-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The internal catalog test helper covers each implemented command exactly once, including hierarchical project check, without adding a public registry.",
+  "Independent --help and -h process fixtures expose the implemented command set, exclude stale planned names, and remain equal without freezing help bytes as a semantic protocol.",
+  "An unknown future query command remains exit class 2 with empty stdout and usage text on stderr; no new diagnostic, schema, completion script, or command is introduced.",
+  "Focused CLI tests and the repository governance/status checks pass offline and preserve compiler, runtime, diagnostics, Semantic IDs, and Unicode 17.0.0 behavior.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "Accepted DEC-0040 closes only this internal help-truth fixture; CLI-1706 remains BlockedSpec for shell completion, future command/option inventories, help lifecycle, and compatibility policy.",
+  "The fixture intentionally checks semantic coverage rather than exact help bytes, locale, line wrapping, shell quoting, aliases, generated scripts, or snapshots.",
 ]
 
 [[task]]

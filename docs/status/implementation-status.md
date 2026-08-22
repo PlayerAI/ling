@@ -60,6 +60,7 @@
 | `CLI-1704-FILE` | Explicit standalone test-file runner Preview | `G1` | `M` | `Done` | `CLI-1701-CATALOG`, `CLI-1702-EXIT` | `72d85d7de77f188b0706acde7a559169d4ac149e` |
 | `CLI-1705` | Semantic query and patch commands | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
 | `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `CLI-1702` | `` |
+| `CLI-1706-HELP` | Truthful implemented-command help fixture | `G1` | `S` | `In Progress` | `CLI-1701-CATALOG`, `CLI-1702-EXIT` | `` |
 | `COMPAT-6501` | Historical Corpus | `G6` | `L` | `BlockedSpec` | `PKG-6404` | `` |
 | `COMPAT-6502` | 1.0 Compiler Compatibility Matrix | `G6` | `L` | `BlockedSpec` | `COMPAT-6501` | `` |
 | `COMPAT-6503` | Language Migration Tool | `G6` | `L` | `BlockedSpec` | `COMPAT-6502` | `` |

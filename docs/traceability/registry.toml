@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-21"
+updated = "2026-08-22"
 
 [[release]]
 id = "v0.0.1"
@@ -375,6 +375,20 @@ id = "EVD-NEG-CLI-TEST-EMPTY"
 kind = "Negative"
 path = "crates/ling-cli/tests/test.rs"
 symbol = "test_rejects_empty_selection_with_stable_diagnostic"
+feature_ids = ["FTR-SEED-0002", "FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-POS-CLI-HELP-TRUTH"
+kind = "Positive"
+path = "crates/ling-cli/tests/help.rs"
+symbol = "help_aliases_have_the_same_truthful_surface"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-CLI-HELP-FUTURE-COMMAND"
+kind = "Negative"
+path = "crates/ling-cli/tests/help.rs"
+symbol = "unknown_future_command_is_rejected_with_usage_on_stderr"
 feature_ids = ["FTR-SEED-0002", "FTR-SEED-0007"]
 
 [[evidence]]

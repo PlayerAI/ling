@@ -2,15 +2,16 @@
 
 ## Outcome
 
-`CLI-1706` is correctly recorded as `BlockedSpec`. The execution plan asks for
-command/flag/exit inventory, help fixtures, and optional bash/zsh/fish/
-PowerShell completion. The current accepted CLI inventory covers only the
-implemented Preview command surface; no accepted decision defines completion
-generation, shell-specific quoting, or help compatibility for future commands.
+`CLI-1706` remains correctly recorded as `BlockedSpec` for the broad
+command/flag/exit inventory, help lifecycle, and optional bash/zsh/fish/
+PowerShell completion contract. Accepted DEC-0040 now closes only the bounded
+`CLI-1706-HELP` child: an internal process fixture protects truthful help for
+the commands already implemented by the parser.
 
-No completion generator, shell script, help snapshot, command registry, or
-placeholder completion entry was added. Existing help continues to describe
-only implemented `ling` commands.
+No completion generator, shell script, help snapshot, public command registry,
+or placeholder completion entry was added. Existing help continues to describe
+only implemented `ling` commands, and `crates/ling-cli/tests/help.rs` verifies
+that boundary without freezing help bytes as a public semantic artifact.
 
 ## Normative traceability
 
@@ -25,18 +26,22 @@ only implemented `ling` commands.
 - `GAP-PROJECT-CLI-INTERFACE-001` and the formatter CLI gap leave future
   command/flag/exit inventories open; CLI-1701 and CLI-1702 are their upstream
   authority gates.
+- Accepted DEC-0040 authorizes only an internal help-truth regression fixture;
+  it does not authorize completion generation, aliases, snapshots, locale
+  policy, or a future command registry.
 - The execution plan allows completion to remain Preview, but a lower-level
   plan marker does not authorize a public command or generated script.
 
 ## Current interface evidence
 
-The repository confirms the missing boundary:
+The repository confirms both the bounded child and the missing parent boundary:
 
-- `crates/ling-cli/src/main.rs` renders a usage string containing only
-  `run|check|semantic|audit`, `repl`, `--format`, and the REPL capability.
-- There is no command/flag inventory artifact, shell completion generator,
-  shell quoting test, or help fixture that can cover the proposed future
-  project, formatter, query, patch, build, or LSP commands.
+- `crates/ling-cli/src/main.rs` renders a usage string for the implemented
+  `run`, `check`, `semantic`, `audit`, `test`, `fmt`, `init`, `project check`,
+  `repl`, and `lsp --stdio` commands plus their accepted options.
+- The bounded fixture now covers the implemented command names, `--help`/`-h`,
+  and rejection of a future `query` command; it does not cover proposed future
+  project, query, patch, build, or shell-specific completion behavior.
 - The current CLI protocol is Preview and rejects unknown commands/options;
   generating completion for unimplemented entries would advertise behavior
   that the parser rejects.
@@ -56,9 +61,9 @@ An implementation-ready decision or RFC must define, at minimum:
 5. positive, negative, shell-parser, Unicode/space/path, redirected-output,
    deterministic, and migration fixtures plus protocol-inventory updates.
 
-Until those decisions and fixtures are Accepted, completion output could
-advertise rejected commands or freeze shell-specific behavior before the CLI
-contracts exist.
+Until the remaining decisions and fixtures are Accepted, completion output
+could advertise rejected commands or freeze shell-specific behavior before the
+CLI contracts exist. The child fixture deliberately avoids that boundary.
 
 ## Evidence and compatibility
 
@@ -73,7 +78,8 @@ made.
 
 ## Intentionally deferred
 
-`CLI-1706` can begin after CLI-1701/1702 define the command and output
-inventories. The implementation should generate completion only from the
-accepted registry, keep help truthful, and provide shell-specific fixtures
-without making help bytes a hidden semantic authority.
+The completed `CLI-1706-HELP` child keeps help truthful using the current
+internal catalog. The parent implementation can begin after CLI-1701/1702
+define the command and output inventories; it should generate completion only
+from the accepted registry, keep help truthful, and provide shell-specific
+fixtures without making help bytes a hidden semantic authority.

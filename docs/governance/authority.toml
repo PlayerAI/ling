@@ -54,6 +54,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0040"
+title = "CLI truthful implemented-command help fixture"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0040-cli-help-truth-fixture.md"
+covers = ["truthful implemented-command help", "internal help regression fixture"]
+depends_on = ["DEC-0003", "DEC-0013", "DEC-0036", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0037"
 title = "CLI internal exit catalog boundary"
 kind = "Decision"

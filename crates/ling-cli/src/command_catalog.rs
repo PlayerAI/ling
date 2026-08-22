@@ -18,6 +18,22 @@ pub(crate) enum Command {
 }
 
 impl Command {
+    #[cfg(test)]
+    pub(crate) const fn all() -> &'static [Self] {
+        &[
+            Self::Run,
+            Self::Check,
+            Self::Repl,
+            Self::Semantic,
+            Self::Audit,
+            Self::Format,
+            Self::Init,
+            Self::Test,
+            Self::ProjectCheck,
+            Self::Lsp,
+        ]
+    }
+
     pub(crate) fn parse(value: &str) -> Option<Self> {
         match value {
             "run" => Some(Self::Run),
@@ -77,5 +93,14 @@ mod tests {
         }
         assert_eq!(Command::parse("build"), None);
         assert_eq!(Command::ProjectCheck.name(), "project check");
+    }
+
+    #[test]
+    fn catalog_contains_each_implemented_command_once() {
+        let commands = Command::all();
+        assert_eq!(commands.len(), 10);
+        for (index, command) in commands.iter().enumerate() {
+            assert!(!commands[..index].contains(command));
+        }
     }
 }
