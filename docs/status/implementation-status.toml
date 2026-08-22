@@ -21925,6 +21925,68 @@ notes = [
 ]
 
 [[task]]
+id = "TIM-5702-OBSERVATION"
+title = "Internal timing-analysis separation boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TIM-5701-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0206-timing-ir-path-boundary-evidence.md",
+  "docs/decisions/0207-timing-analysis-separation-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/timing_analysis_separation_evidence.rs",
+  "docs/decisions/0207-timing-analysis-separation-boundary-evidence.md",
+  "docs/status/TIM-5702-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/TIM-5702-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0207 authorizes only test-local timing-analysis separation boundary evidence; no timing status enum, measurement, estimate, static bound, proof, WCET result, schema, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty result, separation, sampling, uncertainty, target, identity, provenance, failure, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; observed maximum and WCET-claim exclusion remain distinct; tag has no result, analyzer, WCET, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test timing_analysis_separation_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "002769f816455efca2932eecf5674f62a4cdf415"
+completion_commit = "002769f816455efca2932eecf5674f62a4cdf415"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0207; TIM-5702 remains BlockedSpec for result/transition, measurement/estimation/static-analysis/proof/assumption, target, soundness, diagnostic, protocol, and support semantics.",
+  "No timing status enum, measurement API, instrumentation route, analyzer, estimate, static bound, WCET result, schema, deadline hook, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
+]
+
+[[task]]
 id = "TIM-5703"
 title = "Deadline Check"
 state = "BlockedSpec"
