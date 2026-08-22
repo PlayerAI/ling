@@ -389,6 +389,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `SIMD-4303` | G4 | SIMD Differential | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:210`, `docs/status/SIMD-4303-AUTHORITY-AUDIT.md` |
 | `SIMD-4303-OBSERVATION` | G4 | Internal SIMD differential boundary evidence | S | Done | Accepted `DEC-0157`; see `crates/ling-types/tests/simd_differential_evidence.rs` and `docs/status/SIMD-4303-OBSERVATION-IMPLEMENTATION-REPORT.md`; differential semantics remain BlockedSpec |
 | `DBUF-4401` | G4 | Device 类型与 Capability | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:223`, `docs/status/DBUF-4401-AUTHORITY-AUDIT.md` |
+| `DBUF-4401-OBSERVATION` | G4 | Internal Device capability boundary evidence | S | Done | Accepted `DEC-0158`; see `crates/ling-types/tests/device_capability_evidence.rs` and `docs/status/DBUF-4401-OBSERVATION-IMPLEMENTATION-REPORT.md`; Device/capability semantics remain BlockedSpec |
 | `DBUF-4402` | G4 | Buffer Ownership | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:240`, `docs/status/DBUF-4402-AUTHORITY-AUDIT.md` |
 | `DBUF-4403` | G4 | Transfer Effect | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:252`, `docs/status/DBUF-4403-AUTHORITY-AUDIT.md` |
 | `DBUF-4404` | G4 | 同步模型 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:272`, `docs/status/DBUF-4404-AUTHORITY-AUDIT.md` |

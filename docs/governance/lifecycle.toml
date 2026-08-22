@@ -4127,3 +4127,27 @@ unresolved_alternatives = [
   "Verified scalar/SIMD inputs and artifacts; integer/structural exactness; strict FP rounding/NaN/infinity/signed-zero/overflow; relaxed FP tolerances/metrics; reduction/tail/unaligned/alignment/determinism; Fault identity/spans and effect equivalence; unsupported capability vs mismatch vs evidence failure; target features, canonical outputs/traces, redaction/corruption/migration, fixtures, diagnostics, CPU/device differential, protocol inventory, and public differential status remain open under SIMD-4303, SIMD-4301/4302, CPU-4201 through CPU-4203, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0158"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0158-device-capability-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Device capability boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer Device identity, capability discovery, address spaces, Buffer/views, transfer/synchronization, raw-pointer rejection, diagnostics, migration, differential, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Device/Buffer type, capability registry, view/token API, Fence/Event runtime, raw-pointer interface, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Device identity/kind/capability/version/set; address spaces; Buffer element/shape/layout/identity; views, tokens, Fence/Event; raw-pointer prohibition; Typed Core/profiles/targets/effects/capabilities; ownership/alias/bounds/resources; transfer direction/order, async lifetime, cancellation/drop, device loss/Faults; canonical schema/version/migration, fixtures, CPU/device differential, diagnostics, host exclusion, protocol inventory, and public Device status remain open under DBUF-4401, SIMD-4301 through SIMD-4303, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-OWNERSHIP-MODEL-001, and missing authority.",
+]
+superseded_by = ""

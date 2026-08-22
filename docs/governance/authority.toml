@@ -2561,3 +2561,16 @@ covers = ["SIMD-4303 bounded SIMD differential boundary evidence", "test-only sc
 depends_on = ["DEC-0156", "DEC-0155", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0158"
+title = "Internal Device capability boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0158-device-capability-boundary-evidence.md"
+covers = ["DBUF-4401 bounded Device capability boundary evidence", "test-only Device/capability vocabulary", "Device boundaries without Kernel/device/ownership semantics"]
+depends_on = ["DEC-0157", "DEC-0150", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
