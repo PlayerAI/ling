@@ -4220,6 +4220,7 @@ spec = [
   "docs/RFC-0002.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/decisions/0038-cli-init-command.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
@@ -4227,13 +4228,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/CLI-1703-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1703-INIT-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the accepted RFC-0002 library boundary and identifies the missing init root, template, generated-file, editor-file, output, and failure-atomicity contracts.",
+  "The audit records the accepted RFC-0002 library boundary and identifies the remaining project CLI contracts outside the bounded init child.",
   "The audit explicitly rejects stale `zero init` material and preserves the accepted `ling` command and `.ling` source names.",
-  "No init command, filesystem writer, template, manifest field, editor task file, diagnostic allocation, or protocol entry is added while the contract and fixtures are absent.",
+  "Accepted DEC-0038 closes only CLI-1703-INIT; the parent remains blocked for overwrite, workspace, editor, and later project-command behavior.",
   "The future implementation must be offline, deterministic, failure-atomic, and covered by generated-byte and existing-root fixtures.",
 ]
 verified_against_commit = ""
@@ -4241,9 +4243,69 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "CLI-1703 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001 and CLI-1701; RFC-0002 defines library project inputs but no initializer or template protocol.",
+  "CLI-1703 remains BlockedSpec by the broader GAP-PROJECT-CLI-INTERFACE-001 and CLI-1701 surface; DEC-0038 defines only the completed init child.",
   "No lower-authority `zero` spelling, `.zero` file, or unregistered editor metadata is allowed to enter the implementation.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "CLI-1703-INIT"
+title = "Offline `ling init` scaffold"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701-CATALOG", "PRJ-1101"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0038-cli-init-command.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "schemas/registry.toml",
+  "schemas/init/0.1/schema.json",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-cli/src/init.rs",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/src/command_catalog.rs",
+  "crates/ling-cli/tests/init.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/ERROR-CODES.md",
+  "docs/status/CLI-1703-INIT-IMPLEMENTATION-REPORT.md",
+  "docs/status/CLI-1703-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "schemas/registry.toml",
+  "schemas/init/0.1/schema.json",
+  "schemas/init/0.1/valid",
+  "schemas/init/0.1/invalid",
+  "tests/protocols/init/README.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "`ling init` accepts the DEC-0038 options and exactly one missing destination whose parent already exists; existing targets and invalid package names are rejected without mutation.",
+  "The scaffold contains exactly UTF-8/LF `ling.toml`, `src/Main.ling`, `.gitignore`, and canonical `ling.lock/1`; RFC-0002 parsing, discovery, and lock update validate the staged tree before commit.",
+  "Human and `ling.init/0.1` JSON success output are deterministic; host filesystem failures use registered L-IO-0003 and exit class 4; command misuse remains exit class 2.",
+  "Process tests, schema fixtures, protocol inventory, and the authority/lifecycle records cover positive, negative, determinism, offline, and failure-atomicity evidence.",
+]
+verified_against_commit = "8c2ef94e58da75d6c530a4ac60cfbe2eeea11bbf"
+completion_commit = "8c2ef94e58da75d6c530a4ac60cfbe2eeea11bbf"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The child is bounded by Accepted DEC-0038 and does not extend RFC-0002 manifest-v1 with a template field or generate .zed metadata.",
+  "The parent CLI-1703 row remains BlockedSpec for broader project CLI behavior and future overwrite/workspace/editor choices.",
 ]
 
 [[task]]
