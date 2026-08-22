@@ -318,6 +318,7 @@
 | `VM-1209` | Interpreter–VM differential contract and evidence | `G1` | `L` | `Done` | `VM-1208` | `558625676c0402cf793000297b0f388f87e532cc` |
 | `VM-1210` | VM robustness, cancellation, and resource evidence | `G1` | `L` | `Done` | `VM-1209` | `611ab0db31d34219243d74a8ea53898a99296a04` |
 | `ZED-6801` | Zed Compatibility Matrix | `G6` | `M` | `BlockedSpec` | `DOC-6703` | `` |
+| `ZED-6801-SEED` | Seed Zed compatibility-matrix drift gate | `G6` | `S` | `In Progress` | `DOC-6703-SEED` | `` |
 | `ZED-6802` | Language-server Discovery and Acquisition | `G6` | `L` | `BlockedSpec` | `ZED-6801` | `` |
 | `ZED-6803` | Full Zed Extension Acceptance | `G6` | `L` | `BlockedSpec` | `ZED-6802` | `` |
 | `ZED-6804` | DAP Status | `G6` | `M` | `BlockedSpec` | `ZED-6803` | `` |

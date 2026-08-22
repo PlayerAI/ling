@@ -14594,10 +14594,13 @@ spec = [
   "docs/status/ZQ-3202-IMPLEMENTATION-REPORT.md",
   "docs/status/ZQ-3203-IMPLEMENTATION-REPORT.md",
   "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
+  "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md",
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
 ]
 artifacts = [
   "docs/status/ZED-6801-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6801-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md",
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
@@ -14617,6 +14620,58 @@ notes = [
   "ZED-6801 is BlockedSpec because no Zed extension, LSP executable, public editor schema, tested Zed version, or binary acquisition contract exists; G6 depends on G1-G5 exits.",
   "The matrix reuses existing Tree-sitter grammar/query and differential evidence as editor-only implementation evidence and records the local Windows cache-lock limitation honestly.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor protocol, dependencies, or public API.",
+]
+
+[[task]]
+id = "ZED-6801-SEED"
+title = "Seed Zed compatibility-matrix drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DOC-6703-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
+  "editors/tree-sitter-ling/README.md",
+  "editors/tree-sitter-ling/KNOWN-DIFFERENCES.md",
+  "editors/tree-sitter-ling/package.json",
+  "editors/tree-sitter-ling/package-lock.json",
+  "editors/tree-sitter-ling/tree-sitter.json",
+  ".github/workflows/ci.yml",
+]
+artifacts = [
+  "tools/xtask/src/zed_matrix.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
+  "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md",
+  "docs/status/ZED-6801-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6801-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask zed verify deterministically validates ten compatibility surfaces and five package evidence files with non-empty evidence/state cells.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, missing policy markers, and missing package/grammar/README/known-difference markers.",
+  "The command is included in the governance-authority CI gate and does not run npm, download binaries, add editor behavior, allocate public diagnostics, or claim Stable support.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0048 closes only this internal Seed editor-inventory child; the parent ZED-6801 gate remains BlockedSpec for actual Zed/LSP artifacts and release evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects compatibility inventory and package markers only; Tree-sitter execution and the documented Windows cache-lock limitation remain existing evidence.",
+  "No Zed extension, LSP executable, binary acquisition, protocol, schema, migration promise, or placeholder public surface is added.",
 ]
 
 [[task]]

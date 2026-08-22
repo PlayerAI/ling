@@ -270,6 +270,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0048"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask zed verify and assert ten compatibility surfaces and five package evidence files.",
+  "Mutate an isolated surface row/state, policy phrase, or package marker and verify the gate fails closed.",
+  "Retain the documented Windows error-5 cache-lock attempt as environment evidence rather than a passing editor run.",
+  "Run locked compiler/editor differential and generated-Unicode checks without treating the inventory gate as semantic equivalence or Stable support.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask Zed-matrix validator and CI preflight; no language, diagnostic, schema, protocol, profile, or support behavior changes.",
+]
+unresolved_alternatives = [
+  "Zed versions, LSP capabilities, position encodings, extension packaging, per-OS artifacts, binary acquisition, protocol stability, and editor migration remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

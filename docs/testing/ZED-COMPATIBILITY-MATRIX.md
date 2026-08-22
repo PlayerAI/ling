@@ -13,6 +13,10 @@ invalid Ling source valid. The support matrix currently records LSP, Zed
 extension, formatter, and semantic mutation as unsupported because no
 corresponding executable, extension package, or accepted edit protocol exists.
 
+Compiler diagnostics and source maps preserve original UTF-8 byte spans;
+Tree-sitter CST/query positions remain editor-only projections and are not
+Semantic IDs or a public editor protocol.
+
 The G6 checklist asks for a matrix containing the Zed version, compiler/LSP
 range, grammar revision, protocol/schema, operating system, binary acquisition
 mode, and known limitations. Unknown values are recorded as `Not established`

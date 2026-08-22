@@ -49,6 +49,12 @@ per-OS installation/acquisition policy, signed release artifacts, and known
 limitation/migration policy. These require accepted G1-G5 and G6 authorities;
 they cannot be filled by guessing from a Tree-sitter parser.
 
+Accepted `DEC-0048` closes only the bounded `ZED-6801-SEED` child: the
+internal `cargo xtask zed verify` command protects the ten-surface matrix and
+five package evidence files without executing npm or making a Zed support
+claim. The recorded Windows cache-lock failure remains environment evidence,
+not a passing result.
+
 ## Compatibility and deferred work
 
 This audit changes no compiler semantics, diagnostics, schemas, Semantic IDs,
@@ -58,4 +64,6 @@ original UTF-8 spans, deterministic generated files, and offline Rust builds.
 
 Zed/LSP support, binary acquisition, extension metadata, marketplace
 publication, formatter integration, semantic mutation, and Stable node
-compatibility remain deferred and explicitly unsupported.
+compatibility remain deferred and explicitly unsupported. The bounded
+verifier emits only internal `GOV-ZED-MATRIX-*` failures; these are not public
+Ling diagnostics.

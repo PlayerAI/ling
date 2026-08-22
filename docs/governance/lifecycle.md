@@ -77,6 +77,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0045` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0045](../decisions/0045-seed-documentation-inventory-gate.md) |
 | `DEC-0046` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0046](../decisions/0046-seed-example-matrix-gate.md) |
 | `DEC-0047` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0047](../decisions/0047-seed-bilingual-tutorial-gate.md) |
+| `DEC-0048` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0048](../decisions/0048-seed-zed-compatibility-matrix-gate.md) |
 
 ## Migration boundary
 
