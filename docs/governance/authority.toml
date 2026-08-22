@@ -2717,3 +2717,16 @@ covers = ["GPU-4605 bounded error-normalization boundary evidence", "test-only F
 depends_on = ["DEC-0168", "DEC-0167", "DEC-0013", "DEC-0001", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0170"
+title = "Internal accelerator-plugin interface boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0170-accelerator-plugin-interface-boundary-evidence.md"
+covers = ["ACC-4701 bounded accelerator-plugin interface boundary evidence", "test-only accelerator plugin vocabulary", "plugin boundaries without Device IR/ABI/trust semantics"]
+depends_on = ["DEC-0169", "DEC-0168", "DEC-0167", "DEC-0166", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

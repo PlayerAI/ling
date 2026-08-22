@@ -4415,3 +4415,27 @@ unresolved_alternatives = [
   "Fault taxonomy and provenance across source/verifier/compiler/runtime/backend/device/resource/cancellation/host; category precedence for UnsupportedFeature, DeviceUnavailable, CompileFailure, LaunchFailure, OutOfDeviceMemory, DeviceLost, NumericModeUnsupported; retryability, cancellation and severity; source spans, UTF-8, Semantic IDs, structured facts and bilingual rendering; error-code registry/lock, redaction and vendor detail, unknown vendor events; numeric/capability mismatch, malformed modules, queue/synchronization/cleanup failures, migration and determinism; positive/negative/malformed/corrupt-vendor/bilingual/source-map/Unicode/redaction/determinism/migration/cross-backend fixtures; diagnostics, host/driver/path/address/timestamp/debug exclusion, protocol inventory, and public normalization status remain open under GPU-4605, GPU-4601 through GPU-4604, DIR-4501 through DIR-4503, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0170"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0170-accelerator-plugin-interface-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty plugin-interface boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer plugin ABI/registry/loader, declaration semantics, capability and target/cache identity, trust/supply-chain policy, fallback/rejection, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No plugin trait, registry, loader, manifest, dependency, target package, cache API, diagnostic, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Verified Device IR/Kernel input and validation; plugin ABI/version negotiation and declaration schema; supported ops/types, shape/layout, numeric modes and determinism; device capabilities, capability/target/cache identity and invalidation; fallback/rejection, Fault propagation, diagnostics; resource ownership, cleanup and cancellation; host/frontend/plugin isolation; loading and trust boundary; dependencies, signatures, provenance, license, offline build, sandbox; Experimental/Supported/Unsupported lifecycle; positive, negative, malformed, migration, source-map/Unicode, determinism, cache, capability, fallback, security and differential fixtures; diagnostic and host/path/address/timestamp/driver/debug exclusion, protocol inventory, and public plugin status remain open under ACC-4701, GPU-4601 through GPU-4605, DIR-4501 through DIR-4503, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""
