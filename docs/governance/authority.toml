@@ -1833,3 +1833,16 @@ covers = ["SUP-2401 bounded Supervisor observation", "deterministic supervision 
 depends_on = ["DEC-0100", "DEC-0099", "DEC-0098", "DEC-0097", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0102"
+title = "Internal restart-budget observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0102-restart-budget-observation.md"
+covers = ["SUP-2402 bounded restart-budget observation", "deterministic budget observation identities", "budget/circuit labels without restart/runtime semantics"]
+depends_on = ["DEC-0101", "DEC-0100", "DEC-0099", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

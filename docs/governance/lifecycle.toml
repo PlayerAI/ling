@@ -2688,3 +2688,29 @@ unresolved_alternatives = [
   "Child ownership and state, restart/stop/escalate semantics, one-for-one versus rest-for-one, lifetime classes, budgets/windows/backoff, state restore and invariant checks, Fault aggregation/channel, mailbox cleanup, local/remote behavior, runtime ABI, and migration remain open under the supervision gap and SUP-2401.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0102"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0102-restart-budget-observation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build observations with optional actors and every structural label and assert deterministic observation-identity ordering.",
+  "Reject zero identities and duplicate observation identities before publication.",
+  "Compare equivalent models with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep clocks, counters, windows, backoff, circuit transitions, Fault provenance, query/admin protocols, scheduler, runtime, stress, replay, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled checked-data tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public restart, circuit, query, or Actor behavior claim is registered.",
+]
+unresolved_alternatives = [
+  "Budget scope and units, time/logical windows, persistence, backoff and jitter, restart transitions, circuit states, concurrent Fault handling, mailbox/Task interaction, provenance/privacy, query authorization, replay, runtime ABI, and migration remain open under the supervision/replay gaps and SUP-2402.",
+]
+superseded_by = ""

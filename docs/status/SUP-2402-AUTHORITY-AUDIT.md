@@ -14,6 +14,11 @@ provenance store, runtime query, diagnostic, protocol, or placeholder G2 API
 was added. The plan's stale `zero query runtime` example was not propagated to
 the current `ling` CLI or any implementation surface.
 
+Accepted `DEC-0102` now authorizes the bounded child `SUP-2402-OBSERVATION`,
+which records only immutable budget/circuit observation identities and
+structural labels. It does not close the clock, budget, backoff, circuit,
+provenance, query, runtime, or replay gaps described below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its field list and query example

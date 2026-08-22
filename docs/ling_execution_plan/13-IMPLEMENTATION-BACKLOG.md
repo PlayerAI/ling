@@ -275,6 +275,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `SUP-2401` | G2 | Supervisor 模型 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:326`, `docs/status/SUP-2401-AUTHORITY-AUDIT.md` |
 | `SUP-2401-OBSERVATION` | G2 | Internal Supervisor observation | S | Done | Accepted `DEC-0101`; see `crates/ling-concurrency/src/supervisor.rs` and `docs/status/SUP-2401-OBSERVATION-IMPLEMENTATION-REPORT.md`; supervision/restart/Fault semantics remain BlockedSpec |
 | `SUP-2402` | G2 | 重启预算与熔断 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:340`, `docs/status/SUP-2402-AUTHORITY-AUDIT.md` |
+| `SUP-2402-OBSERVATION` | G2 | Internal restart-budget observation | S | Done | Accepted `DEC-0102`; see `crates/ling-concurrency/src/budget.rs` and `docs/status/SUP-2402-OBSERVATION-IMPLEMENTATION-REPORT.md`; budget/circuit/runtime semantics remain BlockedSpec |
 | `SUP-2403` | G2 | 监督测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:355`, `docs/status/SUP-2403-AUTHORITY-AUDIT.md` |
 | `REP-2501` | G2 | Determinism Class | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:369`, `docs/status/REP-2501-AUTHORITY-AUDIT.md` |
 | `REP-2502` | G2 | Replay Log Schema | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:384`, `docs/status/REP-2502-AUTHORITY-AUDIT.md` |

@@ -12,6 +12,7 @@ use std::fmt;
 use ling_source::Span;
 
 mod actor;
+mod budget;
 mod lifecycle;
 mod mailbox;
 mod message;
@@ -26,6 +27,10 @@ pub use actor::{
     ActorId, ActorIdentityError, ActorIdentityKind, ActorIdentityModel, ActorInstance,
     ActorInstanceSpec, ActorRefId, ActorReference, ActorReferenceKind, ActorReferenceSpec,
     ActorType, ActorTypeId, ActorTypeSpec,
+};
+pub use budget::{
+    BudgetIdentityKind, BudgetObservation, BudgetObservationError, BudgetObservationId,
+    BudgetObservationKind, BudgetObservationModel, BudgetObservationSpec,
 };
 pub use lifecycle::{
     FaultId, LifecycleEvent, LifecycleEventKind, LifecycleEventSpec, LifecycleIdentityKind,
