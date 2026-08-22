@@ -4151,3 +4151,27 @@ unresolved_alternatives = [
   "Device identity/kind/capability/version/set; address spaces; Buffer element/shape/layout/identity; views, tokens, Fence/Event; raw-pointer prohibition; Typed Core/profiles/targets/effects/capabilities; ownership/alias/bounds/resources; transfer direction/order, async lifetime, cancellation/drop, device loss/Faults; canonical schema/version/migration, fixtures, CPU/device differential, diagnostics, host exclusion, protocol inventory, and public Device status remain open under DBUF-4401, SIMD-4301 through SIMD-4303, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-OWNERSHIP-MODEL-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0159"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0159-buffer-ownership-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Buffer ownership boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer ownership/borrow states, alias/subview proofs, mapping/pinning, transfer completion, cancellation/drop, crossing, diagnostics, migration, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No ownership checker, Buffer/view API, mapping/pinning runtime, transfer-lifetime state machine, cancellation/drop behavior, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Ownership categories and Copy/Move/borrow identity; shared-read and exclusive-write scopes; alias/subview bounds/layout/identity; mapping/pinning, visibility/coherence; transfer ownership and asynchronous completion; cancellation/timeout/device loss/Fault/drop waiting; task/actor crossing; Typed Core/effect/capability/resource witnesses; canonical schema/version, diagnostics, migration, host/driver exclusion, protocol inventory, and public Buffer status remain open under DBUF-4402, DBUF-4401, KCHK-4104/4105, GAP-OWNERSHIP-MODEL-001, GAP-KERNEL-DEVICE-001, and missing authority.",
+]
+superseded_by = ""

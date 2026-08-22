@@ -2574,3 +2574,16 @@ covers = ["DBUF-4401 bounded Device capability boundary evidence", "test-only De
 depends_on = ["DEC-0157", "DEC-0150", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0159"
+title = "Internal Buffer ownership boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0159-buffer-ownership-boundary-evidence.md"
+covers = ["DBUF-4402 bounded Buffer ownership boundary evidence", "test-only Buffer ownership vocabulary", "ownership boundaries without Device Buffer/concurrency semantics"]
+depends_on = ["DEC-0158", "DEC-0150", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

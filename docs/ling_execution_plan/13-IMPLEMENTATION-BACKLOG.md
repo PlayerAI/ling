@@ -391,6 +391,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DBUF-4401` | G4 | Device 类型与 Capability | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:223`, `docs/status/DBUF-4401-AUTHORITY-AUDIT.md` |
 | `DBUF-4401-OBSERVATION` | G4 | Internal Device capability boundary evidence | S | Done | Accepted `DEC-0158`; see `crates/ling-types/tests/device_capability_evidence.rs` and `docs/status/DBUF-4401-OBSERVATION-IMPLEMENTATION-REPORT.md`; Device/capability semantics remain BlockedSpec |
 | `DBUF-4402` | G4 | Buffer Ownership | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:240`, `docs/status/DBUF-4402-AUTHORITY-AUDIT.md` |
+| `DBUF-4402-OBSERVATION` | G4 | Internal Buffer ownership boundary evidence | S | Done | Accepted `DEC-0159`; see `crates/ling-types/tests/buffer_ownership_evidence.rs` and `docs/status/DBUF-4402-OBSERVATION-IMPLEMENTATION-REPORT.md`; Buffer ownership semantics remain BlockedSpec |
 | `DBUF-4403` | G4 | Transfer Effect | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:252`, `docs/status/DBUF-4403-AUTHORITY-AUDIT.md` |
 | `DBUF-4404` | G4 | 同步模型 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:272`, `docs/status/DBUF-4404-AUTHORITY-AUDIT.md` |
 | `DIR-4501` | G4 | Device IR Schema | L | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:287`, `docs/status/DIR-4501-AUTHORITY-AUDIT.md` |

@@ -16326,6 +16326,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0159-buffer-ownership-boundary-evidence.md",
   "docs/RFC-0014.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
@@ -16338,6 +16339,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DBUF-4402-AUTHORITY-AUDIT.md",
+  "docs/status/DBUF-4402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DBUF-4402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0159-buffer-ownership-boundary-evidence.md",
+  "crates/ling-types/tests/buffer_ownership_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -16357,6 +16366,60 @@ notes = [
   "The repository has no Device Buffer ownership checker, borrow/view state machine, subview proof, mapping or pinning operation, async lifetime model, drop/cancel implementation, or task-crossing corpus.",
   "The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; the plan remains non-normative.",
  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Native, memory categories, ownership, diagnostics, schemas, Semantic IDs, source spans, support claims, or Unicode 17.0.0 behavior.",
+]
+[[task]]
+id = "DBUF-4402-OBSERVATION"
+title = "Internal Buffer ownership boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DBUF-4401-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0158-device-capability-boundary-evidence.md",
+  "docs/decisions/0159-buffer-ownership-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/buffer_ownership_evidence.rs",
+  "docs/decisions/0159-buffer-ownership-boundary-evidence.md",
+  "docs/status/DBUF-4402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DBUF-4402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0159 authorizes only test-local Buffer ownership boundary evidence; no ownership checker, Buffer/view type, mapping/pinning runtime, transfer-lifetime state, cancellation/drop behavior, diagnostic, dependency, protocol, or support claim is made.",
+  "The inventory covers sixty provisional boundaries for ownership schema/category/state, host/device ownership, Copy/Move/borrow/shared-read/exclusive-write/borrow region, alias and subview proofs, mapping/pinning/visibility/coherence, transfer ownership/token/lifetime/completion, cancellation/drop/device loss/Fault, task/actor crossing, checked input/effect/capability/resource witnesses, identity/spans/Unicode/canonicality/version, fixtures/migration, diagnostics, host exclusion, and protocol.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no ownership state, borrow proof, view, cleanup event, diagnostic, Semantic ID, backend, or public protocol authority.",
+  "cargo test -p ling-types --test buffer_ownership_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0159; DBUF-4402 remains BlockedSpec for ownership calculus, views, mapping/pinning, transfer lifetime, cancellation/drop, task/actor crossing, migration, protocol integration, and support claims.",
+  "No parser, AST/HIR/Checked Core node, ownership checker, Buffer/view type, mapping/pinning runtime, transfer-lifetime state machine, cancellation/drop behavior, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 [[task]]
 id = "DBUF-4403"
