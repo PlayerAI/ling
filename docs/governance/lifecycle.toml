@@ -3883,3 +3883,29 @@ unresolved_alternatives = [
   "Kernel subset and profiles; matrix schema/identifiers/conditions/rejections; value/layout/ADT/Managed/Resource/allocation/recursion/loop/call rules; Effect/Capability restrictions; Device/Buffer ownership/address spaces; alias/race/bounds/overflow; numeric/reduction determinism; target discovery/fallback; Typed Core/verifier; CPU reference/device differential; Graph/Audit, diagnostics, fixtures, migration, protocol inventory, and backend/editor support remain open under KCHK-4101, GAP-KERNEL-DEVICE-001, and missing RFC-0013/RFC-H401 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0148"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0148-kernel-effect-capability-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty provisional Kernel Effect/Capability boundaries and their test-local order.",
+  "Compare forward and reversed insertion order and require identical opaque evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep Kernel checker/admission, row semantics, profile/target policy, diagnostics, CPU reference, Device IR/backends, migration, and public support behavior deferred until the required authorities exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed Effect/Capability behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Kernel checker, capability decision, diagnostic, dependency, protocol, backend, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Kernel Effect/Capability schema and closure; forbidden/allowed rows; IO, Network, Task, Actor, Device, Resource, Managed, allocation, mutation, call/recursion/trait propagation; profile/target mismatch; diagnostics/facts; CPU reference, determinism, fallback, migration, protocol inventory, and backend support remain open under KCHK-4102, KCHK-4101, GAP-KERNEL-DEVICE-001, and missing RFC-0013/RFC-H401 authority.",
+]
+superseded_by = ""

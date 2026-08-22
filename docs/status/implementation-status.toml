@@ -14958,6 +14958,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0148-kernel-effect-capability-boundary-evidence.md",
   "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
   "docs/decisions/0147-kernel-capability-matrix-boundary-evidence.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -15081,6 +15082,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/KCHK-4102-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4102-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4102-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0148-kernel-effect-capability-boundary-evidence.md",
+  "crates/ling-types/tests/kernel_effect_capability_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -15090,6 +15099,7 @@ acceptance = [
   "The audit covers effect unions and nested calls, capability minimization and forgery, handler interaction, deterministic RNG, buffer read/write/transfer/barrier ordering, faults, cancellation, CPU-reference equivalence, migration, Unicode/source-map positions, and deterministic canonical evidence.",
   "No Kernel Effect or Capability checker, Typed Core field, deterministic RNG, barrier primitive, Device Buffer API, backend hook, dependency, toolchain, diagnostic allocation, public protocol, CLI command, or placeholder API is added while GAP-KERNEL-DEVICE-001, GAP-EFFECT-HANDLER-001, and GAP-EFFECT-STATE-MASKING-001 remain unresolved.",
   "The future implementation must consume checked Typed Core or a verified derivative only, preserve Semantic IDs and original UTF-8 spans, use bilingual L-<DOMAIN>-<NUMBER> diagnostics, retain Unicode 17.0.0 behavior, and keep host/device details out of Ling semantics.",
+  "Accepted DEC-0148 authorizes only test-local Kernel Effect/Capability boundary evidence; it does not close Kernel rows/checking/admission, profile/target policy, diagnostics, CPU reference, Device IR/backends, migration, protocol integration, or support claims.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -15101,6 +15111,63 @@ notes = [
   "The gap register requires an Accepted Kernel authority and effect-system decisions before extending the checker or Typed Core. The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Native, memory categories, ownership, diagnostics, schemas, Semantic IDs, source spans, support claims, or Unicode 17.0.0 behavior.",
 ]
+[[task]]
+id = "KCHK-4102-OBSERVATION"
+title = "Internal Kernel Effect and Capability boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["KCHK-4101-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0018.md",
+  "docs/decisions/0147-kernel-capability-matrix-boundary-evidence.md",
+  "docs/decisions/0148-kernel-effect-capability-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/kernel_effect_capability_evidence.rs",
+  "docs/decisions/0148-kernel-effect-capability-boundary-evidence.md",
+  "docs/status/KCHK-4102-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4102-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0148 authorizes only test-local Kernel Effect/Capability boundary evidence; no Kernel checker, admission schema, Device Buffer API, backend, diagnostic, dependency, protocol, or support claim is made.",
+  "The test-local inventory covers sixty provisional boundaries for Effect/Capability schemas and projections, inference/closure/entry/handler/allowed/forbidden rows, IO/Network/Task/Actor/Device/Resource/Managed/allocation/mutation, call/recursion/trait propagation, preflight/mismatch/rejection, profile/target scopes, diagnostics/facts/spans/Semantic IDs/Unicode, canonical cross-module/package projections, fixtures, unknown/duplicate/version/migration, checked input/verified derivative, backend/host/public protocol boundaries, CPU reference, determinism, and fallback.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no Kernel, checker, capability, Device, diagnostic, Semantic ID, backend, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0148; KCHK-4102 remains BlockedSpec for Kernel rows/checking/admission, profile/target policy, diagnostics, CPU reference, Device IR/backends, migration, protocol integration, and support claims.",
+  "No parser, AST/HIR/Checked Core node, Kernel Effect/Capability checker, schema, Device Buffer API, backend, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
+]
+
 [[task]]
 id = "KCHK-4103"
 title = "Shape, index, and bounds"

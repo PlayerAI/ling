@@ -2431,3 +2431,16 @@ covers = ["KCHK-4101 bounded Kernel capability-matrix boundary evidence", "test-
 depends_on = ["DEC-0146", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0148"
+title = "Internal Kernel Effect and Capability boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0148-kernel-effect-capability-boundary-evidence.md"
+covers = ["KCHK-4102 bounded Kernel Effect and Capability boundary evidence", "test-only Kernel Effect/Capability vocabulary", "checker boundaries without Kernel admission/device/backend semantics"]
+depends_on = ["DEC-0147", "DEC-0010", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
