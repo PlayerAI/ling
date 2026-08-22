@@ -137,6 +137,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0104` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0104](../decisions/0104-determinism-class-evidence.md) |
 | `DEC-0105` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0105](../decisions/0105-replay-schema-field-evidence.md) |
 | `DEC-0106` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0106](../decisions/0106-effect-recorder-boundary-evidence.md) |
+| `DEC-0107` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0107](../decisions/0107-replay-player-boundary-evidence.md) |
 
 ## Migration boundary
 

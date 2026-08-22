@@ -2817,3 +2817,29 @@ unresolved_alternatives = [
   "Effect operation IDs and boundaries, recordability versus reconstruction, handler nesting/masking, unhandled operations, recorder failure, sensitive values, scheduler nondeterminism, event order, privacy/redaction, schema, resource limits, diagnostics, runtime ABI, and migration remain open under GAP-EFFECT-HANDLER-001, GAP-DETERMINISTIC-REPLAY-001, and REP-2503.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0107"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0107-replay-player-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all eleven provisional boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep checkpoint/program binding, preflight mismatch diagnostics, event application, ordering, Fault/cancellation, divergence, privacy, integrity, migration, CLI/protocol, cross-process, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public replay-player or protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Checkpoint identity and bytes, preflight binding, event application and order, Fault/cancellation, divergence equivalence, privacy/integrity, migration, diagnostics, CLI authorization, resource limits, runtime ABI, and cross-process behavior remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2504.",
+]
+superseded_by = ""

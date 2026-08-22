@@ -1898,3 +1898,16 @@ covers = ["REP-2503 bounded effect-recorder boundary evidence", "test-only recor
 depends_on = ["DEC-0105", "DEC-0104", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0107"
+title = "Internal replay-player boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0107-replay-player-boundary-evidence.md"
+covers = ["REP-2504 bounded replay-player boundary evidence", "test-only replay-player vocabulary", "player boundaries without playback/checkpoint/runtime semantics"]
+depends_on = ["DEC-0106", "DEC-0105", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
