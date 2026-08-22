@@ -291,6 +291,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REP-2506` | G2 | 跨进程重放验收 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:440`, `docs/status/REP-2506-AUTHORITY-AUDIT.md` |
 | `REP-2506-OBSERVATION` | G2 | Internal cross-process replay acceptance boundary evidence | S | Done | Accepted `DEC-0109`; see `crates/ling-concurrency/tests/replay_cross_process_evidence.rs` and `docs/status/REP-2506-OBSERVATION-IMPLEMENTATION-REPORT.md`; process/replay/equivalence/CI semantics remain BlockedSpec |
 | `REM-2601` | G2 | RemoteRef 与 Endpoint | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:452`, `docs/status/REM-2601-AUTHORITY-AUDIT.md` |
+| `REM-2601-OBSERVATION` | G2 | Internal RemoteRef and endpoint boundary evidence | S | Done | Accepted `DEC-0110`; see `crates/ling-concurrency/tests/remote_ref_evidence.rs` and `docs/status/REM-2601-OBSERVATION-IMPLEMENTATION-REPORT.md`; remote identity/protocol/delivery semantics remain BlockedSpec |
 | `REM-2602` | G2 | Transport-neutral Envelope | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:466`, `docs/status/REM-2602-AUTHORITY-AUDIT.md` |
 | `REM-2603` | G2 | Delivery 语义 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:482`, `docs/status/REM-2603-AUTHORITY-AUDIT.md` |
 | `REM-2604` | G2 | 最小参考传输 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:497`, `docs/status/REM-2604-AUTHORITY-AUDIT.md` |

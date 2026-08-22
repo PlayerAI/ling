@@ -140,6 +140,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0107` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0107](../decisions/0107-replay-player-boundary-evidence.md) |
 | `DEC-0108` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0108](../decisions/0108-replay-privacy-integrity-boundary-evidence.md) |
 | `DEC-0109` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0109](../decisions/0109-cross-process-replay-acceptance-boundary-evidence.md) |
+| `DEC-0110` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0110](../decisions/0110-remote-ref-endpoint-boundary-evidence.md) |
 
 ## Migration boundary
 

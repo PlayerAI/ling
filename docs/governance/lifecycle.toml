@@ -2895,3 +2895,29 @@ unresolved_alternatives = [
   "Process and cache isolation, toolchain identity, input provenance, generator/player protocol, binding and mutation semantics, observable-equivalence relation, repeatability threshold, divergence reporting, platform variance, offline guarantees, diagnostics, resource limits, runtime ABI, and migration remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2506.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0110"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0110-remote-ref-endpoint-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all fourteen provisional RemoteRef and endpoint boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep local/remote identity and equality, endpoint authority, protocol negotiation, capability issuance/revocation, serialization prohibition, network/ActorSend Effects, delivery/Fault outcomes, incarnation/liveness, partition/retry/order, diagnostics, resources, security, cross-process, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public RemoteRef, endpoint, or remote-delivery protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Remote identity allocation/reuse, local/remote equality, endpoint discovery and trust, protocol negotiation, capability-token lifecycle, serialization, network/send Effects, delivery/Fault semantics, incarnation/liveness, partition/retry/order, migration, diagnostics, resource limits, runtime ABI, and transport behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2601.",
+]
+superseded_by = ""
