@@ -4173,7 +4173,7 @@ notes = [
 [[task]]
 id = "RC-6905-SEED"
 title = "Seed v1 release-artifact inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -4221,10 +4221,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0056 closes only this internal Seed v1 artifact-inventory child; the parent RC-6905 gate remains BlockedSpec for all publication and Stable-support evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "7b2803ddce930278b03d43aacdbf1e3883532b1d"
+completion_commit = "7b2803ddce930278b03d43aacdbf1e3883532b1d"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects the immutable-Seed/no-publication boundary only; the existing Seed tag and reports remain historical evidence and no v1.0 manifest is inferred.",
   "No v1.0 tag, artifact, installer, extension, language server, signature, SBOM, provenance record, migration executable, evidence bundle, network request, system configuration, or placeholder is added.",
