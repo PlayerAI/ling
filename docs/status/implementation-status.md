@@ -296,6 +296,7 @@
 | `NODE-5305` | Native Node Runtime | `G5` | `L` | `BlockedSpec` | `NODE-5304` | `` |
 | `NODE-5305-OBSERVATION` | Internal Node Native-runtime boundary evidence | `G5` | `S` | `Done` | `NODE-5304-OBSERVATION` | `d08d51178f99c511c4a21fa4c4aa97a17b19b02a` |
 | `NODE-5306` | Node and Actor Boundary | `G5` | `M` | `BlockedSpec` | `NODE-5305` | `` |
+| `NODE-5306-OBSERVATION` | Internal Node/Actor boundary evidence | `G5` | `S` | `Done` | `NODE-5305-OBSERVATION` | `6b3c43226d741b7d834b7e48caf095c35fea6955` |
 | `NODE-5307` | Node Conformance | `G5` | `M` | `BlockedSpec` | `NODE-5306` | `` |
 | `OWN-3201` | Place and Move analysis | `G3` | `L` | `BlockedSpec` | `MEM-3104` | `` |
 | `OWN-3201-OBSERVATION` | Internal Place and Move-analysis boundary evidence | `G3` | `S` | `Done` | `MEM-3104-OBSERVATION` | `1c6528e25fd0b8908cc8b3be5db873a3d2132d0b` |
