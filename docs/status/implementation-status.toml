@@ -14812,10 +14812,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "581f4c3b0537ba2de8c289129c8e2c6a53ac49da"
+completion_commit = "581f4c3b0537ba2de8c289129c8e2c6a53ac49da"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0145; DAP-3602 remains BlockedSpec for extension packaging/configuration, registration/discovery, launch mapping, permissions, DAP/session integration, metadata, fixtures, protocol inventory, and Zed support claims.",
   "No parser, AST/HIR/Checked Core node, extension package, manifest, language config, debugger registration, adapter locator, build/run task, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",

@@ -90,6 +90,7 @@
 | `DAP-3601` | Debugger stdio adapter | `G3+` | `L` | `BlockedSpec` | `DIFF-3702` | `` |
 | `DAP-3601-OBSERVATION` | Internal DAP debugger boundary evidence | `G3+` | `S` | `Done` | `DIFF-3702-OBSERVATION` | `1626b0dad645ae10436e06146c08ceb8a94d1155` |
 | `DAP-3602` | Zed debugger registration | `G3+` | `M` | `BlockedSpec` | `DAP-3601` | `` |
+| `DAP-3602-OBSERVATION` | Internal Zed debugger registration boundary evidence | `G3+` | `S` | `Done` | `DAP-3601-OBSERVATION` | `581f4c3b0537ba2de8c289129c8e2c6a53ac49da` |
 | `DAP-3603` | Staged debugger capabilities | `G3+` | `L` | `BlockedSpec` | `DAP-3602` | `` |
 | `DBUF-4401` | Device Types and Capability | `G4` | `M` | `BlockedSpec` | `SIMD-4303` | `` |
 | `DBUF-4402` | Buffer Ownership | `G4` | `M` | `BlockedSpec` | `DBUF-4401` | `` |
