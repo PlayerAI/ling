@@ -8,6 +8,8 @@ RFC-0002 locked validation. The parent `PRJ-1107` remains `BlockedSpec`: this
 slice does not implement semantic compilation, workspace selection,
 run/test/build, artifact policy, or a new CLI/protocol surface.
 
+Implementation commit: `23f9eb78b1bb3dfb0c90de88be30f4e16b248196`.
+
 ## Normative traceability
 
 - Accepted `DEC-0058` §§1–4 authorizes `LockedProject` and
@@ -25,6 +27,8 @@ run/test/build, artifact policy, or a new CLI/protocol surface.
 - Re-exported the library boundary from `crates/ling-project/src/lib.rs`.
 - Added deterministic fixture tests for repeated equality, graph identity,
   canonical lock bytes, and lock non-mutation.
+- Updated aggregate governance/status count assertions for the new Accepted
+  decision and completed task.
 
 ## Evidence
 
@@ -48,4 +52,3 @@ Compiler-host source loading, workspace/member selection, semantic checking,
 incremental revisions, project run/test/build, artifact generation, registry
 and network access, package publication, and Stable project CLI behavior remain
 deferred to the blocked PRJ-1107 parent.
-

@@ -232,6 +232,7 @@
 | `PRJ-1106` | End-to-end project fixture matrix | `G1` | `M` | `Done` | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105` | `0e9c5800411a6f1acd1441068e6ce2fd58f29816` |
 | `PRJ-1107` | Project API and CLI integration | `G1` | `M` | `BlockedSpec` | `PRJ-1106` | `` |
 | `PRJ-1107-CHECK` | Locked project graph check Preview | `G1` | `M` | `Done` | `PRJ-1106` | `b37ab47f268e83e8c2c39931f5ddd0a311dbf4aa` |
+| `PRJ-1107-LOAD` | Locked project snapshot boundary | `G1` | `S` | `Done` | `PRJ-1106` | `23f9eb78b1bb3dfb0c90de88be30f4e16b248196` |
 | `PRJ-1108` | Project graph property and manifest fuzz coverage | `G1` | `M` | `Done` | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105`, `PRJ-1106` | `29f9c4465b58c7eff23c227436563d69409b880e` |
 | `PROF-5101` | Machine-Readable Critical Profile | `G5` | `M` | `BlockedSpec` | `PLC-4805` | `` |
 | `PROF-5102` | Forbidden Capability Checks | `G5` | `M` | `BlockedSpec` | `PROF-5101` | `` |

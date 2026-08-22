@@ -4440,6 +4440,60 @@ notes = [
 ]
 
 [[task]]
+id = "PRJ-1107-LOAD"
+title = "Locked project snapshot boundary"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1106"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/RFC-0002.md",
+  "docs/RFC-0024.md",
+  "docs/decisions/0058-locked-project-snapshot-boundary.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-project/src/workspace.rs",
+  "crates/ling-project/src/lib.rs",
+  "crates/ling-project/tests/locked_project.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/status.rs",
+  "docs/decisions/0058-locked-project-snapshot-boundary.md",
+  "docs/status/PRJ-1107-LOAD-IMPLEMENTATION-REPORT.md",
+  "docs/status/PRJ-1107-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0058 authorizes only a read-only LockedProject containing the parsed Manifest, validated PackageGraph, and canonical LockFile.",
+  "Repeated loads of the locked fixture compare equal, preserve graph identity and canonical lock bytes, and leave the lock file unchanged.",
+  "The snapshot stores no path or host state and introduces no workspace, compiler, evaluation, run/test/build, artifact, CLI, or protocol behavior.",
+  "Focused project format, test, clippy, diff, and governance checks pass; the PRJ-1107 parent remains BlockedSpec for the deferred project surface.",
+]
+verified_against_commit = "23f9eb78b1bb3dfb0c90de88be30f4e16b248196"
+completion_commit = "23f9eb78b1bb3dfb0c90de88be30f4e16b248196"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This bounded in-process child is complete under DEC-0058; parent PRJ-1107 remains BlockedSpec for compiler-host, workspace, semantic check, run/test/build, and artifact contracts.",
+  "The loader delegates to RFC-0002 LockMode::Locked validation and returns no partial snapshot or lock mutation.",
+]
+
+[[task]]
 id = "CLI-1701"
 title = "Unified CLI command model"
 state = "BlockedSpec"
