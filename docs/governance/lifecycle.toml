@@ -3415,3 +3415,29 @@ unresolved_alternatives = [
   "NIR version and instruction set, SSA/phi and evaluation order, representation and ownership facts, cleanup/Fault/Effect edges, ABI/layout/target policy, FFI/runtime operations, source/debug mapping, serialization/versioning, verifier, migration, security, and interpreter/VM/Native differential semantics remain open under NIR-3401, GC-3304, GC-3303, GC-3302, GC-3301, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-CRITICAL-PROFILE-001, and missing RFC-N304/RFC-N303/RFC-0007 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0130"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0130-native-ir-lowering-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all forty-six provisional lowering boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep Core-to-NIR mappings, memory/closure lowering, Effect/Fault/cleanup, Managed/Resource/Task/Actor operations, ABI/targets, unsupported-form diagnostics, differential harnesses, and Native code generation deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed tests, source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No lowering, Native IR, ABI, differential, diagnostic, Semantic ID, or public protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Core-to-NIR mapping, evaluation/representation, ownership/cleanup/GC, Effects/Fault/cancellation, ABI/target/Profile/FFI/reentry, unsupported-form diagnostics, deterministic serialization, differential equivalence, migration, and Native code generation remain open under NIR-3402, NIR-3401, GC-3304, GC-3303, GC-3302, GC-3301, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, and missing RFC-N304/RFC-N303/RFC-0007 authority.",
+]
+superseded_by = ""

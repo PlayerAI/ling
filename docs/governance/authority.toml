@@ -2197,3 +2197,16 @@ covers = ["NIR-3401 bounded Native IR design boundary evidence", "test-only Nati
 depends_on = ["DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0130"
+title = "Internal Native IR lowering boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0130-native-ir-lowering-boundary-evidence.md"
+covers = ["NIR-3402 bounded Native IR lowering boundary evidence", "test-only lowering vocabulary", "lowering boundaries without translation/ABI/differential semantics"]
+depends_on = ["DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

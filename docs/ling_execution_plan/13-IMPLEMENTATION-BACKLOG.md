@@ -333,6 +333,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `NIR-3401` | G3 | Native IR 设计 | L | BlockedSpec | `07-G3-V0.3-NATIVE.md:291`, `docs/status/NIR-3401-AUTHORITY-AUDIT.md` |
 | `NIR-3401-OBSERVATION` | G3 | Internal Native IR design boundary evidence | S | Done | Accepted `DEC-0129`; see `crates/ling-types/tests/native_ir_design_evidence.rs` and `docs/status/NIR-3401-OBSERVATION-IMPLEMENTATION-REPORT.md`; IR/ABI/lowering semantics remain BlockedSpec |
 | `NIR-3402` | G3 | Core → Native IR Lowering | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:308`, `docs/status/NIR-3402-AUTHORITY-AUDIT.md` |
+| `NIR-3402-OBSERVATION` | G3 | Internal Native IR lowering boundary evidence | S | Done | Accepted `DEC-0130`; see `crates/ling-types/tests/native_ir_lowering_evidence.rs` and `docs/status/NIR-3402-OBSERVATION-IMPLEMENTATION-REPORT.md`; lowering/ABI/differential semantics remain BlockedSpec |
 | `NIR-3403` | G3 | IR Verifier | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:324`, `docs/status/NIR-3403-AUTHORITY-AUDIT.md` |
 | `BACK-3501` | G3 | Backend 选择 Spike | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:341`, `docs/status/BACK-3501-AUTHORITY-AUDIT.md` |
 | `BACK-3502` | G3 | Baseline Codegen | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:352`, `docs/status/BACK-3502-AUTHORITY-AUDIT.md` |
