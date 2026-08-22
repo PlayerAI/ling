@@ -8372,6 +8372,9 @@ spec = [
 ]
 artifacts = [
   "docs/status/TASK-2201-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2201-REJECTION-GATE-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2201-REJECTION-GATE-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0089-task-syntax-rejection-gate.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -8390,6 +8393,57 @@ notes = [
   "TASK-2201 is BlockedSpec by EFF-2103, GAP-STRUCTURED-TASK-001, absent RFC-C202/RFC-0008, and the unresolved Task lifecycle, cancellation, suspension, cleanup, and detach contracts; RFC-0020 covers only host VM cancellation.",
   "Current syntax/AST/HIR/types/effects/evaluator/bytecode/VM implement Seed only; no Task lifecycle node, scope identity, suspension state, cleanup region, or structured runtime exists.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, scheduler, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "TASK-2201-TASK-SYNTAX-REJECTION"
+title = "Internal Task-shaped syntax rejection gate"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GOV-0105"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0089-task-syntax-rejection-gate.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-cli/tests/task_boundary.rs",
+  "docs/decisions/0089-task-syntax-rejection-gate.md",
+  "docs/status/TASK-2201-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2201-REJECTION-GATE-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2201-REJECTION-GATE-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0089 authorizes only a negative Task-shaped syntax fixture under the current Seed exclusion; positive Task semantics remain deferred.",
+  "The shared CLI compiler returns the registered bilingual L-SYNTAX-0010/UNEXPECTED_TOKEN diagnostic with the exact original task byte span and JSON fields.",
+  "The fixture returns no checked ProgramSnapshot and does not add a lexer keyword, grammar production, AST/HIR/Typed Core node, lifecycle/runtime field, scheduler, bytecode, VM, protocol, schema, Semantic ID, or migration.",
+  "cargo test -p ling-cli --test task_boundary --locked --offline passes.",
+]
+verified_against_commit = "b3ede69c33d72d4419775650b820f1b5797dc652"
+completion_commit = "b3ede69c33d72d4419775650b820f1b5797dc652"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This bounded child is complete under DEC-0089; public TASK-2201 remains BlockedSpec for Task grammar, lifecycle, suspension, cancellation, cleanup, Fault, detach, runtime, and interpreter/VM authority.",
+  "The negative fixture reuses L-SYNTAX-0010 and current UTF-8 source spans; it does not reserve task as a lexer keyword or claim Task support.",
 ]
 
 [[task]]

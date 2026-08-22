@@ -314,6 +314,7 @@
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
 | `TASK-2201` | Structured Task syntax and Checked Core | `G2` | `M` | `BlockedSpec` | `EFF-2103` | `` |
+| `TASK-2201-TASK-SYNTAX-REJECTION` | Internal Task-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `b3ede69c33d72d4419775650b820f1b5797dc652` |
 | `TASK-2202` | Task state-machine lowering | `G2` | `L` | `BlockedSpec` | `TASK-2201` | `` |
 | `TASK-2203` | Structured Task lifecycle runtime | `G2` | `L` | `BlockedSpec` | `TASK-2202` | `` |
 | `TASK-2204` | Deterministic Task test scheduler | `G2` | `L` | `BlockedSpec` | `TASK-2203` | `` |
