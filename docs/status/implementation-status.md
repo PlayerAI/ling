@@ -307,6 +307,7 @@
 | `REP-2502` | Replay log schema | `G2` | `L` | `BlockedSpec` | `REP-2501` | `` |
 | `REP-2502-OBSERVATION` | Internal replay-schema field evidence | `G2` | `S` | `Done` | `REP-2501-OBSERVATION` | `040ef2ca03438fe39df121acc07c2f554d24382f` |
 | `REP-2503` | Effect recorder | `G2` | `L` | `BlockedSpec` | `EFF-2105`, `REP-2502` | `` |
+| `REP-2503-OBSERVATION` | Internal effect-recorder boundary evidence | `G2` | `S` | `Done` | `REP-2502-OBSERVATION` | `d85ca61b119d9e7ee70ebad6ec9c4eb48be9accf` |
 | `REP-2504` | Replay player | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503` | `` |
 | `REP-2505` | Replay privacy, trimming, and corruption | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504` | `` |
 | `REP-2506` | Cross-process replay acceptance | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504`, `REP-2505` | `` |
