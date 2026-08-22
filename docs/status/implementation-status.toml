@@ -1,6 +1,6 @@
 schema_version = 2
 feature_schema_version = 1
-updated = "2026-08-22"
+updated = "2026-08-23"
 authority = "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md"
 plan_root = "docs/ling_execution_plan"
 recommended_plan_root = "docs/execution"
@@ -12420,6 +12420,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/GC-3301-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3301-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3301-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "crates/ling-types/tests/managed_object_model_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12429,6 +12437,7 @@ acceptance = [
   "The audit covers root loss, cycles, mutation barriers, weak references, finalization, bounded OOM/recovery, Explore/Native/Critical behavior, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No Managed runtime crate, object layout, collector API, root/handle API, write barrier, weak reference, finalizer, allocator policy, OOM diagnostic, public protocol, or placeholder G3 API is added while RFC-N303/RFC-0007 authority is absent.",
   "The future implementation must preserve Seed value semantics, consume accepted types and checked Core only, keep Rust addresses and allocation behavior non-semantic, and publish Managed graph, Profile, OOM, FFI, and interpreter/VM/Native evidence before exposing v0.3 behavior.",
+  "Accepted DEC-0125 authorizes only test-only Managed object-model boundary vocabulary; it does not close object representation, identity, roots, collection, barriers, weak/finalizer, OOM, Profile, FFI, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12438,6 +12447,64 @@ notes = [
   "GC-3301 is BlockedSpec by absent RFC-N303, RFC-0007, and the Open GAP-OWNERSHIP-MODEL-001 contract for Managed roots/finalization and Profile boundaries.",
   "The current workspace has no Managed-runtime or collector crate and no Ling object header, root registration, write barrier, weak reference, finalizer, OOM boundary, or pointer-identity operation; existing Rust/JSON objects are not Ling Managed values.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "GC-3301-OBSERVATION"
+title = "Internal Managed object-model boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3207-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0008-seed-value-restriction.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0117-managed-island-boundary-evidence.md",
+  "docs/decisions/0124-ownership-corpus-boundary-evidence.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/managed_object_model_evidence.rs",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/status/GC-3301-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3301-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0125 authorizes only test-only Managed object-model boundary evidence; no object representation, identity, roots, collection, barriers, weak references, finalization, allocation, OOM, Profile, FFI, diagnostic, or runtime semantics are claimed.",
+  "The test-local inventory covers forty provisional boundaries for object identity/private header/type metadata, roots/handles/lifetime, reachability/cycles/shared edges, write barriers/mutation ordering, weak/finalizer/OOM/allocation policy, pointer/address observability, Managed/Resource/ownership boundaries, pinning/views, Profiles, FFI roots, projections, diagnostics, Unicode spans, deterministic traversal, differential evidence, migration, security, and collection with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no object-model schema, protocol, diagnostic, or runtime API is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "9b1f037a0b37f781c39c8b61390bbfe942d580d2"
+completion_commit = "9b1f037a0b37f781c39c8b61390bbfe942d580d2"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0125; GC-3301 remains BlockedSpec for object/header, metadata, root, barrier, weak/finalizer, OOM, identity, Profile, and FFI contracts.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

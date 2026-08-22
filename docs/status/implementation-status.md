@@ -5,7 +5,7 @@
 
 - Registry schema: `2`
 - Feature schema: `1`
-- Updated: `2026-08-22`
+- Updated: `2026-08-23`
 - Feature release: `v0.0.1`
 - Baseline release: `v0.0.1`
 - Baseline commit: `639790f4c609d137932d8432d9c5be681aa3e3c1`
@@ -132,6 +132,7 @@
 | `FMT-1507-EDIT` | Deterministic formatter whole-document edit projection | `G1` | `S` | `Done` | `FMT-1506` | `e33f8496de369b8fc6364007a59a0a1fb4ca9e9f` |
 | `FMT-1508` | Audit Source separation | `G1` | `S` | `Done` | `FMT-1506` | `f247dfed98f104ea5227532965e8b579938a213e` |
 | `GC-3301` | Minimal Managed object model | `G3` | `M` | `BlockedSpec` | — | `` |
+| `GC-3301-OBSERVATION` | Internal Managed object-model boundary evidence | `G3` | `S` | `Done` | `OWN-3207-OBSERVATION` | `9b1f037a0b37f781c39c8b61390bbfe942d580d2` |
 | `GC-3302` | First Managed collector | `G3` | `L` | `BlockedSpec` | `GC-3301` | `` |
 | `GC-3303` | Managed Native and FFI boundary | `G3` | `L` | `BlockedSpec` | `GC-3302` | `` |
 | `GC-3304` | Managed profile checks | `G3` | `M` | `BlockedSpec` | `GC-3303` | `` |
