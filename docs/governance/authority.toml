@@ -1315,6 +1315,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0063"
+title = "First-order handler Typed Core projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0063-first-order-handler-core.md"
+covers = ["EFF-2103 bounded handler Core projection", "resume-use invariant", "closed-boundary residual diagnostic"]
+depends_on = ["RFC-0006", "DEC-0062"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0006"
 title = "Effect rows and first-order handlers"
 kind = "RFC"

@@ -93,6 +93,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0060` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0060](../decisions/0060-seed-effect-row-snapshot.md) |
 | `DEC-0061` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0061](../decisions/0061-seed-type-value-classification.md) |
 | `DEC-0062` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0062](../decisions/0062-effect-row-constraint-solver.md) |
+| `DEC-0063` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0063](../decisions/0063-first-order-handler-core.md) |
 
 ## Migration boundary
 

@@ -1714,6 +1714,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0063"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0063-first-order-handler-core.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify single and nested checked handler Core values compute deterministic residual rows, preserve open tails, reject duplicate or mismatched clauses, and exclude source spans from canonical bytes.",
+  "Verify Never/Once/Many resume-use boundaries, unresolved body rejection, exact State handling, and no Capability or Task/Actor boundary inference.",
+  "Verify bilingual L-EFFECT-0003 closed-boundary diagnostics retain the original UTF-8 span and structured residual facts.",
+]
+compatibility_impact = [
+  "Adds only an Experimental v0.2 in-process handler Core projection and one registered residual diagnostic; Seed syntax, schemas, Semantic IDs, CLI, LSP, runtime, bytecode, protocols, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Source grammar and full AST/HIR lowering remain the EFF-2103 parent; runtime continuations, Fault/cancellation, interpreter/VM ABI, Audit Source schema, Task/Actor, Replay, Remote, Native, GPU, and FFI require separate authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0006"
 kind = "RFC"
 status = "Accepted"

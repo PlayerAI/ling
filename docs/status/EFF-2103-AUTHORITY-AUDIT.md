@@ -2,90 +2,58 @@
 
 ## Outcome
 
-`EFF-2103` is correctly recorded as `BlockedSpec`. The G2 plan proposes an
-explicit `handle`/`with operation` Core form, requires RFC-defined linear or
-multiple `resume` behavior, explicit Task/Actor boundary rules, rejection of
-runtime fallback for unhandled effects, and Audit Source expansion of handled
-and residual rows. No accepted RFC fixes that syntax, Typed Core shape,
-resumption, scope, or source projection.
-
-No handler syntax, AST/HIR/Typed Core node, effect-discharge rule, resume
-checker, Audit Source field, diagnostic allocation, or placeholder G2 API was
-added.
+`EFF-2103` remains `BlockedSpec` for the complete `handle`/`with operation`
+source grammar and AST/HIR lowering contract. RFC-0006 is Accepted for the
+first-order Effect/Handler model, DEC-0062 is Accepted for row solving, and
+DEC-0063 authorizes only the bounded `EFF-2103-CORE` checked in-process
+projection. The child does not make the parent complete.
 
 ## Normative traceability
 
 - The G2 execution package is non-normative; its pseudo-syntax and lowering
-  requirements do not authorize a new source construct or Core node.
-- `docs/SEMANTICS.md` describes handlers as future typed Effect behavior and
-  does not accept handler matching, nesting, resumption, or residual-row
-  semantics. The current v0.0.1 Seed grammar excludes these constructs.
-- Accepted DEC-0010 defines State visibility and Capability authorization, but
-  not effect handling, discharge, handler scope, or resume ownership.
-- `GAP-EFFECT-HANDLER-001` keeps matching, elimination, nesting, resumption,
-  Capability interaction, and unhandled-effect failure open; its candidate
-  RFC-0006 is not Accepted. `GAP-EFFECT-STATE-MASKING-001` also remains open.
-- Task and Actor crossing is governed by separate unaccepted RFC-C202/C203/C204
-  placeholders and structured lifecycle gaps. No handler may cross those
-  boundaries by inference from the execution plan.
+  order do not authorize a public construct by themselves.
+- `docs/SEMANTICS.md` and `docs/LANGUAGE.md` describe handlers as future
+  behavior and do not fix source grammar, AST/HIR nodes, or resume syntax.
+- RFC-0006 §§4, 6, 7, and 9 fix canonical rows, operation contracts, lexical
+  residuals, resume cardinality, Capability separation, and path-free
+  projections, while explicitly assigning source syntax and Checked-Core
+  lowering to EFF-2103.
+- DEC-0062 fixes deterministic row constraints and bilingual conflict facts.
+- DEC-0063 closes only the checked first-order Core container, clause body
+  identities, resume-use invariant, and explicit closed-boundary residual
+  diagnostic for `EFF-2103-CORE`.
+- Task/Actor crossing, runtime continuations, Fault/cancellation behavior,
+  Audit Source schema, interpreter/VM ABI, and public protocol migration remain
+  outside these authorities.
 
 ## Current implementation evidence
 
-- `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` have
-  no handler grammar, HIR/Typed Core node, operation clause, resume binding,
-  handler scope, or effect-discharge representation.
-- `ling-effects` only propagates Seed closed rows and validates module
-  Capabilities. It cannot distinguish handled from residual effects or reject
-  an unhandled effect at a profile boundary.
-- `ling-format` and Semantic Graph projections have no accepted handler
-  rendering, residual-row field, source identity, or schema version.
-- No fixture covers single/nested handlers, operation matching, linear versus
-  multiple resume, handler propagation, Fault/mutable-State interaction,
-  cancellation, Task/Actor crossing, source spans, or interpreter/VM
-  differential behavior.
+- The child `EFF-2103-CORE` implements `HandlerCore`, canonical clauses,
+  residual-row computation, resume-use validation, source-span evidence, and
+  `L-EFFECT-0003` closed-boundary diagnostics in `ling-effects`.
+- No source parser, AST/HIR handler node, TypedProgram integration, evaluator,
+  bytecode instruction, VM handler stack, or public schema has been added.
+- The existing Seed checker and runtime remain unchanged.
 
-## Required authority before implementation
+## Required authority before parent completion
 
-An Accepted RFC or decision must define, at minimum:
+An additional Accepted decision must still define, at minimum:
 
-1. source grammar, AST/HIR/Typed Core node shape, operation signatures,
-   handler scope and environment, binding identity, source spans, and lowering
-   invariants;
-2. effect matching/elimination, residual rows, nesting and propagation,
-   operation parameters, return/recovery types, resume typing, linear versus
-   multiple invocation, recursion, and unhandled-effect rejection;
-3. handler interaction with State masking/escape, Capability injection,
-   mutable places, Faults, cancellation, Task scopes, Actor turns, replay,
-   resource cleanup, and profile restrictions;
-4. checked-only evaluation boundary, interpreter/VM ABI and differential
-   semantics, Audit Source/ Semantic Graph representation, deterministic
-   ordering, diagnostics, protocol/version migration, and no runtime fallback;
-5. executable positive/negative/migration/differential fixtures for single and
-   nested handlers, operation propagation, resume cardinality, residual rows,
-   missing/unhandled effects, Fault and mutable State, cancellation, Task/Actor
-   boundaries, Unicode/CRLF/BOM spans, and canonical Audit output.
+1. source grammar and exact AST/HIR lowering for `handle` and operation clauses;
+2. binding identity, lexical scope, operation arguments, return/recovery types,
+   resume syntax, source spans, and checked-only publication invariants;
+3. nested propagation, unhandled-effect policy, mutable State/Fault/cancellation
+   interaction, and explicit Task/Actor boundary behavior; and
+4. Audit Source/Semantic Graph fields, interpreter/VM differential contracts,
+   migration, and executable positive/negative fixtures.
 
-Until these decisions are Accepted, a Core node could allow unsound resume
-aliasing, hide residual effects, cross a Task/Actor boundary incorrectly, or
-let the evaluator execute an unvalidated handler.
+Until those decisions are Accepted, the parent must not publish source syntax
+or let an evaluator execute a handler node. The child remains a reusable Core
+projection only.
 
-## Evidence and compatibility
+## Compatibility and deferred work
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0018,
-`docs/RFC-0001.md`, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
-`docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the current syntax, AST, HIR, type, effect, format, semantic, evaluator,
-and bytecode crates.
-
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
-
-## Intentionally deferred
-
-`EFF-2103` can begin only after EFF-2101/EFF-2102 and an Accepted RFC-0006 (or
-replacement) plus explicit Task/Actor boundary decisions. The future
-implementation must lower only accepted handler syntax into checked Typed
-Core, preserve residual effects and source identity, reject unhandled effects,
-and prove interpreter/VM equivalence before any runtime handler is exposed.
+No Seed source acceptance, existing diagnostic meaning, Semantic ID, schema,
+CLI, LSP, runtime, bytecode, VM, protocol, or Unicode 17.0.0 behavior changes
+under the current child. Full parent completion and EFF-2104/2105 execution
+remain deferred.

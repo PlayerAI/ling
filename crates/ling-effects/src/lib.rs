@@ -12,9 +12,13 @@ use ling_resolve::{
 use ling_source::Span;
 use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
 
+mod handler_core;
 mod solver;
 mod v2;
 
+pub use handler_core::{
+    HandlerCore, HandlerCoreClause, HandlerCoreError, HandlerCoreNodeId, ResumeUse,
+};
 pub use solver::{
     EffectConflictKind, EffectConstraint, EffectConstraintConflict, EffectConstraintError,
     EffectConstraintOrigin, EffectConstraintSolver, EffectInference, EffectInstantiationError,

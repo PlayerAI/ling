@@ -64,6 +64,7 @@ pub mod codes {
     pub const UNUSED_CAPABILITY: DiagnosticCode = DiagnosticCode::new("L-CAP-0003");
     pub const EFFECT_ROW_CONFLICT: DiagnosticCode = DiagnosticCode::new("L-EFFECT-0001");
     pub const EFFECT_ROW_OCCURS_CHECK: DiagnosticCode = DiagnosticCode::new("L-EFFECT-0002");
+    pub const EFFECT_UNHANDLED_RESIDUAL: DiagnosticCode = DiagnosticCode::new("L-EFFECT-0003");
     pub const INVALID_ENTRY_MODULE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0001");
     pub const MISSING_MAIN: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0002");
     pub const INVALID_MAIN_SIGNATURE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0003");

@@ -6924,6 +6924,50 @@ notes = [
 ]
 
 [[task]]
+id = "EFF-2103-CORE"
+title = "First-order handler Typed Core projection"
+state = "In Progress"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2101", "EFF-2102"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0006.md",
+  "docs/decisions/0062-effect-row-constraint-solver.md",
+  "docs/decisions/0063-first-order-handler-core.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-effects/src/handler_core.rs",
+  "crates/ling-effects/src/lib.rs",
+  "docs/status/EFF-2103-CORE-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2103-CORE-IMPLEMENTATION-REPORT.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0063 authorizes only a checked, first-order in-process handler Core projection; source syntax, full lowering, execution, and protocols remain deferred.",
+  "HandlerCore validates body identities, owner/signature matching, duplicate clauses, residual rows, open-tail preservation, and deterministic canonical bytes without source spans or host state.",
+  "Never/Once/Many resume-use limits, nested residual construction, exact State handling, unresolved body rejection, and bilingual L-EFFECT-0003 closed-boundary diagnostics are covered by focused tests.",
+  "The child is isolated from Seed behavior and adds no handler parser, evaluator, VM instruction, public schema, Semantic ID, or Task/Actor crossing rule.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The child implements only DEC-0063's checked Core projection; the EFF-2103 parent remains BlockedSpec for source grammar and full AST/HIR lowering.",
+  "Runtime continuation storage, Fault/cancellation interaction, Audit Source schema, and interpreter/VM differential behavior remain deferred to EFF-2104/2105 and separate authorities.",
+]
+
+[[task]]
 id = "EFF-2104"
 title = "Interpreter and VM handler execution"
 state = "BlockedSpec"

@@ -97,6 +97,7 @@
 | `EFF-2101-SEED-ROW` | Seed EffectRow canonical snapshot | `G2` | `S` | `Done` | — | `fb949ce2b28fc73a1668806952c3f8e790cd6d7a` |
 | `EFF-2102` | Effect inference and constraint solving | `G2` | `L` | `Done` | `EFF-2101` | `e1827e7ceee6ffba9d40d882119a949d4af65a00` |
 | `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `BlockedSpec` | `EFF-2101`, `EFF-2102` | `` |
+| `EFF-2103-CORE` | First-order handler Typed Core projection | `G2` | `S` | `In Progress` | `EFF-2101`, `EFF-2102` | `` |
 | `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `BlockedSpec` | `EFF-2103` | `` |
 | `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `BlockedSpec` | `EFF-2104` | `` |
 | `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |
