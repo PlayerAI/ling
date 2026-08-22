@@ -248,7 +248,7 @@
 | `REL-6601` | Fuzz Coverage Inventory | `G6` | `L` | `BlockedSpec` | `COMPAT-6504` | `` |
 | `REL-6601-SEED` | Seed fuzz inventory and corpus drift gate | `G6` | `S` | `Done` | `FMT-1506`, `GOV-0110`, `PRJ-1108`, `VM-1210` | `97a628311f50742730ba043131878d205f0f47d2` |
 | `REL-6602` | Fault Injection | `G6` | `L` | `BlockedSpec` | `REL-6601` | `` |
-| `REL-6602-SEED` | Seed fault-matrix drift gate | `G6` | `S` | `In Progress` | `REL-6601-SEED` | `` |
+| `REL-6602-SEED` | Seed fault-matrix drift gate | `G6` | `S` | `Done` | `REL-6601-SEED` | `201d9f7cfde5e6c2eebaa5b5324297b6a790d226` |
 | `REL-6603` | Security Audit | `G6` | `L` | `BlockedSpec` | `REL-6602` | `` |
 | `REL-6604` | Performance Baseline | `G6` | `L` | `BlockedSpec` | `REL-6603` | `` |
 | `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |

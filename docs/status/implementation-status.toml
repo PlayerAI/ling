@@ -13998,7 +13998,7 @@ notes = [
 [[task]]
 id = "REL-6602-SEED"
 title = "Seed fault-matrix drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14030,10 +14030,10 @@ acceptance = [
   "The command is included in the existing Seed reproducibility CI gate and does not inject faults or claim crash, sanitizer, or cross-platform release evidence.",
   "Focused xtask, CI-contract, workspace-test, governance, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "201d9f7cfde5e6c2eebaa5b5324297b6a790d226"
+completion_commit = "201d9f7cfde5e6c2eebaa5b5324297b6a790d226"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "Accepted DEC-0042 closes only this internal Seed matrix gate; REL-6602 remains BlockedSpec for release-level fault seams and future recovery protocols.",
   "The verifier protects inventory consistency only; the existing Seed tests and later accepted fault seams remain execution evidence.",
