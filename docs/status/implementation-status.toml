@@ -11856,6 +11856,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/OWN-3203-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3203-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3203-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0120-region-inference-boundary-evidence.md",
+  "crates/ling-types/tests/region_inference_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -11865,6 +11873,7 @@ acceptance = [
   "The audit covers nested scopes, loops, branches, returns, closures, mutable borrows, Task/Actor turns, suspension, cancellation, cross-package/FFI, Unicode/CRLF/BOM spans, deterministic diagnostics, and interpreter/VM/Native differential fixtures.",
   "No region variable, lifetime solver, outlives constraint, public lifetime projection, escape checker, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N303 authority is absent.",
   "The future implementation must preserve accepted Seed behavior, consume accepted types and checked Core only, avoid Rust lifetime leakage, and publish inference, escape, public-API, cross-package, FFI, diagnostic, and interpreter/VM/Native evidence before exposing v0.3 regions.",
+  "Accepted DEC-0120 authorizes only test-only region/lifetime boundary vocabulary; it does not close inference, escape, public lifetime, suspension, diagnostics, or FFI gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -11874,6 +11883,58 @@ notes = [
   "OWN-3203 is BlockedSpec by OWN-3201/OWN-3202, absent RFC-N303/RFC-0007, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, and unresolved region, public lifetime, suspension, Actor, and FFI contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no region variables, lifetime solver, outlives graph, returned-borrow or closure-region analysis, public lifetime projection, local/Actor/Task escape checker, or suspension crossing analysis; Seed has no Borrow/lifetime Core.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Seed Place lowering, future region/lifetime semantics, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3203-OBSERVATION"
+title = "Internal region-inference boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3202-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md",
+  "docs/decisions/0120-region-inference-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/region_inference_evidence.rs",
+  "docs/decisions/0120-region-inference-boundary-evidence.md",
+  "docs/status/OWN-3203-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3203-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0120 authorizes only test-only region/lifetime boundary evidence; no region, lifetime, inference, escape, public-lifetime, or diagnostic semantics are claimed.",
+  "The test-local inventory covers thirty-nine provisional boundaries for region/lifetime variables, lexical/non-lexical scopes, outlives/inference termination, reborrow and memory interactions, returns/closures/escapes, suspension/cancellation/Drop, public lifetime projection, separate compilation, cross-package/FFI/Native, diagnostics, projections, spans, differentials, deterministic inference, and Seed migration with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no region/lifetime Core, solver, escape checker, public protocol, or stale zero command is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "31f6c7ea06fe727ade85e9c07fce13a3f6174b47"
+completion_commit = "31f6c7ea06fe727ade85e9c07fce13a3f6174b47"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0120; OWN-3203 remains BlockedSpec for region inference, public lifetime projection, escape/suspension, diagnostics, FFI, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior is unchanged.",
 ]
 
 [[task]]
