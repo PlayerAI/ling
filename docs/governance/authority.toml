@@ -2990,3 +2990,16 @@ covers = ["NODE-5306 bounded Node/Actor boundary evidence", "test-only Node/Acto
 depends_on = ["DEC-0189", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0191"
+title = "Internal Node conformance boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0191-node-conformance-boundary-evidence.md"
+covers = ["NODE-5307 bounded Node conformance boundary evidence", "test-only Node conformance vocabulary", "conformance boundaries without runner/manifest/oracle/runtime semantics"]
+depends_on = ["DEC-0190", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
