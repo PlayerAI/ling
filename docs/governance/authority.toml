@@ -1742,3 +1742,16 @@ covers = ["TASK-2204 bounded scheduler observation trace", "deterministic schedu
 depends_on = ["DEC-0021", "DEC-0093", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0095"
+title = "Internal Actor identity/reference model"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0095-actor-identity-reference-model.md"
+covers = ["ACT-2301 bounded Actor identity/reference model", "deterministic Actor identity validation", "local/remote labels without runtime semantics"]
+depends_on = ["DEC-0002", "DEC-0090", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -2506,3 +2506,29 @@ unresolved_alternatives = [
   "Seed-to-order mapping, ready/wake tie-breaks, virtual-clock representation, fairness, exploration bounds, trace privacy/corruption, replay/equivalence, scheduler ABI, and migration remain open under GAP-STRUCTURED-TASK-001 and TASK-2204.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0095"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0095-actor-identity-reference-model.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build a model with multiple Actor types, instances, and Local/Remote reference labels and assert deterministic identity ordering.",
+  "Reject zero/unresolved identities, duplicate identities, unknown Actor types, and unknown reference targets before publication.",
+  "Compare equivalent models with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep turn/state/borrow/sendability, mailbox, scheduler, local/remote serialization, runtime, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled checked-data tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public protocol, Actor runtime, or v0.2 support claim is registered.",
+]
+unresolved_alternatives = [
+  "Actor identity lifetime/reuse, typed reference payloads, state/turn isolation, borrow/aliasing, Sendable/Resource/Capability rules, local/remote serialization, mailbox delivery, scheduler interaction, ABI, and migration remain open under the Actor gaps and ACT-2301.",
+]
+superseded_by = ""

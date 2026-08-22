@@ -17,6 +17,11 @@ publication. No Actor syntax, ActorTypeId/ActorId model, ActorRef type, state-is
 checker, turn runtime, borrow rule, serialization schema, diagnostic
 allocation, or placeholder G2 API was added.
 
+Accepted `DEC-0095` now authorizes the bounded child
+`ACT-2301-IDENTITY-MODEL`, which records only immutable structural identities
+and Local/Remote labels. It does not close any Actor semantic or runtime gap
+listed below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative; its identity/state checklist does
@@ -101,6 +106,10 @@ diagnostic, and schema crates.
 
 No compiler, interpreter, VM, bytecode, Actor runtime, diagnostic registry, schema,
 Semantic ID, source-span, scheduler, or Unicode 17.0.0 behavior changed.
+
+The child implementation report and authority audit provide focused evidence
+for the identity boundary; public Actor identity and state-isolation semantics
+remain blocked.
 
 ## Intentionally deferred
 

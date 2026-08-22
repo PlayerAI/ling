@@ -11,10 +11,16 @@ use std::fmt;
 
 use ling_source::Span;
 
+mod actor;
 mod lifecycle;
 mod scheduler;
 mod state_machine;
 
+pub use actor::{
+    ActorId, ActorIdentityError, ActorIdentityKind, ActorIdentityModel, ActorInstance,
+    ActorInstanceSpec, ActorRefId, ActorReference, ActorReferenceKind, ActorReferenceSpec,
+    ActorType, ActorTypeId, ActorTypeSpec,
+};
 pub use lifecycle::{
     FaultId, LifecycleEvent, LifecycleEventKind, LifecycleEventSpec, LifecycleIdentityKind,
     LifecycleTrace, LifecycleTraceError,
