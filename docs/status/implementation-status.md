@@ -307,6 +307,7 @@
 | `PKG-6403` | Registry Minimum Implementation or Deferment Strategy | `G6` | `L` | `BlockedSpec` | `PKG-6402` | `` |
 | `PKG-6404` | Supply-Chain Attack Tests | `G6` | `L` | `BlockedSpec` | `PKG-6403` | `` |
 | `PLC-4801` | Placement Constraint Model | `G4` | `M` | `BlockedSpec` | — | `` |
+| `PLC-4801-OBSERVATION` | Internal Placement-constraint boundary evidence | `G4` | `S` | `Done` | `ACC-4702-OBSERVATION` | `74011d062b0f63647f902111e24d310d74fb3976` |
 | `PLC-4802` | Static Candidates and Runtime Selection | `G4` | `M` | `BlockedSpec` | `PLC-4801` | `` |
 | `PLC-4803` | Cost Model v0 | `G4` | `M` | `BlockedSpec` | `PLC-4802` | `` |
 | `PLC-4804` | Placement Explain Output | `G4` | `M` | `BlockedSpec` | `PLC-4803` | `` |

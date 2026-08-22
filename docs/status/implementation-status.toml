@@ -17882,10 +17882,10 @@ acceptance = [
   "cargo test -p ling-types --test placement_constraint_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "74011d062b0f63647f902111e24d310d74fb3976"
+completion_commit = "74011d062b0f63647f902111e24d310d74fb3976"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0172; PLC-4801 remains BlockedSpec for syntax, solver, topology, capability, fallback, explain/replay/cache, diagnostics, and support claims.",
   "No Placement grammar, dependency, target package, manifest, solver API, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",
