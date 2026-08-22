@@ -8243,6 +8243,59 @@ notes = [
 ]
 
 [[task]]
+id = "EFF-2104-REJECTION-GATE"
+title = "Internal unresolved-handler execution rejection gate"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2103-HIR"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0006.md",
+  "docs/decisions/0063-first-order-handler-core.md",
+  "docs/decisions/0066-handler-hir-projection.md",
+  "docs/decisions/0088-effect-handler-execution-rejection-gate.md",
+  "docs/ERROR-CODES.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-cli/tests/handler_boundary.rs",
+  "docs/decisions/0088-effect-handler-execution-rejection-gate.md",
+  "docs/status/EFF-2104-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2104-REJECTION-GATE-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2104-REJECTION-GATE-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0088 authorizes only the existing L-EFFECT-0004 rejection through the shared CLI compiler; handler runtime semantics remain deferred.",
+  "The fixture returns the registered bilingual L-EFFECT-0004 diagnostic with an original source span and publishes no checked ProgramSnapshot.",
+  "No operation dispatch, continuation, resume, residual runtime row, State/Fault/cancellation, bytecode, VM, ABI, differential, or public protocol behavior is added.",
+  "Focused ling-cli fixture, format, clippy, CI, governance, status, and diff gates pass without changing language semantics, diagnostic registry, schemas, Semantic IDs, runtime, VM, ABI, dependencies, or Unicode 17.0.0 data.",
+]
+verified_against_commit = "e265b451985a2afac071da6862c4bf9451faf9a0"
+completion_commit = "e265b451985a2afac071da6862c4bf9451faf9a0"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This bounded child is complete under DEC-0088; public EFF-2104 remains BlockedSpec for handler execution, continuation, Fault/State/cancellation, bytecode/VM ABI, and differential authority.",
+  "The test is negative evidence only and cannot be used to claim handler syntax or runtime support.",
+]
+
+[[task]]
 id = "EFF-2105"
 title = "Effect fuzz and property tests"
 state = "BlockedSpec"
