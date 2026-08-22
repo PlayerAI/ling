@@ -2392,3 +2392,16 @@ covers = ["DAP-3601 bounded debugger boundary evidence", "test-only DAP/debugger
 depends_on = ["DEC-0143", "DEC-0012", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0145"
+title = "Internal Zed debugger registration boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0145-zed-debugger-registration-boundary-evidence.md"
+covers = ["DAP-3602 bounded Zed debugger-registration boundary evidence", "test-only Zed extension/debugger vocabulary", "editor boundaries without package/registration/protocol semantics"]
+depends_on = ["DEC-0144", "DEC-0143", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

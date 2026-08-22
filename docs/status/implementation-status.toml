@@ -14724,6 +14724,7 @@ spec = [
   "docs/RFC-0014.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
+  "docs/decisions/0145-zed-debugger-registration-boundary-evidence.md",
   "docs/ling_execution_plan/05-ZED-EXTENSION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -14732,6 +14733,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DAP-3602-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3602-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3602-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0145-zed-debugger-registration-boundary-evidence.md",
+  "crates/ling-types/tests/zed_debugger_registration_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14741,6 +14750,7 @@ acceptance = [
   "The audit covers manifest/config/registration, adapter/version/capability, launch/attach/build/run/root/environment, .ling/UTF-8 mapping, breakpoint/step/stack/scope/variable/Fault/ownership, malformed/missing executable/cancel/timeout/permission/multi-session, VM/Native smoke/differential, migration, and offline evidence without unverified claims.",
   "No Zed package, manifest, debugger registration, adapter discovery, build task, stale zero command, dependency, toolchain, diagnostic allocation, public protocol implementation, or placeholder API is added while DAP-3601, debugger, VM/Native, identity, and semantic-protocol authority are absent.",
   "The future implementation must use the authoritative ling CLI and .ling extension, consume verified artifacts only, keep editor/host details outside Ling semantics, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before claiming Zed support.",
+  "Accepted DEC-0145 authorizes only test-local Zed debugger-registration boundary evidence; it does not close extension packaging, manifest/configuration, registration/discovery, launch mapping, permissions, DAP integration, protocol inventory, or public support claims.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14751,6 +14761,64 @@ notes = [
   "The repository contains only the Zed planning document: no extension package, manifest, language config, debugger registration, adapter, launch task, or executable locator exists; RFC-0014/RFC-0018/RFC-0019 provide only experimental VM/source-map/Fault foundations.",
   "The plan's zero build spelling is stale; the audit adds no command and preserves ling/.ling naming. No editor dependency, transport, toolchain, or extension state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, CLI, extension, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "DAP-3602-OBSERVATION"
+title = "Internal Zed debugger registration boundary evidence"
+state = "Done"
+release = "G3+"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DAP-3601-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/decisions/0144-dap-debugger-boundary-evidence.md",
+  "docs/decisions/0145-zed-debugger-registration-boundary-evidence.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/zed_debugger_registration_evidence.rs",
+  "docs/decisions/0145-zed-debugger-registration-boundary-evidence.md",
+  "docs/status/DAP-3602-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3602-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0145 authorizes only test-local Zed debugger-registration boundary evidence; no extension package, manifest, language configuration, debugger registration, adapter locator, launch task, ling build contract, diagnostic, dependency, protocol, or public editor support claim is made.",
+  "The test-local inventory covers sixty provisional boundaries for package/manifest/configuration/registration/discovery/installation/version compatibility, launch/attach/build/run/root/source/environment/profile/target/capability mapping, identity/session/security/limits, malformed configuration, offline/platform/update behavior, debug mappings, Typed Core input, host exclusions, diagnostics/Unicode/Semantic IDs, fixtures, smoke/deterministic evidence, and protocol inventory separation.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no extension, debugger, source-map, diagnostic, Semantic ID, Native, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0145; DAP-3602 remains BlockedSpec for extension packaging/configuration, registration/discovery, launch mapping, permissions, DAP/session integration, metadata, fixtures, protocol inventory, and Zed support claims.",
+  "No parser, AST/HIR/Checked Core node, extension package, manifest, language config, debugger registration, adapter locator, build/run task, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
