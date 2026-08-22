@@ -360,6 +360,7 @@
 | `REP-2506` | Cross-process replay acceptance | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504`, `REP-2505` | `` |
 | `REP-2506-OBSERVATION` | Internal cross-process replay acceptance boundary evidence | `G2` | `S` | `Done` | `REP-2505-OBSERVATION` | `b24983f1807307a48b0e2c2a063702a6a43fff72` |
 | `SIMD-4301` | Vectorization Legality Analysis | `G4` | `M` | `BlockedSpec` | `CPU-4203` | `` |
+| `SIMD-4301-OBSERVATION` | Internal SIMD legality boundary evidence | `G4` | `S` | `Done` | `CPU-4203-OBSERVATION` | `d4a04a70d8ab207d3bb245987abc31bbf439fe16` |
 | `SIMD-4302` | Portable SIMD IR | `G4` | `M` | `BlockedSpec` | `SIMD-4301` | `` |
 | `SIMD-4303` | SIMD Differential | `G4` | `M` | `BlockedSpec` | `SIMD-4302` | `` |
 | `STAB-6101` | Support-Matrix Item Audit | `G6` | `L` | `BlockedSpec` | `CBK-5903` | `` |
