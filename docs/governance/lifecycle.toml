@@ -3831,3 +3831,29 @@ unresolved_alternatives = [
   "Extension package/manifest identity and versions; language configuration and registration; adapter discovery/install/update; Zed/DAP compatibility; launch/attach/build/run/root/environment/profile/target/capability mapping; source/binary/session identity; security, permissions, trust, cancellation, timeouts, errors, platform and offline behavior; VM/Native metadata and debug mappings; diagnostics, Unicode, Semantic IDs, fixtures, smoke tests, migration, and protocol inventory remain open under DAP-3602, DAP-3601, DIFF-3702, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-NATIVE-BACKEND-ABI-001, and missing debugger/Native/editor authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0146"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty provisional staged-debugger boundaries and their test-local order.",
+  "Compare forward and reversed insertion order and require identical opaque evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep capability negotiation, stage semantics, inspection/condition sandbox, attach, Task/Actor behavior, security, protocol readers/migrations, and public support behavior deferred until the required authorities are Accepted.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed tests, source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No debugger capability, runtime hook, condition evaluator, attach authorization, Task/Actor view, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Stage ordering and support gates; stop/breakpoint/step/source-map/identity; stack/scope/variable/ownership/Fault behavior; condition/logpoint sandboxing; attach authentication/session; target/profile/VM/Native selection; Task/Actor lifecycle, suspension/reentry, mailbox and supervision; malformed messages, timeouts, diagnostics, Unicode, Semantic IDs, fixtures, migration, protocol inventory, and editor integration remain open under DAP-3603, DAP-3601/3602, DIFF-3702, GAP-STRUCTURED-TASK-001, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-NATIVE-BACKEND-ABI-001, and missing debugger/Native/Task/Actor authority.",
+]
+superseded_by = ""

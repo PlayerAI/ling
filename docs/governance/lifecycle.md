@@ -176,6 +176,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0143` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0143](../decisions/0143-allowed-difference-registry-boundary-evidence.md) |
 | `DEC-0144` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0144](../decisions/0144-dap-debugger-boundary-evidence.md) |
 | `DEC-0145` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0145](../decisions/0145-zed-debugger-registration-boundary-evidence.md) |
+| `DEC-0146` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0146](../decisions/0146-staged-debugger-capability-boundary-evidence.md) |
 
 ## Migration boundary
 

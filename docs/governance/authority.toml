@@ -2405,3 +2405,16 @@ covers = ["DAP-3602 bounded Zed debugger-registration boundary evidence", "test-
 depends_on = ["DEC-0144", "DEC-0143", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0146"
+title = "Internal staged debugger capability boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md"
+covers = ["DAP-3603 bounded staged-debugger capability boundary evidence", "test-only debugger stage/inspection vocabulary", "capability boundaries without runtime/Task/Actor/protocol semantics"]
+depends_on = ["DEC-0145", "DEC-0144", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

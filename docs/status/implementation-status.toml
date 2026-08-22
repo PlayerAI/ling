@@ -14843,6 +14843,7 @@ spec = [
   "docs/RFC-0014.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
+  "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md",
   "docs/ling_execution_plan/05-ZED-EXTENSION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -14851,6 +14852,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DAP-3603-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md",
+  "crates/ling-types/tests/staged_debugger_capability_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14860,6 +14869,7 @@ acceptance = [
   "The audit covers stage-by-stage positive/negative fixtures, source-map/UTF-8 positions, breakpoints/steps/stacks/scopes/variables/Fault/ownership, condition/logpoint sandboxing, attach authentication, Task/Actor suspension/reentry/cancel/mailbox, malformed messages, timeouts/resource limits, VM/Native differential, migration, and deterministic evidence without unverified claims.",
   "No debugger capability, runtime hook, condition evaluator, dependency, toolchain, diagnostic allocation, public protocol implementation, extension integration, stale zero command, or placeholder API is added while DAP-3601/3602 and the VM/Native/Task/Actor/identity/semantic-protocol authorities are unresolved.",
   "The future implementation must consume verified Typed Core/derived artifacts only, keep host/debugger details outside Ling semantics, retain UTF-8 spans and Semantic IDs, use the authoritative ling/.ling names, and publish bilingual diagnostics and Unicode 17.0.0 evidence before claiming debugger capabilities.",
+  "Accepted DEC-0146 authorizes only test-local staged-debugger capability boundary evidence; it does not close stage semantics, inspection/condition sandboxing, attach, Task/Actor behavior, security, protocol integration, fixtures, or debugger support claims.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14871,6 +14881,64 @@ notes = [
   "The plan's zero commands are stale; the audit adds no command and preserves ling/.ling naming. No debugger dependency, transport, toolchain, runtime, or extension state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, CLI, extension, or Unicode 17.0.0 behavior.",
 ]
+[[task]]
+id = "DAP-3603-OBSERVATION"
+title = "Internal staged debugger capability boundary evidence"
+state = "Done"
+release = "G3+"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DAP-3602-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/decisions/0145-zed-debugger-registration-boundary-evidence.md",
+  "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/staged_debugger_capability_evidence.rs",
+  "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md",
+  "docs/status/DAP-3603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0146 authorizes only test-local staged-debugger capability boundary evidence; no debugger stage, runtime hook, condition evaluator, attach path, Actor/Task view, diagnostic, dependency, protocol, or public support claim is made.",
+  "The test-local inventory covers sixty provisional boundaries for stages/capabilities/stops/breakpoints/steps/source and binary identity, stacks/scopes/variables/Resource/Managed/ownership/Fault, condition/logpoint sandboxing and rejection, attach/session/security/limits, target/profile/VM/Native choice, Task/Actor lifecycle and observations, malformed/unknown messages, fixtures, deterministic/cross-engine evidence, diagnostics/Unicode/Semantic IDs, host exclusion, and protocol inventory separation.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no debugger, condition, attach, Task/Actor, diagnostic, Semantic ID, Native, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0146; DAP-3603 remains BlockedSpec for stage semantics, inspection/condition sandboxing, attach, Task/Actor behavior, security, protocol integration, fixtures, and debugger support claims.",
+  "No parser, AST/HIR/Checked Core node, debugger capability, runtime hook, condition evaluator, attach path, Actor/Task view, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
+]
+
 [[task]]
 id = "KCHK-4101"
 title = "Kernel allowed capability matrix"
