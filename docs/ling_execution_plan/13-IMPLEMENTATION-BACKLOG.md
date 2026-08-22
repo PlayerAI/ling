@@ -355,6 +355,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `FFI-3604` | G3 | Target Primitive Package | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:460`, `docs/status/FFI-3604-AUTHORITY-AUDIT.md` |
 | `FFI-3604-OBSERVATION` | G3 | Internal Target Primitive Package boundary evidence | S | Done | Accepted `DEC-0140`; see `crates/ling-types/tests/target_primitive_package_evidence.rs` and `docs/status/FFI-3604-OBSERVATION-IMPLEMENTATION-REPORT.md`; package/capability/TCB semantics remain BlockedSpec |
 | `FFI-3605` | G3 | FFI fuzz/sanitizer 套件 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:476`, `docs/status/FFI-3605-AUTHORITY-AUDIT.md` |
+| `FFI-3605-OBSERVATION` | G3 | Internal FFI fuzz and sanitizer boundary evidence | S | Done | Accepted `DEC-0141`; see `crates/ling-types/tests/ffi_fuzz_sanitizer_evidence.rs` and `docs/status/FFI-3605-OBSERVATION-IMPLEMENTATION-REPORT.md`; fuzz/sanitizer/security semantics remain BlockedSpec |
 | `DIFF-3701` | G3 | 三方 Harness | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:492`, `docs/status/DIFF-3701-AUTHORITY-AUDIT.md` |
 | `DIFF-3702` | G3 | 已允许差异登记表 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:512`, `docs/status/DIFF-3702-AUTHORITY-AUDIT.md` |
 | `DAP-3601` | G3+ | `zero dap --stdio` | — | BlockedSpec | `05-ZED-EXTENSION.md:526`, `docs/status/DAP-3601-AUTHORITY-AUDIT.md` |

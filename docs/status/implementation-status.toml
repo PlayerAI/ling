@@ -14260,6 +14260,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/FFI-3605-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3605-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3605-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0141-ffi-fuzz-sanitizer-boundary-evidence.md",
+  "crates/ling-types/tests/ffi_fuzz_sanitizer_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14269,6 +14277,7 @@ acceptance = [
   "The audit covers deterministic adversarial corpus, minimized reproducers, independent sanitizer/fuzz runs, callback/allocator/unwind/Capability cases, crash/timeout/resource/suppression policy, cross-target and foreign-compiler differential, provenance/license/TCB, schema migration, and offline evidence without unverified claims.",
   "No fuzz target, sanitizer configuration, C harness, hostile library, test dependency, toolchain, corpus/result schema, diagnostic allocation, public protocol implementation, or placeholder API is added while RFC-N305, RFC-0007, RFC-0011, PROTO-ABI, and PROTO-EVIDENCE authority are absent.",
   "The future implementation must preserve v0.0.1 Seed behavior, keep host crashes/timing/addresses/sanitizer text outside Ling semantics, consume verified ABI/ownership contracts only, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before claiming FFI safety coverage.",
+  "Accepted DEC-0141 authorizes only test-local FFI fuzz and sanitizer boundary evidence; it does not close harness/corpus/mutation, sanitizer/toolchain, crash/coverage/resource bounds, security, provenance, cross-target/compiler, diagnostics, or public protocol contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14278,6 +14287,61 @@ notes = [
   "FFI-3605 is BlockedSpec by FFI-3604, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, absent RFC-N305/RFC-0007/RFC-0011, and the unimplemented PROTO-ABI/PROTO-EVIDENCE registry entries.",
   "The current workspace has no accepted FFI/Native backend, target package, C harness, sanitizer configuration, fuzz corpus, hostile foreign-library adapter, callback/allocator runtime, cross-target matrix, or public result protocol; no FFI toolchain or test dependency state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "FFI-3605-OBSERVATION"
+title = "Internal FFI fuzz and sanitizer boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["FFI-3604-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0140-target-primitive-package-boundary-evidence.md",
+  "docs/decisions/0141-ffi-fuzz-sanitizer-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/ffi_fuzz_sanitizer_evidence.rs",
+  "docs/decisions/0141-ffi-fuzz-sanitizer-boundary-evidence.md",
+  "docs/status/FFI-3605-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3605-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0141 authorizes only test-local FFI fuzz and sanitizer boundary evidence; no fuzz target, sanitizer configuration, native dependency, unsafe code, corpus, crash artifact, security result, diagnostic, toolchain, public protocol, or executable FFI is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for corpus/harness/target, declaration/ABI/shim/target loaders, malformed/unknown/truncated/oversized input and arithmetic/layout/encoding rejection, pointer/bounds/alignment, callback/thread/allocator/ownership/borrow/Fault/cancellation/capability/profile failures, linker/tamper/provenance/license/TCB, deterministic/reproducible/offline/cross-target/compiler runs, sanitizer classes, leak/coverage/crash/corpus/timeout/memory bounds, bilingual diagnostics/Unicode, public-protocol and Semantic-ID separation, host-output exclusion, and Seed compatibility.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no fuzz, sanitizer, security, provenance, Semantic ID, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0141; FFI-3605 remains BlockedSpec for fuzz harness, sanitizer/toolchain, crash/coverage/resource bounds, security, provenance, cross-target/compiler, diagnostics, and public protocol decisions.",
+  "No parser, AST/HIR/Checked Core node, fuzz target, sanitizer configuration, native dependency, unsafe code, generated corpus, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

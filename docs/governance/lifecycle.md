@@ -171,6 +171,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0138` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0138](../decisions/0138-c-abi-interoperability-boundary-evidence.md) |
 | `DEC-0139` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0139](../decisions/0139-ffi-shim-generator-boundary-evidence.md) |
 | `DEC-0140` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0140](../decisions/0140-target-primitive-package-boundary-evidence.md) |
+| `DEC-0141` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0141](../decisions/0141-ffi-fuzz-sanitizer-boundary-evidence.md) |
 
 ## Migration boundary
 

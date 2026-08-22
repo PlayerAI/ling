@@ -2340,3 +2340,16 @@ covers = ["FFI-3604 bounded Target Primitive Package boundary evidence", "test-o
 depends_on = ["DEC-0139", "DEC-0138", "DEC-0137", "DEC-0128", "DEC-0127", "DEC-0124", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0141"
+title = "Internal FFI fuzz and sanitizer boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0141-ffi-fuzz-sanitizer-boundary-evidence.md"
+covers = ["FFI-3605 bounded FFI fuzz and sanitizer boundary evidence", "test-only fuzz/sanitizer vocabulary", "fuzz boundaries without security/toolchain/runtime semantics"]
+depends_on = ["DEC-0140", "DEC-0139", "DEC-0138", "DEC-0137", "DEC-0124", "DEC-0117", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
