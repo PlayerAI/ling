@@ -58,6 +58,7 @@
 | `BACK-3505-OBSERVATION` | Internal Native reproducible-build boundary evidence | `G3` | `S` | `Done` | `BACK-3504-OBSERVATION` | `a4ecedcad8d26eb396e0af7ce2be6b2f6e3c8363` |
 | `BASE-0001` | 仓库基线盘点与执行计划落位 | `G0` | `S` | `Done` | — | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | `BND-5201` | Bound Types and Expressions | `G5` | `M` | `BlockedSpec` | `PROF-5104` | `` |
+| `BND-5201-OBSERVATION` | Internal Bound types/expressions boundary evidence | `G5` | `S` | `Done` | `PROF-5104-OBSERVATION` | `a41323f755cdb2283aed9d7197f0dfe46ab51c77` |
 | `BND-5202` | Loop and Recursion Checks | `G5` | `M` | `BlockedSpec` | `BND-5201` | `` |
 | `BND-5203` | Memory Budget Analysis | `G5` | `M` | `BlockedSpec` | `BND-5202` | `` |
 | `BND-5204` | Resource Budget Diagnostics | `G5` | `M` | `BlockedSpec` | `BND-5203` | `` |

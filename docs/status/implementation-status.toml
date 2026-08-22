@@ -18899,10 +18899,10 @@ acceptance = [
   "cargo test -p ling-types --test bound_types_expressions_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "a41323f755cdb2283aed9d7197f0dfe46ab51c77"
+completion_commit = "a41323f755cdb2283aed9d7197f0dfe46ab51c77"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0181; BND-5201 remains BlockedSpec for grammar, checked representation, arithmetic, solver, proof/resource semantics, profile/target integration, diagnostics, CLI/editor integration, and support claims.",
   "No Bound AST/HIR/Typed-Core node, solver, profile parameter, dependency, target package, manifest, diagnostic, CLI/LSP option, runtime, or Unicode behavior was added.",
