@@ -3172,3 +3172,16 @@ covers = ["MC-5603 bounded Model-Check Report boundary evidence", "test-only rep
 depends_on = ["DEC-0203", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0205"
+title = "Internal Replay Counterexample boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0205-replay-counterexample-boundary-evidence.md"
+covers = ["MC-5604 bounded Replay Counterexample boundary evidence", "test-only replay-conversion vocabulary", "replay boundaries without converter/scheduler/runtime semantics"]
+depends_on = ["DEC-0204", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

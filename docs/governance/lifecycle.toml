@@ -5255,3 +5255,27 @@ unresolved_alternatives = [
   "Versioned report schema and canonical bytes; result validity for CounterexampleFound/NoCounterexampleWithinBounds/Inconclusive/InvalidModel, invalid property, timeout/memory/resource exhaustion, unknown/malformed/corrupt/unsupported-version and fail-closed behavior; model/property/bound/assumption/counterexample/replay/Semantic IDs and source spans; scheduler/time configuration, explored counts and resource disclosure; tool identity, provenance/checksum/signature/redaction, unknown fields/migration and deterministic ordering; counterexample/replay/proof/evidence linkage; independent verification, diagnostics/exit codes, positive/negative and every result-state/bound/counterexample/malformed/Unicode/differential fixture; protocol inventory and public support remain open under MC-5603, MC-5602, MC-5604, RFC-K506, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing report authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0205"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0205-replay-counterexample-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty replay-counterexample categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer converter/replay/runtime implementation, event/scheduler/effect/source-link semantics, schemas, diagnostics, protocols, and public support until accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing differential/cancellation/query-scheduler evidence is not reinterpreted as model-counterexample replay.",
+  "No converter, replay schema/reader/writer, scheduler trace, reference-runtime route, source-link protocol, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Checked-model/exploration-result/counterexample conversion; replay fixture, schema, reader/writer and reference-runtime route; model/runtime/scheduler/counterexample/replay identities; scheduler policy, logical clock, inputs, host effects, state snapshots/checksums, Fault/restart and event ordering; mailbox/backpressure/reentry/drop/expiry/cancellation/ownership/capability/resource semantics; stable Semantic IDs, original UTF-8 spans and checked snapshot identity; provenance/checksum/signature/redaction/privacy; divergence, malformed/corrupt/unknown-field/unsupported-version/migration/unavailable-input/unsupported-Fault and fail-closed behavior; diagnostics, positive/negative/divergence/source-link/Unicode/determinism fixtures, protocol inventory, and public support remain open under MC-5604, MC-5603, RFC-K506, GAP-DETERMINISTIC-REPLAY-001, GAP-CRITICAL-PROFILE-001, PROTO-REPLAY, PROTO-EVIDENCE, and missing replay authority.",
+]
+superseded_by = ""
