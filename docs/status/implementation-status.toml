@@ -6310,6 +6310,60 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2305-IDENTIFIER-OBSERVATION"
+title = "Internal rename-identifier Unicode observation"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2304-REVERSE-INDEX"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0077-ide-rename-identifier-observation.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "Cargo.lock",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/rename_identifier.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0077-ide-rename-identifier-observation.md",
+  "docs/status/IDE-2305-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2305-IDENTIFIER-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0077 authorizes only a pure in-process observation delegated to ling-unicode::inspect_identifier; no name-acceptance policy is invented.",
+  "The observation preserves raw spelling and NFC name, copies Unicode 17 Script/Identifier_Type/status/skeleton/mixed-script facts, and returns the existing IdentifierError for invalid input.",
+  "Owned strings and the authoritative sorted Unicode tables make repeated observations equal without map-order, host-path, allocation-address, locale, cache, or protocol state.",
+  "Focused cargo fmt, ling-db check/tests, and subsequent repository gates pass; decomposed/NFC, confusable mixed-script, invalid XID, repeated deterministic, and raw-spelling cases are covered.",
+  "The public IDE-2305 prepare-rename target remains BlockedSpec for keywords, targets, ranges, aliases, collisions, visibility/coherence, snapshots, versions, diagnostics, edits, and protocol behavior.",
+]
+verified_against_commit = "e2681b0fe08ec95805e6a1346b3e8693ba83a3af"
+completion_commit = "e2681b0fe08ec95805e6a1346b3e8693ba83a3af"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The observation is a Unicode fact boundary only; Allowed/Restricted and suspicious mixed-script values are not rename acceptance decisions and no keyword classifier is duplicated.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, Semantic ID change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2305"
 title = "IDE prepare rename"
 state = "BlockedSpec"

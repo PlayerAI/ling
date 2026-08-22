@@ -151,6 +151,7 @@
 | `IDE-2304` | IDE references | `G1` | `M` | `BlockedSpec` | `IDE-2303`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2304-REVERSE-INDEX` | Internal resolved-reference reverse index | `G1` | `S` | `Done` | `IDE-2303-REFERENCE-INDEX` | `29854ae695f58c611518190b5fcc58263458c6b0` |
 | `IDE-2305` | IDE prepare rename | `G1` | `M` | `BlockedSpec` | `IDE-2304`, `LSP-2102` | `` |
+| `IDE-2305-IDENTIFIER-OBSERVATION` | Internal rename-identifier Unicode observation | `G1` | `S` | `Done` | `IDE-2304-REVERSE-INDEX` | `e2681b0fe08ec95805e6a1346b3e8693ba83a3af` |
 | `IDE-2306` | IDE rename | `G1` | `L` | `BlockedSpec` | `IDE-2305`, `LSP-2102`, `LSP-2104` | `` |
 | `IDE-2307` | IDE completion v0 | `G1` | `L` | `BlockedSpec` | `IDE-2304`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2308` | IDE completion resolve | `G1` | `M` | `BlockedSpec` | `IDE-2307`, `LSP-2101`, `LSP-2102` | `` |
