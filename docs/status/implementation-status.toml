@@ -17658,10 +17658,10 @@ acceptance = [
   "cargo test -p ling-types --test accelerator_plugin_interface_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "c62cfabb7b17cf46ca85c78c803b30b04fe6bf91"
+completion_commit = "c62cfabb7b17cf46ca85c78c803b30b04fe6bf91"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0170; ACC-4701 remains BlockedSpec for plugin ABI, registry/loader, trust, capability, cache, protocol, and support claims.",
   "No accelerator plugin, dependency, target package, manifest, capability API, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",

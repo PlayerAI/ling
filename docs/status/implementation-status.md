@@ -30,6 +30,7 @@
 | Task | Title | Release | Size | State | Dependencies | Completion commit |
 | --- | --- | --- | --- | --- | --- | --- |
 | `ACC-4701` | Accelerator Plugin Interface | `G4` | `M` | `BlockedSpec` | — | `` |
+| `ACC-4701-OBSERVATION` | Internal accelerator-plugin interface boundary evidence | `G4` | `S` | `Done` | `GPU-4605-OBSERVATION` | `c62cfabb7b17cf46ca85c78c803b30b04fe6bf91` |
 | `ACC-4702` | Experimental Accelerator Adapter | `G4` | `M` | `BlockedSpec` | `ACC-4701` | `` |
 | `ACT-2301` | Actor identity and state isolation | `G2` | `M` | `BlockedSpec` | `TASK-2203` | `` |
 | `ACT-2301-ACTOR-SYNTAX-REJECTION` | Internal Actor-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `44bb344db86ad8c1039d8a974f5d608c7c1eff9a` |
