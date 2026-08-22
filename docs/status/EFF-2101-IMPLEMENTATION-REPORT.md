@@ -7,6 +7,8 @@ model in `crates/ling-effects/src/v2.rs`. It is intentionally separate from
 the v0.0.1 Seed `EffectRow` so existing compiler, evaluator, bytecode, and
 protocol behavior remains unchanged.
 
+Milestone commit: `4a3a33b` (`feat(effects): add RFC-0006 core row model`).
+
 本里程碑在 `crates/ling-effects/src/v2.rs` 中实现 RFC-0006 的实验性 v0.2
 Effect 核心数据模型，并与 v0.0.1 Seed `EffectRow` 隔离，保持现有编译器、
 求值器、字节码和协议行为不变。
