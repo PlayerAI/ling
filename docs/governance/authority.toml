@@ -2860,3 +2860,16 @@ covers = ["PROF-5104 bounded Profile Audit/LSP boundary evidence", "test-only pr
 depends_on = ["DEC-0179", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0181"
+title = "Internal Bound types/expressions boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0181-bound-types-expressions-boundary-evidence.md"
+covers = ["BND-5201 bounded Bound types/expressions boundary evidence", "test-only Bound vocabulary", "Bound boundaries without syntax/solver/resource semantics"]
+depends_on = ["DEC-0180", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

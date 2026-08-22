@@ -211,6 +211,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0178` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0178](../decisions/0178-forbidden-capability-boundary-evidence.md) |
 | `DEC-0179` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0179](../decisions/0179-profile-composition-boundary-evidence.md) |
 | `DEC-0180` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0180](../decisions/0180-profile-audit-lsp-boundary-evidence.md) |
+| `DEC-0181` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0181](../decisions/0181-bound-types-expressions-boundary-evidence.md) |
 
 ## Migration boundary
 

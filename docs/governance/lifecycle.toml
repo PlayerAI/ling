@@ -4679,3 +4679,27 @@ unresolved_alternatives = [
   "Audit schema/version/lifecycle; checked-fact provenance; Effect/capability/unbounded finding taxonomy; Profile/target identity; Semantic ID and UTF-8 byte-span relation; related ranges, severity, stable codes, facts, localization, redaction, unknown fields and migration; `ling` profile selection, manifest/config precedence, check/audit/explain command behavior, human/JSON formats, exit statuses and offline rules; LSP initialization, capability negotiation, URI/FileId, document version, UTF-16/UTF-8 position encoding, workspace/profile context, cancellation, stale-result rejection, deterministic publication, limits and error mapping; source mapping and quick-fix safety; Unicode/CRLF, transitive, bounds, revision, cancellation, stale, JSON migration, privacy and differential fixtures; protocol inventory and public status remain open under PROF-5104, PROF-5103, GAP-CRITICAL-PROFILE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and missing Profile/RFC-K501/RFC-0012 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0181"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0181-bound-types-expressions-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Bound/type/expression boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer grammar, type/constraint rules, units, arithmetic, proof/runtime states, resource integration, diagnostics, CLI, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing implementation safety limits are not reinterpreted as Bound semantics.",
+  "No Bound AST/HIR/Typed-Core node, constraint solver, profile parameter API, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Bound grammar and checked representation; constant/Profile parameter scope; range/capacity types; units, domains, variance and Nat/Int arithmetic; overflow/underflow, unknown/symbolic values, canonical bytes; collection, loop, recursion, Task/Actor, stack/arena, message and Device soundness; ownership/effect/capability/scheduler/cancellation/Fault/fallback relations; proof, runtime-guarded, forbidden and assumed states; profile/target limits; bilingual diagnostics and source facts; positive/negative/arithmetic/symbolic/Unicode/differential fixtures; protocol inventory and public status remain open under BND-5201, PROF-5104, GAP-CRITICAL-PROFILE-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-OWNERSHIP-MODEL-001, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing RFC-K504 authority.",
+]
+superseded_by = ""
