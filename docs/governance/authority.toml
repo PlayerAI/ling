@@ -41,6 +41,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0050"
+title = "Seed Zed extension acceptance inventory gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0050-seed-zed-extension-acceptance-inventory-gate.md"
+covers = ["internal Zed extension acceptance inventory", "editor-only evidence boundary", "ZED-6803-SEED evidence"]
+depends_on = ["RFC-0004", "DEC-0049", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0038"
 title = "CLI init command"
 kind = "Decision"

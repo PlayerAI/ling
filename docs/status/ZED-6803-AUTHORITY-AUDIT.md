@@ -15,7 +15,8 @@ crash/restart harness, or marketplace artifact.
 
 The acceptance matrix records `Covered`, `Partial`, `Unsupported`, and `Future`
 rows without promoting the narrower grammar evidence into a full editor
-support claim.
+support claim. The existing Preview `ling lsp --stdio` lifecycle is not an
+editor-feature or marketplace package.
 
 ## Normative traceability
 
@@ -60,3 +61,7 @@ LSP, formatter, semantic mutation, task/runnable integration, Replay/Evidence
 navigation, crash/restart handling, large-workspace limits, Zed package
 metadata, clean install, and marketplace publication remain deferred or
 explicitly unsupported.
+
+The internal `cargo xtask zed-extension verify` command protects the thirteen
+acceptance rows and nine evidence files without running npm, creating a Zed
+manifest, or claiming a marketplace package.

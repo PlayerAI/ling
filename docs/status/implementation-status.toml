@@ -14781,6 +14781,68 @@ notes = [
 ]
 
 [[task]]
+id = "ZED-6803-SEED"
+title = "Seed Zed extension acceptance inventory drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ZED-6802-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0050-seed-zed-extension-acceptance-inventory-gate.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "docs/status/ZED-6803-AUTHORITY-AUDIT.md",
+  "docs/testing/ZED-EXTENSION-ACCEPTANCE.md",
+  "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
+  "docs/status/TS-3108-IMPLEMENTATION-REPORT.md",
+  "docs/status/ZQ-3201-IMPLEMENTATION-REPORT.md",
+  "docs/status/ZQ-3202-IMPLEMENTATION-REPORT.md",
+  "docs/status/ZQ-3203-IMPLEMENTATION-REPORT.md",
+]
+artifacts = [
+  "tools/xtask/src/zed_extension.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0050-seed-zed-extension-acceptance-inventory-gate.md",
+  "docs/status/ZED-6803-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6803-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/testing/ZED-EXTENSION-ACCEPTANCE.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask zed-extension verify deterministically validates thirteen acceptance areas, four covered, four partial, five unsupported, two future classifications, and nine evidence files with non-empty evidence/boundary cells.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, missing authority/no-promotion markers, missing package/query/TS/ZQ evidence markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate and does not run npm, generate a parser, contact a registry, create an extension manifest, start an LSP process, allocate public diagnostics, or claim marketplace support.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0050 closes only this internal Seed editor-inventory child; the parent ZED-6803 gate remains BlockedSpec for full Zed/LSP acceptance and release evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "blocked"
+completed = ""
+notes = [
+  "The verifier protects editor acceptance inventory only; the existing grammar/query package and TS/ZQ reports remain editor evidence, not language or Stable Zed authority.",
+  "No extension manifest, LSP feature, formatter, task/runnable, Replay/Evidence UI, install path, marketplace package, network request, system configuration, or placeholder public API is added.",
+]
+
+[[task]]
 id = "ZED-6803"
 title = "Full Zed Extension Acceptance"
 state = "BlockedSpec"
@@ -14813,6 +14875,7 @@ spec = [
   "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
   "docs/testing/ZED-EXTENSION-ACCEPTANCE.md",
+  "docs/decisions/0050-seed-zed-extension-acceptance-inventory-gate.md",
 ]
 artifacts = [
   "docs/status/ZED-6803-AUTHORITY-AUDIT.md",
