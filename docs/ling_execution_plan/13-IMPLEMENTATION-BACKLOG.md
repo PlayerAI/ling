@@ -471,6 +471,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CTR-5407` | G5 | Contract LSP/Zed | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:375`, `docs/status/CTR-5407-AUTHORITY-AUDIT.md` |
 | `CTR-5407-OBSERVATION` | G5 | Internal Contract LSP/Zed boundary evidence | S | Done | Accepted `DEC-0198`; see `crates/ling-types/tests/contract_lsp_zed_evidence.rs` and `docs/status/CTR-5407-OBSERVATION-IMPLEMENTATION-REPORT.md`; editor/projection/transaction semantics remain BlockedSpec |
 | `PROOF-5501` | G5 | Proof IR | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:386`, `docs/status/PROOF-5501-AUTHORITY-AUDIT.md` |
+| `PROOF-5501-OBSERVATION` | G5 | Internal Proof IR boundary evidence | S | Done | Accepted `DEC-0199`; see `crates/ling-types/tests/proof_ir_evidence.rs` and `docs/status/PROOF-5501-OBSERVATION-IMPLEMENTATION-REPORT.md`; grammar/kernel/translation semantics remain BlockedSpec |
 | `PROOF-5502` | G5 | 独立 Checker | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:400`, `docs/status/PROOF-5502-AUTHORITY-AUDIT.md` |
 | `PROOF-5503` | G5 | 假设注册表 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:412`, `docs/status/PROOF-5503-AUTHORITY-AUDIT.md` |
 | `MC-5601` | G5 | 有限状态投影 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:431`, `docs/status/MC-5601-AUTHORITY-AUDIT.md` |

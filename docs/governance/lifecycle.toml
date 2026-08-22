@@ -5111,3 +5111,27 @@ unresolved_alternatives = [
   "LSP version/capabilities/requests/responses; hover/status/diagnostic/counterexample/code-lens/gutter/Audit/implicit-condition/rename semantics; Contract references and stable IDs/provenance/invalidation; snapshots, Semantic Transactions, stale edits/conflicts and atomic TextEdits; UTF-8 spans, LSP positions/UTF-16, CRLF/BOM/Unicode 17.0.0; unknown/stale/corrupt/unverifiable data, fallback, redaction/privacy; workspace/document/incremental/JSON schema, cancellation/ordering; diagnostics and positive/negative/malformed/stale-version/Unicode/CRLF/incremental/rename/evidence/determinism/client-capability fixtures; Zed extension, protocol inventory, and public status remain open under CTR-5407, CTR-5406, LSP-2205, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing editor authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0199"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0199-proof-ir-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Proof IR categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer proof grammar, terms, certificates, kernel/checker, soundness, assumptions, Contract/Typed-Core translation, diagnostics, protocols, and public support until accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing Trait, bytecode, Checked-Core, and VM evidence is not reinterpreted as Proof IR authority.",
+  "No Proof IR grammar, parser, certificate/query format, proof kernel, assumption registry, Contract translation, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Versioned proof grammar, sorts/types/terms, variables/constants/applications, hypotheses/theorems/goals/rules, arithmetic/memory/alias/effect/ownership axioms, bounds/termination, Node/Task/Actor and FFI/ABI facts, assumptions, provenance/spans/Semantic IDs/Proof IDs, canonical bytes and normalization, well-formedness and Contract/Typed-Core translation, status separation, runtime/test/model evidence, unknown/malformed/corrupt/fail-closed behavior, TCB/kernel/soundness/independent checking/resource limits, deterministic ordering/migration, diagnostics, positive/negative/malformed/adversarial/rejection/Unicode/differential fixtures, protocol inventory, and public support remain open under PROOF-5501, PROOF-5502, PROOF-5503, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing proof authority.",
+]
+superseded_by = ""

@@ -3094,3 +3094,16 @@ covers = ["CTR-5407 bounded Contract LSP/Zed boundary evidence", "test-only Cont
 depends_on = ["DEC-0197", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0199"
+title = "Internal Proof IR boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0199-proof-ir-boundary-evidence.md"
+covers = ["PROOF-5501 bounded Proof IR boundary evidence", "test-only Proof IR vocabulary", "proof boundaries without grammar/kernel/translation semantics"]
+depends_on = ["DEC-0198", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
