@@ -176,6 +176,7 @@
 | `LSP-2103` | LSP open-document overlay | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
 | `LSP-2103-OVERLAY` | LSP full-text overlay Preview slice | `G1` | `M` | `Done` | `LSP-2101-LIFECYCLE`, `LSP-2102-SOURCE-MAP` | `6cedec3e09f8112b28cde1c12dca514dae4191e4` |
 | `LSP-2104` | LSP incremental text changes | `G1` | `M` | `BlockedSpec` | `LSP-2102`, `LSP-2103` | `` |
+| `LSP-2104-POSITION-EDITS` | Bounded internal position-edit projection | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2104-UTF8-EDITS` | `94a990418730a768a7974f3f40629f1d32a5c05e` |
 | `LSP-2104-UTF8-EDITS` | Bounded internal UTF-8 edit application | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2103-OVERLAY` | `4abc84f81bab339c309a1e5a6227fc7f9483e013` |
 | `LSP-2105` | LSP workspace reload | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2103`, `PRJ-1107` | `` |
 | `LSP-2201` | LSP compiler diagnostic adapter | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
