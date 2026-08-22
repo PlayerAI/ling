@@ -322,6 +322,7 @@ dependencies = [
 name = "ling-lsp"
 version = "0.0.1-dev"
 dependencies = [
+ "ling-diagnostics",
  "ling-source",
  "serde_json",
 ]

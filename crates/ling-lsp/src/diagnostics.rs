@@ -1,5 +1,8 @@
 use std::cmp::Ordering;
 
+use ling_diagnostics::DiagnosticSpan;
+use ling_source::{ByteOffset, LspPosition, PositionEncoding, PositionError, SourceFile};
+
 /// Internal canonical ordering key for a future LSP diagnostic projection.
 ///
 /// The key preserves logical names and original UTF-8 byte offsets. It carries
@@ -74,9 +77,109 @@ impl PartialOrd for DiagnosticOrderKey {
     }
 }
 
+/// An internal source-layer projection of one diagnostic span.
+///
+/// This value carries no severity, message, snapshot, URI, version, or wire
+/// representation. The public diagnostic adapter remains deferred.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) struct DiagnosticPositionRange {
+    start: LspPosition,
+    end: LspPosition,
+}
+
+impl DiagnosticPositionRange {
+    #[must_use]
+    pub(crate) const fn start(self) -> LspPosition {
+        self.start
+    }
+
+    #[must_use]
+    pub(crate) const fn end(self) -> LspPosition {
+        self.end
+    }
+}
+
+/// A failure while projecting a compiler diagnostic span into editor
+/// positions. No clamping or path/URI interpretation is performed.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) enum DiagnosticProjectionError {
+    FileMismatch { expected: String, actual: String },
+    OffsetOutOfRange { offset: u64 },
+    ReversedSpan { start: u64, end: u64 },
+    Position(PositionError),
+}
+
+impl std::fmt::Display for DiagnosticProjectionError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::FileMismatch { expected, actual } => write!(
+                formatter,
+                "diagnostic span names `{actual}` but source is `{expected}`"
+            ),
+            Self::OffsetOutOfRange { offset } => {
+                write!(formatter, "diagnostic byte offset {offset} exceeds u32")
+            }
+            Self::ReversedSpan { start, end } => {
+                write!(formatter, "diagnostic span is reversed: {start}..{end}")
+            }
+            Self::Position(error) => {
+                write!(formatter, "diagnostic position projection failed: {error}")
+            }
+        }
+    }
+}
+
+impl std::error::Error for DiagnosticProjectionError {}
+
+impl From<PositionError> for DiagnosticProjectionError {
+    fn from(error: PositionError) -> Self {
+        Self::Position(error)
+    }
+}
+
+/// Projects one compiler diagnostic's original-byte span into an explicit
+/// position encoding using the authoritative source map.
+pub(crate) fn project_span(
+    source: &SourceFile,
+    span: &DiagnosticSpan,
+    encoding: PositionEncoding,
+) -> Result<DiagnosticPositionRange, DiagnosticProjectionError> {
+    if span.file() != source.name() {
+        return Err(DiagnosticProjectionError::FileMismatch {
+            expected: source.name().to_owned(),
+            actual: span.file().to_owned(),
+        });
+    }
+    if span.start_byte() > span.end_byte() {
+        return Err(DiagnosticProjectionError::ReversedSpan {
+            start: span.start_byte(),
+            end: span.end_byte(),
+        });
+    }
+    let start = u32::try_from(span.start_byte())
+        .map(ByteOffset::new)
+        .map_err(|_| DiagnosticProjectionError::OffsetOutOfRange {
+            offset: span.start_byte(),
+        })?;
+    let end = u32::try_from(span.end_byte())
+        .map(ByteOffset::new)
+        .map_err(|_| DiagnosticProjectionError::OffsetOutOfRange {
+            offset: span.end_byte(),
+        })?;
+    Ok(DiagnosticPositionRange {
+        start: source.lsp_position(start, encoding)?,
+        end: source.lsp_position(end, encoding)?,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn source(text: &[u8]) -> SourceFile {
+        SourceFile::from_bytes(ling_source::SourceId::new(7), "main.ling", text.to_vec())
+            .expect("test source is valid UTF-8")
+    }
 
     #[test]
     fn canonical_order_preserves_file_bytes_span_and_code() {
@@ -118,5 +221,73 @@ mod tests {
         left.sort();
         right.sort();
         assert_eq!(left, right);
+    }
+
+    #[test]
+    fn projects_original_diagnostic_bytes_for_each_encoding() {
+        let source = source("\u{feff}a\r\n凌😀z\n".as_bytes());
+        let span = DiagnosticSpan::at("main.ling", 6, 14);
+        let expected = [
+            (
+                PositionEncoding::Utf8,
+                LspPosition::new(1, 0),
+                LspPosition::new(1, 8),
+            ),
+            (
+                PositionEncoding::Utf16,
+                LspPosition::new(1, 0),
+                LspPosition::new(1, 4),
+            ),
+            (
+                PositionEncoding::Utf32,
+                LspPosition::new(1, 0),
+                LspPosition::new(1, 3),
+            ),
+        ];
+        for (encoding, start, end) in expected {
+            let range = project_span(&source, &span, encoding).expect("span projects");
+            assert_eq!((range.start(), range.end()), (start, end));
+        }
+    }
+
+    #[test]
+    fn projection_rejects_identity_range_and_offset_failures_without_clamping() {
+        let source = source(b"hello\n");
+        assert!(matches!(
+            project_span(
+                &source,
+                &DiagnosticSpan::at("other.ling", 0, 1),
+                PositionEncoding::Utf8,
+            ),
+            Err(DiagnosticProjectionError::FileMismatch { .. })
+        ));
+        assert!(matches!(
+            project_span(
+                &source,
+                &DiagnosticSpan::at_u64("main.ling", 4, 2),
+                PositionEncoding::Utf8,
+            ),
+            Err(DiagnosticProjectionError::ReversedSpan { .. })
+        ));
+        assert!(matches!(
+            project_span(
+                &source,
+                &DiagnosticSpan::at_u64(
+                    "main.ling",
+                    u64::from(u32::MAX) + 1,
+                    u64::from(u32::MAX) + 1
+                ),
+                PositionEncoding::Utf8,
+            ),
+            Err(DiagnosticProjectionError::OffsetOutOfRange { .. })
+        ));
+        assert!(matches!(
+            project_span(
+                &source,
+                &DiagnosticSpan::at("main.ling", 0, 99),
+                PositionEncoding::Utf8,
+            ),
+            Err(DiagnosticProjectionError::Position(_))
+        ));
     }
 }

@@ -1443,3 +1443,16 @@ covers = ["LSP-2105 bounded workspace-state snapshot", "immutable VFS source/inp
 depends_on = ["DEC-0019", "RFC-0004", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0072"
+title = "LSP internal diagnostic span projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0072-lsp-diagnostic-span-projection.md"
+covers = ["LSP-2201 bounded diagnostic span projection", "original-byte to explicit position mapping", "strict diagnostic/source identity"]
+depends_on = ["DEC-0002", "DEC-0029", "DEC-0034", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

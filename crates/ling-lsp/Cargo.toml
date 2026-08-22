@@ -7,6 +7,7 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+ling-diagnostics = { path = "../ling-diagnostics" }
 ling-source = { path = "../ling-source" }
 serde_json.workspace = true
 

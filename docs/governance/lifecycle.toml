@@ -1954,3 +1954,27 @@ unresolved_alternatives = [
   "Workspace roots, watcher/event sources, coalescing, graph rebuild scope, failure-atomic publication, stale results, document versions, and public LSP schemas remain open under the registered project, cache, transaction, and semantic-lifecycle gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0072"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0072-lsp-diagnostic-span-projection.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Project Unicode, Chinese, emoji, BOM, CRLF, and final-newline diagnostic spans under UTF-8, UTF-16, and UTF-32 and compare exact positions.",
+  "Reject mismatched logical names, reversed spans, u32-overflow offsets, normalized/interior boundaries, and source-end overflow without clamping or partial output.",
+  "Repeat projections and preserve existing diagnostic JSON/CLI output and ordering; defer severity, related information, repairs, versions, snapshots, publication, and JSON-RPC fixtures.",
+]
+compatibility_impact = [
+  "Adds only private ling-lsp projection values and a local ling-diagnostics dependency; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Severity/tag mapping, related information, localization, Fact/repair schemas, URI/version association, freshness, publication, cancellation, suppression, root-cause grouping, and lifecycle remain open under the LSP-2201/LSP-2204 parents and registered gaps.",
+]
+superseded_by = ""
