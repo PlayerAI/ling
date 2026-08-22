@@ -102,6 +102,7 @@
 | `CTR-5406` | Contract-aware optimizer rules | `G5` | `M` | `BlockedSpec` | `CTR-5405` | `` |
 | `CTR-5406-OBSERVATION` | Internal Contract optimizer boundary evidence | `G5` | `S` | `Done` | `CTR-5405-OBSERVATION` | `d80ddc0aaf2dd13152c407085b81f70e10a52b19` |
 | `CTR-5407` | Contract LSP/Zed | `G5` | `L` | `BlockedSpec` | `CTR-5406`, `LSP-2205` | `` |
+| `CTR-5407-OBSERVATION` | Internal Contract LSP/Zed boundary evidence | `G5` | `S` | `Done` | `CTR-5406-OBSERVATION` | `83ac76284258b83e905f2384d17d33b251db3bb5` |
 | `DAP-3601` | Debugger stdio adapter | `G3+` | `L` | `BlockedSpec` | `DIFF-3702` | `` |
 | `DAP-3601-OBSERVATION` | Internal DAP debugger boundary evidence | `G3+` | `S` | `Done` | `DIFF-3702-OBSERVATION` | `1626b0dad645ae10436e06146c08ceb8a94d1155` |
 | `DAP-3602` | Zed debugger registration | `G3+` | `M` | `BlockedSpec` | `DAP-3601` | `` |

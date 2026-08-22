@@ -20804,6 +20804,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0198-contract-lsp-zed-boundary-evidence.md",
   "docs/ling_execution_plan/05-ZED-EXTENSION.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -20813,6 +20814,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/CTR-5407-AUTHORITY-AUDIT.md",
+  "docs/decisions/0198-contract-lsp-zed-boundary-evidence.md",
+  "docs/status/CTR-5407-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5407-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/tests/contract_lsp_zed_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -20832,6 +20837,70 @@ notes = [
   "The repository has no JSON-RPC LSP server, Contract projection, proof/counterexample/evidence reader, rename transaction, or Zed extension; Tree-sitter provides syntax/highlighting only and Preview diagnostic JSON is not an LSP schema.",
   "The audit does not reinterpret execution-plan bullets, Draft Contract sketches, internal query/byte-span services, or Tree-sitter output as public editor semantics and creates no LSP or Zed placeholder.",
   "The audit adds no public protocol, dependency, editor, runtime, schema, diagnostic, or placeholder API; Contract LSP/Zed remains deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "CTR-5407-OBSERVATION"
+title = "Internal Contract LSP/Zed boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CTR-5406-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0197-contract-optimizer-boundary-evidence.md",
+  "docs/decisions/0198-contract-lsp-zed-boundary-evidence.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/contract_lsp_zed_evidence.rs",
+  "docs/decisions/0198-contract-lsp-zed-boundary-evidence.md",
+  "docs/status/CTR-5407-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CTR-5407-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0198 authorizes only test-local Contract LSP/Zed boundary evidence; no LSP method, schema, Contract projection, rename transaction, Zed extension, diagnostic, CLI, or support claim is made.",
+  "Inventory covers sixty Contract editor, protocol, snapshot/transaction, position, data-validity, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no editor, schema, transaction, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test contract_lsp_zed_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "83ac76284258b83e905f2384d17d33b251db3bb5"
+completion_commit = "83ac76284258b83e905f2384d17d33b251db3bb5"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0198; CTR-5407 remains BlockedSpec for LSP/editor protocol, Contract data projection, proof/evidence/counterexample schemas, snapshot/transaction/position rules, diagnostics, Zed integration, and support claims.",
+  "No LSP method, Contract projection, schema, rename transaction, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
