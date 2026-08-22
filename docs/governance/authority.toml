@@ -2613,3 +2613,16 @@ covers = ["DBUF-4404 bounded Device synchronization boundary evidence", "test-on
 depends_on = ["DEC-0160", "DEC-0159", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0162"
+title = "Internal Device IR schema boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0162-device-ir-schema-boundary-evidence.md"
+covers = ["DIR-4501 bounded Device IR schema boundary evidence", "test-only Device IR schema vocabulary", "IR boundaries without Kernel/device/backend semantics"]
+depends_on = ["DEC-0161", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

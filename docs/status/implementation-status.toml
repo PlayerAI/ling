@@ -16668,6 +16668,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0162-device-ir-schema-boundary-evidence.md",
   "docs/RFC-0014.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
@@ -16680,6 +16681,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DIR-4501-AUTHORITY-AUDIT.md",
+  "docs/status/DIR-4501-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIR-4501-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0162-device-ir-schema-boundary-evidence.md",
+  "crates/ling-types/tests/device_ir_schema_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -16699,6 +16708,60 @@ notes = [
   "The repository has no Device IR type model, schema, encoder/decoder, validator, canonicalizer, source-map carrier, capability registry, operation verifier, or corpus.",
   "The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; the plan remains non-normative.",
  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Native, memory categories, ownership, diagnostics, schemas, Semantic IDs, source spans, support claims, or Unicode 17.0.0 behavior.",
+]
+[[task]]
+id = "DIR-4501-OBSERVATION"
+title = "Internal Device IR schema boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DBUF-4404-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0161-device-synchronization-boundary-evidence.md",
+  "docs/decisions/0162-device-ir-schema-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/device_ir_schema_evidence.rs",
+  "docs/decisions/0162-device-ir-schema-boundary-evidence.md",
+  "docs/status/DIR-4501-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIR-4501-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0162 authorizes only test-local Device IR schema boundary evidence; no IR type/operation, schema/codec, validator/canonicalizer, source-map carrier, capability registry, diagnostic, dependency, protocol, or support claim is made.",
+  "The inventory covers sixty provisional boundaries for IR identity/version, workgroup/grid, scalar/vector/tensor/type shape, address-space/memory/bounds/effects, control flow, barriers/atomics/order, shape/layout/index, numeric modes, source maps/spans, capability/required/optional features/unsupported targets, Fault/cancellation, checked input/provenance/ownership/synchronization, canonical constants/hashes/version/migration/corruption, fixtures, diagnostics, host exclusion, and protocol.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no IR node, schema field, encoding, verifier, capability, target feature, diagnostic, Semantic ID, backend, or public protocol authority.",
+  "cargo test -p ling-types --test device_ir_schema_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0162; DIR-4501 remains BlockedSpec for IR types/operations, schema/codec, verification, canonicalization, source maps, capability negotiation, backend integration, migration, protocol integration, and support claims.",
+  "No parser, AST/HIR/Checked Core node, Device IR type, schema, encoder/decoder, validator, canonicalizer, source-map carrier, capability registry, operation verifier, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 [[task]]
 id = "DIR-4502"

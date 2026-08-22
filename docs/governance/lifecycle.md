@@ -192,6 +192,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0159` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0159](../decisions/0159-buffer-ownership-boundary-evidence.md) |
 | `DEC-0160` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0160](../decisions/0160-transfer-effect-boundary-evidence.md) |
 | `DEC-0161` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0161](../decisions/0161-device-synchronization-boundary-evidence.md) |
+| `DEC-0162` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0162](../decisions/0162-device-ir-schema-boundary-evidence.md) |
 
 ## Migration boundary
 
