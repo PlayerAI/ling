@@ -3185,3 +3185,16 @@ covers = ["MC-5604 bounded Replay Counterexample boundary evidence", "test-only 
 depends_on = ["DEC-0204", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0206"
+title = "Internal Timing IR and Path boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0206-timing-ir-path-boundary-evidence.md"
+covers = ["TIM-5701 bounded Timing IR and Path boundary evidence", "test-only timing/path vocabulary", "timing boundaries without IR/cost/WCET semantics"]
+depends_on = ["DEC-0205", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

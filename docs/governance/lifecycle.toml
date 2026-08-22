@@ -5279,3 +5279,27 @@ unresolved_alternatives = [
   "Checked-model/exploration-result/counterexample conversion; replay fixture, schema, reader/writer and reference-runtime route; model/runtime/scheduler/counterexample/replay identities; scheduler policy, logical clock, inputs, host effects, state snapshots/checksums, Fault/restart and event ordering; mailbox/backpressure/reentry/drop/expiry/cancellation/ownership/capability/resource semantics; stable Semantic IDs, original UTF-8 spans and checked snapshot identity; provenance/checksum/signature/redaction/privacy; divergence, malformed/corrupt/unknown-field/unsupported-version/migration/unavailable-input/unsupported-Fault and fail-closed behavior; diagnostics, positive/negative/divergence/source-link/Unicode/determinism fixtures, protocol inventory, and public support remain open under MC-5604, MC-5603, RFC-K506, GAP-DETERMINISTIC-REPLAY-001, GAP-CRITICAL-PROFILE-001, PROTO-REPLAY, PROTO-EVIDENCE, and missing replay authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0206"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0206-timing-ir-path-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Timing IR/path categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer Timing IR/analyzer implementation, target/path/cost/WCET semantics, schemas, diagnostics, protocols, and public support until Accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing CFG/source-map, bytecode resource, differential, cancellation, and query-scheduler evidence is not reinterpreted as timing or WCET evidence.",
+  "No Timing IR, path solver, target-cost model, WCET result, reader/writer, deadline hook, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Versioned canonical Timing IR; target/profile/build and instruction/block/path identity; calls, returns, branches, loops, recursion and path conditions; loop/recursion/call/resource bounds and their proof or assumption status; cost units and instruction/block/path composition; processor, cache, memory, bus, interrupt and scheduler interference; device/FFI/I/O call bounds; Checked Core, bytecode, machine-code and source-map linkage; stable Semantic IDs and original UTF-8 spans; unknown, infeasible, incomplete, malformed, corrupt, unsupported-version, migration and fail-closed behavior; tool and evidence identity, provenance/checksum/signature/redaction; measurements, estimates, static bounds, assumptions and WCET wording; diagnostics, positive/negative/loop/call/Unicode/differential fixtures, protocol inventory, and public support remain open under TIM-5701, TIM-5702, TIM-5703, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing timing authority.",
+]
+superseded_by = ""

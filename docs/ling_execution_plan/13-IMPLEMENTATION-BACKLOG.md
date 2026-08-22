@@ -485,6 +485,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `MC-5604` | G5 | Replay Counterexample | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:471`, `docs/status/MC-5604-AUTHORITY-AUDIT.md` |
 | `MC-5604-OBSERVATION` | G5 | Internal Replay Counterexample boundary evidence | S | Done | Accepted `DEC-0205`; see `crates/ling-concurrency/tests/replay_counterexample_evidence.rs` and `docs/status/MC-5604-OBSERVATION-IMPLEMENTATION-REPORT.md`; converter/scheduler/runtime semantics remain BlockedSpec |
 | `TIM-5701` | G5 | Timing IR 与 Path | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:477`, `docs/status/TIM-5701-AUTHORITY-AUDIT.md` |
+| `TIM-5701-OBSERVATION` | G5 | Internal Timing IR and Path boundary evidence | S | Done | Accepted `DEC-0206`; see `crates/ling-types/tests/timing_ir_path_evidence.rs` and `docs/status/TIM-5701-OBSERVATION-IMPLEMENTATION-REPORT.md`; IR/cost/WCET semantics remain BlockedSpec |
 | `TIM-5702` | G5 | 测量与静态分析分离 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:489`, `docs/status/TIM-5702-AUTHORITY-AUDIT.md` |
 | `TIM-5703` | G5 | Deadline Check | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:503`, `docs/status/TIM-5703-AUTHORITY-AUDIT.md` |
 | `EVD-5801` | G5 | Bundle Schema | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:518`, `docs/status/EVD-5801-AUTHORITY-AUDIT.md` |
