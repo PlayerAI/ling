@@ -311,6 +311,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `OWN-3201` | G3 | Place 与 Move Analysis | L | BlockedSpec | `07-G3-V0.3-NATIVE.md:125`, `docs/status/OWN-3201-AUTHORITY-AUDIT.md` |
 | `OWN-3201-OBSERVATION` | G3 | Internal Place and Move-analysis boundary evidence | S | Done | Accepted `DEC-0118`; see `crates/ling-types/tests/place_move_evidence.rs` and `docs/status/OWN-3201-OBSERVATION-IMPLEMENTATION-REPORT.md`; ownership/dataflow/lifetime semantics remain BlockedSpec |
 | `OWN-3202` | G3 | Borrow Exclusivity | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:152`, `docs/status/OWN-3202-AUTHORITY-AUDIT.md` |
+| `OWN-3202-OBSERVATION` | G3 | Internal borrow-exclusivity boundary evidence | S | Done | Accepted `DEC-0119`; see `crates/ling-types/tests/borrow_exclusivity_evidence.rs` and `docs/status/OWN-3202-OBSERVATION-IMPLEMENTATION-REPORT.md`; borrow/lifetime/exclusivity semantics remain BlockedSpec |
 | `OWN-3203` | G3 | Region Inference | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:172`, `docs/status/OWN-3203-AUTHORITY-AUDIT.md` |
 | `OWN-3204` | G3 | 跨 `await` / Actor Turn 的 Borrow | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:186`, `docs/status/OWN-3204-AUTHORITY-AUDIT.md` |
 | `OWN-3205` | G3 | Drop 顺序 Lowering | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:196`, `docs/status/OWN-3205-AUTHORITY-AUDIT.md` |

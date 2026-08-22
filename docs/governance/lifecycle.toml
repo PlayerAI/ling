@@ -3129,3 +3129,29 @@ unresolved_alternatives = [
   "Place forms and projections, move/copy/borrow judgments, partial moves and reinitialization, dataflow joins/fixed points, closure/aggregate/generic interaction, lifetime/region projection, suspension/Task/Actor escape, Resource/Managed/FFI/Native behavior, diagnostics, migration, and differential semantics remain open under GAP-OWNERSHIP-MODEL-001 and OWN-3201.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0119"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-four provisional borrow boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep exclusivity judgments, overlap/index policy, automatic reborrows, lifetimes, iterators, suspension/Actor boundaries, diagnostics, migration, fuzzing, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public Borrow, lifetime, or exclusivity protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Borrow type and alias identity, overlap/field/index rules, automatic borrow and reborrow, temporary lifetime, iterator mutation, public lifetime/Region, suspension/Task/Actor escape, FFI/Native behavior, diagnostics, migration, and differential semantics remain open under GAP-OWNERSHIP-MODEL-001 and OWN-3202.",
+]
+superseded_by = ""

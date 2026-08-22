@@ -2054,3 +2054,16 @@ covers = ["OWN-3201 bounded Place/Move-analysis boundary evidence", "test-only P
 depends_on = ["DEC-0117", "DEC-0009", "RFC-0017", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0119"
+title = "Internal borrow-exclusivity boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md"
+covers = ["OWN-3202 bounded borrow-exclusivity boundary evidence", "test-only borrow/alias vocabulary", "borrow boundaries without lifetime/exclusivity semantics"]
+depends_on = ["DEC-0118", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
