@@ -21,6 +21,10 @@ use serde_json::{Map, Value, json};
 // deferred until the parent LSP scheduling contract is Accepted.
 #[allow(dead_code)]
 mod scheduler;
+// DEC-0033 is an internal arithmetic child; public quota and diagnostic
+// behavior remains deferred to the parent LSP-2504 contract.
+#[allow(dead_code)]
+mod resource;
 
 /// Version marker for the current Preview lifecycle protocol.
 pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";

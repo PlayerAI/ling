@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0033"
+title = "LSP internal byte-accounting boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0033-lsp-internal-byte-accounting-boundary.md"
+covers = ["internal LSP UTF-8 byte accounting", "checked reserve/release arithmetic", "public quota deferral"]
+depends_on = ["DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0002"
 title = "Source position units"
 kind = "Decision"

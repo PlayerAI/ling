@@ -8,9 +8,10 @@ diagnostic count, and solver work, and requires a stable tool diagnostic
 instead of OOM. No accepted LSP contract defines resource units, accounting
 scope, limit precedence, failure response, retry behavior, or compatibility.
 
-No LSP limit constants, quota manager, tool diagnostic, request rejection
-response, protocol schema, diagnostic allocation, or placeholder server was
-added.
+Accepted DEC-0033 closes only the bounded `LSP-2504-BYTE-ACCOUNTING` child: an
+internal UTF-8-byte budget with checked reserve/release arithmetic. No public
+LSP limit constant, quota manager, tool diagnostic, request rejection response,
+protocol schema, diagnostic allocation, or placeholder server was added.
 
 ## Normative traceability
 
@@ -22,6 +23,9 @@ added.
 - DEC-0019 bounds internal query inputs and requires oversized or malformed
   snapshots to fail without publishing partial checked results, but it does
   not define an LSP resource protocol or tool diagnostic.
+- Accepted DEC-0033 defines only local UTF-8-byte accounting and typed
+  arithmetic failures; it does not define quotas, configuration, allocator
+  observation, or a client-visible response.
 - `PROTO-DIAGNOSTIC-JSON` is a Preview compiler/CLI diagnostic writer, not an
   LSP resource-limit response. The single diagnostic registry permits only
   registered `L-<DOMAIN>-<NUMBER>` meanings.
@@ -43,6 +47,9 @@ added.
 - No tool diagnostic code, bilingual message/facts schema, capability flag,
   configuration version, retry/backoff rule, or client-visible limit response
   is inventoried for LSP.
+- The byte-accounting child is deliberately disconnected from `LspServer` and
+  therefore cannot claim open-document, pending-request, result, diagnostic,
+  solver, workspace, or process-memory enforcement.
 - No fixture covers exact-boundary/over-limit cases, aggregate versus
   per-request accounting, concurrent requests, nested dependencies, partial
   result suppression, Unicode/CRLF/BOM bytes, cancellation races, or
@@ -88,8 +95,10 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`LSP-2504` can begin after LSP snapshot/version, cancellation, scheduling,
-diagnostics, and Semantic Transaction lifecycle decisions are Accepted. The
-future implementation must use explicit versioned units and quotas, fail
-before partial publication, return registered bilingual tool diagnostics, and
-remain bounded and deterministic under adversarial input.
+The parent `LSP-2504` can begin after LSP snapshot/version, cancellation,
+scheduling, diagnostics, and Semantic Transaction lifecycle decisions are
+Accepted. The future implementation must use explicit versioned units and
+quotas, fail before partial publication, return registered bilingual tool
+diagnostics, and remain bounded and deterministic under adversarial input. The
+`LSP-2504-BYTE-ACCOUNTING` child is complete only for DEC-0033's internal
+arithmetic boundary.

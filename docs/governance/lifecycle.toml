@@ -22,6 +22,29 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0033"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0033-lsp-internal-byte-accounting-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact-boundary reserve, mutation-free over-limit failure, checked release, zero operations, and independent budgets.",
+  "Verify the primitive has no allocator probe, timer, thread, JSON encoding, transport handler, request association, diagnostic, or partial-result state.",
+]
+compatibility_impact = [
+  "Adds only pub(crate) UTF-8-byte arithmetic values; source, language, diagnostics, schemas, Semantic IDs, CLI, wire methods, VM, and Unicode remain unchanged.",
+]
+unresolved_alternatives = [
+  "Public resource units/scopes, defaults, negotiation, quotas, result accounting, diagnostics, retry, host-memory handling, and migration require a later Accepted LSP-2504 decision.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0025"
 kind = "Decision"
 status = "Accepted"

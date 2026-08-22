@@ -68,9 +68,9 @@ mod tests {
             .expect("xtask is under tools/xtask");
         let summary = check_governance(root).expect("all governance registries are valid");
         assert_eq!(summary.check_count, 5);
-        assert_eq!(summary.document_count, 71);
+        assert_eq!(summary.document_count, 72);
         assert_eq!(summary.gap_count, 28);
-        assert_eq!(summary.lifecycle_count, 46);
+        assert_eq!(summary.lifecycle_count, 47);
         assert_eq!(summary.protocol_count, 25);
         assert_eq!(summary.diagnostic_code_count, 82);
     }
