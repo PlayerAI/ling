@@ -13,6 +13,11 @@ thread behavior as Ling semantics.
 No Actor runtime, scheduler, stress protocol, property schema, replay format,
 fixture corpus, diagnostic, or placeholder G2 API was added.
 
+Accepted `DEC-0100` now authorizes the bounded child
+`ACT-2306-PROPERTY-OBSERVATION`, which records only immutable property
+observation identities and structural labels. It does not close the property,
+stress, scheduler, replay, runtime, or cross-backend gaps described below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its property list does not

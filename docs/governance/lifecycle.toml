@@ -2636,3 +2636,29 @@ unresolved_alternatives = [
   "Runtime identity allocation/reuse, registry scope, lifecycle transitions, spawn/stop/send/receive ABI, Task and scheduler integration, Fault provenance, shutdown, local/remote behavior, security, limits, runtime differential tests, and migration remain open under the Actor/Task gaps and ACT-2305.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0100"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0100-actor-property-observation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build observations with optional actors and every structural label and assert deterministic observation-identity ordering.",
+  "Reject zero identities and duplicate observation identities before publication.",
+  "Compare equivalent models with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep property execution, stress thresholds, scheduler/interleaving, resource accounting, replay, shutdown, cross-backend, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled checked-data tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public property protocol, Actor behavior, or v0.2 support claim is registered.",
+]
+unresolved_alternatives = [
+  "Property relation and assertion polarity, serial/parallel guarantees, interleaving classes, mailbox/backpressure outcomes, Fault/cleanup invariants, stress budgets and thresholds, replay privacy/versioning, platform scope, runtime differential comparison, and migration remain open under the Actor gaps and ACT-2306.",
+]
+superseded_by = ""

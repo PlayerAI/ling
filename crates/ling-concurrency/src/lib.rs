@@ -15,6 +15,7 @@ mod actor;
 mod lifecycle;
 mod mailbox;
 mod message;
+mod property;
 mod runtime;
 mod scheduler;
 mod state_machine;
@@ -36,6 +37,10 @@ pub use mailbox::{
 pub use message::{
     MessageFieldId, MessageIdentityKind, MessageSchema, MessageSchemaError, MessageSchemaId,
     MessageSchemaIdentityModel, MessageSchemaSpec,
+};
+pub use property::{
+    PropertyIdentityKind, PropertyObservation, PropertyObservationError, PropertyObservationId,
+    PropertyObservationKind, PropertyObservationModel, PropertyObservationSpec,
 };
 pub use runtime::{
     RuntimeIdentityKind, RuntimeObservation, RuntimeObservationError, RuntimeObservationId,

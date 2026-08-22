@@ -1807,3 +1807,16 @@ covers = ["ACT-2305 bounded runtime observation", "deterministic runtime observa
 depends_on = ["DEC-0098", "DEC-0097", "DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0100"
+title = "Internal Actor property observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0100-actor-property-observation.md"
+covers = ["ACT-2306 bounded property observation", "deterministic property observation identities", "property labels without stress/runtime semantics"]
+depends_on = ["DEC-0099", "DEC-0098", "DEC-0097", "DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
