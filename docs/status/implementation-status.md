@@ -292,6 +292,7 @@
 | `NODE-5303` | Static Node Scheduling | `G5` | `M` | `BlockedSpec` | `NODE-5302` | `` |
 | `NODE-5303-OBSERVATION` | Internal Node static-scheduling boundary evidence | `G5` | `S` | `Done` | `NODE-5302-OBSERVATION` | `5c60fbc0984a37c163edcf79056fa6a7a04418d7` |
 | `NODE-5304` | Virtual-Time Reference Runtime | `G5` | `M` | `BlockedSpec` | `NODE-5303` | `` |
+| `NODE-5304-OBSERVATION` | Internal Node virtual-time runtime boundary evidence | `G5` | `S` | `Done` | `NODE-5303-OBSERVATION` | `39e00c566f57f4433051e0f8e04db73e1ed8c1b3` |
 | `NODE-5305` | Native Node Runtime | `G5` | `L` | `BlockedSpec` | `NODE-5304` | `` |
 | `NODE-5306` | Node and Actor Boundary | `G5` | `M` | `BlockedSpec` | `NODE-5305` | `` |
 | `NODE-5307` | Node Conformance | `G5` | `M` | `BlockedSpec` | `NODE-5306` | `` |
