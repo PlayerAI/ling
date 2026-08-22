@@ -13464,6 +13464,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/BACK-3503-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3503-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3503-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0134-native-runtime-abi-boundary-evidence.md",
+  "crates/ling-types/tests/native_runtime_abi_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -13473,6 +13481,7 @@ acceptance = [
   "The audit covers ABI values/closures/text, Fault/Result, handles/Drop, Task/Actor, version mismatch, target/FFI, cleanup, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No runtime ABI record, calling convention, layout table, runtime library, version marker, handle/drop shim, Task/Actor call surface, diagnostic, public protocol, dependency, or placeholder G3 crate is added while BACK-3501/BACK-3502, RFC-N304/RFC-N306/RFC-0011, and memory/concurrency authority are absent.",
   "The future implementation must preserve Seed behavior, consume verified NIR only, keep Rust layout/unwinding/addresses non-semantic, version internal artifacts explicitly, and publish ABI compatibility and interpreter/VM/Native evidence before exposing v0.3 Native behavior.",
+  "Accepted DEC-0134 authorizes only test-only Native runtime ABI boundary vocabulary; it does not close layout/calling/runtime/ownership/GC/Task/Actor/FFI/versioning, diagnostics, compatibility, or public-ABI contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13482,6 +13491,65 @@ notes = [
   "BACK-3503 is BlockedSpec by BACK-3501/BACK-3502, NIR-3401 through NIR-3403, absent RFC-N304/RFC-N306/RFC-0011, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-STRUCTURED-TASK-001, and GAP-ACTOR-AWAIT-REENTRY-001.",
   "The current workspace has no Native runtime, ABI manifest, calling convention, runtime library, GC handle, Resource-drop shim, Task/Actor ABI, or native String/Text representation; VM values and bytecode are not Native ABI evidence.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "BACK-3503-OBSERVATION"
+title = "Internal Native runtime ABI boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BACK-3502-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0131-native-ir-verifier-boundary-evidence.md",
+  "docs/decisions/0132-native-backend-selection-boundary-evidence.md",
+  "docs/decisions/0133-native-codegen-boundary-evidence.md",
+  "docs/decisions/0134-native-runtime-abi-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/native_runtime_abi_evidence.rs",
+  "docs/decisions/0134-native-runtime-abi-boundary-evidence.md",
+  "docs/status/BACK-3503-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3503-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0134 authorizes only test-only Native runtime ABI boundary evidence; no ABI manifest, layout table, calling convention, runtime library, version marker, handle/drop shim, Task/Actor surface, diagnostic, dependency, or public ABI is claimed.",
+  "The test-local inventory covers fifty-eight provisional boundaries for primitive/aggregate/record/tuple/ADT/closure/string/text/bytes passing, Fault/Result/unwind/cancellation/shutdown/thread/reentry, GC identity/root/barrier/pin, Resource/borrow/FFI, Task/Actor/mailbox/turn, layout/alignment/endianness/target/calling/runtime library, version/compatibility/negotiation/migration/mangling/debug/schema, deterministic metadata, diagnostics, Unicode, security/offline, differential/cross-target/sanitizer, host exclusions, public-ABI exclusion, and Seed compatibility with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and has no layout, runtime, compatibility, diagnostic, dependency, or public-ABI authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "fa8cdb4f16ea22f34fddccd4589d6fb07d2190d1"
+completion_commit = "fa8cdb4f16ea22f34fddccd4589d6fb07d2190d1"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0134; BACK-3503 remains BlockedSpec for Native representation, calling, Fault/GC/Resource/Task/Actor/FFI, versioning, compatibility, security, and public-ABI decisions.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
