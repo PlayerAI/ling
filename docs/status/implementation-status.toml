@@ -11748,6 +11748,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/OWN-3202-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3202-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3202-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md",
+  "crates/ling-types/tests/borrow_exclusivity_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -11757,6 +11765,7 @@ acceptance = [
   "The audit covers overlap, alias conflict, field/index/iterator cases, temporaries, reborrows, closures, suspension/Actor boundaries, Unicode/CRLF/BOM spans, deterministic diagnostics, and interpreter/VM/Native differential fixtures.",
   "No Borrow type, exclusivity checker, overlap/alias analysis, automatic borrow, temporary-lifetime rule, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N302 authority is absent.",
   "The future implementation must preserve accepted Seed Place behavior, consume accepted types and checked Core only, avoid Rust aliasing leakage, and publish overlap, lifetime, iterator, boundary, diagnostic, and interpreter/VM/Native evidence before exposing v0.3 borrowing behavior.",
+  "Accepted DEC-0119 authorizes only test-only borrow-exclusivity boundary vocabulary; it does not close borrow judgments, overlap, lifetimes, diagnostics, suspension, FFI, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -11766,6 +11775,58 @@ notes = [
   "OWN-3202 is BlockedSpec by OWN-3201, absent RFC-N302/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved Borrow/exclusivity, overlap, temporary, lifetime, suspension, Actor, and FFI contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Borrow/&mut type, exclusivity relation, place-overlap solver, field/index alias policy, automatic reborrow, temporary-lifetime analysis, iterator mutation checker, or future diagnostics; accepted Seed rejects implicit alias-visible mutation.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Seed Place lowering, future borrow/exclusivity semantics, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3202-OBSERVATION"
+title = "Internal borrow-exclusivity boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3201-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0118-place-move-boundary-evidence.md",
+  "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/borrow_exclusivity_evidence.rs",
+  "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md",
+  "docs/status/OWN-3202-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3202-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0119 authorizes only test-only borrow-exclusivity boundary evidence; no borrow, overlap, lifetime, or diagnostic semantics are claimed.",
+  "The test-local inventory covers thirty-four provisional boundaries for borrow/alias identity, place overlap, field/index policy, automatic borrow/reborrow, temporaries, iterators, closures/joins/escape, Task/Actor/suspension, Pin/Region, FFI/Native, Copy/Move/Resource/Managed/Trait, projections, diagnostics, spans, differentials, deterministic approximation, and Seed migration with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no Borrow type, exclusivity checker, overlap solver, automatic borrow, public protocol, or stale zero command is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "bd513f54ece16d4d8618f3011cd1607c7a30acd4"
+completion_commit = "bd513f54ece16d4d8618f3011cd1607c7a30acd4"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0119; OWN-3202 remains BlockedSpec for borrow/exclusivity, overlap, lifetimes, iterator mutation, boundary rules, diagnostics, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed Place behavior is unchanged.",
 ]
 
 [[task]]
