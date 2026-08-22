@@ -3155,3 +3155,29 @@ unresolved_alternatives = [
   "Borrow type and alias identity, overlap/field/index rules, automatic borrow and reborrow, temporary lifetime, iterator mutation, public lifetime/Region, suspension/Task/Actor escape, FFI/Native behavior, diagnostics, migration, and differential semantics remain open under GAP-OWNERSHIP-MODEL-001 and OWN-3202.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0120"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0120-region-inference-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-nine provisional region/lifetime boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep inference, fixed points, escape judgments, public lifetime projection, diagnostics, migration, fuzzing, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public region, lifetime, or ownership protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Region/lifetime variable identity, lexical versus non-lexical scope, constraint solving and termination, reborrow/escape rules, public explicit versus inferred lifetimes, separate compilation, suspension/Task/Actor, pinning/cancellation/Drop, FFI/Native ABI, diagnostics, migration, and differential semantics remain open under GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, and OWN-3203.",
+]
+superseded_by = ""

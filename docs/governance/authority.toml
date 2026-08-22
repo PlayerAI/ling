@@ -2067,3 +2067,16 @@ covers = ["OWN-3202 bounded borrow-exclusivity boundary evidence", "test-only bo
 depends_on = ["DEC-0118", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0120"
+title = "Internal region-inference boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0120-region-inference-boundary-evidence.md"
+covers = ["OWN-3203 bounded region-inference boundary evidence", "test-only region/lifetime vocabulary", "region boundaries without inference/escape/public-lifetime semantics"]
+depends_on = ["DEC-0119", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
