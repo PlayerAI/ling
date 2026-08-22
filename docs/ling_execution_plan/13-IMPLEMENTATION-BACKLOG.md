@@ -371,6 +371,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `KCHK-4102` | G4 | Kernel Effect 与 Capability 检查 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:90`, `docs/status/KCHK-4102-AUTHORITY-AUDIT.md` |
 | `KCHK-4102-OBSERVATION` | G4 | Internal Kernel Effect and Capability boundary evidence | S | Done | Accepted `DEC-0148`; see `crates/ling-types/tests/kernel_effect_capability_evidence.rs` and `docs/status/KCHK-4102-OBSERVATION-IMPLEMENTATION-REPORT.md`; Kernel checker/admission semantics remain BlockedSpec |
 | `KCHK-4103` | G4 | Shape、Index 与 Bounds | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:103`, `docs/status/KCHK-4103-AUTHORITY-AUDIT.md` |
+| `KCHK-4103-OBSERVATION` | G4 | Internal Kernel shape/index/bounds boundary evidence | S | Done | Accepted `DEC-0149`; see `crates/ling-types/tests/kernel_shape_index_bounds_evidence.rs` and `docs/status/KCHK-4103-OBSERVATION-IMPLEMENTATION-REPORT.md`; shape/index/bounds/device semantics remain BlockedSpec |
 | `KCHK-4104` | G4 | Alias 和并行写冲突 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:113`, `docs/status/KCHK-4104-AUTHORITY-AUDIT.md` |
 | `KCHK-4105` | G4 | Kernel Core 与 Verifier | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:124`, `docs/status/KCHK-4105-AUTHORITY-AUDIT.md` |
 | `CPU-4201` | G4 | Scalar Reference Backend | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:137`, `docs/status/CPU-4201-AUTHORITY-AUDIT.md` |

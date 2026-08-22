@@ -179,6 +179,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0146` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0146](../decisions/0146-staged-debugger-capability-boundary-evidence.md) |
 | `DEC-0147` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0147](../decisions/0147-kernel-capability-matrix-boundary-evidence.md) |
 | `DEC-0148` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0148](../decisions/0148-kernel-effect-capability-boundary-evidence.md) |
+| `DEC-0149` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0149](../decisions/0149-kernel-shape-index-bounds-boundary-evidence.md) |
 
 ## Migration boundary
 

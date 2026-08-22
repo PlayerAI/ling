@@ -15073,6 +15073,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0149-kernel-shape-index-bounds-boundary-evidence.md",
   "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -15196,6 +15197,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/KCHK-4103-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4103-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4103-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0149-kernel-shape-index-bounds-boundary-evidence.md",
+  "crates/ling-types/tests/kernel_shape_index_bounds_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -15205,6 +15214,7 @@ acceptance = [
   "The audit covers rank/shape/index/layout, static and dynamic checks, slices and views, empty and overflow cases, proof elimination, host/device Faults, source-map positions, Unicode identifiers, CPU-reference equivalence, migration, resource limits, and deterministic canonical evidence.",
   "No Kernel shape or index syntax, bounds pass, Typed Core field, Device Buffer API, Fault mapper, backend hook, dependency, toolchain, diagnostic allocation, public protocol, CLI command, or placeholder API is added while GAP-KERNEL-DEVICE-001 and GAP-NUMERIC-CHECKED-FAULT-001 remain unresolved.",
   "The future implementation must consume checked Typed Core or a verified derivative only, preserve Semantic IDs and original UTF-8 spans, use bilingual L-<DOMAIN>-<NUMBER> diagnostics, retain Unicode 17.0.0 behavior, and keep host/device details out of Ling semantics.",
+  "Accepted DEC-0149 authorizes only test-local Kernel shape/index/bounds boundary evidence; it does not close shape/index/bounds semantics, verifier, alias/race/numeric/device policy, CPU reference, diagnostics, migration, protocol integration, or support claims.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -15216,6 +15226,61 @@ notes = [
   "The gap register requires an Accepted Kernel authority, numeric Fault decision, and CPU reference evidence before implementation. The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Native, memory categories, ownership, diagnostics, schemas, Semantic IDs, source spans, support claims, or Unicode 17.0.0 behavior.",
 ]
+[[task]]
+id = "KCHK-4103-OBSERVATION"
+title = "Internal Kernel shape/index/bounds boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["KCHK-4102-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0148-kernel-effect-capability-boundary-evidence.md",
+  "docs/decisions/0149-kernel-shape-index-bounds-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/kernel_shape_index_bounds_evidence.rs",
+  "docs/decisions/0149-kernel-shape-index-bounds-boundary-evidence.md",
+  "docs/status/KCHK-4103-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/KCHK-4103-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0149 authorizes only test-local Kernel shape/index/bounds boundary evidence; no Kernel syntax, shape schema, checker/verifier, Device Buffer API, backend, diagnostic, dependency, protocol, or support claim is made.",
+  "The test-local inventory covers sixty provisional boundaries for shape/dimension/rank/extent/stride/layout, index/slice/gather/scatter/broadcast/reshape/transpose, bounds and rejection cases, empty/zero/dynamic/static/symbolic shapes/inference/proofs, alias/race/buffer/address/ownership/device/profile/target, checked input/provenance/spans/Semantic IDs, diagnostics/Unicode, fixtures/round-trip/unknown/migration, CPU reference/device differential, host exclusion, and protocol inventory.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no shape, bounds, verifier, Device, diagnostic, Semantic ID, backend, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0149; KCHK-4103 remains BlockedSpec for shape/index/bounds semantics, verifier, alias/race/numeric/device policy, CPU reference, diagnostics, migration, protocol integration, and support claims.",
+  "No parser, AST/HIR/Checked Core node, Kernel shape/index schema, checker/verifier, Device Buffer API, backend, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
+]
+
 [[task]]
 id = "KCHK-4104"
 title = "Alias and parallel-write conflicts"

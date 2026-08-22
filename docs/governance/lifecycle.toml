@@ -3909,3 +3909,29 @@ unresolved_alternatives = [
   "Kernel Effect/Capability schema and closure; forbidden/allowed rows; IO, Network, Task, Actor, Device, Resource, Managed, allocation, mutation, call/recursion/trait propagation; profile/target mismatch; diagnostics/facts; CPU reference, determinism, fallback, migration, protocol inventory, and backend support remain open under KCHK-4102, KCHK-4101, GAP-KERNEL-DEVICE-001, and missing RFC-0013/RFC-H401 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0149"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0149-kernel-shape-index-bounds-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty provisional shape/index/bounds boundaries and their test-local order.",
+  "Compare forward and reversed insertion order and require identical opaque evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep shape/index/bounds semantics, verifier, alias/race/numeric/device policy, CPU reference, migration, diagnostics, and public support behavior deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Kernel shape/checker decision, Device Buffer API, diagnostic, dependency, protocol, backend, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Shape/layout/index model; slicing/gather/scatter/broadcast/reshape/transpose; bounds/overflow/empty/dynamic/static/symbolic/inference/proofs; alias/race, buffer/address/ownership/device/profile/target; Typed Core/verifier, numeric, CPU reference, differential, diagnostics, migration, protocol inventory, and backend/editor support remain open under KCHK-4103, KCHK-4101/4102, GAP-KERNEL-DEVICE-001, and missing RFC-0013/RFC-H401 authority.",
+]
+superseded_by = ""
