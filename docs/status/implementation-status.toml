@@ -6505,6 +6505,59 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2307-SOURCE-INDEX"
+title = "Internal resolver completion-source inventory"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2304-REVERSE-INDEX", "IDE-2305-IDENTIFIER-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0079-ide-completion-source-inventory.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/completion_source_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0079-ide-completion-source-inventory.md",
+  "docs/status/IDE-2307-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2307-SOURCE-INDEX-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0079 authorizes only an immutable resolver-backed inventory of user definitions, local/parameter bindings, and resolved import aliases; no completion policy is invented.",
+  "Entries preserve normalized names, existing DefinitionId or binding/import identity, logical source names, module IDs, and exact original UTF-8 spans; non-user definitions without spans and unresolved imports are omitted.",
+  "Deterministic source/module/span/name/kind/identity ordering and read-only module/source/name lookups make repeated equal resolver inputs equal without protocol or cache state.",
+  "Focused cargo fmt, ling-db tests, and clippy pass; Unicode/import/parameter sources, exact alias spans, repeated construction, and source-scoped lookups are covered.",
+  "The public IDE-2307 completion target remains BlockedSpec for contexts, visibility, ranking, type/effect/capability fit, insertion text, snapshots, versions, stale behavior, and protocol semantics.",
+]
+verified_against_commit = "d9183705b1d720abb90100ff93ee251419290764"
+completion_commit = "d9183705b1d720abb90100ff93ee251419290764"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The index is compiler-side source evidence for future completion analysis, not a completion item, candidate selector, insertion edit, or Semantic ID migration.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2307"
 title = "IDE completion v0"
 state = "BlockedSpec"
