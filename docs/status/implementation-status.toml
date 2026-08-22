@@ -14163,6 +14163,7 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0044-seed-performance-matrix-gate.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -14175,6 +14176,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/REL-6604-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6604-SEED-IMPLEMENTATION-REPORT.md",
   "docs/testing/PERFORMANCE-BASELINE.md",
   "docs/status/INC-1410-PERFORMANCE-BASELINE.json",
   "docs/status/INC-1410-IMPLEMENTATION-REPORT.md",
@@ -14196,6 +14198,53 @@ notes = [
   "REL-6604 is BlockedSpec because G6 depends on G1-G5 exits and no Accepted performance policy defines hardware tiers, warm-up/sample/variance, memory/IO, thresholds, or the unimplemented LSP/Native/Actor/Replay/device/kernel/Zed surfaces.",
   "INC-1410 already provides the authorized Seed query baseline; this audit adds contextual, reproducible trend evidence without converting local timings into release gates.",
   "The audit changes no source semantics, diagnostics, schemas, Semantic IDs, cache format, CLI, editor integration, package behavior, dependency, runtime, or public API and preserves deterministic/offline boundaries.",
+]
+
+[[task]]
+id = "REL-6604-SEED"
+title = "Seed performance-matrix drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REL-6603-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0044-seed-performance-matrix-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/PERFORMANCE-BASELINE.md",
+  ".github/workflows/ci.yml",
+]
+artifacts = [
+  "tools/xtask/src/performance_matrix.rs",
+  "tools/xtask/src/performance.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/testing/PERFORMANCE-BASELINE.md",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0044-seed-performance-matrix-gate.md",
+  "docs/status/REL-6604-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask performance verify deterministically validates twelve documented measurements with two Covered variants, two Partial rows, and eight Deferred rows.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, a missing Plan coverage section, and removal of performance-boundary policy phrases.",
+  "The command is included in the existing Seed reproducibility CI gate and does not run timing code, freeze thresholds, or claim cross-host or G6 performance evidence.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0044 closes only this internal Seed matrix child; the parent REL-6604 gate remains BlockedSpec for future performance authority and release evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects plan-coverage inventory consistency only; the existing timing harness remains opt-in measurement evidence and no threshold is inferred.",
+  "No benchmark dependency, absolute threshold, memory/IO claim, unsupported backend harness, public protocol, or placeholder is added.",
 ]
 
 [[task]]

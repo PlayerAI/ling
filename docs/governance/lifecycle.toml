@@ -170,6 +170,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0044"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0044-seed-performance-matrix-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask performance verify and assert twelve rows with two Covered variants, two Partial rows, and eight Deferred rows.",
+  "Mutate an isolated performance row or remove a policy phrase and verify the gate fails closed.",
+  "Run the opt-in Seed baseline only as measurement evidence without treating the matrix gate as a timing result or release threshold.",
+  "Repeat independent processes and verify no source, semantic, diagnostic, schema, protocol, support, or release-state output is generated.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask documentation validator and CI preflight; no benchmark dependency, threshold, memory claim, public protocol, or language behavior changes.",
+]
+unresolved_alternatives = [
+  "Benchmark schema, hardware tiers, warm-up/variance, memory/IO, broader backend/editor scope, regression ownership, and release threshold policy remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

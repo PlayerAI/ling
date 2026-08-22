@@ -52,6 +52,7 @@ const REQUIRED_GATES: &[GateContract] = &[
             "cargo xtask fault verify",
             "cargo xtask fuzz verify",
             "cargo xtask security verify",
+            "cargo xtask performance verify",
             "cargo run --package unicode-gen --locked --offline",
             "git diff --exit-code -- crates/ling-unicode/src/generated.rs editors/tree-sitter-ling/src/unicode-identifiers.generated.js",
             "cargo xtask seed reproduce",

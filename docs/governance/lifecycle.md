@@ -73,6 +73,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0041` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0041](../decisions/0041-seed-fuzz-inventory-gate.md) |
 | `DEC-0042` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0042](../decisions/0042-seed-fault-matrix-gate.md) |
 | `DEC-0043` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0043](../decisions/0043-seed-security-matrix-gate.md) |
+| `DEC-0044` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0044](../decisions/0044-seed-performance-matrix-gate.md) |
 
 ## Migration boundary
 

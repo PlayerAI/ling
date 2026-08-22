@@ -63,7 +63,7 @@ for another operating system, CPU, profile, or future compiler version.
 | Actor/task overhead | Deferred | Actor/Task runtime is Future/Unsupported. |
 | Replay overhead | Deferred | Replay/evidence protocol is Future/Unsupported. |
 | Kernel CPU/GPU | Deferred | Device/kernel surfaces are Future/Unsupported. |
-| memory peak | Not measured | A platform/resource measurement contract is absent. |
+| memory peak | Deferred | Not measured; a platform/resource measurement contract is absent. |
 | Zed startup/highlight | Deferred | Tree-sitter fixtures are correctness/differential tests, not a startup benchmark. |
 
 ## Reproduction
@@ -80,3 +80,19 @@ and retain the complete JSON output for every comparison. Do not convert this
 baseline into a hard gate until an Accepted performance policy defines sample
 count, warm-up, variance, hardware tiers, memory/IO measurement, and threshold
 ownership.
+
+## Internal matrix drift check
+
+The repository has one offline inventory check for this document:
+
+```text
+cargo xtask performance verify
+```
+
+The check validates the exact twelve planned-measurement rows and their current
+Covered/Partial/Deferred states. It protects the documented boundary only; it
+does not run the timing harness, freeze a threshold, make a cross-host claim,
+or turn the Seed trend baseline into a release gate. A missing memory
+measurement is recorded as Deferred until an Accepted resource policy exists.
+Fixture construction is excluded from timed regions, and the harness makes no absolute performance claim. Do not convert this baseline into a hard gate
+until an Accepted performance policy defines the release comparison rules.

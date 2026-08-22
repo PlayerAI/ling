@@ -20,6 +20,12 @@ maximum, and range, but freezes no absolute threshold. Treating one Windows
 run as a cross-platform release target would expose hardware, scheduler,
 allocation, or host-path behavior as Ling semantics.
 
+Accepted `DEC-0044` closes only the bounded `REL-6604-SEED` child: the
+internal `cargo xtask performance verify` command prevents drift in the
+twelve-row plan-coverage matrix and its measurement-only guardrails. It does
+not run the timing harness, freeze a threshold, or promote `REL-6604` to a G6
+performance sign-off.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:368-387` is a non-normative measurement list.
@@ -44,6 +50,9 @@ scenarios, three samples each, observed work, and dispersion ranges. The
 existing `tools/xtask/src/performance.rs` command emits the versioned internal
 JSON artifact with fixture setup excluded from timed regions. It makes no
 absolute performance claim and has no benchmark dependency.
+`cargo xtask performance verify` checks only the deterministic plan-coverage
+row/state inventory and preserves the Deferred state for memory until an
+Accepted resource policy exists.
 
 The command and relevant test/gate evidence are reproducible with locked
 offline dependencies. They do not measure memory peak, storage/thermal state,
