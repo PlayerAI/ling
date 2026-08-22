@@ -2028,3 +2028,16 @@ covers = ["MEM-3103 bounded Resource and Drop boundary evidence", "test-only Res
 depends_on = ["DEC-0115", "DEC-0009", "DEC-0010", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0117"
+title = "Internal Managed-graph and island boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0117-managed-island-boundary-evidence.md"
+covers = ["MEM-3104 bounded Managed-graph and island boundary evidence", "test-only Managed/island vocabulary", "Managed boundaries without graph/collection/isolation semantics"]
+depends_on = ["DEC-0116", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

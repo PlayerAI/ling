@@ -147,6 +147,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0114` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0114](../decisions/0114-security-resource-boundary-evidence.md) |
 | `DEC-0115` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0115](../decisions/0115-memory-layout-copy-move-boundary-evidence.md) |
 | `DEC-0116` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0116](../decisions/0116-resource-drop-boundary-evidence.md) |
+| `DEC-0117` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0117](../decisions/0117-managed-island-boundary-evidence.md) |
 
 ## Migration boundary
 

@@ -3077,3 +3077,29 @@ unresolved_alternatives = [
   "Resource identity and ownership transfer, Drop order, cleanup failure and cancellation behavior, Effect/Fault representation, Capability restrictions, Managed/GC separation, FFI lifetime/thread/ABI rules, diagnostics, optimization, migration, and differential behavior remain open under GAP-OWNERSHIP-MODEL-001 and MEM-3103.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0117"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0117-managed-island-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-eight provisional Managed/island boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep graph/edge rules, roots/cycles, collection/OOM, pinning/views, concurrency/transfer, isolation/security, diagnostics, migration, fuzzing, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public Managed, GC, isolation, or cross-domain protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Managed identity and reachability, graph/edge ownership, root discovery, cycle/sharing behavior, collection/finalization/OOM, pinning and borrowed views, concurrency/transfer, isolation/security, Native/FFI ABI, diagnostics, optimization, migration, and differential behavior remain open under GAP-OWNERSHIP-MODEL-001 and MEM-3104.",
+]
+superseded_by = ""

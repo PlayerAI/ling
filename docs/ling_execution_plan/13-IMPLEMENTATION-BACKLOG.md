@@ -307,6 +307,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `MEM-3103` | G3 | Resource 定义与 Drop 契约 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:99`, `docs/status/MEM-3103-AUTHORITY-AUDIT.md` |
 | `MEM-3103-OBSERVATION` | G3 | Internal Resource and Drop boundary evidence | S | Done | Accepted `DEC-0116`; see `crates/ling-effects/tests/resource_drop_evidence.rs` and `docs/status/MEM-3103-OBSERVATION-IMPLEMENTATION-REPORT.md`; ownership/Drop/cleanup/FFI semantics remain BlockedSpec |
 | `MEM-3104` | G3 | Managed 类型和 Island 边界 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:111`, `docs/status/MEM-3104-AUTHORITY-AUDIT.md` |
+| `MEM-3104-OBSERVATION` | G3 | Internal Managed-graph and island boundary evidence | S | Done | Accepted `DEC-0117`; see `crates/ling-types/tests/managed_island_evidence.rs` and `docs/status/MEM-3104-OBSERVATION-IMPLEMENTATION-REPORT.md`; graph/collection/isolation semantics remain BlockedSpec |
 | `OWN-3201` | G3 | Place 与 Move Analysis | L | BlockedSpec | `07-G3-V0.3-NATIVE.md:125`, `docs/status/OWN-3201-AUTHORITY-AUDIT.md` |
 | `OWN-3202` | G3 | Borrow Exclusivity | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:152`, `docs/status/OWN-3202-AUTHORITY-AUDIT.md` |
 | `OWN-3203` | G3 | Region Inference | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:172`, `docs/status/OWN-3203-AUTHORITY-AUDIT.md` |
