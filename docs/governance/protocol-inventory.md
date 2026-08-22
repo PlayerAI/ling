@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 25 records: 18 current public, 1 internal, 6 Future.
-- Current public stability: 10 Experimental, 8 Preview, 0 Stable.
+- 25 records: 19 current public, 1 internal, 5 Future.
+- Current public stability: 11 Experimental, 8 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -16,6 +16,7 @@
 | --- | --- | --- | --- | --- | --- | --- | ---: |
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
+| `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
@@ -33,7 +34,6 @@
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.2` | `Experimental` | no | no | 7 |
 | `PROTO-VM-CONTROL` | Public | Runtime control | `ling.vm.control/0.1` | `Experimental` | no | no | 4 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
-| `PROTO-PROJECT-CHECK` | Planned public | CLI | — | `Future` | no | no | 0 |
 | `PROTO-SEMANTIC-TRANSACTION` | Planned public | Transaction | — | `Future` | no | no | 0 |
 | `PROTO-BUILD-METADATA` | Planned public | Package metadata | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
@@ -46,14 +46,14 @@
 
 - Producer: ling executable
 - Consumer: humans; shell scripts; editor and build integrations
-- Reader policy: The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2.
-- Writer policy: Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, lsp --stdio routes to the framed lifecycle server, and no placeholder command is advertised.
+- Reader policy: The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Experimental project check command, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2.
+- Writer policy: Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, project check routes to the locked RFC-0002 graph boundary, lsp --stdio routes to the framed lifecycle server, and no placeholder command is advertised.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
-- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `RFC-0004`
+- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `RFC-0004`, `RFC-0024`
 - Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
-- Notes: The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds only the explicitly gated Preview `ling lsp --stdio` launcher.
+- Notes: The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds the Preview `ling lsp --stdio` launcher and RFC-0024 adds only the Experimental locked project graph check.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 
@@ -67,6 +67,19 @@
 - Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`tests/conformance/p7-hello-run/expect.toml`](../../tests/conformance/p7-hello-run/expect.toml), [`tests/conformance/p12-text-format-fault/expect.toml`](../../tests/conformance/p12-text-format-fault/expect.toml)
 - Notes: Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior.
+
+### `PROTO-PROJECT-CHECK` — Ling project graph check
+
+- Producer: ling project check
+- Consumer: shell scripts; CI jobs; local project tooling
+- Reader policy: The command requires exactly one --manifest-path ending in ling.toml and exactly one --locked option; it validates only the explicit local RFC-0002 project root and rejects unknown options or unsupported project subcommands.
+- Writer policy: Emit one deterministic path-free human line or one ling.project.check/0.1 JSON object; validation diagnostics use existing Diagnostic JSON and no command writes locks, sources, caches, or build artifacts.
+- Unknown-field policy: JSON report fields are current-writer-only; incompatible report changes require a new protocol version.
+- Migration tool: None; ling.project.check/0.1 is Experimental and current-writer-only.
+- Authority: `RFC-0024`, `RFC-0002`, `DEC-0003`, `DEC-0013`
+- Sources: [`docs/RFC-0024.md`](../RFC-0024.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs)
+- Fixtures: [`crates/ling-cli/tests/project_check.rs`](../../crates/ling-cli/tests/project_check.rs), [`tests/protocols/project-check/README.md`](../../tests/protocols/project-check/README.md)
+- Notes: Graph validation only: semantic compilation, run/test/build, workspace search, registry/network behavior, and lock update mode remain deferred.
 
 ### `PROTO-LSP-LIFECYCLE` — Ling LSP lifecycle and stdio transport
 
@@ -288,19 +301,6 @@
 - Sources: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Fixtures: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Notes: This record prevents a versioned implementation artifact from being mistaken for a public 1.x commitment; it is not the Future evidence-bundle protocol.
-
-### `PROTO-PROJECT-CHECK` — Ling project graph check
-
-- Producer: ling project check
-- Consumer: shell scripts; CI jobs; local project tooling
-- Reader policy: The command requires exactly one --manifest-path ending in ling.toml and exactly one --locked option; it validates only the explicit local RFC-0002 project root and rejects unknown options or unsupported project subcommands.
-- Writer policy: Emit one deterministic path-free human line or one ling.project.check/0.1 JSON object; validation diagnostics use existing Diagnostic JSON and no command writes locks, sources, caches, or build artifacts.
-- Unknown-field policy: JSON report fields are current-writer-only; incompatible report changes require a new protocol version.
-- Migration tool: None; ling.project.check/0.1 is Experimental and current-writer-only.
-- Authority: `RFC-0024`, `RFC-0002`, `DEC-0003`, `DEC-0013`
-- Sources: [`docs/RFC-0024.md`](../RFC-0024.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs)
-- Fixtures: —
-- Notes: Graph validation only: semantic compilation, run/test/build, workspace search, registry/network behavior, and lock update mode remain deferred.
 
 ### `PROTO-SEMANTIC-TRANSACTION` — Semantic Transaction
 

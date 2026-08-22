@@ -89,7 +89,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PRJ-1104` | G1/Editor | Dependency graph | L | Done | `03-G1-V0.1-LIVING.md:97`；见 `ling-project` package graph、dependency-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1105` | G1/Editor | Lock file | L | Done | `03-G1-V0.1-LIVING.md:107`；见 `ling-project` lockfile reader/writer、`schemas/lock/1` corpus、机器状态与实施报告 |
 | `PRJ-1106` | G1/Editor | Project fixtures | M | Done | `03-G1-V0.1-LIVING.md:116`；见七组命名 fixture、expected diagnostics/graph/lock、机器状态与实施报告 |
-| `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | M | BlockedSpec | `GAP-PROJECT-CLI-INTERFACE-001`; see `docs/status/PRJ-1107-AUTHORITY-AUDIT.md` |
+| `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | M | BlockedSpec | Accepted RFC-0024 closes only the locked graph-check child; semantic project check/run/test/build/workspace/artifact behavior remains in `GAP-PROJECT-CLI-INTERFACE-001`; see `docs/status/PRJ-1107-AUTHORITY-AUDIT.md` |
+| `PRJ-1107-CHECK` | G1/Editor | Locked project graph check Preview | M | Done | Accepted RFC-0024; see `crates/ling-cli/tests/project_check.rs`, `tests/protocols/project-check/README.md`, and `docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for the deferred project surface |
 | `PRJ-1108` | G1/Editor | Project graph fuzz/property | M | Done | `03-G1-V0.1-LIVING.md:140`；见生成式 cycle/path/order/lock properties、manifest fuzz/CI、机器状态与实施报告 |
 | `VM-1201` | G1/Editor | bytecode RFC 与模型 | M | Done | `03-G1-V0.1-LIVING.md:150`；见 RFC-0014、`ling-bytecode` 未验证模型、TEST-VM-0001 corpus、机器状态与实施报告 |
 | `VM-1202` | G1/Editor | Checked Core → bytecode 最小 lowering | L | Done | `03-G1-V0.1-LIVING.md:166`；见 deterministic lowering/encoder/disassembler、Hello exact goldens、机器状态与实施报告 |

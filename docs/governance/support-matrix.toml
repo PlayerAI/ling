@@ -288,10 +288,10 @@ implemented = true
 
 [[protocol]]
 id = "PROTO-PROJECT-CHECK"
-visibility = "Planned public"
-version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+version = "ling.project.check/0.1"
+stability = "Experimental"
+implemented = true
 
 [[protocol]]
 id = "PROTO-CLI-EXIT"

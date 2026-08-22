@@ -1,5 +1,6 @@
 use std::env;
 use std::ffi::OsString;
+use std::fs;
 use std::io::{BufRead, IsTerminal as _, Read as _, Write as _};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -11,6 +12,10 @@ use ling_diagnostics::{Diagnostic, MessageLanguage};
 use ling_effects::locate_main;
 use ling_eval::{Console, HostError, HostErrorCategory};
 use ling_format::{FormatDisposition, build_format_ir, format_core_with_disposition};
+use ling_project::{
+    LockMode, LockedGraphFailure, ManifestError, PackageGraph, discover_modules, parse_manifest,
+    resolve_package_graph_with_lock,
+};
 use ling_unicode::UNICODE_VERSION;
 
 const CLI_NAME: &str = "ling";
@@ -44,11 +49,22 @@ fn run(arguments: Vec<OsString>) -> u8 {
     let Some(command_name) = arguments[0].to_str() else {
         return invalid_usage("the command name must be valid Unicode");
     };
-    let Some(command) = Command::parse(command_name) else {
-        return invalid_usage(&format!("unknown command `{command_name}`"));
+    let (command, command_arguments) = if command_name == "project" {
+        match arguments.get(1).and_then(|value| value.to_str()) {
+            Some("check") => (Command::ProjectCheck, &arguments[2..]),
+            Some(subcommand) => {
+                return invalid_usage(&format!("unknown project subcommand `{subcommand}`"));
+            }
+            None => return invalid_usage("`project` requires a subcommand"),
+        }
+    } else {
+        let Some(command) = Command::parse(command_name) else {
+            return invalid_usage(&format!("unknown command `{command_name}`"));
+        };
+        (command, &arguments[1..])
     };
 
-    let options = match Options::parse(command, &arguments[1..]) {
+    let options = match Options::parse(command, command_arguments) {
         Ok(options) => options,
         Err(message) => return invalid_usage(&message),
     };
@@ -57,6 +73,15 @@ fn run(arguments: Vec<OsString>) -> u8 {
 }
 
 fn execute(options: Options) -> u8 {
+    if options.command == Command::ProjectCheck {
+        return execute_project_check(
+            options.format,
+            options
+                .manifest_path
+                .expect("project check requires a manifest path"),
+        );
+    }
+
     if options.command == Command::Lsp {
         debug_assert!(options.stdio);
         return execute_lsp();
@@ -158,6 +183,7 @@ fn execute(options: Options) -> u8 {
         }
         Command::Repl => unreachable!("handled before compilation"),
         Command::Format => unreachable!("handled before compilation"),
+        Command::ProjectCheck => unreachable!("handled before project checking"),
         Command::Lsp => unreachable!("handled before compilation"),
     }
 }
@@ -168,6 +194,150 @@ fn execute_lsp() -> u8 {
         Err(error) => {
             eprintln!("LSP 传输失败：{error}\nLSP transport failed: {error}");
             EXIT_RUNTIME_FAULT
+        }
+    }
+}
+
+fn execute_project_check(format: OutputFormat, manifest_path: PathBuf) -> u8 {
+    let project_root = manifest_path
+        .parent()
+        .filter(|path| !path.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+    let bytes = match fs::read(&manifest_path) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            return emit_internal_incident(
+                "project.manifest-read",
+                error.to_string(),
+                Reproduction::new("ling project check"),
+                format,
+            );
+        }
+    };
+    let manifest = match parse_manifest("ling.toml", &bytes) {
+        Ok(manifest) => manifest,
+        Err(error) => return emit_project_manifest_failure(format, error),
+    };
+
+    if let Err(error) = discover_modules(project_root, &manifest) {
+        return emit_project_discovery_failure(format, error);
+    }
+    let graph = match resolve_package_graph_with_lock(project_root, &manifest, LockMode::Locked) {
+        Ok(graph) => graph,
+        Err(error) => return emit_project_locked_failure(format, error),
+    };
+    emit_project_success(format, &graph)
+}
+
+fn emit_project_manifest_failure(format: OutputFormat, error: ManifestError) -> u8 {
+    emit_project_diagnostics(format, &[error.diagnostic()])
+}
+
+fn emit_project_discovery_failure(
+    format: OutputFormat,
+    error: ling_project::DiscoveryFailure,
+) -> u8 {
+    match error {
+        ling_project::DiscoveryFailure::Diagnostics(diagnostics) => {
+            emit_project_diagnostics(format, &diagnostics)
+        }
+        ling_project::DiscoveryFailure::Internal(message) => emit_internal_incident(
+            "project.module-discovery",
+            message,
+            Reproduction::new("ling project check"),
+            format,
+        ),
+    }
+}
+
+fn emit_project_locked_failure(format: OutputFormat, error: LockedGraphFailure) -> u8 {
+    match error.diagnostics() {
+        Some(diagnostics) => emit_project_diagnostics(format, diagnostics),
+        None => emit_internal_incident(
+            "project.locked-resolution",
+            error.to_string(),
+            Reproduction::new("ling project check"),
+            format,
+        ),
+    }
+}
+
+fn emit_project_diagnostics(format: OutputFormat, diagnostics: &[Diagnostic]) -> u8 {
+    match format {
+        OutputFormat::Human => emit_diagnostics(diagnostics, format, EXIT_COMPILE_ERROR),
+        OutputFormat::Json => {
+            let values = match diagnostic_values(diagnostics) {
+                Ok(values) => values,
+                Err(status) => return status,
+            };
+            let report = serde_json::json!({
+                "protocol": "ling.project.check/0.1",
+                "status": "error",
+                "diagnostics": values,
+            });
+            match serde_json::to_string(&report) {
+                Ok(rendered) => {
+                    eprintln!("{rendered}");
+                    EXIT_COMPILE_ERROR
+                }
+                Err(error) => emit_internal_incident(
+                    "project.error-json",
+                    error.to_string(),
+                    Reproduction::new("ling project check --format json"),
+                    format,
+                ),
+            }
+        }
+    }
+}
+
+fn emit_project_success(format: OutputFormat, graph: &PackageGraph) -> u8 {
+    let Some(root_package) = graph.package(graph.root()) else {
+        return emit_internal_incident(
+            "project.root-package",
+            "locked graph omitted its root package",
+            Reproduction::new("ling project check"),
+            format,
+        );
+    };
+    let module_count = graph
+        .packages()
+        .iter()
+        .map(|package| package.modules().nodes().len())
+        .sum::<usize>();
+    let package_count = graph.packages().len();
+    let version = root_package.identity().version().to_string();
+    let package = root_package.identity().name().as_str();
+    let entry = root_package.entry().as_str();
+    match format {
+        OutputFormat::Human => {
+            println!(
+                "项目检查通过 / project check passed: package={package}@{version} entry={entry} modules={module_count} packages={package_count}"
+            );
+            EXIT_SUCCESS
+        }
+        OutputFormat::Json => {
+            let report = serde_json::json!({
+                "protocol": "ling.project.check/0.1",
+                "status": "ok",
+                "package": {"name": package, "version": version},
+                "entry": entry,
+                "modules": module_count,
+                "packages": package_count,
+                "graph": graph.id().as_str(),
+            });
+            match serde_json::to_string(&report) {
+                Ok(rendered) => match write_stdout(format!("{rendered}\n").as_bytes()) {
+                    Ok(()) => EXIT_SUCCESS,
+                    Err(error) => emit_host_io_failure("project.stdout", &error, format),
+                },
+                Err(error) => emit_internal_incident(
+                    "project.success-json",
+                    error.to_string(),
+                    Reproduction::new("ling project check --format json"),
+                    format,
+                ),
+            }
         }
     }
 }
@@ -1049,7 +1219,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
     )
 }
 
@@ -1061,6 +1231,7 @@ enum Command {
     Semantic,
     Audit,
     Format,
+    ProjectCheck,
     Lsp,
 }
 
@@ -1088,6 +1259,7 @@ impl std::fmt::Display for Command {
             Self::Semantic => "semantic",
             Self::Audit => "audit",
             Self::Format => "fmt",
+            Self::ProjectCheck => "project check",
             Self::Lsp => "lsp",
         };
         formatter.write_str(name)
@@ -1115,8 +1287,10 @@ struct Options {
     command: Command,
     format: OutputFormat,
     path: Option<PathBuf>,
+    manifest_path: Option<PathBuf>,
     capabilities: Vec<String>,
     check: bool,
+    locked: bool,
     stdin_name: Option<String>,
     stdio: bool,
 }
@@ -1125,8 +1299,10 @@ impl Options {
     fn parse(command: Command, arguments: &[OsString]) -> Result<Self, String> {
         let mut format = OutputFormat::Human;
         let mut path = None;
+        let mut manifest_path = None;
         let mut capabilities = Vec::new();
         let mut check = false;
+        let mut locked = false;
         let mut stdin_name = None;
         let mut stdio = false;
         let mut index = 0;
@@ -1213,8 +1389,46 @@ impl Options {
                 continue;
             }
 
+            if argument == "--manifest-path" {
+                if command != Command::ProjectCheck {
+                    return Err("`--manifest-path` is only valid with `project check`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--manifest-path` requires a path".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the manifest path must be valid Unicode".to_owned())?;
+                let candidate = PathBuf::from(value);
+                if candidate == Path::new("-")
+                    || candidate.file_name().and_then(|name| name.to_str()) != Some("ling.toml")
+                {
+                    return Err("`--manifest-path` must name a `ling.toml` file".to_owned());
+                }
+                if manifest_path.replace(candidate).is_some() {
+                    return Err("only one `--manifest-path` may be provided".to_owned());
+                }
+                index += 2;
+                continue;
+            }
+
+            if argument == "--locked" {
+                if command != Command::ProjectCheck {
+                    return Err("`--locked` is only valid with `project check`".to_owned());
+                }
+                if locked {
+                    return Err("only one `--locked` may be provided".to_owned());
+                }
+                locked = true;
+                index += 1;
+                continue;
+            }
+
             if argument.to_string_lossy().starts_with('-') && argument != "-" {
                 return Err(format!("unknown option `{}`", argument.to_string_lossy()));
+            }
+            if command == Command::ProjectCheck {
+                return Err("`project check` does not accept a positional path".to_owned());
             }
             if path.replace(PathBuf::from(argument)).is_some() {
                 return Err("only one source file may be provided".to_owned());
@@ -1222,10 +1436,18 @@ impl Options {
             index += 1;
         }
 
-        if matches!(command, Command::Repl | Command::Lsp) && path.is_some() {
+        if matches!(
+            command,
+            Command::Repl | Command::Lsp | Command::ProjectCheck
+        ) && path.is_some()
+        {
             return Err(format!("`{command}` does not accept a source file"));
         }
-        if command != Command::Repl && command != Command::Lsp && path.is_none() {
+        if command != Command::Repl
+            && command != Command::Lsp
+            && command != Command::ProjectCheck
+            && path.is_none()
+        {
             return Err(format!("`{command}` requires a source file"));
         }
         if command == Command::Lsp && !stdio {
@@ -1254,13 +1476,25 @@ impl Options {
         } else if check || stdin_name.is_some() {
             return Err("formatter-only options require `fmt`".to_owned());
         }
+        if command == Command::ProjectCheck {
+            if manifest_path.is_none() {
+                return Err("`project check` requires `--manifest-path path`".to_owned());
+            }
+            if !locked {
+                return Err("`project check` requires `--locked`".to_owned());
+            }
+        } else if manifest_path.is_some() || locked {
+            return Err("project options require `project check`".to_owned());
+        }
 
         Ok(Self {
             command,
             format,
             path,
+            manifest_path,
             capabilities,
             check,
+            locked,
             stdin_name,
             stdio,
         })

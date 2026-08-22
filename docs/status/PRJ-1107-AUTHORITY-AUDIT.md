@@ -2,60 +2,71 @@
 
 ## Outcome
 
-PRJ-1107 is correctly recorded as `BlockedSpec`. Accepted RFC-0002 provides a
-deterministic, local, offline project library protocol, but explicitly leaves
-CLI integration to this task and later specifications. The execution plan asks
-for `CompilerHost::load_workspace`, unified project `check/run/test/build`,
-`--manifest-path`, lock/offline selection, process exits, and JSON output. The
-repository has no accepted public contract for those behaviors.
+PRJ-1107 remains `BlockedSpec` for the full project API and CLI surface. The
+accepted RFC-0024 decision authorizes and the completed child
+`PRJ-1107-CHECK` implements one bounded Preview slice: an explicit, locked,
+offline project graph check. That child does not promote the parent task to
+`Done` because semantic project checking, run/test/build behavior, workspace
+selection, and artifact policy still lack accepted contracts.
 
-No second package-resolution pipeline, project CLI command, build artifact
-model, test-discovery convention, or placeholder `CompilerHost` API was added.
-The current file-oriented `ling` commands remain unchanged.
+The child reuses the accepted RFC-0002 `ling-project` manifest, module
+discovery, lockfile, and package-graph APIs. It does not duplicate package
+resolution or add a placeholder `CompilerHost` API. Existing file-oriented
+`ling` commands remain unchanged outside `ling project check`.
 
 ## Normative traceability
 
-- Accepted RFC-0002 §1 fixes exact `ling.toml` selection and says an explicit
-  manifest path selects exactly one project root; it does not define the CLI
-  flag or workspace command dispatch.
-- Accepted RFC-0002 §2–§14 authorizes the manifest, deterministic local graph,
-  package identities, and `ling.lock/1` library protocols. It explicitly lists
-  CLI integration beyond PRJ-1107 as out of scope.
-- Accepted DEC-0003 fixes the current M0 CLI parser and command baseline; it
-  does not authorize project commands or a build/test artifact contract.
-- Accepted DEC-0013 supplies existing `main`/runtime failure categories and
-  exit semantics, but does not define project-command selection, JSON result
-  fields, or build/test outcomes.
-- `docs/SEMANTICS.md` and `docs/LANGUAGE.md` fix the executable name to `ling`;
-  stale `zero` spellings in the execution plan are not implementation
-  authority.
+- Accepted RFC-0002 §1 and §§2–14 fix explicit `ling.toml` selection, the
+  deterministic local package graph, package identities, and `ling.lock/1`
+  library protocols. They do not define the complete project CLI surface.
+- Accepted RFC-0024 §§1–9 authorize only `ling project check --manifest-path
+  PATH --locked [--format human|json]`: explicit-root selection, local locked
+  graph validation, path-free bilingual human output, the Experimental
+  `ling.project.check/0.1` JSON report, and no lock/network/artifact writes.
+- Accepted DEC-0003 fixes the current M0 CLI parser and command baseline;
+  RFC-0024 is the additional authority for the nested project-check command.
+- Accepted DEC-0013 supplies existing main/runtime failure categories and
+  exit semantics; RFC-0024 deliberately reuses existing diagnostics and does
+  not allocate a new code range.
+- `docs/SEMANTICS.md` and `docs/LANGUAGE.md` fix the executable name to
+  `ling`; stale `zero` spellings in lower-authority execution inputs are not
+  implementation authority.
 
-## Specification gap
+## Specification gap and remaining parent scope
 
-`GAP-PROJECT-CLI-INTERFACE-001` now owns the missing contract for:
+`GAP-PROJECT-CLI-INTERFACE-001` remains open for the parent task's unresolved
+surface:
 
-- manifest-path precedence and project-root selection;
-- project `check`, `run`, `test`, and `build` semantics and artifact scope;
-- `--locked`/`--offline` command behavior;
-- process exit mapping and machine-readable JSON output; and
-- reuse of the RFC-0002 graph without duplicated package resolution.
+- semantic project `check` and its relationship to the checked compiler;
+- project `run`, `test`, and `build` semantics and artifact scope;
+- workspace/member selection, manifest discovery beyond an explicit root, and
+  `--locked`/`--offline` behavior outside RFC-0024;
+- process-exit mapping and machine-readable result contracts for those
+  commands; and
+- any `CompilerHost` or build-artifact API.
 
-The gap remains open because either a versioned project CLI decision or an
-explicit library-only deferral is required. The implementation must not choose
-between those options through code.
+The RFC-0024 child does not choose among those alternatives through code.
 
 ## Evidence and compatibility
 
-The audit was checked against the current `crates/ling-cli` command parser,
-`crates/ling-project` public library boundary, `PROTO-CLI`,
-`PROTO-PACKAGE-MANIFEST`, `PROTO-LOCKFILE`, RFC-0002, DEC-0003, and DEC-0013.
-No diagnostic code, schema, Semantic ID, canonical bytes, source span, Unicode
-table, CLI behavior, or protocol inventory entry changed. No runtime test was
-added because there is no accepted observable project CLI contract to test.
+The child implementation is recorded in
+`docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md` and covered by the
+offline integration tests in `crates/ling-cli/tests/project_check.rs` plus
+the protocol evidence under `tests/protocols/project-check/`. The command
+requires exactly one explicit `ling.toml` path and exactly one `--locked`,
+validates the local graph without writing a lock, and emits deterministic,
+path-free human or JSON output. The protocol inventory and support matrix
+register `ling.project.check/0.1` as Experimental only.
+
+No language semantics, source spans, Semantic IDs, bytecode, VM behavior,
+Unicode tables, existing diagnostic allocations, or stable public schemas
+changed. The JSON report is current-writer-only and intentionally not
+canonical. The implementation is local/offline and does not claim network,
+workspace, artifact, or performance behavior.
 
 ## Intentionally deferred
 
-PRJ-1107 can start only after `GAP-PROJECT-CLI-INTERFACE-001` is resolved by an
-Accepted decision. FMT-1507 and the LSP/transaction work remain separately
-blocked by their registered authority gaps; this audit does not combine their
+The parent PRJ-1107 task remains blocked until accepted decisions define the
+remaining project CLI/API surface. FMT-1507 and the LSP/transaction work have
+separate registered authority gaps; this child does not combine their
 protocol choices or create a shared placeholder service.

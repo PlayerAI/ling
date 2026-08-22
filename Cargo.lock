@@ -223,6 +223,7 @@ dependencies = [
  "ling-format",
  "ling-hir",
  "ling-lsp",
+ "ling-project",
  "ling-resolve",
  "ling-semantic",
  "ling-source",

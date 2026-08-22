@@ -3941,6 +3941,7 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/RFC-0002.md",
+  "docs/RFC-0024.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
@@ -3950,23 +3951,74 @@ spec = [
 ]
 artifacts = [
   "docs/status/PRJ-1107-AUTHORITY-AUDIT.md",
+  "docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md",
   "docs/governance/gap-register.toml",
   "docs/governance/gap-register.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "An accepted project CLI decision defines manifest-path precedence, project check/run/test/build behavior, lock/offline selection, process exits, and JSON output.",
-  "The implementation reuses the RFC-0002 library graph and does not duplicate package resolution or add a placeholder CompilerHost API.",
-  "No stale `zero` command, unregistered protocol, diagnostic allocation, build artifact claim, or project test convention is introduced while the decision is absent.",
+  "RFC-0024 now defines the bounded locked project graph-check command; project semantic check/run/test/build and workspace selection remain separate parent scope.",
+  "The completed child reuses the RFC-0002 library graph and does not duplicate package resolution or add a placeholder CompilerHost API.",
+  "No stale `zero` command, unregistered protocol, diagnostic allocation, build artifact claim, or project test convention is introduced beyond the accepted graph-check boundary.",
 ]
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "PRJ-1107 is blocked by GAP-PROJECT-CLI-INTERFACE-001; RFC-0002 explicitly leaves CLI integration to this task and no accepted command/build/test contract exists.",
-  "The current file-oriented `ling` CLI and accepted `ling.manifest/1`, `ling.semantic/0.2`, and `ling.lock/1` library protocols remain unchanged.",
+  "PRJ-1107 remains BlockedSpec for semantic project checking, run/test/build, workspace selection, and artifact policy; RFC-0024 authorizes only the bounded graph-check child.",
+  "The current file-oriented commands and accepted `ling.manifest/1`, `ling.semantic/0.2`, and `ling.lock/1` library protocols remain unchanged outside `ling project check`.",
+]
+
+[[task]]
+id = "PRJ-1107-CHECK"
+title = "Locked project graph check Preview"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1106"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/RFC-0024.md",
+  "docs/decisions/0003-m0-tooling.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "Cargo.lock",
+  "crates/ling-cli/Cargo.toml",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/tests/project_check.rs",
+  "tests/protocols/project-check/README.md",
+  "docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md",
+  "docs/status/PRJ-1107-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "ling project check requires exactly one --manifest-path ending in ling.toml and exactly one --locked option; unknown, positional, stale zero, and unsupported project options fail with exit 2.",
+  "The command validates the explicit root module graph and recursive local package graph through ling-project LockMode::Locked, performs no network or parent search, and never creates or rewrites a lock.",
+  "Human output is one bilingual path-free success line; JSON output is deterministic ling.project.check/0.1 success or error with existing Diagnostic JSON values.",
+  "Positive offline-lock, missing-lock, deterministic-repeat, path-independence, nonmutation, and invalid-argument integration tests pass.",
+  "No semantic compilation, run/test/build, artifact, diagnostic allocation, Semantic ID, language, bytecode, VM, or Unicode 17.0.0 behavior is claimed.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working-tree"
+completed = "2026-08-22"
+notes = [
+  "This child closes only the RFC-0024 locked graph-check slice; parent PRJ-1107 remains BlockedSpec for the rest of project CLI integration.",
+  "The Experimental ling.project.check/0.1 protocol is registered only after executable tests and generated support evidence are present.",
 ]
 
 [[task]]

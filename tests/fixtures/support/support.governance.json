@@ -490,10 +490,10 @@
     },
     {
       "id": "PROTO-PROJECT-CHECK",
-      "visibility": "Planned public",
-      "version": "",
-      "stability": "Future",
-      "implemented": false
+      "visibility": "Public",
+      "version": "ling.project.check/0.1",
+      "stability": "Experimental",
+      "implemented": true
     },
     {
       "id": "PROTO-REPL-JSON",
