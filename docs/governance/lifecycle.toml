@@ -1688,3 +1688,29 @@ unresolved_alternatives = [
   "Value/Managed/Resource, kind constraints, Copy/Move, ownership, borrowing, region/drop, identity, serialization, profile, Native, FFI, and memory diagnostics remain later MEM-3101 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0006"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0006.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Construct pure, closed, open, parameterized, duplicate, and reordered rows and compare canonical values and bytes across processes and presentation order.",
+  "Verify State<Int> and State<Text> remain distinct, duplicate labels collapse, and pure remains the empty closed row.",
+  "Verify operation signatures preserve ordered type references and resume cardinality; reject empty names, malformed IDs, duplicate clauses, and mismatched handled labels.",
+  "Verify nested handler residual rows and explicit Never/Once/Many declarations without executing a handler or granting Capability authority.",
+  "Verify Unicode NFC, CRLF, BOM, original byte spans, package coordinates, and source-name changes do not enter path-free canonical identities.",
+]
+compatibility_impact = [
+  "Adds only an Experimental v0.2 core model authority; v0.0.1 Seed syntax, diagnostics, schemas, Semantic IDs, bytecode, VM, CLI, LSP, protocols, and Unicode 17.0.0 behavior remain unchanged.",
+]
+unresolved_alternatives = [
+  "EFF-2102 owns row constraint solving and diagnostics; EFF-2103 owns source syntax and Checked-Core lowering; Task, Actor, Replay, Remote, Native, GPU, FFI, and Stable 1.0 compatibility require separate accepted authorities.",
+]
+superseded_by = ""

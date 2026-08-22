@@ -6739,7 +6739,7 @@ notes = [
 [[task]]
 id = "EFF-2101"
 title = "Effect core model freeze"
-state = "BlockedSpec"
+state = "In Progress"
 release = "G2"
 size = "M"
 owner = "Codex"
@@ -6751,6 +6751,7 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/RFC-0001.md",
+  "docs/RFC-0006.md",
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
@@ -6759,25 +6760,29 @@ spec = [
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-effects/src/v2.rs",
+  "docs/status/EFF-2101-IMPLEMENTATION-REPORT.md",
   "docs/status/EFF-2101-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing Effect identity/order, open/closed rows, row variables, operation signatures, handler/recovery/resume semantics, Capability separation, Semantic Graph schema, diagnostics, and migration contracts.",
-  "The audit distinguishes the Accepted Seed EffectRow/State/Capability boundary from the missing v0.2 model and records RFC-C201 as an unregistered placeholder plus candidate RFC-0006 gaps.",
-  "The audit covers pure, Clock, handler discharge, polymorphic map, missing Capability, unhandled profile effects, nested/resumed handlers, State masking, Task/ActorSend, Unicode/CRLF/BOM, canonical ordering, and deterministic graph/differential fixtures.",
-  "No open-row or handler model, new Effect/Capability label, EffectId, schema field, diagnostic allocation, Semantic ID rule, or placeholder G2 crate/API is added while the authority is absent.",
-  "The future implementation must extend the Seed checker only from an Accepted model, preserve canonical rows, keep Capability authorization separate, and provide checked Typed Core plus differential evidence.",
+  "RFC-0006 is Accepted and authorizes the experimental v0.2 Effect identity, label, row-tail, operation, handler, residual-row, and Capability-separation model.",
+  "The implementation is isolated from the Seed closed EffectRow and preserves existing source, diagnostic, Semantic ID, bytecode, VM, CLI/LSP, protocol, and Unicode behavior.",
+  "EffectId, canonical Typed-Core references, parameterized labels, closed/open rows, row-variable union constraints, operation signatures, resume modes, and lexical handler residuals are implemented with deterministic ordering and path-free bytes.",
+  "Focused positive, negative, nested-handler, parameter-distinction, NFC, duplicate-elimination, and canonical-byte tests pass offline; full workspace check and clippy pass.",
+  "Remaining Semantic Graph/Audit projection, reserved-label fixture matrix, solver/lowering diagnostics, and runtime differential evidence are explicitly tracked before the task can become Done.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "working"
 completed = ""
 notes = [
-  "EFF-2101 is BlockedSpec by GAP-EFFECT-STATE-MASKING-001, GAP-EFFECT-HANDLER-001, RFC-C201 being absent/unregistered, and the G2 prerequisite v0.1 exit; Task/Actor effect labels depend on separate unaccepted authorities.",
-  "ling-effects currently implements only Seed Console.Write and State<T> rows with Capability closure and deterministic set behavior; no open rows, handlers, resumption, or v0.2 schema exists.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "RFC-0006 resolves the two Effect specification gaps but deliberately leaves EFF-2102+ inference, diagnostics, lowering, runtime, and separate Task/Actor/Replay/Remote authorities open.",
+  "The v2 model is an in-process experimental boundary; no source handler syntax, Checked Core node, public protocol field, or runtime behavior is implied.",
+  "The authority audit and implementation report record normative clauses, compatibility impact, deterministic/Unicode guarantees, tests, and intentionally deferred work.",
 ]
 
 [[task]]

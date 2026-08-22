@@ -273,6 +273,8 @@ dependencies = [
  "ling-source",
  "ling-syntax",
  "ling-types",
+ "ling-unicode",
+ "unicode-normalization",
 ]
 
 [[package]]

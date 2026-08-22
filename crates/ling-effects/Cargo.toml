@@ -12,6 +12,8 @@ ling-hir = { path = "../ling-hir" }
 ling-resolve = { path = "../ling-resolve" }
 ling-source = { path = "../ling-source" }
 ling-types = { path = "../ling-types" }
+ling-unicode = { path = "../ling-unicode" }
+unicode-normalization.workspace = true
 
 [dev-dependencies]
 ling-ast = { path = "../ling-ast" }

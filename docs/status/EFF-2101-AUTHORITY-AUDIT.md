@@ -2,104 +2,76 @@
 
 ## Outcome
 
-`EFF-2101` is correctly recorded as `BlockedSpec`. The G2 execution plan asks
-for `EffectId`, `EffectRow`, row variables, open/closed rows, operation
-signatures, handler inputs and recovery types, explicit Capability separation,
-canonical ordering, a Semantic Graph schema, and examples for `Clock`,
-`Random`, `Console`, `State<T>`, `Task`, and `ActorSend<T>`. Its declared
-dependency `RFC-C201` is not present as an accepted repository authority.
-The bounded child `EFF-2101-SEED-ROW`, authorized by DEC-0060, adds only a
-canonical in-process snapshot of the existing Seed closed row.
+`RFC-0006` is now an Accepted repository authority for the experimental v0.2
+Effect core model. `EFF-2101` is therefore no longer specification-blocked;
+it is `In Progress` while the checked implementation and conformance evidence
+are completed. The existing v0.0.1 Seed `EffectRow` remains unchanged.
 
-No open-row or handler model, new Effect/Capability label, `EffectId`, schema
-field, diagnostic allocation, Semantic ID rule, or placeholder G2 crate/API was
-added.
+The implementation adds a separate `ling-effects::v2` model for canonical
+`EffectId`, parameterized `EffectLabel`, closed/open rows, row variables,
+operation signatures, resume cardinality, lexical handler clauses, residual
+rows, and deterministic canonical bytes. It does not reinterpret Seed AST or
+publish a runtime, protocol, or bytecode contract.
 
 ## Normative traceability
 
-- The G2 execution package is non-normative; its RFC-C201 placeholder and
-  acceptance table do not authorize v0.2 language behavior.
-- `docs/SEMANTICS.md` describes Seed Effect Rows as unordered, deduplicated
-  labels and marks user-defined handlers as future syntax. It does not accept
-  row variables, open/closed-row inference, handler matching/elimination,
-  resumption, or `Task`/`ActorSend` semantics.
-- Accepted DEC-0010 fixes Seed `State<T>` visibility and Capability authority:
-  local mutation contributes `State<T>`, external Capability requirements are
-  checked before evaluation, and the evaluator cannot invent authorization.
-  It does not define v0.2 row polymorphism or handlers.
-- `GAP-EFFECT-STATE-MASKING-001` leaves State masking and escape proof open;
-  `GAP-EFFECT-HANDLER-001` leaves polymorphism, matching, elimination,
-  nesting, resumption, Capability interaction, and unhandled-effect failure
-  open. Both identify candidate RFC-0006, not an Accepted RFC.
-- The `Task` and actor labels in the proposed examples also depend on the
-  unaccepted structured-task and actor lifecycle authorities. RFC-0001 remains
-  Draft under DEC-0018 and cannot supply post-Seed authorization.
+- RFC-0006 §§1–4 authorize NFC Effect identities, ordered Typed-Core
+  parameters, duplicate-free rows, closed/open tails, deterministic union,
+  explicit operation signatures, lexical first-order handlers, residual-row
+  preservation, and the separation of Effect presence from Capability
+  authorization.
+- RFC-0006 §8 reserves `Clock`, `Random`, `Console.Write`, `State<T>`,
+  `Task`, and `ActorSend<T>` labels. Task/Actor lifecycle and transport
+  semantics remain deferred to their own Accepted authorities.
+- Accepted DEC-0010 continues to govern Seed `State<T>` visibility and host
+  Capability closure. The new model does not change Seed checking or grant a
+  Capability when an Effect is handled.
+- RFC-0006 resolves `GAP-EFFECT-STATE-MASKING-001` by keeping `State<T>`
+  visible and resolves `GAP-EFFECT-HANDLER-001` with a bounded first-order
+  handler model. Solver diagnostics and source syntax remain EFF-2102/EFF-2103
+  responsibilities.
 
 ## Current implementation evidence
 
-- `ling-effects` implements the Seed `EffectRow` as a deterministic set of
-  `Console.Write` and parameterized `State` effects, propagates effects through
-  the checked call graph, and checks the existing Capability closure.
-- `EffectRow::seed_snapshot` exposes only deduplicated canonical names and
-  pure-row state through `SeedEffectRowSnapshot`; it does not add a v0.2 row
-  variable, handler, label, or wire/schema field.
-- The current checker has no `EffectId`, row-variable constraints,
-  open/closed-row distinction, user-defined operations, handler AST/Typed Core,
-  resume multiplicity, effect discharge, or unhandled-handler failure model.
-- `ling-semantic` can project the current Seed Effect/Capability facts, but no
-  v0.2 Semantic Graph schema or canonical identity rule for new effect labels
-  is accepted or inventoried.
-- Existing tests cover Seed purity, `Console.Write`, `State<T>`, higher-order
-  propagation, missing/unused Capability, and set ordering. No fixture covers
-  row unification, generalization/instantiation, nested handlers, resumption,
-  masking, `Clock`/`Random`/`Task`/`ActorSend`, or differential handler
-  execution.
+- `EffectId::new` validates Unicode 17 XID segments, normalizes NFC, rejects
+  empty/path-like identities, and stores only canonical segments.
+- `EffectTypeRef` rejects whitespace, controls, and source path separators;
+  labels compare ordered canonical parameters, so `State<Int>` and
+  `State<Text>` remain distinct.
+- `EffectRowModel` sorts and deduplicates labels, represents `Closed` or a
+  binder-local `RowVariableId`, preserves tails through removal, and rejects a
+  union of distinct open tails instead of choosing a host-dependent result.
+- `EffectOperation` validates operation names and retains ordered input types,
+  one output type, and `Never`/`Once`/`Many` resume mode.
+- `HandlerContract` canonicalizes clauses, rejects duplicate labels and owner
+  mismatches, removes only declared labels, and verifies the declared residual
+  row while preserving an open tail for nested handlers.
+- Focused tests cover NFC/path rejection, pure/closed/open rows, duplicate and
+  presentation-order independence, parameter distinction, union constraints,
+  resume modes, nested residual handlers, and canonical bytes.
 
-## Required authority before implementation
+## Compatibility and determinism
 
-An Accepted RFC or decision must define, at minimum:
+- Seed source syntax, diagnostics, Semantic IDs, schemas, bytecode, VM,
+  interpreter behavior, CLI/LSP protocols, and Unicode 17 data are unchanged.
+- No diagnostic code, wire field, public protocol, or Semantic Graph schema
+  version is allocated by this slice. `canonical_bytes()` is an in-process,
+  length-delimited projection for future graph integration and contains no
+  paths, allocator identity, hash-map order, timing, or debug formatting.
+- Original source spans are not introduced or rewritten; later syntax/Core
+  work must attach the existing UTF-8 spans when it creates source nodes.
 
-1. Effect identity and canonical ordering, parameter normalization, equality,
-   Semantic Graph/Audit Source representation, versioning, and migration;
-2. open/closed rows, row variables, constraints, unification and occurs check,
-   generalization/instantiation, higher-order and partial-application rules,
-   and the boundary between static effects and runtime observations;
-3. operation signatures, handler input/output and recovery types, scope,
-   nesting/elimination, resume linearity or multiplicity, unhandled-effect
-   behavior, and Typed Core lowering;
-4. State masking/escape proofs, Capability requirements and injection, labels
-   for Clock/Random/Console/Task/ActorSend, profile restrictions, diagnostics,
-   and interaction with cancellation, replay, actors, and resource safety; and
-5. executable positive/negative/migration/conformance and compiler-interpreter-
-   VM differential fixtures for pure rows, Clock, handler discharge,
-   polymorphic map, missing Capability, unhandled profile effects, nested and
-   resumed handlers, State masking, Unicode/CRLF/BOM source spans, canonical
-   ordering, and deterministic Semantic Graph bytes.
+## Remaining EFF-2101 work
 
-Until these decisions are Accepted, changing the existing `EffectRow` could
-freeze an incompatible function-type or Capability contract, expose handler
-control flow as language semantics, or make future Task/Actor behavior depend
-on an accidental label representation.
+1. Integrate the model into a versioned, optional Semantic Graph/Audit
+   projection only after that protocol authority is accepted.
+2. Add the full positive/negative fixture matrix for unhandled profile effects,
+   polymorphic calls, Capability failures, and the reserved-label examples.
+3. Keep row constraint solving, generalization/instantiation, diagnostics,
+   handler syntax/Typed Core lowering, and runtime execution in EFF-2102,
+   EFF-2103, and EFF-2104/2105.
+4. Obtain separate Accepted authorities before implementing Task, Actor,
+   Replay, Remote, Native, GPU, or FFI behavior.
 
-## Evidence and compatibility
-
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0018,
-`docs/RFC-0001.md`, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
-`docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and `crates/ling-effects`/`crates/ling-semantic`, including the bounded
-`EFF-2101-SEED-ROW` report.
-
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
-
-## Intentionally deferred
-
-`EFF-2101-SEED-ROW` is complete under DEC-0060. The parent `EFF-2101` can
-begin after v0.1 exit criteria, RFC-0006 (or an accepted replacement), and the
-structured Task/Actor effect authorities are Accepted.
-The future implementation must extend the Seed checker from an explicit
-accepted model, preserve canonical deterministic rows, keep Capability
-authorization separate, and provide checked Typed Core plus differential
-evidence before any handler runtime is added.
+Until these items are complete, `EFF-2101` must not be marked `Done` and the
+v0.2 model must remain explicitly Experimental.
