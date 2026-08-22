@@ -19,6 +19,7 @@ mod property;
 mod runtime;
 mod scheduler;
 mod state_machine;
+mod supervisor;
 mod turn;
 
 pub use actor::{
@@ -53,6 +54,11 @@ pub use scheduler::{
 pub use state_machine::{
     LocalId, MachineIdentityKind, StateEdgeKind, StateId, StateMachineError, StateMachineModel,
     StateNode, StateNodeSpec, StateTransition, StateTransitionSpec, TransitionId,
+};
+pub use supervisor::{
+    SupervisorIdentityKind, SupervisorObservation, SupervisorObservationError,
+    SupervisorObservationId, SupervisorObservationKind, SupervisorObservationModel,
+    SupervisorObservationSpec,
 };
 pub use turn::{
     TurnId, TurnIdentityKind, TurnObservation, TurnObservationError, TurnObservationKind,

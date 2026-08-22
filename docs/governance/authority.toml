@@ -1820,3 +1820,16 @@ covers = ["ACT-2306 bounded property observation", "deterministic property obser
 depends_on = ["DEC-0099", "DEC-0098", "DEC-0097", "DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0101"
+title = "Internal Supervisor observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0101-supervisor-observation.md"
+covers = ["SUP-2401 bounded Supervisor observation", "deterministic supervision observation identities", "supervision labels without restart/Fault semantics"]
+depends_on = ["DEC-0100", "DEC-0099", "DEC-0098", "DEC-0097", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

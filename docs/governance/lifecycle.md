@@ -131,6 +131,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0098` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0098](../decisions/0098-actor-turn-observation.md) |
 | `DEC-0099` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0099](../decisions/0099-actor-runtime-observation.md) |
 | `DEC-0100` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0100](../decisions/0100-actor-property-observation.md) |
+| `DEC-0101` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0101](../decisions/0101-supervisor-observation.md) |
 
 ## Migration boundary
 

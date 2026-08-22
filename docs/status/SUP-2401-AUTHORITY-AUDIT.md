@@ -13,6 +13,11 @@ No Supervisor type, child specification, restart strategy, escalation API,
 Fault channel, state snapshot protocol, diagnostic, public protocol, or
 placeholder G2 API was added.
 
+Accepted `DEC-0101` now authorizes the bounded child `SUP-2401-OBSERVATION`,
+which records only immutable supervision observation identities and structural
+labels. It does not close the child ownership, strategy, restart budget, state
+restore, Fault channel, runtime, or shutdown gaps described below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its supervision checklist cannot

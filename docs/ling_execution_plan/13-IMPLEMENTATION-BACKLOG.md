@@ -273,6 +273,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ACT-2306` | G2 | Actor 性质与压力测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:313`, `docs/status/ACT-2306-AUTHORITY-AUDIT.md` |
 | `ACT-2306-PROPERTY-OBSERVATION` | G2 | Internal Actor property observation | S | Done | Accepted `DEC-0100`; see `crates/ling-concurrency/src/property.rs` and `docs/status/ACT-2306-PROPERTY-OBSERVATION-IMPLEMENTATION-REPORT.md`; property/stress/runtime semantics remain BlockedSpec |
 | `SUP-2401` | G2 | Supervisor 模型 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:326`, `docs/status/SUP-2401-AUTHORITY-AUDIT.md` |
+| `SUP-2401-OBSERVATION` | G2 | Internal Supervisor observation | S | Done | Accepted `DEC-0101`; see `crates/ling-concurrency/src/supervisor.rs` and `docs/status/SUP-2401-OBSERVATION-IMPLEMENTATION-REPORT.md`; supervision/restart/Fault semantics remain BlockedSpec |
 | `SUP-2402` | G2 | 重启预算与熔断 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:340`, `docs/status/SUP-2402-AUTHORITY-AUDIT.md` |
 | `SUP-2403` | G2 | 监督测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:355`, `docs/status/SUP-2403-AUTHORITY-AUDIT.md` |
 | `REP-2501` | G2 | Determinism Class | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:369`, `docs/status/REP-2501-AUTHORITY-AUDIT.md` |
