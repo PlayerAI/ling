@@ -95,6 +95,7 @@
 | `DBUF-4403` | Transfer Effect | `G4` | `M` | `BlockedSpec` | `DBUF-4402` | `` |
 | `DBUF-4404` | Device Synchronization Model | `G4` | `M` | `BlockedSpec` | `DBUF-4403` | `` |
 | `DIFF-3701` | Interpreter/VM/Native differential harness | `G3` | `L` | `BlockedSpec` | `FFI-3605` | `` |
+| `DIFF-3701-OBSERVATION` | Internal differential-harness boundary evidence | `G3` | `S` | `Done` | `FFI-3605-OBSERVATION` | `4d43fa0a3ed9144494b82bdc0dbb3e15ab2daf47` |
 | `DIFF-3702` | Allowed-difference registry | `G3` | `M` | `BlockedSpec` | `DIFF-3701` | `` |
 | `DIR-4501` | Device IR Schema | `G4` | `L` | `BlockedSpec` | `DBUF-4404` | `` |
 | `DIR-4502` | Kernel Core to Device IR | `G4` | `M` | `BlockedSpec` | `DIR-4501` | `` |

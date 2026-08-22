@@ -14458,10 +14458,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "4d43fa0a3ed9144494b82bdc0dbb3e15ab2daf47"
+completion_commit = "4d43fa0a3ed9144494b82bdc0dbb3e15ab2daf47"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0142; DIFF-3701 remains BlockedSpec for engine adapters, Native execution, trace/normalization schemas, equivalence/allowed differences, replay, corpus, diagnostics, migration, and cross-target/compiler decisions.",
   "No parser, AST/HIR/Checked Core node, differential harness, Native adapter, trace schema, normalizer, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
