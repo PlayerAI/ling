@@ -16899,6 +16899,7 @@ spec = [
   "docs/RFC-0014.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
+  "docs/decisions/0164-device-ir-canonicalization-boundary-evidence.md",
   "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -16908,6 +16909,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DIR-4503-AUTHORITY-AUDIT.md",
+  "docs/status/DIR-4503-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIR-4503-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0164-device-ir-canonicalization-boundary-evidence.md",
+  "crates/ling-types/tests/device_ir_canonicalization_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -16927,6 +16936,60 @@ notes = [
   "The repository has no Device IR model, canonical serializer, ordering pass, canonical constant encoder, target-independent hash, specialization hash, schema registry, migration reader/writer, or corpus.",
   "DEC-0012 remains authoritative for current semantic identities only; the audit does not reuse it to invent a Device IR identity or public cache protocol.",
   "The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; the plan remains non-normative.",
+]
+[[task]]
+id = "DIR-4503-OBSERVATION"
+title = "Internal Device IR canonicalization boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DIR-4502-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0163-kernel-device-lowering-boundary-evidence.md",
+  "docs/decisions/0164-device-ir-canonicalization-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/device_ir_canonicalization_evidence.rs",
+  "docs/decisions/0164-device-ir-canonicalization-boundary-evidence.md",
+  "docs/status/DIR-4503-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIR-4503-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0164 authorizes only test-local Device IR canonicalization boundary evidence; no canonicalizer, hash API, schema registry, migration reader/writer, diagnostic, dependency, protocol, or support claim is made.",
+  "Inventory covers sixty provisional boundaries for schema/identity/version/extensions, IR/node/block/op/dependency ordering, constants/bytes/integer/float/opaque/shape/layout/numeric/effects/ownership/synchronization/Fault/capabilities/source maps, domain separation and target-independent/specialization hashes, target profile/features/required/optional/unsupported, extension/corruption/redaction/migration/version/determinism/Unicode, checked input/provenance/resource limits, fixtures, diagnostics, host exclusion, and protocol.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no canonical bytes/hash/schema/migration/public protocol authority.",
+  "cargo test -p ling-types --test device_ir_canonicalization_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "Test-only under DEC-0164; DIR-4503 remains BlockedSpec for canonicalization, hashes, schema/migration, protocol/support.",
+  "No parser/AST/HIR/Checked Core node, Device IR model, canonicalizer, serializer, hash API, schema registry, migration reader/writer, diagnostic, Semantic Graph projection, protocol, CLI/LSP, runtime, Unicode behavior, or public support claim was added.",
 ]
 [[task]]
 id = "GPU-4601"

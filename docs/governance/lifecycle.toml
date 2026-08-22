@@ -4271,3 +4271,27 @@ unresolved_alternatives = [
   "Kernel source/Profile and Typed Core legal subset; elementwise/index/shape/bounds/local-memory/reduction/vector/tensor/synchronization slices; types/effects/ownership/alias proofs; memory/address spaces/layout/numeric and determinism; Fault/cancellation; capability/required features, target scope, fallback/rejection; pre/postconditions, provenance, identity/spans, resource limits, differential CPU reference, canonical version/migration, diagnostics, host/driver redaction, protocol inventory, and public lowering status remain open under DIR-4502, DIR-4501, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0164"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0164-device-ir-canonicalization-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Device IR canonicalization boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer canonical ordering, constant and numeric encodings, hash domains, target profiles, schema compatibility, corruption, migration, redaction, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No canonicalizer, serializer, hash API, schema registry, migration reader/writer, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Device IR schema and identity; node/block/operation/dependency ordering; constant pools and integer/float/opaque/shape/layout encodings; numeric, effect, ownership, synchronization, Fault, and capability fields; source maps and Semantic IDs; target-independent versus target-specialization inputs; feature profiles and unsupported targets; extension, unknown-field, corruption, redaction, version, and migration policy; determinism, Unicode/source-map fixtures, diagnostics, host/driver exclusion, protocol inventory, and public canonicalization status remain open under DIR-4501/4502, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""

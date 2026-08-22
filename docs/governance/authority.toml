@@ -2639,3 +2639,16 @@ covers = ["DIR-4502 bounded Kernel-to-Device lowering boundary evidence", "test-
 depends_on = ["DEC-0162", "DEC-0157", "DEC-0151", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0164"
+title = "Internal Device IR canonicalization boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0164-device-ir-canonicalization-boundary-evidence.md"
+covers = ["DIR-4503 bounded Device IR canonicalization boundary evidence", "test-only Device IR canonicalization vocabulary", "canonicalization boundaries without Device IR/target/backend semantics"]
+depends_on = ["DEC-0163", "DEC-0162", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

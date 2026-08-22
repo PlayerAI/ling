@@ -964,14 +964,14 @@ superseded_by = ""
         let text = fs::read_to_string(root.join("docs/governance/lifecycle.toml"))
             .expect("read repository lifecycle registry");
         let registry: LifecycleRegistry = toml::from_str(&text).expect("parse lifecycle registry");
-        assert_eq!(registry.record.len(), 178);
+        assert_eq!(registry.record.len(), 179);
         assert_eq!(
             registry
                 .record
                 .iter()
                 .filter(|record| record.status == "Accepted")
                 .count(),
-            177
+            178
         );
         assert_eq!(
             registry
