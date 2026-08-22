@@ -2509,3 +2509,16 @@ covers = ["CPU-4202 bounded CPU reference-trace boundary evidence", "test-only r
 depends_on = ["DEC-0152", "DEC-0151", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0154"
+title = "Internal Kernel corpus boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0154-kernel-corpus-boundary-evidence.md"
+covers = ["CPU-4203 bounded Kernel corpus boundary evidence", "test-only Kernel corpus vocabulary", "corpus boundaries without Kernel execution/differential semantics"]
+depends_on = ["DEC-0153", "DEC-0152", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -4031,3 +4031,27 @@ unresolved_alternatives = [
   "Event identity/order/payload and observation points; work-item/index and buffer/view identity; operation/reduction/atomic/barrier/Fault semantics; provenance, numeric/determinism, sampling, event/byte limits, truncation, redaction, canonicalization, corruption, migration, fixtures, CPU/device differential, diagnostics, protocol inventory, and public trace status remain open under CPU-4202, CPU-4201, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0154"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0154-kernel-corpus-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Kernel corpus boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer fixture syntax, manifest fields, expected outputs, Faults, exact or tolerance comparisons, migration, diagnostics, differential, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Kernel corpus, manifest, expected output, backend, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Manifest/fixture identity and versioning; source bytes and `.ling` mapping; profiles/targets, inputs/outputs/Faults/traces; vector/matrix/filter/reduction/histogram/atomic cases; bounds/alias/numeric/determinism; positive/negative/property/corruption/migration/Unicode/source-map fixtures; exact/tolerance comparison; CPU/device differential; diagnostics, host exclusion, protocol inventory, and public corpus status remain open under CPU-4203, CPU-4201/4202, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, and missing authority.",
+]
+superseded_by = ""
