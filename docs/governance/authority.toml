@@ -535,6 +535,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0023"
+title = "LSP Preview document overlay"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0023.md"
+covers = ["ling.lsp.overlay/0.1", "full-text document overlays", "URI and monotonic version validation"]
+depends_on = ["DEC-0002", "DEC-0019", "DEC-0029", "RFC-0004", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

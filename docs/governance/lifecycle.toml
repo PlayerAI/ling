@@ -525,6 +525,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0023"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0023.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify workspace, dependency, and untitled URI mapping, full-text open/change/close transitions, monotonic versions, and notification/request response behavior.",
+  "Reject invalid URI, stale version, read-only dependency, closed document, oversized text, and ranged changes without mutating VFS bytes or versions.",
+  "Verify disk updates remain hidden by open overlays, close reveals the latest disk layer, temporary files are removed, and document views are URI-sorted and deterministic.",
+]
+compatibility_impact = [
+  "Adds the Experimental ling.lsp.overlay/0.1 Preview methods to the existing ling lsp --stdio server; no compiler, diagnostic, Semantic ID, bytecode, VM, CLI, or Unicode contract changes.",
+]
+unresolved_alternatives = [
+  "Incremental range edits, file URI/root mapping, diagnostics, compiler snapshots, Workspace Edits, and Semantic Transactions remain governed by later decisions and gaps.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

@@ -46,6 +46,28 @@ authority = ["RFC-0004", "DEC-0029"]
 notes = ["Preview lifecycle only: initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity. Document synchronization, diagnostics, edits, snapshots, cancellation, and Semantic Transactions remain deferred."]
 
 [[protocol]]
+id = "PROTO-LSP-OVERLAY"
+title = "Ling LSP Preview document overlay"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.overlay/0.1"
+stability = "Experimental"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp overlay adapter"]
+consumer = ["Preview LSP clients", "editor and integration test harnesses"]
+reader_policy = "Accept only the restricted ling://workspace, ling://dependency, and untitled://ling URI forms; require non-negative monotonic document versions and exactly one full-text change; reject invalid, stale, closed, ranged, oversized, or read-only edits without VFS mutation."
+writer_policy = "Retain exact UTF-8 text in the session-local VFS, preserve overlay precedence over disk, reveal the latest disk layer on close, remove temporary untitled files, and expose no SourceId or host path on the wire."
+unknown_field_policy = "Unknown JSON-RPC fields are ignored by the current Preview parser except range/rangeLength on full-sync changes, which are rejected; incompatible URI, version, or edit evolution requires a new protocol version."
+migration_tool = "None; ling.lsp.overlay/0.1 is current-writer-only and remains Experimental."
+fixtures = ["crates/ling-lsp/tests/overlay.rs", "tests/protocols/lsp-overlay/README.md"]
+sources = ["docs/RFC-0023.md", "crates/ling-lsp/src/lib.rs", "crates/ling-source/src/vfs.rs"]
+version_markers = ["ling.lsp.overlay/0.1", "textDocument/didOpen", "textDocument/didChange", "textDocument/didClose"]
+authority = ["RFC-0023", "RFC-0004", "DEC-0019"]
+notes = ["Full-text Preview synchronization only. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, and Semantic Transactions remain deferred."]
+
+[[protocol]]
 id = "PROTO-CLI-EXIT"
 title = "Ling process exit-code mapping"
 category = "CLI"

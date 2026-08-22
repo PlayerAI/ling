@@ -325,6 +325,19 @@ impl VirtualFileSystem {
         })
     }
 
+    /// Removes a session-local file and its disk/overlay layers.
+    ///
+    /// Source IDs are never reused. This is intended for temporary editor
+    /// documents whose `didClose` lifecycle has no disk layer to reveal.
+    pub fn remove_file(&mut self, file: SourceId) -> Result<(), VfsError> {
+        let entry = self
+            .files
+            .remove(&file)
+            .ok_or(VfsError::UnknownFile { file })?;
+        self.names.remove(&entry.logical_name);
+        Ok(())
+    }
+
     /// Returns the currently visible immutable snapshot.
     #[must_use]
     pub fn snapshot(&self, file: SourceId) -> Option<FileSnapshot> {
@@ -495,7 +508,8 @@ fn visible_layer_with_origin(entry: &FileEntry) -> (&Layer, FileOrigin) {
         })
 }
 
-fn validate_logical_name(name: &str) -> Result<(), VfsError> {
+/// Validates a path-free logical source name used by the session VFS.
+pub fn validate_logical_name(name: &str) -> Result<(), VfsError> {
     if name.is_empty() {
         return Err(VfsError::EmptyLogicalName);
     }
@@ -638,5 +652,21 @@ mod tests {
                 Err(VfsError::EmptyLogicalName) | Err(VfsError::NonCanonicalLogicalName { .. })
             ));
         }
+    }
+
+    #[test]
+    fn temporary_file_removal_does_not_reuse_source_ids() {
+        let mut vfs = VirtualFileSystem::new();
+        let first = match vfs.set_disk_snapshot("untitled/Buffer.ling", b"one".to_vec()) {
+            Ok(ChangeEvent::Added { file, .. }) => file,
+            other => panic!("expected Added, got {other:?}"),
+        };
+        vfs.remove_file(first).expect("temporary file exists");
+        assert!(vfs.snapshot(first).is_none());
+        let second = match vfs.set_disk_snapshot("untitled/Buffer.ling", b"two".to_vec()) {
+            Ok(ChangeEvent::Added { file, .. }) => file,
+            other => panic!("expected Added, got {other:?}"),
+        };
+        assert!(second > first);
     }
 }

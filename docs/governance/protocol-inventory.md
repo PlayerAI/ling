@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 23 records: 17 current public, 1 internal, 5 Future.
-- Current public stability: 9 Experimental, 8 Preview, 0 Stable.
+- 24 records: 18 current public, 1 internal, 5 Future.
+- Current public stability: 10 Experimental, 8 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -17,6 +17,7 @@
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
+| `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
 | `PROTO-FORMAT-CLI` | Public | JSON | `ling.format/0.1` | `Preview` | yes | no | 5 |
@@ -78,6 +79,19 @@
 - Sources: [`docs/RFC-0004.md`](../RFC-0004.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-lsp/tests/lifecycle.rs`](../../crates/ling-lsp/tests/lifecycle.rs), [`crates/ling-cli/tests/lsp.rs`](../../crates/ling-cli/tests/lsp.rs), [`tests/protocols/lsp-lifecycle/README.md`](../../tests/protocols/lsp-lifecycle/README.md)
 - Notes: Preview lifecycle only: initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity. Document synchronization, diagnostics, edits, snapshots, cancellation, and Semantic Transactions remain deferred.
+
+### `PROTO-LSP-OVERLAY` — Ling LSP Preview document overlay
+
+- Producer: ling lsp --stdio; ling-lsp overlay adapter
+- Consumer: Preview LSP clients; editor and integration test harnesses
+- Reader policy: Accept only the restricted ling://workspace, ling://dependency, and untitled://ling URI forms; require non-negative monotonic document versions and exactly one full-text change; reject invalid, stale, closed, ranged, oversized, or read-only edits without VFS mutation.
+- Writer policy: Retain exact UTF-8 text in the session-local VFS, preserve overlay precedence over disk, reveal the latest disk layer on close, remove temporary untitled files, and expose no SourceId or host path on the wire.
+- Unknown-field policy: Unknown JSON-RPC fields are ignored by the current Preview parser except range/rangeLength on full-sync changes, which are rejected; incompatible URI, version, or edit evolution requires a new protocol version.
+- Migration tool: None; ling.lsp.overlay/0.1 is current-writer-only and remains Experimental.
+- Authority: `RFC-0023`, `RFC-0004`, `DEC-0019`
+- Sources: [`docs/RFC-0023.md`](../RFC-0023.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-source/src/vfs.rs`](../../crates/ling-source/src/vfs.rs)
+- Fixtures: [`crates/ling-lsp/tests/overlay.rs`](../../crates/ling-lsp/tests/overlay.rs), [`tests/protocols/lsp-overlay/README.md`](../../tests/protocols/lsp-overlay/README.md)
+- Notes: Full-text Preview synchronization only. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, and Semantic Transactions remain deferred.
 
 ### `PROTO-HUMAN-OUTPUT` — Human-readable CLI and diagnostic output
 

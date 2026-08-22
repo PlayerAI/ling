@@ -280,6 +280,13 @@ stability = "Preview"
 implemented = true
 
 [[protocol]]
+id = "PROTO-LSP-OVERLAY"
+visibility = "Public"
+version = "ling.lsp.overlay/0.1"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
 id = "PROTO-CLI-EXIT"
 visibility = "Public"
 version = "0.0.1-dev"

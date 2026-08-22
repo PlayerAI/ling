@@ -4422,6 +4422,8 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -4429,14 +4431,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/LSP-2103-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2103-OVERLAY-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit distinguishes accepted internal VFS overlays/revisions from the missing LSP URI, document-version, open/close, dependency, and notification contract.",
+  "The audit distinguishes the accepted RFC-0023 full-text overlay slice from the remaining URI-root, incremental-edit, snapshot, diagnostic, and transaction contracts.",
   "The audit covers URI identity, virtual/dependency files, overlay precedence, disk races, stale/duplicate versions, snapshots, cancellation, and required deterministic fixtures.",
-  "No LSP overlay API, URI mapper, version field, dependency edit guard, diagnostic allocation, Semantic ID change, or placeholder server is added while the authority is absent.",
-  "The future implementation must adapt internal VFS without exposing Rust identities and must reject stale/read-only edits before compiler queries.",
+  "No host filesystem resolver, range-edit API, diagnostic allocation, Semantic ID change, Workspace Edit, or placeholder transaction is added while the remaining authority is absent.",
+  "The completed child adapts internal VFS without exposing Rust identities and rejects stale/read-only edits before VFS mutation; follow-on query work remains deferred.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -4444,8 +4447,60 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "LSP-2103 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and LSP-2101/LSP-2102; DEC-0019's VFS overlay is an internal compiler boundary only.",
-  "The current VFS behavior remains deterministic and unchanged; no public URI/version or editor overlay protocol is claimed.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "RFC-0023 and LSP-2103-OVERLAY define only the Experimental full-text overlay; range edits, compiler snapshots, diagnostics, Workspace Edits, and transactions remain unresolved.",
+  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, core schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2103-OVERLAY"
+title = "LSP full-text overlay Preview slice"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2101-LIFECYCLE", "LSP-2102-SOURCE-MAP"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/overlay.rs",
+  "crates/ling-source/src/lib.rs",
+  "crates/ling-source/src/vfs.rs",
+  "tests/protocols/lsp-overlay/README.md",
+  "docs/RFC-0023.md",
+  "docs/status/LSP-2103-OVERLAY-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2103-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted RFC-0023 defines ling.lsp.overlay/0.1, restricted path-free URI forms, monotonic versions, full-text synchronization, dependency read-only policy, and disk/temporary close behavior.",
+  "ling-lsp handles didOpen, didChange, and didClose as request-or-notification methods while keeping SourceId, host paths, and revisions out of the wire protocol.",
+  "Stale/duplicate versions, invalid URIs, ranged changes, closed documents, oversized text, and dependency edits fail before VFS mutation; valid changes preserve exact UTF-8 text and overlay precedence.",
+  "Workspace disk updates remain hidden by an open overlay, close reveals the latest disk layer, untitled files are removed, and document views are deterministic by URI.",
+  "No incremental range, diagnostics, compiler query, Workspace Edit, Semantic Transaction, bytecode, VM, CLI, or Unicode contract changes are claimed.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working-tree"
+completed = "2026-08-22"
+notes = [
+  "Bounded full-text overlay slice completed under RFC-0023; parent LSP-2103 remains BlockedSpec for incremental synchronization and transaction/query semantics.",
+  "ling-source exposes the validated logical-name boundary and removes temporary VFS files without reusing SourceIds.",
+  "No public diagnostic allocation or host filesystem behavior is claimed.",
 ]
 
 [[task]]

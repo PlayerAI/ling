@@ -141,6 +141,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2102` | G1/Editor | Position encoding negotiation | S | BlockedSpec | `04-LSP-IMPLEMENTATION.md:145`, `docs/status/LSP-2102-AUTHORITY-AUDIT.md` |
 | `LSP-2102-SOURCE-MAP` | G1/Editor | SourceMap position projection | S | Done | `DEC-0029`; see `crates/ling-source/src/position.rs` and `docs/status/LSP-2102-SOURCE-MAP-IMPLEMENTATION-REPORT.md`; parent LSP lifecycle remains BlockedSpec |
 | `LSP-2103` | G1/Editor | Open document overlay | M | BlockedSpec | `04-LSP-IMPLEMENTATION.md:151`, `docs/status/LSP-2103-AUTHORITY-AUDIT.md` |
+| `LSP-2103-OVERLAY` | G1/Editor | LSP full-text overlay Preview slice | M | Done | Accepted RFC-0023; see `crates/ling-lsp/tests/overlay.rs` and `docs/status/LSP-2103-OVERLAY-IMPLEMENTATION-REPORT.md`; incremental edits and transactions remain in `LSP-2103` |
 | `LSP-2104` | G1/Editor | 增量文本变更 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:170`, `docs/status/LSP-2104-AUTHORITY-AUDIT.md` |
 | `LSP-2105` | G1/Editor | Workspace reload | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:182`, `docs/status/LSP-2105-AUTHORITY-AUDIT.md` |
 | `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:188`, `docs/status/LSP-2201-AUTHORITY-AUDIT.md` |

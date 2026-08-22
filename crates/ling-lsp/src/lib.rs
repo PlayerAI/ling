@@ -1,18 +1,24 @@
-//! Bounded Preview lifecycle and stdio transport for `ling lsp --stdio`.
+//! Bounded Preview lifecycle, document overlays, and stdio transport for
+//! `ling lsp --stdio`.
 //!
-//! This crate deliberately does not implement document synchronization or
-//! compiler queries. RFC-0004 is the authority for this lifecycle boundary;
-//! DEC-0029 remains the authority for position projection.
+//! RFC-0004 is the authority for lifecycle and transport; RFC-0023 is the
+//! authority for the full-text document overlay boundary; DEC-0029 remains the
+//! authority for position projection.
 
+use std::collections::BTreeMap;
 use std::fmt;
 use std::io::{self, BufRead, BufReader, BufWriter, Read, Write};
 
 pub use ling_source::PositionEncoding;
-use ling_source::negotiate_position_encoding;
+use ling_source::{
+    SourceId, VfsError, VirtualFileSystem, negotiate_position_encoding, validate_logical_name,
+};
 use serde_json::{Map, Value, json};
 
 /// Version marker for the current Preview lifecycle protocol.
 pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";
+/// Version marker for the full-text document overlay Preview extension.
+pub const OVERLAY_PROTOCOL_VERSION: &str = "ling.lsp.overlay/0.1";
 /// JSON-RPC protocol version accepted by this server.
 pub const JSON_RPC_VERSION: &str = "2.0";
 /// Maximum JSON body size accepted by the transport.
@@ -25,6 +31,8 @@ pub const MAX_WORKSPACE_FOLDERS: usize = 32;
 pub const MAX_WORKSPACE_URI_BYTES: usize = 4_096;
 /// Maximum UTF-8 byte length of one workspace display name.
 pub const MAX_WORKSPACE_NAME_BYTES: usize = 256;
+/// Maximum UTF-8 byte length of one open-document text value.
+pub const MAX_DOCUMENT_BYTES: usize = MAX_FRAME_BYTES;
 
 const PARSE_ERROR: i32 = -32_700;
 const INVALID_REQUEST: i32 = -32_600;
@@ -32,6 +40,9 @@ const METHOD_NOT_FOUND: i32 = -32_601;
 const INVALID_PARAMS: i32 = -32_602;
 const SERVER_NOT_INITIALIZED: i32 = -32_002;
 const SERVER_SHUTTING_DOWN: i32 = -32_003;
+const DOCUMENT_STALE: i32 = -32_004;
+const DOCUMENT_READ_ONLY: i32 = -32_005;
+const DOCUMENT_URI: i32 = -32_006;
 
 /// Lifecycle state of one LSP server process.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -67,6 +78,79 @@ impl WorkspaceFolder {
     pub fn name(&self) -> &str {
         &self.name
     }
+}
+
+/// A public, path-free view of one document tracked by the Preview overlay.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct DocumentView {
+    uri: String,
+    version: i64,
+    open: bool,
+    writable: bool,
+    text: String,
+}
+
+impl DocumentView {
+    /// Returns the exact URI supplied by the editor.
+    #[must_use]
+    pub fn uri(&self) -> &str {
+        &self.uri
+    }
+
+    /// Returns the last accepted editor version.
+    #[must_use]
+    pub const fn version(&self) -> i64 {
+        self.version
+    }
+
+    /// Returns whether the document currently has an open overlay.
+    #[must_use]
+    pub const fn is_open(&self) -> bool {
+        self.open
+    }
+
+    /// Returns whether the URI accepts editor changes.
+    #[must_use]
+    pub const fn is_writable(&self) -> bool {
+        self.writable
+    }
+
+    /// Returns the exact visible UTF-8 document text.
+    #[must_use]
+    pub fn text(&self) -> &str {
+        &self.text
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct DocumentRecord {
+    file: SourceId,
+    logical_name: String,
+    version: i64,
+    open: bool,
+    writable: bool,
+    temporary: bool,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct DocumentIdentity {
+    logical_name: String,
+    writable: bool,
+    temporary: bool,
+}
+
+/// Errors raised while publishing or applying an RFC-0023 document overlay.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum OverlayError {
+    InvalidParams,
+    InvalidUri,
+    UnknownDocument,
+    AlreadyOpen,
+    NotOpen,
+    StaleVersion { current: i64, requested: i64 },
+    ReadOnly,
+    TextTooLarge,
+    Vfs(VfsError),
 }
 
 /// Result of handling one decoded JSON-RPC body.
@@ -162,6 +246,9 @@ pub struct LspServer {
     state: LifecycleState,
     position_encoding: PositionEncoding,
     workspace_folders: Vec<WorkspaceFolder>,
+    vfs: VirtualFileSystem,
+    documents: BTreeMap<String, DocumentRecord>,
+    last_versions: BTreeMap<String, i64>,
 }
 
 impl Default for LspServer {
@@ -178,6 +265,9 @@ impl LspServer {
             state: LifecycleState::Uninitialized,
             position_encoding: PositionEncoding::Utf16,
             workspace_folders: Vec::new(),
+            vfs: VirtualFileSystem::new(),
+            documents: BTreeMap::new(),
+            last_versions: BTreeMap::new(),
         }
     }
 
@@ -197,6 +287,62 @@ impl LspServer {
     #[must_use]
     pub fn workspace_folders(&self) -> &[WorkspaceFolder] {
         &self.workspace_folders
+    }
+
+    /// Returns tracked documents in deterministic URI order.
+    #[must_use]
+    pub fn documents(&self) -> Vec<DocumentView> {
+        self.documents
+            .keys()
+            .filter_map(|uri| self.document(uri))
+            .collect()
+    }
+
+    /// Returns one tracked document without exposing the internal `SourceId`.
+    #[must_use]
+    pub fn document(&self, uri: &str) -> Option<DocumentView> {
+        let record = self.documents.get(uri)?;
+        let snapshot = self.vfs.snapshot(record.file)?;
+        let text = std::str::from_utf8(snapshot.bytes()).ok()?.to_owned();
+        Some(DocumentView {
+            uri: uri.to_owned(),
+            version: record.version,
+            open: record.open,
+            writable: record.writable,
+            text,
+        })
+    }
+
+    /// Publishes a host-provided disk snapshot without reading the filesystem.
+    ///
+    /// An open overlay continues to hide this snapshot until `didClose`.
+    pub fn publish_disk_snapshot(&mut self, uri: &str, text: &str) -> Result<(), OverlayError> {
+        let identity = document_identity(uri)?;
+        if identity.temporary || text.len() > MAX_DOCUMENT_BYTES {
+            return Err(if identity.temporary {
+                OverlayError::InvalidUri
+            } else {
+                OverlayError::TextTooLarge
+            });
+        }
+        let file = self.ensure_file(uri, &identity, text.as_bytes())?;
+        self.vfs
+            .set_disk_snapshot(identity.logical_name.clone(), text.as_bytes().to_vec())
+            .map_err(OverlayError::Vfs)?;
+        if !self.documents.contains_key(uri) {
+            self.documents.insert(
+                uri.to_owned(),
+                DocumentRecord {
+                    file,
+                    logical_name: identity.logical_name,
+                    version: 0,
+                    open: false,
+                    writable: identity.writable,
+                    temporary: identity.temporary,
+                },
+            );
+        }
+        Ok(())
     }
 
     /// Handles one JSON-RPC body and returns a response body or state event.
@@ -256,6 +402,9 @@ impl LspServer {
             "initialized" => self.initialized(id_present, id),
             "shutdown" => self.shutdown(id_present, id, params),
             "exit" => self.exit(id_present, id),
+            "textDocument/didOpen" => self.did_open(id_present, id, params),
+            "textDocument/didChange" => self.did_change(id_present, id, params),
+            "textDocument/didClose" => self.did_close(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
         }
     }
@@ -336,6 +485,184 @@ impl LspServer {
         let code = u8::from(self.state != LifecycleState::ShutdownRequested);
         self.state = LifecycleState::Exited;
         HandleOutcome::Exit { code }
+    }
+
+    fn did_open(&mut self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
+        if self.state != LifecycleState::Ready {
+            return self.state_error_for(is_request, id);
+        }
+        let result = parse_open_params(&params)
+            .and_then(|(uri, version, text)| self.open_document(uri, version, text));
+        self.overlay_outcome(is_request, id, result)
+    }
+
+    fn did_change(&mut self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
+        if self.state != LifecycleState::Ready {
+            return self.state_error_for(is_request, id);
+        }
+        let result = parse_change_params(&params)
+            .and_then(|(uri, version, text)| self.change_document(&uri, version, text));
+        self.overlay_outcome(is_request, id, result)
+    }
+
+    fn did_close(&mut self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
+        if self.state != LifecycleState::Ready {
+            return self.state_error_for(is_request, id);
+        }
+        let result = parse_close_params(&params).and_then(|uri| self.close_document(&uri));
+        self.overlay_outcome(is_request, id, result)
+    }
+
+    fn open_document(
+        &mut self,
+        uri: String,
+        version: i64,
+        text: String,
+    ) -> Result<(), OverlayError> {
+        let identity = document_identity(&uri)?;
+        if let Some(last) = self.last_versions.get(&uri).copied() {
+            if version <= last {
+                return Err(OverlayError::StaleVersion {
+                    current: last,
+                    requested: version,
+                });
+            }
+        }
+        if self
+            .documents
+            .get(&uri)
+            .is_some_and(|document| document.open)
+        {
+            return Err(OverlayError::AlreadyOpen);
+        }
+        let file = self.ensure_file(&uri, &identity, text.as_bytes())?;
+        self.vfs
+            .open_overlay(file, text.into_bytes())
+            .map_err(OverlayError::Vfs)?;
+        self.documents.insert(
+            uri.clone(),
+            DocumentRecord {
+                file,
+                logical_name: identity.logical_name,
+                version,
+                open: true,
+                writable: identity.writable,
+                temporary: identity.temporary,
+            },
+        );
+        self.last_versions.insert(uri, version);
+        Ok(())
+    }
+
+    fn change_document(
+        &mut self,
+        uri: &str,
+        version: i64,
+        text: String,
+    ) -> Result<(), OverlayError> {
+        document_identity(uri)?;
+        let record = self
+            .documents
+            .get(uri)
+            .cloned()
+            .ok_or(OverlayError::UnknownDocument)?;
+        if !record.open {
+            return Err(OverlayError::NotOpen);
+        }
+        if !record.writable {
+            return Err(OverlayError::ReadOnly);
+        }
+        if version <= record.version {
+            return Err(OverlayError::StaleVersion {
+                current: record.version,
+                requested: version,
+            });
+        }
+        self.vfs
+            .open_overlay(record.file, text.into_bytes())
+            .map_err(OverlayError::Vfs)?;
+        let current = self
+            .documents
+            .get_mut(uri)
+            .ok_or(OverlayError::UnknownDocument)?;
+        current.version = version;
+        self.last_versions.insert(uri.to_owned(), version);
+        Ok(())
+    }
+
+    fn close_document(&mut self, uri: &str) -> Result<(), OverlayError> {
+        document_identity(uri)?;
+        let record = self
+            .documents
+            .get(uri)
+            .cloned()
+            .ok_or(OverlayError::UnknownDocument)?;
+        if !record.open {
+            return Err(OverlayError::NotOpen);
+        }
+        self.vfs
+            .close_overlay(record.file)
+            .map_err(OverlayError::Vfs)?;
+        if record.temporary {
+            self.vfs
+                .remove_file(record.file)
+                .map_err(OverlayError::Vfs)?;
+            self.documents.remove(uri);
+        } else if let Some(current) = self.documents.get_mut(uri) {
+            current.open = false;
+        }
+        Ok(())
+    }
+
+    fn ensure_file(
+        &mut self,
+        uri: &str,
+        identity: &DocumentIdentity,
+        bytes: &[u8],
+    ) -> Result<SourceId, OverlayError> {
+        if let Some(file) = self.vfs.file_id(&identity.logical_name) {
+            if self
+                .documents
+                .iter()
+                .any(|(other_uri, document)| other_uri != uri && document.file == file)
+            {
+                return Err(OverlayError::InvalidUri);
+            }
+            return Ok(file);
+        }
+        self.vfs
+            .set_disk_snapshot(identity.logical_name.clone(), bytes.to_vec())
+            .map_err(OverlayError::Vfs)
+            .and_then(|_| {
+                self.vfs
+                    .file_id(&identity.logical_name)
+                    .ok_or(OverlayError::Vfs(VfsError::FileIdExhausted))
+            })
+    }
+
+    fn overlay_outcome(
+        &self,
+        is_request: bool,
+        id: Value,
+        result: Result<(), OverlayError>,
+    ) -> HandleOutcome {
+        match result {
+            Ok(()) if is_request => HandleOutcome::Response(success_response(id, Value::Null)),
+            Ok(()) => HandleOutcome::NoResponse,
+            Err(error) if is_request => {
+                let (code, message) = overlay_error_details(&error);
+                error_or_none(true, id, code, message)
+            }
+            Err(_) => HandleOutcome::NoResponse,
+        }
+    }
+
+    fn state_error_for(&self, is_request: bool, id: Value) -> HandleOutcome {
+        if is_request {
+            self.state_error(id)
+        } else {
+            HandleOutcome::NoResponse
+        }
     }
 
     fn unknown_method(&self, is_request: bool, id: Value, method: &str) -> HandleOutcome {
@@ -447,6 +774,148 @@ fn parse_initialize_params(params: &Value) -> Result<(PositionEncoding, Vec<Work
         Some(value) => parse_workspace_folders(value)?,
     };
     Ok((encoding, folders))
+}
+
+fn parse_open_params(params: &Value) -> Result<(String, i64, String), OverlayError> {
+    let text_document = params
+        .as_object()
+        .and_then(|object| object.get("textDocument"))
+        .and_then(Value::as_object)
+        .ok_or(OverlayError::InvalidParams)?;
+    let uri = text_document
+        .get("uri")
+        .and_then(Value::as_str)
+        .ok_or(OverlayError::InvalidParams)?
+        .to_owned();
+    let version = parse_version(text_document.get("version"))?;
+    let text = parse_text(text_document.get("text"))?;
+    Ok((uri, version, text))
+}
+
+fn parse_change_params(params: &Value) -> Result<(String, i64, String), OverlayError> {
+    let object = params.as_object().ok_or(OverlayError::InvalidParams)?;
+    let text_document = object
+        .get("textDocument")
+        .and_then(Value::as_object)
+        .ok_or(OverlayError::InvalidParams)?;
+    let uri = text_document
+        .get("uri")
+        .and_then(Value::as_str)
+        .ok_or(OverlayError::InvalidParams)?
+        .to_owned();
+    let version = parse_version(text_document.get("version"))?;
+    let changes = object
+        .get("contentChanges")
+        .and_then(Value::as_array)
+        .ok_or(OverlayError::InvalidParams)?;
+    if changes.len() != 1 {
+        return Err(OverlayError::InvalidParams);
+    }
+    let change = changes[0].as_object().ok_or(OverlayError::InvalidParams)?;
+    if change.contains_key("range") || change.contains_key("rangeLength") {
+        return Err(OverlayError::InvalidParams);
+    }
+    let text = parse_text(change.get("text"))?;
+    Ok((uri, version, text))
+}
+
+fn parse_close_params(params: &Value) -> Result<String, OverlayError> {
+    params
+        .as_object()
+        .and_then(|object| object.get("textDocument"))
+        .and_then(Value::as_object)
+        .and_then(|document| document.get("uri"))
+        .and_then(Value::as_str)
+        .map(str::to_owned)
+        .ok_or(OverlayError::InvalidParams)
+}
+
+fn parse_version(value: Option<&Value>) -> Result<i64, OverlayError> {
+    let version = value
+        .and_then(Value::as_i64)
+        .ok_or(OverlayError::InvalidParams)?;
+    if version < 0 {
+        return Err(OverlayError::InvalidParams);
+    }
+    Ok(version)
+}
+
+fn parse_text(value: Option<&Value>) -> Result<String, OverlayError> {
+    let text = value
+        .and_then(Value::as_str)
+        .ok_or(OverlayError::InvalidParams)?;
+    if text.len() > MAX_DOCUMENT_BYTES {
+        return Err(OverlayError::TextTooLarge);
+    }
+    Ok(text.to_owned())
+}
+
+fn document_identity(uri: &str) -> Result<DocumentIdentity, OverlayError> {
+    if !valid_text(uri, 1, MAX_WORKSPACE_URI_BYTES)
+        || uri.contains('?')
+        || uri.contains('#')
+        || uri.contains('%')
+    {
+        return Err(OverlayError::InvalidUri);
+    }
+    let (prefix, path) = if let Some(path) = uri.strip_prefix("ling://workspace/") {
+        ("workspace", path)
+    } else if let Some(path) = uri.strip_prefix("ling://dependency/") {
+        ("dependency", path)
+    } else if let Some(path) = uri.strip_prefix("untitled://ling/") {
+        ("untitled", path)
+    } else {
+        return Err(OverlayError::InvalidUri);
+    };
+    if path.is_empty() || !path.ends_with(".ling") {
+        return Err(OverlayError::InvalidUri);
+    }
+    let logical_name = match prefix {
+        "workspace" => path.to_owned(),
+        "dependency" => {
+            let (package, logical) = path.split_once('/').ok_or(OverlayError::InvalidUri)?;
+            if package.is_empty() || package.contains('/') {
+                return Err(OverlayError::InvalidUri);
+            }
+            format!("dependencies/{package}/{logical}")
+        }
+        "untitled" => format!("untitled/{path}"),
+        _ => return Err(OverlayError::InvalidUri),
+    };
+    validate_logical_name(&logical_name).map_err(|_| OverlayError::InvalidUri)?;
+    Ok(DocumentIdentity {
+        logical_name,
+        writable: prefix != "dependency",
+        temporary: prefix == "untitled",
+    })
+}
+
+fn overlay_error_details(error: &OverlayError) -> (i32, &'static str) {
+    match error {
+        OverlayError::StaleVersion { .. } => (
+            DOCUMENT_STALE,
+            "文档版本过旧或不单调 / document version is stale or non-monotonic",
+        ),
+        OverlayError::ReadOnly => (
+            DOCUMENT_READ_ONLY,
+            "依赖文档只读 / dependency document is read-only",
+        ),
+        OverlayError::InvalidUri => (
+            DOCUMENT_URI,
+            "文档 URI 无效 / invalid or unsupported document URI",
+        ),
+        OverlayError::TextTooLarge => (
+            INVALID_PARAMS,
+            "文档文本过大 / document text exceeds the size limit",
+        ),
+        OverlayError::UnknownDocument | OverlayError::NotOpen => {
+            (INVALID_PARAMS, "文档状态无效 / invalid document state")
+        }
+        OverlayError::AlreadyOpen => (INVALID_PARAMS, "文档已经打开 / document is already open"),
+        OverlayError::InvalidParams | OverlayError::Vfs(_) => {
+            (INVALID_PARAMS, "文档参数无效 / invalid document parameters")
+        }
+    }
 }
 
 fn parse_workspace_folders(value: &Value) -> Result<Vec<WorkspaceFolder>, ()> {
