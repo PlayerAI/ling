@@ -4535,3 +4535,27 @@ unresolved_alternatives = [
   "Cost factors and canonical units; static/dynamic domains; calibration, provenance, confidence and uncertainty; estimate-versus-guarantee; overflow/unknown/invalid handling; hardware/device/capability/placement/buffer context; policy precedence, limits, fallback/rejection and selection use; diagnostic-only versus profile/replay/cache inputs; explain, versioning, migration, corruption, privacy and unstable host exclusions; fixtures, diagnostics, protocol inventory, and public Cost Model status remain open under PLC-4803, PLC-4802, PLC-4801, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0175"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0175-placement-explain-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty explain boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer command/schema/transport behavior, decision and rejection rendering, privacy/redaction, cache/replay identity, diagnostics, and editor protocol until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; stale zero text is excluded from implementation and fixtures.",
+  "No ling explain route, zero command, schema, dependency, target package, cache/replay protocol, diagnostic, editor integration, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Candidate/rejection/chosen identity and ordering; transfers and numeric mode; fallback and cache hit/miss; record/replay/decision identity; Semantic IDs, spans, provenance and profiles; versioned protocol/JSON transport; stable versus diagnostic-only fields; bilingual rendering, exit/unknown-field/migration behavior; privacy and host/path/address/timestamp/allocation/driver/debug/solver exclusions; fixtures, diagnostics, public CLI/protocol lifecycle, and support remain open under PLC-4804, PLC-4803, PLC-4802, PLC-4801, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing RFC-H405 authority.",
+]
+superseded_by = ""

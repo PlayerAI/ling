@@ -18133,6 +18133,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0175-placement-explain-boundary-evidence.md",
   "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -18142,6 +18143,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/PLC-4804-AUTHORITY-AUDIT.md",
+  "docs/status/PLC-4804-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PLC-4804-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0175-placement-explain-boundary-evidence.md",
+  "crates/ling-types/tests/placement_explain_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -18161,6 +18170,61 @@ notes = [
   "The repository has no Placement explain command, query/report API, machine-readable schema, decision provenance, rejection taxonomy, cache/replay identity, privacy filter, or explain fixtures under crates or tests.",
   "The audit preserves the authoritative `ling` CLI and `.ling` source extension; the plan's stale `zero explain placement` wording remains non-normative and is not copied into implementation or public surfaces.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; implementation remains deferred until accepted authority and executable fixtures exist.",
+]
+[[task]]
+id = "PLC-4804-OBSERVATION"
+title = "Internal Placement-explain boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PLC-4803-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0174-cost-model-boundary-evidence.md",
+  "docs/decisions/0175-placement-explain-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/placement_explain_evidence.rs",
+  "docs/decisions/0175-placement-explain-boundary-evidence.md",
+  "docs/status/PLC-4804-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PLC-4804-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0175 authorizes only test-local Placement-explain boundary evidence; no ling command, stale zero command, machine-readable schema, decision/replay/cache protocol, dependency, target, diagnostic, editor integration, or support claim is made.",
+  "Inventory covers sixty provisional boundaries for candidate/rejection/chosen fields, transfers, numeric/fallback/cache/replay identity, Semantic IDs/spans/provenance, profiles, transport/lifecycle/privacy, ling CLI/source-extension boundary, fixtures, diagnostics, and support exclusion.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no command, schema, solver, dependency, target, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test placement_explain_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "Test-only under DEC-0175; PLC-4804 remains BlockedSpec for explain command/schema/transport, privacy, replay/cache, diagnostics, editor integration, and support claims.",
+  "No ling route, zero command, dependency, target package, manifest, explain API, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "PLC-4805"

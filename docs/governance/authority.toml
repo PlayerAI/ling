@@ -2782,3 +2782,16 @@ covers = ["PLC-4803 bounded Cost Model boundary evidence", "test-only cost vocab
 depends_on = ["DEC-0173", "DEC-0172", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0175"
+title = "Internal placement-explain boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0175-placement-explain-boundary-evidence.md"
+covers = ["PLC-4804 bounded Placement-explain boundary evidence", "test-only explain vocabulary", "explain boundaries without CLI/schema semantics"]
+depends_on = ["DEC-0174", "DEC-0173", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
