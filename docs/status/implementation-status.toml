@@ -6703,6 +6703,58 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2309-REPAIR-INDEX"
+title = "Internal structured diagnostic repair index"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2308-METADATA"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0081-ide-code-action-repair-index.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-diagnostics/src/repair_index.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/decisions/0081-ide-code-action-repair-index.md",
+  "docs/status/IDE-2309-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2309-REPAIR-INDEX-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0081 authorizes only a deterministic immutable observation of existing diagnostic codes/spans and structured Repair payloads; no FixPlan or action policy is invented.",
+  "Repair kind, changes_semantics, facts, code/severity, and optional original diagnostic span are copied; localized messages are never parsed and empty/no-repair input stays empty.",
+  "Deterministic code/severity/span/kind/facts/ordinal ordering and code/kind lookup make repeated equal diagnostic inputs equal without protocol/cache state.",
+  "Focused cargo fmt, ling-diagnostics tests, and clippy pass; message-text independence, structured fact retention, repeated construction, and empty input are covered.",
+  "Public IDE-2309 code actions remain BlockedSpec for action IDs/applicability, edits, positions, versions, stale/rollback, formatter/mutation safety, and protocol semantics.",
+]
+verified_against_commit = "fa54770a8ab71dd93eb6c0a7239153851d0c9593"
+completion_commit = "fa54770a8ab71dd93eb6c0a7239153851d0c9593"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The index is diagnostic evidence for future action analysis, not a code action, FixPlan, edit, message parser, or protocol schema.",
+  "No diagnostic allocation, wire schema, protocol-inventory entry, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2309"
 title = "IDE code actions"
 state = "BlockedSpec"
