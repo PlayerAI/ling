@@ -6739,7 +6739,7 @@ notes = [
 [[task]]
 id = "EFF-2101"
 title = "Effect core model freeze"
-state = "In Progress"
+state = "Done"
 release = "G2"
 size = "M"
 owner = "Codex"
@@ -6773,16 +6773,16 @@ acceptance = [
   "The implementation is isolated from the Seed closed EffectRow and preserves existing source, diagnostic, Semantic ID, bytecode, VM, CLI/LSP, protocol, and Unicode behavior.",
   "EffectId, canonical Typed-Core references, parameterized labels, closed/open rows, row-variable union constraints, operation signatures, resume modes, and lexical handler residuals are implemented with deterministic ordering and path-free bytes.",
   "Focused positive, negative, nested-handler, parameter-distinction, NFC, duplicate-elimination, and canonical-byte tests pass offline; full workspace check and clippy pass.",
-  "Remaining Semantic Graph/Audit projection, reserved-label fixture matrix, solver/lowering diagnostics, and runtime differential evidence are explicitly tracked before the task can become Done.",
+  "The versioned in-process ling.effect/0.1 graph projection and reserved-label fixture matrix are complete without changing a public Seed schema; solver/lowering diagnostics and runtime differential evidence are handed to EFF-2102+.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "61f68a93844431265eca725ee66aab894394c982"
+completion_commit = "61f68a93844431265eca725ee66aab894394c982"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
-  "RFC-0006 resolves the two Effect specification gaps but deliberately leaves EFF-2102+ inference, diagnostics, lowering, runtime, and separate Task/Actor/Replay/Remote authorities open.",
+  "RFC-0006 resolves the two Effect specification gaps; EFF-2102+ owns inference, diagnostics, lowering, runtime, and separate Task/Actor/Replay/Remote authorities.",
   "The v2 model is an in-process experimental boundary; no source handler syntax, Checked Core node, public protocol field, or runtime behavior is implied.",
-  "The authority audit and implementation report record normative clauses, compatibility impact, deterministic/Unicode guarantees, tests, and intentionally deferred work.",
+  "The authority audit and implementation report record normative clauses, compatibility impact, deterministic/Unicode guarantees, tests, and the handoff to later targets.",
 ]
 
 [[task]]
@@ -6821,7 +6821,7 @@ acceptance = [
   "Accepted DEC-0060 authorizes only a read-only snapshot of the existing DEC-0010 Seed closed EffectRow.",
   "The snapshot exposes deduplicated canonical effect names and pure-row state, independent of insertion order and display spelling.",
   "Focused ling-effects tests cover mixed rows, duplicate elimination, pure rows, repeated equality, and path-free canonical output.",
-  "No open/closed row variable, EffectId, handler, State masking, new label, diagnostic, schema, protocol, runtime, VM, or v0.2 support claim is added; parent EFF-2101 remains BlockedSpec.",
+  "No public protocol, runtime, VM, or v0.2 source-language support claim is added by this Seed-only child; the later RFC-0006 model is tracked by the completed parent EFF-2101.",
 ]
 verified_against_commit = "fb949ce2b28fc73a1668806952c3f8e790cd6d7a"
 completion_commit = "fb949ce2b28fc73a1668806952c3f8e790cd6d7a"
