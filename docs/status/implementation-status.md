@@ -205,6 +205,7 @@
 | `LSP-2403` | Semantic token full and delta transport | `G1` | `L` | `BlockedSpec` | `LSP-2401`, `LSP-2402` | `` |
 | `LSP-2403-SNAPSHOT-IDENTITY` | Internal checked-token snapshot identity | `G1` | `S` | `Done` | `LSP-2402-CHECKED-IDENTITY` | `74b3135ef51558a151af2d4a064f907281e4a32e` |
 | `LSP-2404` | Semantic-token fixture corpus | `G1` | `M` | `BlockedSpec` | `LSP-2401`, `LSP-2402`, `LSP-2403` | `` |
+| `LSP-2404-CHECKED-SOURCE-FIXTURES` | Internal checked-token source fixture corpus | `G1` | `S` | `Done` | `LSP-2403-SNAPSHOT-IDENTITY` | `cee068af008cbd1e0327799a418078be850db754` |
 | `LSP-2501` | LSP request snapshot | `G1` | `L` | `BlockedSpec` | `INC-1401`, `INC-1402`, `LSP-2103`, `LSP-2104` | `` |
 | `LSP-2501-SNAPSHOT` | Internal immutable LSP request snapshot capture | `G1` | `S` | `Done` | `INC-1402`, `LSP-2102-NEGOTIATION`, `LSP-2103-OVERLAY` | `64eb8e858f87bc4f5896bbb8ac00f53afc48c97d` |
 | `LSP-2502` | LSP request cancellation | `G1` | `L` | `BlockedSpec` | `INC-1401`, `LSP-2501` | `` |
