@@ -7241,6 +7241,61 @@ notes = [
 ]
 
 [[task]]
+id = "LSP-2403-SNAPSHOT-IDENTITY"
+title = "Internal checked-token snapshot identity"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2402-CHECKED-IDENTITY"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
+  "docs/decisions/0084-lsp-lexical-token-source-index.md",
+  "docs/decisions/0085-lsp-checked-token-identity-observation.md",
+  "docs/decisions/0086-lsp-checked-token-snapshot-identity.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/checked_token_source_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0086-lsp-checked-token-snapshot-identity.md",
+  "docs/status/LSP-2403-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2403-SNAPSHOT-IDENTITY-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2403-SNAPSHOT-IDENTITY-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0086 authorizes only retention of the existing SourceId and session-local VFS Revision; neither becomes an LSP document version or result ID.",
+  "Repeated unchanged queries reuse the immutable checked-token observation by the existing QueryKey; a source edit creates a new revision/query-key result while the old observation remains unchanged.",
+  "Existing lexical source order and exact checked-definition facts remain intact; no token encoding, position, legend, modifier, fallback, URI/version, delta, negotiation, cancellation, or transport field is added.",
+  "Focused ling-db coverage verifies source identity, revision retention, checked facts, source order, and immutable cache reuse.",
+  "Full format, tests, clippy, CI, governance, status, and diff gates pass without changing language semantics, diagnostics, schemas, Semantic IDs, runtime, VM, ABI, dependencies, or Unicode 17.0.0 data.",
+]
+verified_against_commit = "74b3135ef51558a151af2d4a064f907281e4a32e"
+completion_commit = "74b3135ef51558a151af2d4a064f907281e4a32e"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This bounded child is complete under DEC-0086; public LSP-2403 remains BlockedSpec for full/delta encoding, result IDs, document versions, stale/base handling, and transport lifecycle.",
+  "SourceId and Revision are session-local compiler observations only; they are not a cross-process protocol identity or semantic ID.",
+]
+
+[[task]]
 id = "LSP-2404"
 title = "Semantic-token fixture corpus"
 state = "BlockedSpec"
