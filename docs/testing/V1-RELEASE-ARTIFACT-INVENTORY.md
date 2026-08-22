@@ -38,11 +38,18 @@ These commands validate current repository registries and Seed traceability;
 they do not create or publish v1.0 artifacts:
 
 ```text
+cargo xtask v1 verify
 cargo run -p xtask --locked --offline -- status verify
 cargo run -p xtask --locked --offline -- governance check-all
 cargo run -p xtask --locked --offline -- support verify
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 ```
+
+`cargo xtask v1 verify` deterministically checks the exact fourteen release
+items, their partial/unavailable/unsupported/draft/experimental/blocked
+states, the no-publication boundary, and nine linked audit-marker files. It
+is an inventory check only; it does not build, sign, upload, install, or
+advertise a v1.0 release.
 
 No package upload, installer, signing service, release tag, network request,
 or system configuration was exercised by this inventory.

@@ -4171,6 +4171,66 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6905-SEED"
+title = "Seed v1 release-artifact inventory drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6904-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0056-seed-v1-release-artifact-inventory-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6903-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6904-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6905-AUTHORITY-AUDIT.md",
+  "docs/SEED-RELEASE-REPORT.md",
+  "docs/testing/V1-RELEASE-ARTIFACT-INVENTORY.md",
+]
+artifacts = [
+  "tools/xtask/src/v1_artifact_inventory.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0056-seed-v1-release-artifact-inventory-gate.md",
+  "docs/status/RC-6905-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6905-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/testing/V1-RELEASE-ARTIFACT-INVENTORY.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask v1 verify deterministically validates fourteen release items: five partial Seed, two unavailable, two unsupported, one preview/not packaged, one draft, one experimental/preview/future, and two BlockedSpec states with non-empty evidence and required-publication cells and nine linked audit files.",
+  "The verifier fails closed on duplicate/missing/unexpected release items, state drift, missing immutable-Seed/no-publication markers, missing audit markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate and does not build, sign, upload, download, install, advertise, or claim a v1.0 artifact or Stable capability.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0056 closes only this internal Seed v1 artifact-inventory child; the parent RC-6905 gate remains BlockedSpec for all publication and Stable-support evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects the immutable-Seed/no-publication boundary only; the existing Seed tag and reports remain historical evidence and no v1.0 manifest is inferred.",
+  "No v1.0 tag, artifact, installer, extension, language server, signature, SBOM, provenance record, migration executable, evidence bundle, network request, system configuration, or placeholder is added.",
+]
+
+[[task]]
 id = "RC-6905"
 title = "v1.0 Release Artifacts"
 state = "BlockedSpec"

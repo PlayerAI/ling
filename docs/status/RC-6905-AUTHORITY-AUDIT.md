@@ -48,6 +48,13 @@ standard library, Zed/LSP packages, complete reference and migration manuals,
 final support matrix, Stable protocol schemas/golden corpus, Tier1
 conformance, security policy, and a versioned independent evidence bundle.
 
+The bounded `RC-6905-SEED` child is now protected by
+`cargo xtask v1 verify`. That internal command checks the exact fourteen
+release items, their documented non-Stable/blocked states, the immutable-
+Seed/no-publication boundary, and nine linked audit-marker files. It validates
+inventory drift only and does not create a v1.0 manifest, artifact, or Stable
+claim.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

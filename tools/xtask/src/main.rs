@@ -24,6 +24,7 @@ mod status;
 mod support;
 mod traceability;
 mod tutorial_matrix;
+mod v1_artifact_inventory;
 mod zed_extension;
 mod zed_matrix;
 
@@ -454,6 +455,28 @@ fn main() -> ExitCode {
                 }
             }
         }
+        [area, command] if area == "v1" && command == "verify" => {
+            match v1_artifact_inventory::check_repository(&root) {
+                Ok(summary) => {
+                    println!(
+                        "v1.0 artifact inventory OK: {} items ({} partial, {} unavailable, {} unsupported, {} BlockedSpec), {} audit files",
+                        summary.release_item_count,
+                        summary.partial_count,
+                        summary.unavailable_count,
+                        summary.unsupported_count,
+                        summary.blocked_count,
+                        summary.audit_file_count
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
         [area, command] if area == "zed" && command == "verify" => {
             match zed_matrix::check_repository(&root) {
                 Ok(summary) => {
@@ -788,7 +811,7 @@ fn main() -> ExitCode {
         }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask ci verify\n  cargo xtask dap verify\n  cargo xtask governance check-all\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask docs verify\n  cargo xtask examples verify\n  cargo xtask tutorial verify\n  cargo xtask lsp verify\n  cargo xtask rc0 verify\n  cargo xtask rc1 verify\n  cargo xtask rc2 verify\n  cargo xtask rc3 verify\n  cargo xtask zed verify\n  cargo xtask zed-extension verify\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask schema validate-all\n  cargo xtask schema compatibility --from N-1 --to N\n  cargo xtask schema corrupt-inputs\n  cargo xtask seed reproduce\n  cargo xtask performance baseline\n  cargo xtask performance verify\n  cargo xtask fuzz verify\n  cargo xtask fault verify\n  cargo xtask security verify\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
+                "Usage:\n  cargo xtask ci verify\n  cargo xtask dap verify\n  cargo xtask governance check-all\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask docs verify\n  cargo xtask examples verify\n  cargo xtask tutorial verify\n  cargo xtask lsp verify\n  cargo xtask rc0 verify\n  cargo xtask rc1 verify\n  cargo xtask rc2 verify\n  cargo xtask rc3 verify\n  cargo xtask v1 verify\n  cargo xtask zed verify\n  cargo xtask zed-extension verify\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask schema validate-all\n  cargo xtask schema compatibility --from N-1 --to N\n  cargo xtask schema corrupt-inputs\n  cargo xtask seed reproduce\n  cargo xtask performance baseline\n  cargo xtask performance verify\n  cargo xtask fuzz verify\n  cargo xtask fault verify\n  cargo xtask security verify\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

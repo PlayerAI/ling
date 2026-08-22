@@ -190,6 +190,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0056"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0056-seed-v1-release-artifact-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask v1 verify offline and assert fourteen release items with five partial Seed, two unavailable, two unsupported, one preview/not packaged, one draft, one experimental/preview/future, and two BlockedSpec states and nine audit files.",
+  "Mutate an artifact row/state, policy phrase, evidence cell, or linked audit marker and verify the gate fails closed.",
+  "Run cargo xtask ci verify and locked governance, status, support, and traceability checks without treating the inventory as a release manifest or Stable claim.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask v1 artifact-inventory validator and CI preflight; no language, runtime, diagnostic, schema, protocol, dependency, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "Candidate/artifact identity, packaging/acquisition, signatures/SBOM/provenance, Stable standard library/protocols, Zed/LSP, documentation/migration, support, security, and evidence bundle remain future release authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0038"
 kind = "Decision"
 status = "Accepted"

@@ -119,6 +119,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0056"
+title = "Seed v1 release-artifact inventory gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0056-seed-v1-release-artifact-inventory-gate.md"
+covers = ["internal v1.0 release-item inventory", "immutable Seed/no-publication boundary", "RC-6905-SEED evidence"]
+depends_on = ["ROADMAP-1.0", "DEC-0055", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0038"
 title = "CLI init command"
 kind = "Decision"
