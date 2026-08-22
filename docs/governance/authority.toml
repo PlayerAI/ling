@@ -2873,3 +2873,16 @@ covers = ["BND-5201 bounded Bound types/expressions boundary evidence", "test-on
 depends_on = ["DEC-0180", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0182"
+title = "Internal loop/recursion checks boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0182-loop-recursion-checks-boundary-evidence.md"
+covers = ["BND-5202 bounded loop/recursion checks boundary evidence", "test-only termination vocabulary", "termination boundaries without checker/proof/transform semantics"]
+depends_on = ["DEC-0181", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
