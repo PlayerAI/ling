@@ -1976,3 +1976,16 @@ covers = ["REM-2603 bounded remote-delivery boundary evidence", "test-only deliv
 depends_on = ["DEC-0111", "DEC-0110", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0113"
+title = "Internal reference-transport boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0113-reference-transport-boundary-evidence.md"
+covers = ["REM-2604 bounded reference-transport boundary evidence", "test-only transport/codec vocabulary", "transport boundaries without adapter/wire/runtime semantics"]
+depends_on = ["DEC-0112", "DEC-0111", "DEC-0110", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

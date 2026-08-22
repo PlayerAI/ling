@@ -2973,3 +2973,29 @@ unresolved_alternatives = [
   "Delivery class guarantees, exactly-once boundary, identity and deduplication, idempotence, ordering/causality, timeout/disconnect, partition/retry/restart, schema/capability failure, Fault representation, migration, diagnostics, resource limits, runtime ABI, and transport behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2603.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0113"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0113-reference-transport-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all eighteen provisional reference-transport and codec boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep transport/codec interface, framing, version/endpoint negotiation, decoder budgets, business-message capabilities, Typed Faults, loopback-versus-independent semantics, timeout/disconnect/partition, backpressure/cancellation, security, diagnostics, migration, cross-process, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public transport, adapter, codec, or Fault protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Transport interface, loopback and TCP/QUIC adapters, framing/codec ownership, decoder limits, Capability isolation, endpoint/version negotiation, Typed Fault mapping, timeout/disconnect/partition, backpressure/cancellation, loopback/network equivalence, security, diagnostics, migration, runtime ABI, and cross-process behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2604.",
+]
+superseded_by = ""
