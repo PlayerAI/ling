@@ -1755,3 +1755,16 @@ covers = ["ACT-2301 bounded Actor identity/reference model", "deterministic Acto
 depends_on = ["DEC-0002", "DEC-0090", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0096"
+title = "Internal Actor message-schema identity"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0096-actor-message-schema-identity.md"
+covers = ["ACT-2302 bounded message-schema identity model", "deterministic schema/field validation", "message evidence without Sendable or wire semantics"]
+depends_on = ["DEC-0008", "DEC-0009", "DEC-0010", "DEC-0095", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

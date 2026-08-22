@@ -13,6 +13,11 @@ No Sendable trait/judgment, message type checker, cross-turn borrow rule,
 Resource move/copy pass, Managed sharing rule, Capability filter, message
 schema, diagnostic allocation, or placeholder G2 API was added.
 
+Accepted `DEC-0096` now authorizes the bounded child
+`ACT-2302-MESSAGE-SCHEMA-MODEL`, which records only immutable schema/field
+identities. It does not close any Sendable, ownership, Capability, payload,
+serialization, mailbox, or runtime gap listed below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative; its sendability checklist does
@@ -91,6 +96,9 @@ bytecode, VM, and schema crates.
 No compiler, interpreter, VM, bytecode, ownership checker, Actor protocol,
 diagnostic, schema, Semantic ID, source-span, runtime, or Unicode 17.0.0
 behavior changed.
+
+The child implementation report and authority audit provide focused evidence
+for the identity boundary; public Actor message checking remains blocked.
 
 ## Intentionally deferred
 

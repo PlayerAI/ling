@@ -2532,3 +2532,29 @@ unresolved_alternatives = [
   "Actor identity lifetime/reuse, typed reference payloads, state/turn isolation, borrow/aliasing, Sendable/Resource/Capability rules, local/remote serialization, mailbox delivery, scheduler interaction, ABI, and migration remain open under the Actor gaps and ACT-2301.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0096"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0096-actor-message-schema-identity.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build a model with multiple schemas, optional owners, and unsorted field identities and assert deterministic schema/field ordering.",
+  "Reject zero/unresolved identities, duplicate schemas, and repeated fields before publication.",
+  "Compare equivalent models with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep Sendable, borrow/move/Resource/Managed, Capability, payload typing, serialization, mailbox, runtime, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled checked-data tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public protocol, message schema, or v0.2 support claim is registered.",
+]
+unresolved_alternatives = [
+  "Message type identity and recursion, Sendable/ownership, Resource/Managed profiles, Capability transfer, schema versioning, local/remote wire formats, mailbox outcomes, runtime ABI, and migration remain open under the Actor gaps and ACT-2302.",
+]
+superseded_by = ""

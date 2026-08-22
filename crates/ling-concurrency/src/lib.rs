@@ -13,6 +13,7 @@ use ling_source::Span;
 
 mod actor;
 mod lifecycle;
+mod message;
 mod scheduler;
 mod state_machine;
 
@@ -24,6 +25,10 @@ pub use actor::{
 pub use lifecycle::{
     FaultId, LifecycleEvent, LifecycleEventKind, LifecycleEventSpec, LifecycleIdentityKind,
     LifecycleTrace, LifecycleTraceError,
+};
+pub use message::{
+    MessageFieldId, MessageIdentityKind, MessageSchema, MessageSchemaError, MessageSchemaId,
+    MessageSchemaIdentityModel, MessageSchemaSpec,
 };
 pub use scheduler::{
     SchedulerEventId, SchedulerIdentityKind, SchedulerObservation, SchedulerObservationKind,
