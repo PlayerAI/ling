@@ -392,6 +392,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `RC-6902` | G6 | RC1 公开验证 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:490`, `docs/status/RC-6902-AUTHORITY-AUDIT.md`, `docs/testing/RC1-PUBLIC-VALIDATION.md` |
 | `RC-6903-SEED` | G6 | Seed RC3 independent-verification inventory drift gate | S | Done | Accepted DEC-0054; see `cargo xtask rc3 verify`, `docs/testing/RC3-INDEPENDENT-VERIFICATION.md`, and `docs/status/RC-6903-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `RC-6903` | G6 | 独立验证 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:502`, `docs/status/RC-6903-AUTHORITY-AUDIT.md`, `docs/testing/RC3-INDEPENDENT-VERIFICATION.md` |
+| `RC-6904-SEED` | G6 | Seed RC2/final change-control inventory drift gate | S | In Progress | Accepted DEC-0055; see `cargo xtask rc2 verify`, `docs/testing/RC2-FINAL-CHANGE-CONTROL.md`, and `docs/status/RC-6904-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `RC-6904` | G6 | RC2 / Final | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:514`, `docs/status/RC-6904-AUTHORITY-AUDIT.md`, `docs/testing/RC2-FINAL-CHANGE-CONTROL.md` |
 | `RC-6905` | G6 | v1.0 发布物 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:524`, `docs/status/RC-6905-AUTHORITY-AUDIT.md`, `docs/testing/V1-RELEASE-ARTIFACT-INVENTORY.md` |
 

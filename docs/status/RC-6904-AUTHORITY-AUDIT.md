@@ -8,7 +8,7 @@
 ## Decision
 
 `RC-6904` remains `BlockedSpec`. The plan says that only blocker fixes may be
-accepted and lists five required evidence classes, but it does not define a
+accepted and lists six required evidence classes, but it does not define a
 blocker taxonomy, candidate manifest, change-control protocol, risk schema,
 impact/version rules, reviewer approval, or candidate regeneration process.
 The current Seed tests and audits cannot be promoted to an RC2 baseline.
@@ -33,7 +33,7 @@ The current Seed tests and audits cannot be promoted to an RC2 baseline.
 
 ## Evidence and gaps
 
-`docs/testing/RC2-FINAL-CHANGE-CONTROL.md` maps the five required evidence
+`docs/testing/RC2-FINAL-CHANGE-CONTROL.md` maps the six required evidence
 classes and the allowed/forbidden change boundary. Local status, governance,
 support, and traceability gates validate registry consistency only; they do not
 approve a blocker, risk, protocol impact, candidate identity, or Final result.
@@ -42,6 +42,13 @@ The missing evidence includes an accepted blocker/P0/P1 registry, candidate
 baseline, regression and risk schemas, protocol/artifact impact manifest, full
 matrix rerun, immutable candidate identity, and reviewer approval for each
 change.
+
+The bounded `RC-6904-SEED` child is now protected by
+`cargo xtask rc2 verify`. That internal command checks the exact six evidence
+classes, their documented `BlockedSpec` or partial Seed states, the
+blocker-only/no-claim boundary, and seven linked audit-marker files. It
+validates inventory drift only and does not approve a blocker, create a
+candidate, or produce a Final result.
 
 ## Compatibility and deferred work
 

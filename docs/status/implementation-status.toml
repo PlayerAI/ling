@@ -4066,6 +4066,64 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6904-SEED"
+title = "Seed RC2/final change-control inventory drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6903-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0055-seed-rc2-final-change-control-inventory-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6903-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6904-AUTHORITY-AUDIT.md",
+  "docs/testing/RC2-FINAL-CHANGE-CONTROL.md",
+]
+artifacts = [
+  "tools/xtask/src/rc2_change_control.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0055-seed-rc2-final-change-control-inventory-gate.md",
+  "docs/status/RC-6904-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6904-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/testing/RC2-FINAL-CHANGE-CONTROL.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc2 verify deterministically validates six RC2 evidence classes: five BlockedSpec and one partial Seed state with non-empty state/evidence/exit cells and seven linked audit files.",
+  "The verifier fails closed on duplicate/missing/unexpected evidence classes, state drift, missing blocker-only/no-claim markers, missing audit markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate and does not approve a blocker, classify a change, create a candidate, run a matrix, or make a Final/Go decision.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0055 closes only this internal Seed RC2 inventory child; the parent RC-6904 gate remains BlockedSpec for change approval and Final release evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects the RC2 blocker-only/no-claim boundary only; current Seed tests and audits remain non-candidate evidence.",
+  "No source fix, blocker status, risk acceptance, candidate, tag, artifact, reviewer decision, network request, system configuration, or placeholder is added.",
+]
+
+[[task]]
 id = "RC-6904"
 title = "RC2 / Final Change Control"
 state = "BlockedSpec"

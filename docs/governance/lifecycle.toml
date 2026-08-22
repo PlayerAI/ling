@@ -166,6 +166,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0055"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0055-seed-rc2-final-change-control-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc2 verify offline and assert six evidence classes with five BlockedSpec, one partial Seed state, and seven release-audit marker files.",
+  "Mutate an evidence row/state, policy phrase, evidence cell, or linked audit marker and verify the gate fails closed.",
+  "Run cargo xtask ci verify and locked governance, status, support, and traceability checks without treating the inventory as blocker approval or a release candidate.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask RC2 change-control inventory validator and CI preflight; no language, runtime, diagnostic, schema, protocol, dependency, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "Blocker/P0/P1 taxonomy, regression/risk/impact schemas, full matrix, candidate identity, reviewer approval, rollback, and candidate regeneration remain future release authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0038"
 kind = "Decision"
 status = "Accepted"

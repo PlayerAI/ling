@@ -39,11 +39,17 @@ These offline commands validate repository consistency only; they do not
 approve a change or produce a candidate:
 
 ```text
+cargo xtask rc2 verify
 cargo run -p xtask --locked --offline -- status verify
 cargo run -p xtask --locked --offline -- governance check-all
 cargo run -p xtask --locked --offline -- support verify
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 ```
+
+`cargo xtask rc2 verify` deterministically checks the exact six evidence
+classes, their `BlockedSpec` or partial Seed states, the blocker-only/no-claim
+boundary, and seven linked audit-marker files. It is an inventory check only;
+it does not approve a blocker, create a candidate, or produce a release.
 
 No tag, release manifest, artifact, issue disposition, network request, or
 system configuration was created by this audit.

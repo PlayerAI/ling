@@ -588,6 +588,20 @@ symbol = "rejects_rc3_state_drift"
 feature_ids = ["FTR-SEED-0007"]
 
 [[evidence]]
+id = "EVD-POS-RC2-CHANGE-CONTROL-INVENTORY"
+kind = "Positive"
+path = "tools/xtask/src/rc2_change_control.rs"
+symbol = "repository_rc2_inventory_is_deterministic"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-RC2-CHANGE-CONTROL-INVENTORY-DRIFT"
+kind = "Negative"
+path = "tools/xtask/src/rc2_change_control.rs"
+symbol = "rejects_rc2_state_drift"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
 id = "EVD-POS-G0-CI-CONTRACT"
 kind = "Positive"
 path = "tools/xtask/src/ci.rs"
