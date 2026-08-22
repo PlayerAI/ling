@@ -4895,3 +4895,27 @@ unresolved_alternatives = [
   "Native IR validity; ABI/calling convention/layout/endianness/alignment/FFI; target/toolchain identity; ownership/region/resource/drop/aliasing; static-memory accounting; state-cell and safe-state transitions; schedule/clock/tick/deadline/jitter/overrun; timer/watchdog; interrupt/preemption; startup/shutdown/Fault/fallback; telemetry; Critical/Kernel/Device/placement; unsupported target; bilingual diagnostics/facts; ABI/layout, ownership/memory, timer/watchdog, lifecycle, safe-state, target, differential, migration, and Unicode fixtures; protocol inventory and public status remain open under NODE-5305, NODE-5304, RFC-K502, RFC-0011, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-KERNEL-DEVICE-001, GAP-CRITICAL-PROFILE-001, and missing Native authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0190"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0190-node-actor-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Node/Actor boundary categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer bridge queues/envelopes, capacity/backpressure/drop/expiry, sampling/commit, ordering, ownership/serialization, turn/reentry, supervision/Fault/restart, replay, diagnostics, CLI/LSP, and runtime protocol behavior until accepted authority and fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; structural Actor/mailbox observations and host controls are not reinterpreted as bridge semantics.",
+  "No Node/Actor queue, bridge envelope, replay schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Node/Actor identity and bridge/envelope version; port/message schema and serialization; ownership/Move/Borrow/Managed and privacy; mailbox capacity, admission, backpressure, drop/expiry/stale input; sampling/commit and clock conversion; delivery order and simultaneous-event tie-break; bounded memory; Actor turn/await/reentry, cancellation, supervision/restart/shutdown, Fault/fallback; hard-real-time non-waiting, network/service boundary, Critical/Native/Device/target profiles; replay/effect records, privacy, corruption/divergence and migration; bilingual diagnostics/facts; capacity, stale/drop, ordering, sampling, ownership, restart/replay, Unicode, differential fixtures; protocol inventory and public status remain open under NODE-5306, NODE-5305, RFC-K502, RFC-0008, RFC-0009, RFC-0010, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-ACTOR-AWAIT-REENTRY-001, GAP-STRUCTURED-TASK-001, GAP-DETERMINISTIC-REPLAY-001, GAP-CRITICAL-PROFILE-001, and missing Node/Actor authority.",
+]
+superseded_by = ""

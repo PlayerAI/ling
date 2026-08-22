@@ -2977,3 +2977,16 @@ covers = ["NODE-5305 bounded Node Native-runtime boundary evidence", "test-only 
 depends_on = ["DEC-0188", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0190"
+title = "Internal Node/Actor boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0190-node-actor-boundary-evidence.md"
+covers = ["NODE-5306 bounded Node/Actor boundary evidence", "test-only Node/Actor bridge vocabulary", "bridge boundaries without envelope/queue/ownership/replay semantics"]
+depends_on = ["DEC-0189", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
