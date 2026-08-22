@@ -209,6 +209,7 @@
 | `KCHK-4104` | Alias and parallel-write conflicts | `G4` | `L` | `BlockedSpec` | `KCHK-4103` | `` |
 | `KCHK-4104-OBSERVATION` | Internal Kernel alias/parallel-write boundary evidence | `G4` | `S` | `Done` | `KCHK-4103-OBSERVATION` | `5a0fe371452fbdf4bfdd87dd31b8030456b3e5b2` |
 | `KCHK-4105` | Kernel Core and verifier | `G4` | `L` | `BlockedSpec` | `KCHK-4104` | `` |
+| `KCHK-4105-OBSERVATION` | Internal Kernel Core/verifier boundary evidence | `G4` | `S` | `Done` | `KCHK-4104-OBSERVATION` | `b362af10cd5bf5bc872cb46625aa05aa90c09b03` |
 | `LSP-2101` | LSP lifecycle skeleton | `G1` | `S` | `BlockedSpec` | `CLI-1701` | `` |
 | `LSP-2101-LIFECYCLE` | LSP lifecycle Preview slice | `G1` | `S` | `Done` | — | `38d95fb7b91c2035bd2b1b4ebf864c1693050925` |
 | `LSP-2102` | LSP position-encoding negotiation | `G1` | `S` | `BlockedSpec` | `LSP-2101` | `` |

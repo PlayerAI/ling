@@ -15501,10 +15501,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "b362af10cd5bf5bc872cb46625aa05aa90c09b03"
+completion_commit = "b362af10cd5bf5bc872cb46625aa05aa90c09b03"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0151; KCHK-4105 remains BlockedSpec for Core/verifier semantics, schemas, diagnostics, CPU/device evidence, migration, protocol integration, and support claims.",
   "No parser, AST/HIR/Checked Core node, Kernel Core schema, encoder/decoder, verifier, Device IR, backend, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
