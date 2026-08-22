@@ -5979,6 +5979,60 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2302-TYPED-INDEX"
+title = "Internal typed-definition observation"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EFF-2102", "IDE-2301-INDEX", "INC-1405"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0060-seed-effect-row-snapshot.md",
+  "docs/decisions/0074-ide-typed-definition-observation.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/typed_definition_index.rs",
+  "crates/ling-db/src/definition_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0074-ide-typed-definition-observation.md",
+  "docs/status/IDE-2302-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2302-TYPED-INDEX-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0074 authorizes only an in-process immutable observation built from a successful CheckedProgram; builtins and Prelude entries are excluded and missing source facts are not synthesized.",
+  "Records preserve resolver DefinitionId, module/name spelling, classification, mutability, logical source name, SourceId, and original UTF-8 Span, plus optional exact type display, canonical Effect labels, and checked module capabilities.",
+  "Existing TypedProgram, EffectRow, and capability facts are copied without new type, Effect, Capability, namespace, or Semantic ID rules; explicit source/span/name/identity ordering makes repeated observations equal.",
+  "Focused cargo fmt, ling-db tests, and Clippy checks pass; Unicode/BOM/CRLF spans, Console.Write effect/capability facts, repeated output, user-only lookup, and invalid UTF-8 failure are covered.",
+  "The public IDE-2302 hover target remains BlockedSpec for target selection, presentation, Markdown/localization, positions, URI/version, cancellation, publication, Trait witnesses, and fixtures.",
+]
+verified_against_commit = "d0727d95442309390a68d1af512111a8cd17f919"
+completion_commit = "d0727d95442309390a68d1af512111a8cd17f919"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The index is a compiler-query observation over checked resolver/type/effect/capability facts; it is not hover text, an LSP response, or a Semantic ID generator.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2301"
 title = "IDE document symbols"
 state = "BlockedSpec"
