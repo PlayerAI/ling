@@ -1835,3 +1835,27 @@ unresolved_alternatives = [
   "EFF-2102 owns row constraint solving and diagnostics; EFF-2103 owns source syntax and Checked-Core lowering; Task, Actor, Replay, Remote, Native, GPU, FFI, and Stable 1.0 compatibility require separate accepted authorities.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0067"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0067-effect-model-property-corpus.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Enumerate bounded label permutations and duplicates and compare canonical row names, bytes, and open-tail identity.",
+  "Enumerate row-constraint insertion orders and compare deterministic substitutions and normalized rows.",
+  "Enumerate handler-clause orders and compare residual rows, resume limits, graph bytes, and HandlerCore bytes while excluding source spans.",
+]
+compatibility_impact = [
+  "Adds only offline bounded model-property tests and status metadata; Seed behavior, runtime, protocols, diagnostics, schemas, Semantic IDs, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Full well-typed Core generation, handler execution, Fault/cancellation behavior, and interpreter/VM differential evidence remain EFF-2105 parent work requiring separate accepted authorities.",
+]
+superseded_by = ""

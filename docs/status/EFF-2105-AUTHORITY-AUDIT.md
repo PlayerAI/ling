@@ -2,13 +2,14 @@
 
 ## Outcome
 
-`EFF-2105` is correctly recorded as `BlockedSpec`. The G2 plan requires a
+`EFF-2105` remains correctly recorded as `BlockedSpec` for its full runtime and
+differential target. Accepted `RFC-0006` and `DEC-0062` now authorize the
+deterministic in-process model boundary, and `DEC-0067` closes the bounded
+`EFF-2105-MODEL-PROPERTIES` evidence child. The parent still requires a
 generator for small well-typed Core programs and comparison of interpreter and
 VM results, residual Effect Rows, and Fault categories. It also requires
 bounded randomized inputs that cannot cause host panics, unbounded recursion,
-or canonical-output drift. The handler, row-polymorphism, residual-effect,
-Fault, and VM equivalence contracts needed to define those properties are not
-accepted.
+or canonical-output drift.
 
 No Core generator, handler/effect oracle, residual-row comparator, new
 property-test protocol, fuzz corpus, diagnostic allocation, or placeholder G2
@@ -19,9 +20,10 @@ API was added.
 - The G2 execution package is non-normative; its fuzz/property-test outline
   does not authorize a new Typed Core generator, handler semantics, or a
   differential equivalence relation.
-- EFF-2101 through EFF-2104 are `BlockedSpec`; without accepted Effect Row,
-  handler Core, resume, and interpreter/VM contracts there is no valid
-  handler-bearing input or expected result for a property oracle.
+- EFF-2101 and EFF-2102, together with the bounded EFF-2103 Core/source/HIR
+  children, now have accepted model authority. EFF-2104 remains `BlockedSpec`;
+  without accepted handler runtime and interpreter/VM contracts there is no
+  valid handler-bearing input or expected result for the full property oracle.
 - `docs/SEMANTICS.md` and DEC-0010 define current Seed closed-row
   propagation, `State<T>` visibility, and Capability behavior, but leave row
   polymorphism, handler elimination, residual rows, and State masking open.
@@ -29,10 +31,9 @@ API was added.
   boundaries. They do not authorize handler Fault categories, residual-effect
   observations, randomized cancellation semantics, or a new differential
   protocol.
-- `GAP-EFFECT-HANDLER-001` leaves matching, elimination, nesting, resumption,
-  Capability interaction, unhandled failure, and differential evidence open;
-  `GAP-EFFECT-STATE-MASKING-001` leaves mutable-State visibility open. Their
-  candidate RFC-0006 is not Accepted.
+- `GAP-EFFECT-HANDLER-001` is resolved for the Experimental v0.2 model by
+  RFC-0006, while runtime and differential evidence remain open;
+  `GAP-EFFECT-STATE-MASKING-001` is resolved by the accepted visible-State rule.
 
 ## Current implementation evidence
 
@@ -48,6 +49,9 @@ API was added.
   manifests, and bytecode decoding/verification. It has no well-typed Core
   generator, interpreter/VM effect differential target, bounded handler
   recursion model, or effect-specific corpus.
+- `crates/ling-effects/tests/model_properties.rs` provides only the bounded
+  DEC-0067 permutation corpus for canonical rows, solver substitutions,
+  handler residuals, and path-free graph/Core bytes; it is not the full target.
 - Existing randomized or differential checks cannot be promoted to EFF-2105
   by inference: doing so would freeze unaccepted handler semantics and could
   make host behavior, Fault mapping, or canonical bytes part of the language
@@ -75,9 +79,10 @@ An Accepted RFC or decision must define, at minimum:
    unhandled operations, malformed bytecode, resource limits, deterministic
    output, and no unchecked-AST execution.
 
-Until these decisions are Accepted, a property test could encode the wrong
-handler semantics, accept divergent interpreter/VM results, hide residual
-effects, or turn a generator panic into an accidental language guarantee.
+Until runtime, generator, and differential decisions are Accepted, a full
+property test could encode the wrong handler execution semantics, accept
+divergent interpreter/VM results, hide residual effects, or turn a generator
+panic into an accidental language guarantee.
 
 ## Evidence and compatibility
 
@@ -90,13 +95,15 @@ This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `crates/ling-vm`, and the excluded `fuzz` workspace.
 
 No compiler, interpreter, VM, bytecode, fuzz protocol, diagnostic, schema,
-Semantic ID, source-span, runtime, or Unicode 17.0.0 behavior changed.
+Semantic ID, source-span, runtime, or Unicode 17.0.0 behavior changed. The
+bounded model-property child adds offline tests only.
 
 ## Intentionally deferred
 
-`EFF-2105` can begin only after EFF-2101 through EFF-2104 and an Accepted
-RFC-0006 (or replacement), followed by explicit generator, residual-row, and
-interpreter/VM equivalence authority. The future implementation must generate
-only checked, bounded Core, compare stable semantic projections, retain
-reproducible seeds and minimized corpus entries, and publish differential
-evidence without exposing a new public protocol before acceptance.
+The full `EFF-2105` target can begin only after EFF-2104 and explicit
+generator, residual-row, and interpreter/VM equivalence authority. The future
+implementation must generate only checked, bounded Core, compare stable
+semantic projections, retain reproducible seeds and minimized corpus entries,
+and publish differential evidence without exposing a new public protocol
+before acceptance. `EFF-2105-MODEL-PROPERTIES` is complete under DEC-0067 and
+does not remove these parent blockers.

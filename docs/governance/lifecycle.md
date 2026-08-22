@@ -97,6 +97,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0064` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0064](../decisions/0064-handler-source-cst-projection.md) |
 | `DEC-0065` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0065](../decisions/0065-handler-ast-projection.md) |
 | `DEC-0066` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0066](../decisions/0066-handler-hir-projection.md) |
+| `DEC-0067` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0067](../decisions/0067-effect-model-property-corpus.md) |
 
 ## Migration boundary
 

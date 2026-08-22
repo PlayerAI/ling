@@ -5,9 +5,10 @@
 `EFF-2104` is correctly recorded as `BlockedSpec`. The G2 plan requires an
 interpreter reference path followed by VM execution and a differential corpus
 for single/nested handlers, propagation, resume, handler Faults, mutable State,
-and cancellation. The handler Typed Core and Effect semantics are not
-accepted, so no operation dispatch, continuation representation, residual-row
-behavior, bytecode encoding, or runtime failure contract can be implemented.
+and cancellation. RFC-0006 now accepts the Experimental Effect model and the
+EFF-2103 bounded source/Core/HIR children preserve checked-only boundaries, but
+operation dispatch, continuation representation, runtime residual-row
+behavior, bytecode encoding, and runtime failure contracts remain unaccepted.
 
 No handler evaluator, continuation object, VM instruction, bytecode version,
 runtime Fault mapping, differential fixture, diagnostic allocation, or
@@ -17,8 +18,9 @@ placeholder G2 API was added.
 
 - The G2 execution package is non-normative; its interpreter-first order and
   differential list do not authorize handler execution semantics or a VM ABI.
-- EFF-2101 through EFF-2103 are `BlockedSpec`; without an accepted Effect Row,
-  handler Core, and resume model there is no valid checked input for either
+- EFF-2101 and EFF-2102 and the bounded EFF-2103 children have accepted model
+  authority, but no source handler has yet become checked Typed Core. Without
+  an accepted runtime/ABI contract there is no valid handler input for either
   backend.
 - `docs/SEMANTICS.md` and DEC-0010 keep Seed evaluation on checked
   `ProgramSnapshot` data and define current State/Capability behavior, but do
@@ -26,9 +28,10 @@ placeholder G2 API was added.
 - DEC-0013 defines current main/runtime failure classes and exit behavior;
   RFC-0020 defines VM host cancellation only. Neither defines handler Faults,
   operation effects, or a new bytecode instruction.
-- `GAP-EFFECT-HANDLER-001` leaves matching, elimination, nesting, resumption,
-  Capability interaction, unhandled failure, and differential evidence open.
-  `GAP-EFFECT-STATE-MASKING-001` leaves mutable-State visibility/escape open.
+- `GAP-EFFECT-HANDLER-001` is resolved for the Experimental model by RFC-0006,
+  while matching execution, resumption runtime, and differential evidence
+  remain open. `GAP-EFFECT-STATE-MASKING-001` is resolved by the accepted
+  visible-State rule, but runtime State interaction remains unimplemented.
 
 ## Current implementation evidence
 
@@ -67,9 +70,9 @@ An Accepted RFC or decision must define, at minimum:
    limits, Unicode/CRLF/BOM spans, deterministic output, and no unchecked-AST
    execution.
 
-Until these decisions are Accepted, a runtime could resume with the wrong
-continuation, duplicate or lose effects, diverge between interpreter and VM,
-or execute handler data that was never checked.
+Until the runtime and VM decisions are Accepted, a runtime could resume with
+the wrong continuation, duplicate or lose effects, diverge between interpreter
+and VM, or execute handler data that was never checked.
 
 ## Evidence and compatibility
 
@@ -85,8 +88,8 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`EFF-2104` can begin after EFF-2101 through EFF-2103 and an Accepted RFC-0006
-(or replacement), followed by explicit bytecode/VM authority. The future
+`EFF-2104` can begin after the accepted EFF-2101 through EFF-2103 model slices
+and explicit bytecode/VM authority. The future
 implementation must use checked Typed Core only, establish the interpreter as
 the reference, version and verify any VM encoding, and publish differential
 evidence before exposing handler execution.

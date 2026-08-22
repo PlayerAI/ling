@@ -1378,3 +1378,16 @@ covers = ["EFF-2103 unresolved handler HIR expression", "resolver rejection gate
 depends_on = ["RFC-0006", "DEC-0063", "DEC-0064", "DEC-0065"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0067"
+title = "Effect model deterministic property corpus"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0067-effect-model-property-corpus.md"
+covers = ["EFF-2105 bounded Effect model property corpus", "canonical row/solver/handler evidence", "runtime/differential boundary"]
+depends_on = ["RFC-0006", "DEC-0062"]
+supersedes = []
+stable_basis = true
