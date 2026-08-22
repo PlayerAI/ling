@@ -302,6 +302,7 @@
 | `REM-2602` | Transport-neutral envelope | `G2` | `L` | `BlockedSpec` | `REM-2601` | `` |
 | `REM-2602-OBSERVATION` | Internal transport-neutral envelope boundary evidence | `G2` | `S` | `Done` | `REM-2601-OBSERVATION` | `a64cadce09b158820ba5c8841d4695778e8a86af` |
 | `REM-2603` | Delivery semantics | `G2` | `L` | `BlockedSpec` | `REM-2602` | `` |
+| `REM-2603-OBSERVATION` | Internal remote-delivery boundary evidence | `G2` | `S` | `Done` | `REM-2602-OBSERVATION` | `cbfd4592fd499bd09722936caa597cccbd10f172` |
 | `REM-2604` | Minimal reference transport | `G2` | `L` | `BlockedSpec` | `REM-2603` | `` |
 | `REM-2605` | Security and resource limits | `G2` | `L` | `BlockedSpec` | `REM-2604` | `` |
 | `REP-2501` | Determinism class | `G2` | `L` | `BlockedSpec` | `SUP-2403` | `` |

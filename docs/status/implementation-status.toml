@@ -10887,6 +10887,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/REM-2603-AUTHORITY-AUDIT.md",
+  "docs/status/REM-2603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/REM-2603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0112-remote-delivery-boundary-evidence.md",
+  "crates/ling-concurrency/tests/remote_delivery_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -10894,6 +10902,7 @@ acceptance = [
   "The audit records the missing delivery guarantees/classes, retry and idempotence-key rules, deduplication identity/lifetime, ordering/causality, timeout/disconnect/partition, stale incarnation/restart, schema compatibility, and Capability revocation contracts.",
   "The audit distinguishes the plan's prohibition on an unconditional Exactly Once claim and the SEMANTICS Delivery sketch from the absent Accepted RFC-C206/RFC-0009 runtime and protocol authority, and preserves the checked-only evaluation boundary.",
   "The audit covers delivery outcomes, duplicates, reordering, retries, deadlines/cancellation, backpressure, replay/determinism, malformed or incompatible messages, Unicode/CRLF/BOM spans, security, and interpreter/VM/runtime differential fixtures.",
+  "Accepted DEC-0112 authorizes only test-only remote-delivery and failure boundary vocabulary; it does not close delivery guarantees, retry/deduplication, ordering, partition, schema/capability failure, or runtime gaps.",
   "No delivery-policy type, retry queue, deduplication store, ordering ledger, remote Fault, capability-revocation path, transport adapter, diagnostic allocation, public protocol, or placeholder G2 API is added while the authority is absent.",
   "The future implementation must consume accepted types and checked Core only, never promise unconditional Exactly Once, and publish timeout, partition, duplication, ordering, restart, schema, capability, and interpreter/VM evidence before exposing remote messaging.",
 ]
@@ -10905,6 +10914,57 @@ notes = [
   "REM-2603 is BlockedSpec by REM-2602, absent RFC-C206/RFC-0009, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved delivery-guarantee, retry/deduplication, ordering, partition, restart, schema, and Capability-revocation contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Remote Actor runtime, delivery policy, network Effect, remote Fault, retry or deduplication state, ordering ledger, incarnation registry, or capability-revocation hook; local cancellation and Semantic IDs are not remote delivery semantics.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, RemoteRef, envelope, delivery, network, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "REM-2603-OBSERVATION"
+title = "Internal remote-delivery boundary evidence"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REM-2602-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0111-transport-neutral-envelope-boundary-evidence.md",
+  "docs/decisions/0112-remote-delivery-boundary-evidence.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/tests/remote_delivery_evidence.rs",
+  "docs/decisions/0112-remote-delivery-boundary-evidence.md",
+  "docs/status/REM-2603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/REM-2603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0112 authorizes only test-only remote-delivery and failure boundary evidence; no delivery semantics are claimed.",
+  "The test-local inventory covers delivery class, AtMostOnce, AtLeastOnce, IdempotentRetry, the ExactlyOnce boundary, delivery identity, idempotence key, deduplication, ordering, causality, timeout, disconnect, duplicate, reorder, stale incarnation, remote restart, schema mismatch, and Capability revocation with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; no delivery policy, retry/deduplication store, ordering ledger, remote Fault, transport, public protocol, or stale zero command is added.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "cbfd4592fd499bd09722936caa597cccbd10f172"
+completion_commit = "cbfd4592fd499bd09722936caa597cccbd10f172"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0112; REM-2603 remains BlockedSpec for delivery guarantees, retries, deduplication, ordering, partition, restart, schema/capability failures, Faults, and runtime semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added.",
 ]
 
 [[task]]
