@@ -3042,3 +3042,16 @@ covers = ["CTR-5403 bounded Contract runtime-check boundary evidence", "test-onl
 depends_on = ["DEC-0193", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0195"
+title = "Internal Contract VC boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0195-contract-vc-boundary-evidence.md"
+covers = ["CTR-5404 bounded Contract VC boundary evidence", "test-only Proof IR/VC vocabulary", "VC boundaries without proof grammar/translation/soundness semantics"]
+depends_on = ["DEC-0194", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

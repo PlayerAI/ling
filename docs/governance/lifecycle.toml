@@ -5015,3 +5015,27 @@ unresolved_alternatives = [
   "Checked Contract Core and binding; pre/post/invariant/instance semantics; call/return/declared/suspension/Node/Actor/FFI/cleanup boundaries; order, short-circuit, purity/totality/effects/capabilities/allocation/termination, assume restrictions; unknown/malformed input; effect isolation, atomicity and committed state; Fault/category/code/facts, status and provenance; captured values, privacy/size limits; profile gates and Critical non-weakening; reference/VM/Native equivalence, evidence, replay and migration; diagnostics, positive/negative/boundary/isolation/profile/replay/Unicode fixtures; protocol inventory and public status remain open under CTR-5403, CTR-5402, RFC-K503, GAP-CRITICAL-PROFILE-001, and missing Contract authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0195"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0195-contract-vc-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Contract VC categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer Proof IR/VC, Contract-to-VC translation, assumption/TCB registry, solver/checker, evidence schema, diagnostics, CLI/LSP, and protocol behavior until accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing bytecode verifier/lowering invariants and VM evidence are not reinterpreted as source proof.",
+  "No Proof IR, VC generator, obligation lowering, assumption registry, solver/checker, evidence schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Proof IR/VC grammar/version/well-formedness/canonical bytes; obligation, Contract and Semantic IDs/spans; SSA/path, branches/loops/recursion/termination; arithmetic/overflow/rounding, memory/alias/ownership, Effect/Capability, timing/FFI and external assumptions; translation and soundness/non-claims; bounded/unbounded reasoning; solver candidate, certificate, timeout/unknown/invalid model/fail-closed behavior; limits, evidence/counterexample/replay/provenance/redaction/revocation/migration; diagnostics, profiles/optimization; positive/negative/malformed, arithmetic, alias/effect, assumption, timeout/unknown, Unicode/differential fixtures; protocol inventory and public status remain open under CTR-5404, CTR-5403, RFC-K505, RFC-K506, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing proof authority.",
+]
+superseded_by = ""
