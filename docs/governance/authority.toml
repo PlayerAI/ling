@@ -1328,6 +1328,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0068"
+title = "Trait solver bounded termination corpus"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0068-trait-termination-corpus.md"
+covers = ["TRAIT-1309 bounded termination evidence", "source-evidence-independent solver projection", "cycle/depth boundary"]
+depends_on = ["RFC-0005", "DEC-0026"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0006"
 title = "Effect rows and first-order handlers"
 kind = "RFC"

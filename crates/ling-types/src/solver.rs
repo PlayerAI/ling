@@ -268,9 +268,12 @@ mod tests {
     use crate::constraints;
 
     fn resolved_once(text: &str) -> ResolvedProgram {
-        let source =
-            SourceFile::from_bytes(SourceId::new(0), "solver.ling", text.as_bytes().to_vec())
-                .expect("valid source");
+        resolved_named("solver.ling", text)
+    }
+
+    fn resolved_named(name: &str, text: &str) -> ResolvedProgram {
+        let source = SourceFile::from_bytes(SourceId::new(0), name, text.as_bytes().to_vec())
+            .expect("valid source");
         let parsed = parse(&source);
         assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
         let ast = lower_ast(&source, &parsed).expect("valid AST");
@@ -415,5 +418,40 @@ mod tests {
             errors[0].kind,
             SolverErrorKind::InvalidReceiverArity { actual: 2 }
         ));
+    }
+
+    #[test]
+    fn bounded_termination_projection_ignores_source_evidence() {
+        let text = concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let show requires { Renderable<Item> } value = value\n",
+        );
+        let project = |source_name: &str| {
+            let program = resolved_named(source_name, text);
+            let index = coherence::build_index(&program).expect("coherence");
+            let obligations = constraints::collect_obligations(&program).expect("obligations");
+            solve_obligations(&program, &index, &obligations, &BTreeMap::new())
+                .expect("bounded selection")
+                .into_iter()
+                .map(|selection| {
+                    (
+                        selection.obligation_order,
+                        selection.trait_id.name,
+                        selection.impl_id.ordinal,
+                        selection.receiver,
+                        selection.member_names,
+                    )
+                })
+                .collect::<Vec<_>>()
+        };
+
+        let first = project("first.ling");
+        let second = project("second.ling");
+        assert_eq!(first, second);
     }
 }

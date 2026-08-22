@@ -2,9 +2,10 @@
 
 ## Outcome
 
-`TRAIT-1309` is correctly recorded as `BlockedSpec`. The current internal
-solver already implements the accepted first-slice termination evidence, but
-the execution plan also asks for a deep-chain/diamond/failure/cross-package
+`TRAIT-1309` remains correctly recorded as `BlockedSpec` for its production
+performance and editor target. Accepted RFC-0005/DEC-0026 and DEC-0068 now
+authorize the bounded `TRAIT-1309-TERMINATION` evidence child, while the
+execution plan still asks for a deep-chain/diamond/failure/cross-package
 benchmark and an explainable resource limit suitable for an LSP. No accepted
 authority defines those performance and cancellation semantics yet.
 
@@ -43,6 +44,9 @@ The repository establishes the safe part of the boundary:
 - Existing solver tests cover a concrete selection, unsatisfied/variable and
   ambiguous candidates, active cycles, invalid arity, and the 64-level limit.
   They are correctness tests, not a versioned performance benchmark corpus.
+- `crates/ling-types/src/solver.rs` additionally compares the deterministic
+  selected projection for equivalent fixtures under distinct logical source
+  names; it does not claim a timing or cancellation contract.
 - The repository has a general opt-in incremental-query timing tool, but it
   does not measure Trait obligations and makes no absolute performance
   promise. Reusing it for Traits would require an accepted fixture and scope.
@@ -67,7 +71,8 @@ An implementation-ready decision or RFC must define, at minimum:
 
 Until those decisions and the production integration exist, changing the
 solver limit or publishing a benchmark budget would either alter accepted
-termination semantics or imply an unsupported LSP performance contract.
+termination semantics or imply an unsupported LSP performance contract. The
+bounded child does neither.
 
 ## Evidence and compatibility
 
@@ -78,14 +83,15 @@ This audit was checked against `docs/RFC-0005.md`,
 `docs/ling_execution_plan/03-G1-V0.1-LIVING.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `crates/ling-types/src/solver.rs`, and `tools/xtask/src/performance.rs`.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+The bounded child changes only internal test evidence; no public protocol,
+diagnostic allocation, schema, Semantic ID, source-span, runtime, bytecode,
+VM, or Unicode 17.0.0 claim is made.
 
 ## Intentionally deferred
 
-`TRAIT-1309` can begin after the solver is attached to the accepted HIR/Typed
-Core pipeline and the resource/cancellation and benchmark evidence contracts
-are Accepted. The implementation should preserve the RFC-0005 64-level
-termination rule, keep measurements opt-in and deterministic, and avoid
-turning host timing into Ling semantics.
+The full `TRAIT-1309` target can begin after the solver is attached to the
+accepted HIR/Typed Core pipeline and the resource/cancellation and benchmark
+evidence contracts are Accepted. The implementation should preserve the
+RFC-0005 64-level termination rule, keep measurements opt-in and deterministic,
+and avoid turning host timing into Ling semantics. The bounded
+`TRAIT-1309-TERMINATION` child is complete under DEC-0068.

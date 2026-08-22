@@ -1859,3 +1859,26 @@ unresolved_alternatives = [
   "Full well-typed Core generation, handler execution, Fault/cancellation behavior, and interpreter/VM differential evidence remain EFF-2105 parent work requiring separate accepted authorities.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0068"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0068-trait-termination-corpus.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run the concrete Trait fixture under distinct logical source names and compare only deterministic selected Trait/implementation/member projections.",
+  "Retain active-cycle and depth-64 negative fixtures without changing their accepted error categories or semantic limit.",
+]
+compatibility_impact = [
+  "Adds only an internal bounded termination test and status metadata; Trait semantics, diagnostics, protocols, CLI/LSP, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Production HIR integration, performance metrics, resource budgets, cancellation, and public Trait evidence remain TRAIT-1309 parent work requiring separate authority.",
+]
+superseded_by = ""
