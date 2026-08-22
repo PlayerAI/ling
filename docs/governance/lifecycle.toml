@@ -1906,3 +1906,27 @@ unresolved_alternatives = [
   "Negotiated positions, URI/version checks, VFS publication, stale results, JSON-RPC didChange, Workspace Edits, range transactions, and public compatibility remain LSP-2104 parent work under GAP-LSP-TRANSACTION-PROTOCOL-001.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0070"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0070-lsp-position-edit-projection.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Apply equivalent edits under UTF-8, UTF-16, and UTF-32 and compare exact bytes, lexical text, source identity, and source-map results across Unicode, BOM, CRLF, and final-line inputs.",
+  "Apply an ordered position batch and compare with full replacement; reject scalar/surrogate/interior and out-of-range positions without clamping or partial publication.",
+  "Repeat every operation for deterministic immutable results; keep URI, version, JSON-RPC, VFS, diagnostics, and transaction fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only an in-process ling-source position-edit value, typed error, and immutable composition; language, diagnostics, schemas, Semantic IDs, protocols, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Negotiation, URI/document identity, version/stale-result checks, VFS publication, JSON-RPC didChange, Workspace Edits, range transactions, and public compatibility remain LSP-2104 parent work under GAP-LSP-TRANSACTION-PROTOCOL-001.",
+]
+superseded_by = ""

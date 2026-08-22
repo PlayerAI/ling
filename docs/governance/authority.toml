@@ -1417,3 +1417,16 @@ covers = ["LSP-2104 bounded UTF-8 edit application", "ordered atomic source edit
 depends_on = ["DEC-0002", "DEC-0019", "DEC-0029", "RFC-0023", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0070"
+title = "LSP internal position-edit projection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0070-lsp-position-edit-projection.md"
+covers = ["LSP-2104 bounded position-edit projection", "explicit UTF-8/16/32 composition", "position-edit atomicity"]
+depends_on = ["DEC-0029", "DEC-0069", "RFC-0023", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

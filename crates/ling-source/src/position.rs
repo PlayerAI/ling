@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fmt;
 
-use super::{ByteOffset, LexicalOffset, SourceFile, SourceMapError};
+use super::{ByteOffset, LexicalOffset, SourceEditError, SourceFile, SourceMapError, Utf8Edit};
 
 /// A negotiated position encoding used by an editor adapter.
 ///
@@ -84,6 +84,43 @@ impl LspPosition {
     }
 }
 
+/// One in-process replacement expressed in an explicit lexical position
+/// encoding. This value is converted through the source map before it reaches
+/// the original-byte edit primitive; it is not a serialized LSP `TextEdit`.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct LspPositionEdit {
+    start: LspPosition,
+    end: LspPosition,
+    replacement: Vec<u8>,
+}
+
+impl LspPositionEdit {
+    /// Creates a half-open replacement in the normalized lexical view.
+    #[must_use]
+    pub fn new(start: LspPosition, end: LspPosition, replacement: impl Into<Vec<u8>>) -> Self {
+        Self {
+            start,
+            end,
+            replacement: replacement.into(),
+        }
+    }
+
+    #[must_use]
+    pub const fn start(&self) -> LspPosition {
+        self.start
+    }
+
+    #[must_use]
+    pub const fn end(&self) -> LspPosition {
+        self.end
+    }
+
+    #[must_use]
+    pub fn replacement(&self) -> &[u8] {
+        &self.replacement
+    }
+}
+
 /// A failure while converting between original bytes and an editor position.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PositionError {
@@ -138,6 +175,43 @@ impl Error for PositionError {}
 impl From<SourceMapError> for PositionError {
     fn from(error: SourceMapError) -> Self {
         Self::SourceMap(error)
+    }
+}
+
+/// Failure while projecting and applying an in-process position edit.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum LspPositionEditError {
+    Position(PositionError),
+    Source(SourceEditError),
+}
+
+impl fmt::Display for LspPositionEditError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Position(error) => write!(formatter, "position edit projection failed: {error}"),
+            Self::Source(error) => write!(formatter, "position edit application failed: {error}"),
+        }
+    }
+}
+
+impl Error for LspPositionEditError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Position(error) => Some(error),
+            Self::Source(error) => Some(error),
+        }
+    }
+}
+
+impl From<PositionError> for LspPositionEditError {
+    fn from(error: PositionError) -> Self {
+        Self::Position(error)
+    }
+}
+
+impl From<SourceEditError> for LspPositionEditError {
+    fn from(error: SourceEditError) -> Self {
+        Self::Source(error)
     }
 }
 
@@ -225,6 +299,34 @@ impl SourceFile {
             u32::try_from(lexical_index).expect("source length is bounded by u32"),
         );
         Ok(self.source_map.original_offset(lexical_offset)?)
+    }
+
+    /// Applies one explicit position edit through the authoritative source
+    /// map and immutable UTF-8 byte-edit boundary.
+    pub fn apply_lsp_position_edit(
+        &self,
+        encoding: PositionEncoding,
+        edit: &LspPositionEdit,
+    ) -> Result<Self, LspPositionEditError> {
+        let start = self.original_offset(edit.start, encoding)?;
+        let end = self.original_offset(edit.end, encoding)?;
+        let utf8_edit = Utf8Edit::new(start, end, edit.replacement.clone());
+        Ok(self.apply_utf8_edit(&utf8_edit)?)
+    }
+
+    /// Applies position edits in order against the snapshot produced by the
+    /// preceding edit. The input source remains unchanged if any projection or
+    /// byte-edit validation fails.
+    pub fn apply_lsp_position_edits(
+        &self,
+        encoding: PositionEncoding,
+        edits: &[LspPositionEdit],
+    ) -> Result<Self, LspPositionEditError> {
+        let mut current = self.clone();
+        for edit in edits {
+            current = current.apply_lsp_position_edit(encoding, edit)?;
+        }
+        Ok(current)
     }
 
     fn line_index(&self, offset: LexicalOffset) -> usize {
@@ -461,5 +563,88 @@ mod tests {
             source.original_offset(LspPosition::new(1, 1), PositionEncoding::Utf8),
             Ok(ByteOffset::new(4))
         );
+    }
+
+    #[test]
+    fn applies_position_edits_for_each_explicit_encoding() {
+        let source = source("人物 😀\r\n");
+        let ends = [
+            (PositionEncoding::Utf8, 6),
+            (PositionEncoding::Utf16, 2),
+            (PositionEncoding::Utf32, 2),
+        ];
+
+        for (encoding, end_character) in ends {
+            let edited = source
+                .apply_lsp_position_edit(
+                    encoding,
+                    &LspPositionEdit::new(
+                        LspPosition::new(0, 0),
+                        LspPosition::new(0, end_character),
+                        "将军".as_bytes().to_vec(),
+                    ),
+                )
+                .unwrap();
+            assert_eq!(edited.original_text(), "将军 😀\r\n");
+            assert_eq!(edited.lexical_text(), "将军 😀\n");
+            assert_eq!(edited.id(), SOURCE_ID);
+        }
+    }
+
+    #[test]
+    fn position_edit_preserves_leading_bom_and_crlf_bytes() {
+        let source = source("\u{feff}人物\r\n");
+        let edited = source
+            .apply_lsp_position_edit(
+                PositionEncoding::Utf16,
+                &LspPositionEdit::new(
+                    LspPosition::new(0, 0),
+                    LspPosition::new(0, 2),
+                    "将军".as_bytes().to_vec(),
+                ),
+            )
+            .unwrap();
+
+        assert_eq!(edited.original_text(), "\u{feff}将军\r\n");
+        assert!(edited.had_bom());
+        assert_eq!(edited.source_map().original_len(), ByteOffset::new(11));
+    }
+
+    #[test]
+    fn failed_position_batch_is_atomic_and_full_replacement_is_equivalent() {
+        let source = source("abc");
+        let edits = [
+            LspPositionEdit::new(
+                LspPosition::new(0, 0),
+                LspPosition::new(0, 1),
+                b"x".to_vec(),
+            ),
+            LspPositionEdit::new(
+                LspPosition::new(0, 0),
+                LspPosition::new(0, 99),
+                b"y".to_vec(),
+            ),
+        ];
+        assert!(matches!(
+            source
+                .apply_lsp_position_edits(PositionEncoding::Utf8, &edits)
+                .unwrap_err(),
+            LspPositionEditError::Position(PositionError::CharacterOutOfBounds { .. })
+        ));
+        assert_eq!(source.original_text(), "abc");
+
+        let replacement = b"xyz".to_vec();
+        let edited = source
+            .apply_lsp_position_edit(
+                PositionEncoding::Utf8,
+                &LspPositionEdit::new(
+                    LspPosition::new(0, 0),
+                    LspPosition::new(0, 3),
+                    replacement.clone(),
+                ),
+            )
+            .unwrap();
+        let expected = SourceFile::from_bytes(SOURCE_ID, "position.ling", replacement).unwrap();
+        assert_eq!(edited, expected);
     }
 }

@@ -13,6 +13,11 @@ child implements only immutable source-layer byte-range application and its
 tests; it does not close the parent public LSP, position, version, VFS, or
 transaction boundary.
 
+Accepted `DEC-0070` also authorizes the bounded
+`LSP-2104-POSITION-EDITS` child. It composes the explicit DEC-0029
+position-to-byte projection with the DEC-0069 primitive, while keeping the
+same public-protocol boundary.
+
 No incremental-change parser, range application API, LSP version validator,
 partial-edit transaction, or placeholder server was added. Existing VFS full
 snapshot and compiler incremental-query behavior remains unchanged.
@@ -42,6 +47,9 @@ The current repository confirms the missing boundary:
 - `ling-source` now provides `Utf8Edit` and ordered immutable application under
   `DEC-0069`; the primitive rejects scalar/CRLF interior boundaries and
   revalidates every resulting snapshot without publishing it to the VFS.
+- `ling-source` also provides `LspPositionEdit` and ordered projection under
+  `DEC-0070`; each explicit UTF-8/16/32 position is converted through the
+  SourceMap before the byte primitive is called.
 - No public adapter defines range interpretation across UTF-8/UTF-16, client
   change ordering, stale-version response, or the required LSP fixtures.
 
@@ -84,4 +92,5 @@ The full `LSP-2104` target can begin after the LSP position/overlay/version
 contract is Accepted. The public implementation must apply each change batch
 atomically, preserve full-replacement equivalence, reject stale/invalid ranges
 before publication, and keep compiler byte spans authoritative. The
-`LSP-2104-UTF8-EDITS` source-only child is complete under `DEC-0069`.
+`LSP-2104-UTF8-EDITS` and `LSP-2104-POSITION-EDITS` source-only children are
+complete under `DEC-0069` and `DEC-0070`; the parent remains deferred.
