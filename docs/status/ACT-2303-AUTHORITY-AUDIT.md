@@ -14,6 +14,11 @@ No mailbox data structure, backpressure effect, send-result type, overflow
 policy, scheduler, Actor runtime, diagnostic, public protocol, or placeholder
 G2 API was added.
 
+Accepted `DEC-0097` now authorizes the bounded child
+`ACT-2303-MAILBOX-OBSERVATION`, which records only immutable mailbox identities
+and structural policy labels. It does not close the capacity, queue, send,
+backpressure, ordering, supervision, or runtime gaps described below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its example and policy checklist

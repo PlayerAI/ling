@@ -265,6 +265,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ACT-2302` | G2 | 消息可发送性检查 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:263`, `docs/status/ACT-2302-AUTHORITY-AUDIT.md` |
 | `ACT-2302-MESSAGE-SCHEMA-MODEL` | G2 | Internal Actor message-schema identity model | S | Done | Accepted `DEC-0096`; see `crates/ling-concurrency/src/message.rs` and `docs/status/ACT-2302-MESSAGE-SCHEMA-MODEL-IMPLEMENTATION-REPORT.md`; Sendable/ownership semantics remain BlockedSpec |
 | `ACT-2303` | G2 | 有界 Mailbox 与背压 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:273`, `docs/status/ACT-2303-AUTHORITY-AUDIT.md` |
+| `ACT-2303-MAILBOX-OBSERVATION` | G2 | Internal Actor mailbox observation | S | Done | Accepted `DEC-0097`; see `crates/ling-concurrency/src/mailbox.rs` and `docs/status/ACT-2303-MAILBOX-OBSERVATION-IMPLEMENTATION-REPORT.md`; capacity/backpressure/runtime semantics remain BlockedSpec |
 | `ACT-2304` | G2 | Turn 与重入规则 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:290`, `docs/status/ACT-2304-AUTHORITY-AUDIT.md` |
 | `ACT-2305` | G2 | Actor Runtime | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:300`, `docs/status/ACT-2305-AUTHORITY-AUDIT.md` |
 | `ACT-2306` | G2 | Actor 性质与压力测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:313`, `docs/status/ACT-2306-AUTHORITY-AUDIT.md` |

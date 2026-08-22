@@ -2558,3 +2558,29 @@ unresolved_alternatives = [
   "Message type identity and recursion, Sendable/ownership, Resource/Managed profiles, Capability transfer, schema versioning, local/remote wire formats, mailbox outcomes, runtime ABI, and migration remain open under the Actor gaps and ACT-2302.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0097"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0097-actor-mailbox-observation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build observations with optional owners and every structural label and assert deterministic mailbox-identity ordering.",
+  "Reject zero identities and duplicate mailbox identities before publication.",
+  "Compare equivalent models with different insertion order and source spans and require identical path-free canonical bytes.",
+  "Keep capacity, queue, send, backpressure, ordering, fairness, coalescing, close/termination, supervision, runtime, stress, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal publish-disabled checked-data tests; Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public mailbox protocol, Actor behavior, or v0.2 support claim is registered.",
+]
+unresolved_alternatives = [
+  "Capacity units and bounds, queue ownership and quotas, typed send outcomes, Wait suspension, overflow and coalescing semantics, ordering/fairness, cancellation and shutdown, supervision/Fault, local/remote delivery, schema identity, runtime ABI, and migration remain open under the Actor gaps and ACT-2303.",
+]
+superseded_by = ""

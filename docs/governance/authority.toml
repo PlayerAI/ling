@@ -1768,3 +1768,16 @@ covers = ["ACT-2302 bounded message-schema identity model", "deterministic schem
 depends_on = ["DEC-0008", "DEC-0009", "DEC-0010", "DEC-0095", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0097"
+title = "Internal Actor mailbox observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0097-actor-mailbox-observation.md"
+covers = ["ACT-2303 bounded mailbox observation", "deterministic mailbox identities", "policy labels without queue/backpressure semantics"]
+depends_on = ["DEC-0096", "DEC-0095", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

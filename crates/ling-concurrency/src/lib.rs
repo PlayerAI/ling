@@ -13,6 +13,7 @@ use ling_source::Span;
 
 mod actor;
 mod lifecycle;
+mod mailbox;
 mod message;
 mod scheduler;
 mod state_machine;
@@ -25,6 +26,10 @@ pub use actor::{
 pub use lifecycle::{
     FaultId, LifecycleEvent, LifecycleEventKind, LifecycleEventSpec, LifecycleIdentityKind,
     LifecycleTrace, LifecycleTraceError,
+};
+pub use mailbox::{
+    MailboxId, MailboxIdentityKind, MailboxObservation, MailboxObservationError,
+    MailboxObservationKind, MailboxObservationModel, MailboxObservationSpec,
 };
 pub use message::{
     MessageFieldId, MessageIdentityKind, MessageSchema, MessageSchemaError, MessageSchemaId,
