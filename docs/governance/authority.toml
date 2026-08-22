@@ -2145,3 +2145,16 @@ covers = ["GC-3301 bounded Managed object-model boundary evidence", "test-only o
 depends_on = ["DEC-0124", "DEC-0117", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0126"
+title = "Internal Managed collector boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0126-managed-collector-boundary-evidence.md"
+covers = ["GC-3302 bounded Managed collector boundary evidence", "test-only collector vocabulary", "collector boundaries without heap/scheduler/OOM/metrics semantics"]
+depends_on = ["DEC-0125", "DEC-0124", "DEC-0121", "DEC-0094", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
