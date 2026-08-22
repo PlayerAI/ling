@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0036"
+title = "CLI internal command catalog boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0036-cli-internal-command-catalog-boundary.md"
+covers = ["internal CLI command identity", "current command spelling", "future command deferral"]
+depends_on = ["DEC-0003", "DEC-0013", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0035"
 title = "LSP internal diagnostic batch boundary"
 kind = "Decision"

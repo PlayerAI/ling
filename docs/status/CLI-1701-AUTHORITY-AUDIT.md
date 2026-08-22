@@ -9,7 +9,9 @@ checked compiler pipeline, but the execution plan's unified model also names
 selection, dispatch, output, project, and transaction behavior is not accepted
 by the repository authorities.
 
-No new command, alias, dispatch service, `CompilerHost` API, project mode, or
+Accepted DEC-0036 closes only the bounded `CLI-1701-CATALOG` child: the
+existing private command identity is centralized without changing behavior. No
+new command, alias, dispatch service, `CompilerHost` API, project mode, or
 placeholder help entry was added. The current `ling` command surface remains
 unchanged.
 
@@ -41,6 +43,8 @@ The current repository confirms the boundary:
 - Existing commands use the shared checked path, but there is no accepted
   command registry, service interface, or project-aware dispatch layer for
   the additional execution-plan commands.
+- The DEC-0036 catalog owns only current command identity; options, execution,
+  diagnostics, project selection, and public help remain in existing paths.
 - `ling-project` exposes library graph/lock behavior; PRJ-1107 remains
   BlockedSpec for manifest selection, locked/offline policy, project exits,
   and JSON output.
@@ -83,8 +87,9 @@ made.
 
 ## Intentionally deferred
 
-`CLI-1701` can begin after the command registry, project/formatter/query
-contracts, and LSP/Semantic Transaction lifecycle are Accepted. The first
-implementation should reuse the existing checked services and update the
-protocol inventory and fixtures atomically; it must not advertise an
-unimplemented command.
+The parent `CLI-1701` can begin after the command registry, project/formatter/
+query contracts, and LSP/Semantic Transaction lifecycle are Accepted. The
+first public implementation should reuse existing checked services and update
+the protocol inventory and fixtures atomically; it must not advertise an
+unimplemented command. The `CLI-1701-CATALOG` child is complete only for
+DEC-0036's internal identity boundary.

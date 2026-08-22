@@ -5,6 +5,9 @@ use std::io::{BufRead, IsTerminal as _, Read as _, Write as _};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
+mod command_catalog;
+
+use command_catalog::Command;
 use ling_cli::incident::{InternalIncident, Reproduction};
 use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
 use ling_cli::{CompileFailure, compile_path};
@@ -1221,49 +1224,6 @@ fn usage() -> String {
     format!(
         "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
     )
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum Command {
-    Run,
-    Check,
-    Repl,
-    Semantic,
-    Audit,
-    Format,
-    ProjectCheck,
-    Lsp,
-}
-
-impl Command {
-    fn parse(value: &str) -> Option<Self> {
-        match value {
-            "run" => Some(Self::Run),
-            "check" => Some(Self::Check),
-            "repl" => Some(Self::Repl),
-            "semantic" => Some(Self::Semantic),
-            "audit" => Some(Self::Audit),
-            "fmt" => Some(Self::Format),
-            "lsp" => Some(Self::Lsp),
-            _ => None,
-        }
-    }
-}
-
-impl std::fmt::Display for Command {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let name = match self {
-            Self::Run => "run",
-            Self::Check => "check",
-            Self::Repl => "repl",
-            Self::Semantic => "semantic",
-            Self::Audit => "audit",
-            Self::Format => "fmt",
-            Self::ProjectCheck => "project check",
-            Self::Lsp => "lsp",
-        };
-        formatter.write_str(name)
-    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

@@ -22,6 +22,29 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0036"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0036-cli-internal-command-catalog-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify every current root command and project check identity, canonical display names, and rejection of unimplemented roots.",
+  "Verify parser options, execution, output, diagnostics, exit codes, and usage text remain outside the catalog and unchanged.",
+]
+compatibility_impact = [
+  "Adds only an internal command catalog refactor; source, language, diagnostics, schemas, Semantic IDs, protocol inventory, runtime, VM, and Unicode remain unchanged.",
+]
+unresolved_alternatives = [
+  "The broader command registry, shared options, project/build/test selection, transactions, completion, help policy, and service ownership require later Accepted CLI authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0035"
 kind = "Decision"
 status = "Accepted"

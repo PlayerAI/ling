@@ -65,6 +65,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0033` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0033](../decisions/0033-lsp-internal-byte-accounting-boundary.md) |
 | `DEC-0034` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0034](../decisions/0034-lsp-internal-diagnostic-ordering-boundary.md) |
 | `DEC-0035` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0035](../decisions/0035-lsp-internal-diagnostic-batch-boundary.md) |
+| `DEC-0036` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0036](../decisions/0036-cli-internal-command-catalog-boundary.md) |
 
 ## Migration boundary
 
