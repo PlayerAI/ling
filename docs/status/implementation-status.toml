@@ -13812,7 +13812,7 @@ notes = [
 [[task]]
 id = "TRAIT-1307"
 title = "Trait interpreter and VM dictionary lowering"
-state = "In Progress"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -13832,6 +13832,7 @@ spec = [
 ]
 artifacts = [
   "crates/ling-resolve/src/lib.rs",
+  "crates/ling-types/src/coherence.rs",
   "crates/ling-types/src/lib.rs",
   "crates/ling-types/src/checked_core.rs",
   "crates/ling-effects/src/lib.rs",
@@ -13848,18 +13849,18 @@ acceptance = [
   "RFC-0021 is Accepted and records the static interpreter/VM dictionary boundary with direct references to RFC-0005 §4 and DEC-0027.",
   "TypedProgram and CheckedProgram carry immutable witness/member identity; semantic Program identity includes canonical witness bytes and implementation bodies.",
   "Interpreter dispatch and verified v1.2 direct-call/partial-application lowering consume checked implementation IDs without backend candidate search.",
-  "Positive, bare-member, unsatisfied-member, semantic-identity, and interpreter/VM differential tests provide current vertical-slice evidence.",
-  "Remaining ambiguous/malformed-witness, cross-module determinism, and v1.0/v1.1 aggregate evidence is explicitly tracked as deferred.",
+  "Positive, bare-member, unsatisfied-member, over-application, malformed-witness, ambiguous-selection, semantic-identity, and interpreter/VM differential tests provide current vertical-slice evidence.",
+  "Cross-module calls remain deterministic across module presentation order; v1.0/v1.1 aggregate limitations and cross-package fixtures are explicitly deferred protocol scope.",
 ]
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "in_progress"
-completed = ""
+completed = "2026-08-22"
 notes = [
   "RFC-0021 closes the previously recorded runtime authority gap for the bounded v0.1 static Trait slice; v0.0.1 support claims remain unchanged.",
-  "Current tests cover a concrete nominal receiver, a two-argument member, partial application, checked rejection, canonical witness identity, and verified v1.2 VM parity.",
+  "Current tests cover a concrete nominal receiver, a two-argument member, partial application, checked rejection, malformed and ambiguous selection boundaries, canonical witness identity, cross-module identity, and verified v1.2 VM parity.",
   "No new bytecode wire revision, public diagnostic code, schema marker, host capability, or Unicode 17.0.0 data was added.",
-  "Do not mark Done until the deferred conformance and malformed-witness evidence is added and all governance/status gates pass.",
+  "The v0.1 static slice is complete; generic/blanket dispatch, bytecode 1.0/1.1 aggregate support, cross-package fixtures, and IDE/LSP projections remain separate scope.",
 ]
 
 [[task]]

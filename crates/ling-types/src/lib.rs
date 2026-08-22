@@ -863,7 +863,7 @@ impl Inferencer {
                     module: pending.module,
                     owner: constraints::ObligationOwner::Definition(pending.owner.clone()),
                     trait_name,
-                    arguments: vec![self.constraint_type(&pending.receiver)],
+                    arguments: vec![self.constraint_type(pending.module, &pending.receiver)],
                     origin: constraints::ObligationOrigin {
                         source_name,
                         span: pending.span,
@@ -959,7 +959,7 @@ impl Inferencer {
         (dictionary, calls)
     }
 
-    fn constraint_type(&self, value: &InferType) -> constraints::ConstraintType {
+    fn constraint_type(&self, module: ModuleId, value: &InferType) -> constraints::ConstraintType {
         match self.apply(value.clone()) {
             InferType::Record {
                 definition,
@@ -969,10 +969,19 @@ impl Inferencer {
                 definition,
                 arguments,
             } => {
-                let name = self
-                    .resolved
-                    .definition(&definition)
-                    .map(|info| info.name.clone())
+                let info = self.resolved.definition(&definition);
+                let name = info
+                    .map(|info| {
+                        let local = match info.origin {
+                            ling_resolve::DefinitionOrigin::User { module: owner }
+                                if owner != module =>
+                            {
+                                format!("{}.{}", info.module_name, info.name)
+                            }
+                            _ => info.name.clone(),
+                        };
+                        local
+                    })
                     .unwrap_or_else(|| definition.to_string());
                 if arguments.is_empty() {
                     constraints::ConstraintType::Named(name)
@@ -981,14 +990,14 @@ impl Inferencer {
                         name,
                         arguments: arguments
                             .iter()
-                            .map(|argument| self.constraint_type(argument))
+                            .map(|argument| self.constraint_type(module, argument))
                             .collect(),
                     }
                 }
             }
             InferType::List(element) => constraints::ConstraintType::Applied {
                 name: "List".to_owned(),
-                arguments: vec![self.constraint_type(&element)],
+                arguments: vec![self.constraint_type(module, &element)],
             },
             InferType::Variable(variable) => {
                 constraints::ConstraintType::Variable(format!("t{variable}"))
@@ -3968,6 +3977,80 @@ mod tests {
             unsatisfied
                 .iter()
                 .any(|error| matches!(error.kind, TypeErrorKind::UnsupportedTypeSyntax))
+        );
+    }
+
+    #[test]
+    fn resolves_imported_trait_member_calls_to_the_same_checked_identity() {
+        let sources = [
+            (
+                "Main.ling",
+                concat!(
+                    "module Main\n",
+                    "import UI as UI\n",
+                    "import Domain as D\n\n",
+                    "let item: D.Item = { name = \"Ling\" }\n",
+                    "let main () = UI.Renderable.render item\n",
+                ),
+            ),
+            (
+                "UI.ling",
+                concat!(
+                    "module UI\n",
+                    "import Domain as D\n\n",
+                    "trait Renderable<'a> =\n",
+                    "    render: 'a -> Text\n\n",
+                    "impl Renderable D.Item =\n",
+                    "    let render item = item.name\n",
+                ),
+            ),
+            (
+                "Domain.ling",
+                "module Domain\n\ntype Item = { name: Text }\n",
+            ),
+        ];
+        let first = check(resolved_modules(&sources)).expect("imported Trait call type-checks");
+        let reversed = [sources[2], sources[1], sources[0]];
+        let second = check(resolved_modules(&reversed)).expect("reordered modules type-check");
+
+        assert_eq!(
+            first.dictionary().canonical_bytes(),
+            second.dictionary().canonical_bytes()
+        );
+        let first_call = first
+            .expression_types()
+            .keys()
+            .find_map(|key| first.trait_member_call(*key))
+            .expect("first checked Trait call");
+        let second_call = second
+            .expression_types()
+            .keys()
+            .find_map(|key| second.trait_member_call(*key))
+            .expect("second checked Trait call");
+        assert_eq!(first_call.member_ordinal(), second_call.member_ordinal());
+        assert_eq!(
+            first_call.implementation(),
+            second_call.implementation(),
+            "implementation identity must not depend on source presentation order"
+        );
+    }
+
+    #[test]
+    fn rejects_over_applied_trait_member_calls_before_typed_core() {
+        let errors = check(resolved(concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main () = Renderable.render { name = \"Ling\" } \"extra\"\n",
+        )))
+        .expect_err("over-applied Trait member must be rejected");
+        assert!(
+            errors
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::Arity { .. }))
         );
     }
 

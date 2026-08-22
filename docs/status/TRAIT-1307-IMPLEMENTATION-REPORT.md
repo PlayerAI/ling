@@ -28,13 +28,16 @@ claim.
 
 ## Evidence
 
-- `ling-types`: 36 tests pass, including positive dictionary lowering and bare/
-  unsatisfied rejection.
+- `ling-types`: 38 tests pass, including positive dictionary lowering,
+  bare/unsatisfied and over-application rejection, malformed witness checks,
+  and cross-module/module-order identity checks.
 - `ling-effects`: 9 tests pass.
 - `ling-semantic`: 13 unit tests and 5 project tests pass, including witness
   identity and implementation-body invalidation.
 - `ling-vm` execution suite: 22 tests pass, including interpreter/v1.2 VM
   differential execution with a two-argument member and partial application.
+- Full workspace tests, governance/status/CI gates, formatting, and Clippy
+  complete successfully.
 - `cargo fmt --all` passes after formatting.
 
 ## Compatibility
@@ -56,6 +59,7 @@ claim.
 
 ## Deferred work
 
-Add ambiguous/malformed-witness and over-application differential fixtures,
-cross-module/package determinism evidence, remaining v1.0/v1.1 aggregate
-coverage, and downstream IDE/LSP projections before marking TRAIT-1307 Done.
+The v1.0/v1.1 aggregate limitations and cross-package fixture matrix remain
+deferred protocol scope. Generic receiver substitution, blanket implementations,
+trait objects, and downstream IDE/LSP projections require separate accepted
+authority and tasks.

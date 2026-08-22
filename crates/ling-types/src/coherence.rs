@@ -177,6 +177,8 @@ pub(crate) fn build_index(
                     continue;
                 }
             };
+            let receiver_owner = receiver_owner(resolved, module, &receiver);
+            let receiver = normalize_receiver(resolved, module, receiver);
             let receiver_head = receiver_head(&receiver).unwrap_or_default();
             if receiver_head.is_empty() {
                 errors.push(CoherenceError {
@@ -198,7 +200,7 @@ pub(crate) fn build_index(
                 });
                 continue;
             }
-            let Some(receiver_owner) = receiver_owner(resolved, module, &receiver) else {
+            let Some(receiver_owner) = receiver_owner else {
                 errors.push(CoherenceError {
                     source_name: module.hir.source_name.clone(),
                     span: declaration.receiver.span,
@@ -452,6 +454,53 @@ fn resolve_type_name(module: &ResolvedModule, name: &str) -> (Option<ModuleId>, 
         return (Some(*imported), rest.join("."));
     }
     (None, name.to_owned())
+}
+
+fn normalize_receiver(
+    resolved: &ResolvedProgram,
+    module: &ResolvedModule,
+    receiver: ConstraintType,
+) -> ConstraintType {
+    match receiver {
+        ConstraintType::Named(name) => {
+            ConstraintType::Named(normalize_receiver_name(resolved, module, &name))
+        }
+        ConstraintType::Variable(name) => ConstraintType::Variable(name),
+        ConstraintType::Applied { name, arguments } => ConstraintType::Applied {
+            name: normalize_receiver_name(resolved, module, &name),
+            arguments: arguments
+                .into_iter()
+                .map(|argument| normalize_receiver(resolved, module, argument))
+                .collect(),
+        },
+    }
+}
+
+fn normalize_receiver_name(
+    resolved: &ResolvedProgram,
+    module: &ResolvedModule,
+    name: &str,
+) -> String {
+    let (target_module, local_name) = resolve_type_name(module, name);
+    let Some(target_module) = target_module else {
+        return name.to_owned();
+    };
+    if target_module == module.id {
+        return local_name;
+    }
+    let Some(target) = resolved.module(target_module) else {
+        return name.to_owned();
+    };
+    if target
+        .hir
+        .types
+        .iter()
+        .any(|declaration| declaration.name.normalized == local_name)
+    {
+        format!("{}.{}", target.hir.module.name.normalized(), local_name)
+    } else {
+        name.to_owned()
+    }
 }
 
 fn package_key(module: &ResolvedModule) -> Option<String> {

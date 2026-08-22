@@ -2,16 +2,16 @@
 
 ## Outcome
 
-TRAIT-1307 is now `In Progress`. The missing runtime boundary is authorized by
+TRAIT-1307 is now `Done` for the bounded v0.1 static Trait slice. The missing runtime boundary is authorized by
 Accepted RFC-0021, which closes the implementation seam left by RFC-0005 §4
 and DEC-0027. The current vertical slice is deliberately static and bounded:
 the checker selects a concrete nominal implementation, attaches an immutable
 witness/member mapping, and both runtime backends consume that mapping without
 candidate search.
 
-The task is not complete. IDE projection, generic/blanket implementations,
-serialized dictionary formats, and the remaining negative/determinism fixture
-matrix are intentionally deferred.
+IDE projection, generic/blanket implementations, serialized dictionary formats,
+and bytecode 1.0/1.1 aggregate coverage remain intentionally deferred scope;
+they do not alter the completed static v1.2 execution boundary.
 
 ## Normative traceability
 
@@ -33,7 +33,8 @@ matrix are intentionally deferred.
   `DefinitionId` values and resolves local/imported qualified member names.
 - `ling-types` selects concrete calls, rejects bare or unsatisfied members,
   attaches `DictionaryTable` and `TraitMemberCall` records to `TypedProgram`,
-  and exposes the same immutable mapping through `CheckedProgram`.
+  exposes the same immutable mapping through `CheckedProgram`, canonicalizes
+  imported nominal receiver identities, and rejects over-application.
 - `ling-effects` tracks implementation-member effects and static member calls
   in capability propagation.
 - `ling-semantic` includes canonical witness bytes and implementation-member
@@ -46,15 +47,23 @@ matrix are intentionally deferred.
 - `crates/ling-vm/tests/execution.rs` compares the checked interpreter with the
   independently verified v1.2 VM for a two-argument member and partial
   application.
+- Cross-module Trait calls are checked with reordered module input and produce
+  equal witness bytes, member ordinals, and implementation identities.
 
 ## Verification performed
 
-- `cargo test -p ling-types --locked --offline` — 36 tests passed.
+- `cargo test -p ling-types --locked --offline` — 38 tests passed.
 - `cargo test -p ling-effects --locked --offline` — 9 tests passed.
 - `cargo test -p ling-semantic --locked --offline` — 12 unit tests and 5
   project tests passed.
 - `cargo test -p ling-vm --test execution --locked --offline` — 22 tests
   passed, including Trait interpreter/VM differential execution.
+- `cargo test --workspace --locked --offline --quiet` — complete workspace
+  suite passed, including 92 governance tests.
+- `cargo clippy --workspace --all-targets --all-features --locked --offline
+  -- -D warnings` — passed.
+- `cargo fmt --all -- --check`, `xtask governance check-all`, `xtask status
+  verify`, and `xtask ci verify` — passed.
 - `cargo fmt --all` completed successfully.
 
 ## Compatibility and determinism
@@ -69,12 +78,8 @@ matrix are intentionally deferred.
 
 ## Intentionally deferred
 
-- unknown-member, ambiguous-impl, malformed-witness, and over-application
-  differential fixtures beyond the current checked rejection coverage;
-- cross-module package conformance and module-input-order reproducibility;
+- package-level cross-package fixtures beyond the current same-workspace
+  module-order coverage;
 - v1.0/v1.1 aggregate limitations and any new bytecode serialization;
 - generic receiver substitution, blanket impls, trait objects, associated
   types, default methods, specialization, and IDE/LSP projections.
-
-TRAIT-1307 may be marked `Done` only after the deferred evidence is added and
-the governance/status/support registries are regenerated and verified.
