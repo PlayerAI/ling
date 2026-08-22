@@ -2002,3 +2002,26 @@ unresolved_alternatives = [
   "LSP symbol kinds, hierarchy, full/selection ranges, URI/version/snapshot and generated/dependency policy, position encoding, documentation, cancellation, rename/reference linkage, and protocol migration remain IDE-2301 parent work under the registered LSP and semantic lifecycle gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0074"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0074-ide-typed-definition-observation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify Unicode, BOM, CRLF, exact original-byte spans, user-only filtering, checked type display, canonical Effect labels, module capabilities, and deterministic repeated observations.",
+  "Preserve absent optional facts without placeholders and reject invalid source or failed checking without partial publication; keep hover presentation and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db checked-observation values and an accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Hover target selection, expression-level inference, display/localization/Markdown policy, Trait witnesses, URI/version/snapshot binding, position encoding, limits, cancellation, stale publication, protocol negotiation, and migration remain open under IDE-2302 and the registered LSP/semantic lifecycle gaps.",
+]
+superseded_by = ""

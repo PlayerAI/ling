@@ -26,10 +26,12 @@ use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
 
 mod definition_index;
+mod typed_definition_index;
 
 pub use definition_index::{
     ResolvedDefinitionIndex, ResolvedDefinitionKind, ResolvedDefinitionSymbol,
 };
+pub use typed_definition_index::{TypedDefinitionIndex, TypedDefinitionSymbol};
 
 const LANGUAGE_VERSION: (u16, u16, u16) = (0, 1, 0);
 const UNICODE_VERSION: (u8, u8, u8) = (17, 0, 0);
@@ -900,6 +902,21 @@ impl CompilerDb {
             .ok_or(QueryError::UnknownFile { file })?;
         let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
         Ok(Arc::new(ResolvedDefinitionIndex::from_resolved(&resolved)))
+    }
+
+    /// Builds an immutable source-order observation of checked user
+    /// definitions. This is not an LSP hover response or presentation model.
+    pub fn typed_definition_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<TypedDefinitionIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+        Ok(Arc::new(TypedDefinitionIndex::from_checked(&checked)))
     }
 
     /// Type-checks and effect-checks one module against the current resolved
@@ -2330,6 +2347,81 @@ mod tests {
         let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
         assert!(matches!(
             db.resolved_definition_index(file),
+            Err(QueryError::InvalidSource { .. })
+        ));
+    }
+
+    #[test]
+    fn typed_definition_index_preserves_checked_facts_and_source_spans() {
+        let mut db = CompilerDb::new();
+        let source = "\u{feff}module Main\r\n    requires Console.Write\r\n\r\nlet 人物 = 1\r\n\r\nlet main () = Console.write (Text.format \"{}\" 人物)\r\n";
+        let file = file(
+            db.set_disk_snapshot("unicode/Main.ling", source.as_bytes().to_vec())
+                .unwrap(),
+        );
+
+        let index = db
+            .typed_definition_index(file)
+            .expect("valid source type-checks");
+        let repeated = db
+            .typed_definition_index(file)
+            .expect("repeated observation type-checks");
+        assert_eq!(&*index, &*repeated);
+        assert_eq!(
+            index
+                .symbols()
+                .iter()
+                .map(TypedDefinitionSymbol::name_source)
+                .collect::<Vec<_>>(),
+            ["人物", "main"]
+        );
+
+        let person = index
+            .symbols()
+            .iter()
+            .find(|symbol| symbol.name_source() == "人物")
+            .expect("Chinese definition is indexed");
+        assert_eq!(person.type_display(), Some("Int"));
+        assert_eq!(person.effects(), Some([].as_slice()));
+        assert_eq!(
+            person.capabilities(),
+            Some(["Console.Write".to_owned()].as_slice())
+        );
+
+        let main = index
+            .symbols()
+            .iter()
+            .find(|symbol| symbol.name_source() == "main")
+            .expect("main definition is indexed");
+        assert_eq!(
+            main.effects(),
+            Some(["Console.Write".to_owned()].as_slice())
+        );
+        assert_eq!(
+            main.capabilities(),
+            Some(["Console.Write".to_owned()].as_slice())
+        );
+
+        let bytes = db.vfs.snapshot(file).expect("source snapshot exists");
+        for symbol in index.symbols() {
+            assert_eq!(symbol.source_name(), "unicode/Main.ling");
+            assert_eq!(symbol.span().source(), file);
+            let start = symbol.span().start().get() as usize;
+            let end = symbol.span().end().get() as usize;
+            assert_eq!(
+                std::str::from_utf8(&bytes.bytes()[start..end]).unwrap(),
+                symbol.name_source()
+            );
+        }
+        assert_eq!(index.source_symbols("unicode/Main.ling").len(), 2);
+    }
+
+    #[test]
+    fn typed_definition_index_does_not_publish_after_source_failure() {
+        let mut db = CompilerDb::new();
+        let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
+        assert!(matches!(
+            db.typed_definition_index(file),
             Err(QueryError::InvalidSource { .. })
         ));
     }

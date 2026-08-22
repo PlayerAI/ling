@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use ling_resolve::{DefinitionKind, DefinitionOrigin, ResolvedProgram};
+use ling_resolve::{DefinitionInfo, DefinitionKind, DefinitionOrigin, ResolvedProgram};
 use ling_source::Span;
 
 /// The resolver classification retained by the internal definition index.
@@ -129,18 +129,7 @@ impl ResolvedDefinitionIndex {
                 }
                 let source_name = definition.source_name.clone()?;
                 let span = definition.span?;
-                let kind = if resolved.trait_member(&definition.id).is_some() {
-                    ResolvedDefinitionKind::TraitMember
-                } else if resolved.impl_member(&definition.id).is_some() {
-                    ResolvedDefinitionKind::ImplementationMember
-                } else {
-                    match definition.kind {
-                        DefinitionKind::Value => ResolvedDefinitionKind::Value,
-                        DefinitionKind::Type => ResolvedDefinitionKind::Type,
-                        DefinitionKind::Constructor => ResolvedDefinitionKind::Constructor,
-                        DefinitionKind::Builtin => return None,
-                    }
-                };
+                let kind = classify_definition(resolved, definition)?;
                 Some(ResolvedDefinitionSymbol {
                     definition_id: definition.id.as_str().to_owned(),
                     module_name: definition.module_name.clone(),
@@ -173,6 +162,24 @@ impl ResolvedDefinitionIndex {
 
         Self {
             symbols: symbols.into_boxed_slice(),
+        }
+    }
+}
+
+pub(crate) fn classify_definition(
+    resolved: &ResolvedProgram,
+    definition: &DefinitionInfo,
+) -> Option<ResolvedDefinitionKind> {
+    if resolved.trait_member(&definition.id).is_some() {
+        Some(ResolvedDefinitionKind::TraitMember)
+    } else if resolved.impl_member(&definition.id).is_some() {
+        Some(ResolvedDefinitionKind::ImplementationMember)
+    } else {
+        match definition.kind {
+            DefinitionKind::Value => Some(ResolvedDefinitionKind::Value),
+            DefinitionKind::Type => Some(ResolvedDefinitionKind::Type),
+            DefinitionKind::Constructor => Some(ResolvedDefinitionKind::Constructor),
+            DefinitionKind::Builtin => None,
         }
     }
 }

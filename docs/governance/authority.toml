@@ -1469,3 +1469,16 @@ covers = ["IDE-2301 bounded resolved-definition index", "resolver-owned source s
 depends_on = ["DEC-0012", "DEC-0019", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0074"
+title = "Internal typed-definition observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0074-ide-typed-definition-observation.md"
+covers = ["IDE-2302 bounded typed-definition observation", "checked type/effect/capability facts", "deterministic internal hover source"]
+depends_on = ["DEC-0012", "DEC-0019", "DEC-0060", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
