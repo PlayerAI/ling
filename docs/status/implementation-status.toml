@@ -14783,7 +14783,7 @@ notes = [
 [[task]]
 id = "ZED-6803-SEED"
 title = "Seed Zed extension acceptance inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14833,10 +14833,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0050 closes only this internal Seed editor-inventory child; the parent ZED-6803 gate remains BlockedSpec for full Zed/LSP acceptance and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "75b6dd213dc1b07717f8cf2718dbe939176b76ae"
+completion_commit = "75b6dd213dc1b07717f8cf2718dbe939176b76ae"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects editor acceptance inventory only; the existing grammar/query package and TS/ZQ reports remain editor evidence, not language or Stable Zed authority.",
   "No extension manifest, LSP feature, formatter, task/runnable, Replay/Evidence UI, install path, marketplace package, network request, system configuration, or placeholder public API is added.",
