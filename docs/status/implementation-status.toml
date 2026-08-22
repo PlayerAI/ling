@@ -16527,10 +16527,10 @@ acceptance = [
   "cargo test -p ling-types --test transfer_effect_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "97b93d7352f4c0e4c32a439eb26768bf6aaeaaf4"
+completion_commit = "97b93d7352f4c0e4c32a439eb26768bf6aaeaaf4"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0160; DBUF-4403 remains BlockedSpec for transfer syntax/effects, capability and address-space semantics, ownership transitions, lifecycle, cost/Fault evidence, migration, protocol integration, and support claims.",
   "No parser, AST/HIR/Checked Core node, transfer expression, Effect Row extension, DeviceTransfer capability, address-space type, lifecycle runtime, cost reporter, Fault mapper, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
