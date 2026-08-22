@@ -429,6 +429,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PROF-5101` | G5 | 机器可读 Profile | M | BlockedSpec | `09-G5-V0.5-CRITICAL.md:77`, `docs/status/PROF-5101-AUTHORITY-AUDIT.md` |
 | `PROF-5101-OBSERVATION` | G5 | Internal Critical Profile boundary evidence | S | Done | Accepted `DEC-0177`; see `crates/ling-types/tests/critical_profile_evidence.rs` and `docs/status/PROF-5101-OBSERVATION-IMPLEMENTATION-REPORT.md`; profile schema/proof semantics remain BlockedSpec |
 | `PROF-5102` | G5 | 禁止能力检查 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:108`, `docs/status/PROF-5102-AUTHORITY-AUDIT.md` |
+| `PROF-5102-OBSERVATION` | G5 | Internal forbidden-capability boundary evidence | S | Done | Accepted `DEC-0178`; see `crates/ling-types/tests/forbidden_capability_evidence.rs` and `docs/status/PROF-5102-OBSERVATION-IMPLEMENTATION-REPORT.md`; checker/policy semantics remain BlockedSpec |
 | `PROF-5103` | G5 | Profile Composition | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:122`, `docs/status/PROF-5103-AUTHORITY-AUDIT.md` |
 | `PROF-5104` | G5 | Profile Audit 与 LSP | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:126`, `docs/status/PROF-5104-AUTHORITY-AUDIT.md` |
 | `BND-5201` | G5 | Bound 类型与表达式 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:140`, `docs/status/BND-5201-AUTHORITY-AUDIT.md` |

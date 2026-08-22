@@ -18473,6 +18473,8 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0177-critical-profile-boundary-evidence.md",
+  "docs/decisions/0178-forbidden-capability-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -18482,6 +18484,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/PROF-5102-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5102-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5102-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0178-forbidden-capability-boundary-evidence.md",
+  "crates/ling-types/tests/forbidden_capability_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -18498,9 +18508,64 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "PROF-5102 is BlockedSpec by PROF-5101, open GAP-CRITICAL-PROFILE-001, absent RFC-K501/RFC-0012 authority, and unresolved ownership, concurrency, Kernel/Device, Native/ABI, numeric, and Fault boundaries.",
-  "The repository has no Critical profile context, capability/effect taxonomy, boundedness checker, pre-lowering rejection pass, transitive policy summary, or forbidden-capability fixtures under crates or tests.",
+  "The repository has no Critical profile context, capability/effect taxonomy, boundedness checker, pre-lowering rejection pass, or transitive policy summary; the observation adds only bounded test-local forbidden-capability evidence.",
   "The audit does not reinterpret existing Seed effect/type checks as Critical prohibitions or infer policy from plan examples; the plan remains non-normative.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; enforcement remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "PROF-5102-OBSERVATION"
+title = "Internal forbidden-capability boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROF-5101-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0177-critical-profile-boundary-evidence.md",
+  "docs/decisions/0178-forbidden-capability-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/forbidden_capability_evidence.rs",
+  "docs/decisions/0178-forbidden-capability-boundary-evidence.md",
+  "docs/status/PROF-5102-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROF-5102-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0178 authorizes only test-local forbidden-capability boundary evidence; no checker, policy, dependency, target, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty provisional boundaries for capability/effect taxonomy, Critical policy, listed forbidden categories, Typed-Core/lowering/transitive/target boundaries, Forbidden/Unavailable/Unknown/Assumed/RuntimeChecked/Proved/Experimental states, migration/conflict, Semantic ID/source span, diagnostics/privacy, fixtures, and protocol.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no checker, dependency, target, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test forbidden_capability_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "Test-only under DEC-0178; PROF-5102 remains BlockedSpec for capability/effect policy, checker phase, transitive/bounds/topology/numeric/Fault/FFI semantics, diagnostics, CLI/editor integration, and support claims.",
+  "No checker, profile policy, dependency, target package, manifest, diagnostic, CLI/LSP option, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "PROF-5103"

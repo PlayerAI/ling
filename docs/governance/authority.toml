@@ -2821,3 +2821,16 @@ covers = ["PROF-5101 bounded Critical Profile boundary evidence", "test-only Cri
 depends_on = ["DEC-0176", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0178"
+title = "Internal forbidden-capability boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0178-forbidden-capability-boundary-evidence.md"
+covers = ["PROF-5102 bounded forbidden-capability boundary evidence", "test-only forbidden capability vocabulary", "capability boundaries without checker/policy semantics"]
+depends_on = ["DEC-0177", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
