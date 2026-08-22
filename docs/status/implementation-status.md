@@ -303,6 +303,7 @@
 | `REM-2604` | Minimal reference transport | `G2` | `L` | `BlockedSpec` | `REM-2603` | `` |
 | `REM-2605` | Security and resource limits | `G2` | `L` | `BlockedSpec` | `REM-2604` | `` |
 | `REP-2501` | Determinism class | `G2` | `L` | `BlockedSpec` | `SUP-2403` | `` |
+| `REP-2501-OBSERVATION` | Internal determinism-class evidence | `G2` | `S` | `Done` | `SUP-2403-OBSERVATION` | `0d3d11d9be50790c35ac014b33318d3966b10464` |
 | `REP-2502` | Replay log schema | `G2` | `L` | `BlockedSpec` | `REP-2501` | `` |
 | `REP-2503` | Effect recorder | `G2` | `L` | `BlockedSpec` | `EFF-2105`, `REP-2502` | `` |
 | `REP-2504` | Replay player | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503` | `` |
