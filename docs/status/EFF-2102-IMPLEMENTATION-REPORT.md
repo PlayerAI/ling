@@ -7,6 +7,8 @@ Effect-row solver in `crates/ling-effects/src/solver.rs`. It is an in-process
 component over canonical checked rows; it does not change the v0.0.1 Seed
 checker, source syntax, Typed-Core lowering, runtime, or public protocols.
 
+Milestone commit: `e1827e7ceee6ffba9d40d882119a949d4af65a00`
+
 本里程碑在 `crates/ling-effects/src/solver.rs` 中实现已接受的
 RFC-0006/DEC-0062 实验性 v0.2 Effect Row 求解器。它只处理 canonical checked
 row，不改变 v0.0.1 Seed 检查器、源代码语法、Typed Core lowering、运行时或公共协议。

@@ -2,15 +2,14 @@
 
 ## Outcome
 
-`EFF-2102` is now `In Progress`. RFC-0006 is Accepted for the experimental v0.2
-Effect model, and Accepted DEC-0062 closes the solver-specific authority gap.
-The bounded in-process solver is being implemented under those documents and
-remains separate from Seed syntax, Checked-Core lowering, runtime execution,
-and public protocols.
+`EFF-2102` is now `Done`. RFC-0006 is Accepted for the experimental v0.2 Effect
+model, and Accepted DEC-0062 closes the solver-specific authority gap. The
+bounded in-process solver is implemented and committed under those documents,
+separate from Seed syntax, Checked-Core lowering, runtime execution, and public
+protocols.
 
-The implementation report records the current solver and focused evidence; the
-task remains incomplete until the full acceptance gates and integration status
-are committed.
+The implementation report and repository-wide gates provide the acceptance
+evidence; later tasks consume the solver only through its explicit API.
 
 ## Normative traceability
 

@@ -6835,7 +6835,7 @@ notes = [
 [[task]]
 id = "EFF-2102"
 title = "Effect inference and constraint solving"
-state = "In Progress"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -6870,12 +6870,12 @@ acceptance = [
   "The implementation must not add a placeholder G2 API or change Seed behavior; the authorized solver and its registered diagnostics are the only EFF-2102 additions.",
   "The solver consumes canonical checked rows, produces deterministic substitutions and stable bilingual conflicts, and passes workspace offline tests before any later runtime integration.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "e1827e7ceee6ffba9d40d882119a949d4af65a00"
+completion_commit = "e1827e7ceee6ffba9d40d882119a949d4af65a00"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
-  "EFF-2102 is In Progress under EFF-2101, RFC-0006, and DEC-0062; the solver implementation report records the current 22 focused tests and the two registered L-EFFECT diagnostics.",
+  "EFF-2102 is complete under EFF-2101, RFC-0006, and DEC-0062; commit e1827e7ceee6ffba9d40d882119a949d4af65a00 records the solver, governance, diagnostics, and focused evidence.",
   "ling-effects now contains deterministic Equal/Requires constraints, substitution/unification, occurs-check evidence, value-restricted row schemes, handler subtraction, and canonical conflict diagnostics alongside the existing Seed checker.",
   "The implementation preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Semantic IDs, schemas, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
