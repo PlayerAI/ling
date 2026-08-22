@@ -13,6 +13,11 @@ No workspace-symbol handler, reverse/incremental index, query API, result-limit
 or cancellation protocol, protocol field, or placeholder editor surface was
 added.
 
+The bounded child `IDE-2311-SOURCE-LOOKUPS` adds only exact module/name
+lookups over the existing resolver definition inventory. It does not add a
+workspace query, search policy, ranking, result limit, position projection,
+revision binding, cancellation, or protocol response.
+
 ## Normative traceability
 
 - The execution package is non-normative; its index and query wording does not
@@ -40,6 +45,9 @@ added.
 - `ling-semantic` emits deterministic definitions/modules/packages and
   Experimental references, but no workspace symbol kind/container/location
   schema or query service.
+- `ling-db::ResolvedDefinitionIndex` now exposes exact module/name source
+  lookups while retaining resolver identities and original spans; it still has
+  no workspace search or editor presentation policy.
 - `ling-project` provides deterministic package discovery and lock graph data;
   it does not define editor workspace-root selection, dependency/generated
   visibility, or read-only symbol policy.

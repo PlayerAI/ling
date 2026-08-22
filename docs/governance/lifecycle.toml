@@ -2186,3 +2186,26 @@ unresolved_alternatives = [
   "Code-action kind/ID/applicability/capability policy, FixPlan/edit/overlap/atomicity/version/stale/rollback/position/cancellation/limits, formatter/mutation safety, and migration remain open under IDE-2309 and the registered LSP/formatter/semantic gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0082"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0082-ide-workspace-symbol-lookups.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact module/name lookups over existing user-definition identities and original spans, missing-key emptiness, deterministic result order, and repeated equality.",
+  "Keep workspace scope/search taxonomy, package/dependency/generated/builtin policy, positions, versions, limits, truncation, cancellation, stale behavior, persistence, and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal read-only definition-index lookup methods; language semantics, diagnostics, schemas, Semantic IDs, CLI/LSP behavior, runtime, bytecode, VM, ABI, and Unicode tables remain unchanged.",
+]
+unresolved_alternatives = [
+  "Workspace scope/package selection, symbol taxonomy and containers, exact/prefix/fuzzy matching, visibility/duplicate policy, incremental invalidation, limits/truncation, cancellation, stale behavior, protocol lifecycle, and migration remain open under IDE-2311 and the registered incremental-cache/LSP/Semantic gaps.",
+]
+superseded_by = ""

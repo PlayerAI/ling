@@ -112,6 +112,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0079` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0079](../decisions/0079-ide-completion-source-inventory.md) |
 | `DEC-0080` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0080](../decisions/0080-ide-completion-checked-metadata.md) |
 | `DEC-0081` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0081](../decisions/0081-ide-code-action-repair-index.md) |
+| `DEC-0082` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0082](../decisions/0082-ide-workspace-symbol-lookups.md) |
 
 ## Migration boundary
 

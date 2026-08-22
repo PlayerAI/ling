@@ -2441,6 +2441,10 @@ mod tests {
             );
         }
         assert_eq!(index.source_symbols("unicode/Main.ling").len(), 4);
+        assert_eq!(index.module_symbols("Main").len(), 4);
+        assert_eq!(index.name_symbols("Choice").len(), 1);
+        assert!(index.module_symbols("Missing").is_empty());
+        assert!(index.name_symbols("missing").is_empty());
         assert!(index.definition("missing-definition-id").is_none());
     }
 

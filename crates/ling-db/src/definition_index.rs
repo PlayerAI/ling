@@ -119,6 +119,30 @@ impl ResolvedDefinitionIndex {
             .collect()
     }
 
+    /// Returns user definitions from one exact resolver module name.
+    ///
+    /// The result retains the index's deterministic source/span order. This
+    /// is an internal source lookup, not a workspace-symbol search policy.
+    #[must_use]
+    pub fn module_symbols(&self, module_name: &str) -> Vec<&ResolvedDefinitionSymbol> {
+        self.symbols
+            .iter()
+            .filter(|symbol| symbol.module_name == module_name)
+            .collect()
+    }
+
+    /// Returns user definitions from one exact source spelling.
+    ///
+    /// Unlike a future editor query, this performs no prefix/fuzzy matching,
+    /// ranking, truncation, or protocol position conversion.
+    #[must_use]
+    pub fn name_symbols(&self, name: &str) -> Vec<&ResolvedDefinitionSymbol> {
+        self.symbols
+            .iter()
+            .filter(|symbol| symbol.name == name)
+            .collect()
+    }
+
     pub(crate) fn from_resolved(resolved: &ResolvedProgram) -> Self {
         let mut symbols = resolved
             .definitions()

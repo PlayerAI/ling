@@ -1573,3 +1573,16 @@ covers = ["IDE-2309 bounded structured diagnostic repair index", "existing diagn
 depends_on = ["DEC-0001", "DEC-0002", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0082"
+title = "Internal workspace-symbol source lookups"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0082-ide-workspace-symbol-lookups.md"
+covers = ["IDE-2311 bounded workspace-symbol source lookups", "exact module/name definition inventory lookup", "deterministic internal symbol source"]
+depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "DEC-0073", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
