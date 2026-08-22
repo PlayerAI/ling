@@ -245,6 +245,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0047"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0047-seed-bilingual-tutorial-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask tutorial verify and assert two bilingual sources and eight requirement rows.",
+  "Mutate an isolated source/requirement row, policy phrase, tutorial boundary marker, or source marker and verify the gate fails closed.",
+  "Run locked tutorial process/conformance tests without treating the inventory gate as execution or Stable-support evidence.",
+  "Repeat independent processes and verify no source, semantic, diagnostic, schema, protocol, support, or release-state output is generated.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask tutorial validator, coverage document, and CI preflight; no language, diagnostic, schema, protocol, profile, or support behavior changes.",
+]
+unresolved_alternatives = [
+  "Stable tutorial content, localization/alias policy, profile guidance, future manuals, migration text, and release sample policy remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

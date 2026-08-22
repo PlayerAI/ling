@@ -145,6 +145,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0047"
+title = "Seed bilingual tutorial coverage gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0047-seed-bilingual-tutorial-gate.md"
+covers = ["Seed bilingual tutorial coverage", "tutorial evidence drift gate"]
+depends_on = ["RFC-0001", "RFC-0019", "DEC-0018", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0037"
 title = "CLI internal exit catalog boundary"
 kind = "Decision"

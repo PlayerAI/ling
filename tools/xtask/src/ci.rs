@@ -13,6 +13,7 @@ const REQUIRED_GATES: &[GateContract] = &[
             "cargo xtask governance check-all",
             "cargo xtask docs verify",
             "cargo xtask examples verify",
+            "cargo xtask tutorial verify",
             "cargo xtask ci verify",
         ],
     },

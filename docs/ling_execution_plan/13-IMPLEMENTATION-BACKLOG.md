@@ -376,6 +376,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DOC-6701-SEED` | G6 | Seed documentation-inventory drift gate | S | In Progress | Accepted DEC-0045; see `cargo xtask docs verify` and `docs/status/DOC-6701-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `DOC-6702` | G6 | 双层示例 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:406`, `docs/status/DOC-6702-AUTHORITY-AUDIT.md`, `docs/testing/EXAMPLE-COVERAGE.md` |
 | `DOC-6702-SEED` | G6 | Seed example-matrix drift gate | S | In Progress | Accepted DEC-0046; see `cargo xtask examples verify` and `docs/status/DOC-6702-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `DOC-6703-SEED` | G6 | Seed bilingual tutorial coverage drift gate | S | In Progress | Accepted DEC-0047; see `cargo xtask tutorial verify`, `docs/testing/TUTORIAL-COVERAGE.md`, and `docs/status/DOC-6703-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `DOC-6703` | G6 | Tutorial 与中文优先样例 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:417`, `docs/status/DOC-6703-AUTHORITY-AUDIT.md`, `docs/TUTORIAL.md` |
 | `ZED-6801` | G6 | 兼容矩阵 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:430`, `docs/status/ZED-6801-AUTHORITY-AUDIT.md`, `docs/testing/ZED-COMPATIBILITY-MATRIX.md` |
 | `ZED-6802` | G6 | 语言服务器发现/获取 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:442`, `docs/status/ZED-6802-AUTHORITY-AUDIT.md`, `docs/testing/LSP-DISCOVERY-ACQUISITION.md` |

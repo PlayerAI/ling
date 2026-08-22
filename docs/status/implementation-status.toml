@@ -14474,7 +14474,9 @@ spec = [
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/testing/EXAMPLE-COVERAGE.md",
+  "docs/testing/TUTORIAL-COVERAGE.md",
   "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
+  "docs/decisions/0047-seed-bilingual-tutorial-gate.md",
   "docs/TUTORIAL.md",
   "examples/tutorial-zh.ling",
   "examples/tutorial-en.ling",
@@ -14483,7 +14485,9 @@ spec = [
 ]
 artifacts = [
   "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6703-SEED-IMPLEMENTATION-REPORT.md",
   "docs/TUTORIAL.md",
+  "docs/testing/TUTORIAL-COVERAGE.md",
   "examples/tutorial-zh.ling",
   "examples/tutorial-en.ling",
   "crates/ling-cli/tests/conformance.rs",
@@ -14505,6 +14509,58 @@ notes = [
   "DOC-6703 is BlockedSpec because no current feature is Stable and G6 depends on G1-G5 exits before bilingual tutorials can document a frozen 1.0 support surface.",
   "The two tutorial sources are Seed evidence only; they use existing grammar, Effect/Capability checks, diagnostics, and Semantic/Audit protocols.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, or public API.",
+]
+
+[[task]]
+id = "DOC-6703-SEED"
+title = "Seed bilingual tutorial coverage drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DOC-6702-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0047-seed-bilingual-tutorial-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/TUTORIAL-COVERAGE.md",
+  "docs/TUTORIAL.md",
+  "examples/tutorial-zh.ling",
+  "examples/tutorial-en.ling",
+  "crates/ling-cli/tests/conformance.rs",
+  ".github/workflows/ci.yml",
+]
+artifacts = [
+  "tools/xtask/src/tutorial_matrix.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/testing/TUTORIAL-COVERAGE.md",
+  "docs/TUTORIAL.md",
+  "docs/decisions/0047-seed-bilingual-tutorial-gate.md",
+  "docs/status/DOC-6703-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask tutorial verify deterministically validates two bilingual tutorial sources and eight requirement rows with non-empty evidence cells.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, label or output drift, empty evidence cells, missing bilingual/boundary markers, and missing source markers.",
+  "The command is included in the governance-authority CI gate and does not run examples, add syntax, allocate public diagnostics, or claim Stable support.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0047 closes only this internal Seed tutorial child; the parent DOC-6703 gate remains BlockedSpec for Stable localization policy and release evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects bilingual tutorial inventory and source/document markers only; tutorial execution and observed outputs remain existing Seed evidence.",
+  "No syntax, localized alias, API, profile, ownership rule, migration promise, security claim, or placeholder public surface is added.",
 ]
 
 [[task]]

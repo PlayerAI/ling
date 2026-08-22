@@ -19,6 +19,11 @@ Chinese identifiers, `Console.Write` Effect/Capability, correct errors, and
 the unavailable Profile/ownership/runtime boundaries without defining new
 language behavior.
 
+Accepted `DEC-0047` closes only the bounded `DOC-6703-SEED` child: the
+internal `cargo xtask tutorial verify` command protects the two-source,
+eight-requirement Seed inventory and its bilingual/source boundary markers.
+It does not execute programs or promote the G6 tutorial gate to Stable.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:417-426` is a non-normative tutorial checklist;
@@ -43,6 +48,9 @@ language behavior.
   prints `alive`.
 - `docs/TUTORIAL.md` gives bilingual copyable commands, Semantic/Audit output,
   the registered missing-Capability negative fixture, and explicit boundaries.
+- `docs/testing/TUTORIAL-COVERAGE.md` records the exact two-source and
+  eight-requirement inventory; `cargo xtask tutorial verify` checks its drift
+  together with the tutorial and source markers.
 - `crates/ling-cli/tests/conformance.rs` includes both tutorial files in the
   process-level check/run/Semantic matrix; the existing Audit determinism test
   and Seed traceability registry provide protocol evidence.
@@ -54,6 +62,9 @@ schema, Semantic ID rule, CLI command, package behavior, runtime feature,
 editor protocol, dependency, or public API. The new sources exercise only the
 existing checked Seed path and preserve Unicode 17.0.0 and original UTF-8
 spans.
+
+The bounded verifier is inventory-only and emits internal
+`GOV-TUTORIAL-MATRIX-*` failures; those are not public Ling diagnostics.
 
 A future promotion requires accepted localization/alias policy where needed,
 Stable support-matrix entries, positive and negative fixtures for each stable

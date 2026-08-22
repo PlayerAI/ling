@@ -179,11 +179,13 @@ not invent new diagnostic codes.
 cargo test -p ling-cli --test conformance seed_examples_check_run_and_emit_semantic_graphs --locked --offline
 cargo test -p ling-cli --test conformance audit_output_is_deterministic_and_round_trips --locked --offline
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
+cargo xtask tutorial verify
 ```
 
 These commands validate the runnable example matrix, canonical Audit output,
-and the complete Seed traceability registry. They do not promote any feature
-to Stable or authorize future syntax.
+the complete Seed traceability registry, and tutorial inventory drift. They do
+not promote any feature to Stable or authorize future syntax.
 
 这些命令验证可运行示例矩阵、规范 Audit 输出和完整 Seed 追踪注册表，但不会把
-任何能力提升为 Stable，也不会授权未来语法。
+教程清单漂移误报为实现完成；它们不会把任何能力提升为 Stable，也不会授权未来
+语法。
