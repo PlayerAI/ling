@@ -18928,6 +18928,7 @@ spec = [
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
   "docs/RFC-0015.md",
+  "docs/decisions/0182-loop-recursion-checks-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -18937,6 +18938,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/BND-5202-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5202-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5202-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0182-loop-recursion-checks-boundary-evidence.md",
+  "crates/ling-types/tests/loop_recursion_checks_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -18953,9 +18962,65 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "BND-5202 is BlockedSpec by BND-5201, absent RFC-K504 authority, open GAP-CRITICAL-PROFILE-001, and unresolved concurrency/mailbox, ownership, effects, replay, and LSP/Semantic Transaction boundaries.",
-  "The repository has no source termination checker, ranking-function engine, Bound state, runtime guard contract, or work-queue transformation; RFC-0015's frame limit is VM-only evidence.",
+  "The repository has no source termination checker, ranking-function engine, Bound state, runtime guard contract, or work-queue transformation; RFC-0015's frame limit is VM-only evidence; the observation adds only bounded test-local evidence.",
   "The audit does not reinterpret bytecode recursion or implementation depth guards as source-level termination proof and does not create a semantics-changing code action.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; loop/recursion checking remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "BND-5202-OBSERVATION"
+title = "Internal loop/recursion checks boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BND-5201-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0015.md",
+  "docs/decisions/0181-bound-types-expressions-boundary-evidence.md",
+  "docs/decisions/0182-loop-recursion-checks-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/loop_recursion_checks_evidence.rs",
+  "docs/decisions/0182-loop-recursion-checks-boundary-evidence.md",
+  "docs/status/BND-5202-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5202-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0182 authorizes only test-local loop/recursion checks boundary evidence; no termination calculus, proof, runtime guard, transformation, dependency, target, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty provisional termination states/cases, ranking and proof trust, effect/resource/concurrency relations, runtime guards and limits, work-queue eligibility/equivalence/consent, diagnostics, and fixtures.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no checker, proof, guard, transformation, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test loop_recursion_checks_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "5961d9b7e97882333646020b27c8c3b0b7461243"
+completion_commit = "5961d9b7e97882333646020b27c8c3b0b7461243"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0182; BND-5202 remains BlockedSpec for termination calculus, proof states, runtime guards, work-queue transformation, profile/resource integration, diagnostics, CLI/editor integration, and support claims.",
+  "No termination checker, Typed-Core state, runtime guard, transformation, dependency, target package, manifest, diagnostic, CLI/LSP action, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "BND-5203"

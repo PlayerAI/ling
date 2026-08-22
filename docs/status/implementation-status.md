@@ -60,6 +60,7 @@
 | `BND-5201` | Bound Types and Expressions | `G5` | `M` | `BlockedSpec` | `PROF-5104` | `` |
 | `BND-5201-OBSERVATION` | Internal Bound types/expressions boundary evidence | `G5` | `S` | `Done` | `PROF-5104-OBSERVATION` | `a41323f755cdb2283aed9d7197f0dfe46ab51c77` |
 | `BND-5202` | Loop and Recursion Checks | `G5` | `M` | `BlockedSpec` | `BND-5201` | `` |
+| `BND-5202-OBSERVATION` | Internal loop/recursion checks boundary evidence | `G5` | `S` | `Done` | `BND-5201-OBSERVATION` | `5961d9b7e97882333646020b27c8c3b0b7461243` |
 | `BND-5203` | Memory Budget Analysis | `G5` | `M` | `BlockedSpec` | `BND-5202` | `` |
 | `BND-5204` | Resource Budget Diagnostics | `G5` | `M` | `BlockedSpec` | `BND-5203` | `` |
 | `CBK-5901` | Trusted Compiler Route Decision | `G5` | `L` | `BlockedSpec` | `EVD-5804` | `` |
