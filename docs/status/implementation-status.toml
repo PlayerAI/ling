@@ -4494,6 +4494,63 @@ notes = [
 ]
 
 [[task]]
+id = "PRJ-1107-SEMANTIC-SNAPSHOT"
+title = "Internal locked-project semantic snapshot"
+state = "Done"
+release = "G1"
+size = "M"
+owner = "Codex"
+branch = "main"
+depends_on = ["PRJ-1103", "PRJ-1107-LOAD"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0058-locked-project-snapshot-boundary.md",
+  "docs/decisions/0083-prj-locked-project-semantic-snapshot.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "Cargo.lock",
+  "crates/ling-db/Cargo.toml",
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-db/src/project_snapshot.rs",
+  "docs/decisions/0083-prj-locked-project-semantic-snapshot.md",
+  "docs/status/PRJ-1107-SEMANTIC-SNAPSHOT-AUTHORITY-AUDIT.md",
+  "docs/status/PRJ-1107-SEMANTIC-SNAPSHOT-IMPLEMENTATION-REPORT.md",
+  "docs/status/PRJ-1107-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0083 authorizes only the internal CompilerDb::project_semantic_snapshot(&LockedProject) query; public project selection, compiler-host, CLI, execution, test, build, artifact, and protocol behavior remain deferred.",
+  "The query consumes retained locked-project bytes in canonical package/source order, uses deterministic SourceId values and path-free package:<name>/<logical-path> source names, and reuses parse, AST, HIR, resolve_project, type, effect, and build_project stages.",
+  "Successful and failed results are cached by immutable PackageGraphId; typed failures publish no partial semantic snapshot and preserve existing compiler error categories.",
+  "The offline locked fixture verifies ling.semantic/0.2, package-graph identity, package count, pointer reuse, deterministic output, and absence of host/fixture paths.",
+  "Focused ling-db tests, format, clippy, governance, and full repository gates pass without changing language semantics, diagnostics, schemas, Semantic IDs, runtime, VM, ABI, or Unicode 17.0.0 data.",
+]
+verified_against_commit = "026555cad800dd660fc550408d300fffd3c7af68"
+completion_commit = "026555cad800dd660fc550408d300fffd3c7af68"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is complete under DEC-0083; parent PRJ-1107 remains BlockedSpec for public semantic project check, compiler-host lifecycle, workspace selection, run/test/build, and artifact contracts.",
+  "The adapter is internal and read-only: it does not select a manifest, inspect host paths, mutate locks, access the network, execute code, or publish CLI/LSP/DAP output.",
+]
+
+[[task]]
 id = "CLI-1701"
 title = "Unified CLI command model"
 state = "BlockedSpec"
