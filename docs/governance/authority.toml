@@ -2353,3 +2353,16 @@ covers = ["FFI-3605 bounded FFI fuzz and sanitizer boundary evidence", "test-onl
 depends_on = ["DEC-0140", "DEC-0139", "DEC-0138", "DEC-0137", "DEC-0124", "DEC-0117", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0142"
+title = "Internal differential-harness boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0142-differential-harness-boundary-evidence.md"
+covers = ["DIFF-3701 bounded differential-harness boundary evidence", "test-only Interpreter/VM/Native differential vocabulary", "differential boundaries without execution/equivalence semantics"]
+depends_on = ["DEC-0141", "DEC-0140", "DEC-0139", "DEC-0138", "DEC-0137", "DEC-0109", "DEC-0009", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

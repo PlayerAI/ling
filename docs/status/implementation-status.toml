@@ -14377,6 +14377,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DIFF-3701-AUTHORITY-AUDIT.md",
+  "docs/status/DIFF-3701-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIFF-3701-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0142-differential-harness-boundary-evidence.md",
+  "crates/ling-types/tests/differential_harness_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14386,6 +14394,7 @@ acceptance = [
   "The audit covers return/event/Fault/cleanup/replay/float/Semantic-ID comparisons, host-noise exclusion, deterministic repeated/cross-process runs, allowed-difference negative cases, property/fuzz, cross-target, and schema evidence without unverified claims.",
   "No Native adapter, three-way harness, comparison/result schema, allowed-difference entry, Native dependency/toolchain, diagnostic allocation, public protocol implementation, or placeholder API is added while Native/FFI/ownership authority, DIFF-3702, PROTO-ABI, and PROTO-EVIDENCE are absent.",
   "The future implementation must preserve checked Typed Core as the sole semantic input, retain current Interpreter–VM behavior and Seed conformance, keep host paths/addresses/timing/allocation/debug details outside Ling semantics, and publish bilingual diagnostics and Unicode 17.0.0 evidence before claiming three-engine conformance.",
+  "Accepted DEC-0142 authorizes only test-local differential-harness boundary evidence; it does not close engine adapters, Native execution, trace/normalization schemas, equivalence/allowed differences, replay, corpus, diagnostics, migration, or cross-target/compiler contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14395,6 +14404,67 @@ notes = [
   "DIFF-3701 is BlockedSpec by FFI-3605, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, absent RFC-N304/RFC-N305/RFC-N306/RFC-0007/RFC-0011, and the unimplemented DIFF-3702/PROTO-ABI/PROTO-EVIDENCE boundaries.",
   "The workspace already has accepted experimental checked Interpreter–VM differential evidence under RFC-0018/RFC-0019, but no Native backend, Native adapter, three-way corpus, or machine-readable allowed-difference registry; no Native toolchain or differential state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "DIFF-3701-OBSERVATION"
+title = "Internal differential-harness boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["FFI-3605-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0015.md",
+  "docs/RFC-0016.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0141-ffi-fuzz-sanitizer-boundary-evidence.md",
+  "docs/decisions/0142-differential-harness-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/differential_harness_evidence.rs",
+  "docs/decisions/0142-differential-harness-boundary-evidence.md",
+  "docs/status/DIFF-3701-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DIFF-3701-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0142 authorizes only test-local differential-harness boundary evidence; no harness, Native backend, engine adapter, trace schema, normalizer, corpus, replay tool, allowed-difference registry, equivalence result, diagnostic, dependency, toolchain, public protocol, or executable Native path is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for source/Checked Core/bytecode and engine identity, snapshots/entry/arguments/results/Faults/diagnostics/spans/Semantic IDs, effects/capabilities/resources/actors/scheduling/mailboxes/cancellation, step/instruction/event/heap observations and host exclusions, value/error/Fault/text/numeric/aggregate/closure/console/host-failure normalization, unsupported/malformed/limit cases, Seed corpus cases, canonical/deterministic/cross-process/target/compiler runs, differential classification/allowed differences, bilingual diagnostics/Unicode, schema migration, and public-protocol exclusion.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no execution, equivalence, replay, diagnostic, Semantic ID, Native, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0142; DIFF-3701 remains BlockedSpec for engine adapters, Native execution, trace/normalization schemas, equivalence/allowed differences, replay, corpus, diagnostics, migration, and cross-target/compiler decisions.",
+  "No parser, AST/HIR/Checked Core node, differential harness, Native adapter, trace schema, normalizer, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
