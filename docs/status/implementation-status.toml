@@ -9783,6 +9783,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/SUP-2402-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0102-restart-budget-observation.md",
+  "crates/ling-concurrency/src/budget.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -9790,6 +9799,7 @@ acceptance = [
   "The audit records the missing budget scope/units, counters/windows, clock/replay, restart/stop/escalate, backoff/jitter, circuit transitions, Fault provenance, restore/cleanup, mailbox/cancellation, observability, protocol, diagnostics, resource, and migration contracts.",
   "The audit distinguishes the plan's stale zero query example and the high-level SEMANTICS/LANGUAGE/ROADMAP restart requirements from the absent Accepted RFC-C204 authority, and preserves the checked-only evaluation boundary.",
   "The audit covers burst/window boundaries, backoff, budget exhaustion, circuit transitions, repeated/concurrent Faults, restart during cancellation, restore failure, mailbox cleanup, clock/replay determinism, resource limits, Unicode/CRLF/BOM spans, and interpreter/VM/runtime differential fixtures.",
+  "Accepted DEC-0102 authorizes only the publish-disabled restart-budget observation child; it does not close clock, budget, backoff, circuit, provenance, query, runtime, or replay gaps.",
   "No restart counter, budget, backoff scheduler, circuit breaker, Fault provenance store, runtime query, diagnostic allocation, public protocol, or placeholder G2 API is added while the authority is absent.",
   "The future implementation must consume accepted types and checked Core only, expose a versioned budget/circuit state machine, enforce bounded restart/resource behavior, retain deterministic provenance, and publish recovery, cleanup, and replay evidence before restart control is exposed.",
 ]
@@ -9801,6 +9811,65 @@ notes = [
   "SUP-2402 is BlockedSpec by SUP-2401, ACT-2301 through ACT-2306, absent RFC-C204/RFC-0009, GAP-ACTOR-MAILBOX-SUPERVISOR-001, and unresolved Supervisor budget/clock/backoff/circuit/provenance contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no restart loop, budget store, logical clock, backoff scheduler, circuit state, provenance index, runtime query, or public supervision protocol; compiler-query scheduling is unrelated.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Supervisor, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "SUP-2402-OBSERVATION"
+title = "Internal restart-budget observation"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["SUP-2401-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0095-actor-identity-reference-model.md",
+  "docs/decisions/0096-actor-message-schema-identity.md",
+  "docs/decisions/0097-actor-mailbox-observation.md",
+  "docs/decisions/0098-actor-turn-observation.md",
+  "docs/decisions/0099-actor-runtime-observation.md",
+  "docs/decisions/0100-actor-property-observation.md",
+  "docs/decisions/0101-supervisor-observation.md",
+  "docs/decisions/0102-restart-budget-observation.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/src/budget.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/decisions/0102-restart-budget-observation.md",
+  "docs/status/SUP-2402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0102 authorizes only publish-disabled restart-budget observations; no budget/circuit semantics are claimed.",
+  "BudgetObservationModel validates nonzero observation/actor identities and duplicate-free observations; observations are sorted deterministically.",
+  "Budget/circuit labels are observations only, with no clock/counter/window/backoff/circuit/provenance/query semantics; stale zero command is absent; source spans are evidence only; canonical bytes are path-free.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "7ee0cf0bf90971bb6844c8bf467f5506e5e5e796"
+completion_commit = "7ee0cf0bf90971bb6844c8bf467f5506e5e5e796"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is a data-only boundary under DEC-0102; SUP-2402 remains BlockedSpec for clocks, budgets, backoff, circuit transitions, Fault provenance, query protocols, runtime, and interpreter/VM behavior.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, or Unicode behavior was added.",
 ]
 
 [[task]]

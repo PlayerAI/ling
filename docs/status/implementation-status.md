@@ -320,6 +320,7 @@
 | `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `SUP-2401-OBSERVATION` | Internal Supervisor observation | `G2` | `S` | `Done` | `ACT-2306-PROPERTY-OBSERVATION` | `c29d95c7bc7b926c92757b2c32fccf960500e421` |
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
+| `SUP-2402-OBSERVATION` | Internal restart-budget observation | `G2` | `S` | `Done` | `SUP-2401-OBSERVATION` | `7ee0cf0bf90971bb6844c8bf467f5506e5e5e796` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
 | `TASK-2201` | Structured Task syntax and Checked Core | `G2` | `M` | `BlockedSpec` | `EFF-2103` | `` |
 | `TASK-2201-CORE-MODEL` | Internal Structured Task Checked-Core identity model | `G2` | `S` | `Done` | `TASK-2201-TASK-SYNTAX-REJECTION` | `6028e78ce4091e58d5df1289c59b8fd6b0f61c4e` |
