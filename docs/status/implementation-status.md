@@ -358,6 +358,7 @@
 | `PROOF-5502` | Independent Checker | `G5` | `L` | `BlockedSpec` | `PROOF-5501` | `` |
 | `PROOF-5502-OBSERVATION` | Internal Independent Checker boundary evidence | `G5` | `S` | `Done` | `PROOF-5501-OBSERVATION` | `657d3a63eea75b45708aa91aa7806e16ced03e68` |
 | `PROOF-5503` | Assumption Registry | `G5` | `M` | `BlockedSpec` | `PROOF-5502` | `` |
+| `PROOF-5503-OBSERVATION` | Internal Assumption Registry boundary evidence | `G5` | `S` | `Done` | `PROOF-5502-OBSERVATION` | `2a34482fb99c7a045f99fd456cf68961aefdfcb6` |
 | `PROTO-6201` | Protocol Registry | `G6` | `L` | `BlockedSpec` | `STAB-6103` | `` |
 | `PROTO-6202` | Reader/Writer Compatibility Tests | `G6` | `L` | `BlockedSpec` | `PROTO-6201` | `` |
 | `PROTO-6203` | Semantic Hash Upgrade Rehearsal | `G6` | `L` | `BlockedSpec` | `PROTO-6202` | `` |
