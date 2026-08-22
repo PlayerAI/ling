@@ -2223,3 +2223,16 @@ covers = ["NIR-3403 bounded Native IR verifier boundary evidence", "test-only ve
 depends_on = ["DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0132"
+title = "Internal Native backend selection boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0132-native-backend-selection-boundary-evidence.md"
+covers = ["BACK-3501 bounded Native backend selection boundary evidence", "test-only backend comparison vocabulary", "backend boundaries without selection/toolchain/benchmark/support semantics"]
+depends_on = ["DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
