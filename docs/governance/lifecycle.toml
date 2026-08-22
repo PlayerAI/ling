@@ -2330,3 +2330,27 @@ unresolved_alternatives = [
   "Versioned semantic-token fixture schema, legend/modifier mapping, typed versus parsed fallback, position encoding, document versions, full/delta equivalence, result-ID/base handling, stale/cancellation/limits, protocol inventory, and migration remain open under LSP-2401 through LSP-2404, LSP-2501/LSP-2502, and registered gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0088"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0088-effect-handler-execution-rejection-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compile the accepted unresolved handler source through the shared CLI compiler and assert L-EFFECT-0004, bilingual message text, and a non-empty original source span.",
+  "Assert no checked snapshot is returned and keep all positive handler/runtime, bytecode, VM, Fault, cancellation, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds one internal negative CLI fixture and no language, diagnostic registry, schema, Semantic ID, runtime, bytecode, VM, ABI, dependency, or Unicode 17.0.0 behavior changes.",
+  "Reuses the existing registered L-EFFECT-0004; no new public code or protocol field is introduced.",
+]
+unresolved_alternatives = [
+  "Checked handler operation signatures, binding/resume typing, nested propagation, continuation storage, runtime Fault/State/cancellation, interpreter behavior, bytecode/VM ABI, differential equivalence, syntax stabilization, and migration remain open under EFF-2103 through EFF-2105 and registered Effect gaps.",
+]
+superseded_by = ""

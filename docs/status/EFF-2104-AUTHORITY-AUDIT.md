@@ -12,7 +12,10 @@ behavior, bytecode encoding, and runtime failure contracts remain unaccepted.
 
 No handler evaluator, continuation object, VM instruction, bytecode version,
 runtime Fault mapping, differential fixture, diagnostic allocation, or
-placeholder G2 API was added.
+placeholder G2 API was added. Accepted DEC-0088 and the bounded
+`EFF-2104-REJECTION-GATE` child add only a negative CLI compilation fixture
+proving unresolved handlers are rejected before checked snapshot publication
+or execution.
 
 ## Normative traceability
 
@@ -32,6 +35,8 @@ placeholder G2 API was added.
   while matching execution, resumption runtime, and differential evidence
   remain open. `GAP-EFFECT-STATE-MASKING-001` is resolved by the accepted
   visible-State rule, but runtime State interaction remains unimplemented.
+- Accepted DEC-0088 authorizes only the existing `L-EFFECT-0004` rejection
+  through the shared CLI compiler; it does not authorize handler execution.
 
 ## Current implementation evidence
 
@@ -47,6 +52,9 @@ placeholder G2 API was added.
 - No differential fixture covers a handler in either backend, nested dispatch,
   propagation, resume cardinality, Fault/mutable State, cancellation,
   deterministic residual rows, or malformed/unsupported handler bytecode.
+- The rejection-gate child covers only the negative compile boundary and
+  diagnostic serialization; it has no checked snapshot, runtime, bytecode, VM,
+  Fault, cancellation, or differential behavior.
 
 ## Required authority before implementation
 
@@ -88,6 +96,7 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
+The bounded rejection-gate child is complete under DEC-0088. Public
 `EFF-2104` can begin after the accepted EFF-2101 through EFF-2103 model slices
 and explicit bytecode/VM authority. The future
 implementation must use checked Typed Core only, establish the interpreter as

@@ -118,6 +118,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0085` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0085](../decisions/0085-lsp-checked-token-identity-observation.md) |
 | `DEC-0086` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0086](../decisions/0086-lsp-checked-token-snapshot-identity.md) |
 | `DEC-0087` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0087](../decisions/0087-lsp-checked-token-source-fixtures.md) |
+| `DEC-0088` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0088](../decisions/0088-effect-handler-execution-rejection-gate.md) |
 
 ## Migration boundary
 
