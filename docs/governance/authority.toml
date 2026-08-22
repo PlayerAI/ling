@@ -1924,3 +1924,16 @@ covers = ["REP-2505 bounded replay privacy and integrity boundary evidence", "te
 depends_on = ["DEC-0107", "DEC-0106", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0109"
+title = "Internal cross-process replay acceptance boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0109-cross-process-replay-acceptance-boundary-evidence.md"
+covers = ["REP-2506 bounded cross-process replay acceptance boundary evidence", "test-only process/provenance/comparison vocabulary", "cross-process boundaries without harness/replay semantics"]
+depends_on = ["DEC-0108", "DEC-0107", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

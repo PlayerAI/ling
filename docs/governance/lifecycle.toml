@@ -2869,3 +2869,29 @@ unresolved_alternatives = [
   "Sensitivity taxonomy, redaction representation, default-deny and authorization rules, key handling, retention/deletion, dependency closure, chunk framing, checksum scope, truncation/corruption recovery, diagnostics, unknown fields, offline guarantees, migration, resource limits, runtime ABI, and cross-process behavior remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2505.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0109"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0109-cross-process-replay-acceptance-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all eighteen provisional cross-process boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep process/toolchain/profile/target identity, cache/input isolation, generator/player behavior, Program/Schema binding, mutation rejection, observable equivalence, repeat thresholds, divergence, provenance, resources, platform differences, offline enforcement, privacy/corruption, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public cross-process replay or reproducibility claim is registered.",
+]
+unresolved_alternatives = [
+  "Process and cache isolation, toolchain identity, input provenance, generator/player protocol, binding and mutation semantics, observable-equivalence relation, repeatability threshold, divergence reporting, platform variance, offline guarantees, diagnostics, resource limits, runtime ABI, and migration remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2506.",
+]
+superseded_by = ""
