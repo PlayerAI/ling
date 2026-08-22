@@ -2548,3 +2548,16 @@ covers = ["SIMD-4302 bounded Portable SIMD IR boundary evidence", "test-only Por
 depends_on = ["DEC-0155", "DEC-0154", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0157"
+title = "Internal SIMD differential boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0157-simd-differential-boundary-evidence.md"
+covers = ["SIMD-4303 bounded SIMD differential boundary evidence", "test-only scalar/SIMD comparison vocabulary", "differential boundaries without Kernel/Native/backend semantics"]
+depends_on = ["DEC-0156", "DEC-0155", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

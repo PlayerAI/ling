@@ -4103,3 +4103,27 @@ unresolved_alternatives = [
   "Lane types/counts and vector values; load/store addressing/alignment/bounds/alias; mask truth, shuffle indexes, horizontal reduction/order; scalarization/fallback, effects/memory/Faults, shape/layout/index/overflow, strict/relaxed FP and determinism; capability identity/required/optional features and target rejection; canonical schema/version/identity, fixtures, diagnostics, CPU/device differential, protocol inventory, and public IR status remain open under SIMD-4302, SIMD-4301, CPU-4201 through CPU-4203, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0157"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0157-simd-differential-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty SIMD differential boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer exact/tolerance equality, numeric modes, Fault/effect equivalence, target mismatch classification, canonical results, diagnostics, migration, differential, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No differential runner, comparison contract, tolerance policy, backend, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Verified scalar/SIMD inputs and artifacts; integer/structural exactness; strict FP rounding/NaN/infinity/signed-zero/overflow; relaxed FP tolerances/metrics; reduction/tail/unaligned/alignment/determinism; Fault identity/spans and effect equivalence; unsupported capability vs mismatch vs evidence failure; target features, canonical outputs/traces, redaction/corruption/migration, fixtures, diagnostics, CPU/device differential, protocol inventory, and public differential status remain open under SIMD-4303, SIMD-4301/4302, CPU-4201 through CPU-4203, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""

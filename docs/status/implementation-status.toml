@@ -16098,6 +16098,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0157-simd-differential-boundary-evidence.md",
   "docs/RFC-0014.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
@@ -16110,6 +16111,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/SIMD-4303-AUTHORITY-AUDIT.md",
+  "docs/status/SIMD-4303-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/SIMD-4303-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0157-simd-differential-boundary-evidence.md",
+  "crates/ling-types/tests/simd_differential_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -16129,6 +16138,60 @@ notes = [
   "The repository has no CPU/SIMD differential runner, comparison result type, tolerance policy, Fault-location mapper, target matrix, input corpus, or SIMD evidence.",
   "The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; the plan remains non-normative.",
  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Native, memory categories, ownership, diagnostics, schemas, Semantic IDs, source spans, support claims, or Unicode 17.0.0 behavior.",
+]
+[[task]]
+id = "SIMD-4303-OBSERVATION"
+title = "Internal SIMD differential boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["SIMD-4302-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0156-portable-simd-ir-boundary-evidence.md",
+  "docs/decisions/0157-simd-differential-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/simd_differential_evidence.rs",
+  "docs/decisions/0157-simd-differential-boundary-evidence.md",
+  "docs/status/SIMD-4303-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/SIMD-4303-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0157 authorizes only test-local SIMD differential boundary evidence; no runner, comparison schema, tolerance policy, Fault mapper, target matrix, diagnostic, dependency, protocol, or support claim is made.",
+  "The test-local inventory covers sixty provisional boundaries for verified scalar/SIMD inputs and results, integer/structural exactness, strict/relaxed FP, rounding/NaN/infinity/signed-zero/overflow, tolerances, reductions/tails/unaligned access, Fault/effect equivalence, capability mismatch, provenance, fixtures, migration, diagnostics, host exclusion, and protocol inventory.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no comparison result, tolerance, Fault, diagnostic, Semantic ID, backend, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0157; SIMD-4303 remains BlockedSpec for differential comparisons, exact/tolerance rules, Fault/effect equivalence, target matrices, migration, protocol integration, and support claims.",
+  "No parser, AST/HIR/Checked Core node, CPU/SIMD differential runner, comparison result type, tolerance policy, Fault mapper, target matrix, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 [[task]]
 id = "DBUF-4401"
