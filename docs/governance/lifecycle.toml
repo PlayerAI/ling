@@ -4511,3 +4511,27 @@ unresolved_alternatives = [
   "Static legality and verified artifacts; capability/target/toolchain/topology identity; runtime availability and remote facts; policy/cost precedence and deterministic choice; fallback/rejection/conflict/missing-device/cancellation/resource/Fault behavior; Critical/Strict/Native profiles and fixed placement; decision/replay/stale/migration/explain/cache schemas; provenance/privacy and host/driver exclusions; fixtures, diagnostics, protocol inventory, and public selection status remain open under PLC-4802, PLC-4801, ACC-4702, ACC-4701, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing RFC-H405 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0174"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0174-cost-model-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty cost-model boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer estimator behavior, units, calibration, uncertainty, policy integration, profile/replay/cache semantics, diagnostics, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No cost estimator, benchmark claim, dependency, target package, cache/replay field, diagnostic, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Cost factors and canonical units; static/dynamic domains; calibration, provenance, confidence and uncertainty; estimate-versus-guarantee; overflow/unknown/invalid handling; hardware/device/capability/placement/buffer context; policy precedence, limits, fallback/rejection and selection use; diagnostic-only versus profile/replay/cache inputs; explain, versioning, migration, corruption, privacy and unstable host exclusions; fixtures, diagnostics, protocol inventory, and public Cost Model status remain open under PLC-4803, PLC-4802, PLC-4801, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""

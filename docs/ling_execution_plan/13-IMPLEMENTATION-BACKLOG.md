@@ -421,6 +421,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PLC-4802` | G4 | 静态候选与运行时选择 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:448`, `docs/status/PLC-4802-AUTHORITY-AUDIT.md` |
 | `PLC-4802-OBSERVATION` | G4 | Internal Placement-selection boundary evidence | S | Done | Accepted `DEC-0173`; see `crates/ling-types/tests/placement_selection_evidence.rs` and `docs/status/PLC-4802-OBSERVATION-IMPLEMENTATION-REPORT.md`; selector/replay semantics remain BlockedSpec |
 | `PLC-4803` | G4 | Cost Model v0 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:466`, `docs/status/PLC-4803-AUTHORITY-AUDIT.md` |
+| `PLC-4803-OBSERVATION` | G4 | Internal Cost Model boundary evidence | S | Done | Accepted `DEC-0174`; see `crates/ling-types/tests/cost_model_evidence.rs` and `docs/status/PLC-4803-OBSERVATION-IMPLEMENTATION-REPORT.md`; estimator/benchmark semantics remain BlockedSpec |
 | `PLC-4804` | G4 | `zero explain placement` | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:480`, `docs/status/PLC-4804-AUTHORITY-AUDIT.md` |
 | `PLC-4805` | G4 | 设备二进制缓存 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:495`, `docs/status/PLC-4805-AUTHORITY-AUDIT.md` |
 | `PROF-5101` | G5 | 机器可读 Profile | M | BlockedSpec | `09-G5-V0.5-CRITICAL.md:77`, `docs/status/PROF-5101-AUTHORITY-AUDIT.md` |

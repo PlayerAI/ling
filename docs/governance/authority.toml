@@ -2769,3 +2769,16 @@ covers = ["PLC-4802 bounded Placement-selection boundary evidence", "test-only s
 depends_on = ["DEC-0172", "DEC-0171", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0174"
+title = "Internal cost-model boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0174-cost-model-boundary-evidence.md"
+covers = ["PLC-4803 bounded Cost Model boundary evidence", "test-only cost vocabulary", "cost boundaries without estimator/benchmark semantics"]
+depends_on = ["DEC-0173", "DEC-0172", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
