@@ -5,6 +5,8 @@
 
 use std::fmt;
 
+use ling_source::{Revision, SourceId};
+
 use crate::{TokenSource, TokenSourceIndex};
 
 use super::TypedDefinitionIndex;
@@ -49,12 +51,18 @@ impl CheckedTokenSource {
 /// Source-order lexical tokens joined to exact checked definition spans.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct CheckedTokenSourceIndex {
+    source: SourceId,
+    revision: Revision,
     source_name: String,
     entries: Box<[CheckedTokenSource]>,
 }
 
 impl CheckedTokenSourceIndex {
-    pub(crate) fn from_indexes(lexical: &TokenSourceIndex, typed: &TypedDefinitionIndex) -> Self {
+    pub(crate) fn from_indexes(
+        lexical: &TokenSourceIndex,
+        typed: &TypedDefinitionIndex,
+        revision: Revision,
+    ) -> Self {
         let entries = lexical
             .tokens()
             .iter()
@@ -86,9 +94,23 @@ impl CheckedTokenSourceIndex {
             .collect::<Vec<_>>()
             .into_boxed_slice();
         Self {
+            source: lexical.source(),
+            revision,
             source_name: lexical.source_name().to_owned(),
             entries,
         }
+    }
+
+    /// Returns the existing session-local source identity for this observation.
+    #[must_use]
+    pub const fn source(&self) -> SourceId {
+        self.source
+    }
+
+    /// Returns the immutable VFS revision used to build this observation.
+    #[must_use]
+    pub const fn revision(&self) -> Revision {
+        self.revision
     }
 
     #[must_use]

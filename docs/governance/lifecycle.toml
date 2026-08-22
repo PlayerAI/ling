@@ -2281,3 +2281,27 @@ unresolved_alternatives = [
   "Checked HIR/Core source precedence, reference identity mapping, semantic-token categories/modifiers/legends, capability redaction, position/version binding, snapshots, negotiation, full/delta transport, stale/cancellation policy, lifecycle, and migration remain LSP-2402 through LSP-2404 and registered gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0086"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0086-lsp-checked-token-snapshot-identity.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert exact SourceId and session-local Revision retention, immutable repeated-query reuse, and a new observation after a source edit without mutating the old observation.",
+  "Preserve original UTF-8 spans, source order, BOM/CRLF and Unicode spelling; keep URI, document-version, UTF-16 position, legend, full/delta, result-ID, cancellation, and transport fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only existing SourceId/Revision accessors to an internal ling-db observation; language, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "Query identity and invalidation continue to use the existing QueryKey and VFS revision rules; no cross-process or cross-workspace numbering promise is created.",
+]
+unresolved_alternatives = [
+  "Document URI/version binding, snapshot lifetime, semantic-token taxonomy/fallback, position encoding, result-ID retention, full/delta base validation, stale/cancellation/limits, negotiation, protocol inventory, and migration remain open under LSP-2401 through LSP-2404, LSP-2501/LSP-2502, and registered gaps.",
+]
+superseded_by = ""

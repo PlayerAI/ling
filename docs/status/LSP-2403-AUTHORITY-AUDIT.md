@@ -9,7 +9,10 @@ version. The repository has no accepted full/delta wire schema, token legend,
 result-ID lifecycle, base-result validation, or stale-version behavior.
 
 No full-token writer, delta encoder, result-ID store, protocol field, diagnostic
-allocation, or placeholder LSP surface was added.
+allocation, or placeholder LSP surface was added. Accepted DEC-0086 and the
+bounded `LSP-2403-SNAPSHOT-IDENTITY` child add only existing `SourceId` and VFS
+`Revision` observations to the internal checked-token source; public transport
+remains blocked.
 
 ## Normative traceability
 
@@ -27,6 +30,9 @@ allocation, or placeholder LSP surface was added.
   open; `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves protocol stability,
   reader/writer compatibility, stale rejection, and migration open. LSP-2501
   and LSP-2502 separately remain unaccepted snapshot/cancellation contracts.
+- Accepted DEC-0086 authorizes only retention of the existing source identity
+  and session-local VFS revision on `CheckedTokenSourceIndex`; neither value is
+  an LSP document version or result ID.
 
 ## Current interface evidence
 
@@ -40,6 +46,9 @@ allocation, or placeholder LSP surface was added.
 - No fixture proves full/delta equivalence, base-result mismatch recovery,
   changed token ranges, document version transitions, limits, cancellation,
   Unicode/CRLF/BOM positions, or deterministic encoding.
+- The snapshot-identity child records source/revision binding and cache
+  invalidation but has no token encoding, delta state, URI/version, or transport
+  field.
 
 ## Required authority before implementation
 
@@ -78,6 +87,7 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
+The bounded snapshot-identity child is complete under DEC-0086. Public
 `LSP-2403` can begin after LSP-2401 taxonomy, LSP-2402 generation,
 LSP-2501/LSP-2502 snapshot/cancellation, and Semantic Graph lifecycle decisions
 are Accepted. The future implementation must publish only same-version,

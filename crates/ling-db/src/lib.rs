@@ -880,7 +880,11 @@ impl CompilerDb {
         }
         let lexical = self.token_source_index(file)?;
         let typed = self.typed_definition_index(file)?;
-        let index = Arc::new(CheckedTokenSourceIndex::from_indexes(&lexical, &typed));
+        let index = Arc::new(CheckedTokenSourceIndex::from_indexes(
+            &lexical,
+            &typed,
+            snapshot.revision(),
+        ));
         self.checked_token_source_indexes.insert(key, index.clone());
         self.record(
             QueryKind::CheckedTokenSourceIndex,
@@ -2309,6 +2313,8 @@ mod tests {
             .checked_token_source_index(file)
             .expect("checked token source index repeats");
         assert!(Arc::ptr_eq(&first, &repeated));
+        assert_eq!(first.source(), file);
+        assert_eq!(first.revision().get(), 1);
         assert_eq!(first.source_name(), "checked/Main.ling");
         let helper = first
             .entries()
