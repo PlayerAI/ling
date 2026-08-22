@@ -4247,3 +4247,27 @@ unresolved_alternatives = [
   "IR identity/version and workgroup/grid; scalar/vector/tensor types and shape; address spaces and memory operations/effects; control flow; barriers/atomics and memory order; shape/layout/index/bounds; numeric modes and exact encoding; source maps, capability/required-feature negotiation, unsupported targets, Fault/cancellation; canonical constants, target-independent/specialization hashes, migration/corruption; diagnostics, host/driver redaction, protocol inventory, and public Device IR status remain open under DIR-4501, DBUF-4401 through DBUF-4404, SIMD-4301 through SIMD-4303, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0163"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0163-kernel-device-lowering-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Kernel-to-Device lowering boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer verifier/lowering slices, proof preservation, ownership/effects, numeric/differential semantics, capability/rejection/fallback, source maps, diagnostics, migration, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No Kernel verifier extension, lowerer, mapper, proof carrier, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Kernel source/Profile and Typed Core legal subset; elementwise/index/shape/bounds/local-memory/reduction/vector/tensor/synchronization slices; types/effects/ownership/alias proofs; memory/address spaces/layout/numeric and determinism; Fault/cancellation; capability/required features, target scope, fallback/rejection; pre/postconditions, provenance, identity/spans, resource limits, differential CPU reference, canonical version/migration, diagnostics, host/driver redaction, protocol inventory, and public lowering status remain open under DIR-4502, DIR-4501, KCHK-4101 through KCHK-4105, CPU-4201 through CPU-4203, SIMD-4301 through SIMD-4303, DBUF-4401 through DBUF-4404, GAP-KERNEL-DEVICE-001, GAP-NATIVE-BACKEND-ABI-001, and missing authority.",
+]
+superseded_by = ""

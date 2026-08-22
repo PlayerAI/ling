@@ -399,6 +399,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DIR-4501` | G4 | Device IR Schema | L | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:287`, `docs/status/DIR-4501-AUTHORITY-AUDIT.md` |
 | `DIR-4501-OBSERVATION` | G4 | Internal Device IR schema boundary evidence | S | Done | Accepted `DEC-0162`; see `crates/ling-types/tests/device_ir_schema_evidence.rs` and `docs/status/DIR-4501-OBSERVATION-IMPLEMENTATION-REPORT.md`; Device IR schema semantics remain BlockedSpec |
 | `DIR-4502` | G4 | Kernel Core → Device IR | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:305`, `docs/status/DIR-4502-AUTHORITY-AUDIT.md` |
+| `DIR-4502-OBSERVATION` | G4 | Internal Kernel-to-Device lowering boundary evidence | S | Done | Accepted `DEC-0163`; see `crates/ling-types/tests/kernel_device_lowering_evidence.rs` and `docs/status/DIR-4502-OBSERVATION-IMPLEMENTATION-REPORT.md`; lowering semantics remain BlockedSpec |
 | `DIR-4503` | G4 | Device IR Canonicalization | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:317`, `docs/status/DIR-4503-AUTHORITY-AUDIT.md` |
 | `GPU-4601` | G4 | Backend Spike 与选择 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:328`, `docs/status/GPU-4601-AUTHORITY-AUDIT.md` |
 | `GPU-4602` | G4 | Backend Adapter | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:351`, `docs/status/GPU-4602-AUTHORITY-AUDIT.md` |

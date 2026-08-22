@@ -2626,3 +2626,16 @@ covers = ["DIR-4501 bounded Device IR schema boundary evidence", "test-only Devi
 depends_on = ["DEC-0161", "DEC-0157", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0163"
+title = "Internal Kernel-to-Device lowering boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0163-kernel-device-lowering-boundary-evidence.md"
+covers = ["DIR-4502 bounded Kernel-to-Device lowering boundary evidence", "test-only Kernel-to-Device lowering vocabulary", "lowering boundaries without Kernel/Device/backend semantics"]
+depends_on = ["DEC-0162", "DEC-0157", "DEC-0151", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
