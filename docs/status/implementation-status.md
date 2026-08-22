@@ -201,6 +201,7 @@
 | `INC-1409` | Disposable persistent query cache slice | `G1` | `L` | `Done` | `INC-1408` | `897d9c0a5480ff93417a17a1b3e642bd8967c55f` |
 | `INC-1410` | Incremental performance baseline | `G1` | `M` | `Done` | `INC-1409` | `bcd58bb53a3f9a71613ba287d5a733b7aecd467f` |
 | `KCHK-4101` | Kernel allowed capability matrix | `G4` | `M` | `BlockedSpec` | — | `` |
+| `KCHK-4101-OBSERVATION` | Internal Kernel capability-matrix boundary evidence | `G4` | `S` | `Done` | `DAP-3603-OBSERVATION` | `dfae551210f494cd67dd2815901de833132db952` |
 | `KCHK-4102` | Kernel Effect and Capability checks | `G4` | `L` | `BlockedSpec` | `KCHK-4101` | `` |
 | `KCHK-4103` | Shape, index, and bounds | `G4` | `L` | `BlockedSpec` | `KCHK-4102` | `` |
 | `KCHK-4104` | Alias and parallel-write conflicts | `G4` | `L` | `BlockedSpec` | `KCHK-4103` | `` |
