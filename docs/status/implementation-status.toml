@@ -4331,6 +4331,8 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/decisions/0002-source-position-units.md",
+  "docs/RFC-0004.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -4338,23 +4340,24 @@ spec = [
 ]
 artifacts = [
   "docs/status/LSP-2102-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2102-NEGOTIATION-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records DEC-0002's byte-span/scalar-column authority and distinguishes it from missing LSP encoding negotiation and conversion behavior.",
-  "The audit covers supported encodings, fallback, invalid boundaries, CRLF/BOM/Unicode, document versions, handler-wide conversion, and required deterministic fixtures.",
-  "No LSP position type, negotiation field, conversion API, diagnostic allocation, Semantic ID change, or placeholder editor adapter is added while the authority is absent.",
-  "The future implementation must derive positions from SourceMap and keep compiler byte spans authoritative.",
+  "The audit records the DEC-0002 byte-span/scalar-column authority and the bounded RFC-0004/DEC-0029 negotiation and SourceMap slices.",
+  "The completed children cover supported encodings, first-supported selection, UTF-16 fallback, invalid metadata, strict boundaries, CRLF/BOM/Unicode, and deterministic fixtures.",
+  "The parent remains blocked for document versions, snapshots, stale results, handler-wide diagnostics/Workspace Edit conversion, cancellation, and Stable field lifecycle.",
+  "All position-bearing behavior derives from SourceMap and keeps compiler byte spans authoritative.",
 ]
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2102 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001 and LSP-2101; DEC-0002 explicitly defers UTF-16 projection to a labeled future LSP adapter.",
-  "The current source/index code preserves byte spans and scalar columns but exposes no negotiated editor encoding or public LSP protocol.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "LSP-2102 remains BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001 for the complete editor transaction surface; RFC-0004 and DEC-0029 authorize only the bounded children.",
+  "LSP-2102-SOURCE-MAP and LSP-2102-NEGOTIATION are independently complete and do not expose host paths, revisions, or document identity.",
+  "The parent audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
 
 [[task]]
@@ -4405,6 +4408,52 @@ notes = [
   "This is the dependency-complete source projection slice for LSP-2102. DEC-0029 is Accepted and limits the implementation to an internal ling-source boundary.",
   "The parent LSP-2102 task remains BlockedSpec for snapshot identity, document versions, stale-result/failure responses, handler-wide conversion, and public editor field stability.",
   "Verified and committed as 9e917250bff5bb3ebba1ef02a5f2f6b66ab700de after focused, full offline workspace, governance, status, formatting, and diff gates passed.",
+]
+
+[[task]]
+id = "LSP-2102-NEGOTIATION"
+title = "LSP initialize position-encoding negotiation"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2101-LIFECYCLE", "LSP-2102-SOURCE-MAP"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0004.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/lifecycle.rs",
+  "crates/ling-lsp/tests/position_encoding.rs",
+  "docs/status/LSP-2102-NEGOTIATION-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2102-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "RFC-0004 initialize accepts the optional general.positionEncodings list and returns the selected wire label in capabilities.positionEncoding.",
+  "DEC-0029 first-supported selection, unknown-label filtering, utf-16 fallback, and deterministic process-local state are covered by integration tests.",
+  "Malformed position-encoding metadata is rejected with JSON-RPC invalid-params before lifecycle state changes; no client value is silently coerced.",
+  "The implementation consumes the ling-source PositionEncoding boundary and does not expose SourceId, host paths, revisions, diagnostics, edits, or transaction state.",
+  "No language semantics, diagnostic allocation, schema, Semantic ID, bytecode, VM, CLI, or Unicode 17.0.0 behavior changes are claimed.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working-tree"
+completed = "2026-08-22"
+notes = [
+  "This is the dependency-complete initialize negotiation slice of LSP-2102; the parent remains BlockedSpec for document/snapshot and transaction semantics.",
+  "Existing lifecycle code from RFC-0004 stores the selected encoding; this milestone adds focused conformance evidence and updates the authority traceability.",
 ]
 
 [[task]]

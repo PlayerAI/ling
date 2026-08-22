@@ -55,10 +55,11 @@ errors, unknown-line rejection, and no-clamping behavior.
 
 ## Deferred work
 
-The parent `LSP-2102` task remains `BlockedSpec` until an accepted decision
-defines document lifecycle, snapshot/version preconditions, stale-result and
-failure handling, handler-wide conversion, and public protocol field
-stability. Downstream diagnostics, overlays, edits, and Semantic Transaction
-work remain deferred with that parent gate.
+The source-projection slice is complete under Accepted `DEC-0029`. The parent
+`LSP-2102` task remains `BlockedSpec` for document/snapshot version
+preconditions, stale-result and failure handling, handler-wide conversion, and
+public protocol field stability; its lifecycle and negotiation children are
+separately complete. Downstream diagnostics, Workspace Edits, and Semantic
+Transaction work remain deferred with that parent gate.
 
 Implementation commit: `9e917250bff5bb3ebba1ef02a5f2f6b66ab700de`.
