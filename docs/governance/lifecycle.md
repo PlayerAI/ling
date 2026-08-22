@@ -80,6 +80,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0048` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0048](../decisions/0048-seed-zed-compatibility-matrix-gate.md) |
 | `DEC-0049` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0049](../decisions/0049-seed-lsp-discovery-inventory-gate.md) |
 | `DEC-0050` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0050](../decisions/0050-seed-zed-extension-acceptance-inventory-gate.md) |
+| `DEC-0051` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0051](../decisions/0051-seed-dap-status-inventory-gate.md) |
 
 ## Migration boundary
 

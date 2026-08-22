@@ -17,6 +17,7 @@ const REQUIRED_GATES: &[GateContract] = &[
             "cargo xtask lsp verify",
             "cargo xtask zed verify",
             "cargo xtask zed-extension verify",
+            "cargo xtask dap verify",
             "cargo xtask ci verify",
         ],
     },

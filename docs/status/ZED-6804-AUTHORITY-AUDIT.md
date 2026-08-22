@@ -45,6 +45,10 @@ security/resource policy, platform/offline artifacts, and independent
 verification. DAP remains intentionally non-blocking for language/editor
 support until those conditions exist.
 
+The internal `cargo xtask dap verify` command protects the nine-surface
+inventory and three DAP authority-audit markers without registering DAP,
+starting a debugger, or exposing controls.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

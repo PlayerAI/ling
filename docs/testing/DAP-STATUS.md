@@ -41,10 +41,14 @@ cargo run -p xtask --locked --offline -- status verify
 cargo run -p xtask --locked --offline -- governance check-all
 cargo run -p xtask --locked --offline -- support verify
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
+cargo xtask dap verify
 ```
 
 No DAP process, network request, extension registration, debugger button, or
 system configuration was exercised by this audit.
+The internal `cargo xtask dap verify` command checks this nine-surface matrix
+and the three DAP authority-audit markers only; it does not register DAP or
+claim debugger support.
 
 ## Promotion rules
 

@@ -54,6 +54,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0051"
+title = "Seed DAP status inventory gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0051-seed-dap-status-inventory-gate.md"
+covers = ["internal DAP status inventory", "non-blocking debugger boundary", "ZED-6804-SEED evidence"]
+depends_on = ["RFC-0004", "RFC-0014", "DEC-0050", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0038"
 title = "CLI init command"
 kind = "Decision"

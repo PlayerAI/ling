@@ -532,6 +532,20 @@ symbol = "rejects_acceptance_state_drift"
 feature_ids = ["FTR-SEED-0007"]
 
 [[evidence]]
+id = "EVD-POS-DAP-STATUS"
+kind = "Positive"
+path = "tools/xtask/src/dap_status.rs"
+symbol = "repository_dap_status_is_deterministic"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-DAP-STATUS-DRIFT"
+kind = "Negative"
+path = "tools/xtask/src/dap_status.rs"
+symbol = "rejects_dap_state_drift"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
 id = "EVD-POS-G0-CI-CONTRACT"
 kind = "Positive"
 path = "tools/xtask/src/ci.rs"

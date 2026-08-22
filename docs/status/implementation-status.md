@@ -324,6 +324,7 @@
 | `ZED-6803` | Full Zed Extension Acceptance | `G6` | `L` | `BlockedSpec` | `ZED-6802` | `` |
 | `ZED-6803-SEED` | Seed Zed extension acceptance inventory drift gate | `G6` | `S` | `Done` | `ZED-6802-SEED` | `75b6dd213dc1b07717f8cf2718dbe939176b76ae` |
 | `ZED-6804` | DAP Status | `G6` | `M` | `BlockedSpec` | `ZED-6803` | `` |
+| `ZED-6804-SEED` | Seed DAP status inventory drift gate | `G6` | `S` | `In Progress` | `ZED-6803-SEED` | `` |
 | `ZQ-3201` | Syntax highlighting queries | `G1` | `S` | `Done` | `TS-3108` | `77aab24ff8160e1535ea15b67d5302c1a4bb3fc8` |
 | `ZQ-3202` | Bracket matching queries | `G1` | `S` | `Done` | `ZQ-3201` | `1106b323685ed4910e6580a4347dce47df466208` |
 | `ZQ-3203` | Automatic indentation queries | `G1` | `S` | `Done` | `ZQ-3202` | `a4377450d26374098d95a9bb38520d3e3552dfd7` |

@@ -70,6 +70,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0051"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0051-seed-dap-status-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask dap verify offline and assert nine surfaces: four Unavailable, three Future, one Partial foundation, and one Unsupported.",
+  "Mutate a matrix row/state, policy phrase, audit marker, or stale-name boundary and verify the gate fails closed.",
+  "Run cargo xtask ci verify and locked governance, status, support, and traceability checks without treating the inventory as DAP execution or debugger evidence.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask DAP-status validator and CI preflight; no language, diagnostic, schema, protocol, debugger, runtime, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "DAP wire/lifecycle, capabilities, launch/attach, breakpoints, values, Fault mapping, Task/Actor views, metadata, installation, security, platforms, cancellation, and migration remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0038"
 kind = "Decision"
 status = "Accepted"

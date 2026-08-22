@@ -384,6 +384,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ZED-6802` | G6 | 语言服务器发现/获取 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:442`, `docs/status/ZED-6802-AUTHORITY-AUDIT.md`, `docs/testing/LSP-DISCOVERY-ACQUISITION.md` |
 | `ZED-6803-SEED` | G6 | Seed Zed extension acceptance inventory drift gate | S | Done | Accepted DEC-0050; see `cargo xtask zed-extension verify`, `docs/testing/ZED-EXTENSION-ACCEPTANCE.md`, and `docs/status/ZED-6803-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `ZED-6803` | G6 | 扩展完整功能验收 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:461`, `docs/status/ZED-6803-AUTHORITY-AUDIT.md`, `docs/testing/ZED-EXTENSION-ACCEPTANCE.md` |
+| `ZED-6804-SEED` | G6 | Seed DAP status inventory drift gate | S | In Progress | Accepted DEC-0051; see `cargo xtask dap verify`, `docs/testing/DAP-STATUS.md`, and `docs/status/ZED-6804-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `ZED-6804` | G6 | DAP 状态 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:473`, `docs/status/ZED-6804-AUTHORITY-AUDIT.md`, `docs/testing/DAP-STATUS.md` |
 | `RC-6901` | G6 | RC0 内部冻结 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:479`, `docs/status/RC-6901-AUTHORITY-AUDIT.md`, `docs/testing/RC0-INTERNAL-FREEZE.md` |
 | `RC-6902` | G6 | RC1 公开验证 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:490`, `docs/status/RC-6902-AUTHORITY-AUDIT.md`, `docs/testing/RC1-PUBLIC-VALIDATION.md` |
