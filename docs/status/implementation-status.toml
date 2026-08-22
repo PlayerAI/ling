@@ -5337,6 +5337,59 @@ notes = [
 ]
 
 [[task]]
+id = "LSP-2104-UTF8-EDITS"
+title = "Bounded internal UTF-8 edit application"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2102-SOURCE-MAP", "LSP-2103-OVERLAY"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0023.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0069-lsp-utf8-edit-primitive.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-source/src/lib.rs",
+  "docs/decisions/0069-lsp-utf8-edit-primitive.md",
+  "docs/status/LSP-2104-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2104-UTF8-EDITS-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2104-UTF8-EDITS-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0069 authorizes only immutable in-process original-byte UTF-8 edits; no public LSP schema, position, version, VFS, or transaction behavior is inferred.",
+  "SourceFile::apply_utf8_edit and apply_utf8_edits preserve SourceId/name, reject reversed/out-of-bounds/scalar-interior/CRLF-interior ranges, revalidate UTF-8/BOM/size, and rebuild exact source maps.",
+  "Ordered edits match equivalent full replacement and a failed later edit publishes no new snapshot; Unicode, BOM, CRLF, invalid replacement, and deterministic cases are covered.",
+  "cargo fmt --all, cargo test -p ling-source --all-targets --locked --offline (21 tests), cargo clippy -p ling-source --all-targets --locked --offline -- -D warnings, and authority/lifecycle checks pass.",
+  "The LSP-2104 parent remains BlockedSpec for public range encoding, document versions, stale results, VFS publication, and transaction fixtures.",
+]
+verified_against_commit = "4abc84f81bab339c309a1e5a6227fc7f9483e013"
+completion_commit = "4abc84f81bab339c309a1e5a6227fc7f9483e013"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The bounded source-only child is complete under DEC-0069; the public LSP-2104 target remains BlockedSpec and no protocol-inventory entry is added.",
+]
+
+[[task]]
 id = "LSP-2104"
 title = "LSP incremental text changes"
 state = "BlockedSpec"
