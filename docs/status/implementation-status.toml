@@ -3663,7 +3663,7 @@ notes = [
 [[task]]
 id = "ZED-6804-SEED"
 title = "Seed DAP status inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -3711,10 +3711,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0051 closes only this internal Seed DAP-status child; the parent ZED-6804 gate remains BlockedSpec for DAP protocol, adapter, registration, and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "cf49269ecee39eeb8f3033a5520127f2837f4755"
+completion_commit = "cf49269ecee39eeb8f3033a5520127f2837f4755"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects the non-blocking DAP boundary only; VM/Fault/source-map evidence remains experimental foundation, not debugger protocol behavior.",
   "No adapter, debugger command, extension registration, launch/attach API, network request, system configuration, or placeholder public API is added.",
