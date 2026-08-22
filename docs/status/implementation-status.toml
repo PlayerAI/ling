@@ -12535,6 +12535,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/GC-3302-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3302-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3302-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "crates/ling-concurrency/tests/managed_collector_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12544,6 +12552,7 @@ acceptance = [
   "The audit covers root loss, cycles, safe points, pauses, cancellation/restart, memory limits, deterministic metrics, bounded stress/fuzz behavior, Unicode/CRLF/BOM spans, and interpreter/VM/Native differential fixtures.",
   "No collector algorithm, Managed heap, scheduler hook, root registry, memory-limit API, metrics schema, OOM diagnostic, public protocol, or placeholder G3 API is added while RFC-N303/RFC-0007 and Task/Actor authority are absent.",
   "The future implementation must preserve Seed value semantics, consume accepted types and checked Core only, keep collector strategy and host timing non-semantic, and publish root, cycle, pause, OOM, Profile, and interpreter/VM/Native evidence before exposing v0.3 behavior.",
+  "Accepted DEC-0126 authorizes only test-only Managed collector boundary vocabulary; it does not close collector choice, heap, roots, pauses, safe points, memory limits, OOM, metrics, stress/fuzz, Task/Actor, Profile, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12553,6 +12562,64 @@ notes = [
   "GC-3302 is BlockedSpec by GC-3301, absent RFC-N303/RFC-0007, GAP-OWNERSHIP-MODEL-001, GAP-STRUCTURED-TASK-001, and GAP-ACTOR-AWAIT-REENTRY-001.",
   "The current workspace has no Managed heap, collector, root registry, safepoint, pause event, memory limit, metrics schema, Task/Actor scheduler, or OOM-as-Ling-Fault boundary; host VM cancellation is not a collector contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "GC-3302-OBSERVATION"
+title = "Internal Managed collector boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GC-3301-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0094-task-scheduler-observation-trace.md",
+  "docs/decisions/0121-borrow-await-turn-boundary-evidence.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/tests/managed_collector_evidence.rs",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "docs/status/GC-3302-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GC-3302-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0126 authorizes only test-only Managed collector boundary evidence; no collector, heap, roots, pauses, safe points, scheduler hooks, memory limits, OOM, metrics, stress/fuzz, Profile, FFI, diagnostic, or runtime semantics are claimed.",
+  "The test-local inventory covers forty-three provisional boundaries for collector/heap strategy, roots and lifetimes across stack/closure/global/Task/Actor/callback/Native Island/suspension, reachability/cycles/barriers, safe points/pauses/progress/attachment, cancellation/restart/shutdown, memory limits/allocation/OOM/recovery, metrics, stress/property/fuzz evidence, deterministic bounds, differential evidence, Unicode spans, host opacity, Profiles, and Resource Drop with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no collector, heap, scheduler, metrics schema, diagnostic, protocol, or runtime API is added.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "fc0e9a503d33ea89d9a0372745e22d3bb58ea2e1"
+completion_commit = "fc0e9a503d33ea89d9a0372745e22d3bb58ea2e1"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0126; GC-3302 remains BlockedSpec for collector, heap, roots, safe points, pauses, memory limits, OOM, metrics, stress/fuzz, Task/Actor, Profile, and differential contracts.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

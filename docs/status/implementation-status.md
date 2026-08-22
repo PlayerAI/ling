@@ -134,6 +134,7 @@
 | `GC-3301` | Minimal Managed object model | `G3` | `M` | `BlockedSpec` | — | `` |
 | `GC-3301-OBSERVATION` | Internal Managed object-model boundary evidence | `G3` | `S` | `Done` | `OWN-3207-OBSERVATION` | `9b1f037a0b37f781c39c8b61390bbfe942d580d2` |
 | `GC-3302` | First Managed collector | `G3` | `L` | `BlockedSpec` | `GC-3301` | `` |
+| `GC-3302-OBSERVATION` | Internal Managed collector boundary evidence | `G3` | `S` | `Done` | `GC-3301-OBSERVATION` | `fc0e9a503d33ea89d9a0372745e22d3bb58ea2e1` |
 | `GC-3303` | Managed Native and FFI boundary | `G3` | `L` | `BlockedSpec` | `GC-3302` | `` |
 | `GC-3304` | Managed profile checks | `G3` | `M` | `BlockedSpec` | `GC-3303` | `` |
 | `GOV-0101` | 建立规范权威索引 | `G0` | `S` | `Done` | `BASE-0001` | `7bba2adf9104d7d7f96c7ef50343647f649e229e` |
