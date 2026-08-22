@@ -19043,6 +19043,7 @@ spec = [
   "docs/RFC-0001.md",
   "docs/RFC-0014.md",
   "docs/RFC-0015.md",
+  "docs/decisions/0183-memory-budgets-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -19052,6 +19053,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/BND-5203-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5203-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5203-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0183-memory-budgets-boundary-evidence.md",
+  "crates/ling-types/tests/memory_budgets_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -19071,6 +19080,63 @@ notes = [
   "The repository has no source memory-budget analyzer, ownership/allocator/region model, stack/arena/peak analysis, queue/task/device accounting, target ABI binding, or budget fixtures; VM and bytecode limits remain host/input safety only.",
   "The audit does not reinterpret RFC-0014/0015 runtime limits as cross-backend memory semantics or infer layout, units, proof status, or fallback from plan examples.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; memory-budget work remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "BND-5203-OBSERVATION"
+title = "Internal memory-budget boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BND-5202-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0015.md",
+  "docs/decisions/0182-loop-recursion-checks-boundary-evidence.md",
+  "docs/decisions/0183-memory-budgets-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/memory_budgets_evidence.rs",
+  "docs/decisions/0183-memory-budgets-boundary-evidence.md",
+  "docs/status/BND-5203-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BND-5203-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0183 authorizes only test-local memory-budget boundary evidence; no memory model, analyzer, proof, target binding, runtime guard, fallback, dependency, target, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty memory-budget, allocation/lifetime/alias, queue/task/device, proof/target, fallback, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no analyzer, model, proof, guard, target, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test memory_budgets_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "a4a63c8443db52946029b9cee3a742216831038b"
+completion_commit = "a4a63c8443db52946029b9cee3a742216831038b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0183; BND-5203 remains BlockedSpec for units/layout, allocation/ownership/lifetime/peak semantics, target/ABI binding, proof/estimate states, runtime/fallback behavior, diagnostics, CLI/editor integration, and support claims.",
+  "No memory-budget analyzer, Typed-Core state, allocation model, target schema, runtime guard, dependency, target package, manifest, diagnostic, CLI/LSP action, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "BND-5204"

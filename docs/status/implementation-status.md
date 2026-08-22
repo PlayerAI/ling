@@ -62,6 +62,7 @@
 | `BND-5202` | Loop and Recursion Checks | `G5` | `M` | `BlockedSpec` | `BND-5201` | `` |
 | `BND-5202-OBSERVATION` | Internal loop/recursion checks boundary evidence | `G5` | `S` | `Done` | `BND-5201-OBSERVATION` | `5961d9b7e97882333646020b27c8c3b0b7461243` |
 | `BND-5203` | Memory Budget Analysis | `G5` | `M` | `BlockedSpec` | `BND-5202` | `` |
+| `BND-5203-OBSERVATION` | Internal memory-budget boundary evidence | `G5` | `S` | `Done` | `BND-5202-OBSERVATION` | `a4a63c8443db52946029b9cee3a742216831038b` |
 | `BND-5204` | Resource Budget Diagnostics | `G5` | `M` | `BlockedSpec` | `BND-5203` | `` |
 | `CBK-5901` | Trusted Compiler Route Decision | `G5` | `L` | `BlockedSpec` | `EVD-5804` | `` |
 | `CBK-5902` | Lowering Validator | `G5` | `L` | `BlockedSpec` | `CBK-5901` | `` |
