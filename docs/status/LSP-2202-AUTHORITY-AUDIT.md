@@ -8,7 +8,9 @@ workspace type results, document-version tagging, and replacement of older
 results. These behaviors depend on unaccepted LSP lifecycle, overlay/version,
 position, and diagnostic-adapter contracts.
 
-No push-diagnostics publisher, debounce scheduler, version tag, clear-result
+Accepted DEC-0035 closes only the bounded `LSP-2202-BATCH` child: an internal
+immutable batch over opaque diagnostic IDs and DEC-0034 ordering keys. No
+push-diagnostics publisher, debounce scheduler, version tag, clear-result
 policy, or placeholder LSP handler was added. Existing compiler/CLI diagnostic
 behavior remains unchanged.
 
@@ -35,6 +37,9 @@ The current repository confirms the missing boundary:
   emitted.
 - `ling-db` exposes query revisions and traces internally, but no LSP debounce,
   cancellation, result replacement, or snapshot association exists.
+- The batch child is deliberately disconnected from `LspServer`; it cannot
+  claim `publishDiagnostics`, trigger/debounce, clear/replace, stale-result, or
+  client-version behavior.
 - No fixture defines syntax-only versus workspace-type timing, stale result
   suppression, empty-diagnostics clearing, or related-document publication.
 
@@ -70,7 +75,8 @@ made.
 
 ## Intentionally deferred
 
-`LSP-2202` can begin after lifecycle, overlay/version, position, and diagnostic
-adapter decisions are Accepted. The implementation must publish only
-snapshot-associated results, replace/clear atomically, and keep debounce and
-timing choices out of Ling semantics.
+The parent `LSP-2202` can begin after lifecycle, overlay/version, position, and
+diagnostic adapter decisions are Accepted. The implementation must publish
+only snapshot-associated results, replace/clear atomically, and keep debounce
+and timing choices out of Ling semantics. The `LSP-2202-BATCH` child is complete
+only for DEC-0035's internal immutable collection boundary.

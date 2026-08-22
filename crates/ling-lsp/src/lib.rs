@@ -29,6 +29,10 @@ mod resource;
 // publication remain deferred to the parent LSP contracts.
 #[allow(dead_code)]
 mod diagnostics;
+// DEC-0035 is an internal immutable collection child; public diagnostics
+// publication remains deferred to the parent LSP contracts.
+#[allow(dead_code)]
+mod diagnostic_batch;
 
 /// Version marker for the current Preview lifecycle protocol.
 pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";

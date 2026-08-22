@@ -22,6 +22,29 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0035"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0035-lsp-internal-diagnostic-batch-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify empty batches, DEC-0034 ordering, duplicate/equal-key insertion stability, and repeated immutable output.",
+  "Verify the batch has no JSON, request/version, position, cancellation, suppression, truncation, publication, or diagnostic-allocation state.",
+]
+compatibility_impact = [
+  "Adds only pub(crate) immutable batch values; source, language, diagnostics, schemas, Semantic IDs, CLI, wire methods, VM, and Unicode remain unchanged.",
+]
+unresolved_alternatives = [
+  "Public diagnostic triggers, push/pull, snapshot/version, positions, clear/replace, suppression, caps, stale precedence, and lifecycle require later Accepted LSP-2202/LSP-2203/LSP-2204 authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0034"
 kind = "Decision"
 status = "Accepted"

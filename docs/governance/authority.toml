@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0035"
+title = "LSP internal diagnostic batch boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0035-lsp-internal-diagnostic-batch-boundary.md"
+covers = ["internal LSP diagnostic batches", "immutable ordered diagnostic IDs", "public diagnostics deferral"]
+depends_on = ["DEC-0034", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0034"
 title = "LSP internal diagnostic ordering boundary"
 kind = "Decision"
