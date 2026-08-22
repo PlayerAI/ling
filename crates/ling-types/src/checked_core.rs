@@ -7,7 +7,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use ling_resolve::{DefinitionId, ResolvedProgram};
+use ling_resolve::{DefinitionId, ModuleId, ResolvedProgram};
 use ling_source::Span;
 
 use crate::coherence::{self, CoherenceIndex, ImplId, TraitId};
@@ -57,6 +57,42 @@ impl DictionaryWitness {
     #[must_use]
     pub fn trait_name(&self) -> &str {
         &self.trait_id.name
+    }
+
+    /// Returns the resolved module identity of the declared Trait.
+    #[must_use]
+    pub const fn trait_module(&self) -> ModuleId {
+        self.trait_id.module
+    }
+
+    /// Returns the resolved module identity of the selected implementation.
+    #[must_use]
+    pub const fn implementation_module(&self) -> ModuleId {
+        self.impl_id.module
+    }
+
+    /// Returns the deterministic ordinal of the selected implementation.
+    #[must_use]
+    pub const fn implementation_ordinal(&self) -> usize {
+        self.impl_id.ordinal
+    }
+
+    /// Returns the canonical, path-free receiver spelling used by the witness.
+    #[must_use]
+    pub fn receiver(&self) -> String {
+        coherence::canonical_type(&self.receiver)
+    }
+
+    /// Returns the exact source name that introduced the obligation.
+    #[must_use]
+    pub fn origin_source(&self) -> &str {
+        &self.origin.source_name
+    }
+
+    /// Returns the original UTF-8 span that introduced the obligation.
+    #[must_use]
+    pub const fn origin_span(&self) -> Span {
+        self.origin.span
     }
 
     #[must_use]

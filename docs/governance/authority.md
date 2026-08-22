@@ -1,7 +1,7 @@
 # Ling 规范权威索引 / Specification Authority Index
 
 > 状态：由 `authority.toml` 确定性生成
-> 更新日期：2026-08-21
+> 更新日期：2026-08-22
 > 本索引描述现有权威关系，不新增语言语义。
 
 ## Authority order
@@ -61,6 +61,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `RFC-0019` | RFC | `Accepted` | `1` | `Accepted` | yes | [Seed Interpreter–VM Differential Contract](../RFC-0019.md) | `interpreter–VM logical event equivalence`, `Runtime Fault projection`, `checked snapshot identity`, `bytecode round-trip differential evidence` | `DEC-0012`, `RFC-0014`, `RFC-0015`, `RFC-0016`, `RFC-0017`, `RFC-0018`, `SEMANTICS`, `LANGUAGE` | — |
 | `RFC-0020` | RFC | `Accepted` | `1` | `Accepted` | yes | [Seed VM Robustness, Cancellation, and Resource Evidence](../RFC-0020.md) | `cooperative VM cancellation`, `Runtime Fault cancellation projection`, `bytecode fuzz determinism`, `resource-limit evidence` | `DEC-0013`, `RFC-0014`, `RFC-0018`, `RFC-0019`, `SEMANTICS`, `LANGUAGE` | — |
 | `RFC-0021` | RFC | `Accepted` | `1` | `Accepted` | yes | [Static Trait Dictionary Call Boundary](../RFC-0021.md) | `static Trait.member calls`, `witness-bound member slots`, `interpreter/VM direct-call lowering` | `DEC-0026`, `DEC-0027`, `RFC-0005`, `RFC-0014`, `SEMANTICS`, `LANGUAGE` | — |
+| `RFC-0022` | RFC | `Accepted` | `1` | `Accepted` | yes | [Trait Semantic IDE Projection](../RFC-0022.md) | `x-ling-trait-ide semantic graph extension`, `Trait witness/member source spans`, `deterministic Trait IDE projection identities` | `DEC-0012`, `DEC-0027`, `RFC-0005`, `RFC-0021`, `SEMANTICS`, `LANGUAGE` | — |
 | `SEMANTICS` | Core specification | `Draft` | `0.1` | `Semantics` | no | [Ling core semantics](../SEMANTICS.md) | `language semantics`, `Semantic Graph`, `execution profiles` | — | — |
 | `LANGUAGE` | Design specification | `Draft` | `0.1` | `Language` | no | [Ling language design](../LANGUAGE.md) | `language goals`, `surface design`, `roadmap` | — | — |
 | `CONFORMANCE` | Conformance corpus | `Active` | `0.0.1` | `Conformance` | no | [Ling conformance corpus](../../tests/conformance) | `observable Seed behavior`, `positive and negative cases` | `SEMANTICS`, `LANGUAGE` | — |

@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-21"
+updated = "2026-08-22"
 
 # RFC-0001 and DEC-0001 through DEC-0016 predate the checked section
 # templates. This is a closed migration set; the checker rejects any new
@@ -497,6 +497,30 @@ compatibility_impact = [
 ]
 unresolved_alternatives = [
   "Serialized dictionary tables, generic dictionary threading, blanket implementations, implicit receivers, dynamic dispatch, and trait objects require separate accepted authority.",
+]
+superseded_by = ""
+
+[[record]]
+id = "RFC-0022"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0022.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Serialize and validate the optional x-ling-trait-ide extension for concrete checked witnesses, preserving ordered member identities and original UTF-8 spans.",
+  "Round-trip valid file and package graphs and reject wrong versions, malformed identities, duplicate ordinals, invalid spans, and witness/member mismatches.",
+  "Compare repeated processes, module presentation order, package coordinates, and source presentation names without changing program identity or runtime behavior.",
+]
+compatibility_impact = [
+  "Adds only an optional Experimental x-* extension to existing semantic graph JSON; programs without Trait witnesses remain byte-for-byte unchanged and no LSP/CLI/diagnostic/bytecode contract changes.",
+]
+unresolved_alternatives = [
+  "LSP methods, document synchronization, stale versions, Workspace Edits, rename/repair semantics, generic dispatch, and trait objects require separate accepted authority.",
 ]
 superseded_by = ""
 

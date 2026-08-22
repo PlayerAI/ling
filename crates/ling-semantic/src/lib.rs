@@ -11,11 +11,13 @@ use ling_resolve::{
     DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey, ModuleId, PRELUDE_MODULE,
     ReferenceTarget,
 };
+use ling_source::Span;
 use serde::{Deserialize, Serialize};
 
 pub const SEMANTIC_SCHEMA: &str = "ling.semantic/0.1";
 pub const PROJECT_SEMANTIC_SCHEMA: &str = "ling.semantic/0.2";
 pub const LANGUAGE_VERSION: &str = "0.0.1-dev";
+pub const TRAIT_IDE_EXTENSION_VERSION: &str = "0.1";
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BodyId(String);
@@ -67,6 +69,12 @@ pub struct SemanticGraph {
     #[serde(default)]
     pub nodes: Vec<SemanticNode>,
     pub references: Vec<SemanticReference>,
+    #[serde(
+        rename = "x-ling-trait-ide",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub trait_ide: Option<SemanticTraitIdeProjection>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
@@ -160,6 +168,47 @@ pub struct SemanticReference {
     pub source_id: Option<String>,
     pub target_kind: String,
     pub target: String,
+}
+
+/// Experimental, data-only projection of checked Trait dictionary witnesses.
+///
+/// This is carried as an `x-*` extension so graphs without Trait witnesses
+/// retain their existing wire shape. The projection never enters evaluation.
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTraitIdeProjection {
+    pub version: String,
+    pub witnesses: Vec<SemanticTraitWitness>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTraitWitness {
+    pub trait_id: String,
+    pub trait_name: String,
+    pub trait_module: String,
+    pub receiver: String,
+    pub implementation_id: String,
+    pub implementation_module: String,
+    pub obligation_order: u32,
+    pub members: Vec<SemanticTraitMember>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTraitMember {
+    pub ordinal: u32,
+    pub name: String,
+    pub trait_definition_id: String,
+    pub implementation_definition_id: String,
+    pub trait_source: String,
+    pub trait_span: SemanticByteSpan,
+    pub implementation_source: String,
+    pub implementation_span: SemanticByteSpan,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticByteSpan {
+    pub source: u32,
+    pub start: u32,
+    pub end: u32,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -326,6 +375,12 @@ impl ProjectProgramSnapshot {
     pub fn json(&self) -> &str {
         &self.json
     }
+
+    /// Returns the optional experimental Trait IDE projection.
+    #[must_use]
+    pub fn trait_ide(&self) -> Option<&SemanticTraitIdeProjection> {
+        self.graph.trait_ide.as_ref()
+    }
 }
 
 impl ProgramSnapshot {
@@ -352,6 +407,12 @@ impl ProgramSnapshot {
     #[must_use]
     pub fn json(&self) -> &str {
         &self.json
+    }
+
+    /// Returns the optional experimental Trait IDE projection.
+    #[must_use]
+    pub fn trait_ide(&self) -> Option<&SemanticTraitIdeProjection> {
+        self.graph.trait_ide.as_ref()
     }
 
     #[must_use]
@@ -644,6 +705,22 @@ pub enum SemanticReadErrorKind {
     PackageCoordinateMismatch {
         entity: String,
     },
+    InvalidTraitIdeVersion {
+        version: String,
+    },
+    InvalidTraitIdeIdentity {
+        value: String,
+    },
+    InvalidTraitIdeSpan,
+    DuplicateTraitIdeOrdinal {
+        ordinal: u32,
+    },
+    UnsortedTraitIdeOrdinal {
+        ordinal: u32,
+    },
+    TraitIdeMismatch {
+        value: String,
+    },
 }
 
 impl fmt::Display for SemanticReadError {
@@ -796,6 +873,7 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
                 })
             })
             .collect(),
+        trait_ide: None,
     };
     validate_graph(&graph, IdentityMode::Seed)?;
     for (module_index, module) in model.modules.iter().enumerate() {
@@ -1324,7 +1402,7 @@ fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), Seman
         }
         if !matches!(
             definition.kind.as_str(),
-            "value" | "type" | "constructor" | "builtin"
+            "value" | "type" | "constructor" | "builtin" | "trait-member"
         ) {
             return Err(SemanticReadError {
                 kind: SemanticReadErrorKind::InvalidDefinitionKind {
@@ -1554,6 +1632,140 @@ fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), Seman
                     path: format!("$.references[{index}].target_kind"),
                 });
             }
+        }
+    }
+    validate_trait_ide(graph)?;
+    Ok(())
+}
+
+fn validate_trait_ide(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
+    let projection = graph.trait_ide.as_ref();
+    let Some(projection) = projection else {
+        return Ok(());
+    };
+    if projection.version != TRAIT_IDE_EXTENSION_VERSION {
+        return Err(SemanticReadError {
+            kind: SemanticReadErrorKind::InvalidTraitIdeVersion {
+                version: projection.version.clone(),
+            },
+            path: "$.x-ling-trait-ide.version".to_owned(),
+        });
+    }
+    let mut witness_ordinals = BTreeSet::new();
+    let mut previous_witness = None;
+    for (witness_index, witness) in projection.witnesses.iter().enumerate() {
+        validate_id(
+            &witness.trait_id,
+            &format!("$.x-ling-trait-ide.witnesses[{witness_index}].trait_id"),
+        )?;
+        validate_id(
+            &witness.implementation_id,
+            &format!("$.x-ling-trait-ide.witnesses[{witness_index}].implementation_id"),
+        )?;
+        if witness.trait_name.is_empty()
+            || witness.trait_module.is_empty()
+            || witness.receiver.is_empty()
+            || witness.implementation_module.is_empty()
+        {
+            return Err(SemanticReadError {
+                kind: SemanticReadErrorKind::InvalidTraitIdeIdentity {
+                    value: witness.trait_name.clone(),
+                },
+                path: format!("$.x-ling-trait-ide.witnesses[{witness_index}]"),
+            });
+        }
+        if !witness_ordinals.insert(witness.obligation_order) {
+            return Err(SemanticReadError {
+                kind: SemanticReadErrorKind::DuplicateTraitIdeOrdinal {
+                    ordinal: witness.obligation_order,
+                },
+                path: format!("$.x-ling-trait-ide.witnesses[{witness_index}].obligation_order"),
+            });
+        }
+        if previous_witness.is_some_and(|previous| previous > witness.obligation_order) {
+            return Err(SemanticReadError {
+                kind: SemanticReadErrorKind::UnsortedTraitIdeOrdinal {
+                    ordinal: witness.obligation_order,
+                },
+                path: format!("$.x-ling-trait-ide.witnesses[{witness_index}].obligation_order"),
+            });
+        }
+        previous_witness = Some(witness.obligation_order);
+
+        let mut member_ordinals = BTreeSet::new();
+        let mut previous_member = None;
+        for (member_index, member) in witness.members.iter().enumerate() {
+            validate_id(
+                &member.trait_definition_id,
+                &format!(
+                    "$.x-ling-trait-ide.witnesses[{witness_index}].members[{member_index}].trait_definition_id"
+                ),
+            )?;
+            validate_id(
+                &member.implementation_definition_id,
+                &format!(
+                    "$.x-ling-trait-ide.witnesses[{witness_index}].members[{member_index}].implementation_definition_id"
+                ),
+            )?;
+            if !graph
+                .definitions
+                .iter()
+                .any(|definition| definition.definition_id == member.trait_definition_id)
+                || !graph.definitions.iter().any(|definition| {
+                    definition.definition_id == member.implementation_definition_id
+                })
+            {
+                return Err(SemanticReadError {
+                    kind: SemanticReadErrorKind::TraitIdeMismatch {
+                        value: member.name.clone(),
+                    },
+                    path: format!(
+                        "$.x-ling-trait-ide.witnesses[{witness_index}].members[{member_index}]"
+                    ),
+                });
+            }
+            if member.name.is_empty()
+                || member.trait_source.is_empty()
+                || member.implementation_source.is_empty()
+                || member.trait_span.start > member.trait_span.end
+                || member.implementation_span.start > member.implementation_span.end
+            {
+                return Err(SemanticReadError {
+                    kind: SemanticReadErrorKind::InvalidTraitIdeSpan,
+                    path: format!(
+                        "$.x-ling-trait-ide.witnesses[{witness_index}].members[{member_index}]"
+                    ),
+                });
+            }
+            if !member_ordinals.insert(member.ordinal) {
+                return Err(SemanticReadError {
+                    kind: SemanticReadErrorKind::DuplicateTraitIdeOrdinal {
+                        ordinal: member.ordinal,
+                    },
+                    path: format!(
+                        "$.x-ling-trait-ide.witnesses[{witness_index}].members[{member_index}].ordinal"
+                    ),
+                });
+            }
+            if previous_member.is_some_and(|previous| previous > member.ordinal) {
+                return Err(SemanticReadError {
+                    kind: SemanticReadErrorKind::UnsortedTraitIdeOrdinal {
+                        ordinal: member.ordinal,
+                    },
+                    path: format!(
+                        "$.x-ling-trait-ide.witnesses[{witness_index}].members[{member_index}].ordinal"
+                    ),
+                });
+            }
+            previous_member = Some(member.ordinal);
+        }
+        if witness.members.is_empty() {
+            return Err(SemanticReadError {
+                kind: SemanticReadErrorKind::TraitIdeMismatch {
+                    value: witness.trait_id.clone(),
+                },
+                path: format!("$.x-ling-trait-ide.witnesses[{witness_index}].members"),
+            });
         }
     }
     Ok(())
@@ -1818,6 +2030,7 @@ impl SnapshotBuilder {
         let definitions = self.definitions(&body_ids);
         let nodes = self.nodes();
         let references = self.references();
+        let trait_ide = self.trait_ide();
         let graph = SemanticGraph {
             schema: SEMANTIC_SCHEMA.to_owned(),
             language_version: LANGUAGE_VERSION.to_owned(),
@@ -1839,6 +2052,7 @@ impl SnapshotBuilder {
             definitions,
             nodes,
             references,
+            trait_ide,
         };
         let json = serde_json::to_string(&graph).map_err(SnapshotError)?;
         Ok(ProgramSnapshot {
@@ -1857,6 +2071,7 @@ impl SnapshotBuilder {
         let definitions = self.definitions(&body_ids);
         let nodes = self.nodes();
         let references = self.references();
+        let trait_ide = self.trait_ide();
         let project = self
             .checked
             .typed()
@@ -1897,6 +2112,7 @@ impl SnapshotBuilder {
             definitions,
             nodes,
             references,
+            trait_ide,
         };
         let json = serde_json::to_string(&graph).map_err(ProjectSnapshotError::Serialization)?;
         Ok(ProjectProgramSnapshot {
@@ -1958,6 +2174,105 @@ impl SnapshotBuilder {
             encoder.string(body.as_str());
         }
         ProgramId(hash(encoder.finish()))
+    }
+
+    fn trait_ide(&self) -> Option<SemanticTraitIdeProjection> {
+        let typed = self.checked.typed();
+        let dictionary = typed.dictionary();
+        if dictionary.witnesses().is_empty() {
+            return None;
+        }
+
+        let resolved = typed.resolved();
+        let mut witnesses = Vec::with_capacity(dictionary.witnesses().len());
+        for witness in dictionary.witnesses() {
+            let trait_module = resolved
+                .module(witness.trait_module())
+                .expect("checked Trait witness references an existing Trait module");
+            let trait_module_name = trait_module.hir.module.name.normalized();
+            let trait_name = witness.trait_name().to_owned();
+            let package = trait_module.package.as_ref();
+            let receiver = witness.receiver();
+            let mut members = Vec::with_capacity(witness.members().len());
+            let mut trait_definition_ids = Vec::with_capacity(witness.members().len());
+            let mut implementation_definition_ids = Vec::with_capacity(witness.members().len());
+
+            for member in witness.members() {
+                let trait_member = resolved
+                    .trait_members()
+                    .values()
+                    .find(|candidate| {
+                        candidate.module == witness.trait_module()
+                            && candidate.trait_name == trait_name
+                            && candidate.member_name == member.name()
+                            && candidate.ordinal == member.ordinal()
+                    })
+                    .expect("checked Trait witness references an existing Trait member");
+                let implementation_member = resolved
+                    .impl_member(member.definition())
+                    .expect("checked Trait witness references an existing implementation member");
+                let ordinal = u32::try_from(member.ordinal()).unwrap_or(u32::MAX);
+                trait_definition_ids.push(trait_member.definition.as_str().to_owned());
+                implementation_definition_ids.push(member.definition().as_str().to_owned());
+                members.push(SemanticTraitMember {
+                    ordinal,
+                    name: member.name().to_owned(),
+                    trait_definition_id: trait_member.definition.as_str().to_owned(),
+                    implementation_definition_id: member.definition().as_str().to_owned(),
+                    trait_source: trait_member.source_name.clone(),
+                    trait_span: semantic_byte_span(trait_member.span),
+                    implementation_source: implementation_member.source_name.clone(),
+                    implementation_span: semantic_byte_span(implementation_member.span),
+                });
+            }
+
+            let trait_id = trait_ide_id(
+                self.mode,
+                package,
+                &trait_module_name,
+                &trait_name,
+                &trait_definition_ids,
+            );
+            let first_implementation_definition = witness
+                .members()
+                .first()
+                .expect("checked Trait witness contains at least one member")
+                .definition();
+            let implementation_member = resolved
+                .impl_member(first_implementation_definition)
+                .expect("checked Trait witness references an existing implementation member");
+            let implementation_module = resolved
+                .module(implementation_member.module)
+                .expect("checked implementation member references an existing module");
+            let implementation_module_name = implementation_module.hir.module.name.normalized();
+            let implementation_id = implementation_ide_id(
+                self.mode,
+                resolved
+                    .module(implementation_member.module)
+                    .and_then(|module| module.package.as_ref()),
+                &implementation_module_name,
+                &trait_id,
+                &receiver,
+                &implementation_definition_ids,
+            );
+            let obligation_order = u32::try_from(witness.obligation_order()).unwrap_or(u32::MAX);
+            witnesses.push(SemanticTraitWitness {
+                trait_id,
+                trait_name,
+                trait_module: trait_module_name,
+                receiver,
+                implementation_id,
+                implementation_module: implementation_module_name,
+                obligation_order,
+                members,
+            });
+        }
+
+        witnesses.sort_by_key(|witness| witness.obligation_order);
+        Some(SemanticTraitIdeProjection {
+            version: TRAIT_IDE_EXTENSION_VERSION.to_owned(),
+            witnesses,
+        })
     }
 
     fn modules(&self) -> Vec<SemanticModule> {
@@ -2258,6 +2573,47 @@ impl SnapshotBuilder {
                     definition_id.as_str(),
                     &definition.value,
                 );
+            }
+            for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
+                for (member_ordinal, member) in implementation.members.iter().enumerate() {
+                    let Some(member_id) = resolved
+                        .impl_members()
+                        .values()
+                        .find(|candidate| {
+                            candidate.module == module.id
+                                && candidate.impl_ordinal == impl_ordinal
+                                && candidate.member_ordinal == member_ordinal
+                                && candidate.member_name == member.name.normalized
+                        })
+                        .map(|candidate| candidate.definition.clone())
+                    else {
+                        continue;
+                    };
+                    let function_id = semantic_node_id(
+                        self.mode,
+                        module.package.as_ref(),
+                        "function",
+                        &module_name,
+                        &format!("definition:{member_id}"),
+                    );
+                    for (ordinal, parameter) in member.parameters.iter().enumerate() {
+                        add_parameter_and_pattern_nodes(
+                            &mut nodes,
+                            typed,
+                            context,
+                            &function_id,
+                            ordinal,
+                            parameter,
+                        );
+                    }
+                    add_expression_nodes(
+                        &mut nodes,
+                        &self.checked,
+                        context,
+                        member_id.as_str(),
+                        &member.value,
+                    );
+                }
             }
         }
         nodes.sort_by(|left, right| left.node_id.cmp(&right.node_id));
@@ -3403,6 +3759,60 @@ fn collect_expression_reference_sources(
     }
 }
 
+fn semantic_byte_span(span: Span) -> SemanticByteSpan {
+    SemanticByteSpan {
+        source: span.source().get(),
+        start: span.start().get(),
+        end: span.end().get(),
+    }
+}
+
+fn trait_ide_id(
+    mode: IdentityMode,
+    package: Option<&PackageIdentity>,
+    module: &str,
+    name: &str,
+    member_definition_ids: &[String],
+) -> String {
+    let mut encoder = Encoder::new("ling.trait-ide-id/v1");
+    encoder.string(LANGUAGE_VERSION);
+    encoder.string(mode.schema());
+    encode_optional_package(package, &mut encoder);
+    encoder.string(module);
+    encoder.string(name);
+    encoder.strings(member_definition_ids);
+    hash(encoder.finish())
+}
+
+fn implementation_ide_id(
+    mode: IdentityMode,
+    package: Option<&PackageIdentity>,
+    module: &str,
+    trait_id: &str,
+    receiver: &str,
+    member_definition_ids: &[String],
+) -> String {
+    let mut encoder = Encoder::new("ling.impl-ide-id/v1");
+    encoder.string(LANGUAGE_VERSION);
+    encoder.string(mode.schema());
+    encode_optional_package(package, &mut encoder);
+    encoder.string(module);
+    encoder.string(trait_id);
+    encoder.string(receiver);
+    encoder.strings(member_definition_ids);
+    hash(encoder.finish())
+}
+
+fn encode_optional_package(package: Option<&PackageIdentity>, encoder: &mut Encoder) {
+    match package {
+        Some(package) => {
+            encoder.bool(true);
+            encode_package_identity_to_encoder(package, encoder);
+        }
+        None => encoder.bool(false),
+    }
+}
+
 fn definition_kind(kind: DefinitionKind) -> &'static str {
     match kind {
         DefinitionKind::Value => "value",
@@ -3646,6 +4056,100 @@ mod tests {
         );
         assert_eq!(first.program_id(), repeat.program_id());
         assert_ne!(first.program_id(), second.program_id());
+    }
+
+    #[test]
+    fn trait_ide_projection_preserves_selected_ids_and_original_spans() {
+        let source = concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main () = Renderable.render { name = \"Ling\" }\n",
+        );
+        let snapshot = snapshot(source);
+        let projection = snapshot
+            .trait_ide()
+            .expect("Trait witness projection is present");
+        assert_eq!(projection.version, TRAIT_IDE_EXTENSION_VERSION);
+        assert_eq!(projection.witnesses.len(), 1);
+        let witness = &projection.witnesses[0];
+        assert_eq!(witness.trait_name, "Renderable");
+        assert_eq!(witness.trait_module, "Main");
+        assert_eq!(witness.implementation_module, "Main");
+        assert_eq!(witness.obligation_order, 0);
+        assert_eq!(witness.members.len(), 1);
+        let member = &witness.members[0];
+        assert_eq!(member.ordinal, 0);
+        assert_eq!(member.name, "render");
+        assert!(member.trait_span.start < member.trait_span.end);
+        assert!(member.implementation_span.start < member.implementation_span.end);
+        assert!(member.trait_source.ends_with("test.ling"));
+        assert!(member.implementation_source.ends_with("test.ling"));
+        assert!(
+            member
+                .trait_definition_id
+                .starts_with("experimental:blake3:")
+        );
+        assert!(
+            member
+                .implementation_definition_id
+                .starts_with("experimental:blake3:")
+        );
+        assert!(witness.trait_id.starts_with("experimental:blake3:"));
+        assert!(
+            witness
+                .implementation_id
+                .starts_with("experimental:blake3:")
+        );
+
+        let decoded = read_json(snapshot.json()).expect("projection round-trips");
+        assert_eq!(decoded, snapshot.graph().clone());
+        let alternate_name = snapshot_named("different-host-name.ling", source);
+        assert_eq!(snapshot.program_id(), alternate_name.program_id());
+        assert_eq!(
+            snapshot.trait_ide().unwrap().witnesses[0].trait_id,
+            alternate_name.trait_ide().unwrap().witnesses[0].trait_id
+        );
+        assert_ne!(
+            snapshot.trait_ide().unwrap().witnesses[0].members[0].trait_source,
+            alternate_name.trait_ide().unwrap().witnesses[0].members[0].trait_source
+        );
+    }
+
+    #[test]
+    fn trait_ide_projection_rejects_bad_extension_version_and_spans() {
+        let snapshot = snapshot(concat!(
+            "module Main\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main () = Renderable.render { name = \"Ling\" }\n",
+        ));
+        let mut version: serde_json::Value =
+            serde_json::from_str(snapshot.json()).expect("snapshot JSON");
+        version["x-ling-trait-ide"]["version"] = serde_json::json!("0.2");
+        let error = read_json(&serde_json::to_string(&version).unwrap()).expect_err("version");
+        assert!(matches!(
+            error.kind,
+            SemanticReadErrorKind::InvalidTraitIdeVersion { .. }
+        ));
+
+        let mut span: serde_json::Value =
+            serde_json::from_str(snapshot.json()).expect("snapshot JSON");
+        span["x-ling-trait-ide"]["witnesses"][0]["members"][0]["trait_span"]["start"] =
+            serde_json::json!(99);
+        span["x-ling-trait-ide"]["witnesses"][0]["members"][0]["trait_span"]["end"] =
+            serde_json::json!(1);
+        let error = read_json(&serde_json::to_string(&span).unwrap()).expect_err("span");
+        assert!(matches!(
+            error.kind,
+            SemanticReadErrorKind::InvalidTraitIdeSpan
+        ));
     }
 
     #[test]

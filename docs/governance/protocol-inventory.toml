@@ -150,10 +150,10 @@ writer_policy = "Emit deterministic JSON from checked Typed Core with canonical 
 unknown_field_policy = "Accept x-* extension fields at checked object levels and reject unknown core fields."
 migration_tool = "None; schema or identity changes require an explicit version upgrade, migration notes, and regenerated fixtures."
 fixtures = ["crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs", "schemas/semantic/0.1/schema.json", "schemas/semantic/0.1/valid", "schemas/semantic/0.1/invalid", "schemas/semantic/0.1/canonical"]
-sources = ["crates/ling-semantic/src/lib.rs", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "schemas/registry.toml", "schemas/semantic/0.1/schema.json", "tools/xtask/src/schema.rs"]
+sources = ["crates/ling-semantic/src/lib.rs", "docs/RFC-0022.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "schemas/registry.toml", "schemas/semantic/0.1/schema.json", "tools/xtask/src/schema.rs"]
 version_markers = ["ling.semantic/0.1"]
-authority = ["DEC-0012"]
-notes = ["GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open."]
+authority = ["DEC-0012", "RFC-0022"]
+notes = ["GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.", "RFC-0022 defines the optional Experimental x-ling-trait-ide witness/member projection; it does not add a core field or an LSP wire method."]
 
 [[protocol]]
 id = "PROTO-PACKAGE-SEMANTIC-GRAPH-JSON"

@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-21"
+updated = "2026-08-22"
 
 [[document]]
 id = "RFC-0001"
@@ -518,6 +518,19 @@ authority = "Accepted"
 path = "docs/RFC-0021.md"
 covers = ["static Trait.member calls", "witness-bound member slots", "interpreter/VM direct-call lowering"]
 depends_on = ["DEC-0026", "DEC-0027", "RFC-0005", "RFC-0014", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "RFC-0022"
+title = "Trait Semantic IDE Projection"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0022.md"
+covers = ["x-ling-trait-ide semantic graph extension", "Trait witness/member source spans", "deterministic Trait IDE projection identities"]
+depends_on = ["DEC-0012", "DEC-0027", "RFC-0005", "RFC-0021", "SEMANTICS", "LANGUAGE"]
 supersedes = []
 stable_basis = true
 

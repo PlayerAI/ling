@@ -2,14 +2,15 @@
 
 ## Outcome
 
-`TRAIT-1308` is correctly recorded as `BlockedSpec`. It is the next
-execution-plan item after the dictionary-lowering boundary, but the accepted
-authorities do not yet define the public editor projection needed to implement
-hover, go-to implementation/trait, member completion, identity-preserving
-rename, or safe constraint fixes.
+`TRAIT-1308` remains `BlockedSpec` for the full IDE/LSP surface. Accepted
+RFC-0022 authorizes and the child task `TRAIT-1308-PROJECTION` implements only a
+bounded, data-only `x-ling-trait-ide` extension on the existing Semantic Graph.
+It exposes checked dictionary-witness identities and original source spans; it
+does not implement hover, go-to implementation/trait, completion,
+identity-preserving rename, repairs, or LSP transactions.
 
-No IDE adapter, LSP field, public Trait diagnostic, Semantic ID rule,
-placeholder repair, or editor-facing method table was added. Existing Seed
+No IDE adapter, LSP request/response method, public Trait diagnostic,
+placeholder repair, or Stable 1.0 editor claim was added. Existing v0.0.1 Seed
 language and editor behavior remains unchanged.
 
 ## Normative traceability
@@ -25,8 +26,11 @@ language and editor behavior remains unchanged.
   decisions and require any new public projection to be versioned with resolved
   implementation identity.
 - Accepted DEC-0027 keeps the witness module crate-private and explicitly
-  defers `TypedProgram`, the Semantic Graph projection, public diagnostics, and
-  CLI/LSP integration to later authority.
+  defers public diagnostics and CLI/LSP integration to later authority.
+- Accepted RFC-0022 §§1–8 defines the optional `x-ling-trait-ide` projection,
+  deterministic path-free Trait/implementation identities, member definition
+  mapping, original UTF-8 byte spans, structural reader validation, and the
+  explicit non-goals for the remaining IDE/LSP surface.
 - `docs/SEMANTICS.md` requires stable Semantic IDs, original UTF-8 spans, and
   atomic Semantic Transactions; it does not define a Trait-specific editor
   schema or repair contract. Trait syntax remains outside the v0.0.1 Seed
@@ -34,66 +38,64 @@ language and editor behavior remains unchanged.
 
 ## Current interface evidence
 
-The current repository confirms that the IDE boundary is missing:
+The current repository confirms that only the bounded graph projection exists:
 
-- `ling-types::checked_core` contains internal witness identity only; it is not
-  attached to `TypedProgram`, `CheckedProgram`, `ProgramSnapshot`, or a public
-  Semantic Graph snapshot.
-- The witness stores ordered member name evidence, not callable definition or
-  stable editor method-slot identity. An IDE cannot safely navigate to or
-  complete a member from that evidence alone.
-- The current checker rejects Trait-bearing programs at the Seed boundary, so
-  there is no accepted checked diagnostic stream from which a Trait hover or
-  constraint repair could be projected.
+- `ling-types::checked_core` now supplies the immutable witness consumed by
+  `ling-semantic`; `ProgramSnapshot` and `ProjectProgramSnapshot` optionally
+  carry the RFC-0022 projection with stable member definition IDs and original
+  source spans.
+- The projection is data-only. It does not define callable method-slot
+  requests, hover rendering, completion ranking, rename edits, or repair facts.
+- The v0.0.1 support matrix is unchanged; the v0.1 static Trait slice is an
+  accepted implementation boundary and is not a claim that the full editor
+  protocol exists.
 - The open governance gaps
   `GAP-LSP-TRANSACTION-PROTOCOL-001` and
   `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leave position/snapshot/version
   preconditions, Workspace Edit fields, and Stable versus Experimental
   compatibility unresolved.
-- `GAP-TRAIT-COHERENCE-001` records the still-unintegrated Trait projection and
-  lowering boundary. No accepted protocol inventory entry or executable editor
-  fixture authorizes a Trait-specific public surface.
+- `GAP-TRAIT-COHERENCE-001` still records the unintegrated full Trait IDE/LSP
+  surface; RFC-0022 and the child projection resolve only its graph-data
+  sub-slice.
 
 ## Required authority before implementation
 
-An implementation-ready decision or RFC must define, at minimum:
+The remaining parent task requires accepted authority for, at minimum:
 
-1. the versioned Semantic Graph projection for Trait declarations,
-   obligations, selected implementations, ordered members, and their stable
-   Semantic IDs;
-2. the identity and source-span mapping from each witness member to an
-   executable definition or method slot, including go-to and rename behavior
-   across packages and localized aliases;
-3. bilingual registered diagnostic codes and structured Facts/repairs for
+1. hover, completion, definition, implementation, and rename request/response
+   schemas, including position encoding, document-version preconditions,
+   transaction atomicity, and Stable versus Experimental lifecycle labels;
+2. bilingual registered diagnostic codes and structured Facts/repairs for
    missing, ambiguous, orphan, overlapping, and unsatisfied constraints,
    including the rule that repairs cannot synthesize an unsafe orphan impl;
-4. hover, completion, definition, implementation, and rename request/response
-   schemas, position encoding, document-version preconditions, transaction
-   atomicity, and Stable versus Experimental lifecycle labels; and
-5. positive, negative, deterministic, cross-package, stale-document, rename,
+3. cross-package identity and source-span behavior for editor operations,
+   without re-running Trait selection or exposing host paths; and
+4. positive, negative, deterministic, cross-package, stale-document, rename,
    and editor/semantic differential fixtures.
 
 Until those decisions are Accepted, changing an LSP/IDE crate or adding
-Trait-specific fields to an existing protocol would invent public behavior,
-leak unstable identity, or claim support that the v0.0.1 matrix explicitly
-does not authorize.
+request/response fields would invent public behavior, leak unresolved
+transaction semantics, or claim support that the v0.0.1 matrix explicitly does
+not authorize.
 
 ## Evidence and compatibility
 
 This audit was checked against `docs/RFC-0005.md`,
+`docs/RFC-0022.md`,
 `docs/decisions/0027-trait-checked-core-dictionary-witness.md`,
 `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
 `docs/governance/gap-register.toml`,
 `docs/governance/protocol-inventory.toml`,
 `docs/ling_execution_plan/03-G1-V0.1-LIVING.md`, and the current
 `ling-types`, `ling-effects`, `ling-semantic`, and editor-facing source tree.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, bytecode, VM, or Unicode 17.0.0 claim is made.
+The bounded projection changed the optional Semantic Graph extension only; no
+diagnostic allocation, LSP wire method, bytecode, VM, or Unicode 17.0.0
+contract changed.
 
 ## Intentionally deferred
 
-`TRAIT-1308` can begin after the Trait semantic projection, method identity,
-diagnostic registry, and LSP/Semantic Transaction contracts are Accepted and
-their fixtures exist. Its first implementation should project the approved
-immutable witness and stable identities; it must not re-run Trait selection or
-invent repair behavior.
+The child projection is complete under RFC-0022. The parent `TRAIT-1308`
+remains deferred until the full method identity/query surface, diagnostic
+registry, LSP/Semantic Transaction contracts, and their fixtures are Accepted.
+Any follow-on implementation must consume the projected immutable witness and
+must not re-run Trait selection or invent repair behavior.
