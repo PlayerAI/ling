@@ -103,6 +103,7 @@
 | `DBUF-4403` | Transfer Effect | `G4` | `M` | `BlockedSpec` | `DBUF-4402` | `` |
 | `DBUF-4403-OBSERVATION` | Internal Transfer Effect boundary evidence | `G4` | `S` | `Done` | `DBUF-4402-OBSERVATION` | `97b93d7352f4c0e4c32a439eb26768bf6aaeaaf4` |
 | `DBUF-4404` | Device Synchronization Model | `G4` | `M` | `BlockedSpec` | `DBUF-4403` | `` |
+| `DBUF-4404-OBSERVATION` | Internal Device synchronization boundary evidence | `G4` | `S` | `Done` | `DBUF-4403-OBSERVATION` | `dfcec89a334e2818771efe174e0db62c339bd2c3` |
 | `DIFF-3701` | Interpreter/VM/Native differential harness | `G3` | `L` | `BlockedSpec` | `FFI-3605` | `` |
 | `DIFF-3701-OBSERVATION` | Internal differential-harness boundary evidence | `G3` | `S` | `Done` | `FFI-3605-OBSERVATION` | `4d43fa0a3ed9144494b82bdc0dbb3e15ab2daf47` |
 | `DIFF-3702` | Allowed-difference registry | `G3` | `M` | `BlockedSpec` | `DIFF-3701` | `` |
