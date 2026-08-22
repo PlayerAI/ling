@@ -288,6 +288,7 @@
 | `NODE-5301` | Node Syntax and Semantics | `G5` | `L` | `BlockedSpec` | `BND-5204` | `` |
 | `NODE-5301-OBSERVATION` | Internal Node syntax/semantics boundary evidence | `G5` | `S` | `Done` | `BND-5204-OBSERVATION` | `157e3cf79e6d35af6eae4568b55138f97257c1f4` |
 | `NODE-5302` | Node Checked Core | `G5` | `M` | `BlockedSpec` | `NODE-5301` | `` |
+| `NODE-5302-OBSERVATION` | Internal Node Checked Core boundary evidence | `G5` | `S` | `Done` | `NODE-5301-OBSERVATION` | `4008b1ca42444f080d40ac71708ba7bebd9de00e` |
 | `NODE-5303` | Static Node Scheduling | `G5` | `M` | `BlockedSpec` | `NODE-5302` | `` |
 | `NODE-5304` | Virtual-Time Reference Runtime | `G5` | `M` | `BlockedSpec` | `NODE-5303` | `` |
 | `NODE-5305` | Native Node Runtime | `G5` | `L` | `BlockedSpec` | `NODE-5304` | `` |
