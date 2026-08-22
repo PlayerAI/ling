@@ -4619,6 +4619,7 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0033-lsp-internal-byte-accounting-boundary.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -5843,12 +5844,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/LSP-2504-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2504-BYTE-ACCOUNTING-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The audit records the missing resource units/accounting, defaults/configuration, hard versus soft limits, failure precedence, cleanup, no-partial-publication, diagnostics, and protocol lifecycle contracts.",
   "The audit distinguishes RFC-0002 project and bytecode limits, DEC-0019 internal query bounds, and RFC-0020 VM cancellation/resource behavior from the missing LSP quotas and tool diagnostic.",
+  "Accepted DEC-0033 closes only the internal deterministic UTF-8-byte accounting child; the parent remains blocked for public resource behavior.",
   "The audit covers exact-boundary/over-limit, per-request versus aggregate, concurrent requests, dependency/generated files, partial result suppression, Unicode/CRLF/BOM bytes, cancellation/stale races, deterministic behavior, retry, and no-OOM fixtures.",
   "No LSP limit constants, quota manager, tool diagnostic, request rejection response, protocol schema, diagnostic allocation, or placeholder server is added while the authority is absent.",
   "The future implementation must use explicit versioned units and quotas, fail before partial publication, return registered bilingual tool diagnostics, and remain bounded and deterministic under adversarial input.",
@@ -5858,9 +5861,54 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2504 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2201, LSP-2501/LSP-2502/LSP-2503, and the missing LSP quota/diagnostic contract; existing project/bytecode limits are domain-specific.",
-  "No LSP resource accounting, request/queue quota, result-size policy, bilingual tool diagnostic, capability/configuration version, or protocol inventory entry exists.",
+  "LSP-2504 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2201, LSP-2501/LSP-2502/LSP-2503, and the missing LSP quota/diagnostic contract; DEC-0033 is internal only and existing project/bytecode limits are domain-specific.",
+  "No public LSP resource accounting, request/queue quota, result-size policy, bilingual tool diagnostic, capability/configuration version, or protocol inventory entry exists; the DEC-0033 byte budget is not wired to LSP.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "LSP-2504-BYTE-ACCOUNTING"
+title = "Internal deterministic LSP UTF-8 byte accounting"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["LSP-2501-SNAPSHOT", "LSP-2502-CANCELLATION", "LSP-2503-SCHEDULER"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0002.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0033-lsp-internal-byte-accounting-boundary.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-lsp/src/resource.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "docs/status/LSP-2504-BYTE-ACCOUNTING-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2504-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "ByteBudget is pub(crate), counts UTF-8 bytes only, and exposes deterministic limit/used/remaining arithmetic.",
+  "Exact-boundary reserves succeed; over-limit reserves and releases beyond usage return typed errors without mutation or wrapping.",
+  "Zero reserve/release operations and independent budget instances are deterministic, with no allocator, host-memory, timing, request, or protocol state.",
+  "Focused ling-lsp tests cover exact boundaries, failed-operation stability, checked release, zero operations, and independent isolation; parent public quotas remain deferred.",
+]
+verified_against_commit = "2bf9ea77d87716138920201116c8849f4625c2e3"
+completion_commit = "2bf9ea77d87716138920201116c8849f4625c2e3"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child implements only DEC-0033's internal byte arithmetic; LSP-2504 remains BlockedSpec for public quotas, diagnostics, configuration, and failure precedence.",
+  "The budget is intentionally not added to the protocol inventory or support matrix and does not change compiler, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode behavior.",
 ]
 
 [[task]]
