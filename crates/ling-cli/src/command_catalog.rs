@@ -11,6 +11,7 @@ pub(crate) enum Command {
     Semantic,
     Audit,
     Format,
+    Init,
     ProjectCheck,
     Lsp,
 }
@@ -24,6 +25,7 @@ impl Command {
             "semantic" => Some(Self::Semantic),
             "audit" => Some(Self::Audit),
             "fmt" => Some(Self::Format),
+            "init" => Some(Self::Init),
             "lsp" => Some(Self::Lsp),
             _ => None,
         }
@@ -37,6 +39,7 @@ impl Command {
             Self::Semantic => "semantic",
             Self::Audit => "audit",
             Self::Format => "fmt",
+            Self::Init => "init",
             Self::ProjectCheck => "project check",
             Self::Lsp => "lsp",
         }
@@ -62,6 +65,7 @@ mod tests {
             ("semantic", Command::Semantic),
             ("audit", Command::Audit),
             ("fmt", Command::Format),
+            ("init", Command::Init),
             ("lsp", Command::Lsp),
         ] {
             assert_eq!(Command::parse(name), Some(command));

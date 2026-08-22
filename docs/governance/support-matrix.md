@@ -76,6 +76,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-CANONICAL-BYTES` | `Public` | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | yes |
 | `PROTO-CLI` | `Public` | `0.0.1-dev` | `Preview` | yes |
 | `PROTO-CLI-EXIT` | `Public` | `0.0.1-dev` | `Preview` | yes |
+| `PROTO-CLI-INIT` | `Public` | `ling.init/0.1` | `Preview` | yes |
 | `PROTO-DIAGNOSTIC-JSON` | `Public` | `ling.diagnostic/0.1` | `Preview` | yes |
 | `PROTO-EVIDENCE` | `Planned public` | — | `Future` | no |
 | `PROTO-FORMAT-CLI` | `Public` | `ling.format/0.1` | `Preview` | yes |

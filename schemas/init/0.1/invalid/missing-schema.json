@@ -1,0 +1,7 @@
+{
+  "status": "ok",
+  "directory": "hello",
+  "template_version": "1",
+  "package": {"name": "hello", "version": "0.1.0"},
+  "files": [".gitignore", "ling.lock", "ling.toml", "src/Main.ling"]
+}

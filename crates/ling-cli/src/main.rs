@@ -7,6 +7,7 @@ use std::process::ExitCode;
 
 mod command_catalog;
 mod exit_catalog;
+mod init;
 
 use command_catalog::Command;
 use exit_catalog::{
@@ -74,6 +75,14 @@ fn run(arguments: Vec<OsString>) -> u8 {
 }
 
 fn execute(options: Options) -> u8 {
+    if options.command == Command::Init {
+        return execute_init(
+            options.format,
+            options.path.expect("init requires a destination"),
+            options.init_name,
+            options.init_display_name,
+        );
+    }
     if options.command == Command::ProjectCheck {
         return execute_project_check(
             options.format,
@@ -186,6 +195,65 @@ fn execute(options: Options) -> u8 {
         Command::Format => unreachable!("handled before compilation"),
         Command::ProjectCheck => unreachable!("handled before project checking"),
         Command::Lsp => unreachable!("handled before compilation"),
+        Command::Init => unreachable!("handled before compilation"),
+    }
+}
+
+fn execute_init(
+    format: OutputFormat,
+    destination: PathBuf,
+    package_name: Option<String>,
+    display_name: Option<String>,
+) -> u8 {
+    match init::create(destination, package_name, display_name) {
+        Ok(summary) => match format {
+            OutputFormat::Human => {
+                println!(
+                    "已创建 Ling 工程 / created Ling project: directory={} package={} files={}",
+                    summary.directory,
+                    summary.package_name,
+                    summary.files.join(",")
+                );
+                EXIT_SUCCESS
+            }
+            OutputFormat::Json => {
+                let report = serde_json::json!({
+                    "schema": init::INIT_PROTOCOL,
+                    "status": "ok",
+                    "directory": summary.directory,
+                    "template_version": init::INIT_TEMPLATE_VERSION,
+                    "package": {"name": summary.package_name, "version": "0.1.0"},
+                    "files": summary.files,
+                });
+                match serde_json::to_string(&report) {
+                    Ok(rendered) => match write_stdout(format!("{rendered}\n").as_bytes()) {
+                        Ok(()) => EXIT_SUCCESS,
+                        Err(error) => emit_host_io_failure("init.stdout", &error, format),
+                    },
+                    Err(error) => emit_internal_incident(
+                        "init.success-json",
+                        error.to_string(),
+                        Reproduction::new("ling init --format json"),
+                        format,
+                    ),
+                }
+            }
+        },
+        Err(init::Failure::Usage(message)) => invalid_usage(&message),
+        Err(init::Failure::Diagnostics(diagnostics)) => {
+            emit_diagnostics(&diagnostics, format, EXIT_COMPILE_ERROR)
+        }
+        Err(init::Failure::Internal(message)) => emit_internal_incident(
+            "init.template",
+            message,
+            Reproduction::new("ling init"),
+            format,
+        ),
+        Err(failure @ init::Failure::Io { .. }) => {
+            let diagnostic = init::diagnostic_for_failure(&failure)
+                .expect("I/O init failures always have a diagnostic");
+            emit_diagnostics(&[diagnostic], format, EXIT_RUNTIME_FAULT)
+        }
     }
 }
 
@@ -1220,7 +1288,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} init [--format human|json] [--name package] [--display-name text] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
     )
 }
 
@@ -1251,6 +1319,8 @@ struct Options {
     locked: bool,
     stdin_name: Option<String>,
     stdio: bool,
+    init_name: Option<String>,
+    init_display_name: Option<String>,
 }
 
 impl Options {
@@ -1263,6 +1333,8 @@ impl Options {
         let mut locked = false;
         let mut stdin_name = None;
         let mut stdio = false;
+        let mut init_name = None;
+        let mut init_display_name = None;
         let mut index = 0;
 
         while index < arguments.len() {
@@ -1347,6 +1419,40 @@ impl Options {
                 continue;
             }
 
+            if argument == "--name" {
+                if command != Command::Init {
+                    return Err("`--name` is only valid with `init`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--name` requires a package name".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the package name must be valid Unicode".to_owned())?;
+                if init_name.replace(value.to_owned()).is_some() {
+                    return Err("only one `--name` may be provided".to_owned());
+                }
+                index += 2;
+                continue;
+            }
+
+            if argument == "--display-name" {
+                if command != Command::Init {
+                    return Err("`--display-name` is only valid with `init`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--display-name` requires text".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the display name must be valid Unicode".to_owned())?;
+                if init_display_name.replace(value.to_owned()).is_some() {
+                    return Err("only one `--display-name` may be provided".to_owned());
+                }
+                index += 2;
+                continue;
+            }
+
             if argument == "--manifest-path" {
                 if command != Command::ProjectCheck {
                     return Err("`--manifest-path` is only valid with `project check`".to_owned());
@@ -1389,7 +1495,11 @@ impl Options {
                 return Err("`project check` does not accept a positional path".to_owned());
             }
             if path.replace(PathBuf::from(argument)).is_some() {
-                return Err("only one source file may be provided".to_owned());
+                return Err(if command == Command::Init {
+                    "only one init destination may be provided".to_owned()
+                } else {
+                    "only one source file may be provided".to_owned()
+                });
             }
             index += 1;
         }
@@ -1406,7 +1516,11 @@ impl Options {
             && command != Command::ProjectCheck
             && path.is_none()
         {
-            return Err(format!("`{command}` requires a source file"));
+            return Err(if command == Command::Init {
+                "`init` requires a destination directory".to_owned()
+            } else {
+                format!("`{command}` requires a source file")
+            });
         }
         if command == Command::Lsp && !stdio {
             return Err("`lsp` requires `--stdio`".to_owned());
@@ -1445,6 +1559,13 @@ impl Options {
             return Err("project options require `project check`".to_owned());
         }
 
+        if command != Command::Init && (init_name.is_some() || init_display_name.is_some()) {
+            return Err("init metadata options require `init`".to_owned());
+        }
+        if command == Command::Init && path.as_deref() == Some(Path::new("-")) {
+            return Err("`init` requires a destination directory, not `-`".to_owned());
+        }
+
         Ok(Self {
             command,
             format,
@@ -1455,6 +1576,8 @@ impl Options {
             locked,
             stdin_name,
             stdio,
+            init_name,
+            init_display_name,
         })
     }
 }

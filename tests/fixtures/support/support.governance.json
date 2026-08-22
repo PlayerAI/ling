@@ -412,6 +412,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-CLI-INIT",
+      "visibility": "Public",
+      "version": "ling.init/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-DIAGNOSTIC-JSON",
       "visibility": "Public",
       "version": "ling.diagnostic/0.1",

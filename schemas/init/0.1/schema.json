@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:init:0.1",
+  "title": "Ling init report JSON 0.1",
+  "type": "object",
+  "required": ["schema", "status", "directory", "template_version", "package", "files"],
+  "properties": {
+    "schema": { "const": "ling.init/0.1" },
+    "status": { "const": "ok" },
+    "directory": { "type": "string", "minLength": 1 },
+    "template_version": { "const": "1" },
+    "package": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "const": "0.1.0" }
+      },
+      "additionalProperties": false
+    },
+    "files": {
+      "type": "array",
+      "const": [".gitignore", "ling.lock", "ling.toml", "src/Main.ling"]
+    }
+  },
+  "additionalProperties": false
+}

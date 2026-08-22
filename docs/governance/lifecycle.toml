@@ -22,6 +22,30 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0038"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0038-cli-init-command.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Create fresh destinations with derived and explicit package names; validate exact manifest, source, gitignore, lock, and ling.init/0.1 JSON bytes.",
+  "Reject existing destinations, invalid names, missing operands, unknown options, and invalid metadata without target or staging residue.",
+  "Exercise repeated processes, filesystem failure boundaries, offline behavior, and no-network/no-shell guarantees.",
+]
+compatibility_impact = [
+  "Adds the Preview ling init command, ling.init/0.1 success report, and L-IO-0003; RFC-0002 manifest-v1 and ling.lock/1 bytes are reused without unregistered fields.",
+]
+unresolved_alternatives = [
+  "Overwrite/force, current-directory defaulting, template selection, .zed/tasks.json, workspace manifests, and project test/build remain future decisions.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

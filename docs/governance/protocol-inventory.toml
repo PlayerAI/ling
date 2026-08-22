@@ -2,6 +2,28 @@ schema_version = 1
 updated = "2026-08-22"
 
 [[protocol]]
+id = "PROTO-CLI-INIT"
+title = "Ling project initialization report"
+category = "JSON"
+visibility = "Public"
+current_version = "ling.init/0.1"
+stability = "Preview"
+implemented = true
+public_schema = true
+canonical = false
+producer = ["ling init"]
+consumer = ["shell scripts", "project tooling", "humans"]
+reader_policy = "Consumers must gate on the exact ling.init/0.1 marker; the current repository provides a writer but no public reader, and unknown core fields are rejected by the schema."
+writer_policy = "On success, emit exactly one report with the requested directory operand, fixed template version 1, package coordinates, and the sorted four-file scaffold list; failures remain Diagnostic JSON on stderr."
+unknown_field_policy = "Reject unknown core fields; incompatible template or output changes require a new protocol version and accepted decision."
+migration_tool = "None; ling.init/0.1 is current-writer-only."
+fixtures = ["crates/ling-cli/tests/init.rs", "tests/protocols/init/README.md", "schemas/init/0.1/schema.json", "schemas/init/0.1/valid", "schemas/init/0.1/invalid"]
+sources = ["docs/decisions/0038-cli-init-command.md", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/init.rs"]
+version_markers = ["ling.init/0.1", "ling init"]
+authority = ["DEC-0038", "RFC-0002", "DEC-0003", "DEC-0013"]
+notes = ["The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated."]
+
+[[protocol]]
 id = "PROTO-CLI"
 title = "Ling command and option surface"
 category = "CLI"

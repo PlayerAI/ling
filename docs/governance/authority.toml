@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0038"
+title = "CLI init command"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0038-cli-init-command.md"
+covers = ["ling init scaffold", "offline template", "ling.init/0.1 report", "failure-atomic project creation"]
+depends_on = ["RFC-0002", "DEC-0003", "DEC-0013", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0037"
 title = "CLI internal exit catalog boundary"
 kind = "Decision"

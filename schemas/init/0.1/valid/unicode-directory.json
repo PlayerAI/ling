@@ -1,0 +1,8 @@
+{
+  "schema": "ling.init/0.1",
+  "status": "ok",
+  "directory": "starter",
+  "template_version": "1",
+  "package": {"name": "hello-world", "version": "0.1.0"},
+  "files": [".gitignore", "ling.lock", "ling.toml", "src/Main.ling"]
+}

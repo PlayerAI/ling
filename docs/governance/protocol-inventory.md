@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 25 records: 19 current public, 1 internal, 5 Future.
-- Current public stability: 11 Experimental, 8 Preview, 0 Stable.
+- 26 records: 20 current public, 1 internal, 5 Future.
+- Current public stability: 11 Experimental, 9 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -20,6 +20,7 @@
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
+| `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
 | `PROTO-FORMAT-CLI` | Public | JSON | `ling.format/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-LOCKFILE` | Public | JSON | `ling.lock/1` | `Experimental` | yes | yes | 8 |
@@ -119,6 +120,19 @@
 - Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
 - Notes: Stable diagnostic code meanings are a compatibility subset; the surrounding human bytes are not Stable or canonical.
+
+### `PROTO-CLI-INIT` — Ling project initialization report
+
+- Producer: ling init
+- Consumer: shell scripts; project tooling; humans
+- Reader policy: Consumers must gate on the exact ling.init/0.1 marker; the current repository provides a writer but no public reader, and unknown core fields are rejected by the schema.
+- Writer policy: On success, emit exactly one report with the requested directory operand, fixed template version 1, package coordinates, and the sorted four-file scaffold list; failures remain Diagnostic JSON on stderr.
+- Unknown-field policy: Reject unknown core fields; incompatible template or output changes require a new protocol version and accepted decision.
+- Migration tool: None; ling.init/0.1 is current-writer-only.
+- Authority: `DEC-0038`, `RFC-0002`, `DEC-0003`, `DEC-0013`
+- Sources: [`docs/decisions/0038-cli-init-command.md`](../decisions/0038-cli-init-command.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/init.rs`](../../crates/ling-cli/src/init.rs)
+- Fixtures: [`crates/ling-cli/tests/init.rs`](../../crates/ling-cli/tests/init.rs), [`tests/protocols/init/README.md`](../../tests/protocols/init/README.md), [`schemas/init/0.1/schema.json`](../../schemas/init/0.1/schema.json), [`schemas/init/0.1/valid`](../../schemas/init/0.1/valid), [`schemas/init/0.1/invalid`](../../schemas/init/0.1/invalid)
+- Notes: The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated.
 
 ### `PROTO-DIAGNOSTIC-JSON` — Structured bilingual Diagnostic JSON
 

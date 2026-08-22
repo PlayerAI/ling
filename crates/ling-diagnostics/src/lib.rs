@@ -16,6 +16,7 @@ pub mod codes {
 
     pub const SOURCE_READ_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0001");
     pub const PROJECT_LOCK_IO_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0002");
+    pub const PROJECT_INIT_IO_FAILED: DiagnosticCode = DiagnosticCode::new("L-IO-0003");
     pub const INVALID_UTF8: DiagnosticCode = DiagnosticCode::new("L-LEX-0001");
     pub const MISPLACED_BOM: DiagnosticCode = DiagnosticCode::new("L-LEX-0002");
     pub const SOURCE_TOO_LARGE: DiagnosticCode = DiagnosticCode::new("L-LEX-0003");

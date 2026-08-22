@@ -11,7 +11,7 @@ CAP = 3
 ENTRY = 3
 IMPL = 1
 INTERNAL = 1
-IO = 2
+IO = 3
 LEX = 12
 MUT = 1
 NAME = 9
@@ -138,6 +138,12 @@ facts = ["io_kind:string:required"]
 [[code]]
 id = "L-IO-0002"
 core_sha256 = "sha256:642a56f96f07ecf31c5e6d9c02902cef24ecc3b7a1ceff47748d2e73b0b64856"
+retired = false
+facts = ["io_kind:string:required", "operation:string:required"]
+
+[[code]]
+id = "L-IO-0003"
+core_sha256 = "sha256:b55ae17f1ff97feeaf22514ab06234dd37ab292bc52a1379022fce23defda62e"
 retired = false
 facts = ["io_kind:string:required", "operation:string:required"]
 

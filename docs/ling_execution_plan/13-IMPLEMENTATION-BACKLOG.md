@@ -135,7 +135,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CLI-1701-CATALOG` | G1/Editor | Internal current CLI command catalog | S | Done | Accepted DEC-0036; see `crates/ling-cli/src/command_catalog.rs` and `docs/status/CLI-1701-CATALOG-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `CLI-1702` | G1/Editor | 输出与退出码 | — | BlockedSpec | Accepted DEC-0037 closes only the internal exit catalog; public output/failure/retry contracts remain open; see `docs/status/CLI-1702-AUTHORITY-AUDIT.md` |
 | `CLI-1702-EXIT` | G1/Editor | Internal CLI exit-code catalog | S | Done | Accepted DEC-0037; see `crates/ling-cli/src/exit_catalog.rs` and `docs/status/CLI-1702-EXIT-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
-| `CLI-1703` | G1/Editor | `init` | — | BlockedSpec | `03-G1-V0.1-LIVING.md:470`, `docs/status/CLI-1703-AUTHORITY-AUDIT.md` |
+| `CLI-1703` | G1/Editor | `init` | — | BlockedSpec | Accepted DEC-0038 closes only the bounded init child; broader project CLI behavior remains open; see `docs/status/CLI-1703-AUTHORITY-AUDIT.md` |
+| `CLI-1703-INIT` | G1/Editor | Offline `ling init` scaffold | M | Done | Accepted DEC-0038; see `crates/ling-cli/src/init.rs`, `schemas/init/0.1/`, and `docs/status/CLI-1703-INIT-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `CLI-1704` | G1/Editor | `test` | — | BlockedSpec | `03-G1-V0.1-LIVING.md:474`, `docs/status/CLI-1704-AUTHORITY-AUDIT.md` |
 | `CLI-1705` | G1/Editor | `query/patch` | — | BlockedSpec | `03-G1-V0.1-LIVING.md:478`, `docs/status/CLI-1705-AUTHORITY-AUDIT.md` |
 | `CLI-1706` | G1/Editor | Shell completion 与 help fixtures | — | BlockedSpec | `03-G1-V0.1-LIVING.md:482`, `docs/status/CLI-1706-AUTHORITY-AUDIT.md` |
