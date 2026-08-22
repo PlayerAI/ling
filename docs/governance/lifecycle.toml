@@ -95,6 +95,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0041"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0041-seed-fuzz-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask fuzz verify and assert eight targets and eighteen Seed corpus files are discovered deterministically.",
+  "Mutate an isolated manifest target set and verify target-set drift fails closed.",
+  "Run locked fuzz compilation and pinned CI smoke commands without treating inventory validation as sanitizer execution evidence.",
+  "Repeat independent processes and verify no source, semantic, diagnostic, schema, protocol, or support output is generated.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask validation command and CI preflight; no Ling source, runtime, bytecode, diagnostic, schema, protocol, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "LibFuzzer execution, sanitizer availability, crash triage, future protocol harnesses, and G6 release coverage remain deferred.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

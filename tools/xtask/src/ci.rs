@@ -49,6 +49,7 @@ const REQUIRED_GATES: &[GateContract] = &[
     GateContract {
         name: "seed-reproducibility",
         commands: &[
+            "cargo xtask fuzz verify",
             "cargo run --package unicode-gen --locked --offline",
             "git diff --exit-code -- crates/ling-unicode/src/generated.rs editors/tree-sitter-ling/src/unicode-identifiers.generated.js",
             "cargo xtask seed reproduce",

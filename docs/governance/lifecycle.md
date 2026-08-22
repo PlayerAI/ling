@@ -70,6 +70,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0038` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0038](../decisions/0038-cli-init-command.md) |
 | `DEC-0039` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0039](../decisions/0039-cli-test-file-runner.md) |
 | `DEC-0040` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0040](../decisions/0040-cli-help-truth-fixture.md) |
+| `DEC-0041` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0041](../decisions/0041-seed-fuzz-inventory-gate.md) |
 
 ## Migration boundary
 

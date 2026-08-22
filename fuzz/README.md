@@ -26,6 +26,13 @@ the repository has an implementation to exercise. A missing future protocol is
 recorded as an explicit gap; it is not represented by a placeholder fuzz
 binary.
 
+Before running the fuzzers, verify that the checked-in target declarations,
+source entry points, corpus counts, and inventory names remain synchronized:
+
+```text
+cargo xtask fuzz verify
+```
+
 Run a deterministic corpus smoke pass:
 
 ```text

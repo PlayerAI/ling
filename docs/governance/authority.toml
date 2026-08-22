@@ -67,6 +67,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0041"
+title = "Seed fuzz inventory gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0041-seed-fuzz-inventory-gate.md"
+covers = ["Seed fuzz target inventory", "fuzz corpus drift gate"]
+depends_on = ["RFC-0020", "RFC-0002", "DEC-0023", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0037"
 title = "CLI internal exit catalog boundary"
 kind = "Decision"

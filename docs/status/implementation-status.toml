@@ -13845,6 +13845,7 @@ spec = [
   "docs/decisions/0001-error-code-policy.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0041-seed-fuzz-inventory-gate.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -13857,6 +13858,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/REL-6601-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6601-SEED-IMPLEMENTATION-REPORT.md",
   "docs/testing/FUZZ-COVERAGE.md",
   "fuzz/Cargo.toml",
   "fuzz/README.md",
@@ -13875,7 +13877,7 @@ acceptance = [
   "Available Seed harnesses cover source/lexer/parser, formatter Format IR, Audit schema diagnostics, project manifest/lock, and bytecode decoder/verifier paths with deterministic repeated-input checks and bounded diagnostics.",
   "Pinned cargo-fuzz and nightly toolchain, corpus replay commands, timeout/RSS limits, crash-retention policy, and the offline local compile gate are recorded in fuzz documentation and CI.",
   "The audit preserves unsupported/future protocol boundaries and records the G1-G5 dependency; it does not claim complete G6 or v1.0 fuzz coverage.",
-  "No public protocol, language semantic, diagnostic allocation, placeholder binary, support claim, or unimplemented-surface API is introduced.",
+  "No public protocol, language semantic, diagnostic allocation, placeholder binary, support claim, or unimplemented-surface API is introduced; DEC-0041 closes only the internal Seed inventory child.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13885,6 +13887,55 @@ notes = [
   "REL-6601 is BlockedSpec as a G6 release gate because G1-G5 exits and release-level authority for replay/evidence, FFI, device, archive, LSP/DAP, and editor surfaces are not complete.",
   "The Seed-level inventory and three additional test-only harnesses make current formatter, Audit schema, and lock decoding coverage explicit without fabricating missing protocols.",
   "The audit changes no source semantics, public protocol, diagnostic/schema version, package behavior, CLI, editor integration, dependency, or runtime API and preserves deterministic/offline evidence.",
+]
+
+[[task]]
+id = "REL-6601-SEED"
+title = "Seed fuzz inventory and corpus drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["FMT-1506", "GOV-0110", "PRJ-1108", "VM-1210"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0041-seed-fuzz-inventory-gate.md",
+  "docs/RFC-0002.md",
+  "docs/RFC-0020.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/FUZZ-COVERAGE.md",
+  "fuzz/Cargo.toml",
+  "fuzz/README.md",
+  ".github/workflows/ci.yml",
+]
+artifacts = [
+  "tools/xtask/src/fuzz.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "fuzz/Cargo.lock",
+  "fuzz/README.md",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0041-seed-fuzz-inventory-gate.md",
+  "docs/status/REL-6601-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask fuzz verify deterministically validates exactly eight accepted Seed targets, their exact source paths and libFuzzer entry points, and eighteen regular corpus files.",
+  "The verifier fails closed on target-set/path/flag drift, missing entry points, nested or non-regular corpus entries, count drift, and missing inventory names.",
+  "The command is included in the existing Seed reproducibility CI gate and does not execute libFuzzer or claim sanitizer/cross-platform release evidence.",
+  "Focused xtask, CI-contract, locked fuzz compilation, governance, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "Accepted DEC-0041 closes only this internal Seed inventory gate; REL-6601 remains BlockedSpec for future protocol harnesses and the G6 release gate.",
+  "The verifier records metadata consistency only; pinned libFuzzer execution and sanitizer availability remain separate CI evidence.",
 ]
 
 [[task]]

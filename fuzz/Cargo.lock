@@ -301,6 +301,7 @@ dependencies = [
  "ling-hir",
  "ling-project",
  "ling-resolve",
+ "ling-source",
  "ling-types",
  "ling-unicode",
  "num-bigint",

@@ -14,7 +14,9 @@ IR, Audit schema decoding, project manifests, project locks, and bytecode
 decoding/verifying. Those harnesses are added or inventoried without changing
 language semantics or public protocols.
 
-`REL-6601` cannot be marked complete as a G6 release task yet. The plan asks
+`REL-6601` cannot be marked complete as a G6 release task yet. Accepted
+DEC-0041 closes only the bounded `REL-6601-SEED` internal inventory and corpus
+drift gate. The plan asks
 for continuous fuzz coverage across replay/evidence, FFI, device metadata,
 LSP/DAP, archives, and editor integrations, while G6 itself is gated by the
 G1--G5 exits. Several of those surfaces are Future or Unsupported and have no
@@ -85,6 +87,10 @@ reliability gate, the repository needs:
 
 ## Compatibility and deferred work
 
+The completed child adds only `cargo xtask fuzz verify`, which checks the
+existing target declarations, source entry points, corpus counts, and
+inventory names without executing libFuzzer or claiming G6 coverage.
+
 This audit changes no language grammar, parser semantics, resolver, evaluator,
 Typed Core, diagnostic allocation, schema version, package publication,
 runtime, CLI, editor protocol, dependency, or public API. The new fuzz
@@ -94,4 +100,5 @@ locked builds.
 
 The missing future-surface harnesses remain explicitly deferred. No placeholder
 binary, protocol field, support claim, or release-completion assertion is
-added.
+added. The parent remains blocked on G1--G5 exits and accepted authority for
+each future input family.

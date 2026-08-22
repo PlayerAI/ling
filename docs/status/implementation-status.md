@@ -246,6 +246,7 @@
 | `RC-6904` | RC2 / Final Change Control | `G6` | `L` | `BlockedSpec` | `RC-6903` | `` |
 | `RC-6905` | v1.0 Release Artifacts | `G6` | `L` | `BlockedSpec` | `RC-6904` | `` |
 | `REL-6601` | Fuzz Coverage Inventory | `G6` | `L` | `BlockedSpec` | `COMPAT-6504` | `` |
+| `REL-6601-SEED` | Seed fuzz inventory and corpus drift gate | `G6` | `S` | `In Progress` | `FMT-1506`, `GOV-0110`, `PRJ-1108`, `VM-1210` | `` |
 | `REL-6602` | Fault Injection | `G6` | `L` | `BlockedSpec` | `REL-6601` | `` |
 | `REL-6603` | Security Audit | `G6` | `L` | `BlockedSpec` | `REL-6602` | `` |
 | `REL-6604` | Performance Baseline | `G6` | `L` | `BlockedSpec` | `REL-6603` | `` |

@@ -392,6 +392,20 @@ symbol = "unknown_future_command_is_rejected_with_usage_on_stderr"
 feature_ids = ["FTR-SEED-0002", "FTR-SEED-0007"]
 
 [[evidence]]
+id = "EVD-POS-FUZZ-INVENTORY"
+kind = "Positive"
+path = "tools/xtask/src/fuzz.rs"
+symbol = "repository_fuzz_inventory_is_deterministic"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-FUZZ-INVENTORY-DRIFT"
+kind = "Negative"
+path = "tools/xtask/src/fuzz.rs"
+symbol = "rejects_target_set_drift"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
 id = "EVD-POS-G0-CI-CONTRACT"
 kind = "Positive"
 path = "tools/xtask/src/ci.rs"
