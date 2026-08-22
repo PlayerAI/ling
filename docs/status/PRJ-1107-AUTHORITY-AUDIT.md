@@ -7,9 +7,12 @@ accepted RFC-0024 decision authorizes and the completed child
 `PRJ-1107-CHECK` implements one bounded Preview slice: an explicit, locked,
 offline project graph check. Accepted DEC-0058 and the completed child
 `PRJ-1107-LOAD` add a read-only locked-project snapshot boundary around the
-same graph/lock APIs. These children do not promote the parent task to `Done`
-because semantic project checking, run/test/build behavior, workspace
-selection, and artifact policy still lack accepted contracts.
+same graph/lock APIs. Accepted DEC-0083 and the completed child
+`PRJ-1107-SEMANTIC-SNAPSHOT` add an internal, read-only adapter from that
+validated snapshot to the existing package-aware checked semantic pipeline.
+These children do not promote the parent task to `Done` because public
+semantic project checking, run/test/build behavior, workspace selection, and
+artifact policy still lack accepted contracts.
 
 The children reuse the accepted RFC-0002 `ling-project` manifest, module
 discovery, lockfile, and package-graph APIs. They do not duplicate package
@@ -33,6 +36,12 @@ resolution or add a placeholder `CompilerHost` API. Existing file-oriented
 - Accepted DEC-0058 authorizes only the in-process `LockedProject` snapshot and
   `load_locked_project` read-only locked boundary; it does not define a
   compiler host, workspace, run/test/build, artifact, CLI, or protocol API.
+- Accepted DEC-0083 authorizes only the internal
+  `CompilerDb::project_semantic_snapshot(&LockedProject)` query. It fixes
+  canonical package/source traversal, path-free `package:<name>/<logical>`
+  source names, the existing parse-to-`build_project` pipeline, and
+  graph-identity caching; it does not define a compiler host or public project
+  semantic-check command.
 - `docs/SEMANTICS.md` and `docs/LANGUAGE.md` fix the executable name to
   `ling`; stale `zero` spellings in lower-authority execution inputs are not
   implementation authority.
@@ -56,18 +65,21 @@ The RFC-0024 child does not choose among those alternatives through code.
 
 The child implementations are recorded in
 `docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md` and
-`docs/status/PRJ-1107-LOAD-IMPLEMENTATION-REPORT.md`. The existing command is
+`docs/status/PRJ-1107-LOAD-IMPLEMENTATION-REPORT.md`, and
+`docs/status/PRJ-1107-SEMANTIC-SNAPSHOT-IMPLEMENTATION-REPORT.md`. The existing command is
 covered by `crates/ling-cli/tests/project_check.rs` and the protocol evidence
 under `tests/protocols/project-check/`; the snapshot is covered by
-`crates/ling-project/tests/locked_project.rs`. The command still requires
+`crates/ling-project/tests/locked_project.rs` and the internal query test in
+`crates/ling-db/src/lib.rs`. The command still requires
 exactly one explicit `ling.toml` path and exactly one `--locked`, while the
-snapshot is read-only, path-free, and deterministic. The protocol inventory
+snapshots are read-only, path-free, and deterministic. The protocol inventory
 and support matrix register `ling.project.check/0.1` as Experimental only.
 
 No language semantics, source spans, Semantic IDs, bytecode, VM behavior,
 Unicode tables, existing diagnostic allocations, or stable public schemas
 changed. The JSON report is current-writer-only and intentionally not
-canonical. The implementation is local/offline and does not claim network,
+canonical. The internal semantic adapter adds no protocol or diagnostic
+allocation. The implementation is local/offline and does not claim network,
 workspace, artifact, or performance behavior.
 
 ## Intentionally deferred

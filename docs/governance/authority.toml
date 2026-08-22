@@ -1586,3 +1586,16 @@ covers = ["IDE-2311 bounded workspace-symbol source lookups", "exact module/name
 depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "DEC-0073", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0083"
+title = "Locked-project semantic snapshot boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0083-prj-locked-project-semantic-snapshot.md"
+covers = ["PRJ-1107 bounded locked-project semantic snapshot", "internal package-aware checked pipeline", "deterministic path-free project snapshot"]
+depends_on = ["RFC-0002", "DEC-0058", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

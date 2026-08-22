@@ -16,6 +16,7 @@ use ling_ast::{LowerError, Program, lower};
 use ling_cache::{CacheKey, CacheStore};
 use ling_effects::{self, CheckedProgram, EffectError};
 use ling_hir::{self, LowerError as HirLowerError};
+use ling_project::PackageGraphId;
 use ling_resolve::{ResolveError, ResolvedModule, ResolvedProgram, resolve};
 use ling_semantic::{self, ProgramSnapshot};
 use ling_source::{
@@ -28,6 +29,7 @@ use ling_types::{self, TypeError};
 mod completion_metadata_index;
 mod completion_source_index;
 mod definition_index;
+mod project_snapshot;
 mod reference_index;
 mod reference_span_index;
 mod rename_identifier;
@@ -41,6 +43,7 @@ pub use completion_source_index::{
 pub use definition_index::{
     ResolvedDefinitionIndex, ResolvedDefinitionKind, ResolvedDefinitionSymbol,
 };
+pub use project_snapshot::ProjectSnapshotError;
 pub use reference_index::{
     ResolvedReferenceBindingTarget, ResolvedReferenceDefinitionTarget, ResolvedReferenceEntry,
     ResolvedReferenceIndex, ResolvedReferenceReverseEntry, ResolvedReferenceReverseIndex,
@@ -480,6 +483,9 @@ pub enum QueryError {
     SemanticSnapshot {
         message: String,
     },
+    ProjectSnapshot {
+        error: ProjectSnapshotError,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -534,6 +540,7 @@ impl fmt::Display for QueryError {
             Self::SemanticSnapshot { message } => {
                 write!(formatter, "semantic snapshot failed: {message}")
             }
+            Self::ProjectSnapshot { error } => error.fmt(formatter),
         }
     }
 }
@@ -632,6 +639,11 @@ struct WorkspaceResolveKey {
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct ProjectSemanticKey {
+    graph: PackageGraphId,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 struct TypeEffectKey {
     graph: ModuleGraphKey,
     file: SourceId,
@@ -664,6 +676,10 @@ pub struct CompilerDb {
     checked_programs: BTreeMap<WorkspaceResolveKey, Result<Arc<CheckedProgram>, TypeEffectFailure>>,
     type_effects: BTreeMap<TypeEffectKey, Result<Arc<TypeEffectModule>, TypeEffectFailure>>,
     semantic_snapshots: BTreeMap<WorkspaceResolveKey, Result<Arc<ProgramSnapshot>, String>>,
+    project_semantic_snapshots: BTreeMap<
+        ProjectSemanticKey,
+        Result<Arc<ling_semantic::ProjectProgramSnapshot>, ProjectSnapshotError>,
+    >,
     semantic_fragments: BTreeMap<String, Arc<SemanticModuleFragment>>,
     trace: Vec<QueryEvent>,
 }
@@ -688,6 +704,7 @@ impl CompilerDb {
             checked_programs: BTreeMap::new(),
             type_effects: BTreeMap::new(),
             semantic_snapshots: BTreeMap::new(),
+            project_semantic_snapshots: BTreeMap::new(),
             semantic_fragments: BTreeMap::new(),
             trace: Vec::new(),
         }
@@ -1099,6 +1116,25 @@ impl CompilerDb {
         self.semantic_snapshots.insert(key, result.clone());
         self.record(QueryKind::Semantic, &snapshot, QueryOutcome::Miss);
         result.map_err(|message| QueryError::SemanticSnapshot { message })
+    }
+
+    /// Builds and caches the package-aware semantic snapshot for an already
+    /// validated locked project.  This is an internal compiler observation;
+    /// it does not select projects, read host paths, execute code, build
+    /// artifacts, or publish a CLI/LSP response.
+    pub fn project_semantic_snapshot(
+        &mut self,
+        project: &ling_project::LockedProject,
+    ) -> Result<Arc<ling_semantic::ProjectProgramSnapshot>, QueryError> {
+        let key = ProjectSemanticKey {
+            graph: project.graph().id().clone(),
+        };
+        if let Some(cached) = self.project_semantic_snapshots.get(&key).cloned() {
+            return cached.map_err(|error| QueryError::ProjectSnapshot { error });
+        }
+        let result = project_snapshot::build(project).map(Arc::new);
+        self.project_semantic_snapshots.insert(key, result.clone());
+        result.map_err(|error| QueryError::ProjectSnapshot { error })
     }
 
     /// Returns a canonical semantic definition/reference fragment for one
@@ -1907,6 +1943,8 @@ fn splitmix64(mut value: u64) -> u64 {
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+
     use super::*;
 
     fn clean_database(source: &CompilerDb) -> CompilerDb {
@@ -1929,6 +1967,15 @@ mod tests {
             }
         }
         clean
+    }
+
+    fn locked_project_fixture() -> ling_project::LockedProject {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/projects/offline-lock");
+        let manifest_path = root.join(ling_project::MANIFEST_FILE_NAME);
+        let bytes = std::fs::read(&manifest_path).expect("locked fixture manifest is readable");
+        let manifest = ling_project::parse_manifest(&manifest_path.to_string_lossy(), &bytes)
+            .expect("locked fixture manifest is valid");
+        ling_project::load_locked_project(&root, &manifest).expect("locked fixture is valid")
     }
 
     fn clean_file(source: &CompilerDb, clean: &CompilerDb, file: SourceId) -> SourceId {
@@ -2833,6 +2880,31 @@ mod tests {
             first_fragment.definition("callee").unwrap().body_id(),
             comment_fragment.definition("callee").unwrap().body_id()
         );
+    }
+
+    #[test]
+    fn project_semantic_snapshot_is_locked_path_free_and_cached() {
+        let project = locked_project_fixture();
+        let mut db = CompilerDb::new();
+        let first = db
+            .project_semantic_snapshot(&project)
+            .expect("locked project sources resolve and type-check");
+        let repeated = db
+            .project_semantic_snapshot(&project)
+            .expect("repeated locked project snapshot succeeds");
+
+        assert!(Arc::ptr_eq(&first, &repeated));
+        assert_eq!(
+            first.graph().package_graph_id.as_deref(),
+            Some(project.graph().id().as_str())
+        );
+        assert_eq!(
+            first.graph().packages.len(),
+            project.graph().packages().len()
+        );
+        assert_eq!(first.graph().schema, ling_semantic::PROJECT_SEMANTIC_SCHEMA);
+        assert!(!first.json().contains("offline-lock"));
+        assert!(!first.json().contains("\\"));
     }
 
     #[test]

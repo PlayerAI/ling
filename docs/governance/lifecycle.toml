@@ -2209,3 +2209,27 @@ unresolved_alternatives = [
   "Workspace scope/package selection, symbol taxonomy and containers, exact/prefix/fuzzy matching, visibility/duplicate policy, incremental invalidation, limits/truncation, cancellation, stale behavior, protocol lifecycle, and migration remain open under IDE-2311 and the registered incremental-cache/LSP/Semantic gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0083"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0083-prj-locked-project-semantic-snapshot.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Build the locked offline project fixture and assert the project schema, package-graph identity, cross-package modules, cached pointer reuse, and path-free JSON.",
+  "Repeat the graph through separate compiler databases and compare canonical JSON and Semantic IDs; preserve original UTF-8/BOM/CRLF spans.",
+  "Keep project selection, workspace reload, stale/version/cancellation, lock mutation, CLI exits/JSON, execution, test discovery, artifacts, and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only an internal ling-db project query and typed error over the existing ling-project, ling-resolve, ling-types, ling-effects, and ling-semantic pipeline; language, diagnostics, schemas, Semantic IDs, CLI/LSP/DAP, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Project/workspace selection, general compiler-host lifecycle, incremental invalidation, public project semantic-check commands, run/test/build behavior, artifacts, exits, machine output, network policy, and protocol publication remain PRJ-1107 and GAP-PROJECT-CLI-INTERFACE-001 work.",
+]
+superseded_by = ""

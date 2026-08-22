@@ -11,6 +11,7 @@ ling-cache = { path = "../ling-cache" }
 ling-ast = { path = "../ling-ast" }
 ling-effects = { path = "../ling-effects" }
 ling-hir = { path = "../ling-hir" }
+ling-project = { path = "../ling-project" }
 ling-semantic = { path = "../ling-semantic" }
 ling-resolve = { path = "../ling-resolve" }
 ling-source = { path = "../ling-source" }

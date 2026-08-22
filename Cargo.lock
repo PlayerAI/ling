@@ -246,6 +246,7 @@ dependencies = [
  "ling-eval",
  "ling-format",
  "ling-hir",
+ "ling-project",
  "ling-resolve",
  "ling-semantic",
  "ling-source",
