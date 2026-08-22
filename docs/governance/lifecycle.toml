@@ -2843,3 +2843,29 @@ unresolved_alternatives = [
   "Checkpoint identity and bytes, preflight binding, event application and order, Fault/cancellation, divergence equivalence, privacy/integrity, migration, diagnostics, CLI authorization, resource limits, runtime ABI, and cross-process behavior remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2504.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0108"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0108-replay-privacy-integrity-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixteen provisional privacy, trimming, and corruption boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep sensitivity, redaction, secret/PII, capability/resource, authorization, key/retention, dependency closure, chunk/checksum, truncation/corruption, diagnostics, unknown-field, offline, migration, cross-process, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public privacy, integrity, or replay protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Sensitivity taxonomy, redaction representation, default-deny and authorization rules, key handling, retention/deletion, dependency closure, chunk framing, checksum scope, truncation/corruption recovery, diagnostics, unknown fields, offline guarantees, migration, resource limits, runtime ABI, and cross-process behavior remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2505.",
+]
+superseded_by = ""
