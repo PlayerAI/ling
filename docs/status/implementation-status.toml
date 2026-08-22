@@ -13892,7 +13892,7 @@ notes = [
 [[task]]
 id = "REL-6601-SEED"
 title = "Seed fuzz inventory and corpus drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -13929,10 +13929,10 @@ acceptance = [
   "The command is included in the existing Seed reproducibility CI gate and does not execute libFuzzer or claim sanitizer/cross-platform release evidence.",
   "Focused xtask, CI-contract, locked fuzz compilation, governance, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "97a628311f50742730ba043131878d205f0f47d2"
+completion_commit = "97a628311f50742730ba043131878d205f0f47d2"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "Accepted DEC-0041 closes only this internal Seed inventory gate; REL-6601 remains BlockedSpec for future protocol harnesses and the G6 release gate.",
   "The verifier records metadata consistency only; pinned libFuzzer execution and sanitizer availability remain separate CI evidence.",
