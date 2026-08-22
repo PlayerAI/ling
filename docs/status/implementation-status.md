@@ -314,6 +314,7 @@
 | `TRAIT-1308-PROJECTION` | Trait Semantic Graph projection | `G1` | `M` | `Done` | `TRAIT-1307` | `61ea00d8c19c6c5caa51461d4cffb8d2993e59d0` |
 | `TRAIT-1308-QUERY` | Trait projection read-only lookups | `G1` | `S` | `Done` | `TRAIT-1308-PROJECTION` | `feb2be24fc78abc73010f283e830d3844f49b303` |
 | `TRAIT-1309` | Trait solver performance and termination | `G1` | `M` | `BlockedSpec` | `TRAIT-1308` | `` |
+| `TRAIT-1309-TERMINATION` | Bounded Trait solver termination evidence | `G1` | `S` | `Done` | `TRAIT-1307` | `6f84216c796253e51d4877edfbdc65ba7c0e5cad` |
 | `TS-3101` | Grammar 规范映射表 | `G1` | `S` | `Done` | `BASE-0001` | `4d1b643bd1a971bcd01d101cd81411557d3c3074` |
 | `TS-3102` | 宽度优先 Tree-sitter grammar skeleton | `G1` | `M` | `Done` | `TS-3101` | `14fb7986501abda6eed178b5b7af405fcb0313e9` |
 | `TS-3103` | Offside/缩进策略 | `G1` | `M` | `Done` | `TS-3102` | `28750bcbd458322e856cf45842b8241047a8e41b` |

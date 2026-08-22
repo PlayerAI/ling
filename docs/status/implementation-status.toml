@@ -16104,6 +16104,53 @@ notes = [
 ]
 
 [[task]]
+id = "TRAIT-1309-TERMINATION"
+title = "Bounded Trait solver termination evidence"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1307"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0026-trait-solver-v0-boundary.md",
+  "docs/decisions/0068-trait-termination-corpus.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/src/solver.rs",
+  "docs/decisions/0068-trait-termination-corpus.md",
+  "docs/status/TRAIT-1309-TERMINATION-AUTHORITY-AUDIT.md",
+  "docs/status/TRAIT-1309-TERMINATION-IMPLEMENTATION-REPORT.md",
+  "docs/status/TRAIT-1309-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0068 limits the child to internal deterministic termination evidence; no timing, work-budget, cancellation, or public Trait protocol is defined.",
+  "Equivalent concrete Trait fixtures under distinct source names produce the same selected Trait/implementation/member projection.",
+  "Existing active-cycle and RFC-0005 depth-64 negative tests remain unchanged and continue to enforce their accepted categories.",
+  "No solver limit, benchmark schema, public diagnostic, Semantic ID, CLI/LSP surface, runtime, bytecode, VM, or Unicode behavior changes.",
+  "cargo test -p ling-types --lib --offline passes.",
+]
+verified_against_commit = "6f84216c796253e51d4877edfbdc65ba7c0e5cad"
+completion_commit = "6f84216c796253e51d4877edfbdc65ba7c0e5cad"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The bounded termination child records source-evidence independence only; the TRAIT-1309 parent remains BlockedSpec for production HIR integration, benchmark metrics, resource budgets, and LSP cancellation.",
+]
+
+[[task]]
 id = "TRAIT-1304"
 title = "Trait coherence and orphan index"
 state = "Done"
