@@ -11418,6 +11418,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/MEM-3103-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3103-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3103-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0116-resource-drop-boundary-evidence.md",
+  "crates/ling-effects/tests/resource_drop_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -11427,6 +11435,7 @@ acceptance = [
   "The audit covers resource cleanup, cancellation, partial failure, FFI transfer, capability/network restrictions, deterministic bounded Drop, Unicode/CRLF/BOM spans, and interpreter/VM/Native differential fixtures.",
   "No Resource type, ownership token, Drop operation, cleanup lowering, Drop Effect/Fault, cancellation hook, FFI transfer mode, diagnostic allocation, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N301 authority is absent.",
   "The future implementation must preserve Seed Value semantics, consume accepted types and checked Core only, make cleanup deterministic and bounded, and publish drop-order, cancellation, failure, Profile, FFI, and interpreter/VM/Native evidence before exposing Resource behavior.",
+  "Accepted DEC-0116 authorizes only test-only Resource and Drop boundary vocabulary; it does not close ownership, cleanup, Effect/Fault, Managed, FFI, diagnostic, or runtime gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -11436,6 +11445,59 @@ notes = [
   "MEM-3103 is BlockedSpec by MEM-3101/MEM-3102, absent RFC-N301/RFC-0007, GAP-OWNERSHIP-MODEL-001, and unresolved Resource identity, Drop, cleanup, Effect/Fault, cancellation, and FFI contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Resource type, owner identity, move checker, Drop lowering, cleanup stack, cancellation-safe destructor, resource Effect/Fault, FFI transfer mode, or Managed finalizer boundary; host handles and Rust Drop are not Ling Resource semantics.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory kind, Value layout, Resource, Drop, ownership, Native ABI, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "MEM-3103-OBSERVATION"
+title = "Internal Resource and Drop boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["MEM-3102-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0115-memory-layout-copy-move-boundary-evidence.md",
+  "docs/decisions/0116-resource-drop-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-effects/tests/resource_drop_evidence.rs",
+  "docs/decisions/0116-resource-drop-boundary-evidence.md",
+  "docs/status/MEM-3103-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MEM-3103-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0116 authorizes only test-only Resource and Drop boundary evidence; no ownership, cleanup, Effect/Fault, Managed, or FFI semantics are claimed.",
+  "The test-local inventory covers thirty-three provisional boundaries for Resource identity/ownership, move/use-after-move, Drop order, cleanup outcomes, cancellation/termination, Effects/Faults, Capability restrictions, Managed separation, FFI/Native boundaries, diagnostics, spans, differentials, and deterministic bounded cleanup with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no Resource type, ownership checker, Drop lowering, cleanup stack, FFI mode, public protocol, or stale zero command is added.",
+  "cargo test -p ling-effects --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-effects --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "339e7ff12d67f19c2d99a025353103bb809e87db"
+completion_commit = "339e7ff12d67f19c2d99a025353103bb809e87db"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0116; MEM-3103 remains BlockedSpec for ownership, Drop order, cleanup failure/cancellation, Effect/Fault, Managed finalization, FFI, diagnostics, migration, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added.",
 ]
 
 [[task]]

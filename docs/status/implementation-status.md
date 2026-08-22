@@ -231,6 +231,7 @@
 | `MEM-3102` | Value layout and Copy/Move | `G3` | `L` | `BlockedSpec` | `MEM-3101` | `` |
 | `MEM-3102-OBSERVATION` | Internal Value-layout and Copy/Move boundary evidence | `G3` | `S` | `Done` | `MEM-3101-SEED-VALUE` | `6f5d2c1da186151ce36c0c67a3f3410424ae48b4` |
 | `MEM-3103` | Resource definition and Drop contract | `G3` | `L` | `BlockedSpec` | `MEM-3102` | `` |
+| `MEM-3103-OBSERVATION` | Internal Resource and Drop boundary evidence | `G3` | `S` | `Done` | `MEM-3102-OBSERVATION` | `339e7ff12d67f19c2d99a025353103bb809e87db` |
 | `MEM-3104` | Managed types and island boundaries | `G3` | `L` | `BlockedSpec` | `MEM-3103` | `` |
 | `NIR-3401` | Native IR design | `G3` | `L` | `BlockedSpec` | `GC-3304` | `` |
 | `NIR-3402` | Core to Native IR lowering | `G3` | `L` | `BlockedSpec` | `NIR-3401` | `` |
