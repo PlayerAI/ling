@@ -122,6 +122,7 @@
 | `EVD-5803` | Reproducible Build Binding | `G5` | `M` | `BlockedSpec` | `EVD-5802` | `` |
 | `EVD-5804` | AI Provenance | `G5` | `M` | `BlockedSpec` | `EVD-5803` | `` |
 | `FFI-3601` | FFI declaration model | `G3` | `M` | `BlockedSpec` | `BACK-3505` | `` |
+| `FFI-3601-OBSERVATION` | Internal FFI declaration boundary evidence | `G3` | `S` | `Done` | `BACK-3505-OBSERVATION` | `d254184a0f8a3e123e746c1c2f34973756ff6ba0` |
 | `FFI-3602` | Minimal C ABI interoperability | `G3` | `M` | `BlockedSpec` | `FFI-3601` | `` |
 | `FFI-3603` | FFI shim generator | `G3` | `M` | `BlockedSpec` | `FFI-3602` | `` |
 | `FFI-3604` | Target Primitive Package | `G3` | `M` | `BlockedSpec` | `FFI-3603` | `` |
