@@ -239,6 +239,7 @@
 | `MEM-3104` | Managed types and island boundaries | `G3` | `L` | `BlockedSpec` | `MEM-3103` | `` |
 | `MEM-3104-OBSERVATION` | Internal Managed-graph and island boundary evidence | `G3` | `S` | `Done` | `MEM-3103-OBSERVATION` | `778228b810ef690b43a7eb7ce3d3b76dafdb4aeb` |
 | `NIR-3401` | Native IR design | `G3` | `L` | `BlockedSpec` | `GC-3304` | `` |
+| `NIR-3401-OBSERVATION` | Internal Native IR design boundary evidence | `G3` | `S` | `Done` | `GC-3304-OBSERVATION` | `7192361d50163d96946cb7ab2e3f3daf4f670d9d` |
 | `NIR-3402` | Core to Native IR lowering | `G3` | `L` | `BlockedSpec` | `NIR-3401` | `` |
 | `NIR-3403` | Native IR verifier | `G3` | `M` | `BlockedSpec` | `NIR-3402` | `` |
 | `NODE-5301` | Node Syntax and Semantics | `G5` | `L` | `BlockedSpec` | `BND-5204` | `` |

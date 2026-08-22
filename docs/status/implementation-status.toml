@@ -12881,6 +12881,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/NIR-3401-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3401-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3401-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0129-native-ir-design-boundary-evidence.md",
+  "crates/ling-types/tests/native_ir_design_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12890,6 +12898,7 @@ acceptance = [
   "The audit covers valid and invalid blocks/phi/SSA/types/cleanup/Fault/effects, Managed handles, Task/Actor ABI, source/debug mapping, serialization rejection, cross-target ABI, Unicode/CRLF/BOM spans, determinism, and interpreter/VM/Native differential fixtures.",
   "No Native IR crate, instruction set, ABI record, serializer, verifier, debug schema, diagnostic, public protocol, or placeholder G3 API is added while RFC-N304/RFC-0011 and the dependent RFC-N301/RFC-N302/RFC-N303/RFC-N305/RFC-N306 authority are absent.",
   "The future implementation must preserve Seed behavior, consume accepted types and checked Core only, keep Rust layout/unwinding/addresses non-semantic, and publish NIR validity, semantic-preservation, ABI, target, and interpreter/VM/Native evidence before exposing v0.3 Native behavior.",
+  "Accepted DEC-0129 authorizes only test-only Native IR design boundary vocabulary; it does not close the instruction set, ABI, serialization, verifier, debug, or lowering contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12899,6 +12908,66 @@ notes = [
   "NIR-3401 is BlockedSpec by absent RFC-N304/RFC-0011 and dependent RFC-N301/RFC-N302/RFC-N303/RFC-N305/RFC-N306, GC-3301 through GC-3304, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, and GAP-CRITICAL-PROFILE-001.",
   "The current workspace has no Native IR, ABI, FFI, backend, target-package, or debug-location crate; ling-bytecode is an internal VM bytecode path and is not NIR.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "NIR-3401-OBSERVATION"
+title = "Internal Native IR design boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GC-3304-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0125-managed-object-model-boundary-evidence.md",
+  "docs/decisions/0126-managed-collector-boundary-evidence.md",
+  "docs/decisions/0127-managed-ffi-boundary-evidence.md",
+  "docs/decisions/0128-managed-profile-boundary-evidence.md",
+  "docs/decisions/0129-native-ir-design-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/native_ir_design_evidence.rs",
+  "docs/decisions/0129-native-ir-design-boundary-evidence.md",
+  "docs/status/NIR-3401-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NIR-3401-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0129 authorizes only test-only Native IR design boundary evidence; no IR, instruction set, ABI, serializer, verifier, debug schema, diagnostic, or lowering semantics are claimed.",
+  "The test-local inventory covers forty-six provisional boundaries for typed SSA/control flow, blocks/phi/evaluation order, Value/Resource/Managed and aggregate/closure representation, borrow/alias/ownership facts, Drop/cleanup, function/data ABI/layout, Fault/unwind, Effects/capabilities, Task/Actor/FFI/targets, source/debug/definition mapping, serialization/version/rejection, backend neutrality, Typed Core/Graph/Audit projections, Semantic IDs, differential evidence, Unicode spans, migration, and security bounds with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no IR node, instruction, ABI, serializer, verifier, diagnostic, protocol, or lowering API is added.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "7192361d50163d96946cb7ab2e3f3daf4f670d9d"
+completion_commit = "7192361d50163d96946cb7ab2e3f3daf4f670d9d"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0129; NIR-3401 remains BlockedSpec for the IR version/instruction set, SSA/phi, representation, ownership, ABI, Fault, Effects, FFI, debug/source mapping, serializer, verifier, and differential contracts.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
