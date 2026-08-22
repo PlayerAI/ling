@@ -3944,6 +3944,7 @@ spec = [
   "docs/RFC-0024.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0037-cli-internal-exit-catalog-boundary.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
@@ -4137,12 +4138,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/CLI-1702-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1702-EXIT-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The audit records the accepted human/JSON and exit-code subset and distinguishes it from unaccepted language, color, quiet/verbose, and future-command output extensions.",
   "The missing localization, TTY/color, event-level, stdout/stderr, per-command failure, schema, and fixture contracts are identified with direct authority references.",
+  "Accepted DEC-0037 closes only the internal exit-code catalog child; the parent remains blocked for public output/failure behavior.",
   "No flag, exit class, diagnostic allocation, output schema, ANSI policy, or localization behavior is added while the command contracts and fixtures are absent.",
   "The future implementation must preserve stable diagnostic identity, source spans, Semantic IDs, and program Fault semantics while adding only registered options.",
 ]
@@ -4151,9 +4154,53 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "CLI-1702 is BlockedSpec downstream of CLI-1701 and the project/formatter CLI gates; the current PROTO-CLI-EXIT and DEC-0013 behavior remains unchanged.",
-  "The current Seed subset already supports human/JSON rendering and stable exit classes; this audit does not relabel that implemented evidence as a future command contract.",
+  "CLI-1702 is BlockedSpec downstream of CLI-1701 and the project/formatter CLI gates; DEC-0037 is internal only and the current PROTO-CLI-EXIT/DEC-0013 behavior remains unchanged.",
+  "The current Seed subset already supports human/JSON rendering and stable exit classes; the catalog is not wired as a future command contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "CLI-1702-EXIT"
+title = "Internal CLI exit-code catalog"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CLI-1701-CATALOG"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0037-cli-internal-exit-catalog-boundary.md",
+  "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  "crates/ling-cli/src/exit_catalog.rs",
+  "crates/ling-cli/src/main.rs",
+  "docs/status/CLI-1702-EXIT-IMPLEMENTATION-REPORT.md",
+  "docs/status/CLI-1702-AUTHORITY-AUDIT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The internal catalog preserves exit values 0, 1, 2, 4, 5, and 6 with their existing category distinctions.",
+  "Existing command handlers retain all output, diagnostics, JSON fields, and exit selection; the catalog owns constants only.",
+  "No future command, flag, output schema, retry policy, diagnostic allocation, or exit category is introduced.",
+  "Focused ling-cli tests and the existing conformance suite verify the catalog and unchanged output/exit behavior.",
+]
+verified_against_commit = "b55db2ca22e597da4266f1af3deb664f610cd1ea"
+completion_commit = "b55db2ca22e597da4266f1af3deb664f610cd1ea"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child implements only DEC-0037's internal numeric catalog; CLI-1702 remains BlockedSpec for public output, failure, retry, and future-command behavior.",
+  "The catalog is private to the binary target and does not change the protocol inventory or support matrix.",
 ]
 
 [[task]]
