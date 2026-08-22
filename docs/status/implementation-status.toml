@@ -14677,7 +14677,7 @@ notes = [
 [[task]]
 id = "ZED-6802-SEED"
 title = "Seed language-server discovery inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14722,10 +14722,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0049 closes only this internal Seed inventory child; the parent ZED-6802 gate remains BlockedSpec for real discovery/acquisition authority and artifacts.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "c058d49001fe24b0d6f22c4850025414451c04d3"
+completion_commit = "c058d49001fe24b0d6f22c4850025414451c04d3"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects the negative discovery/acquisition boundary only; the existing Preview ling lsp --stdio lifecycle is not an acquisition source.",
   "No setting, executable identity, release URL, checksum/signature registry, installer, network request, system configuration, or placeholder public API is added.",
