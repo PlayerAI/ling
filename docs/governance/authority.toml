@@ -1716,3 +1716,16 @@ covers = ["TASK-2202 bounded internal state-machine identity graph", "determinis
 depends_on = ["DEC-0002", "DEC-0091", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0093"
+title = "Internal Task lifecycle observation trace"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0093-task-lifecycle-observation-trace.md"
+covers = ["TASK-2203 bounded lifecycle observation trace", "deterministic lifecycle/Fault identities", "structural event evidence without runtime semantics"]
+depends_on = ["DEC-0002", "DEC-0092", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

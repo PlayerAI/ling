@@ -11,8 +11,13 @@ use std::fmt;
 
 use ling_source::Span;
 
+mod lifecycle;
 mod state_machine;
 
+pub use lifecycle::{
+    FaultId, LifecycleEvent, LifecycleEventKind, LifecycleEventSpec, LifecycleIdentityKind,
+    LifecycleTrace, LifecycleTraceError,
+};
 pub use state_machine::{
     LocalId, MachineIdentityKind, StateEdgeKind, StateId, StateMachineError, StateMachineModel,
     StateNode, StateNodeSpec, StateTransition, StateTransitionSpec, TransitionId,

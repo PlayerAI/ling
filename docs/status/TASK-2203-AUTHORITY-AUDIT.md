@@ -13,6 +13,11 @@ No Task runtime, scope registry, child cancellation propagation, join policy,
 Fault aggregator, timeout API, orphan detector, scheduler interface,
 diagnostic allocation, or placeholder G2 API was added.
 
+Accepted `DEC-0093` now authorizes the bounded child
+`TASK-2203-LIFECYCLE-OBSERVATION`, which records only immutable structural
+observations and deterministic identities. It does not close any of the
+runtime authority gaps listed below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative; its runtime checklist does not
@@ -87,6 +92,9 @@ crates.
 
 No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
 source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
+
+The child implementation report and authority audit provide focused evidence
+for the observation boundary; the public lifecycle runtime remains blocked.
 
 ## Intentionally deferred
 
