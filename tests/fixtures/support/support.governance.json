@@ -489,6 +489,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-PROJECT-CHECK",
+      "visibility": "Planned public",
+      "version": "",
+      "stability": "Future",
+      "implemented": false
+    },
+    {
       "id": "PROTO-REPL-JSON",
       "visibility": "Public",
       "version": "ling.repl/0.1",

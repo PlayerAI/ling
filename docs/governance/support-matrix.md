@@ -87,6 +87,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-PACKAGE-IDENTITY` | `Public` | `v1 domain encodings` | `Experimental` | yes |
 | `PROTO-PACKAGE-MANIFEST` | `Public` | `ling.manifest/1` | `Experimental` | yes |
 | `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | `Public` | `ling.semantic/0.2` | `Experimental` | yes |
+| `PROTO-PROJECT-CHECK` | `Planned public` | — | `Future` | no |
 | `PROTO-REPL-JSON` | `Public` | `ling.repl/0.1` | `Preview` | yes |
 | `PROTO-REPLAY` | `Planned public` | — | `Future` | no |
 | `PROTO-SEMANTIC-GRAPH-JSON` | `Public` | `ling.semantic/0.1` | `Experimental` | yes |

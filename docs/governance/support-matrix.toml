@@ -287,6 +287,13 @@ stability = "Experimental"
 implemented = true
 
 [[protocol]]
+id = "PROTO-PROJECT-CHECK"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
 id = "PROTO-CLI-EXIT"
 visibility = "Public"
 version = "0.0.1-dev"

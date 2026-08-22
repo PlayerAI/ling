@@ -24,6 +24,28 @@ authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "RFC-0004"]
 notes = ["The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds only the explicitly gated Preview `ling lsp --stdio` launcher."]
 
 [[protocol]]
+id = "PROTO-PROJECT-CHECK"
+title = "Ling project graph check"
+category = "CLI"
+visibility = "Planned public"
+current_version = ""
+stability = "Future"
+implemented = false
+public_schema = false
+canonical = false
+producer = ["ling project check"]
+consumer = ["shell scripts", "CI jobs", "local project tooling"]
+reader_policy = "The command requires exactly one --manifest-path ending in ling.toml and exactly one --locked option; it validates only the explicit local RFC-0002 project root and rejects unknown options or unsupported project subcommands."
+writer_policy = "Emit one deterministic path-free human line or one ling.project.check/0.1 JSON object; validation diagnostics use existing Diagnostic JSON and no command writes locks, sources, caches, or build artifacts."
+unknown_field_policy = "JSON report fields are current-writer-only; incompatible report changes require a new protocol version."
+migration_tool = "None; ling.project.check/0.1 is Experimental and current-writer-only."
+fixtures = []
+sources = ["docs/RFC-0024.md", "crates/ling-cli/src/main.rs", "crates/ling-project/src/lib.rs"]
+version_markers = []
+authority = ["RFC-0024", "RFC-0002", "DEC-0003", "DEC-0013"]
+notes = ["Graph validation only: semantic compilation, run/test/build, workspace search, registry/network behavior, and lock update mode remain deferred."]
+
+[[protocol]]
 id = "PROTO-LSP-LIFECYCLE"
 title = "Ling LSP lifecycle and stdio transport"
 category = "LSP"

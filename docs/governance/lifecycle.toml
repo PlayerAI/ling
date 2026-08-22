@@ -549,6 +549,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0024"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0024.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact ling project check parsing, explicit manifest selection, required locked mode, and deterministic human/JSON output.",
+  "Run valid and invalid local project fixtures from distinct roots; reject missing, malformed, noncanonical, and mismatched locks without mutation.",
+  "Prove no parent search, network, semantic evaluation, test discovery, build artifact, or path leakage occurs and preserve accepted exit classes.",
+]
+compatibility_impact = [
+  "Adds only the Experimental ling.project.check/0.1 project graph check command; existing file commands, language semantics, diagnostics, Semantic IDs, bytecode, VM, and Unicode behavior remain unchanged.",
+]
+unresolved_alternatives = [
+  "Lock update mode, semantic compilation, project run/test/build, parent search, workspace selection, registry/network access, and Stable 1.0 project compatibility remain future decisions.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

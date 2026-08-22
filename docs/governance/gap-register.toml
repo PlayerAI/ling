@@ -145,13 +145,13 @@ observed_markers = []
 [[gap]]
 id = "GAP-PROJECT-CLI-INTERFACE-001"
 title = "Project workspace selection and build/test CLI contract"
-status = "Open"
+status = "Accepted"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["PRJ-1107"]
-observable_behavior = "Accepted RFC-0002 defines the deterministic library project protocol but leaves CLI integration to PRJ-1107; no accepted contract fixes manifest-path precedence, project check/run/test/build behavior, lock/offline selection, exit-code mapping, or JSON output."
-authority = ["ROADMAP-1.0", "RFC-0002", "DEC-0003", "DEC-0013"]
-candidate_rfcs = []
+observable_behavior = "RFC-0024 now fixes the bounded ling project check command, explicit manifest selection, locked/offline graph validation, exit classes, and path-free human/JSON output; project semantic check/run/test/build and workspace selection remain open."
+authority = ["ROADMAP-1.0", "RFC-0002", "RFC-0024", "DEC-0003", "DEC-0013"]
+candidate_rfcs = ["RFC-0024"]
 source_items = ["03-G1-V0.1-LIVING.md:132-138", "RFC-0002:29-34", "RFC-0002:46", "PROTOCOL-INVENTORY:134,398"]
 options = [
   "Accept a versioned project CLI contract that selects one RFC-0002 workspace and specifies check/run/test/build, manifest-path, lock/offline, exit, and JSON behavior.",
@@ -160,8 +160,8 @@ options = [
 irreversible_consequences = ["Project command names, selection precedence, exit statuses, and JSON fields become automation and editor compatibility commitments; an implicit build/test contract can publish incompatible artifacts or bypass the checked project graph."]
 required_evidence = ["positive", "negative", "migration", "manifest-path", "locked-offline", "exit-codes", "json-output"]
 owner_role = "package-design"
-next_action = "Accept a project CLI decision that reuses the RFC-0002 library graph without duplicating resolution, then implement PRJ-1107 behind that contract."
-resolution = []
+next_action = "Implement the RFC-0024 bounded graph-check child; retain PRJ-1107 blocked for semantic check/run/test/build and workspace-selection contracts."
+resolution = ["RFC-0024"]
 superseded_by = ""
 observed_markers = []
 

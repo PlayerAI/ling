@@ -548,6 +548,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0024"
+title = "Project graph check Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0024.md"
+covers = ["ling project check", "locked local project graph validation", "ling.project.check/0.1"]
+depends_on = ["DEC-0003", "DEC-0013", "RFC-0002", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"
