@@ -181,6 +181,7 @@
 | `GPU-4603` | Launch and Runtime | `G4` | `M` | `BlockedSpec` | — | `` |
 | `GPU-4603-OBSERVATION` | Internal launch and runtime boundary evidence | `G4` | `S` | `Done` | `GPU-4602-OBSERVATION` | `f41c2bc0a5277c7d51fd2c3050b721b9103bcd15` |
 | `GPU-4604` | Differential and Hardware Matrix | `G4` | `M` | `BlockedSpec` | — | `` |
+| `GPU-4604-OBSERVATION` | Internal differential and hardware-matrix boundary evidence | `G4` | `S` | `Done` | `GPU-4603-OBSERVATION` | `1b718796e69546462fceed0f52012cee36726885` |
 | `GPU-4605` | Error Normalization | `G4` | `M` | `BlockedSpec` | — | `` |
 | `IDE-2301` | IDE document symbols | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2301-INDEX` | Internal resolved-definition source-order index | `G1` | `S` | `Done` | `INC-1403`, `PRJ-1102` | `cdce9928bb84526f2adefbb0e607c84bb4ac2116` |
