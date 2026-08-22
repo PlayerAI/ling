@@ -2262,3 +2262,16 @@ covers = ["BACK-3503 bounded Native runtime ABI boundary evidence", "test-only r
 depends_on = ["DEC-0133", "DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0009", "DEC-0012", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0135"
+title = "Internal Native optimization boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0135-native-optimization-boundary-evidence.md"
+covers = ["BACK-3504 bounded Native optimization boundary evidence", "test-only optimization vocabulary", "optimization boundaries without pass/proof/diagnostic/performance semantics"]
+depends_on = ["DEC-0134", "DEC-0133", "DEC-0132", "DEC-0131", "DEC-0130", "DEC-0129", "DEC-0128", "DEC-0127", "DEC-0126", "DEC-0125", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
