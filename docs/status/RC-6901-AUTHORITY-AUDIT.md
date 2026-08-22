@@ -45,6 +45,12 @@ P0/P1 disposition register, historical manifest and migration runs, complete
 security/SBOM/provenance outputs, reproducible release artifacts, and a
 complete bilingual 1.0 documentation set.
 
+The bounded `RC-6901-SEED` child is now protected by
+`cargo xtask rc0 verify`. That internal command checks the exact eight
+`BlockedSpec` rows, the explicit no-freeze/no-publication language, and ten
+linked audit-marker files. It validates inventory drift only and does not
+create any of the missing release evidence.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

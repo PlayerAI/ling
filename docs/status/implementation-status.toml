@@ -3721,6 +3721,69 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6901-SEED"
+title = "Seed RC0 internal-freeze inventory drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ZED-6804-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0052-seed-rc0-internal-freeze-inventory-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/gap-register.toml",
+  "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6501-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6603-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6701-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6804-AUTHORITY-AUDIT.md",
+  "docs/SEED-RELEASE-REPORT.md",
+  "docs/testing/RC0-INTERNAL-FREEZE.md",
+  "docs/testing/SECURITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/rc0_freeze.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0052-seed-rc0-internal-freeze-inventory-gate.md",
+  "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6901-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/testing/RC0-INTERNAL-FREEZE.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/traceability/registry.toml",
+  "docs/traceability/v0.0.1.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc0 verify deterministically validates eight RC0 criteria, all BlockedSpec, with non-empty evidence and required-exit cells and ten linked audit files.",
+  "The verifier fails closed on duplicate/missing/unexpected criteria, state drift, missing no-freeze/no-publication markers, missing audit markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate and does not create a tag, artifact, protocol, issue status, network request, system configuration, or release claim.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0052 closes only this internal Seed RC0 inventory child; the parent RC-6901 gate remains BlockedSpec for all release exits.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects the RC0 negative boundary only; the v0.0.1 Seed report remains distinct from a v1.0 candidate and all release evidence remains deferred.",
+  "No release tag, artifact, signature, SBOM, issue disposition, network request, system configuration, or placeholder release API is added.",
+]
+
+[[task]]
 id = "RC-6901"
 title = "RC0 Internal Freeze"
 state = "BlockedSpec"

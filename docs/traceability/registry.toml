@@ -546,6 +546,20 @@ symbol = "rejects_dap_state_drift"
 feature_ids = ["FTR-SEED-0007"]
 
 [[evidence]]
+id = "EVD-POS-RC0-FREEZE-INVENTORY"
+kind = "Positive"
+path = "tools/xtask/src/rc0_freeze.rs"
+symbol = "repository_rc0_inventory_is_deterministic"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
+id = "EVD-NEG-RC0-FREEZE-INVENTORY-DRIFT"
+kind = "Negative"
+path = "tools/xtask/src/rc0_freeze.rs"
+symbol = "rejects_rc0_state_drift"
+feature_ids = ["FTR-SEED-0007"]
+
+[[evidence]]
 id = "EVD-POS-G0-CI-CONTRACT"
 kind = "Positive"
 path = "tools/xtask/src/ci.rs"

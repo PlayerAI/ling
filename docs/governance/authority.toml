@@ -67,6 +67,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0052"
+title = "Seed RC0 internal-freeze inventory gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0052-seed-rc0-internal-freeze-inventory-gate.md"
+covers = ["internal RC0 checklist inventory", "no-freeze/no-publication boundary", "RC-6901-SEED evidence"]
+depends_on = ["ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0038"
 title = "CLI init command"
 kind = "Decision"

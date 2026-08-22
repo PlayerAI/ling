@@ -94,6 +94,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0052"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0052-seed-rc0-internal-freeze-inventory-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc0 verify offline and assert eight BlockedSpec criteria and ten release-audit marker files.",
+  "Mutate a criterion row/state, policy phrase, evidence cell, or linked audit marker and verify the gate fails closed.",
+  "Run cargo xtask ci verify and locked governance, status, support, and traceability checks without treating the inventory as a release freeze or artifact verification.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask RC0 inventory validator and CI preflight; no language, runtime, diagnostic, schema, protocol, dependency, or Unicode behavior changes.",
+]
+unresolved_alternatives = [
+  "Candidate identity/change control, protocol migration, support tiers, P0/P1 disposition, historical corpus, security sign-off, artifact provenance, and complete 1.0 documentation remain future release authorities.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0038"
 kind = "Decision"
 status = "Accepted"

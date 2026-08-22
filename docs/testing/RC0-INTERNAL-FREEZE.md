@@ -33,11 +33,18 @@ The following offline gates validate the registry and the current negative
 boundary without claiming RC0 completion:
 
 ```text
+cargo xtask rc0 verify
 cargo run -p xtask --locked --offline -- status verify
 cargo run -p xtask --locked --offline -- governance check-all
 cargo run -p xtask --locked --offline -- support verify
 cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 ```
+
+`cargo xtask rc0 verify` deterministically checks the exact eight criteria,
+their `BlockedSpec` states, the no-freeze/no-publication policy, and the ten
+linked release-audit marker files. It is an inventory check only; it does not
+execute a freeze, release build, security scan, issue-tracker operation, or
+artifact publication.
 
 No release tag was created, no package or artifact was published, no issue
 tracker was changed, and no external security or platform result is inferred
