@@ -13696,6 +13696,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/BACK-3505-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3505-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3505-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0136-native-reproducible-build-boundary-evidence.md",
+  "crates/ling-types/tests/native_reproducible_build_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -13705,6 +13713,7 @@ acceptance = [
   "The audit covers clean repeated builds, byte and manifest comparison, path/timestamp/build-ID normalization, tampered/missing inputs, provenance/license, cross-target, Unicode/CRLF/BOM spans, and deterministic evidence without unverified claims.",
   "No reproducible-build script, artifact manifest, path-remapping policy, toolchain pin, build-ID rule, target matrix, linker integration, diagnostic, dependency, toolchain install, public protocol, or placeholder G3 crate is added while BACK/NIR/ABI authority and RFC-N306/RFC-0011 are absent.",
   "The future implementation must preserve Seed behavior, keep build reproducibility distinct from Semantic IDs and language semantics, control all declared inputs, and publish reviewed offline and cross-target evidence before claiming v0.3 reproducible Native builds.",
+  "Accepted DEC-0136 authorizes only test-only Native reproducible-build boundary vocabulary; it does not close toolchain/input closure, artifact identity/difference, provenance/license/offline, cross-host/target, diagnostics, release, migration, or Semantic-ID separation contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13714,6 +13723,63 @@ notes = [
   "BACK-3505 is BlockedSpec by BACK-3501 through BACK-3504, NIR-3401 through NIR-3403, absent RFC-N304/RFC-N306/RFC-0011, GAP-NATIVE-BACKEND-ABI-001, and the open Semantic Hash lifecycle boundary.",
   "The current workspace has no Native toolchain/target/linker matrix, artifact manifest, path/timestamp/build-ID policy, artifact comparer, provenance/license review, or Native release protocol; no external toolchain or dependency state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "BACK-3505-OBSERVATION"
+title = "Internal Native reproducible-build boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BACK-3504-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0133-native-codegen-boundary-evidence.md",
+  "docs/decisions/0134-native-runtime-abi-boundary-evidence.md",
+  "docs/decisions/0135-native-optimization-boundary-evidence.md",
+  "docs/decisions/0136-native-reproducible-build-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/native_reproducible_build_evidence.rs",
+  "docs/decisions/0136-native-reproducible-build-boundary-evidence.md",
+  "docs/status/BACK-3505-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3505-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0136 authorizes only test-only Native reproducible-build boundary evidence; no build script, artifact manifest, path-remapping policy, toolchain pin, build-ID rule, target matrix, linker integration, diagnostic, dependency, toolchain, public protocol, or byte-identical result is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for toolchain/linker/target/environment/library/options/lock and source/Core/NIR/Profile inputs, artifact/object/executable/debug/symbol identity, path/timestamp/build-ID/section/symbol/compression/archive policy, versioned difference manifests, byte/manifest comparison, clean/repeat/offline/cross-host/target reproduction, tamper/missing inputs, provenance/license/TCB, cache/release, Semantic-ID/source-span/performance separation, bounds/metadata/host exclusions, Unicode/diagnostics/unsupported input/migration/security/differential/schema/optional-toolchain evidence with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and has no build, artifact, provenance, release, Semantic ID, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "a4ecedcad8d26eb396e0af7ce2be6b2f6e3c8363"
+completion_commit = "a4ecedcad8d26eb396e0af7ce2be6b2f6e3c8363"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0136; BACK-3505 remains BlockedSpec for Native toolchain/target/linker, input closure, artifact identity, path/time/build-ID, provenance/license/offline, cross-target, migration, release, and byte-identical-build decisions.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

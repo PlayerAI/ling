@@ -53,6 +53,7 @@
 | `BACK-3504` | Native optimization and verification | `G3` | `L` | `BlockedSpec` | `BACK-3503` | `` |
 | `BACK-3504-OBSERVATION` | Internal Native optimization boundary evidence | `G3` | `S` | `Done` | `BACK-3503-OBSERVATION` | `66da38f19fd2a75ecc3f5b4c14da9e500d1481e9` |
 | `BACK-3505` | Reproducible Native build | `G3` | `M` | `BlockedSpec` | `BACK-3504` | `` |
+| `BACK-3505-OBSERVATION` | Internal Native reproducible-build boundary evidence | `G3` | `S` | `Done` | `BACK-3504-OBSERVATION` | `a4ecedcad8d26eb396e0af7ce2be6b2f6e3c8363` |
 | `BASE-0001` | 仓库基线盘点与执行计划落位 | `G0` | `S` | `Done` | — | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | `BND-5201` | Bound Types and Expressions | `G5` | `M` | `BlockedSpec` | `PROF-5104` | `` |
 | `BND-5202` | Loop and Recursion Checks | `G5` | `M` | `BlockedSpec` | `BND-5201` | `` |
