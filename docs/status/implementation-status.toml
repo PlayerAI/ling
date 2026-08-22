@@ -21537,6 +21537,7 @@ spec = [
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0204-model-check-report-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -21545,6 +21546,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/MC-5603-AUTHORITY-AUDIT.md",
+  "docs/decisions/0204-model-check-report-boundary-evidence.md",
+  "docs/status/MC-5603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MC-5603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "crates/ling-concurrency/tests/model_check_report_evidence.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -21564,6 +21569,68 @@ notes = [
   "The repository has no model-check report type, result enum, bounded-result schema, counterexample payload, report reader/writer, model-check diagnostic codes, or report fixtures; existing Seed semantic/VM reports are unrelated.",
   "The audit does not reinterpret execution-plan labels, Draft ModelChecked status, compiler/runtime diagnostics, or RFC-0019 differential outcomes as a public model-check report and creates no report placeholder.",
   "The audit adds no public protocol, dependency, model, runtime, schema, diagnostic, CLI, or placeholder API; Model-Check Report Semantics remains deferred until accepted authority and fixtures exist.",
+]
+
+[[task]]
+id = "MC-5603-OBSERVATION"
+title = "Internal Model-Check Report boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["MC-5602-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0203-exploration-engine-boundary-evidence.md",
+  "docs/decisions/0204-model-check-report-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/tests/model_check_report_evidence.rs",
+  "docs/decisions/0204-model-check-report-boundary-evidence.md",
+  "docs/status/MC-5603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/MC-5603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0204 authorizes only test-local Model-Check Report boundary evidence; no report enum/schema, result semantics, counterexample payload, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty result, identity, bound, resource, provenance, counterexample, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; bounded absence includes non-proof and prohibited-safety-claim markers; tag has no report or protocol authority.",
+  "cargo test -p ling-concurrency --test model_check_report_evidence --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "b1abd86442f7f5908961646eee6fd377d4811219"
+completion_commit = "b1abd86442f7f5908961646eee6fd377d4811219"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0204; MC-5603 remains BlockedSpec for report/result/counterexample schemas, validity/exit semantics, diagnostics, protocols, and support claims.",
+  "No report enum/schema, result semantics, counterexample payload, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
 ]
 
 [[task]]
