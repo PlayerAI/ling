@@ -14147,6 +14147,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/FFI-3604-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3604-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3604-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0140-target-primitive-package-boundary-evidence.md",
+  "crates/ling-types/tests/target_primitive_package_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14156,6 +14164,7 @@ acceptance = [
   "The audit covers package discovery and lock fixtures, primitive/layout/ABI and capability checks, proof/TCB/admission and provenance/license evidence, malformed/tampered/unknown/revoked/migration cases, offline/reproducible builds, cross-target and Native/FFI differential, sanitizer/fuzz, and deterministic evidence without unverified claims.",
   "No target package, lingabi schema, primitive registry, capability or TCB checker, target selector/backend, dependency, toolchain, diagnostic allocation, public protocol implementation, or placeholder API is added while RFC-N305, RFC-0007, RFC-0011, PROTO-ABI, and PROTO-EVIDENCE authority are absent.",
   "The future implementation must preserve v0.0.1 Seed behavior, keep host/hardware/Rust layout outside Ling semantics, consume verified primitive declarations only, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before exposing Target Primitive Packages.",
+  "Accepted DEC-0140 authorizes only test-local Target Primitive Package boundary evidence; it does not close package/lingabi schemas, discovery/locking, target/profile selection, primitive lowering, capability/TCB admission, proof, provenance/revocation, diagnostics, migration, sanitizer/fuzz, or cross-target contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14165,6 +14174,61 @@ notes = [
   "FFI-3604 is BlockedSpec by FFI-3603, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, absent RFC-N305/RFC-0007/RFC-0011, unsupported TARGET-NATIVE-AOT, and the unimplemented PROTO-ABI/PROTO-EVIDENCE registry entries.",
   "The current workspace has no committed Ling Native target, target package, lingabi reader/verifier, primitive registry, capability evaluator, TCB checker, target selector, or target backend; no target toolchain or hardware dependency state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "FFI-3604-OBSERVATION"
+title = "Internal Target Primitive Package boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["FFI-3603-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0139-ffi-shim-generator-boundary-evidence.md",
+  "docs/decisions/0140-target-primitive-package-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/target_primitive_package_evidence.rs",
+  "docs/decisions/0140-target-primitive-package-boundary-evidence.md",
+  "docs/status/FFI-3604-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3604-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0140 authorizes only test-local Target Primitive Package and lingabi boundary evidence; no target package, manifest, schema reader, primitive registry, capability/TCB checker, proof verifier, target selector, diagnostic, dependency, toolchain, public protocol, or executable primitive is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for target/package identity/version/source, manifest/lingabi schemas, primitive identity/signature/layout, capability/profile/target availability, dependency/lock/canonical/unknown/migration rules, implementation/unsafe/trust/signature/TCB/proof, compiler/backend/runtime assumptions, license/revocation/update, artifact/shim/toolchain/offline/deterministic inputs, Semantic-ID/source-span views, ABI/calling/ownership/borrow/Resource/Managed/thread/reentry/blocking/Error/Fault/bounds, rejection rules, diagnostics/Unicode, sanitizer/fuzz, cross-target evidence, public-protocol exclusion, and Seed compatibility.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no package, lingabi, capability, TCB, proof, Semantic ID, diagnostic, target, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0140; FFI-3604 remains BlockedSpec for package/lingabi, target/profile, capability/TCB, proof, ownership/ABI, provenance, diagnostics, migration, sanitizer/fuzz, and cross-target decisions.",
+  "No parser, AST/HIR/Checked Core node, target package, manifest, schema reader, primitive registry, capability/TCB checker, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

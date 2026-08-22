@@ -2327,3 +2327,16 @@ covers = ["FFI-3603 bounded shim-generator boundary evidence", "test-only FFI sh
 depends_on = ["DEC-0138", "DEC-0137", "DEC-0136", "DEC-0124", "DEC-0117", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0140"
+title = "Internal Target Primitive Package boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0140-target-primitive-package-boundary-evidence.md"
+covers = ["FFI-3604 bounded Target Primitive Package boundary evidence", "test-only target-package/lingabi vocabulary", "package boundaries without target/capability/TCB semantics"]
+depends_on = ["DEC-0139", "DEC-0138", "DEC-0137", "DEC-0128", "DEC-0127", "DEC-0124", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
