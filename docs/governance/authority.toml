@@ -2886,3 +2886,16 @@ covers = ["BND-5202 bounded loop/recursion checks boundary evidence", "test-only
 depends_on = ["DEC-0181", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0183"
+title = "Internal memory-budget boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0183-memory-budgets-boundary-evidence.md"
+covers = ["BND-5203 bounded memory-budget boundary evidence", "test-only memory-budget vocabulary", "memory boundaries without analyzer/model/target semantics"]
+depends_on = ["DEC-0182", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -4727,3 +4727,27 @@ unresolved_alternatives = [
   "Termination calculus for loops, direct/mutual/higher-order recursion and data size; ranking/size-change, assumptions and proof trust; Effect/Fault/concurrency/Task/Actor/mailbox/backpressure/cancellation/ordering/Device/Native/numeric/fallback relations; stack/heap/arena and runtime guards; Forbidden/Unknown states and profile policy; work-queue eligibility and state/ownership/effect/ordering/allocation/cancellation/Fault/source-map equivalence; user consent, rollback and output; bilingual diagnostics and provenance; positive/negative/counterexample/transformation/Unicode/determinism/differential fixtures; protocol inventory and public status remain open under BND-5202, BND-5201, GAP-CRITICAL-PROFILE-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-OWNERSHIP-MODEL-001, and missing RFC-K504 and transaction authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0183"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0183-memory-budgets-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty memory-budget boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer memory accounting, proof/estimate states, target binding, runtime guards, fallback semantics, diagnostics, CLI/LSP, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing VM and decoder limits are not reinterpreted as memory semantics.",
+  "No memory-budget analyzer, allocation/ownership model, target binding, proof state, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Memory units and object/layout rules; allocation, ownership, regions, borrowing, sharing, aliasing, alignment and drop timing; Value/Managed/Resource/Device memory; static/stack/arena/buffer accounting; transient peaks, control-flow joins, recursion, cancellation and worst-case paths; queue/mailbox/task/actor/backpressure/device placement; proof, estimate, assumption, unknown, overflow, unsupported and target-mismatch states; target ABI/compiler identity, migration, cache/replay identity; runtime guards, out-of-memory, queue overflow, device allocation failure and fallback policy; logical versus host-safety guarantees; bilingual diagnostics and source facts; positive/negative/boundary/ownership/queue-target/determinism/differential fixtures; protocol inventory and public status remain open under BND-5203, GAP-CRITICAL-PROFILE-001, GAP-OWNERSHIP-MODEL-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-NATIVE-BACKEND-ABI-001, GAP-KERNEL-DEVICE-001, and missing RFC-K504 authority.",
+]
+superseded_by = ""
