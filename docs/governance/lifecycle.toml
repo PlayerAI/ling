@@ -4991,3 +4991,27 @@ unresolved_alternatives = [
   "Status vocabulary/version and meanings; obligation/Contract/Definition/Semantic identity and canonical bytes; proof, runtime-check, model-check, test, assumption, unknown, failed, and not-applicable composition; trust, provenance, solver/checker identity, bounds, timeout/cancellation, staleness/corruption/revocation; transition, terminality, precedence, aggregation, invalidation, migration and compatibility; Audit/Graph/Evidence projection, UI text/accessibility, profiles/optimization, effect isolation and Fault; bilingual diagnostics/facts; positive/negative/transition/stale/corruption/migration/Unicode/differential fixtures; protocol inventory and public status remain open under CTR-5402, CTR-5401, RFC-K503, GAP-CRITICAL-PROFILE-001, and missing Contract authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0194"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0194-contract-runtime-check-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Contract runtime-check categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer the evaluator/runtime hook, check order and isolation, Fault/status, profile policy, evidence schema, diagnostics, CLI/LSP, and protocol behavior until accepted authority and fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing Seed Runtime Faults and VM differential events are not reinterpreted as Contract checks.",
+  "No Contract evaluator, runtime hook, profile switch, Fault kind, evidence schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Checked Contract Core and binding; pre/post/invariant/instance semantics; call/return/declared/suspension/Node/Actor/FFI/cleanup boundaries; order, short-circuit, purity/totality/effects/capabilities/allocation/termination, assume restrictions; unknown/malformed input; effect isolation, atomicity and committed state; Fault/category/code/facts, status and provenance; captured values, privacy/size limits; profile gates and Critical non-weakening; reference/VM/Native equivalence, evidence, replay and migration; diagnostics, positive/negative/boundary/isolation/profile/replay/Unicode fixtures; protocol inventory and public status remain open under CTR-5403, CTR-5402, RFC-K503, GAP-CRITICAL-PROFILE-001, and missing Contract authority.",
+]
+superseded_by = ""
