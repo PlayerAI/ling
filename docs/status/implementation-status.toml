@@ -14605,6 +14605,7 @@ spec = [
   "docs/RFC-0014.md",
   "docs/RFC-0018.md",
   "docs/RFC-0019.md",
+  "docs/decisions/0144-dap-debugger-boundary-evidence.md",
   "docs/ling_execution_plan/05-ZED-EXTENSION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -14613,6 +14614,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/DAP-3601-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3601-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0144-dap-debugger-boundary-evidence.md",
+  "crates/ling-types/tests/dap_debugger_boundary_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14622,6 +14631,7 @@ acceptance = [
   "The audit covers capability/launch/attach/cancel, source-map and UTF-8/LSP positions, breakpoints/steps/stacks/scopes/variables/Fault/Resource/Managed, malformed/unknown/oversized messages, multi-session/security/timeouts, VM/Native differential, migrations, and deterministic evidence without unverified claims.",
   "No DAP adapter, stdio command, wire schema, debugger dependency, source-map bridge, runtime hook, diagnostic allocation, public protocol implementation, extension manifest, zero command, or placeholder API is added while debugger/VM/Native/identity/semantic-protocol authority is absent.",
   "The future implementation must use the authoritative ling CLI name, consume verified Typed Core/derived artifacts only, keep debugger host details outside Ling semantics, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before claiming debugger support.",
+  "Accepted DEC-0144 authorizes only test-local DAP debugger boundary evidence; it does not close transport/framing, lifecycle, debug semantics, source-map metadata, security, extension integration, protocol inventory, or public support claims.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14632,6 +14642,64 @@ notes = [
   "The current workspace has no DAP adapter, stdio framing, debugger command, editor extension, Native debug metadata, launch/attach model, breakpoint index, stack/locals projection, or DAP protocol inventory entry; RFC-0014/RFC-0018/RFC-0019 only provide experimental VM/source-map/Fault/differential foundations.",
   "The plan's zero dap --stdio spelling is stale; the audit adds no command and preserves the authoritative ling/.ling naming. No debugger dependency, transport, toolchain, or extension state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, support matrix, target, CLI, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "DAP-3601-OBSERVATION"
+title = "Internal DAP debugger boundary evidence"
+state = "Done"
+release = "G3+"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DIFF-3702-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/decisions/0143-allowed-difference-registry-boundary-evidence.md",
+  "docs/decisions/0144-dap-debugger-boundary-evidence.md",
+  "docs/ling_execution_plan/05-ZED-EXTENSION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/dap_debugger_boundary_evidence.rs",
+  "docs/decisions/0144-dap-debugger-boundary-evidence.md",
+  "docs/status/DAP-3601-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/DAP-3601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0144 authorizes only test-local DAP debugger boundary evidence; no DAP transport, framing, command, runtime hook, source-map bridge, extension, diagnostic, dependency, protocol, or public support claim is made.",
+  "The test-local inventory covers sixty provisional boundaries for protocol framing/lifecycle/capabilities/sessions/security, malformed messages/version/migration, source maps and UTF-8/LSP positions, snapshots/identity, breakpoints/steps/stacks/scopes/variables/Fault/ownership, VM/Native metadata, Typed Core input, host exclusions, limits/redaction, diagnostics/Unicode/Semantic IDs, fixtures, deterministic evidence, and protocol inventory separation.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no debugger, source-map, diagnostic, Semantic ID, Native, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0144; DAP-3601 remains BlockedSpec for transport/framing, lifecycle, engine-neutral debug semantics, source-map/identity metadata, security, extension integration, protocol inventory, fixtures, and support claims.",
+  "No parser, AST/HIR/Checked Core node, DAP adapter, debugger command, runtime hook, source-map bridge, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

@@ -361,6 +361,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `DIFF-3702` | G3 | 已允许差异登记表 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:512`, `docs/status/DIFF-3702-AUTHORITY-AUDIT.md` |
 | `DIFF-3702-OBSERVATION` | G3 | Internal allowed-difference registry boundary evidence | S | Done | Accepted `DEC-0143`; see `crates/ling-types/tests/allowed_difference_registry_evidence.rs` and `docs/status/DIFF-3702-OBSERVATION-IMPLEMENTATION-REPORT.md`; registry/equivalence semantics remain BlockedSpec |
 | `DAP-3601` | G3+ | `zero dap --stdio` | — | BlockedSpec | `05-ZED-EXTENSION.md:526`, `docs/status/DAP-3601-AUTHORITY-AUDIT.md` |
+| `DAP-3601-OBSERVATION` | G3+ | Internal DAP debugger boundary evidence | S | Done | Accepted `DEC-0144`; see `crates/ling-types/tests/dap_debugger_boundary_evidence.rs` and `docs/status/DAP-3601-OBSERVATION-IMPLEMENTATION-REPORT.md`; debugger protocol/runtime semantics remain BlockedSpec |
 | `DAP-3602` | G3+ | Zed debugger registration | — | BlockedSpec | `05-ZED-EXTENSION.md:530`, `docs/status/DAP-3602-AUTHORITY-AUDIT.md` |
 | `DAP-3603` | G3+ | 能力阶段 | — | BlockedSpec | `05-ZED-EXTENSION.md:538`, `docs/status/DAP-3603-AUTHORITY-AUDIT.md` |
 | `KCHK-4101` | G4 | Kernel 允许能力矩阵 | M | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:69`, `docs/status/KCHK-4101-AUTHORITY-AUDIT.md` |

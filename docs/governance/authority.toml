@@ -2379,3 +2379,16 @@ covers = ["DIFF-3702 bounded allowed-difference registry boundary evidence", "te
 depends_on = ["DEC-0142", "DEC-0141", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0144"
+title = "Internal DAP debugger boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0144-dap-debugger-boundary-evidence.md"
+covers = ["DAP-3601 bounded debugger boundary evidence", "test-only DAP/debugger vocabulary", "debugger boundaries without transport/runtime/protocol semantics"]
+depends_on = ["DEC-0143", "DEC-0012", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
