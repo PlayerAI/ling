@@ -16185,10 +16185,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "ae5694c4a134b9d7a8a0ec671835d28a21be8f81"
+completion_commit = "ae5694c4a134b9d7a8a0ec671835d28a21be8f81"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0157; SIMD-4303 remains BlockedSpec for differential comparisons, exact/tolerance rules, Fault/effect equivalence, target matrices, migration, protocol integration, and support claims.",
   "No parser, AST/HIR/Checked Core node, CPU/SIMD differential runner, comparison result type, tolerance policy, Fault mapper, target matrix, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",

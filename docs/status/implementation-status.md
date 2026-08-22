@@ -364,6 +364,7 @@
 | `SIMD-4302` | Portable SIMD IR | `G4` | `M` | `BlockedSpec` | `SIMD-4301` | `` |
 | `SIMD-4302-OBSERVATION` | Internal Portable SIMD IR boundary evidence | `G4` | `S` | `Done` | `SIMD-4301-OBSERVATION` | `917a64ad8bf7521f7455cade79b4fdb2056bd894` |
 | `SIMD-4303` | SIMD Differential | `G4` | `M` | `BlockedSpec` | `SIMD-4302` | `` |
+| `SIMD-4303-OBSERVATION` | Internal SIMD differential boundary evidence | `G4` | `S` | `Done` | `SIMD-4302-OBSERVATION` | `ae5694c4a134b9d7a8a0ec671835d28a21be8f81` |
 | `STAB-6101` | Support-Matrix Item Audit | `G6` | `L` | `BlockedSpec` | `CBK-5903` | `` |
 | `STAB-6102` | Remove False Entry Points | `G6` | `L` | `BlockedSpec` | `STAB-6101` | `` |
 | `STAB-6103` | Feature State Metadata | `G6` | `L` | `BlockedSpec` | `STAB-6102` | `` |
