@@ -1963,3 +1963,16 @@ covers = ["REM-2602 bounded transport-neutral envelope boundary evidence", "test
 depends_on = ["DEC-0110", "DEC-0096", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0112"
+title = "Internal remote-delivery boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0112-remote-delivery-boundary-evidence.md"
+covers = ["REM-2603 bounded remote-delivery boundary evidence", "test-only delivery/failure vocabulary", "delivery boundaries without retry/ordering/runtime semantics"]
+depends_on = ["DEC-0111", "DEC-0110", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

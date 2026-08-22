@@ -295,6 +295,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REM-2602` | G2 | Transport-neutral Envelope | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:466`, `docs/status/REM-2602-AUTHORITY-AUDIT.md` |
 | `REM-2602-OBSERVATION` | G2 | Internal transport-neutral envelope boundary evidence | S | Done | Accepted `DEC-0111`; see `crates/ling-concurrency/tests/remote_envelope_evidence.rs` and `docs/status/REM-2602-OBSERVATION-IMPLEMENTATION-REPORT.md`; wire/transport/schema semantics remain BlockedSpec |
 | `REM-2603` | G2 | Delivery 语义 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:482`, `docs/status/REM-2603-AUTHORITY-AUDIT.md` |
+| `REM-2603-OBSERVATION` | G2 | Internal remote-delivery boundary evidence | S | Done | Accepted `DEC-0112`; see `crates/ling-concurrency/tests/remote_delivery_evidence.rs` and `docs/status/REM-2603-OBSERVATION-IMPLEMENTATION-REPORT.md`; delivery/retry/ordering/Fault semantics remain BlockedSpec |
 | `REM-2604` | G2 | 最小参考传输 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:497`, `docs/status/REM-2604-AUTHORITY-AUDIT.md` |
 | `REM-2605` | G2 | 安全与资源限制 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:506`, `docs/status/REM-2605-AUTHORITY-AUDIT.md` |
 | `MEM-3101` | G3 | 类型分类模型 | M | BlockedSpec | `07-G3-V0.3-NATIVE.md:67`, `docs/status/MEM-3101-AUTHORITY-AUDIT.md` |

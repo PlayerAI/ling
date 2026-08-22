@@ -2947,3 +2947,29 @@ unresolved_alternatives = [
   "Canonical bytes and field encoding, extension/version negotiation, identity and schema binding, deadline/cancellation units, delivery/retry/order, payload serialization/checksum, authentication/privacy, resource limits, diagnostics, migration, transport adapters, runtime ABI, and cross-process behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2602.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0112"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0112-remote-delivery-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all eighteen provisional delivery and failure boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep delivery guarantees, loss/duplicate behavior, idempotence-key scope, ordering/causality, timeout/disconnect/partition, stale incarnation, restart, schema/capability failures, retries, replay, diagnostics, resources, security, cross-process, differential, and runtime fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public delivery guarantee or remote protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Delivery class guarantees, exactly-once boundary, identity and deduplication, idempotence, ordering/causality, timeout/disconnect, partition/retry/restart, schema/capability failure, Fault representation, migration, diagnostics, resource limits, runtime ABI, and transport behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2603.",
+]
+superseded_by = ""
