@@ -2048,3 +2048,26 @@ unresolved_alternatives = [
   "Reference source-span lookup, request positions, URI/version/snapshot binding, declaration/type-definition policy, aliases, builtins/Prelude/primitives, generated/dependency documents, limits, cancellation, stale publication, protocol negotiation, and migration remain open under IDE-2303 and the registered LSP/semantic lifecycle gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0076"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0076-ide-resolved-reference-reverse-index.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify definition and binding target grouping from Unicode, BOM, CRLF, imported, and repeated-reference inputs with deterministic source/module/reference ordering.",
+  "Repeat reverse construction, compare target identity to the forward index, and preserve empty/missing lookup behavior; keep taxonomy, ranges, invalidation, persistence, and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db reverse-observation values and an accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Relation taxonomy, overlap/precedence, source reference spans, declaration/use semantics, target eligibility, revision keys, dependency invalidation, persistence/corruption, resource limits, URI/version/snapshot binding, cancellation, stale publication, protocol negotiation, and migration remain open under IDE-2304 and the registered cache/LSP/semantic lifecycle gaps.",
+]
+superseded_by = ""

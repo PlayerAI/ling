@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::collections::BTreeMap;
 
 use ling_resolve::{ReferenceTarget, ResolvedProgram};
 use ling_source::Span;
@@ -93,6 +94,36 @@ impl ResolvedReferenceTarget {
             Self::Binding(_) => ResolvedReferenceTargetKind::Binding,
         }
     }
+
+    #[must_use]
+    pub fn key(&self) -> ResolvedReferenceTargetKey {
+        match self {
+            Self::Definition(target) => {
+                ResolvedReferenceTargetKey::Definition(target.definition_id.clone())
+            }
+            Self::Binding(target) => ResolvedReferenceTargetKey::Binding {
+                module_id: target.module_id,
+                binding_id: target.binding_id,
+            },
+        }
+    }
+}
+
+/// Stable resolver identity used to group references without Semantic IDs.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum ResolvedReferenceTargetKey {
+    Definition(String),
+    Binding { module_id: u32, binding_id: u32 },
+}
+
+impl ResolvedReferenceTargetKey {
+    #[must_use]
+    pub const fn kind(&self) -> ResolvedReferenceTargetKind {
+        match self {
+            Self::Definition(_) => ResolvedReferenceTargetKind::Definition,
+            Self::Binding { .. } => ResolvedReferenceTargetKind::Binding,
+        }
+    }
 }
 
 /// One source reference and its resolver-owned target.
@@ -164,6 +195,114 @@ impl ResolvedReferenceIndex {
                 .windows(2)
                 .all(|pair| { entry_order(&pair[0], &pair[1]) != Ordering::Greater })
         );
+        Self {
+            entries: entries.into_boxed_slice(),
+        }
+    }
+}
+
+/// One source reference retained by the internal reverse index.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct ResolvedReferenceSource {
+    source_module_id: u32,
+    source_module: String,
+    source_name: String,
+    reference_id: u32,
+}
+
+impl ResolvedReferenceSource {
+    #[must_use]
+    pub const fn source_module_id(&self) -> u32 {
+        self.source_module_id
+    }
+
+    #[must_use]
+    pub fn source_module(&self) -> &str {
+        &self.source_module
+    }
+
+    #[must_use]
+    pub fn source_name(&self) -> &str {
+        &self.source_name
+    }
+
+    #[must_use]
+    pub const fn reference_id(&self) -> u32 {
+        self.reference_id
+    }
+}
+
+/// All resolver references grouped under one existing target identity.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ResolvedReferenceReverseEntry {
+    target: ResolvedReferenceTargetKey,
+    sources: Box<[ResolvedReferenceSource]>,
+}
+
+impl ResolvedReferenceReverseEntry {
+    #[must_use]
+    pub const fn target(&self) -> &ResolvedReferenceTargetKey {
+        &self.target
+    }
+
+    #[must_use]
+    pub fn sources(&self) -> &[ResolvedReferenceSource] {
+        &self.sources
+    }
+}
+
+/// Deterministic target-to-source reverse lookup over the forward index.
+///
+/// This is an in-process observation only. It has no relation taxonomy,
+/// revision cache, persistence, source ranges, URI/version, or LSP state.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ResolvedReferenceReverseIndex {
+    entries: Box<[ResolvedReferenceReverseEntry]>,
+}
+
+impl ResolvedReferenceReverseIndex {
+    #[must_use]
+    pub fn entries(&self) -> &[ResolvedReferenceReverseEntry] {
+        &self.entries
+    }
+
+    #[must_use]
+    pub fn target(
+        &self,
+        target: &ResolvedReferenceTargetKey,
+    ) -> Option<&ResolvedReferenceReverseEntry> {
+        self.entries.iter().find(|entry| &entry.target == target)
+    }
+
+    pub(crate) fn from_resolved(resolved: &ResolvedProgram) -> Self {
+        let forward = ResolvedReferenceIndex::from_resolved(resolved);
+        Self::from_forward(&forward)
+    }
+
+    fn from_forward(forward: &ResolvedReferenceIndex) -> Self {
+        let mut grouped =
+            BTreeMap::<ResolvedReferenceTargetKey, Vec<ResolvedReferenceSource>>::new();
+        for entry in forward.entries() {
+            grouped
+                .entry(entry.target.key())
+                .or_default()
+                .push(ResolvedReferenceSource {
+                    source_module_id: entry.source_module_id,
+                    source_module: entry.source_module.clone(),
+                    source_name: entry.source_name.clone(),
+                    reference_id: entry.reference_id,
+                });
+        }
+        let entries = grouped
+            .into_iter()
+            .map(|(target, mut sources)| {
+                sources.sort();
+                ResolvedReferenceReverseEntry {
+                    target,
+                    sources: sources.into_boxed_slice(),
+                }
+            })
+            .collect::<Vec<_>>();
         Self {
             entries: entries.into_boxed_slice(),
         }

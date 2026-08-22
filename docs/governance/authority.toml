@@ -1495,3 +1495,16 @@ covers = ["IDE-2303 bounded resolved-reference target index", "resolver referenc
 depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0076"
+title = "Internal resolved-reference reverse index"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0076-ide-resolved-reference-reverse-index.md"
+covers = ["IDE-2304 bounded resolved-reference reverse lookup", "existing target identity grouping", "deterministic internal references source"]
+depends_on = ["DEC-0002", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

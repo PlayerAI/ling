@@ -34,7 +34,9 @@ pub use definition_index::{
 };
 pub use reference_index::{
     ResolvedReferenceBindingTarget, ResolvedReferenceDefinitionTarget, ResolvedReferenceEntry,
-    ResolvedReferenceIndex, ResolvedReferenceTarget, ResolvedReferenceTargetKind,
+    ResolvedReferenceIndex, ResolvedReferenceReverseEntry, ResolvedReferenceReverseIndex,
+    ResolvedReferenceSource, ResolvedReferenceTarget, ResolvedReferenceTargetKey,
+    ResolvedReferenceTargetKind,
 };
 pub use typed_definition_index::{TypedDefinitionIndex, TypedDefinitionSymbol};
 
@@ -922,6 +924,23 @@ impl CompilerDb {
             .ok_or(QueryError::UnknownFile { file })?;
         let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
         Ok(Arc::new(ResolvedReferenceIndex::from_resolved(&resolved)))
+    }
+
+    /// Builds an immutable target-to-source reverse observation over resolved
+    /// references. This is not an editor references response or cache.
+    pub fn resolved_reference_reverse_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<ResolvedReferenceReverseIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
+        Ok(Arc::new(ResolvedReferenceReverseIndex::from_resolved(
+            &resolved,
+        )))
     }
 
     /// Builds an immutable source-order observation of checked user
@@ -2425,6 +2444,59 @@ mod tests {
         let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
         assert!(matches!(
             db.resolved_reference_index(file),
+            Err(QueryError::InvalidSource { .. })
+        ));
+    }
+
+    #[test]
+    fn resolved_reference_reverse_index_groups_existing_targets_deterministically() {
+        let mut db = CompilerDb::new();
+        let source = "module Main\n\nlet helper = 1\n\nlet main () = helper\n";
+        let file = file(
+            db.set_disk_snapshot("src/Main.ling", source.as_bytes().to_vec())
+                .unwrap(),
+        );
+
+        let forward = db
+            .resolved_reference_index(file)
+            .expect("valid source resolves references");
+        let reverse = db
+            .resolved_reference_reverse_index(file)
+            .expect("valid source builds reverse index");
+        let repeated = db
+            .resolved_reference_reverse_index(file)
+            .expect("repeated reverse index is deterministic");
+        assert_eq!(&*reverse, &*repeated);
+
+        let helper_reference = forward
+            .entries()
+            .iter()
+            .find(|entry| {
+                matches!(
+                    entry.target(),
+                    ResolvedReferenceTarget::Definition(target) if target.name() == Some("helper")
+                )
+            })
+            .expect("helper reference is indexed");
+        let target_key = helper_reference.target().key();
+        let grouped = reverse
+            .target(&target_key)
+            .expect("helper target is grouped");
+        assert_eq!(grouped.target(), &target_key);
+        assert_eq!(grouped.sources().len(), 1);
+        assert_eq!(grouped.sources()[0].source_name(), "src/Main.ling");
+        assert_eq!(
+            grouped.sources()[0].reference_id(),
+            helper_reference.reference_id()
+        );
+    }
+
+    #[test]
+    fn resolved_reference_reverse_index_does_not_publish_after_source_failure() {
+        let mut db = CompilerDb::new();
+        let file = file(db.set_disk_snapshot("bad/Main.ling", vec![0xFF]).unwrap());
+        assert!(matches!(
+            db.resolved_reference_reverse_index(file),
             Err(QueryError::InvalidSource { .. })
         ));
     }

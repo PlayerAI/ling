@@ -106,6 +106,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0073` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0073](../decisions/0073-ide-resolved-definition-index.md) |
 | `DEC-0074` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0074](../decisions/0074-ide-typed-definition-observation.md) |
 | `DEC-0075` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0075](../decisions/0075-ide-resolved-reference-index.md) |
+| `DEC-0076` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0076](../decisions/0076-ide-resolved-reference-reverse-index.md) |
 
 ## Migration boundary
 

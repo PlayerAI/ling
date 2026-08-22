@@ -5,12 +5,14 @@
 `IDE-2304` is correctly recorded as `BlockedSpec`. The execution plan asks for a
 definition/reference index, relation categories (`read`, `write`, `call`,
 `type`, and `implementation`), and incrementally updated results for later
-semantic tokens and rename. The repository has internal forward reference data,
-but no accepted reverse-index model, relation taxonomy, source-location
+semantic tokens and rename. Accepted `DEC-0076` closes only the bounded
+internal `IDE-2304-REVERSE-INDEX` grouping over existing resolver targets. The
+repository still has no accepted relation taxonomy, source-location
 projection, snapshot contract, or public references response.
 
-No reference handler, reverse index, relation schema, incremental cache API,
-protocol field, or placeholder editor surface was added.
+No reference handler, relation schema, incremental cache API, protocol field,
+or placeholder editor surface was added. The child exposes only immutable
+target grouping inside `ling-db`.
 
 ## Normative traceability
 
@@ -37,8 +39,8 @@ protocol field, or placeholder editor surface was added.
 ## Current interface evidence
 
 - `ling-resolve` stores deterministic forward references to definitions or
-  bindings, but does not expose an editor-facing reverse index or the planned
-  read/write/call/type/implementation taxonomy with stable semantics.
+  bindings. `ling-db::ResolvedReferenceReverseIndex` now groups those exact
+  target keys, but exposes no editor-facing relation taxonomy or response.
 - `ling-semantic` emits Experimental graph references with source/target
   identity and kind metadata, but no editor ranges, URI/source mapping,
   reverse-index lifecycle, or public references request/response.
@@ -74,19 +76,28 @@ Until these contracts are Accepted, a reverse index could classify references
 ## Evidence and compatibility
 
 This audit was checked against `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
-`docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, `0019-incremental-query-boundary`,
+`docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012,
+`docs/decisions/0076-ide-resolved-reference-reverse-index.md`,
+`0019-incremental-query-boundary`,
 `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the `ling-resolve`, `ling-semantic`, `ling-source`, and `ling-project`
-crates.
+and the `ling-resolve`, `ling-semantic`, `ling-source`, `ling-project`, and
+`ling-db/src/reference_index.rs` crates.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+The child adds only internal resolver-derived grouping values; no compiler
+language, interpreter, VM, bytecode, diagnostic, schema, Semantic ID, runtime,
+or Unicode 17.0.0 behavior changed.
+
+## Accepted bounded child
+
+`IDE-2304-REVERSE-INDEX` is `Done` under `DEC-0076`. It performs no relation
+classification or incremental persistence, and its acceptance evidence is
+recorded in `docs/status/IDE-2304-REVERSE-INDEX-IMPLEMENTATION-REPORT.md`.
 
 ## Intentionally deferred
 
-`IDE-2304` can begin after relation/index, incremental invalidation, LSP
-transaction, and Semantic Graph lifecycle decisions are Accepted. The future
-implementation must derive results from checked references, preserve source
-span and identity truth, update indexes deterministically, and label
+The parent `IDE-2304` can begin after relation/index, incremental invalidation,
+LSP transaction, and Semantic Graph lifecycle decisions are Accepted. Any
+future implementation must derive results from checked references, preserve
+source-span and identity truth, update indexes deterministically, and label
 experimental fields explicitly.
