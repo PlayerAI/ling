@@ -6408,6 +6408,59 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2306-REFERENCE-SPANS"
+title = "Internal resolved-reference source-span observation"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2304-REVERSE-INDEX", "IDE-2305-IDENTIFIER-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0078-ide-rename-reference-span-observation.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/reference_span_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0078-ide-rename-reference-span-observation.md",
+  "docs/status/IDE-2306-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2306-REFERENCE-SPANS-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0078 authorizes only a resolver-filtered immutable observation of original UTF-8 reference spans; no rename policy is invented.",
+  "Name, projection-field, and mutable-place-root spans preserve the HIR SourceId + Span; orphan HIR IDs are omitted and no editor position is synthesized.",
+  "Deterministic source/module/reference/span ordering and source-scoped lookup make repeated equal resolver/HIR inputs equal without protocol/cache state.",
+  "Focused cargo fmt and ling-db tests pass; Unicode/BOM/CRLF exact spans, repeated construction, source lookup, and resolver filtering are covered.",
+  "The public IDE-2306 rename target remains BlockedSpec for target/alias policy, edits, snapshots, identity migration, versions, stale behavior, and protocol semantics.",
+]
+verified_against_commit = "70e0aeb833013a65c73e71b48d195c2d69454bfd"
+completion_commit = "70e0aeb833013a65c73e71b48d195c2d69454bfd"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The index is source-span evidence for future rename analysis, not an editor range, Workspace Edit, target selector, or Semantic ID migration.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2306"
 title = "IDE rename"
 state = "BlockedSpec"
