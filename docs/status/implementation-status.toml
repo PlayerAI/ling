@@ -12192,6 +12192,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/OWN-3206-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3206-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3206-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0123-ownership-diagnostic-boundary-evidence.md",
+  "crates/ling-diagnostics/tests/ownership_diagnostic_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -12201,6 +12209,7 @@ acceptance = [
   "The audit covers moves, aliases, partial moves, branches/loops/match/closures, cancellation, Task/Actor/await, FFI transfer, region escape, automatic-borrow ambiguity, repair preconditions/ranking, Unicode/CRLF/BOM spans, and interpreter/VM/Native differential fixtures.",
   "No future ownership diagnostic, error-code allocation, repair ranking, ownership-specific JSON field, LSP code action, public protocol, or placeholder G3 API is added while RFC-0007/RFC-N305 authority is absent; existing codes and schemas remain unchanged.",
   "The future implementation must preserve existing diagnostic codes and schemas, consume accepted types and checked Core only, keep repairs deterministic and safe, and publish diagnostic, LSP, migration, source-span, and interpreter/VM/Native evidence before exposing v0.3 ownership repairs.",
+  "Accepted DEC-0123 authorizes only test-only ownership-diagnostic and repair boundary vocabulary; it does not close ownership meanings, code allocation, repair ranking, LSP, migration, or FFI gaps.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -12210,6 +12219,61 @@ notes = [
   "OWN-3206 is BlockedSpec by OWN-3201 through OWN-3205, absent RFC-N305/RFC-0007, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, and unresolved ownership semantics, diagnostic meanings, repair ranking, and LSP contracts.",
   "Current repository has a Preview bilingual Diagnostic JSON container and generic Facts/Repair structures, but no ownership-specific code, resource-origin tracking, move/borrow conflict model, region facts, ranked repairs, or v0.3 LSP code-action adapter; no new L-* code is allocated.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, existing diagnostic registry, future ownership diagnostics, error-code allocation, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "OWN-3206-OBSERVATION"
+title = "Internal ownership-diagnostic and repair boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["OWN-3205-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0119-borrow-exclusivity-boundary-evidence.md",
+  "docs/decisions/0122-drop-order-boundary-evidence.md",
+  "docs/decisions/0123-ownership-diagnostic-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-diagnostics/tests/ownership_diagnostic_evidence.rs",
+  "docs/decisions/0123-ownership-diagnostic-boundary-evidence.md",
+  "docs/status/OWN-3206-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/OWN-3206-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0123 authorizes only test-only ownership-diagnostic and repair boundary evidence; no ownership diagnostic, error code, Fact, Repair, ranking, edit, LSP, or migration semantics are claimed.",
+  "The test-local inventory covers forty-five provisional boundaries for ownership facts/root cause/severity, Seed diagnostic interaction, Repair schema/ranking, edits/preconditions/stale span/version/applicability, alternatives/localization/safety, LSP and source/CST/AST/HIR/Checked Core/Graph/Audit Source projections, UTF-8 spans/Semantic IDs/schema versioning, migration/Profile/FFI/Native/Task/Actor/Fault, Unicode/host-text/unchecked-AST rejection, negative fixtures, differential evidence, and Seed migration with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and no ownership diagnostic, error-code allocation, repair ranking, public protocol, or stale zero command is added.",
+  "cargo test -p ling-diagnostics --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-diagnostics --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "6088923b9b8cc1accea7f7283784ac9ef2cd428c"
+completion_commit = "6088923b9b8cc1accea7f7283784ac9ef2cd428c"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is test-only evidence under DEC-0123; OWN-3206 remains BlockedSpec for ownership meanings, error-code allocation, repair ranking, LSP mapping, migration, FFI, and differential semantics.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed diagnostics remain unchanged.",
 ]
 
 [[task]]
