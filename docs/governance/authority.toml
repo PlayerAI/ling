@@ -2002,3 +2002,16 @@ covers = ["REM-2605 bounded security/resource boundary evidence", "test-only sec
 depends_on = ["DEC-0113", "DEC-0010", "DEC-0012", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0115"
+title = "Internal Value-layout and Copy/Move boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0115-memory-layout-copy-move-boundary-evidence.md"
+covers = ["MEM-3102 bounded Value-layout and Copy/Move boundary evidence", "test-only memory/ownership vocabulary", "memory boundaries without layout/ABI/ownership semantics"]
+depends_on = ["DEC-0061", "DEC-0008", "DEC-0009", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

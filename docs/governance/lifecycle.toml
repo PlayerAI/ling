@@ -3025,3 +3025,29 @@ unresolved_alternatives = [
   "Resource accounting and quota scope, decoder limits, host versus Profile policy, trust roots, credential and Capability lifecycle, endpoint binding, privacy, replay/rate semantics, schema/version failure, Fault mapping, transport/runtime ownership, diagnostics, migration, fuzz corpus, and cross-process behavior remain open under GAP-ACTOR-REMOTE-DELIVERY-001 and REM-2605.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0115"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0115-memory-layout-copy-move-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-seven provisional memory/layout boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep memory kinds, Copy/Move legality, layout/ABI/serialization, ownership, diagnostics, optimization proof, profiles, migration, fuzzing, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public memory, ownership, ABI, or Copy/Move claim is registered.",
+]
+unresolved_alternatives = [
+  "Memory-kind classification, representation and layout obligations, Copy/Move legality, implicit copies, Resource interaction, ownership diagnostics, serialization and canonical bytes, Native/FFI ABI, Profile constraints, optimization proof, migration, and differential behavior remain open under GAP-OWNERSHIP-MODEL-001 and MEM-3102.",
+]
+superseded_by = ""
