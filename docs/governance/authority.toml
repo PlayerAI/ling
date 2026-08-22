@@ -1287,3 +1287,16 @@ covers = ["Seed closed EffectRow canonical snapshot", "EFF-2101-SEED-ROW evidenc
 depends_on = ["DEC-0010", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0061"
+title = "Seed type value classification"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0061-seed-type-value-classification.md"
+covers = ["Seed completed-type Value classification", "MEM-3101-SEED-VALUE evidence"]
+depends_on = ["DEC-0008", "DEC-0009", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

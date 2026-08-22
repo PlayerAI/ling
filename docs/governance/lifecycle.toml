@@ -1664,3 +1664,27 @@ unresolved_alternatives = [
   "Effect IDs, open/closed rows, operation signatures, polymorphic inference, handlers, resume rules, State masking, Task/Actor effects, v0.2 diagnostics, and migration remain later EFF-2101 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0061"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0061-seed-type-value-classification.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify completed Seed primitive, aggregate, nominal, function, variant, and collection forms classify as Value.",
+  "Verify unresolved type variables and error sentinels return no classification instead of a future memory kind.",
+  "Verify repeated calls are deterministic and carry no layout, pointer, allocator, source-path, or host-state information.",
+]
+compatibility_impact = [
+  "Adds only an in-process ling-types enum and method over the accepted Seed value boundary; language, diagnostics, schemas, Semantic IDs, source spans, CLI, runtime, bytecode, VM, protocols, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Value/Managed/Resource, kind constraints, Copy/Move, ownership, borrowing, region/drop, identity, serialization, profile, Native, FFI, and memory diagnostics remain later MEM-3101 authority.",
+]
+superseded_by = ""

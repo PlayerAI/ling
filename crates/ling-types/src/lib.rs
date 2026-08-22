@@ -60,6 +60,38 @@ pub enum Type {
     Error,
 }
 
+/// The only memory classification authorized by the v0.0.1 Seed boundary.
+///
+/// Managed and Resource classifications belong to the future ownership and
+/// native-memory authorities; they are intentionally not represented here.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SeedTypeClass {
+    Value,
+}
+
+impl Type {
+    /// Classifies a resolved Seed type without choosing future memory rules.
+    ///
+    /// Unresolved type variables and error sentinels are not valid completed
+    /// Seed types and therefore return `None`.
+    #[must_use]
+    pub const fn seed_type_class(&self) -> Option<SeedTypeClass> {
+        match self {
+            Self::Variable(_) | Self::Error => None,
+            Self::Unit
+            | Self::Bool
+            | Self::Int
+            | Self::Float64
+            | Self::Text
+            | Self::Tuple(_)
+            | Self::List(_)
+            | Self::Function { .. }
+            | Self::NominalRecord { .. }
+            | Self::NominalVariant { .. } => Some(SeedTypeClass::Value),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct TypeArena {
     types: Vec<Type>,
@@ -3892,6 +3924,25 @@ mod tests {
             })
             .collect();
         ling_resolve::resolve(programs, "Main").expect("resolves")
+    }
+
+    #[test]
+    fn seed_type_classifies_only_completed_types_as_values() {
+        assert_eq!(Type::Int.seed_type_class(), Some(SeedTypeClass::Value));
+        assert_eq!(
+            Type::Tuple(vec![TypeId(0)]).seed_type_class(),
+            Some(SeedTypeClass::Value)
+        );
+        assert_eq!(
+            Type::Function {
+                parameters: vec![TypeId(0)],
+                result: TypeId(0),
+            }
+            .seed_type_class(),
+            Some(SeedTypeClass::Value)
+        );
+        assert_eq!(Type::Variable(0).seed_type_class(), None);
+        assert_eq!(Type::Error.seed_type_class(), None);
     }
 
     #[test]

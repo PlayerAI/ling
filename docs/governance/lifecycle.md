@@ -90,6 +90,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0058` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0058](../decisions/0058-locked-project-snapshot-boundary.md) |
 | `DEC-0059` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0059](../decisions/0059-trait-ide-projection-lookups.md) |
 | `DEC-0060` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0060](../decisions/0060-seed-effect-row-snapshot.md) |
+| `DEC-0061` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0061](../decisions/0061-seed-type-value-classification.md) |
 
 ## Migration boundary
 
