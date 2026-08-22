@@ -3959,7 +3959,7 @@ notes = [
 [[task]]
 id = "RC-6903-SEED"
 title = "Seed RC3 independent-verification inventory drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -4007,10 +4007,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0054 closes only this internal Seed RC3 readiness child; the parent RC-6903 gate remains BlockedSpec for independent verification and release sign-off.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "c782b771b0c72c8cf7cbdcbfa3ab64a6cd001774"
+completion_commit = "c782b771b0c72c8cf7cbdcbfa3ab64a6cd001774"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects the RC3 no-independent-sign-off boundary only; Seed self-validation remains repository validation and not independent evidence.",
   "No tag, artifact, evidence bundle, reviewer identity, signature, issue status, network request, system configuration, or placeholder is added.",
