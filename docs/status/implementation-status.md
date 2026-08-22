@@ -147,6 +147,7 @@
 | `IDE-2302` | IDE hover | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `LSP-2201` | `` |
 | `IDE-2302-TYPED-INDEX` | Internal typed-definition observation | `G1` | `S` | `Done` | `EFF-2102`, `IDE-2301-INDEX`, `INC-1405` | `d0727d95442309390a68d1af512111a8cd17f919` |
 | `IDE-2303` | IDE definition navigation | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `IDE-2302`, `LSP-2101`, `LSP-2102` | `` |
+| `IDE-2303-REFERENCE-INDEX` | Internal resolved-reference target index | `G1` | `S` | `Done` | `IDE-2301-INDEX`, `INC-1404` | `1f1b10653f2a38f477cf359ac318be8b662e1503` |
 | `IDE-2304` | IDE references | `G1` | `M` | `BlockedSpec` | `IDE-2303`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2305` | IDE prepare rename | `G1` | `M` | `BlockedSpec` | `IDE-2304`, `LSP-2102` | `` |
 | `IDE-2306` | IDE rename | `G1` | `L` | `BlockedSpec` | `IDE-2305`, `LSP-2102`, `LSP-2104` | `` |

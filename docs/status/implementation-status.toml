@@ -6116,6 +6116,59 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2303-REFERENCE-INDEX"
+title = "Internal resolved-reference target index"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2301-INDEX", "INC-1404"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0075-ide-resolved-reference-index.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/reference_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0075-ide-resolved-reference-index.md",
+  "docs/status/IDE-2303-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2303-REFERENCE-INDEX-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0075 authorizes only an in-process immutable inventory copied from a validated ResolvedProgram; malformed target metadata is omitted rather than synthesized.",
+  "Entries preserve resolver source module/name, SourceId identity, reference ID, target kind, DefinitionId or binding module/local IDs, and existing target names/source names/original UTF-8 spans.",
+  "Definition targets may retain absent source metadata for builtins/Prelude without inventing locations; explicit source/module/reference/target ordering makes repeated indexes equal.",
+  "Focused cargo fmt, ling-db tests, and Clippy checks pass; Unicode/BOM/CRLF target spans, source-local lookup, repeated output, and invalid UTF-8 failure are covered.",
+  "The public IDE-2303 navigation target remains BlockedSpec for request positions, URI/version/snapshot, source-origin policy, dependency/generated documents, declaration/type-definition semantics, cancellation, publication, and fixtures.",
+]
+verified_against_commit = "1f1b10653f2a38f477cf359ac318be8b662e1503"
+completion_commit = "1f1b10653f2a38f477cf359ac318be8b662e1503"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The index is a resolver query observation over reference keys and existing targets; it is not a navigation request, editor location, or Semantic ID generator.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2303"
 title = "IDE definition navigation"
 state = "BlockedSpec"
