@@ -4199,3 +4199,27 @@ unresolved_alternatives = [
   "Transfer syntax/result and Effect Row identity; DeviceTransfer capability discovery/version/direction; logical byte count, address spaces, shape/layout, alignment/bounds; copy/move/borrow/view ownership transitions; token, synchronization, visibility/coherence, asynchronous completion, cancellation, timeout, device loss/Fault/drop, resource limits, cost/evidence status; canonical Semantic Graph/Audit fields, diagnostics, migration, host/driver redaction, protocol inventory, and public Transfer Effect status remain open under DBUF-4403, DBUF-4401/4402, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-OWNERSHIP-MODEL-001, and missing authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0161"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0161-device-synchronization-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Device synchronization boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer queue/event/fence identity, await/barrier scope, cross-queue ordering, visibility, hazard proofs, cancellation/device loss, diagnostics, migration, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No queue/event/fence type, barrier or hazard checker, host-await or cancellation runtime, device-loss handler, diagnostic, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Queue/event/fence identity and capability; submission ownership and scope; host await; barrier and cross-queue ordering; happens-before, visibility, acquire/release, buffer hazards, subviews and transfer dependencies; cancellation/timeout/device loss/Fault/drop/cleanup and committed effects; canonical synchronization schema, diagnostics, migration, host/driver redaction, protocol inventory, and public synchronization status remain open under DBUF-4404, DBUF-4401 through DBUF-4403, KCHK-4101 through KCHK-4105, GAP-KERNEL-DEVICE-001, GAP-OWNERSHIP-MODEL-001, and missing authority.",
+]
+superseded_by = ""

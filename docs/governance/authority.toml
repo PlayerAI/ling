@@ -2600,3 +2600,16 @@ covers = ["DBUF-4403 bounded Transfer Effect boundary evidence", "test-only Tran
 depends_on = ["DEC-0159", "DEC-0158", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0161"
+title = "Internal Device synchronization boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0161-device-synchronization-boundary-evidence.md"
+covers = ["DBUF-4404 bounded Device synchronization boundary evidence", "test-only Device synchronization vocabulary", "synchronization boundaries without Device/ownership/runtime semantics"]
+depends_on = ["DEC-0160", "DEC-0159", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
