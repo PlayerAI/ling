@@ -2106,3 +2106,16 @@ covers = ["OWN-3205 bounded Drop-order and cleanup boundary evidence", "test-onl
 depends_on = ["DEC-0121", "DEC-0116", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0123"
+title = "Internal ownership-diagnostic and repair boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0123-ownership-diagnostic-boundary-evidence.md"
+covers = ["OWN-3206 bounded ownership-diagnostic and repair boundary evidence", "test-only ownership diagnostic vocabulary", "diagnostic boundaries without error-code/repair/LSP semantics"]
+depends_on = ["DEC-0122", "DEC-0001", "DEC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
