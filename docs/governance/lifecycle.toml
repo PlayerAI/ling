@@ -4847,3 +4847,27 @@ unresolved_alternatives = [
   "Graph/node/edge identity and topological/legal-cycle order; cycle breaks; clock/rate/period/phase; multi-rate bridge interpolation/decimation, buffering/backpressure/loss/state ownership; priority, release/deadline, jitter, preemption/cooperative execution, admission/schedulability/WCET; target/compiler, interrupt/cache/bus assumptions; release/overrun, Fault, cancellation, restart/recovery/fallback; replay/determinism; manifest version/migration; Critical Profile, Task/Actor, Kernel/Device, memory/queue bounds; unknown schedulability, unsupported bridge, target mismatch; bilingual diagnostics and facts; graph/schedule, rate/clock, bridge, cycle, deadline, target, virtual-clock, replay, Unicode and differential fixtures; protocol inventory and public status remain open under NODE-5303, NODE-5302, GAP-CRITICAL-PROFILE-001, GAP-STRUCTURED-TASK-001, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-DETERMINISTIC-REPLAY-001, and missing RFC-K502 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0188"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0188-node-virtual-time-runtime-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty virtual-time/runtime boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer clock/tick runtime, input/output traces, overrun/Fault, replay, diagnostics, CLI/LSP, migration, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; RFC-0019/0020 evidence and host cancellation are not reinterpreted as Node timing/replay semantics.",
+  "No virtual-clock type, Node runtime, trace/replay schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Reference versus production runtime; checked Node Core input; epoch, units, advancement, overflow, tick/release/deadline and tie-break; injected input, output trace, port sampling/state commit, event identity, bounds and canonical serialization; overrun/missed tick/Fault/fallback/cancellation/restart/recovery; Effect/input/output records; replay equivalence/order/privacy/redaction, corruption/truncation/divergence/migration; Critical Profile, Task/Actor, Native/ABI, Kernel/Device and target/runtime relations; unknown/unsupported traces; bilingual diagnostics and facts; clock/input/state/overrun/replay/corruption/migration/determinism/Unicode/differential fixtures; protocol inventory and public status remain open under NODE-5304, NODE-5303, GAP-CRITICAL-PROFILE-001, GAP-DETERMINISTIC-REPLAY-001, Future PROTO-REPLAY, and missing RFC-K502 authority.",
+]
+superseded_by = ""

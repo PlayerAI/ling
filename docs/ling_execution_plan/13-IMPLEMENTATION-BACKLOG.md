@@ -449,6 +449,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `NODE-5303` | G5 | 静态调度 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:242`, `docs/status/NODE-5303-AUTHORITY-AUDIT.md` |
 | `NODE-5303-OBSERVATION` | G5 | Internal Node static-scheduling boundary evidence | S | Done | Accepted `DEC-0187`; see `crates/ling-types/tests/node_static_scheduling_evidence.rs` and `docs/status/NODE-5303-OBSERVATION-IMPLEMENTATION-REPORT.md`; graph/bridge/WCET/manifest semantics remain BlockedSpec |
 | `NODE-5304` | G5 | 虚拟时间参考 Runtime | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:254`, `docs/status/NODE-5304-AUTHORITY-AUDIT.md` |
+| `NODE-5304-OBSERVATION` | G5 | Internal Node virtual-time runtime boundary evidence | S | Done | Accepted `DEC-0188`; see `crates/ling-types/tests/node_virtual_time_runtime_evidence.rs` and `docs/status/NODE-5304-OBSERVATION-IMPLEMENTATION-REPORT.md`; clock/trace/replay semantics remain BlockedSpec |
 | `NODE-5305` | G5 | Native Node Runtime | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:266`, `docs/status/NODE-5305-AUTHORITY-AUDIT.md` |
 | `NODE-5306` | G5 | Node/Actor 边界 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:277`, `docs/status/NODE-5306-AUTHORITY-AUDIT.md` |
 | `NODE-5307` | G5 | Node conformance | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:288`, `docs/status/NODE-5307-AUTHORITY-AUDIT.md` |

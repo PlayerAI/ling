@@ -2951,3 +2951,16 @@ covers = ["NODE-5303 bounded Node static-scheduling boundary evidence", "test-on
 depends_on = ["DEC-0186", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0188"
+title = "Internal Node virtual-time runtime boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0188-node-virtual-time-runtime-boundary-evidence.md"
+covers = ["NODE-5304 bounded Node virtual-time/runtime boundary evidence", "test-only virtual-time vocabulary", "runtime boundaries without clock/trace/replay semantics"]
+depends_on = ["DEC-0187", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
