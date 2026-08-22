@@ -445,6 +445,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `NODE-5301` | G5 | Node 语法与语义 | L | BlockedSpec | `09-G5-V0.5-CRITICAL.md:199`, `docs/status/NODE-5301-AUTHORITY-AUDIT.md` |
 | `NODE-5301-OBSERVATION` | G5 | Internal Node syntax/semantics boundary evidence | S | Done | Accepted `DEC-0185`; see `crates/ling-types/tests/node_syntax_semantics_evidence.rs` and `docs/status/NODE-5301-OBSERVATION-IMPLEMENTATION-REPORT.md`; grammar/Core/runtime/timing semantics remain BlockedSpec |
 | `NODE-5302` | G5 | Node Checked Core | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:226`, `docs/status/NODE-5302-AUTHORITY-AUDIT.md` |
+| `NODE-5302-OBSERVATION` | G5 | Internal Node Checked Core boundary evidence | S | Done | Accepted `DEC-0186`; see `crates/ling-types/tests/node_checked_core_evidence.rs` and `docs/status/NODE-5302-OBSERVATION-IMPLEMENTATION-REPORT.md`; schema/graph/fixed-point semantics remain BlockedSpec |
 | `NODE-5303` | G5 | 静态调度 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:242`, `docs/status/NODE-5303-AUTHORITY-AUDIT.md` |
 | `NODE-5304` | G5 | 虚拟时间参考 Runtime | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:254`, `docs/status/NODE-5304-AUTHORITY-AUDIT.md` |
 | `NODE-5305` | G5 | Native Node Runtime | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:266`, `docs/status/NODE-5305-AUTHORITY-AUDIT.md` |

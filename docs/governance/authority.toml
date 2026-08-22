@@ -2925,3 +2925,16 @@ covers = ["NODE-5301 bounded Node syntax/semantics boundary evidence", "test-onl
 depends_on = ["DEC-0184", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0186"
+title = "Internal Node Checked Core boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0186-node-checked-core-boundary-evidence.md"
+covers = ["NODE-5302 bounded Node Checked Core boundary evidence", "test-only Node Core vocabulary", "Core boundaries without schema/graph/fixed-point semantics"]
+depends_on = ["DEC-0185", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
