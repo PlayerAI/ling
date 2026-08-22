@@ -1583,7 +1583,7 @@ mod tests {
         assert_eq!(summary.feature_count, 7);
         assert_eq!(summary.profile_count, 3);
         assert_eq!(summary.host_count, 3);
-        assert_eq!(summary.protocol_count, 25);
+        assert_eq!(summary.protocol_count, 26);
         assert_eq!(summary.unsupported_count, 9);
     }
 }
