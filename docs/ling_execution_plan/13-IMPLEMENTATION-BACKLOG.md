@@ -321,6 +321,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `OWN-3206` | G3 | Ownership 诊断与修复 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:209`, `docs/status/OWN-3206-AUTHORITY-AUDIT.md` |
 | `OWN-3206-OBSERVATION` | G3 | Internal ownership-diagnostic and repair boundary evidence | S | Done | Accepted `DEC-0123`; see `crates/ling-diagnostics/tests/ownership_diagnostic_evidence.rs` and `docs/status/OWN-3206-OBSERVATION-IMPLEMENTATION-REPORT.md`; ownership diagnostics/repairs remain BlockedSpec |
 | `OWN-3207` | G3 | 负向 corpus 与 property tests | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:224`, `docs/status/OWN-3207-AUTHORITY-AUDIT.md` |
+| `OWN-3207-OBSERVATION` | G3 | Internal ownership corpus and property boundary evidence | S | Done | Accepted `DEC-0124`; see `crates/ling-types/tests/ownership_corpus_evidence.rs` and `docs/status/OWN-3207-OBSERVATION-IMPLEMENTATION-REPORT.md`; ownership corpus/property semantics remain BlockedSpec |
 | `GC-3301` | G3 | 最小对象模型 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:241`, `docs/status/GC-3301-AUTHORITY-AUDIT.md` |
 | `GC-3302` | G3 | 第一版 Collector | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:256`, `docs/status/GC-3302-AUTHORITY-AUDIT.md` |
 | `GC-3303` | G3 | Managed 与 Native/FFI 边界 | — | BlockedSpec | `07-G3-V0.3-NATIVE.md:271`, `docs/status/GC-3303-AUTHORITY-AUDIT.md` |

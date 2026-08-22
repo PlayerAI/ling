@@ -3259,3 +3259,29 @@ unresolved_alternatives = [
   "Ownership error taxonomy, resource/move/borrow/region facts, repair schema and ranking, edits/preconditions, LSP mapping, public schema/versioning, migration, Profile/FFI/Native/Task/Actor boundaries, diagnostics, and differential semantics remain open under GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, OWN-3206, and missing RFC-N305/RFC-0007 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0124"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0124-ownership-corpus-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-six provisional corpus/property boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep legal/illegal outcomes, generators, shrinking, bounds, interleavings, diagnostics, fuzzing, migration, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed tests, source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No ownership corpus, generator, property, fuzz, diagnostic, or public protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Legal/illegal oracle semantics, domain invariants, generators/shrinking, state-machine/interleaving, failure/cancellation/restart, deterministic seeds, resource limits, host-failure separation, expected diagnostics/repairs, Unicode spans, migration, and interpreter/VM/Native differential semantics remain open under GAP-OWNERSHIP-MODEL-001, GAP-ACTOR-AWAIT-REENTRY-001, OWN-3207, and missing RFC-N306/RFC-N303/RFC-0007 authority.",
+]
+superseded_by = ""

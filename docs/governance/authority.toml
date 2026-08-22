@@ -2119,3 +2119,16 @@ covers = ["OWN-3206 bounded ownership-diagnostic and repair boundary evidence", 
 depends_on = ["DEC-0122", "DEC-0001", "DEC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0124"
+title = "Internal ownership corpus and property boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0124-ownership-corpus-boundary-evidence.md"
+covers = ["OWN-3207 bounded ownership corpus/property boundary evidence", "test-only ownership corpus vocabulary", "corpus boundaries without oracle/generator/diagnostic semantics"]
+depends_on = ["DEC-0123", "DEC-0122", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
