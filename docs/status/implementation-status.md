@@ -51,6 +51,7 @@
 | `BACK-3503` | Native runtime ABI | `G3` | `L` | `BlockedSpec` | `BACK-3502` | `` |
 | `BACK-3503-OBSERVATION` | Internal Native runtime ABI boundary evidence | `G3` | `S` | `Done` | `BACK-3502-OBSERVATION` | `fa8cdb4f16ea22f34fddccd4589d6fb07d2190d1` |
 | `BACK-3504` | Native optimization and verification | `G3` | `L` | `BlockedSpec` | `BACK-3503` | `` |
+| `BACK-3504-OBSERVATION` | Internal Native optimization boundary evidence | `G3` | `S` | `Done` | `BACK-3503-OBSERVATION` | `66da38f19fd2a75ecc3f5b4c14da9e500d1481e9` |
 | `BACK-3505` | Reproducible Native build | `G3` | `M` | `BlockedSpec` | `BACK-3504` | `` |
 | `BASE-0001` | 仓库基线盘点与执行计划落位 | `G0` | `S` | `Done` | — | `aa8c02894bd2fdd696ab60c97423d07c0ce9614a` |
 | `BND-5201` | Bound Types and Expressions | `G5` | `M` | `BlockedSpec` | `PROF-5104` | `` |

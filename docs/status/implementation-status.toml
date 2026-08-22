@@ -13581,6 +13581,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/BACK-3504-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3504-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3504-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0135-native-optimization-boundary-evidence.md",
+  "crates/ling-types/tests/native_optimization_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -13590,6 +13598,7 @@ acceptance = [
   "The audit covers per-pass valid/invalid cases, proof rejection, closure/cleanup/effect/Fault boundaries, stack/debug identity, deterministic pass ordering, Unicode/CRLF/BOM spans, property/fuzz evidence, and optimized/unoptimized interpreter/VM/Native differential fixtures.",
   "No Native optimizer, pass manager, proof representation, verifier hook, optimization diagnostic, performance claim, public protocol, or placeholder G3 crate is added while BACK-3501 through BACK-3503, NIR/ABI authority, and memory/ownership/Profile decisions are absent.",
   "The future implementation must preserve Seed behavior, consume verified NIR only, keep optimization strategy and host timing/allocation non-semantic, and publish semantic-preservation, proof, reproducibility, and interpreter/VM/Native evidence before exposing v0.3 optimization.",
+  "Accepted DEC-0135 authorizes only test-only Native optimization boundary vocabulary; it does not close transformation legality/proofs, verifier/pass order, diagnostics, debug/stack identity, reproducibility, performance, or differential/property contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13599,6 +13608,65 @@ notes = [
   "BACK-3504 is BlockedSpec by BACK-3501 through BACK-3503, NIR-3401 through NIR-3403, absent RFC-N304/RFC-N306/RFC-0011, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, and unresolved Profile/Task/Actor contracts.",
   "The current workspace has no Native optimizer, pass manager, proof/certificate format, pre/post NIR verifier integration, or Native differential/property harness; Seed evaluator/VM behavior remains unchanged.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "BACK-3504-OBSERVATION"
+title = "Internal Native optimization boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BACK-3503-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0017.md",
+  "docs/decisions/0132-native-backend-selection-boundary-evidence.md",
+  "docs/decisions/0133-native-codegen-boundary-evidence.md",
+  "docs/decisions/0134-native-runtime-abi-boundary-evidence.md",
+  "docs/decisions/0135-native-optimization-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/native_optimization_evidence.rs",
+  "docs/decisions/0135-native-optimization-boundary-evidence.md",
+  "docs/status/BACK-3504-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3504-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0135 authorizes only test-only Native optimization boundary evidence; no optimizer, pass manager, proof representation, verifier hook, optimization diagnostic, performance claim, public protocol, or Native behavior is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for numeric/effect/Fault folding, dead blocks/reachability, inlining/closure/recursion, copy/alias/bounds proofs, tail/cleanup/evaluation order, capability/Resource/Managed/borrow/Task/Actor/cancellation/FFI/Profile/ABI/target constraints, verifier/proof/pass-order/invalidation, diagnostics/source/debug/stack/Semantic ID/Unicode, reproducibility/bounds/security/migration, fixtures/property/fuzz/differential equivalence, and host-output exclusions with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and has no pass, proof, diagnostic, performance, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "66da38f19fd2a75ecc3f5b4c14da9e500d1481e9"
+completion_commit = "66da38f19fd2a75ecc3f5b4c14da9e500d1481e9"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0135; BACK-3504 remains BlockedSpec for optimization legality, proof, verifier, pass order, diagnostics, debug/stack, reproducibility, security, and differential/property decisions.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
