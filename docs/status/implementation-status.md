@@ -80,6 +80,7 @@
 | `CPU-4201` | Scalar Reference Backend | `G4` | `L` | `BlockedSpec` | `KCHK-4105` | `` |
 | `CPU-4201-OBSERVATION` | Internal CPU scalar-reference boundary evidence | `G4` | `S` | `Done` | `KCHK-4105-OBSERVATION` | `9f723650d65177833a34d623b5b0123e57cb9ecf` |
 | `CPU-4202` | Reference Trace | `G4` | `M` | `BlockedSpec` | `CPU-4201` | `` |
+| `CPU-4202-OBSERVATION` | Internal CPU reference-trace boundary evidence | `G4` | `S` | `Done` | `CPU-4201-OBSERVATION` | `cbdf4d64da02f41d6f7ef21df528b17e77136cfb` |
 | `CPU-4203` | Kernel Corpus | `G4` | `M` | `BlockedSpec` | `CPU-4202` | `` |
 | `CTR-5401` | Contract Syntax and AST/Core | `G5` | `M` | `BlockedSpec` | `NODE-5307` | `` |
 | `CTR-5402` | Contract Status Model | `G5` | `M` | `BlockedSpec` | `CTR-5401` | `` |
