@@ -1,7 +1,7 @@
 # Ling 规范权威索引 / Specification Authority Index
 
 > 状态：由 `authority.toml` 确定性生成
-> 更新日期：2026-08-22
+> 更新日期：2026-08-23
 > 本索引描述现有权威关系，不新增语言语义。
 
 ## Authority order
@@ -151,6 +151,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `DEC-0128` | Decision | `Accepted` | `1` | `Accepted` | yes | [Internal Managed Profile boundary evidence](../decisions/0128-managed-profile-boundary-evidence.md) | `GC-3304 bounded Managed Profile boundary evidence`, `test-only Profile and no_gc vocabulary`, `Profile boundaries without checker/syntax/runtime semantics` | `DEC-0127`, `DEC-0126`, `DEC-0125`, `DEC-0013`, `ROADMAP-1.0`, `GAP-REGISTER` | — |
 | `DEC-0129` | Decision | `Accepted` | `1` | `Accepted` | yes | [Internal Native IR design boundary evidence](../decisions/0129-native-ir-design-boundary-evidence.md) | `NIR-3401 bounded Native IR design boundary evidence`, `test-only Native IR vocabulary`, `IR boundaries without instruction/ABI/serialization/lowering semantics` | `DEC-0128`, `DEC-0127`, `DEC-0126`, `DEC-0125`, `DEC-0012`, `ROADMAP-1.0`, `GAP-REGISTER` | — |
 | `DEC-0130` | Decision | `Accepted` | `1` | `Accepted` | yes | [Internal Native IR lowering boundary evidence](../decisions/0130-native-ir-lowering-boundary-evidence.md) | `NIR-3402 bounded Native IR lowering boundary evidence`, `test-only lowering vocabulary`, `lowering boundaries without translation/ABI/differential semantics` | `DEC-0129`, `DEC-0128`, `DEC-0127`, `DEC-0126`, `DEC-0125`, `DEC-0012`, `ROADMAP-1.0`, `GAP-REGISTER` | — |
+| `DEC-0131` | Decision | `Accepted` | `1` | `Accepted` | yes | [Internal Native IR verifier boundary evidence](../decisions/0131-native-ir-verifier-boundary-evidence.md) | `NIR-3403 bounded Native IR verifier boundary evidence`, `test-only verifier vocabulary`, `verifier boundaries without parser/IR/diagnostic/execution semantics` | `DEC-0130`, `DEC-0129`, `DEC-0128`, `DEC-0127`, `DEC-0126`, `DEC-0125`, `DEC-0012`, `ROADMAP-1.0`, `GAP-REGISTER` | — |
 | `RFC-0002` | RFC | `Accepted` | `1` | `Accepted` | yes | [Local package identity and project protocol](../RFC-0002.md) | `ling.toml`, `package identity`, `local dependencies`, `module exports`, `ling.lock`, `offline resolution` | `DEC-0002`, `DEC-0007`, `DEC-0012`, `DEC-0018`, `SEMANTICS`, `LANGUAGE` | — |
 | `RFC-0004` | RFC | `Accepted` | `1` | `Accepted` | yes | [LSP lifecycle and transport](../RFC-0004.md) | `ling lsp --stdio`, `JSON-RPC framing`, `LSP lifecycle state machine`, `position-encoding negotiation`, `workspace-folder validation` | `DEC-0002`, `DEC-0029`, `ROADMAP-1.0`, `GAP-REGISTER` | — |
 | `RFC-0005` | RFC | `Accepted` | `1` | `Accepted` | yes | [Restricted Traits and constraint solving](../RFC-0005.md) | `Trait declarations`, `nominal constraints`, `coherence and orphan rules`, `deterministic selection`, `Checked Core dictionary witnesses` | `RFC-0001`, `SEMANTICS`, `LANGUAGE`, `ROADMAP-1.0`, `GAP-REGISTER` | — |

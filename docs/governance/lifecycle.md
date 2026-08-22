@@ -1,7 +1,7 @@
 # RFC 与 Decision 生命周期 / Lifecycle Registry
 
 > 状态：由 `lifecycle.toml` 确定性生成
-> 更新日期：2026-08-22
+> 更新日期：2026-08-23
 > 本文件定义治理状态和证据要求，不新增语言语义。
 
 ## State machine
@@ -161,6 +161,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0128` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0128](../decisions/0128-managed-profile-boundary-evidence.md) |
 | `DEC-0129` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0129](../decisions/0129-native-ir-design-boundary-evidence.md) |
 | `DEC-0130` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0130](../decisions/0130-native-ir-lowering-boundary-evidence.md) |
+| `DEC-0131` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0131](../decisions/0131-native-ir-verifier-boundary-evidence.md) |
 
 ## Migration boundary
 
