@@ -13,6 +13,11 @@ No Task scheduler, virtual-clock type, seed-to-order algorithm, wake queue,
 interleaving explorer, trace schema, scheduler diagnostic, production API, or
 placeholder G2 surface was added.
 
+Accepted `DEC-0094` now authorizes the bounded child
+`TASK-2204-SCHEDULER-OBSERVATION`, which records only immutable structural
+observations and deterministic identities. It does not close any of the
+scheduler authority gaps listed below.
+
 ## Normative traceability
 
 - The G2 execution package is non-normative; its test-scheduler checklist does
@@ -85,6 +90,10 @@ and the current database, evaluator, bytecode, VM, and test crates.
 No compiler, interpreter, VM, bytecode, scheduler, trace protocol,
 diagnostic, schema, Semantic ID, source-span, runtime, or Unicode 17.0.0
 behavior changed.
+
+The child implementation report and authority audit provide focused evidence
+for the observation boundary; the public deterministic scheduler remains
+blocked.
 
 ## Intentionally deferred
 

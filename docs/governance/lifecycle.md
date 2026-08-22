@@ -124,6 +124,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0091` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0091](../decisions/0091-task-checked-core-model.md) |
 | `DEC-0092` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0092](../decisions/0092-task-state-machine-model.md) |
 | `DEC-0093` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0093](../decisions/0093-task-lifecycle-observation-trace.md) |
+| `DEC-0094` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0094](../decisions/0094-task-scheduler-observation-trace.md) |
 
 ## Migration boundary
 

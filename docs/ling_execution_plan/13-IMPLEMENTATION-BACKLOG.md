@@ -256,6 +256,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TASK-2203` | G2 | 结构化生命周期 Runtime | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:195`, `docs/status/TASK-2203-AUTHORITY-AUDIT.md` |
 | `TASK-2203-LIFECYCLE-OBSERVATION` | G2 | Internal Task lifecycle observation trace | S | Done | Accepted `DEC-0093`; see `crates/ling-concurrency/src/lifecycle.rs` and `docs/status/TASK-2203-LIFECYCLE-OBSERVATION-IMPLEMENTATION-REPORT.md`; runtime semantics remain BlockedSpec |
 | `TASK-2204` | G2 | 确定性测试调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:207`, `docs/status/TASK-2204-AUTHORITY-AUDIT.md` |
+| `TASK-2204-SCHEDULER-OBSERVATION` | G2 | Internal Task scheduler observation trace | S | Done | Accepted `DEC-0094`; see `crates/ling-concurrency/src/scheduler.rs` and `docs/status/TASK-2204-SCHEDULER-OBSERVATION-IMPLEMENTATION-REPORT.md`; scheduler semantics remain BlockedSpec |
 | `TASK-2205` | G2 | 生产本地调度器 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:221`, `docs/status/TASK-2205-AUTHORITY-AUDIT.md` |
 | `TASK-2206` | G2 | Task conformance 与压力测试 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:235`, `docs/status/TASK-2206-AUTHORITY-AUDIT.md` |
 | `ACT-2301` | G2 | Actor 身份与状态隔离 | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:250`, `docs/status/ACT-2301-AUTHORITY-AUDIT.md` |

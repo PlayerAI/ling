@@ -1729,3 +1729,16 @@ covers = ["TASK-2203 bounded lifecycle observation trace", "deterministic lifecy
 depends_on = ["DEC-0002", "DEC-0092", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0094"
+title = "Internal Task scheduler observation trace"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0094-task-scheduler-observation-trace.md"
+covers = ["TASK-2204 bounded scheduler observation trace", "deterministic scheduler-observation identities", "structural scheduler evidence without runtime semantics"]
+depends_on = ["DEC-0021", "DEC-0093", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
