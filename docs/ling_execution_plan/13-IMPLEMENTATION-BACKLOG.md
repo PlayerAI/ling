@@ -417,6 +417,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ACC-4702` | G4 | Experimental 适配器 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:425`, `docs/status/ACC-4702-AUTHORITY-AUDIT.md` |
 | `ACC-4702-OBSERVATION` | G4 | Internal Experimental accelerator-adapter boundary evidence | S | Done | Accepted `DEC-0171`; see `crates/ling-types/tests/experimental_accelerator_adapter_evidence.rs` and `docs/status/ACC-4702-OBSERVATION-IMPLEMENTATION-REPORT.md`; Experimental adapter semantics remain BlockedSpec |
 | `PLC-4801` | G4 | Placement 约束模型 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:431`, `docs/status/PLC-4801-AUTHORITY-AUDIT.md` |
+| `PLC-4801-OBSERVATION` | G4 | Internal Placement-constraint boundary evidence | S | Done | Accepted `DEC-0172`; see `crates/ling-types/tests/placement_constraint_evidence.rs` and `docs/status/PLC-4801-OBSERVATION-IMPLEMENTATION-REPORT.md`; Placement syntax and solver remain BlockedSpec |
 | `PLC-4802` | G4 | 静态候选与运行时选择 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:448`, `docs/status/PLC-4802-AUTHORITY-AUDIT.md` |
 | `PLC-4803` | G4 | Cost Model v0 | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:466`, `docs/status/PLC-4803-AUTHORITY-AUDIT.md` |
 | `PLC-4804` | G4 | `zero explain placement` | — | BlockedSpec | `08-G4-V0.4-HETEROGENEOUS.md:480`, `docs/status/PLC-4804-AUTHORITY-AUDIT.md` |

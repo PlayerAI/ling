@@ -2743,3 +2743,16 @@ covers = ["ACC-4702 bounded Experimental accelerator-adapter boundary evidence",
 depends_on = ["DEC-0170", "DEC-0169", "DEC-0168", "DEC-0167", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0172"
+title = "Internal placement-constraint boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0172-placement-constraint-boundary-evidence.md"
+covers = ["PLC-4801 bounded Placement-constraint boundary evidence", "test-only Placement vocabulary", "Placement boundaries without syntax/solver semantics"]
+depends_on = ["DEC-0171", "DEC-0170", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
