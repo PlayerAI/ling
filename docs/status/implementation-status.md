@@ -281,6 +281,7 @@
 | `MC-5603` | Model-Check Report Semantics | `G5` | `M` | `BlockedSpec` | `MC-5602` | `` |
 | `MC-5603-OBSERVATION` | Internal Model-Check Report boundary evidence | `G5` | `S` | `Done` | `MC-5602-OBSERVATION` | `b1abd86442f7f5908961646eee6fd377d4811219` |
 | `MC-5604` | Replay Counterexample | `G5` | `L` | `BlockedSpec` | `MC-5603` | `` |
+| `MC-5604-OBSERVATION` | Internal Replay Counterexample boundary evidence | `G5` | `S` | `Done` | `MC-5603-OBSERVATION` | `ef57fe3c594229bad9c1ef098c8beac3d7710c72` |
 | `MEM-3101` | Type classification model | `G3` | `M` | `BlockedSpec` | — | `` |
 | `MEM-3101-SEED-VALUE` | Seed completed-type Value classification | `G3` | `S` | `Done` | — | `c64ceb9101190d630125d3a7b6e1ede150c01488` |
 | `MEM-3102` | Value layout and Copy/Move | `G3` | `L` | `BlockedSpec` | `MEM-3101` | `` |
