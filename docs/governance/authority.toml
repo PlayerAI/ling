@@ -2080,3 +2080,16 @@ covers = ["OWN-3203 bounded region-inference boundary evidence", "test-only regi
 depends_on = ["DEC-0119", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0121"
+title = "Internal cross-suspension and Actor-turn boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0121-borrow-await-turn-boundary-evidence.md"
+covers = ["OWN-3204 bounded cross-suspension and Actor-turn boundary evidence", "test-only await/Actor vocabulary", "suspension boundaries without borrow/reentry/sendability semantics"]
+depends_on = ["DEC-0120", "DEC-0119", "DEC-0009", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

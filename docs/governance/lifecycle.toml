@@ -3181,3 +3181,29 @@ unresolved_alternatives = [
   "Region/lifetime variable identity, lexical versus non-lexical scope, constraint solving and termination, reborrow/escape rules, public explicit versus inferred lifetimes, separate compilation, suspension/Task/Actor, pinning/cancellation/Drop, FFI/Native ABI, diagnostics, migration, and differential semantics remain open under GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, and OWN-3203.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0121"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0121-borrow-await-turn-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-seven provisional suspension/Actor boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep await/suspension state, pinning, reentry, sendability, cancellation, Drop, diagnostics, migration, fuzzing, replay/interleaving, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public await, Actor, message, or ownership protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Suspension and await state-machine identity, pinning/owned field eligibility, cross-turn borrow and Actor reentry, message sendability/schema, cancellation/timeout/Drop/Fault, Task/Actor ordering, FFI/Native ABI, Capability/security, diagnostics, migration, and differential semantics remain open under GAP-ACTOR-AWAIT-REENTRY-001, GAP-OWNERSHIP-MODEL-001, OWN-3204, and the missing RFC-N302/RFC-N303/RFC-0007 authority.",
+]
+superseded_by = ""

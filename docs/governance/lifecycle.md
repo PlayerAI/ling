@@ -151,6 +151,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0118` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0118](../decisions/0118-place-move-boundary-evidence.md) |
 | `DEC-0119` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0119](../decisions/0119-borrow-exclusivity-boundary-evidence.md) |
 | `DEC-0120` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0120](../decisions/0120-region-inference-boundary-evidence.md) |
+| `DEC-0121` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0121](../decisions/0121-borrow-await-turn-boundary-evidence.md) |
 
 ## Migration boundary
 
