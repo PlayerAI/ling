@@ -10,7 +10,9 @@ prepare-rename request/response, rename target policy, or version precondition
 contract.
 
 No prepare-rename handler, name validator, placeholder editor API, diagnostic
-allocation, or protocol field was added.
+allocation, or protocol field was added. The bounded child
+`IDE-2305-IDENTIFIER-OBSERVATION` only copies Unicode facts from the existing
+authoritative implementation; it does not accept or reject a rename name.
 
 ## Normative traceability
 
@@ -39,6 +41,11 @@ allocation, or protocol field was added.
 - `ling-source` and the lexer preserve byte spans and implement Seed identifier
   normalization/validity boundaries, but expose no editor rename target or
   localized failure model.
+- `ling-db::observe_rename_identifier` now exposes an owned, in-process
+  observation of raw spelling, NFC name, Script/Identifier_Type, status,
+  skeleton, and mixed-script facts. It returns existing Unicode validation
+  errors and intentionally has no target, span, keyword, edit, or protocol
+  policy.
 - `ling-resolve` and `ling-semantic` retain internal definitions, references,
   and identities, but provide no prepare-rename service, exact identifier-range
   projection, or generated/dependency mutability policy.

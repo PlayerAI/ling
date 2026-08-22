@@ -27,6 +27,7 @@ use ling_types::{self, TypeError};
 
 mod definition_index;
 mod reference_index;
+mod rename_identifier;
 mod typed_definition_index;
 
 pub use definition_index::{
@@ -37,6 +38,9 @@ pub use reference_index::{
     ResolvedReferenceIndex, ResolvedReferenceReverseEntry, ResolvedReferenceReverseIndex,
     ResolvedReferenceSource, ResolvedReferenceTarget, ResolvedReferenceTargetKey,
     ResolvedReferenceTargetKind,
+};
+pub use rename_identifier::{
+    RenameIdentifierObservation, RenameIdentifierStatus, observe_rename_identifier,
 };
 pub use typed_definition_index::{TypedDefinitionIndex, TypedDefinitionSymbol};
 

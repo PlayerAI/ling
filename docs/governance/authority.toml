@@ -1508,3 +1508,16 @@ covers = ["IDE-2304 bounded resolved-reference reverse lookup", "existing target
 depends_on = ["DEC-0002", "DEC-0019", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0077"
+title = "Internal rename-identifier Unicode observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0077-ide-rename-identifier-observation.md"
+covers = ["IDE-2305 bounded rename-identifier Unicode observation", "Unicode 17 XID/NFC/security facts", "deterministic internal rename input observation"]
+depends_on = ["DEC-0002", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

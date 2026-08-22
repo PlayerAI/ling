@@ -16,6 +16,7 @@ ling-resolve = { path = "../ling-resolve" }
 ling-source = { path = "../ling-source" }
 ling-syntax = { path = "../ling-syntax" }
 ling-types = { path = "../ling-types" }
+ling-unicode = { path = "../ling-unicode" }
 
 [dev-dependencies]
 ling-eval = { path = "../ling-eval" }
