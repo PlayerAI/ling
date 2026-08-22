@@ -2691,3 +2691,16 @@ covers = ["GPU-4603 bounded launch and runtime boundary evidence", "test-only la
 depends_on = ["DEC-0166", "DEC-0165", "DEC-0164", "DEC-0163", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0168"
+title = "Internal differential and hardware-matrix boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0168-differential-hardware-matrix-boundary-evidence.md"
+covers = ["GPU-4604 bounded differential and hardware-matrix boundary evidence", "test-only CPU/GPU comparison and matrix vocabulary", "matrix boundaries without numeric/support semantics"]
+depends_on = ["DEC-0167", "DEC-0166", "DEC-0165", "DEC-0164", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

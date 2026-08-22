@@ -17346,6 +17346,7 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0168-differential-hardware-matrix-boundary-evidence.md",
   "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -17355,6 +17356,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/GPU-4604-AUTHORITY-AUDIT.md",
+  "docs/status/GPU-4604-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GPU-4604-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0168-differential-hardware-matrix-boundary-evidence.md",
+  "crates/ling-types/tests/differential_hardware_matrix_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -17374,6 +17383,61 @@ notes = [
   "The repository has no Kernel CPU reference, GPU differential harness, hardware/software matrix schema, combination identity, numeric comparator, tolerance registry, evidence bundle, or matrix fixtures under crates or tests.",
   "The audit does not infer support from local hardware or benchmark output and does not turn plan metadata into a stable protocol; uncovered combinations remain explicitly unsupported.",
   "The audit adds no stale zero command, public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; the plan remains non-normative.",
+]
+[[task]]
+id = "GPU-4604-OBSERVATION"
+title = "Internal differential and hardware-matrix boundary evidence"
+state = "Done"
+release = "G4"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["GPU-4603-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0167-launch-runtime-boundary-evidence.md",
+  "docs/decisions/0168-differential-hardware-matrix-boundary-evidence.md",
+  "docs/ling_execution_plan/08-G4-V0.4-HETEROGENEOUS.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/differential_hardware_matrix_evidence.rs",
+  "docs/decisions/0168-differential-hardware-matrix-boundary-evidence.md",
+  "docs/status/GPU-4604-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/GPU-4604-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0168 authorizes only test-local differential and hardware-matrix boundary evidence; no CPU/GPU harness, matrix schema, comparator, tolerance registry, hardware claim, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty provisional boundaries for CPU/GPU references, checked artifacts/corpus/seed/work-item/reduction, numeric comparison, combination identity and OS/device/vendor/architecture/runtime/driver/compiler/toolchain/features/layout/limits, provenance/expiry/evidence/reproducibility, support states/fallback/rejection, fixtures, diagnostics, local-machine exclusions, and protocol.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no CPU/GPU oracle, numeric comparator, matrix, support, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test differential_hardware_matrix_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "Test-only under DEC-0168; GPU-4604 remains BlockedSpec for differential semantics, hardware matrix, numeric comparison, support status, protocol, and stable claims.",
+  "No CPU reference, GPU differential harness, matrix schema, comparator, tolerance registry, hardware claim, dependency, target package, diagnostic, CLI/LSP command, runtime, or Unicode behavior was added.",
 ]
 [[task]]
 id = "GPU-4605"
