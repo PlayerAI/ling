@@ -10,6 +10,9 @@ public mutation and compatibility contracts is Accepted.
 
 No rename handler, Workspace Edit schema, temporary-snapshot mutation API,
 name validator, diagnostic allocation, or placeholder editor surface was added.
+The bounded child `IDE-2306-REFERENCE-SPANS` only projects resolver-backed HIR
+identifier spans into an internal read-only value; it does not choose targets
+or apply edits.
 
 ## Normative traceability
 
@@ -37,6 +40,10 @@ name validator, diagnostic allocation, or placeholder editor surface was added.
 - `ling-resolve` and `ling-semantic` provide internal identity and reference
   data, but no complete reference/import-alias index, rename target service, or
   public identity migration model.
+- `ling-db::resolved_reference_span_index` now pairs resolver reference IDs
+  with exact original UTF-8 Name, projection-field, and mutable-place-root
+  spans. It omits HIR IDs absent from resolver identity and has no editor range,
+  edit, version, or mutation policy.
 - `ling-source` has session-local VFS revisions and source maps, but no atomic
   multi-document edit, open-document version precondition, conflict response,
   or rollback contract.

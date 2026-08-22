@@ -27,6 +27,7 @@ use ling_types::{self, TypeError};
 
 mod definition_index;
 mod reference_index;
+mod reference_span_index;
 mod rename_identifier;
 mod typed_definition_index;
 
@@ -39,6 +40,7 @@ pub use reference_index::{
     ResolvedReferenceSource, ResolvedReferenceTarget, ResolvedReferenceTargetKey,
     ResolvedReferenceTargetKind,
 };
+pub use reference_span_index::{ResolvedReferenceSpan, ResolvedReferenceSpanIndex};
 pub use rename_identifier::{
     RenameIdentifierObservation, RenameIdentifierStatus, observe_rename_identifier,
 };
@@ -943,6 +945,23 @@ impl CompilerDb {
             .ok_or(QueryError::UnknownFile { file })?;
         let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
         Ok(Arc::new(ResolvedReferenceReverseIndex::from_resolved(
+            &resolved,
+        )))
+    }
+
+    /// Builds an immutable original-byte span observation for resolved
+    /// references. This is not an editor range or a rename edit.
+    pub fn resolved_reference_span_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<ResolvedReferenceSpanIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
+        Ok(Arc::new(ResolvedReferenceSpanIndex::from_resolved(
             &resolved,
         )))
     }

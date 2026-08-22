@@ -108,6 +108,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0075` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0075](../decisions/0075-ide-resolved-reference-index.md) |
 | `DEC-0076` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0076](../decisions/0076-ide-resolved-reference-reverse-index.md) |
 | `DEC-0077` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0077](../decisions/0077-ide-rename-identifier-observation.md) |
+| `DEC-0078` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0078](../decisions/0078-ide-rename-reference-span-observation.md) |
 
 ## Migration boundary
 

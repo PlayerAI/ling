@@ -1521,3 +1521,16 @@ covers = ["IDE-2305 bounded rename-identifier Unicode observation", "Unicode 17 
 depends_on = ["DEC-0002", "DEC-0019", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0078"
+title = "Internal rename reference-span observation"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0078-ide-rename-reference-span-observation.md"
+covers = ["IDE-2306 bounded rename reference-span observation", "original UTF-8 reference spans", "deterministic internal rename span source"]
+depends_on = ["DEC-0002", "DEC-0012", "DEC-0019", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

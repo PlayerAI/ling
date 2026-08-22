@@ -2094,3 +2094,26 @@ unresolved_alternatives = [
   "Keyword/raw-identifier policy, target/range selection, aliases, collisions, target eligibility, visibility/coherence, diagnostics, versions, positions, edits, cancellation, stale publication, protocol negotiation, and DefinitionId migration remain open under IDE-2305/IDE-2306 and the registered Unicode/LSP/semantic lifecycle gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0078"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0078-ide-rename-reference-span-observation.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact Unicode, BOM, CRLF, Name/projection/place-root spans, resolver filtering, source-scoped lookup, and deterministic repeated observations.",
+  "Keep target selection, edit, snapshot/version, position, stale, rollback, and protocol fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only internal ling-db reference-span observation values and an accessor; language, diagnostics, schemas, Semantic IDs, CLI/LSP wire behavior, runtime, bytecode, VM, ABI, and Unicode tables remain unchanged.",
+]
+unresolved_alternatives = [
+  "Rename identity/target/relation/alias policy, Unicode name acceptance, temporary snapshots, multi-file edits, DefinitionId migration, URI/version/position/cancellation/stale/rollback/protocol lifecycle remain open under IDE-2306 and the registered rename/LSP/semantic gaps.",
+]
+superseded_by = ""
