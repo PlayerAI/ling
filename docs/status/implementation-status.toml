@@ -19499,6 +19499,7 @@ spec = [
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/RFC-0001.md",
+  "docs/decisions/0187-node-static-scheduling-boundary-evidence.md",
   "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -19507,6 +19508,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/NODE-5303-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5303-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5303-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0187-node-static-scheduling-boundary-evidence.md",
+  "crates/ling-types/tests/node_static_scheduling_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -19526,6 +19535,62 @@ notes = [
   "The repository has no Node graph scheduler, rate/clock bridge, priority/release/deadline analysis, overrun policy, or scheduler manifest; DEC-0019's scheduler is internal to incremental compiler queries.",
   "The audit does not reinterpret internal query scheduling or VM limits as Node real-time semantics, schedulability evidence, or a public manifest and creates no scheduler API.",
   "The audit adds no public protocol, dependency, target, runtime, schema, diagnostic, or placeholder API; static Node scheduling remains deferred until accepted authority and fixtures exist.",
+]
+[[task]]
+id = "NODE-5303-OBSERVATION"
+title = "Internal Node static-scheduling boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["NODE-5302-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0186-node-checked-core-boundary-evidence.md",
+  "docs/decisions/0187-node-static-scheduling-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/node_static_scheduling_evidence.rs",
+  "docs/decisions/0187-node-static-scheduling-boundary-evidence.md",
+  "docs/status/NODE-5303-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/NODE-5303-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0187 authorizes only test-local Node static-scheduling boundary evidence; no scheduler, graph/rate analyzer, bridge, schedulability/WCET proof, manifest, dependency, target, diagnostic, CLI, protocol, or support claim is made.",
+  "Inventory covers sixty graph/order, rate/clock/bridge, release/deadline/priority, overrun/replay, target/manifest, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no scheduler, bridge, WCET, manifest, runtime, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test node_static_scheduling_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "5c60fbc0984a37c163edcf79056fa6a7a04418d7"
+completion_commit = "5c60fbc0984a37c163edcf79056fa6a7a04418d7"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0187; NODE-5303 remains BlockedSpec for graph/schedule, rate/clock/bridge, release/deadline/admission/WCET, overrun/Fault/replay, target/manifest, diagnostics, CLI/editor integration, and support claims.",
+  "No Node scheduler, bridge, WCET analyzer, manifest schema, target binding, runtime, dependency, diagnostic, CLI/LSP action, or Unicode behavior was added.",
 ]
 [[task]]
 id = "NODE-5304"
