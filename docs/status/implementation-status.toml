@@ -13349,6 +13349,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/BACK-3502-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3502-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3502-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0133-native-codegen-boundary-evidence.md",
+  "crates/ling-types/tests/native_codegen_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -13358,6 +13366,7 @@ acceptance = [
   "The audit covers valid/unsupported codegen, object/link/runtime, source maps, deterministic metadata, cross-target/ABI, sanitizer, Unicode/CRLF/BOM spans, and interpreter/VM/Native differential fixtures without unverified support claims.",
   "No Native codegen, object/executable writer, linker integration, debug map, target manifest, diagnostic, build command, dependency, toolchain install, public API, or placeholder G3 crate is added while BACK-3501, NIR/ABI authority, RFC-N306/RFC-0011, and memory/ownership/Profile decisions are absent.",
   "The future implementation must preserve Seed behavior, consume verified NIR only, keep host paths/timestamps/addresses/section order non-semantic, and publish target, ABI, reproducibility, and interpreter/VM/Native evidence before exposing v0.3 codegen.",
+  "Accepted DEC-0133 authorizes only test-only Native codegen boundary vocabulary; it does not close target/layout/ABI/emission/artifact/linking, diagnostics, reproducibility, or public build/support contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -13367,6 +13376,63 @@ notes = [
   "BACK-3502 is BlockedSpec by BACK-3501, NIR-3401 through NIR-3403, absent RFC-N304/RFC-N306/RFC-0011, GAP-NATIVE-BACKEND-ABI-001, and the v0.0.1 Native-backend non-goal.",
   "The current workspace has no Native codegen, object/executable writer, linker, target manifest, debug/source-map generator, runtime library, or unsupported Native diagnostic; no native artifact or toolchain state was created.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "BACK-3502-OBSERVATION"
+title = "Internal Native codegen boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["BACK-3501-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0130-native-ir-lowering-boundary-evidence.md",
+  "docs/decisions/0131-native-ir-verifier-boundary-evidence.md",
+  "docs/decisions/0132-native-backend-selection-boundary-evidence.md",
+  "docs/decisions/0133-native-codegen-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/native_codegen_evidence.rs",
+  "docs/decisions/0133-native-codegen-boundary-evidence.md",
+  "docs/status/BACK-3502-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/BACK-3502-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0133 authorizes only test-only Native codegen boundary evidence; no emitter, object/executable writer, relocation/linker, target manifest, diagnostic, build command, dependency, toolchain, Native artifact, or public protocol is claimed.",
+  "The test-local inventory covers fifty-eight provisional boundaries for target/profile/layout/endianness, function/data/closure/ADT/string and Value/Resource/Managed/calling/Fault/Task/Actor/FFI representation, relocation/link/runtime/object/executable/section/symbol artifacts, debug/source identity, deterministic metadata, unsupported bilingual diagnostics, verified NIR/ABI/profile inputs, allocation/cleanup, cross-target/ABI, reproducibility, semantic/differential/sanitizer/security evidence, license/offline, artifact/migration, Seed/Unicode, host-output exclusions, malformed input, toolchain, and resource bounds with stable local ordering.",
+  "Forward and reversed boundary insertion order produce identical test-only evidence bytes; duplicate labels are rejected; the evidence tag is opaque and has no emission, artifact, target, build, diagnostic, or protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "fe1a9477d22015288a05c6cfaf17950f22592d99"
+completion_commit = "fe1a9477d22015288a05c6cfaf17950f22592d99"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child is test-only evidence under DEC-0133; BACK-3502 remains BlockedSpec for target/layout/ABI, machine emission, artifacts/linking/runtime, debug/source maps, unsupported diagnostics, reproducibility, semantic/differential, security/license/offline, and public build/support decisions.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]

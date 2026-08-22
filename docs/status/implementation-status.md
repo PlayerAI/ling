@@ -47,6 +47,7 @@
 | `BACK-3501` | Native backend selection spike | `G3` | `M` | `BlockedSpec` | `NIR-3403` | `` |
 | `BACK-3501-OBSERVATION` | Internal Native backend selection boundary evidence | `G3` | `S` | `Done` | `NIR-3403-OBSERVATION` | `1330d19d967d48bbbc95ee3640d75344add66fd7` |
 | `BACK-3502` | Baseline Native codegen | `G3` | `L` | `BlockedSpec` | `BACK-3501` | `` |
+| `BACK-3502-OBSERVATION` | Internal Native codegen boundary evidence | `G3` | `S` | `Done` | `BACK-3501-OBSERVATION` | `fe1a9477d22015288a05c6cfaf17950f22592d99` |
 | `BACK-3503` | Native runtime ABI | `G3` | `L` | `BlockedSpec` | `BACK-3502` | `` |
 | `BACK-3504` | Native optimization and verification | `G3` | `L` | `BlockedSpec` | `BACK-3503` | `` |
 | `BACK-3505` | Reproducible Native build | `G3` | `M` | `BlockedSpec` | `BACK-3504` | `` |
