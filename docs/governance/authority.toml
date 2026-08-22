@@ -2015,3 +2015,16 @@ covers = ["MEM-3102 bounded Value-layout and Copy/Move boundary evidence", "test
 depends_on = ["DEC-0061", "DEC-0008", "DEC-0009", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0116"
+title = "Internal Resource and Drop boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0116-resource-drop-boundary-evidence.md"
+covers = ["MEM-3103 bounded Resource and Drop boundary evidence", "test-only Resource/cleanup vocabulary", "Resource boundaries without ownership/Drop/FFI semantics"]
+depends_on = ["DEC-0115", "DEC-0009", "DEC-0010", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

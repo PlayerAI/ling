@@ -3051,3 +3051,29 @@ unresolved_alternatives = [
   "Memory-kind classification, representation and layout obligations, Copy/Move legality, implicit copies, Resource interaction, ownership diagnostics, serialization and canonical bytes, Native/FFI ABI, Profile constraints, optimization proof, migration, and differential behavior remain open under GAP-OWNERSHIP-MODEL-001 and MEM-3102.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0116"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0116-resource-drop-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all thirty-three provisional Resource/Drop boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep ownership, move checking, Drop order, cleanup failure/cancellation, Effect/Fault mapping, Managed finalization, FFI transfer, diagnostics, migration, fuzzing, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public Resource, Drop, ownership, or cleanup protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Resource identity and ownership transfer, Drop order, cleanup failure and cancellation behavior, Effect/Fault representation, Capability restrictions, Managed/GC separation, FFI lifetime/thread/ABI rules, diagnostics, optimization, migration, and differential behavior remain open under GAP-OWNERSHIP-MODEL-001 and MEM-3103.",
+]
+superseded_by = ""
