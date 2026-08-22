@@ -2158,3 +2158,16 @@ covers = ["GC-3302 bounded Managed collector boundary evidence", "test-only coll
 depends_on = ["DEC-0125", "DEC-0124", "DEC-0121", "DEC-0094", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0127"
+title = "Internal Managed/Native/FFI boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0127-managed-ffi-boundary-evidence.md"
+covers = ["GC-3303 bounded Managed/Native/FFI boundary evidence", "test-only interop vocabulary", "interop boundaries without handle/pin/ABI/FFI semantics"]
+depends_on = ["DEC-0126", "DEC-0125", "DEC-0121", "DEC-0013", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
