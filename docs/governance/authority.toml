@@ -2912,3 +2912,16 @@ covers = ["BND-5204 bounded resource-budget diagnostic boundary evidence", "test
 depends_on = ["DEC-0183", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0185"
+title = "Internal Node syntax/semantics boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0185-node-syntax-semantics-boundary-evidence.md"
+covers = ["NODE-5301 bounded Node syntax/semantics boundary evidence", "test-only Node vocabulary", "Node boundaries without grammar/Core/runtime/timing semantics"]
+depends_on = ["DEC-0184", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

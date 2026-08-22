@@ -4775,3 +4775,27 @@ unresolved_alternatives = [
   "Budget/usage/contributor field types and units; proof/estimate/assumption/unknown/overflow/unsupported/target-mismatch states; target/compiler and path/provenance identity; contributor ordering and diagnostic size limits; bilingual code allocation, Facts, severity, localization, schema version and migration; Preview container compatibility; Repair versus transformation; Workspace Edit, Semantic Transaction, snapshot/version, stale-result, cancellation, confirmation, rollback, ownership/effect/resource/source-map preservation; checked Typed Core and Critical/BND dependencies; positive, negative, boundary, unknown-assumption, provenance, localization, target-migration, transaction, repair-equivalence, Unicode, determinism and differential fixtures; protocol inventory and public status remain open under BND-5204, BND-5203, GAP-CRITICAL-PROFILE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-PROJECT-CLI-INTERFACE-001, and missing RFC-K504 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0185"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0185-node-syntax-semantics-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Node syntax/semantics boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer Node grammar/Core/runtime, clock/scheduler, timing/WCET, Fault, diagnostics, CLI/LSP, and protocol behavior until accepted authority exists.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; Node sketches and VM limits are not reinterpreted as Node semantics.",
+  "No node parser, NodeStep Core variant, scheduler, runtime, timing model, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Node declarations, ports, state and types; every/deadline duration units; logical ticks, input sampling/output commit, initialization/restart, absence/presence, clock domains/conversion, evaluation order and composition; Effect/Capability/Task/Actor/Kernel/Device/FFI relations; persistent state and visibility; missed ticks, overrun, Fault/recovery, cancellation/fallback; scheduler/virtual clock, WCET/cache/bus assumptions, target/compiler/evidence identity; Critical Profile, allocation/GC/recursion, mailbox/ownership; unknown timing/resource; bilingual diagnostics and facts; virtual-clock, state/restart, absence/presence, composition, deadline/target/migration, Unicode and differential fixtures; protocol inventory and public status remain open under NODE-5301, GAP-CRITICAL-PROFILE-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-OWNERSHIP-MODEL-001, GAP-NATIVE-BACKEND-ABI-001, GAP-KERNEL-DEVICE-001, and missing RFC-K502 authority.",
+]
+superseded_by = ""
