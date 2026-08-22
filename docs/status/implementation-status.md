@@ -92,6 +92,7 @@
 | `DAP-3602` | Zed debugger registration | `G3+` | `M` | `BlockedSpec` | `DAP-3601` | `` |
 | `DAP-3602-OBSERVATION` | Internal Zed debugger registration boundary evidence | `G3+` | `S` | `Done` | `DAP-3601-OBSERVATION` | `581f4c3b0537ba2de8c289129c8e2c6a53ac49da` |
 | `DAP-3603` | Staged debugger capabilities | `G3+` | `L` | `BlockedSpec` | `DAP-3602` | `` |
+| `DAP-3603-OBSERVATION` | Internal staged debugger capability boundary evidence | `G3+` | `S` | `Done` | `DAP-3602-OBSERVATION` | `b24c9771a6ea19959bd036a4fc5f6475c1b98d3f` |
 | `DBUF-4401` | Device Types and Capability | `G4` | `M` | `BlockedSpec` | `SIMD-4303` | `` |
 | `DBUF-4402` | Buffer Ownership | `G4` | `M` | `BlockedSpec` | `DBUF-4401` | `` |
 | `DBUF-4403` | Transfer Effect | `G4` | `M` | `BlockedSpec` | `DBUF-4402` | `` |
