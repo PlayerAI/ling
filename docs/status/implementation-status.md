@@ -318,6 +318,7 @@
 | `TASK-2201-CORE-MODEL` | Internal Structured Task Checked-Core identity model | `G2` | `S` | `Done` | `TASK-2201-TASK-SYNTAX-REJECTION` | `6028e78ce4091e58d5df1289c59b8fd6b0f61c4e` |
 | `TASK-2201-TASK-SYNTAX-REJECTION` | Internal Task-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `b3ede69c33d72d4419775650b820f1b5797dc652` |
 | `TASK-2202` | Task state-machine lowering | `G2` | `L` | `BlockedSpec` | `TASK-2201` | `` |
+| `TASK-2202-STATE-MACHINE-MODEL` | Internal Task state-machine identity model | `G2` | `S` | `Done` | `TASK-2201-CORE-MODEL` | `80f3a8c7b579c65bd77030de159cfefdc42a5a4b` |
 | `TASK-2203` | Structured Task lifecycle runtime | `G2` | `L` | `BlockedSpec` | `TASK-2202` | `` |
 | `TASK-2204` | Deterministic Task test scheduler | `G2` | `L` | `BlockedSpec` | `TASK-2203` | `` |
 | `TASK-2205` | Production local Task scheduler | `G2` | `L` | `BlockedSpec` | `TASK-2204` | `` |

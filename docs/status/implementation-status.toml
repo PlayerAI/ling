@@ -8532,6 +8532,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/TASK-2202-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2202-STATE-MACHINE-MODEL-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2202-STATE-MACHINE-MODEL-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0092-task-state-machine-model.md",
+  "crates/ling-concurrency/src/state_machine.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -8539,7 +8543,7 @@ acceptance = [
   "The audit records the missing Task Core input, suspension identity, live-local and continuation layout, state numbering, cancellation/cleanup/Fault edges, bytecode/version/verifier, source-map, resource, diagnostic, schema, and migration contracts.",
   "The audit distinguishes existing Seed bytecode revisions and VM call frames from the missing Task continuation/state-machine ABI and preserves the checked-only evaluation boundary.",
   "The audit covers multiple suspension points, match branches, loops, nested scopes, cancellation before/after effects, cleanup on success/cancel/Fault, child Fault aggregation, malformed/oversized bytecode, Unicode/CRLF/BOM spans, deterministic scheduling, and interpreter/VM differential fixtures.",
-  "No Task lowering pass, continuation layout, state-machine bytecode instruction, serialization/version marker, cancellation or cleanup edge, source-map rule, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
+  "No Task lowering pass, typed continuation layout, state-machine bytecode instruction, serialization/version marker, runtime cancellation or cleanup edge, source-map rule, diagnostic allocation, or placeholder G2 API is added while the authority is absent; DEC-0092 is limited to an internal structural model.",
   "The future lowering must consume checked Task Core only, preserve live values and source identity, make cancellation/cleanup/Fault edges explicit, and publish interpreter/VM evidence before exposing a new bytecode revision.",
 ]
 verified_against_commit = ""
@@ -8548,8 +8552,61 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "TASK-2202 is BlockedSpec by TASK-2201, GAP-STRUCTURED-TASK-001, absent RFC-C202/RFC-0008, and missing Task continuation/state-machine, bytecode, cancellation, cleanup, Fault, and source-map authority; RFC-0020 covers only host VM cancellation.",
+  "DEC-0092 and TASK-2202-STATE-MACHINE-MODEL cover only internal state/local/edge identity validation and do not authorize lowering or execution.",
   "ling-bytecode has versioned Seed formats and ordinary call/control-flow lowering, while ling-vm has Seed call frames; neither represents Task suspension, live locals, cleanup/Fault edges, or a Task ABI.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, scheduler, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "TASK-2202-STATE-MACHINE-MODEL"
+title = "Internal Task state-machine identity model"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TASK-2201-CORE-MODEL"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0091-task-checked-core-model.md",
+  "docs/decisions/0092-task-state-machine-model.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/src/state_machine.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/decisions/0092-task-state-machine-model.md",
+  "docs/status/TASK-2202-STATE-MACHINE-MODEL-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2202-STATE-MACHINE-MODEL-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0092 authorizes only the publish-disabled state-machine identity graph; no lowering or runtime behavior is claimed.",
+  "StateMachineModel validates a nonzero task and entry, unique states and transitions, unique live locals, known endpoints, and duplicate-free structural edges.",
+  "Resume, Cancel, Cleanup, and Fault labels remain structural observations only; source spans are evidence and canonical bytes are path-free.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "80f3a8c7b579c65bd77030de159cfefdc42a5a4b"
+completion_commit = "80f3a8c7b579c65bd77030de159cfefdc42a5a4b"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is a reusable checked-data boundary only; TASK-2202 remains BlockedSpec for actual lowering, continuation liveness, cancellation/cleanup/Fault semantics, bytecode/VM ABI, verifier, and differential evidence.",
+  "The structural model adds no diagnostic, schema, Semantic ID, CLI/LSP command, runtime, or Unicode behavior.",
 ]
 
 [[task]]
