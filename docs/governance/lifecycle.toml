@@ -3207,3 +3207,29 @@ unresolved_alternatives = [
   "Suspension and await state-machine identity, pinning/owned field eligibility, cross-turn borrow and Actor reentry, message sendability/schema, cancellation/timeout/Drop/Fault, Task/Actor ordering, FFI/Native ABI, Capability/security, diagnostics, migration, and differential semantics remain open under GAP-ACTOR-AWAIT-REENTRY-001, GAP-OWNERSHIP-MODEL-001, OWN-3204, and the missing RFC-N302/RFC-N303/RFC-0007 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0122"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0122-drop-order-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all forty-one provisional Drop/cleanup boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep Resource ownership, Drop order, Cleanup Core, cancellation/failure, diagnostics, migration, fuzzing, and interpreter/VM/Native fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public Resource, Drop, cleanup, or failure protocol claim is registered.",
+]
+unresolved_alternatives = [
+  "Resource identity and transfer, implicit versus explicit Drop, aggregate and control-flow order, Cleanup Core shape, partial initialization, cancellation/termination, failure aggregation, Effects/Faults, Managed separation, Capability/network, Native/FFI ABI, Profile/Critical, diagnostics, migration, and differential semantics remain open under GAP-OWNERSHIP-MODEL-001, OWN-3205, and missing RFC-N304/RFC-0007 authority.",
+]
+superseded_by = ""
