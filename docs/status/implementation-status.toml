@@ -18787,10 +18787,10 @@ acceptance = [
   "cargo test -p ling-types --test profile_audit_lsp_evidence --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "7578bdaebbc65043696c4a0cc582258598864f2c"
+completion_commit = "7578bdaebbc65043696c4a0cc582258598864f2c"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "Test-only under DEC-0180; PROF-5104 remains BlockedSpec for Profile checker/report semantics, CLI lifecycle, diagnostics, LSP/editor integration, migration, quick fixes, and support claims.",
   "No stale `zero` command, `ling` profile route, LSP method, schema, dependency, diagnostic, runtime, or Unicode behavior was added.",
