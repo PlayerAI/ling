@@ -39,6 +39,7 @@
 | `ACT-2303` | Bounded mailbox and backpressure | `G2` | `L` | `BlockedSpec` | `ACT-2302` | `` |
 | `ACT-2303-MAILBOX-OBSERVATION` | Internal Actor mailbox observation | `G2` | `S` | `Done` | `ACT-2302-MESSAGE-SCHEMA-MODEL` | `fb42fb580dde35d09594392f16e5798621fd3785` |
 | `ACT-2304` | Actor turn and reentry rules | `G2` | `L` | `BlockedSpec` | `ACT-2303` | `` |
+| `ACT-2304-TURN-OBSERVATION` | Internal Actor turn observation | `G2` | `S` | `Done` | `ACT-2303-MAILBOX-OBSERVATION` | `ec279c46f14acb2634fa7783f8e195d457178041` |
 | `ACT-2305` | Actor runtime | `G2` | `L` | `BlockedSpec` | `ACT-2304` | `` |
 | `ACT-2306` | Actor properties and stress tests | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `BACK-3501` | Native backend selection spike | `G3` | `M` | `BlockedSpec` | `NIR-3403` | `` |

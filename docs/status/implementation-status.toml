@@ -9330,6 +9330,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/ACT-2304-AUTHORITY-AUDIT.md",
+  "docs/status/ACT-2304-TURN-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/ACT-2304-TURN-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0098-actor-turn-observation.md",
+  "crates/ling-concurrency/src/turn.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -9337,6 +9346,7 @@ acceptance = [
   "The audit records the missing turn lifecycle/atomic boundary, await suspend/reentry choice, state-version/guard, borrow, self-send, recursion, cancellation/Fault, watchdog, scheduler/replay, local/remote, diagnostics, schema, and migration contracts.",
   "The audit distinguishes SEMANTICS/LANGUAGE/ROADMAP high-level turn constraints and their explicit future-RFC reentry gap from the absent Accepted RFC-C203/C204 authority, and preserves the checked-only evaluation boundary.",
   "The audit covers no-await atomic turns, each reentry alternative, nested/recursive self-send through the mailbox, concurrent interleavings, state-version conflicts, active-borrow rejection, cancellation/Fault cleanup, watchdog observation, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM differential fixtures.",
+  "Accepted DEC-0098 authorizes only the publish-disabled turn-observation child; it does not close await, reentry, state-guard, self-send, watchdog, scheduler, supervision, or runtime gaps.",
   "No turn state machine, reentry guard, state-version token, await lowering, self-send path, watchdog, scheduler hook, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
   "The future implementation must consume accepted types and checked Core only, enforce turn-local state/borrow invariants, route self-send through the accepted mailbox, expose only an accepted watchdog, and publish interleaving, cleanup, replay, and interpreter/VM evidence before Actor execution.",
 ]
@@ -9348,6 +9358,62 @@ notes = [
   "ACT-2304 is BlockedSpec by ACT-2301/ACT-2302/ACT-2303, absent RFC-C203/C204/RFC-0009, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved turn/reentry/state/watchdog contracts.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Actor/Task await, turn context, state-version guard, reentry judgment, self-send operation, watchdog, scheduler, or Actor protocol; ordinary recursive calls do not define Actor recursion.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "ACT-2304-TURN-OBSERVATION"
+title = "Internal Actor turn observation"
+state = "Done"
+release = "G2"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ACT-2303-MAILBOX-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0008-seed-value-restriction.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0095-actor-identity-reference-model.md",
+  "docs/decisions/0096-actor-message-schema-identity.md",
+  "docs/decisions/0097-actor-mailbox-observation.md",
+  "docs/decisions/0098-actor-turn-observation.md",
+  "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-concurrency/src/turn.rs",
+  "crates/ling-concurrency/src/lib.rs",
+  "docs/decisions/0098-actor-turn-observation.md",
+  "docs/status/ACT-2304-TURN-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/ACT-2304-TURN-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0098 authorizes only publish-disabled turn observations; no turn or reentry semantics are claimed.",
+  "TurnObservationModel validates nonzero turn/actor identities and duplicate-free turns; observations are sorted deterministically.",
+  "Vocabulary labels are observations only, with no await/reentry/state-guard/self-send/watchdog semantics; source spans are evidence only; canonical bytes are path-free.",
+  "cargo test -p ling-concurrency --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-concurrency --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "ec279c46f14acb2634fa7783f8e195d457178041"
+completion_commit = "ec279c46f14acb2634fa7783f8e195d457178041"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "This child is a data-only boundary under DEC-0098; ACT-2304 remains BlockedSpec for await, reentry, state guards, self-send, watchdog, scheduler, supervision, runtime, and interpreter/VM behavior.",
+  "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, or Unicode behavior was added.",
 ]
 
 [[task]]
