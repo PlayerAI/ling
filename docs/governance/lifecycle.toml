@@ -5087,3 +5087,27 @@ unresolved_alternatives = [
   "Status trust and admission; Proved/runtime/model/test/assumed/unknown/stale/corrupt/unverifiable semantics; profile/Critical non-weakening; transformation catalogue and pre/postconditions; constant folding/check elimination/dead code/inlining; Effect/Capability, evaluation order/short-circuit, Fault/cleanup, ownership/resource/timing/Node/Task/Actor, numeric/FFI/ABI, stack/debug mappings, Semantic IDs/spans; invalidation on dependency/source changes; proof/assumption/evidence links; diagnostics, profiles, positive/negative/rejection/stale/corrupt/unknown/effect-Fault/Unicode/differential/optimization fixtures; protocol inventory and public status remain open under CTR-5406, CTR-5405, RFC-K503, RFC-K505, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing optimization authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0198"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0198-contract-lsp-zed-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Contract LSP/Zed categories and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer LSP methods, Contract projection, proof/evidence/counterexample schemas, rename transactions, position conversion, diagnostics, Zed integration, and protocol behavior until accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; byte-span/query/Tree-sitter observations and Preview diagnostic JSON are not reinterpreted as Contract editor semantics.",
+  "No LSP method, Contract status field, proof/evidence link, counterexample schema, rename edit, Zed package, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "LSP version/capabilities/requests/responses; hover/status/diagnostic/counterexample/code-lens/gutter/Audit/implicit-condition/rename semantics; Contract references and stable IDs/provenance/invalidation; snapshots, Semantic Transactions, stale edits/conflicts and atomic TextEdits; UTF-8 spans, LSP positions/UTF-16, CRLF/BOM/Unicode 17.0.0; unknown/stale/corrupt/unverifiable data, fallback, redaction/privacy; workspace/document/incremental/JSON schema, cancellation/ordering; diagnostics and positive/negative/malformed/stale-version/Unicode/CRLF/incremental/rename/evidence/determinism/client-capability fixtures; Zed extension, protocol inventory, and public status remain open under CTR-5407, CTR-5406, LSP-2205, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing editor authority.",
+]
+superseded_by = ""

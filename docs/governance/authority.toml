@@ -3081,3 +3081,16 @@ covers = ["CTR-5406 bounded Contract optimizer boundary evidence", "test-only op
 depends_on = ["DEC-0196", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0198"
+title = "Internal Contract LSP/Zed boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0198-contract-lsp-zed-boundary-evidence.md"
+covers = ["CTR-5407 bounded Contract LSP/Zed boundary evidence", "test-only Contract editor vocabulary", "editor boundaries without LSP/projection/transaction semantics"]
+depends_on = ["DEC-0197", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
