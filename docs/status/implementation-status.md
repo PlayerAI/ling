@@ -174,6 +174,7 @@
 | `LSP-2501` | LSP request snapshot | `G1` | `L` | `BlockedSpec` | `INC-1401`, `INC-1402`, `LSP-2103`, `LSP-2104` | `` |
 | `LSP-2501-SNAPSHOT` | Internal immutable LSP request snapshot capture | `G1` | `S` | `Done` | `INC-1402`, `LSP-2102-NEGOTIATION`, `LSP-2103-OVERLAY` | `64eb8e858f87bc4f5896bbb8ac00f53afc48c97d` |
 | `LSP-2502` | LSP request cancellation | `G1` | `L` | `BlockedSpec` | `INC-1401`, `LSP-2501` | `` |
+| `LSP-2502-CANCELLATION` | Internal cooperative LSP cancellation token | `G1` | `S` | `Done` | `INC-1401`, `LSP-2501-SNAPSHOT` | `132fcc9073bebf2a5e49716bc61048248cc4305a` |
 | `LSP-2503` | LSP debounce and priority scheduling | `G1` | `L` | `BlockedSpec` | `LSP-2103`, `LSP-2104`, `LSP-2202`, `LSP-2501`, `LSP-2502` | `` |
 | `LSP-2504` | LSP memory and resource limits | `G1` | `L` | `BlockedSpec` | `LSP-2201`, `LSP-2501`, `LSP-2502`, `LSP-2503` | `` |
 | `MC-5601` | Finite-State Projection | `G5` | `L` | `BlockedSpec` | `BND-5204`, `NODE-5307`, `PROOF-5503` | `` |

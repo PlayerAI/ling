@@ -5721,9 +5721,9 @@ acceptance = [
   "Focused cancellation tests cover pre-cancel success, clone propagation, repeated cancellation, typed errors, and independent-token isolation.",
   "Public JSON-RPC cancellation, compiler propagation, result precedence, partial-result suppression, deadlines, limits, and migration remain deferred to parent LSP-2502.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working-tree"
+verified_against_commit = "132fcc9073bebf2a5e49716bc61048248cc4305a"
+completion_commit = "132fcc9073bebf2a5e49716bc61048248cc4305a"
+integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "This child closes only DEC-0031's internal cooperative token; parent LSP-2502 remains BlockedSpec for public/compiler cancellation.",
