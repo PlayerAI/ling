@@ -14109,10 +14109,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "015c016c6d557bc3ae66d44b7f0a5aaf0981fcc8"
+completion_commit = "015c016c6d557bc3ae66d44b7f0a5aaf0981fcc8"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0139; FFI-3603 remains BlockedSpec for shim schemas, generated checks/adapters, trust/TCB, provenance/build hash, diagnostics, migration, sanitizer/fuzz, and cross-target decisions.",
   "No parser, AST/HIR/Checked Core node, generator, template, generated artifact, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",

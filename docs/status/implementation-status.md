@@ -126,6 +126,7 @@
 | `FFI-3602` | Minimal C ABI interoperability | `G3` | `M` | `BlockedSpec` | `FFI-3601` | `` |
 | `FFI-3602-OBSERVATION` | Internal C ABI interoperability boundary evidence | `G3` | `S` | `Done` | `FFI-3601-OBSERVATION` | `a632900b083762a745a6138629074be182ab2a2d` |
 | `FFI-3603` | FFI shim generator | `G3` | `M` | `BlockedSpec` | `FFI-3602` | `` |
+| `FFI-3603-OBSERVATION` | Internal FFI shim-generator boundary evidence | `G3` | `S` | `Done` | `FFI-3602-OBSERVATION` | `015c016c6d557bc3ae66d44b7f0a5aaf0981fcc8` |
 | `FFI-3604` | Target Primitive Package | `G3` | `M` | `BlockedSpec` | `FFI-3603` | `` |
 | `FFI-3605` | FFI fuzz and sanitizer suite | `G3` | `M` | `BlockedSpec` | `FFI-3604` | `` |
 | `FMT-1501` | Author Source formatter preservation decision | `G1` | `M` | `Done` | `INC-1410` | `fa2560fc09772ed98f8af97a71164ee1f465495f` |
