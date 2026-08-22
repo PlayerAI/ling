@@ -136,6 +136,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0103` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0103](../decisions/0103-supervision-test-evidence.md) |
 | `DEC-0104` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0104](../decisions/0104-determinism-class-evidence.md) |
 | `DEC-0105` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0105](../decisions/0105-replay-schema-field-evidence.md) |
+| `DEC-0106` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-22` | [DEC-0106](../decisions/0106-effect-recorder-boundary-evidence.md) |
 
 ## Migration boundary
 

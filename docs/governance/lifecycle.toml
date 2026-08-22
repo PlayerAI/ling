@@ -2791,3 +2791,29 @@ unresolved_alternatives = [
   "Canonical envelope and field types, event IDs, ordering and identity rules, checksum/integrity, class/toolchain/profile/schema metadata, payload framing, migration, privacy/redaction, corruption, divergence, diagnostics, resource limits, and runtime ABI remain open under GAP-DETERMINISTIC-REPLAY-001 and REP-2502.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0106"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0106-effect-recorder-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all six provisional boundaries and their test-local order.",
+  "Compare forward and reversed boundary insertion order and require identical test-only evidence bytes.",
+  "Reject duplicate boundary vocabulary.",
+  "Keep Effect Row/Handler operation identity, recordable/reconstructible semantics, handler masking, recorder lifecycle/failure, scheduler/Task/Actor interaction, payloads, privacy, diagnostics, resources, cross-process, differential, and migration fixtures deferred.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Seed source behavior, diagnostics, schemas, Semantic IDs, CLI/LSP, runtime, bytecode, VM, ABI, dependencies, and Unicode 17.0.0 remain unchanged.",
+  "No public recorder or replay claim is registered.",
+]
+unresolved_alternatives = [
+  "Effect operation IDs and boundaries, recordability versus reconstruction, handler nesting/masking, unhandled operations, recorder failure, sensitive values, scheduler nondeterminism, event order, privacy/redaction, schema, resource limits, diagnostics, runtime ABI, and migration remain open under GAP-EFFECT-HANDLER-001, GAP-DETERMINISTIC-REPLAY-001, and REP-2503.",
+]
+superseded_by = ""

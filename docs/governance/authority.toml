@@ -1885,3 +1885,16 @@ covers = ["REP-2502 bounded replay-schema field evidence", "test-only replay fie
 depends_on = ["DEC-0104", "DEC-0012", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0106"
+title = "Internal effect-recorder boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0106-effect-recorder-boundary-evidence.md"
+covers = ["REP-2503 bounded effect-recorder boundary evidence", "test-only recordable effect vocabulary", "effect boundaries without recording/payload/runtime semantics"]
+depends_on = ["DEC-0105", "DEC-0104", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
