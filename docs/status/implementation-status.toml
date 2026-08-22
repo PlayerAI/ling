@@ -14042,7 +14042,7 @@ notes = [
 [[task]]
 id = "REL-6603-SEED"
 title = "Seed security-audit matrix drift gate"
-state = "In Progress"
+state = "Done"
 release = "G6"
 size = "S"
 owner = "Codex"
@@ -14076,10 +14076,10 @@ acceptance = [
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0043 closes only this internal Seed matrix child; the parent REL-6603 gate remains BlockedSpec for future security authority and release evidence.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "working"
-completed = ""
+verified_against_commit = "d96bea813fb6576ef3212cbffeb478d9829210ec"
+completion_commit = "d96bea813fb6576ef3212cbffeb478d9829210ec"
+integration_state = "committed"
+completed = "2026-08-22"
 notes = [
   "The verifier protects matrix inventory consistency only; Covered rows remain current-control evidence and Partial/Deferred rows remain explicit gaps.",
   "No security API, FFI, sandbox, remote adapter, replay/evidence decoder, device runtime, editor updater, SBOM schema, advisory result, or placeholder is added.",
