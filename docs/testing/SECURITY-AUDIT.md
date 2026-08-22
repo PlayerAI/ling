@@ -49,6 +49,23 @@ These commands do not prove resistance to a vulnerability database entry,
 malicious native code, a remote service, an archive bomb, a device, a replay
 log, or an editor binary that the Seed implementation does not accept.
 
+## Internal matrix drift check
+
+The repository has one offline inventory check for this document:
+
+```text
+cargo xtask security verify
+```
+
+The check validates the exact nine audit-surface rows, their current
+Covered/Partial/Deferred states, and the release-evidence guardrails. It only
+protects the audit inventory from documentation drift; it does not run an
+advisory scanner, inspect a remote service, or make a vulnerability-free claim.
+The required release evidence remains a threat model and trust-boundary
+inventory, accepted security decisions, deterministic hostile-input fixtures,
+reproducible advisory, license, SBOM, checksum, and provenance reports, and an
+incident/disclosure process. No security API is inferred from this check.
+
 ## Required release evidence
 
 Before `REL-6603` can become a completed G6 security gate, the project needs:

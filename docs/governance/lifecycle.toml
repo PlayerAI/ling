@@ -145,6 +145,31 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0043"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0043-seed-security-matrix-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask security verify and assert nine rows with three Covered variants, two Partial rows, and four Deferred rows.",
+  "Mutate an isolated security matrix row or remove a policy phrase and verify the gate fails closed.",
+  "Run existing locked Seed control checks without treating the matrix gate as an advisory scan or G6 security sign-off.",
+  "Repeat independent processes and verify no source, semantic, diagnostic, schema, protocol, support, or release-state output is generated.",
+]
+compatibility_impact = [
+  "Adds only an internal xtask documentation validator and CI preflight; no security API, FFI, sandbox, remote protocol, diagnostic, schema, or language behavior changes.",
+]
+unresolved_alternatives = [
+  "Threat-model scope, trust boundaries, archive quotas, remote authentication, replay/evidence privacy, editor trust roots, advisory/license/SBOM tooling, and disclosure ownership remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0037"
 kind = "Decision"
 status = "Accepted"

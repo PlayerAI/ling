@@ -14040,6 +14040,52 @@ notes = [
 ]
 
 [[task]]
+id = "REL-6603-SEED"
+title = "Seed security-audit matrix drift gate"
+state = "In Progress"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REL-6602-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0043-seed-security-matrix-gate.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/testing/SECURITY-AUDIT.md",
+  ".github/workflows/ci.yml",
+]
+artifacts = [
+  "tools/xtask/src/security.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/testing/SECURITY-AUDIT.md",
+  ".github/workflows/ci.yml",
+  "docs/decisions/0043-seed-security-matrix-gate.md",
+  "docs/status/REL-6603-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask security verify deterministically validates nine documented surfaces with three Covered variants, two Partial rows, and four Deferred rows.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, and removal of the required security-boundary policy phrases.",
+  "The command is included in the existing Seed reproducibility CI gate and does not run scanners, invent a threat model, or claim a vulnerability-free or G6 security result.",
+  "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
+  "Accepted DEC-0043 closes only this internal Seed matrix child; the parent REL-6603 gate remains BlockedSpec for future security authority and release evidence.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "working"
+completed = ""
+notes = [
+  "The verifier protects matrix inventory consistency only; Covered rows remain current-control evidence and Partial/Deferred rows remain explicit gaps.",
+  "No security API, FFI, sandbox, remote adapter, replay/evidence decoder, device runtime, editor updater, SBOM schema, advisory result, or placeholder is added.",
+]
+
+[[task]]
 id = "REL-6603"
 title = "Security Audit"
 state = "BlockedSpec"
@@ -14058,6 +14104,7 @@ spec = [
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/decisions/0022-disposable-persistent-query-cache.md",
+  "docs/decisions/0043-seed-security-matrix-gate.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -14076,6 +14123,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/REL-6603-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6603-SEED-IMPLEMENTATION-REPORT.md",
   "docs/testing/SECURITY-AUDIT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",

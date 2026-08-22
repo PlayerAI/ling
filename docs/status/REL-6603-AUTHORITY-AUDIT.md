@@ -20,6 +20,12 @@ are bounded and canonical, path/symlink and capability checks exist, and lock
 files are reproducible. It does not convert those facts into a vulnerability
 absence claim or invent security APIs.
 
+Accepted `DEC-0043` closes only the bounded `REL-6603-SEED` child: the
+internal `cargo xtask security verify` command prevents drift in this
+document's nine-row matrix and its explicit release-evidence guardrails. It
+does not promote `REL-6603`, the current controls, or any Covered row to a G6
+security sign-off.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:354-366` is a non-normative checklist. It does
@@ -46,6 +52,9 @@ controls, state, and release evidence. The executable Seed evidence includes
 workspace unsafe denial, bounded readers, symlink/path defenses, lock
 canonicality/transaction tests, capability enforcement, VM resource limits,
 locked offline metadata, and a passing workspace Clippy `-D warnings` gate.
+`cargo xtask security verify` checks only the deterministic row/state inventory
+and the policy phrases that keep missing threat-model and release evidence
+explicit.
 
 No `unsafe` Rust source, FFI implementation, remote transport, replay/evidence
 decoder, device runtime, or Zed binary updater is present. `cargo-audit` and

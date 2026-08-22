@@ -369,6 +369,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REL-6602` | G6 | 故障注入 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:340`, `docs/status/REL-6602-AUTHORITY-AUDIT.md`, `docs/testing/FAULT-INJECTION.md` |
 | `REL-6602-SEED` | G6 | Seed fault-matrix drift gate | S | Done | Accepted DEC-0042; see `cargo xtask fault verify` and `docs/status/REL-6602-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `REL-6603` | G6 | 安全审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:354`, `docs/status/REL-6603-AUTHORITY-AUDIT.md`, `docs/testing/SECURITY-AUDIT.md` |
+| `REL-6603-SEED` | G6 | Seed security-audit matrix drift gate | S | In Progress | Accepted DEC-0043; see `cargo xtask security verify` and `docs/status/REL-6603-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `REL-6604` | G6 | 性能基线 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:368`, `docs/status/REL-6604-AUTHORITY-AUDIT.md`, `docs/testing/PERFORMANCE-BASELINE.md` |
 | `DOC-6701` | G6 | 正式文档集 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:391`, `docs/status/DOC-6701-AUTHORITY-AUDIT.md`, `docs/testing/DOCUMENTATION-INVENTORY.md` |
 | `DOC-6702` | G6 | 双层示例 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:406`, `docs/status/DOC-6702-AUTHORITY-AUDIT.md`, `docs/testing/EXAMPLE-COVERAGE.md` |
