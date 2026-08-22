@@ -4871,3 +4871,27 @@ unresolved_alternatives = [
   "Reference versus production runtime; checked Node Core input; epoch, units, advancement, overflow, tick/release/deadline and tie-break; injected input, output trace, port sampling/state commit, event identity, bounds and canonical serialization; overrun/missed tick/Fault/fallback/cancellation/restart/recovery; Effect/input/output records; replay equivalence/order/privacy/redaction, corruption/truncation/divergence/migration; Critical Profile, Task/Actor, Native/ABI, Kernel/Device and target/runtime relations; unknown/unsupported traces; bilingual diagnostics and facts; clock/input/state/overrun/replay/corruption/migration/determinism/Unicode/differential fixtures; protocol inventory and public status remain open under NODE-5304, NODE-5303, GAP-CRITICAL-PROFILE-001, GAP-DETERMINISTIC-REPLAY-001, Future PROTO-REPLAY, and missing RFC-K502 authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0189"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0189-node-native-runtime-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Native Node runtime boundaries and local order; compare forward/reverse opaque bytes; reject duplicates.",
+  "Defer ABI/layout, ownership/drop, static-memory, target, timer/watchdog, startup/shutdown, safe-state, telemetry, diagnostics, CLI/LSP, and runtime protocol behavior until accepted authority and fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; VM controls and host facilities are not reinterpreted as Native guarantees.",
+  "No Native IR/backend, ABI or target schema, ownership/memory enforcement, timer/watchdog runtime, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Native IR validity; ABI/calling convention/layout/endianness/alignment/FFI; target/toolchain identity; ownership/region/resource/drop/aliasing; static-memory accounting; state-cell and safe-state transitions; schedule/clock/tick/deadline/jitter/overrun; timer/watchdog; interrupt/preemption; startup/shutdown/Fault/fallback; telemetry; Critical/Kernel/Device/placement; unsupported target; bilingual diagnostics/facts; ABI/layout, ownership/memory, timer/watchdog, lifecycle, safe-state, target, differential, migration, and Unicode fixtures; protocol inventory and public status remain open under NODE-5305, NODE-5304, RFC-K502, RFC-0011, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-KERNEL-DEVICE-001, GAP-CRITICAL-PROFILE-001, and missing Native authority.",
+]
+superseded_by = ""
