@@ -362,6 +362,7 @@
 | `SIMD-4301` | Vectorization Legality Analysis | `G4` | `M` | `BlockedSpec` | `CPU-4203` | `` |
 | `SIMD-4301-OBSERVATION` | Internal SIMD legality boundary evidence | `G4` | `S` | `Done` | `CPU-4203-OBSERVATION` | `d4a04a70d8ab207d3bb245987abc31bbf439fe16` |
 | `SIMD-4302` | Portable SIMD IR | `G4` | `M` | `BlockedSpec` | `SIMD-4301` | `` |
+| `SIMD-4302-OBSERVATION` | Internal Portable SIMD IR boundary evidence | `G4` | `S` | `Done` | `SIMD-4301-OBSERVATION` | `917a64ad8bf7521f7455cade79b4fdb2056bd894` |
 | `SIMD-4303` | SIMD Differential | `G4` | `M` | `BlockedSpec` | `SIMD-4302` | `` |
 | `STAB-6101` | Support-Matrix Item Audit | `G6` | `L` | `BlockedSpec` | `CBK-5903` | `` |
 | `STAB-6102` | Remove False Entry Points | `G6` | `L` | `BlockedSpec` | `STAB-6101` | `` |

@@ -16071,10 +16071,10 @@ acceptance = [
   "cargo test -p ling-types --all-targets --locked --offline passes.",
   "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "pending"
-completed = ""
+verified_against_commit = "917a64ad8bf7521f7455cade79b4fdb2056bd894"
+completion_commit = "917a64ad8bf7521f7455cade79b4fdb2056bd894"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
   "This child is test-only evidence under DEC-0156; SIMD-4302 remains BlockedSpec for IR schema/operations, lowering, capabilities, fallback, differential evidence, migration, protocol integration, and support claims.",
   "No parser, AST/HIR/Checked Core node, SIMD IR type, operation verifier, canonical schema, serializer/decoder, target capability registry, scalarization record, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
