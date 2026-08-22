@@ -143,6 +143,29 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0030"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0030-lsp-request-snapshot-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Capture disk and overlay documents, mutate and close them, and prove an existing snapshot retains exact bytes, origin, state, and client version.",
+  "Verify deterministic URI ordering, explicit client-version/VFS-revision separation, negotiated encoding/state retention, and no partial snapshot publication.",
+]
+compatibility_impact = [
+  "Adds only internal ling-source and ling-lsp Rust capture values; language, diagnostics, schemas, Semantic IDs, CLI, JSON-RPC methods, Workspace Edits, and Unicode data remain unchanged.",
+]
+unresolved_alternatives = [
+  "Public request IDs, project/query inputs, cancellation, stale-result handling, memory limits, Workspace Edits, and Semantic Transactions require later accepted authority.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0024"
 kind = "Decision"
 status = "Accepted"

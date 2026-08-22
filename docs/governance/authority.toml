@@ -353,6 +353,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0030"
+title = "LSP request snapshot internal capture boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0030-lsp-request-snapshot-boundary.md"
+covers = ["internal LSP request snapshots", "immutable visible document capture", "client-version and VFS-revision separation"]
+depends_on = ["DEC-0002", "DEC-0019", "DEC-0029", "RFC-0004", "RFC-0023", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0024"
 title = "Trait obligation collection boundary"
 kind = "Decision"
