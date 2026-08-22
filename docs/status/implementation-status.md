@@ -322,6 +322,7 @@
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
 | `SUP-2402-OBSERVATION` | Internal restart-budget observation | `G2` | `S` | `Done` | `SUP-2401-OBSERVATION` | `7ee0cf0bf90971bb6844c8bf467f5506e5e5e796` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
+| `SUP-2403-OBSERVATION` | Internal supervision test evidence | `G2` | `S` | `Done` | `SUP-2402-OBSERVATION` | `73046c5049324455ec87d0011e62482de97c07aa` |
 | `TASK-2201` | Structured Task syntax and Checked Core | `G2` | `M` | `BlockedSpec` | `EFF-2103` | `` |
 | `TASK-2201-CORE-MODEL` | Internal Structured Task Checked-Core identity model | `G2` | `S` | `Done` | `TASK-2201-TASK-SYNTAX-REJECTION` | `6028e78ce4091e58d5df1289c59b8fd6b0f61c4e` |
 | `TASK-2201-TASK-SYNTAX-REJECTION` | Internal Task-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `b3ede69c33d72d4419775650b820f1b5797dc652` |
