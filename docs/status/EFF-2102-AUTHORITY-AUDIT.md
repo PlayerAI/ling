@@ -2,94 +2,79 @@
 
 ## Outcome
 
-`EFF-2102` is correctly recorded as `BlockedSpec`. The G2 execution plan asks
-for operation/call row-constraint collection, row unification with occurs
-checks, generalization/instantiation, minimal-conflict explanations, and
-bilingual diagnostics. These algorithms depend on the unaccepted EFF-2101
-model and RFC-C201/RFC-0006; their constraint language, handler subtraction,
-State masking, and error meaning are not fixed.
+`EFF-2102` is now `In Progress`. RFC-0006 is Accepted for the experimental v0.2
+Effect model, and Accepted DEC-0062 closes the solver-specific authority gap.
+The bounded in-process solver is being implemented under those documents and
+remains separate from Seed syntax, Checked-Core lowering, runtime execution,
+and public protocols.
 
-No row-constraint solver, unification algorithm, generalized effect type,
-handler subtraction, diagnostic code, Semantic ID change, or placeholder G2
-API was added.
+The implementation report records the current solver and focused evidence; the
+task remains incomplete until the full acceptance gates and integration status
+are committed.
 
 ## Normative traceability
 
-- The G2 execution package is non-normative; its three PR split and algorithm
-  names do not authorize a public inference behavior.
-- `docs/SEMANTICS.md` fixes the Seed closed, deduplicated Effect Row concept
-  and conservative static checking, but does not accept row variables,
-  constraint solving, handler elimination, or generalized effect schemes.
-- Accepted DEC-0010 fixes Seed State/Capability visibility and call-graph
-  authorization. It does not decide whether State can be masked or how a
-  handler subtracts an effect from a function type.
-- `GAP-EFFECT-STATE-MASKING-001` and `GAP-EFFECT-HANDLER-001` are Open and
-  block EFF-2102; their candidate RFC-0006 is not Accepted. RFC-C201 is an
-  execution-plan placeholder, not a repository document.
-- The existing diagnostic registry requires stable bilingual `L-<DOMAIN>-<NUMBER>`
-  allocations. No accepted code or schema defines row-conflict, occurs-check,
-  unhandled-effect, or minimal-conflict payloads for v0.2.
+- The G2 execution package remains non-normative planning material; its task
+  split is implemented only within the Accepted authority below.
+- `docs/SEMANTICS.md`, `docs/LANGUAGE.md`, and DEC-0010 continue to govern the
+  v0.0.1 Seed closed Effect/State/Capability boundary. EFF-2102 must not alter
+  that checker.
+- Accepted RFC-0006 defines canonical `EffectId`, parameterized labels,
+  open/closed rows, row variables, operation contracts, residual rows,
+  Capability separation, and the explicit prohibition on implicit State
+  masking. See RFC-0006 clauses 1–10.
+- Accepted DEC-0062 defines the EFF-2102 constraint grammar, provenance and
+  canonical work order, substitution/unification, deterministic fresh tails,
+  occurs check, minimal conflicts, value-restricted generalization and
+  instantiation, handler subtraction, State/Capability boundaries, and the
+  `L-EFFECT-0001`/`L-EFFECT-0002` diagnostic allocation.
+- `GAP-EFFECT-STATE-MASKING-001` and `GAP-EFFECT-HANDLER-001` are resolved by
+  RFC-0006 for this bounded core model; runtime masking and handler execution
+  remain outside its scope.
 
 ## Current implementation evidence
 
-- `ling-effects` collects direct Seed effects and propagates a deterministic
-  fixed-point call graph over a closed `BTreeSet`-backed row. It has no row
-  constraints, substitutions, levels, occurs check, generalization, or
-  instantiation.
-- Higher-order Seed call propagation and `State<T>`/`Console.Write`
-  Capability checks are implemented, but there is no operation-signature
-  constraint source for `Clock`, `Random`, `Task`, `ActorSend`, or user-defined
-  effects.
-- Current EffectError values cover missing and unknown Seed Capabilities only;
-  no minimal unsatisfiable subset, related spans, canonical conflict order, or
-  bilingual row explanation exists.
-- No fixture covers equivalent constraint order, cyclic rows, polymorphic
-  instantiation, value restriction, partial applications, handler subtraction,
-  State masking, profile rejection, or deterministic diagnostic facts.
+- `ling-effects` already contains the canonical RFC-0006 row, label, operation,
+  handler, and projection values. The existing Seed `EffectRow` remains a
+  closed `BTreeSet` fixed-point checker.
+- The v0.2 module now provides the EFF-2102 constraint collection, substitution
+  normalization, row unification, occurs-check boundary,
+  generalization/instantiation, tracked conflict facts, and bilingual solver
+  diagnostics in a separate solver module.
+- No source-level row syntax, handler Typed Core node, runtime/VM handler
+  execution, Task/Actor behavior, or public schema/protocol is added by this
+  authority.
 
-## Required authority before implementation
+## Implementation acceptance boundary
 
-An Accepted RFC or decision must define, at minimum:
+The implementation must provide, with focused tests:
 
-1. the constraint grammar and provenance for operations, calls, handlers,
-   function types, row variables, levels, schemes, and module boundaries;
-2. substitution/unification, row-tail normalization, occurs-check failure,
-   generalization/instantiation, value restriction, partial application,
-   recursion, and deterministic canonical ordering independent of traversal;
-3. handler effect elimination/subtraction, resume typing, State masking and
-   escape proofs, Capability closure, unhandled/profile failure, and the
-   checked Typed Core representation consumed by evaluation;
-4. conflict selection and explanation: minimal conflict-set definition,
-   precedence, stable bilingual diagnostic codes/messages/facts/spans,
-   recovery, related information, Semantic Graph/Audit Source fields, and
-   schema/identity migration; and
-5. executable positive/negative/property/migration and compiler-interpreter-
-   VM differential fixtures for pure/Clock/Random rows, polymorphic `map`,
-   nested handlers, occurs cycles, conflicting constraints, missing
-   Capability, unhandled profile effects, State masking, Unicode/CRLF/BOM
-   spans, randomized constraint order, canonical output, and deterministic
-   minimal diagnostics.
+1. `Equal` and `Requires` constraints carrying stable provenance and original
+   UTF-8 byte spans when supplied.
+2. Canonical sorting/deduplication independent of insertion order, a
+   deterministic substitution map, row-tail normalization, distinct-tail
+   unification, and an occurs check.
+3. Explicit value-restriction generalization and caller-seeded instantiation,
+   with sorted quantified variables and no host allocator identity.
+4. Handler subtraction that preserves open tails, never implicitly masks
+   `State<T>`, and never changes Capability facts.
+5. Minimal deterministic conflict sets and bilingual `L-EFFECT-0001` and
+   `L-EFFECT-0002` diagnostics in human and JSON representations.
+6. Positive, negative, property, randomized-order, Unicode/CRLF/BOM-span, and
+   clean/incremental differential fixtures before EFF-2103 consumes results.
 
-Until these decisions are Accepted, a solver could infer a different function
-type, hide a State effect without proof, emit unstable diagnostics, or allow
-unchecked effect data to reach the evaluator.
+## Compatibility and determinism
 
-## Evidence and compatibility
-
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ERROR-CODES.md`, `docs/ROADMAP-1.0.md`, DEC-0010,
-DEC-0017, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
-`docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and `crates/ling-effects`/`crates/ling-types`.
-
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+This task may add only an Experimental v0.2 in-process API and the two
+registered diagnostic entries. Seed source acceptance, existing diagnostics,
+Semantic IDs, schemas, CLI, LSP, bytecode, VM, protocols, ABI, and Unicode
+17.0.0 data remain unchanged. Canonical rows and substitutions must exclude
+paths, host state, allocation identity, hash-map order, scheduling, and debug
+formatting. Original UTF-8 byte spans remain evidence fields only.
 
 ## Intentionally deferred
 
-`EFF-2102` can begin only after EFF-2101's Effect/Handler authority and the
-v0.1 exit are Accepted, with an independently reviewed RFC-0006 (or
-replacement). The future solver must consume checked inputs, produce
-canonical deterministic rows and stable bilingual conflicts, and prove
-clean/differential equivalence before runtime integration.
+Source syntax and Checked-Core lowering remain EFF-2103. Handler execution,
+continuations, Task/Actor lifecycle, Replay, Remote, Native, GPU, FFI, and
+Stable 1.0 compatibility require their own accepted authorities. This audit
+does not claim any of those features.

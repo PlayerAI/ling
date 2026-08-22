@@ -218,7 +218,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ZED-3504` | G1/Editor | Snippets | — | Blocked by G0/interface | `05-ZED-EXTENSION.md:512` |
   | `EFF-2101` | G2 | Effect 核心模型冻结 | M | Done | `06-G2-V0.2-CONCURRENT.md:81`, `docs/RFC-0006.md`, `docs/status/EFF-2101-AUTHORITY-AUDIT.md`, `docs/status/EFF-2101-IMPLEMENTATION-REPORT.md` |
 | `EFF-2101-SEED-ROW` | G2 | Seed EffectRow canonical snapshot | S | Done | Accepted DEC-0060; see `docs/status/EFF-2101-SEED-ROW-IMPLEMENTATION-REPORT.md`; v0.2 Effect model remains in `EFF-2101` |
-| `EFF-2102` | G2 | Effect 推导和约束求解 | L | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:105`, `docs/status/EFF-2102-AUTHORITY-AUDIT.md` |
+| `EFF-2102` | G2 | Effect 推导和约束求解 | L | In Progress | `06-G2-V0.2-CONCURRENT.md:105`, `DEC-0062`, `docs/status/EFF-2102-AUTHORITY-AUDIT.md`, `docs/status/EFF-2102-IMPLEMENTATION-REPORT.md` |
 | `EFF-2103` | G2 | Handler Typed Core 表示 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:115`, `docs/status/EFF-2103-AUTHORITY-AUDIT.md` |
 | `EFF-2104` | G2 | 解释器与 VM Handler 执行 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:131`, `docs/status/EFF-2104-AUTHORITY-AUDIT.md` |
 | `EFF-2105` | G2 | Effect fuzz/property tests | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:143`, `docs/status/EFF-2105-AUTHORITY-AUDIT.md` |

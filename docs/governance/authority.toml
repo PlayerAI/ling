@@ -1302,6 +1302,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0062"
+title = "Deterministic effect-row constraint solver"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0062-effect-row-constraint-solver.md"
+covers = ["EFF-2102 deterministic row constraints", "row unification and occurs check", "generalization and handler subtraction"]
+depends_on = ["RFC-0006"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "RFC-0006"
 title = "Effect rows and first-order handlers"
 kind = "RFC"

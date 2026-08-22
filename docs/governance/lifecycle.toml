@@ -1690,6 +1690,30 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0062"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0062-effect-row-constraint-solver.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-22"
+proposed = "2026-08-22"
+decided = "2026-08-22"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify canonical constraint ordering, duplicate elimination, deterministic substitutions, occurs-check rejection, minimal conflict sets, and preserved UTF-8 spans across randomized input order.",
+  "Verify explicit value-restriction generalization and deterministic instantiation, nested handler subtraction, open-tail preservation, and the prohibition on implicit State masking or Capability inference.",
+  "Verify bilingual L-EFFECT-0001 and L-EFFECT-0002 diagnostics in human and JSON forms, with stable codes, facts, and canonical conflict ordering.",
+]
+compatibility_impact = [
+  "Adds only an Experimental v0.2 in-process ling-effects solver; Seed syntax, existing diagnostics, Semantic IDs, schemas, CLI, LSP, bytecode, VM, protocols, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Source syntax and Checked-Core lowering remain EFF-2103; runtime handler execution, Task/Actor, Replay, Remote, Native, GPU, and FFI require separate accepted authorities; any fresh-variable policy change requires a superseding accepted decision and migration evidence.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0006"
 kind = "RFC"
 status = "Accepted"

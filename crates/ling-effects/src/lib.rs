@@ -12,8 +12,15 @@ use ling_resolve::{
 use ling_source::Span;
 use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
 
+mod solver;
 mod v2;
 
+pub use solver::{
+    EffectConflictKind, EffectConstraint, EffectConstraintConflict, EffectConstraintError,
+    EffectConstraintOrigin, EffectConstraintSolver, EffectInference, EffectInstantiationError,
+    EffectRowScheme, EffectSourceSpan, EffectSubstitution, GeneralizationBoundary,
+    subtract_handler,
+};
 pub use v2::{
     EFFECT_GRAPH_EXTENSION_VERSION, EffectGraphProjection, EffectId, EffectIdError, EffectLabel,
     EffectOperation, EffectOperationError, EffectRowModel, EffectRowTail, EffectRowUnionError,
