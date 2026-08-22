@@ -6213,6 +6213,59 @@ notes = [
 ]
 
 [[task]]
+id = "IDE-2304-REVERSE-INDEX"
+title = "Internal resolved-reference reverse index"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["IDE-2303-REFERENCE-INDEX"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0075-ide-resolved-reference-index.md",
+  "docs/decisions/0076-ide-resolved-reference-reverse-index.md",
+  "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-db/src/reference_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "docs/decisions/0076-ide-resolved-reference-reverse-index.md",
+  "docs/status/IDE-2304-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2304-REVERSE-INDEX-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0076 authorizes only an in-process immutable grouping of existing forward-index target keys; no relation taxonomy, source range, or target eligibility rule is invented.",
+  "Groups preserve DefinitionId or binding module/local identity and source logical name, module identity, and resolver reference ID with explicit deterministic ordering.",
+  "The reverse view is derived from the validated resolver observation without revision cache, dependency invalidation, persistence, corruption recovery, or Semantic ID generation.",
+  "Focused cargo fmt, ling-db tests, and Clippy checks pass; repeated grouping, forward-to-reverse identity, source reference IDs, and invalid UTF-8 failure are covered.",
+  "The public IDE-2304 references target remains BlockedSpec for relation categories, source ranges, incremental lifecycle, URI/version, cancellation, publication, and fixtures.",
+]
+verified_against_commit = "29854ae695f58c611518190b5fcc58263458c6b0"
+completion_commit = "29854ae695f58c611518190b5fcc58263458c6b0"
+integration_state = "committed"
+completed = "2026-08-22"
+notes = [
+  "The reverse index is a resolver-derived compiler observation over existing target identities; it is not a references response, relation classifier, persistent cache, or Semantic ID generator.",
+  "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
+]
+
+[[task]]
 id = "IDE-2304"
 title = "IDE references"
 state = "BlockedSpec"

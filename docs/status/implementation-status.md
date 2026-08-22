@@ -149,6 +149,7 @@
 | `IDE-2303` | IDE definition navigation | `G1` | `M` | `BlockedSpec` | `IDE-2301`, `IDE-2302`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2303-REFERENCE-INDEX` | Internal resolved-reference target index | `G1` | `S` | `Done` | `IDE-2301-INDEX`, `INC-1404` | `1f1b10653f2a38f477cf359ac318be8b662e1503` |
 | `IDE-2304` | IDE references | `G1` | `M` | `BlockedSpec` | `IDE-2303`, `LSP-2101`, `LSP-2102` | `` |
+| `IDE-2304-REVERSE-INDEX` | Internal resolved-reference reverse index | `G1` | `S` | `Done` | `IDE-2303-REFERENCE-INDEX` | `29854ae695f58c611518190b5fcc58263458c6b0` |
 | `IDE-2305` | IDE prepare rename | `G1` | `M` | `BlockedSpec` | `IDE-2304`, `LSP-2102` | `` |
 | `IDE-2306` | IDE rename | `G1` | `L` | `BlockedSpec` | `IDE-2305`, `LSP-2102`, `LSP-2104` | `` |
 | `IDE-2307` | IDE completion v0 | `G1` | `L` | `BlockedSpec` | `IDE-2304`, `LSP-2101`, `LSP-2102` | `` |
