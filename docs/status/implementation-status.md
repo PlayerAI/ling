@@ -96,6 +96,7 @@
 | `CTR-5403` | Runtime Contract Check | `G5` | `M` | `BlockedSpec` | `CTR-5402` | `` |
 | `CTR-5403-OBSERVATION` | Internal Contract runtime-check boundary evidence | `G5` | `S` | `Done` | `CTR-5402-OBSERVATION` | `69e594c9d10f56fe397453e0c79cbd4479101f55` |
 | `CTR-5404` | Verification Condition Generation | `G5` | `L` | `BlockedSpec` | `CTR-5403` | `` |
+| `CTR-5404-OBSERVATION` | Internal Contract VC boundary evidence | `G5` | `S` | `Done` | `CTR-5403-OBSERVATION` | `e8c3a94a4b85fe3ce4b55816f109b99672591d32` |
 | `CTR-5405` | Solver/Proof Checker Adapter | `G5` | `L` | `BlockedSpec` | `CTR-5404` | `` |
 | `CTR-5406` | Contract-aware optimizer rules | `G5` | `M` | `BlockedSpec` | `CTR-5405` | `` |
 | `CTR-5407` | Contract LSP/Zed | `G5` | `L` | `BlockedSpec` | `CTR-5406`, `LSP-2205` | `` |
