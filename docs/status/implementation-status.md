@@ -438,6 +438,7 @@
 | `TASK-2206` | Task conformance and stress tests | `G2` | `L` | `BlockedSpec` | `TASK-2205` | `` |
 | `TEST-VM-0001` | VM failing-first corpus and differential harness baseline | `G1` | `M` | `Done` | `GOV-0104`, `GOV-0105` | `5bd49583c9160cd2067a7124bc014ebc3b4bcf95` |
 | `TIM-5701` | Timing IR and Path | `G5` | `L` | `BlockedSpec` | `MC-5604` | `` |
+| `TIM-5701-OBSERVATION` | Internal Timing IR and Path boundary evidence | `G5` | `S` | `Done` | `MC-5604-OBSERVATION` | `d6c3d6315c04a3e85db518341b8002cac1076e14` |
 | `TIM-5702` | Measurement and Static-Analysis Separation | `G5` | `M` | `BlockedSpec` | `TIM-5701` | `` |
 | `TIM-5703` | Deadline Check | `G5` | `M` | `BlockedSpec` | `TIM-5702` | `` |
 | `TRAIT-1301` | Trait RFC closure | `G1` | `M` | `Done` | — | `ccab6ea91e05ed477457cc1ed870d76faaa46e3c` |

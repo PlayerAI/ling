@@ -21809,6 +21809,68 @@ notes = [
 ]
 
 [[task]]
+id = "TIM-5701-OBSERVATION"
+title = "Internal Timing IR and Path boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["MC-5604-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0205-replay-counterexample-boundary-evidence.md",
+  "docs/decisions/0206-timing-ir-path-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/timing_ir_path_evidence.rs",
+  "docs/decisions/0206-timing-ir-path-boundary-evidence.md",
+  "docs/status/TIM-5701-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/TIM-5701-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0206 authorizes only test-local Timing IR and Path boundary evidence; no Timing IR, path solver, target-cost model, WCET claim, schema, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty representation, target, control-flow, bound, assumption, identity, source-link, failure, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; tag has no Timing IR, analyzer, WCET, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test timing_ir_path_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "d6c3d6315c04a3e85db518341b8002cac1076e14"
+completion_commit = "d6c3d6315c04a3e85db518341b8002cac1076e14"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0206; TIM-5701 remains BlockedSpec for representation, target/path/cost/WCET semantics, schemas, diagnostics, protocols, and support claims.",
+  "No Timing IR, analyzer, target-cost model, WCET result, schema, deadline hook, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
+]
+
+[[task]]
 id = "TIM-5702"
 title = "Measurement and Static-Analysis Separation"
 state = "BlockedSpec"
