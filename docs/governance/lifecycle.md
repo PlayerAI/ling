@@ -169,6 +169,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0136` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0136](../decisions/0136-native-reproducible-build-boundary-evidence.md) |
 | `DEC-0137` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0137](../decisions/0137-ffi-declaration-boundary-evidence.md) |
 | `DEC-0138` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0138](../decisions/0138-c-abi-interoperability-boundary-evidence.md) |
+| `DEC-0139` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0139](../decisions/0139-ffi-shim-generator-boundary-evidence.md) |
 
 ## Migration boundary
 

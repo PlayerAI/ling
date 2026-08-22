@@ -14034,6 +14034,14 @@ spec = [
 ]
 artifacts = [
   "docs/status/FFI-3603-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/decisions/0139-ffi-shim-generator-boundary-evidence.md",
+  "crates/ling-types/tests/ffi_shim_generator_evidence.rs",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -14043,6 +14051,7 @@ acceptance = [
   "The audit covers golden deterministic shims, independent layout/header/compiler/linker checks, malformed/tampered metadata, null/bounds/overflow/encoding/ownership/drop/allocator/callback/thread/reentry/Fault/Capability cases, provenance/license/TCB, schema migration, sanitizer/fuzz, cross-target, and source-span evidence without unverified claims.",
   "No shim generator, template, generated source, layout or safety check, ownership adapter, callback trampoline, Fault/capability bridge, provenance record, build-hash input, diagnostic allocation, dependency, toolchain, public protocol implementation, or placeholder API is added while RFC-N305, RFC-0007, RFC-0011, PROTO-ABI, and PROTO-EVIDENCE authority are absent.",
   "The future implementation must preserve v0.0.1 Seed behavior, consume verified declarations only, keep generated/host details outside Ling semantics, retain UTF-8 spans and Semantic IDs, and publish bilingual diagnostics and Unicode 17.0.0 evidence before exposing generated Native/FFI shims.",
+  "Accepted DEC-0139 authorizes only test-local FFI shim-generator boundary evidence; it does not close shim schemas, generated checks/adapters, trust/TCB, provenance/build hash, diagnostics, migration, sanitizer/fuzz, or cross-target contracts.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -14052,6 +14061,61 @@ notes = [
   "FFI-3603 is BlockedSpec by FFI-3602, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-OWNERSHIP-PUBLIC-LIFETIME-001, absent RFC-N305/RFC-0007/RFC-0011, and the unimplemented PROTO-ABI/PROTO-EVIDENCE registry entries.",
   "The current workspace has no accepted shim schema, generator, generated artifact directory, target package, layout/ownership verifier, callback/Fault adapter, provenance schema, or public build-hash protocol; no generated code or native toolchain state was changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, dependency lock, memory categories, Managed/Resource/ownership behavior, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+]
+
+[[task]]
+id = "FFI-3603-OBSERVATION"
+title = "Internal FFI shim-generator boundary evidence"
+state = "Done"
+release = "G3"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["FFI-3602-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0009-seed-borrow-and-mutation-boundary.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/decisions/0138-c-abi-interoperability-boundary-evidence.md",
+  "docs/decisions/0139-ffi-shim-generator-boundary-evidence.md",
+  "docs/ling_execution_plan/07-G3-V0.3-NATIVE.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/ffi_shim_generator_evidence.rs",
+  "docs/decisions/0139-ffi-shim-generator-boundary-evidence.md",
+  "docs/status/FFI-3603-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/FFI-3603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0139 authorizes only test-local FFI shim-generator boundary evidence; no generator, template, generated source/header, layout or pointer check, ownership adapter, callback trampoline, provenance record, build-hash input, diagnostic, dependency, toolchain, public protocol, or executable shim is claimed.",
+  "The test-local inventory covers sixty provisional boundaries for shim input/declaration/ABI/target/layout/ownership/capability/encoding/callback/error facts, source-span/Semantic-ID views, generator/template trust/version, output/source/artifact/metadata, layout/null/bounds/overflow/mutability/encoding checks, ownership/allocator/drop conversion, callback lifetime/thread/reentry/cancellation, Fault/Capability, unsupported/unknown rules, canonical/deterministic/clean/repeat/offline generation, provenance/license/TCB/tamper, build-hash/Semantic-ID and host exclusions, diagnostics/Unicode, schema migration, target compatibility, sanitizer/fuzz, compiler differential evidence, public-protocol exclusion, and Seed compatibility.",
+  "Forward and reversed boundary insertion order produce identical opaque test-only evidence bytes; duplicate labels are rejected; the evidence tag has no generator, artifact, build-hash, provenance, Semantic ID, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --all-targets --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = ""
+completion_commit = ""
+integration_state = "pending"
+completed = ""
+notes = [
+  "This child is test-only evidence under DEC-0139; FFI-3603 remains BlockedSpec for shim schemas, generated checks/adapters, trust/TCB, provenance/build hash, diagnostics, migration, sanitizer/fuzz, and cross-target decisions.",
+  "No parser, AST/HIR/Checked Core node, generator, template, generated artifact, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, mailbox, Actor behavior, or Unicode behavior was added; accepted Seed behavior remains unchanged.",
 ]
 
 [[task]]
