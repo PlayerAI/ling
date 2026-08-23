@@ -23567,6 +23567,54 @@ notes = [
 ]
 
 [[task]]
+id = "PROTO-6203-OBSERVATION"
+title = "Internal Semantic Hash Upgrade Rehearsal boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROTO-6202-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0220-reader-writer-compatibility-boundary-evidence.md",
+  "docs/decisions/0221-semantic-hash-upgrade-rehearsal-boundary-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/status/PROTO-6203-AUTHORITY-AUDIT.md",
+  "schemas/registry.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/semantic_hash_upgrade_rehearsal_evidence.rs",
+  "tools/xtask/src/schema.rs",
+  "docs/status/PROTO-6203-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROTO-6203-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0221 authorizes only bounded Semantic Hash upgrade rehearsal evidence; no old/new algorithm pair, dual reader, migration, cache/lock rewrite, replay/evidence protocol, or compatibility promise is defined.",
+  "The test-local inventory covers sixty rehearsal, identity, migration, dependency, cache, replay/evidence, failure, determinism, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "The schema registry retains exactly three hash-bearing records: ling.semantic/0.1 with experimental BLAKE3 and v1 domains, ling.semantic/0.2 with experimental BLAKE3 and v2 domains, and ling.lock/1 with SHA-256.",
+  "Every hash-bearing schema remains NoPreviousVersion with empty previous markers and compatibility paths and migration_adapter=None; the two Semantic Graph records are not presented as a migration edge.",
+  "cargo test -p ling-types --test semantic_hash_upgrade_rehearsal_evidence --locked --offline passes.",
+  "cargo test -p xtask schema::tests --locked --offline passes.",
+  "cargo clippy -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "schema validation, compatibility, corrupt-input, protocol, governance, formatting, and diff checks pass without changing public identity or compatibility claims.",
+]
+verified_against_commit = "37aa6b4cc623fe1322e2806c71f7be349373117b"
+completion_commit = "37aa6b4cc623fe1322e2806c71f7be349373117b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0221; PROTO-6203 remains BlockedSpec for a real algorithm/version migration contract, dual-reader behavior, dependency/lock propagation, cache invalidation, replay/evidence linkage, diagnostics, and release evidence.",
+  "The opaque ling.semantic-hash-upgrade-rehearsal-observation/0 bytes are test evidence only and are not Semantic canonical bytes, an ID prefix, an algorithm ID, a schema marker, a cache key, or a migration manifest.",
+  "No hash algorithm, Semantic ID, canonical domain, schema/version, compatibility edge, reader, writer, migration, dependency/lock behavior, cache invalidation, replay/evidence format, diagnostic, CLI/LSP route, source span, or Unicode behavior changed.",
+]
+
+[[task]]
 id = "PROTO-6204"
 title = "CLI and Exit-Code Freeze"
 state = "BlockedSpec"

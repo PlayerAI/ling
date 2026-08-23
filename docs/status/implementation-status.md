@@ -375,6 +375,7 @@
 | `PROTO-6202` | Reader/Writer Compatibility Tests | `G6` | `L` | `BlockedSpec` | `PROTO-6201` | `` |
 | `PROTO-6202-OBSERVATION` | Internal Reader/Writer Compatibility boundary evidence | `G6` | `S` | `Done` | `PROTO-6201-OBSERVATION` | `64076eaade1f6858718e70e33f131f835b5c71b1` |
 | `PROTO-6203` | Semantic Hash Upgrade Rehearsal | `G6` | `L` | `BlockedSpec` | `PROTO-6202` | `` |
+| `PROTO-6203-OBSERVATION` | Internal Semantic Hash Upgrade Rehearsal boundary evidence | `G6` | `S` | `Done` | `PROTO-6202-OBSERVATION` | `37aa6b4cc623fe1322e2806c71f7be349373117b` |
 | `PROTO-6204` | CLI and Exit-Code Freeze | `G6` | `L` | `BlockedSpec` | `PROTO-6203` | `` |
 | `RC-6901` | RC0 Internal Freeze | `G6` | `L` | `BlockedSpec` | `ZED-6804` | `` |
 | `RC-6901-SEED` | Seed RC0 internal-freeze inventory drift gate | `G6` | `S` | `Done` | `ZED-6804-SEED` | `dc0f2e5ca98b9c705b9932267011c246058db4ec` |
