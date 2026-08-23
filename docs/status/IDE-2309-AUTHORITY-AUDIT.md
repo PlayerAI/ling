@@ -2,16 +2,18 @@
 
 ## Outcome
 
-`IDE-2309` is correctly recorded as `BlockedSpec`. The execution plan proposes
+`IDE-2309` was correctly recorded as `BlockedSpec` before RFC-0044. The execution plan proposes
 structured `FixPlan` actions for importing a missing symbol, renaming a
 confusable, making a binding/field mutable, adding match cases, replacing stale
 syntax, and applying the formatter. Each action is required to carry a kind,
 diagnostic code, and snapshot/version precondition, without parsing diagnostic
-message text. No accepted FixPlan or code-action mutation contract exists.
+message text. No accepted FixPlan or code-action mutation contract existed at
+the time of the original audit.
 
-No code-action handler, FixPlan schema, diagnostic-to-action registry,
-Workspace Edit, formatter action adapter, diagnostic allocation, or placeholder
-editor surface was added.
+Accepted RFC-0044 now authorizes one bounded Seed action:
+`source.fixAll.ling.format`, derived solely from the accepted compiler-CST
+formatter and returned as one versioned transactional Workspace Edit. It does
+not authorize diagnostic-to-edit conversion or the other speculative actions.
 
 The bounded child `IDE-2309-REPAIR-INDEX` only copies existing diagnostic
 codes/spans and structured `Repair` payloads into an internal read-only index.
@@ -33,8 +35,9 @@ It does not derive action IDs, applicability, edits, or protocol responses.
   formatting. `GAP-FORMATTER-AUTHOR-SOURCE-001` and
   `GAP-FORMATTER-CLI-PROTOCOL-001` leave broader formatter/editor integration
   and CLI/report behavior open.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` explicitly blocks IDE-2309 and leaves
-  snapshot/version and Stable versus Experimental edit fields open.
+- `GAP-LSP-TRANSACTION-PROTOCOL-001` originally blocked IDE-2309. RFC-0044 now
+  closes only the bounded formatter action by composing the accepted snapshot,
+  version, and transactional Workspace Edit rules; the general gap remains.
   `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves Semantic Graph/Transaction
   stability and migration open. Alias/localization gaps affect confusable and
   insertion fixes. RFC-0005/DEC-0027 provide no public Trait action surface.
@@ -42,47 +45,36 @@ It does not derive action IDs, applicability, edits, or protocol responses.
 ## Current interface evidence
 
 - Parser, resolver, type/effect checks, and `ling-cli` produce structured
-  diagnostics with registered codes, but there is no FixPlan/action kind,
-  applicability predicate, or diagnostic-to-edit mapping.
+  diagnostics with registered codes, but there remains no diagnostic-to-edit
+  mapping. RFC-0044 defines one independent formatter plan and action kind.
 - `ling-diagnostics::DiagnosticRepairIndex` provides deterministic structured
   repair facts without inspecting `message_zh` or `message_en`; it has no
   FixPlan, mutation, version, or action policy.
-- `ling-source` and formatter code preserve source spans/revisions, yet no
-  atomic multi-file Workspace Edit, snapshot/version precondition, overlap
-  policy, rollback, or stale-action response is implemented.
+- `ling-source` and formatter code preserve source spans/revisions. RFC-0044
+  composes them into one versioned single-document edit with complete freshness;
+  multi-file overlap, rollback, and general transaction policy remain absent.
 - No accepted semantic service describes safe import insertion, confusable
-  rename, mutability, match-case generation, stale-syntax replacement, or
-  formatter application; no action fixture exists.
-- There is no public code-action protocol entry in the inventory and no test
-  that proves actions are derived from structured facts rather than diagnostic
-  message text.
+  rename, mutability, match-case generation, or stale-syntax replacement.
+- `PROTO-LSP-CODE-ACTION` and the RFC-0044 integration fixtures now prove the
+  formatter action derives only from `FormatEdit`, never diagnostic text/data.
 
-## Required authority before implementation
+## Authority supplied by RFC-0044
 
-An Accepted decision or RFC must define, at minimum:
+RFC-0044 defines the implemented formatter action's:
 
-1. action kinds, stable IDs, diagnostic-code association, applicability,
-   preferred/suppressed behavior, capability requirements, and deterministic
-   ordering;
-2. structured FixPlan payloads and multi-file edit schema: source ranges,
-   URI/path normalization, UTF-8/UTF-16 conversion, overlap/ordering,
-   atomicity, rollback/conflict behavior, open-document versions, cancellation,
-   limits, and stale-result rejection;
-3. semantic safety for missing imports, confusable rename, mutable binding or
-   field, exhaustive match cases, stale syntax replacement, and formatter use,
-   including name-resolution, visibility, effects/capabilities, coherence,
-   generated/dependency read-only, comments, and localized source rules;
-4. diagnostic registry integration, bilingual/localized rendering, protocol
-   inventory, Semantic ID/provenance, Stable versus Experimental fields, and
-   migration; and
-5. executable positive/negative fixtures for every action, multi-file and
-   overlapping edits, Unicode/CRLF/BOM, stale versions, dependency/generated
-   targets, formatter preservation, deterministic ordering, rollback, and
-   message-text independence.
+1. exact action kind, preferred state, capability requirements, filtering, and
+   one-action cardinality;
+2. structured single-document formatter plan, original-byte range, URI,
+   version, transactional versioned Workspace Edit, freshness, and limits;
+3. formatter safety through RFC-0026 and DEC-0057, with diagnostics opaque and
+   dependencies/generated documents read-only;
+4. bilingual title/failures, protocol lifecycle/inventory, and the absence of
+   diagnostic or Semantic ID changes; and
+5. executable positive, negative, Unicode/CRLF/BOM, version, determinism,
+   read-only, filtering, and message/data-independence fixtures.
 
-Until these decisions are Accepted, a code action could apply a stale or
-mispositioned edit, create an invalid import/match/mutability change, rewrite
-Author Source unexpectedly, or turn diagnostic wording into an unstable API.
+The other proposed actions remain unavailable until separate Accepted checked
+edit producers define their semantic safety and fixtures.
 
 ## Evidence and compatibility
 
@@ -98,8 +90,8 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`IDE-2309` can begin after FixPlan/action, LSP transaction, diagnostic adapter,
-formatter, and Semantic Graph lifecycle decisions are Accepted. The future
-implementation must consume structured checked facts, preserve source-span and
-identity truth, apply edits atomically against explicit versions, avoid parsing
-message text, and label experimental fields.
+RFC-0044 does not authorize missing-import, confusable-rename, mutability,
+match-case, stale-syntax, diagnostic quick-fix, multi-document, resolve,
+command, generated/dependency mutation, general Semantic Transaction, or Stable
+lifecycle behavior. Those remain deferred rather than represented by placeholder
+actions.

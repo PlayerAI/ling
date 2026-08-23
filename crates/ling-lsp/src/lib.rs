@@ -10,7 +10,7 @@
 //! RFC-0039 governs checked References; RFC-0040 governs Prepare Rename;
 //! RFC-0041 governs checked transactional Rename; RFC-0042 governs checked
 //! deterministic Completion; RFC-0043 governs snapshot-bound Completion
-//! Resolve.
+//! Resolve; RFC-0044 governs bounded transactional Code Actions.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -76,6 +76,8 @@ pub use completion_resolve::{
     MAX_COMPLETION_DETAIL_BYTES, MAX_COMPLETION_DOCUMENTATION_BYTES,
     MAX_COMPLETION_RESOLVE_HANDLES,
 };
+mod code_action;
+pub use code_action::{CODE_ACTION_PROTOCOL_VERSION, FORMAT_ACTION_KIND};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -115,6 +117,7 @@ const INVALID_REQUEST: i32 = -32_600;
 const METHOD_NOT_FOUND: i32 = -32_601;
 const INVALID_PARAMS: i32 = -32_602;
 const INTERNAL_ERROR: i32 = -32_603;
+const REQUEST_FAILED: i32 = -32_803;
 const SERVER_NOT_INITIALIZED: i32 = -32_002;
 const SERVER_SHUTTING_DOWN: i32 = -32_003;
 const DOCUMENT_STALE: i32 = -32_004;
@@ -599,6 +602,7 @@ pub struct LspServer {
     hover_markup: hover::HoverMarkup,
     transactional_rename_supported: bool,
     completion_resolve: completion_resolve::CompletionResolveState,
+    code_action: code_action::CodeActionOptions,
 }
 
 impl Default for LspServer {
@@ -627,6 +631,7 @@ impl LspServer {
             hover_markup: hover::HoverMarkup::Plaintext,
             transactional_rename_supported: false,
             completion_resolve: completion_resolve::CompletionResolveState::new(),
+            code_action: code_action::CodeActionOptions::disabled(),
         }
     }
 
@@ -829,6 +834,7 @@ impl LspServer {
             "textDocument/rename" => self.rename(id_present, id, params),
             "textDocument/completion" => self.completion(id_present, id, params),
             "completionItem/resolve" => self.completion_resolve(id_present, id, params),
+            "textDocument/codeAction" => self.code_action(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -857,6 +863,7 @@ impl LspServer {
             hover_markup,
             transactional_rename_supported,
             completion_resolve,
+            code_action,
         } = match parse_initialize_params(&params) {
             Ok(value) => value,
             Err(()) => {
@@ -876,6 +883,7 @@ impl LspServer {
         self.hover_markup = hover_markup;
         self.transactional_rename_supported = transactional_rename_supported;
         self.completion_resolve.configure(completion_resolve);
+        self.code_action = code_action;
         self.state = LifecycleState::AwaitingInitialized;
         HandleOutcome::Response(success_response(
             id,
@@ -886,6 +894,7 @@ impl LspServer {
                 hierarchical_document_symbols,
                 hover_markup,
                 completion_resolve,
+                code_action,
             ),
         ))
     }
@@ -1101,6 +1110,93 @@ impl LspServer {
                 },
             }]),
         ))
+    }
+
+    fn code_action(&self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
+        if !is_request {
+            return HandleOutcome::NoResponse;
+        }
+        if self.state != LifecycleState::Ready {
+            return self.state_error(id);
+        }
+        if !self.code_action.enabled() {
+            return error_or_none(
+                true,
+                id,
+                REQUEST_FAILED,
+                "代码动作不可用 / code action unavailable",
+            );
+        }
+        let before = match self.capture_request_snapshot() {
+            Ok(snapshot) => snapshot,
+            Err(_) => {
+                return error_or_none(
+                    true,
+                    id,
+                    REQUEST_FAILED,
+                    "代码动作不可用 / code action unavailable",
+                );
+            }
+        };
+        let parsed = match code_action::parse_code_action_params(&params) {
+            Ok(parsed) => parsed,
+            Err(()) => {
+                return error_or_none(
+                    true,
+                    id,
+                    INVALID_PARAMS,
+                    "代码动作参数无效 / invalid code-action parameters",
+                );
+            }
+        };
+        let result = match code_action::build_code_actions(&before, &parsed) {
+            Ok(result) => result,
+            Err(code_action::CodeActionError::InvalidParams) => {
+                return error_or_none(
+                    true,
+                    id,
+                    INVALID_PARAMS,
+                    "代码动作参数无效 / invalid code-action parameters",
+                );
+            }
+            Err(code_action::CodeActionError::Unavailable) => {
+                return error_or_none(
+                    true,
+                    id,
+                    REQUEST_FAILED,
+                    "代码动作不可用 / code action unavailable",
+                );
+            }
+        };
+        let after = match self.capture_request_snapshot() {
+            Ok(snapshot) => snapshot,
+            Err(_) => {
+                return error_or_none(
+                    true,
+                    id,
+                    REQUEST_FAILED,
+                    "代码动作不可用 / code action unavailable",
+                );
+            }
+        };
+        if before != after {
+            return error_or_none(
+                true,
+                id,
+                REQUEST_FAILED,
+                "代码动作不可用 / code action unavailable",
+            );
+        }
+        let response = success_response(id.clone(), result);
+        if response.len() > MAX_FRAME_BYTES {
+            return error_or_none(
+                true,
+                id,
+                REQUEST_FAILED,
+                "代码动作不可用 / code action unavailable",
+            );
+        }
+        HandleOutcome::Response(response)
     }
 
     fn open_document(
@@ -1430,6 +1526,7 @@ struct ParsedInitializeParams {
     hover_markup: hover::HoverMarkup,
     transactional_rename_supported: bool,
     completion_resolve: completion_resolve::CompletionResolveOptions,
+    code_action: code_action::CodeActionOptions,
 }
 
 fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()> {
@@ -1443,6 +1540,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
     let mut hover_markup = hover::HoverMarkup::Plaintext;
     let mut transactional_rename_supported = false;
     let mut completion_resolve = completion_resolve::CompletionResolveOptions::disabled();
+    let mut code_action = code_action::CodeActionOptions::disabled();
     if let Some(capabilities) = object.get("capabilities") {
         let Some(capabilities) = capabilities.as_object() else {
             return Err(());
@@ -1487,6 +1585,10 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
             prepare_rename::parse_prepare_rename_capability(text_document)?;
             completion_resolve =
                 completion_resolve::parse_completion_resolve_capability(text_document)?;
+            code_action = code_action::parse_code_action_capability(
+                text_document,
+                transactional_rename_supported,
+            )?;
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -1505,6 +1607,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
         hover_markup,
         transactional_rename_supported,
         completion_resolve,
+        code_action,
     })
 }
 
@@ -2037,6 +2140,7 @@ fn initialize_result(
     hierarchical_document_symbols: bool,
     hover_markup: hover::HoverMarkup,
     completion_resolve: completion_resolve::CompletionResolveOptions,
+    code_action: code_action::CodeActionOptions,
 ) -> Value {
     let mut result = json!({
         "capabilities": {
@@ -2148,6 +2252,20 @@ fn initialize_result(
             "maxHandles": MAX_COMPLETION_RESOLVE_HANDLES,
             "properties": ["detail", "documentation"],
             "version": COMPLETION_RESOLVE_PROTOCOL_VERSION,
+        });
+    }
+    if code_action.enabled() {
+        result["capabilities"]["codeActionProvider"] = json!({
+            "codeActionKinds": [FORMAT_ACTION_KIND],
+            "resolveProvider": false,
+        });
+        result["capabilities"]["experimental"]["lingCodeAction"] = json!({
+            "actionKinds": [FORMAT_ACTION_KIND],
+            "maxActions": 1,
+            "result": "versionedDocumentChanges",
+            "source": "compiler-cst-format-plan",
+            "transactional": true,
+            "version": CODE_ACTION_PROTOCOL_VERSION,
         });
     }
     result

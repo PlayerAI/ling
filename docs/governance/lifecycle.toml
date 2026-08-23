@@ -7199,3 +7199,32 @@ unresolved_alternatives = [
   "Author documentation, localized presentation, source excerpts, generated and dependency provenance, builtin and field metadata, snippets, additional edits, auto-imports, formatter integration, persistent handles, asynchronous cancellation, AI assistance, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0044"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0044.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify capable and incapable initialize shapes, malformed capabilities, static discovery, lifecycle, notification silence, and unnegotiated failure.",
+  "Verify exact params, unknown ordinary fields, invalid URI, range, position and trigger kinds, source-kind filtering, exact empty results, and fixed bilingual failures.",
+  "Verify one exact source.fixAll.ling.format action and versioned Workspace Edit for changed valid input, with no action for unchanged, invalid, recovery, read-only, and unsupported-filter cases.",
+  "Prove client diagnostics and localized messages cannot create or alter a plan, Repair metadata is not an edit, and no identity, path, diagnostic, command, annotation, partial response, or server mutation is exposed.",
+  "Cover UTF-8, UTF-16, and UTF-32, Chinese, combining characters, emoji prefixes, BOM, CRLF, client versions, complete-snapshot staleness, repeated determinism, response bounds, and formatter idempotence.",
+  "Add exact protocol transcripts and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds capability-negotiated Preview ling.lsp.code-action/0.1 with no predecessor; incapable clients retain the prior initialize response and no provider.",
+  "Composes the existing compiler-CST formatter and FormatEdit into one request-local internal plan without changing formatter output or promising persistence.",
+  "Adds no diagnostic code or Repair kind, Semantic ID schema, Ling syntax or semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, package, filesystem/network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Missing-import, confusable-rename, mutability, match-case, stale-syntax, diagnostic quick-fix, multi-document, resolve, command, annotation, generated/dependency mutation, cancellation, general Semantic Transaction, and Stable lifecycle behavior remain deferred.",
+]
+superseded_by = ""

@@ -840,9 +840,9 @@ notes = []
             .and_then(Path::parent)
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("repository protocol inventory is valid");
-        assert_eq!(summary.protocol_count, 43);
-        assert_eq!(summary.public_count, 39);
-        assert_eq!(summary.preview_count, 23);
+        assert_eq!(summary.protocol_count, 44);
+        assert_eq!(summary.public_count, 40);
+        assert_eq!(summary.preview_count, 24);
         assert_eq!(summary.experimental_count, 16);
         assert_eq!(summary.stable_count, 0);
         assert_eq!(summary.internal_count, 1);

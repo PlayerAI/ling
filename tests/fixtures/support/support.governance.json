@@ -475,6 +475,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-CODE-ACTION",
+      "visibility": "Public",
+      "version": "ling.lsp.code-action/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-COMPLETION",
       "visibility": "Public",
       "version": "ling.lsp.completion/0.2",

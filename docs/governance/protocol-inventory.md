@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 43 records: 39 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 23 Preview, 0 Stable.
+- 44 records: 40 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 24 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -17,6 +17,7 @@
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 10 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 4 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
+| `PROTO-LSP-CODE-ACTION` | Public | LSP | `ling.lsp.code-action/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-COMPLETION` | Public | LSP | `ling.lsp.completion/0.2` | `Preview` | no | no | 8 |
 | `PROTO-LSP-DIAGNOSTIC` | Public | LSP | `ling.lsp.diagnostic/0.2` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-DIAGNOSTIC-CONTROL` | Public | LSP | `ling.lsp.diagnostic-control/0.1` | `Preview` | no | no | 5 |
@@ -98,6 +99,19 @@
 - Sources: [`docs/RFC-0024.md`](../RFC-0024.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs)
 - Fixtures: [`crates/ling-cli/tests/project_check.rs`](../../crates/ling-cli/tests/project_check.rs), [`tests/protocols/project-check/README.md`](../../tests/protocols/project-check/README.md)
 - Notes: Graph validation only: semantic compilation, run/test/build, workspace search, registry/network behavior, and lock update mode remain deferred.
+
+### `PROTO-LSP-CODE-ACTION` — Ling bounded transactional LSP code action
+
+- Producer: ling lsp --stdio; ling-lsp compiler-CST formatter plan
+- Consumer: LSP clients with exact code-action literal and transactional versioned Workspace Edit support; editor and integration test harnesses
+- Reader policy: Enable textDocument/codeAction only when codeActionLiteralSupport contains source.fixAll.ling.format and workspace.workspaceEdit promises documentChanges=true plus failureHandling=transactional; validate the standard request range and context while treating client diagnostics as opaque filter context.
+- Writer policy: From one complete immutable snapshot, emit zero actions or exactly one preferred source.fixAll.ling.format action containing one versioned documentChanges TextEdit derived solely from the accepted compiler-CST FormatEdit; recheck complete freshness, enforce the 1 MiB response bound, and never apply the edit.
+- Unknown-field policy: Ignore ordinary unknown request and capability members while rejecting malformed known members; capability, discovery, params, kind filtering, diagnostic opacity, plan, projection, title, version, result, empty-result, freshness, bound, or failure changes require a new marker and migration evidence.
+- Migration tool: None; ling.lsp.code-action/0.1 has no predecessor, incapable clients retain the prior initialize response without a provider, and clients gate on the exact discovery marker and transactional capabilities.
+- Authority: `RFC-0044`, `RFC-0041`, `RFC-0039`, `RFC-0038`, `RFC-0031`, `RFC-0030`, `RFC-0029`, `RFC-0026`, `RFC-0023`, `RFC-0005`, `RFC-0004`, `DEC-0001`, `DEC-0002`, `DEC-0012`, `DEC-0015`, `DEC-0019`, `DEC-0023`, `DEC-0029`, `DEC-0034`, `DEC-0057`, `DEC-0071`, `DEC-0072`, `DEC-0081`
+- Sources: [`docs/RFC-0044.md`](../RFC-0044.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0026.md`](../RFC-0026.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0031.md`](../RFC-0031.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/RFC-0041.md`](../RFC-0041.md), [`docs/decisions/0001-error-code-policy.md`](../decisions/0001-error-code-policy.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0015-audit-source-format.md`](../decisions/0015-audit-source-format.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0023-author-source-formatter-preservation.md`](../decisions/0023-author-source-formatter-preservation.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md`](../decisions/0034-lsp-internal-diagnostic-ordering-boundary.md), [`docs/decisions/0057-formatter-in-process-edit-projection.md`](../decisions/0057-formatter-in-process-edit-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0072-lsp-diagnostic-span-projection.md`](../decisions/0072-lsp-diagnostic-span-projection.md), [`docs/decisions/0081-ide-code-action-repair-index.md`](../decisions/0081-ide-code-action-repair-index.md), [`crates/ling-format/src/edit.rs`](../../crates/ling-format/src/edit.rs), [`crates/ling-lsp/src/code_action.rs`](../../crates/ling-lsp/src/code_action.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-lsp/src/code_action.rs`](../../crates/ling-lsp/src/code_action.rs), [`crates/ling-lsp/tests/code_action.rs`](../../crates/ling-lsp/tests/code_action.rs), [`tests/protocols/lsp-code-action/README.md`](../../tests/protocols/lsp-code-action/README.md), [`docs/status/IDE-2309-IMPLEMENTATION-REPORT.md`](../status/IDE-2309-IMPLEMENTATION-REPORT.md)
+- Notes: Version 0.1 closes the Seed code-action surface with one actual checked formatter plan. Missing-import, confusable-rename, mutability, match-case, stale-syntax, diagnostic quick-fix, multi-document, resolve, command, generated/dependency mutation, cancellation, general Semantic Transaction, and Stable behavior remain out of scope.
 
 ### `PROTO-LSP-COMPLETION` — Ling checked deterministic LSP completion and resolve
 

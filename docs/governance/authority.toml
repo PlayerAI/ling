@@ -1159,6 +1159,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0044"
+title = "Bounded Transactional LSP Code Action Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0044.md"
+covers = ["ling.lsp.code-action/0.1", "capability-negotiated source.fixAll.ling.format over one immutable open writable document", "compiler-CST FormatEdit plans, exact versioned transactional documentChanges, diagnostic opacity, freshness, bounds, and no server-side mutation"]
+depends_on = ["RFC-0004", "RFC-0005", "RFC-0023", "RFC-0026", "RFC-0029", "RFC-0030", "RFC-0031", "RFC-0038", "RFC-0039", "RFC-0041", "DEC-0001", "DEC-0002", "DEC-0012", "DEC-0015", "DEC-0019", "DEC-0023", "DEC-0029", "DEC-0034", "DEC-0057", "DEC-0071", "DEC-0072", "DEC-0081", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

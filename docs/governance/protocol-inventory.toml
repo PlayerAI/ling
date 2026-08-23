@@ -420,6 +420,28 @@ authority = ["RFC-0043", "RFC-0042", "RFC-0039", "RFC-0038", "RFC-0037", "RFC-00
 notes = ["The negotiated resolve Preview presents existing DEC-0080 facts and only directly attached `///` Author Source text; it never fabricates documentation or changes an RFC-0042 edit. Incomplete recovery, zero-width insertion, auto-imports, snippets, generated/dependency/builtin metadata, persistent handles, cancellation, AI ranking, and Stable lifecycle remain out of scope."]
 
 [[protocol]]
+id = "PROTO-LSP-CODE-ACTION"
+title = "Ling bounded transactional LSP code action"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.code-action/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp compiler-CST formatter plan"]
+consumer = ["LSP clients with exact code-action literal and transactional versioned Workspace Edit support", "editor and integration test harnesses"]
+reader_policy = "Enable textDocument/codeAction only when codeActionLiteralSupport contains source.fixAll.ling.format and workspace.workspaceEdit promises documentChanges=true plus failureHandling=transactional; validate the standard request range and context while treating client diagnostics as opaque filter context."
+writer_policy = "From one complete immutable snapshot, emit zero actions or exactly one preferred source.fixAll.ling.format action containing one versioned documentChanges TextEdit derived solely from the accepted compiler-CST FormatEdit; recheck complete freshness, enforce the 1 MiB response bound, and never apply the edit."
+unknown_field_policy = "Ignore ordinary unknown request and capability members while rejecting malformed known members; capability, discovery, params, kind filtering, diagnostic opacity, plan, projection, title, version, result, empty-result, freshness, bound, or failure changes require a new marker and migration evidence."
+migration_tool = "None; ling.lsp.code-action/0.1 has no predecessor, incapable clients retain the prior initialize response without a provider, and clients gate on the exact discovery marker and transactional capabilities."
+fixtures = ["crates/ling-lsp/src/code_action.rs", "crates/ling-lsp/tests/code_action.rs", "tests/protocols/lsp-code-action/README.md", "docs/status/IDE-2309-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0044.md", "docs/RFC-0004.md", "docs/RFC-0005.md", "docs/RFC-0023.md", "docs/RFC-0026.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0031.md", "docs/RFC-0038.md", "docs/RFC-0039.md", "docs/RFC-0041.md", "docs/decisions/0001-error-code-policy.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0015-audit-source-format.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0023-author-source-formatter-preservation.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md", "docs/decisions/0057-formatter-in-process-edit-projection.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0072-lsp-diagnostic-span-projection.md", "docs/decisions/0081-ide-code-action-repair-index.md", "crates/ling-format/src/edit.rs", "crates/ling-lsp/src/code_action.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.code-action/0.1", "textDocument/codeAction", "codeActionProvider", "lingCodeAction", "source.fixAll.ling.format", "documentChanges"]
+authority = ["RFC-0044", "RFC-0041", "RFC-0039", "RFC-0038", "RFC-0031", "RFC-0030", "RFC-0029", "RFC-0026", "RFC-0023", "RFC-0005", "RFC-0004", "DEC-0001", "DEC-0002", "DEC-0012", "DEC-0015", "DEC-0019", "DEC-0023", "DEC-0029", "DEC-0034", "DEC-0057", "DEC-0071", "DEC-0072", "DEC-0081"]
+notes = ["Version 0.1 closes the Seed code-action surface with one actual checked formatter plan. Missing-import, confusable-rename, mutability, match-case, stale-syntax, diagnostic quick-fix, multi-document, resolve, command, generated/dependency mutation, cancellation, general Semantic Transaction, and Stable behavior remain out of scope."]
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 title = "Ling LSP bounded document formatting"
 category = "LSP"
