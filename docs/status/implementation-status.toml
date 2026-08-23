@@ -25284,6 +25284,7 @@ spec = [
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/decisions/0022-disposable-persistent-query-cache.md",
   "docs/decisions/0043-seed-security-matrix-gate.md",
+  "docs/decisions/0236-workspace-unsafe-policy-gate.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -25303,13 +25304,16 @@ spec = [
 artifacts = [
   "docs/status/REL-6603-AUTHORITY-AUDIT.md",
   "docs/status/REL-6603-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/REL-6603-UNSAFE-POLICY-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6603-UNSAFE-POLICY-IMPLEMENTATION-REPORT.md",
+  "tools/xtask/src/security.rs",
   "docs/testing/SECURITY-AUDIT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The audit records all nine REL-6603 surfaces with current controls, explicit Covered/Partial/Deferred states, evidence, and missing release authority.",
-  "The audit verifies the workspace unsafe-code denial, bounded readers, symlink/path defenses, lock/package isolation, capability enforcement, VM limits, and locked offline dependency metadata without making a vulnerability-free claim.",
+  "The audit verifies the workspace unsafe-code denial and every declared member's lint inheritance, bounded readers, symlink/path defenses, lock/package isolation, capability enforcement, VM limits, and locked offline dependency metadata without making a vulnerability-free claim.",
   "The workspace Clippy -D warnings gate passes; the existing HIR sequence enum retains its intentional inline layout under a narrowly scoped lint rationale without changing public semantics.",
   "The audit records the absent FFI, remote, replay/evidence, device, Zed binary, SBOM, advisory-scan, threat-model, and disclosure contracts and identifies the required evidence before G6 completion.",
   "The audit preserves deterministic/offline behavior, Unicode 17.0.0, original UTF-8 spans, bilingual registered diagnostics, and explicit Future/Unsupported boundaries.",
@@ -25321,8 +25325,51 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "REL-6603 is BlockedSpec because the G6 gate lacks an Accepted threat model and security protocols for FFI, archive/build sandboxing, remote, replay/evidence, device, editor binaries, advisory/license/SBOM, and disclosure.",
-  "Current Seed controls are evidence only: unsafe code is denied, readers are bounded, paths/symlinks and capabilities are checked, and dependencies are locked/offline; cargo-audit and cargo-deny are unavailable here.",
+  "Accepted DEC-0236 closes only the manifest-level unsafe-policy drift child; it does not audit dependencies, generated macros, uncompiled targets, native code, or vulnerabilities.",
+  "Current Seed controls are evidence only: unsafe code is denied and inherited by all declared members, readers are bounded, paths/symlinks and capabilities are checked, and dependencies are locked/offline; cargo-audit and cargo-deny are unavailable here.",
   "The audit changes no language semantics, public protocol, diagnostic/schema version, package/lock behavior, CLI, editor integration, dependency version, runtime, or public API and preserves deterministic/offline boundaries.",
+]
+
+[[task]]
+id = "REL-6603-UNSAFE-POLICY"
+title = "Workspace unsafe-policy drift gate"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REL-6603-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0043-seed-security-matrix-gate.md",
+  "docs/decisions/0236-workspace-unsafe-policy-gate.md",
+  "docs/status/REL-6603-AUTHORITY-AUDIT.md",
+  "docs/testing/SECURITY-AUDIT.md",
+  "Cargo.toml",
+]
+artifacts = [
+  "tools/xtask/src/security.rs",
+  "tools/xtask/src/main.rs",
+  "docs/testing/SECURITY-AUDIT.md",
+  "docs/status/REL-6603-UNSAFE-POLICY-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6603-UNSAFE-POLICY-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask security verify parses the root manifest and requires workspace.lints.rust.unsafe_code to be exactly deny.",
+  "The verifier accepts only unique explicit relative workspace-member paths with normal forward-slash components and rejects empty, absolute, parent-traversing, wildcard, backslash, colon, or malformed entries.",
+  "All twenty-two current workspace member manifests parse successfully and set lints.workspace = true; the focused test binds the reviewed member count and detects policy or inheritance drift.",
+  "The existing matrix remains exactly nine surfaces with three Covered variants, two Partial rows, and four Deferred rows.",
+  "Focused xtask tests and the workspace, CI, governance, status, formatting, and lint gates pass offline.",
+]
+verified_against_commit = "1b6548eef4fdc3a6e46615bc7d36d4c06f6e2924"
+completion_commit = "1b6548eef4fdc3a6e46615bc7d36d4c06f6e2924"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "REL-6603 remains BlockedSpec for dependency/generated-code/cross-target/native audits, a complete threat model, future-system authorities, third-party review, release reports, and incident response.",
+  "This child changes only an internal manifest drift gate; no Ling diagnostic, schema, Semantic ID, package format, dependency, CLI, runtime, editor protocol, Unicode behavior, vulnerability claim, or public security API changes.",
 ]
 
 [[task]]
