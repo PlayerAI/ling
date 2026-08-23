@@ -7573,7 +7573,7 @@ notes = [
 [[task]]
 id = "IDE-2309"
 title = "IDE code actions"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -7590,31 +7590,45 @@ spec = [
   "docs/decisions/0015-audit-source-format.md",
   "docs/decisions/0023-author-source-formatter-preservation.md",
   "docs/RFC-0005.md",
+  "docs/RFC-0026.md",
+  "docs/RFC-0044.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/decisions/0057-formatter-in-process-edit-projection.md",
+  "docs/decisions/0081-ide-code-action-repair-index.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/code_action.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/code_action.rs",
+  "docs/RFC-0044.md",
   "docs/status/IDE-2309-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2309-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "tests/protocols/lsp-code-action/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing FixPlan/action kinds, diagnostic association, applicability, edit/range, snapshot/version, formatter, semantic safety, capability, Semantic ID, and protocol lifecycle contracts.",
-  "The audit covers missing imports, confusable rename, mutability, match cases, stale syntax, formatter actions, multi-file/overlapping edits, Unicode/CRLF/BOM, dependency/generated targets, stale versions, rollback, deterministic ordering, and message-text independence fixtures.",
-  "No code-action handler, FixPlan schema, diagnostic-to-action registry, Workspace Edit, formatter adapter, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must consume structured checked facts, preserve source-span/ID truth, apply edits atomically against explicit versions, avoid parsing message text, and label experimental fields.",
+  "Accepted RFC-0044 defines capability-negotiated Public Preview ling.lsp.code-action/0.1 with exactly one source.fixAll.ling.format action and exact conditional discovery.",
+  "The handler validates standard ranges and context, treats every client diagnostic field as opaque, builds one request-local plan solely from the accepted compiler-CST FormatEdit, and returns one captured-version transactional documentChanges edit without server mutation.",
+  "Six integration tests cover exact negotiation, malformed and incapable clients, three position encodings, Unicode, BOM/CRLF, latest versions, deterministic results, kind filters, diagnostic message/data independence, invalid sources, read-only/missing documents, and notifications.",
+  "Locked/offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass for implementation commit 369432ef6146a27e236276ced2ab14e9065ca5af.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "369432ef6146a27e236276ced2ab14e9065ca5af"
+completion_commit = "369432ef6146a27e236276ced2ab14e9065ca5af"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "IDE-2309 now has its LSP-2202 dependency satisfied but remains BlockedSpec by unresolved repair/edit/localization authorities, FMT-1507, and IDE-2308; RFC-0031 exposes repair metadata but authorizes no code action or edit application.",
-  "Current diagnostics and compiler services expose registered facts but no approved FixPlan, action applicability, structured edit, formatter bridge, or snapshot/version contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostic codes, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "RFC-0044 closes only the bounded Seed formatter action; missing-import, confusable-rename, mutability, match-case, stale-syntax, and diagnostic quick-fix producers remain intentionally deferred rather than exposed as placeholders.",
+  "DEC-0081 Repair observations remain read-only metadata and are never interpreted as an edit; message text, returned diagnostic data, Facts, ranges, and Semantic IDs cannot create or modify an action.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime/VM/bytecode/ABI/package behavior, Semantic ID schema, source-position unit, filesystem/network mutation, or Unicode 17.0.0 table changed.",
 ]
 
 [[task]]
