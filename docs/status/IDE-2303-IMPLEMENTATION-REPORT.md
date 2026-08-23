@@ -1,6 +1,8 @@
 # IDE-2303 implementation report
 
-> Status: Implemented; status-ledger binding pending the implementation commit
+> Status: **Done**
+> Completed: 2026-08-23
+> Final verified implementation commit: `5abd8034dfeac3ca4b3a7b25cb18c22bfb885ec6`
 > Task: `IDE-2303`
 > Authority: Accepted `RFC-0038`, `RFC-0004`, `RFC-0005`, `RFC-0023`,
 > `RFC-0029`, `RFC-0030`, `RFC-0037`, `DEC-0002`, `DEC-0012`, `DEC-0019`,
@@ -55,8 +57,11 @@ unsupported targets rather than inventing virtual documents or paths.
 
 - `cargo test -p ling-db navigation_index --locked --offline` passes.
 - `cargo test -p ling-lsp --test navigation --locked --offline` passes.
-- Remaining workspace, governance, and release gates are recorded only after
-  execution against the implementation commit.
+- `cargo test --workspace --all-targets --locked --offline --quiet` passes.
+- `cargo clippy --workspace --all-targets --locked --offline -- -D warnings`
+  passes.
+- CI, governance, LSP, support, status, RC0, v0.0.1 traceability, formatting,
+  and diff verification gates pass against the implementation commit.
 
 ## Compatibility, determinism, and Unicode impact
 

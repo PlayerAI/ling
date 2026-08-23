@@ -6884,7 +6884,7 @@ acceptance = [
   "Entries preserve resolver source module/name, SourceId identity, reference ID, target kind, DefinitionId or binding module/local IDs, and existing target names/source names/original UTF-8 spans.",
   "Definition targets may retain absent source metadata for builtins/Prelude without inventing locations; explicit source/module/reference/target ordering makes repeated indexes equal.",
   "Focused cargo fmt, ling-db tests, and Clippy checks pass; Unicode/BOM/CRLF target spans, source-local lookup, repeated output, and invalid UTF-8 failure are covered.",
-  "The public IDE-2303 navigation target remains BlockedSpec for request positions, URI/version/snapshot, source-origin policy, dependency/generated documents, declaration/type-definition semantics, cancellation, publication, and fixtures.",
+  "IDE-2303 later consumes this resolver observation under Accepted RFC-0038 while retaining its own exact location, snapshot, URI, checked-type, publication, and fixture contracts.",
 ]
 verified_against_commit = "1f1b10653f2a38f477cf359ac318be8b662e1503"
 completion_commit = "1f1b10653f2a38f477cf359ac318be8b662e1503"
@@ -6898,7 +6898,7 @@ notes = [
 [[task]]
 id = "IDE-2303"
 title = "IDE definition navigation"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6913,30 +6913,38 @@ spec = [
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/RFC-0005.md",
+  "docs/RFC-0038.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/definition_projection.rs",
+  "crates/ling-db/src/navigation_index.rs",
+  "crates/ling-lsp/src/navigation.rs",
+  "crates/ling-lsp/tests/navigation.rs",
+  "docs/RFC-0038.md",
   "docs/status/IDE-2303-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2303-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-navigation/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing navigation request, source-origin, URI, position/version, declaration/type-definition, dependency/generated/primitive, Semantic ID, and protocol lifecycle contracts.",
-  "The audit covers resolved references, cross-package read-only targets, aliases/constructors, virtual documents, Unicode/CRLF/BOM, stale results, deterministic ordering, and required fixtures.",
-  "No definition handler, location adapter, virtual-document policy, dependency API, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must consume checked resolution, preserve byte-span/ID truth, and expose dependency or generated targets only under explicit accepted policy.",
+  "Accepted RFC-0038 fixes capability negotiation, exact static discovery, immutable request snapshots, resolver-only reference selection, source-origin eligibility, definition/declaration parity, checked direct-nominal type targets, exact Location-or-null results, fixed failures, bounds, and Preview migration behavior.",
+  "The compiler indexes join exact resolver reference spans to validated user definition/binding locations and checked nominal result types without exposing resolver IDs, Semantic IDs, implementation ordinals, host paths, or virtual documents.",
+  "Executable tests cover definitions, declarations, type definitions, parameters, locals, constructors, Trait members, function results, non-nominal and generic null targets, workspace/dependency/temporary isolation, insertion-order invariance, UTF-8/16/32, BOM/CRLF/Chinese/emoji/combining text, checked failure, malformed input, notifications, freshness, and bounds.",
+  "Locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass against implementation commit 5abd8034dfeac3ca4b3a7b25cb18c22bfb885ec6.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "5abd8034dfeac3ca4b3a7b25cb18c22bfb885ec6"
+completion_commit = "5abd8034dfeac3ca4b3a7b25cb18c22bfb885ec6"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "IDE-2303 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2101/LSP-2102, and IDE-2301/IDE-2302; the Experimental Semantic Graph JSON is not a navigation schema.",
-  "Current resolver, semantic graph, source, and project code provides internal identity/path inputs but no public location, URI, snapshot, or read-only dependency contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, or Unicode 17.0.0 behavior.",
+  "Implementation commit 5abd8034dfeac3ca4b3a7b25cb18c22bfb885ec6 adds Accepted RFC-0038, bounded resolved/checked navigation indexes, three LSP providers, exact transcript migration, protocol/governance records, and implementation evidence.",
+  "Generated/primitive virtual documents, alias hops, multiple targets, LocationLink, implementation witnesses, dynamic registration, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deliberately deferred.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, Semantic ID/schema, or Unicode 17.0.0 behavior changes.",
 ]
 
 [[task]]
