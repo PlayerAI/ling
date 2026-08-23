@@ -1,6 +1,6 @@
 # ZED-6803 Extension Acceptance Matrix
 
-Status: editor acceptance inventory (2026-08-22). This matrix separates the
+Status: current-evidence editor acceptance inventory (2026-08-23). This matrix separates the
 implemented Tree-sitter development surface from unavailable Zed/LSP features.
 It is not a claim that a Zed extension is packaged or ready for a marketplace.
 
@@ -17,9 +17,14 @@ editor aids only. Each row uses one of these states:
 - `Future`: an accepted specification, implementation, or release fixture is
   still required.
 
-The support matrix currently records LSP, Zed extension, formatter, and
-semantic mutation as unsupported. Seed features and Semantic/Audit protocols
-remain Experimental/Preview rather than Stable.
+The support matrix records LSP document features, Zed extension integration,
+formatter editor transactions, and semantic mutation as unsupported. A
+source-built Preview LSP lifecycle/full-text overlay, position negotiation,
+source-position projection, and formatter CLI exist as narrower prerequisites;
+none is a Zed feature or Stable editor contract. Seed features and
+Semantic/Audit protocols remain Experimental/Preview rather than Stable.
+All current source-position evidence remains on Unicode 17.0.0 and projects
+from original UTF-8 spans rather than exposing normalized or host-path offsets.
 
 ## Acceptance matrix
 
@@ -30,11 +35,11 @@ remain Experimental/Preview rather than Stable.
 | Brackets | ZQ-3202 query and 20 positive/negative assertions cover four delimiter pairs, escapes, nested comments, and recovery | Covered for query fixtures | No Stable editor package contract |
 | Indentation | ZQ-3203 query and fixtures cover relative layout, delimiters, pipelines, Chinese names, and recovery | Covered for query fixtures | Compiler owns layout validity; no formatter or width policy is implied |
 | Outline / textobjects / runnables | No outline, textobject, runnable query, Zed task, or extension action exists | Future / Unsupported | Requires accepted editor behavior, query fixtures, and executable task integration |
-| LSP diagnostics, hover, definition, references, rename, completion, code actions, format, semantic tokens | No editor-feature LSP adapter, position fixture, formatter, or semantic-token protocol exists | Unsupported | Requires accepted LSP/edit protocol, UTF-8/UTF-16 mapping, implementation, and fixtures |
+| LSP diagnostics, hover, definition, references, rename, completion, code actions, format, semantic tokens | Preview lifecycle/full-text overlay and UTF-8/UTF-16/UTF-32 negotiation/projection are tested; formatter CLI and internal diagnostic/edit primitives exist, but none of the listed public feature methods is implemented | Partial prerequisites; listed features Unsupported | Requires accepted LSP/edit protocols, public adapters, capability advertisement, response/edit fixtures, and Zed integration |
 | Task / run / test / Audit | File-mode `ling run`, `check`, `semantic`, and `audit` are tested; no Zed task/runnable integration or project test command exists | Partial | CLI protocols are Preview/Experimental; Zed task schema and project orchestration are future |
 | Replay / evidence | Replay and evidence protocols are future/unsupported in the support matrix | Unsupported | Requires G2/G5 semantics, schemas, verifiers, and editor navigation fixtures |
-| Chinese / emoji / CRLF / UTF-16 positions | Compiler and grammar cover Chinese, emoji, CRLF, Unicode 17.0.0, and original UTF-8 spans; no LSP UTF-16 adapter exists | Partial | Add negotiated UTF-16 positions, surrogate-boundary negatives, and Zed integration fixtures |
-| Language-server crash / restart | No editor-feature language-server lifecycle, restart harness, or recovery fixture exists | Unsupported | Requires bounded lifecycle, restart, snapshot/version, and diagnostic recovery evidence |
+| Chinese / emoji / CRLF / UTF-16 positions | Compiler/grammar evidence plus negotiated UTF-8/UTF-16/UTF-32 lifecycle tests and source projections cover Chinese, emoji, CRLF, BOM preservation, and surrogate-boundary negatives | Partial | No listed document feature consumes these positions and no Zed integration fixture exists |
+| Language-server crash / restart | A bounded Preview initialize/shutdown/exit lifecycle exists; no crash injection, editor restart harness, process replacement, or recovered diagnostic fixture exists | Unsupported | Requires restart ownership, snapshot/version restoration, backoff/resource policy, and executable Zed recovery evidence |
 | Large file / workspace | Grammar runners bound individual parse/recovery inputs; no extension or workspace benchmark exists | Partial / Future | Define host limits, cancellation, memory/latency evidence, and reproducible workspaces |
 | Extension license / metadata / repository | Local grammar metadata is Apache-2.0 and points to `PlayerAI/ling`; no Zed extension manifest/repository package exists | Partial | Add accepted package metadata, license review, provenance, and publication artifact |
 | Development install / marketplace package | No Zed extension package or marketplace submission exists | Unsupported | Requires extension artifact, clean install, offline/cache behavior, and marketplace acceptance evidence |
@@ -60,14 +65,17 @@ cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 cargo xtask zed-extension verify
 ```
 
-The local Windows `npm run verify --offline` attempt on 2026-08-22 was blocked
-by Tree-sitter cache-lock access (Windows error 5); it is recorded as a failed
-local attempt, not a pass. The Rust/conformance and repository governance
-commands remain the executable evidence used by this audit. Existing TS/ZQ
-reports record prior grammar/query runs and their exact limitations.
-The internal `cargo xtask zed-extension verify` command checks this acceptance
-inventory and its evidence markers only; it does not run npm or claim a Zed
-extension package.
+The locked Windows `npm run verify --offline` suite passed on 2026-08-23 with
+41 grammar cases, 18 Unicode cases, 29 precedence cases, 41 pattern/type cases,
+10 recovery cases, 42 conformance programs, 18 highlight captures, 4 bracket
+pairs, 15 indentation CST nodes, and example parsing. Regeneration left no
+tracked worktree drift. This is local grammar/query evidence, not a Zed or
+cross-host result.
+
+The internal `cargo xtask zed-extension verify` command composes the current
+Zed-matrix and discovery-boundary gates, checks ten historical/current evidence
+files, and validates three position-evidence files. It does not run npm, start
+an editor, create a Zed manifest, or claim an extension package.
 
 ## Completion requirements
 

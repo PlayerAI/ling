@@ -3666,3 +3666,16 @@ covers = ["ZED-6802 bounded current Preview server/discovery boundary", "source-
 depends_on = ["DEC-0049", "RFC-0004", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0243"
+title = "Current Zed acceptance evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0243-current-zed-acceptance-evidence.md"
+covers = ["ZED-6803 bounded current grammar/LSP/position acceptance evidence", "passing locked Windows grammar suite and composed current upstream gates", "position prerequisites without public editor-feature, Zed, cross-host, marketplace, or G6 completion claims"]
+depends_on = ["DEC-0050", "DEC-0241", "DEC-0242", "RFC-0004", "RFC-0023", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

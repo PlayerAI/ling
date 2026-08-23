@@ -6234,3 +6234,29 @@ unresolved_alternatives = [
   "Executable identity/version negotiation; configuration and PATH precedence; signed release artifacts; secure download/install; offline fallback; bilingual diagnostics; Zed packaging/tests; cross-host evidence; and G6 sign-off remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0243"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0243-current-zed-acceptance-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run the locked offline npm suite on Windows and retain exact grammar, differential, recovery, query, and example totals with zero tracked drift.",
+  "Validate thirteen exact acceptance areas with four covered, five partial, five unsupported, and two future classifications.",
+  "Require both upstream evidence gates and three current position-evidence files; reject missing markers with a focused negative test.",
+  "Run position, lifecycle, overlay, CLI process, workspace, CI, governance, status, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Corrects documentation, composes internal gates, and strengthens evidence validation only; Ling semantics, diagnostics, public schemas, Semantic IDs, packages, dependencies, CLI/LSP behavior, runtime, Unicode, protocols, support states, and editor APIs remain unchanged.",
+  "Adds no Zed extension, public document feature, editor transaction, task/runnable, restart policy, marketplace artifact, network behavior, or Stable support claim.",
+]
+unresolved_alternatives = [
+  "Zed manifest/API/version policy; public LSP document features and edits; tasks/runnables; Replay/Evidence UI; crash/restart; workspace limits; install/marketplace provenance; cross-host/Zed execution; migration; and G6 sign-off remain deferred.",
+]
+superseded_by = ""

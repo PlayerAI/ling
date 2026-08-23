@@ -7,11 +7,14 @@
 
 ## Decision
 
-`ZED-6803` remains `BlockedSpec`. The repository has a grammar-only Tree-sitter
+`ZED-6803` remains `BlockedSpec`. The repository has a Tree-sitter development
 package with reviewed highlights, brackets, indentation, recovery, Unicode,
-and compiler differential fixtures. It has no Zed extension package, LSP
-server, formatter, task/runnable integration, replay/evidence navigation,
-crash/restart harness, or marketplace artifact.
+and compiler differential fixtures. It also has a source-built Preview LSP
+lifecycle/full-text overlay, tested position negotiation/projection, and a
+formatter CLI/internal edit primitive. It has no Zed extension package, public
+LSP document-feature adapters, editor formatter transaction, task/runnable
+integration, Replay/Evidence navigation, crash/restart harness, or marketplace
+artifact.
 
 The acceptance matrix records `Covered`, `Partial`, `Unsupported`, and `Future`
 rows without promoting the narrower grammar evidence into a full editor
@@ -44,10 +47,15 @@ outline/textobjects/runnables, all absent LSP features, partial CLI/Audit
 coverage, unsupported Replay/Evidence, Unicode/position limits, lifecycle,
 workspace scale, metadata/license, and packaging/install.
 
-The local npm verification was attempted offline but failed at the Tree-sitter
-cache lock with Windows error 5. No npm pass or Zed platform claim is made.
-Existing implementation reports remain historical evidence tied to their
-recorded revisions; they do not establish a current Stable extension.
+The locked offline npm suite passed on Windows on 2026-08-23 and regeneration
+left no tracked drift. It covers the current grammar/differential/recovery/query
+surface only; it is not a Zed, Linux/macOS, cross-host, or Stable extension
+result.
+
+Accepted `DEC-0243` closes only the bounded
+`ZED-6803-CURRENT-EVIDENCE` child. The downstream verifier composes the current
+Zed-matrix and discovery gates and validates three position-evidence files; no
+acceptance row becomes a public Zed feature.
 
 ## Compatibility and deferred work
 
@@ -57,11 +65,12 @@ public API. It preserves the editor-only grammar boundary, Unicode 17.0.0,
 original UTF-8 spans, deterministic generated files, and locked offline Rust
 validation.
 
-LSP, formatter, semantic mutation, task/runnable integration, Replay/Evidence
-navigation, crash/restart handling, large-workspace limits, Zed package
-metadata, clean install, and marketplace publication remain deferred or
-explicitly unsupported.
+Public LSP document features, editor formatter transactions, semantic mutation,
+task/runnable integration, Replay/Evidence navigation, crash/restart handling,
+large-workspace limits, Zed package metadata, clean install, and marketplace
+publication remain deferred or explicitly unsupported.
 
 The internal `cargo xtask zed-extension verify` command protects the thirteen
-acceptance rows and nine evidence files without running npm, creating a Zed
-manifest, or claiming a marketplace package.
+acceptance rows, ten historical/current evidence files, two upstream gates, and
+three position-evidence files without running npm, creating a Zed manifest, or
+claiming a marketplace package.

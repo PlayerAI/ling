@@ -273,6 +273,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0240` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0240](../decisions/0240-bilingual-tutorial-semantic-equivalence.md) |
 | `DEC-0241` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0241](../decisions/0241-current-zed-matrix-evidence.md) |
 | `DEC-0242` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0242](../decisions/0242-current-lsp-discovery-boundary.md) |
+| `DEC-0243` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0243](../decisions/0243-current-zed-acceptance-evidence.md) |
 
 ## Migration boundary
 

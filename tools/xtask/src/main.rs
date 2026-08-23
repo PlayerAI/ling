@@ -643,13 +643,15 @@ fn main() -> ExitCode {
             match zed_extension::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "Zed extension acceptance inventory OK: {} areas ({} covered, {} partial, {} unsupported, {} future), {} evidence files",
+                        "Zed extension acceptance inventory OK: {} areas ({} covered, {} partial, {} unsupported, {} future), {} historical/current evidence files, {} upstream gates, {} position evidence files",
                         summary.acceptance_count,
                         summary.covered_count,
                         summary.partial_count,
                         summary.unsupported_count,
                         summary.future_count,
-                        summary.evidence_file_count
+                        summary.evidence_file_count,
+                        summary.upstream_gate_count,
+                        summary.position_evidence_file_count
                     );
                     ExitCode::SUCCESS
                 }

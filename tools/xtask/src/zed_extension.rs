@@ -33,7 +33,7 @@ const ACCEPTANCE_AREAS: &[AcceptanceSpec] = &[
     },
     AcceptanceSpec {
         area: "LSP diagnostics, hover, definition, references, rename, completion, code actions, format, semantic tokens",
-        state: "Unsupported",
+        state: "Partial prerequisites; listed features Unsupported",
     },
     AcceptanceSpec {
         area: "Task / run / test / Audit",
@@ -68,10 +68,11 @@ const ACCEPTANCE_AREAS: &[AcceptanceSpec] = &[
 const REQUIRED_POLICY_PHRASES: &[&str] = &[
     "It is not a claim that a Zed extension is packaged or ready for a marketplace.",
     "The Tree-sitter parser and queries are editor aids only.",
-    "The support matrix currently records LSP, Zed extension, formatter, and semantic mutation as unsupported.",
+    "The support matrix records LSP document features, Zed extension integration, formatter editor transactions, and semantic mutation as unsupported.",
+    "source-built Preview LSP lifecycle/full-text overlay",
     "Unicode 17.0.0",
     "original UTF-8 spans",
-    "Windows error 5",
+    "Windows `npm run verify --offline` suite passed",
     "No row may be promoted",
     "No row may be promoted by copying a planning checklist",
 ];
@@ -150,6 +151,52 @@ const REQUIRED_EVIDENCE_MARKERS: &[(&str, &[&str])] = &[
             "editor aid",
         ],
     ),
+    (
+        "docs/status/ZED-6801-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+        &[
+            "npm run verify --offline",
+            "passed on Windows",
+            "41 grammar cases",
+            "42 conformance programs",
+            "18 highlight captures",
+            "4 bracket pairs",
+            "15 indentation CST nodes",
+            "Linux/macOS and Zed were not executed",
+        ],
+    ),
+];
+
+const POSITION_EVIDENCE_MARKERS: &[(&str, &[&str])] = &[
+    (
+        "crates/ling-source/src/position.rs",
+        &[
+            "SUPPORTED_POSITION_ENCODINGS",
+            "PositionEncoding::Utf16",
+            "rejects_inside_utf8_scalars_and_utf16_surrogate_pairs",
+            "position_edit_preserves_leading_bom_and_crlf_bytes",
+            "人物 😀",
+        ],
+    ),
+    (
+        "crates/ling-lsp/src/lib.rs",
+        &[
+            "positionEncodings",
+            "positionEncoding",
+            "PositionEncoding::Utf16",
+            "textDocument/didOpen",
+            "textDocument/didChange",
+            "textDocument/didClose",
+        ],
+    ),
+    (
+        "crates/ling-lsp/tests/position_encoding.rs",
+        &[
+            "negotiation_selects_the_first_supported_client_label",
+            "negotiation_uses_utf16_for_absent_or_empty_client_lists",
+            "malformed_position_encoding_metadata_is_rejected_before_lifecycle_transition",
+            "positionEncoding",
+        ],
+    ),
 ];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -160,6 +207,8 @@ pub struct CheckSummary {
     pub unsupported_count: usize,
     pub future_count: usize,
     pub evidence_file_count: usize,
+    pub upstream_gate_count: usize,
+    pub position_evidence_file_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -170,6 +219,13 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_evidence(root));
+    if let Err(upstream_errors) = crate::zed_matrix::check_repository(root) {
+        errors.extend(upstream_errors);
+    }
+    if let Err(upstream_errors) = crate::lsp_discovery::check_repository(root) {
+        errors.extend(upstream_errors);
+    }
+    errors.extend(validate_position_evidence(root));
     finish(errors).map(|()| CheckSummary {
         acceptance_count: ACCEPTANCE_AREAS.len(),
         covered_count: count_states_containing("Covered"),
@@ -177,6 +233,8 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
         unsupported_count: count_states_containing("Unsupported"),
         future_count: count_states_containing("Future"),
         evidence_file_count: REQUIRED_EVIDENCE_MARKERS.len(),
+        upstream_gate_count: 2,
+        position_evidence_file_count: POSITION_EVIDENCE_MARKERS.len(),
     })
 }
 
@@ -257,8 +315,16 @@ fn validate_matrix(matrix: &str) -> Vec<String> {
 }
 
 fn validate_evidence(root: &Path) -> Vec<String> {
+    validate_evidence_files(root, REQUIRED_EVIDENCE_MARKERS)
+}
+
+fn validate_position_evidence(root: &Path) -> Vec<String> {
+    validate_evidence_files(root, POSITION_EVIDENCE_MARKERS)
+}
+
+fn validate_evidence_files(root: &Path, evidence: &[(&str, &[&str])]) -> Vec<String> {
     let mut errors = Vec::new();
-    for (path, markers) in REQUIRED_EVIDENCE_MARKERS {
+    for (path, markers) in evidence {
         let text = match fs::read_to_string(root.join(path)) {
             Ok(text) => text,
             Err(error) => {
@@ -268,16 +334,20 @@ fn validate_evidence(root: &Path) -> Vec<String> {
                 continue;
             }
         };
-        let normalized = normalize(&text);
-        for marker in *markers {
-            if !normalized.contains(&normalize(marker)) {
-                errors.push(format!(
-                    "GOV-ZED-ACCEPTANCE-0010: {path} is missing evidence marker {marker:?}"
-                ));
-            }
-        }
+        errors.extend(validate_evidence_text(path, &text, markers));
     }
     errors
+}
+
+fn validate_evidence_text(path: &str, text: &str, markers: &[&str]) -> Vec<String> {
+    let normalized = normalize(text);
+    markers
+        .iter()
+        .filter(|marker| !normalized.contains(&normalize(marker)))
+        .map(|marker| {
+            format!("GOV-ZED-ACCEPTANCE-0010: {path} is missing evidence marker {marker:?}")
+        })
+        .collect()
 }
 
 fn count_states_containing(fragment: &str) -> usize {
@@ -331,10 +401,12 @@ mod tests {
         let summary = check_repository(root).expect("Zed acceptance inventory is valid");
         assert_eq!(summary.acceptance_count, 13);
         assert_eq!(summary.covered_count, 4);
-        assert_eq!(summary.partial_count, 4);
+        assert_eq!(summary.partial_count, 5);
         assert_eq!(summary.unsupported_count, 5);
         assert_eq!(summary.future_count, 2);
-        assert_eq!(summary.evidence_file_count, 9);
+        assert_eq!(summary.evidence_file_count, 10);
+        assert_eq!(summary.upstream_gate_count, 2);
+        assert_eq!(summary.position_evidence_file_count, 3);
     }
 
     #[test]
@@ -363,14 +435,13 @@ mod tests {
         );
     }
 
-    fn validate_evidence_text(path: &str, text: &str, markers: &[&str]) -> Vec<String> {
-        let normalized = normalize(text);
-        markers
-            .iter()
-            .filter(|marker| !normalized.contains(&normalize(marker)))
-            .map(|marker| {
-                format!("GOV-ZED-ACCEPTANCE-0010: {path} is missing evidence marker {marker:?}")
-            })
-            .collect()
+    #[test]
+    fn rejects_position_evidence_marker_drift() {
+        let errors = validate_evidence_text(
+            "position.rs",
+            "PositionEncoding::Utf16",
+            &["utf16_surrogate_pairs", "crlf_bytes"],
+        );
+        assert_eq!(errors.len(), 2);
     }
 }
