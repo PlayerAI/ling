@@ -5674,3 +5674,29 @@ unresolved_alternatives = [
   "Algorithm and schema-version ownership; old/new identifiers; dual-reader duration; writer cutover; migration idempotence and rollback; dependency/lock propagation; cache invalidation; replay/evidence linkage; corruption diagnostics; fixtures; release policy; and independent review remain open under PROTO-6203, PROTO-6204, RFC-0004 or its Accepted replacement, registered semantic lifecycle gaps, and incomplete G1-G5 exits.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0222"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0222-cli-exit-freeze-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert the exact ordered ten-value internal catalog, nine parseable roots, hierarchical project-check spelling, and rejection of plan-only roots.",
+  "Assert the exact assigned exit list and explicit absence of value 3.",
+  "Assert all sixty local boundaries, exact order, duplicate rejection, and order-independent opaque bytes.",
+  "Run CLI unit/conformance, support, protocol, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds only exact-scope and test-local evidence. Existing command parsing, options, defaults, help/version output, stdout/stderr routing, exits, schemas, diagnostics, project/formatter behavior, language/runtime semantics, source spans, and Unicode 17.0.0 remain unchanged.",
+  "No command, alias, option, output contract, exit meaning, color/path/offline policy, schema, diagnostic, or stability promotion is added.",
+]
+unresolved_alternatives = [
+  "The Stable 1.0 command matrix; plan-only commands; shared option grammar; defaults and environment precedence; color/path policy; project run/test/build and workspace selection; output byte compatibility; human/JSON lifecycle; cancellation and future exits; shell completion; locale; migration; and release policy remain open under PROTO-6204, incomplete G1-G5 exits, ROADMAP-1.0, support blockers, and protocol lifecycle work.",
+]
+superseded_by = ""

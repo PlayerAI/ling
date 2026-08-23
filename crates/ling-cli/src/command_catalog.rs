@@ -77,7 +77,7 @@ mod tests {
 
     #[test]
     fn catalog_parses_only_implemented_root_commands() {
-        for (name, command) in [
+        let roots = [
             ("run", Command::Run),
             ("check", Command::Check),
             ("repl", Command::Repl),
@@ -87,11 +87,27 @@ mod tests {
             ("init", Command::Init),
             ("test", Command::Test),
             ("lsp", Command::Lsp),
-        ] {
+        ];
+        for (name, command) in roots {
             assert_eq!(Command::parse(name), Some(command));
             assert_eq!(command.name(), name);
         }
-        assert_eq!(Command::parse("build"), None);
+        assert_eq!(
+            roots.map(|(name, _)| name),
+            [
+                "run", "check", "repl", "semantic", "audit", "fmt", "init", "test", "lsp",
+            ]
+        );
+        for planned_only in [
+            "project", "build", "query", "patch", "replay", "explain", "evidence", "version",
+            "support",
+        ] {
+            assert_eq!(
+                Command::parse(planned_only),
+                None,
+                "plan-only root command must stay rejected: {planned_only}"
+            );
+        }
         assert_eq!(Command::ProjectCheck.name(), "project check");
     }
 
@@ -99,6 +115,24 @@ mod tests {
     fn catalog_contains_each_implemented_command_once() {
         let commands = Command::all();
         assert_eq!(commands.len(), 10);
+        assert_eq!(
+            commands
+                .iter()
+                .map(|command| command.name())
+                .collect::<Vec<_>>(),
+            vec![
+                "run",
+                "check",
+                "repl",
+                "semantic",
+                "audit",
+                "fmt",
+                "init",
+                "test",
+                "project check",
+                "lsp",
+            ]
+        );
         for (index, command) in commands.iter().enumerate() {
             assert!(!commands[..index].contains(command));
         }

@@ -16,12 +16,14 @@ future protocol commands, or which versioned schemas and compatibility rules
 apply to their output.
 
 The repository has accepted decisions for the M0 hand-written parser, Seed
-runtime failures, Audit Source, and REPL sessions. Those decisions are scoped
-contracts, not a complete 1.0 freeze. The active `PROTO-CLI` and
-`PROTO-CLI-EXIT` records remain Preview, while project CLI and formatter CLI
-gaps are open and support-matrix entries explicitly mark several proposed
-commands unsupported. Freezing all plan-listed behavior now would create
-automation commitments without accepted authority.
+runtime failures, Audit Source, REPL sessions, formatter, initialization,
+standalone test-file execution, bounded project graph checking, and the LSP
+launcher. Those decisions are scoped contracts, not a complete 1.0 freeze.
+The active `PROTO-CLI` and `PROTO-CLI-EXIT` records remain Preview; accepted
+project and formatter gaps close only bounded children, while support-matrix
+entries explicitly mark several proposed commands unsupported. Freezing all
+plan-listed behavior now would create automation commitments without accepted
+authority.
 
 ## Normative traceability
 
@@ -43,16 +45,16 @@ automation commitments without accepted authority.
   repository-wide color, path-normalization, or offline policy.
 - `docs/governance/protocol-inventory.toml` records `PROTO-CLI`,
   `PROTO-CLI-EXIT`, human output, and diagnostic JSON as Preview. The current
-  parser surface is the implemented `--help`/`--version`, `run`, `check`,
-  `semantic`, `audit`, `repl`, `--format`, and REPL capability subset; it has
-  no independent Stable 1.0 CLI schema.
-- `GAP-PROJECT-CLI-INTERFACE-001` is Open and blocks PRJ-1107. It states that
-  manifest-path precedence, project check/run/test/build behavior,
-  lock/offline selection, exit mapping, and JSON output still need an accepted
-  project CLI decision.
-- `GAP-FORMATTER-CLI-PROTOCOL-001` is Open and blocks FMT-1507. It leaves
-  formatter command spelling, stdin/logical filename, check exit status,
-  source-name rules, and report schema unresolved.
+  parser surface is `--help`/`-h`, `--version`/`-V`, roots `run`, `check`,
+  `repl`, `semantic`, `audit`, `fmt`, `init`, `test`, and `lsp`, plus
+  hierarchical `project check`; it has no independent Stable 1.0 CLI schema.
+- `GAP-PROJECT-CLI-INTERFACE-001` is Accepted through RFC-0024 only for the
+  bounded explicit-manifest, locked/offline `ling project check` graph
+  validation command. Project semantic check/run/test/build and workspace
+  selection remain unresolved.
+- `GAP-FORMATTER-CLI-PROTOCOL-001` is Accepted through DEC-0028 only for the
+  Preview stdout-only formatter CLI. Incompatible report or write-in-place
+  extensions remain unresolved.
 - The support matrix marks `ling version --format json` and `ling support
   --format json` unsupported, and separately excludes CLI project/package
   installation, publication/registry, bytecode emission/loading, and backend
@@ -73,10 +75,11 @@ package, support, bytecode, backend, and registry commands. There is no
 single accepted 1.0 command matrix containing all syntax, defaults, path,
 color, stdout/stderr, offline, and compatibility rules requested by the plan.
 
-The open project and formatter gaps require versioned decisions and positive,
-negative, migration, JSON/report, stdin, manifest-path, and locked-offline
-evidence. Existing Seed fixtures cannot be promoted to a universal 1.0 freeze
-without changing their authority or inventing behavior for absent commands.
+The accepted project and formatter gap resolutions provide bounded versioned
+decisions and fixtures, but they do not define project run/test/build,
+workspace selection, formatter write-in-place behavior, or a universal 1.0
+contract. Existing fixtures cannot be promoted to a universal freeze without
+changing their authority or inventing behavior for absent commands.
 
 ## Required authority before implementation
 
@@ -114,8 +117,9 @@ Preview/Future/Unsupported states.
 It deliberately adds no command, flag, backend selector, project/formatter
 integration, JSON/report protocol, migration adapter, public API, diagnostic,
 dependency, or placeholder, and introduces no stale `zero` names. Future
-freeze work may proceed only after the command-family authorities and their
-fixtures are Accepted, the open project/formatter contracts are resolved, and
-the compatibility/support matrix is executable. The implementation must keep
+freeze work may proceed only after the remaining command-family authorities
+and their fixtures are Accepted, the unresolved project/formatter extensions
+are resolved, and the compatibility/support matrix is executable. The
+implementation must keep
 the checked compiler pipeline and must not expose host paths, allocation,
 environment, or map-order details as CLI semantics.

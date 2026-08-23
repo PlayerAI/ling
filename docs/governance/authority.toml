@@ -3393,3 +3393,16 @@ covers = ["PROTO-6203 bounded Semantic Hash Upgrade Rehearsal boundary evidence"
 depends_on = ["DEC-0012", "DEC-0220", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0222"
+title = "Internal CLI and Exit-Code Freeze boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0222-cli-exit-freeze-boundary-evidence.md"
+covers = ["PROTO-6204 bounded CLI and Exit-Code Freeze boundary evidence", "exact implemented command catalog and assigned exit values", "test-only freeze boundaries without Stable CLI semantics"]
+depends_on = ["DEC-0013", "DEC-0036", "DEC-0037", "DEC-0040", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

@@ -23,5 +23,27 @@ mod tests {
         assert_eq!(EXIT_SNAPSHOT_MISMATCH, 6);
         assert_ne!(EXIT_RUNTIME_FAULT, EXIT_INTERNAL_ERROR);
         assert_ne!(EXIT_INTERNAL_ERROR, EXIT_SNAPSHOT_MISMATCH);
+        assert_eq!(
+            [
+                EXIT_SUCCESS,
+                EXIT_COMPILE_ERROR,
+                EXIT_INVALID_USAGE,
+                EXIT_RUNTIME_FAULT,
+                EXIT_INTERNAL_ERROR,
+                EXIT_SNAPSHOT_MISMATCH,
+            ],
+            [0, 1, 2, 4, 5, 6]
+        );
+        assert!(
+            ![
+                EXIT_SUCCESS,
+                EXIT_COMPILE_ERROR,
+                EXIT_INVALID_USAGE,
+                EXIT_RUNTIME_FAULT,
+                EXIT_INTERNAL_ERROR,
+                EXIT_SNAPSHOT_MISMATCH,
+            ]
+            .contains(&3)
+        );
     }
 }
