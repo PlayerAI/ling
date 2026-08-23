@@ -1251,6 +1251,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0026"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0026.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify the documentFormattingProvider capability and exact request shape, fixed Ling options, lifecycle state, URI, open-state, and writability rules.",
+  "Project one safe formatter result into zero or one whole-document TextEdit under UTF-8, UTF-16, and UTF-32 with Unicode, BOM, CRLF, and latest-overlay fixtures.",
+  "Reject notifications, malformed options, missing/closed documents, dependency documents, and internal projection failures without mutating text, version, VFS revision, disk, or protocol state.",
+  "Retain formatter semantic-equivalence, Audit separation, LSP lifecycle/overlay/position, workspace, offline, deterministic, and repository-wide gates.",
+]
+compatibility_impact = [
+  "Adds Experimental textDocument/formatting and ling.lsp.formatting/0.1 plus documentFormattingProvider while retaining lifecycle and overlay behavior.",
+  "Adds no Ling diagnostic, language rule, Semantic ID, Audit change, WorkspaceEdit, Semantic Transaction, range formatting, disk write, or Stable compatibility claim.",
+]
+unresolved_alternatives = [
+  "Configurable style, range/on-type formatting, minimal edits, format-on-save, WorkspaceEdit, Semantic Transaction, cancellation, asynchronous publication, closed-file formatting, and Stable compatibility remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

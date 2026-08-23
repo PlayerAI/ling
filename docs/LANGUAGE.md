@@ -1321,6 +1321,12 @@ ling build --manifest-path ./ling.toml --locked --offline \
 The `native` and `critical` build forms in the broader draft catalog remain
 future design until their own Accepted profile/backend authority exists.
 
+Accepted RFC-0026 adds bounded editor formatting to `ling lsp --stdio`:
+`textDocument/formatting` consumes the current open writable overlay and returns
+zero or one whole-document `TextEdit` using the negotiated position encoding.
+It does not implement range formatting, format-on-save, `WorkspaceEdit`, or a
+Semantic Transaction.
+
 所有命令应支持：
 
 ```bash

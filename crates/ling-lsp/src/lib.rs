@@ -2,8 +2,9 @@
 //! `ling lsp --stdio`.
 //!
 //! RFC-0004 is the authority for lifecycle and transport; RFC-0023 is the
-//! authority for the full-text document overlay boundary; DEC-0029 remains the
-//! authority for position projection.
+//! authority for the full-text document overlay boundary; RFC-0026 governs the
+//! bounded document-formatting response; DEC-0029 remains the authority for
+//! position projection.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -13,7 +14,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 pub use ling_source::{FileOrigin, PositionEncoding, Revision};
 use ling_source::{
-    SourceId, VfsError, VirtualFileSystem, negotiate_position_encoding, validate_logical_name,
+    SourceFile, SourceId, VfsError, VirtualFileSystem, negotiate_position_encoding,
+    validate_logical_name,
 };
 use serde_json::{Map, Value, json};
 
@@ -38,6 +40,8 @@ mod diagnostic_batch;
 pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";
 /// Version marker for the full-text document overlay Preview extension.
 pub const OVERLAY_PROTOCOL_VERSION: &str = "ling.lsp.overlay/0.1";
+/// Version marker for the bounded document-formatting Experimental extension.
+pub const FORMATTING_PROTOCOL_VERSION: &str = "ling.lsp.formatting/0.1";
 /// JSON-RPC protocol version accepted by this server.
 pub const JSON_RPC_VERSION: &str = "2.0";
 /// Maximum JSON body size accepted by the transport.
@@ -57,6 +61,7 @@ const PARSE_ERROR: i32 = -32_700;
 const INVALID_REQUEST: i32 = -32_600;
 const METHOD_NOT_FOUND: i32 = -32_601;
 const INVALID_PARAMS: i32 = -32_602;
+const INTERNAL_ERROR: i32 = -32_603;
 const SERVER_NOT_INITIALIZED: i32 = -32_002;
 const SERVER_SHUTTING_DOWN: i32 = -32_003;
 const DOCUMENT_STALE: i32 = -32_004;
@@ -639,6 +644,7 @@ impl LspServer {
             "textDocument/didOpen" => self.did_open(id_present, id, params),
             "textDocument/didChange" => self.did_change(id_present, id, params),
             "textDocument/didClose" => self.did_close(id_present, id, params),
+            "textDocument/formatting" => self.document_formatting(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
         }
     }
@@ -745,6 +751,92 @@ impl LspServer {
         }
         let result = parse_close_params(&params).and_then(|uri| self.close_document(&uri));
         self.overlay_outcome(is_request, id, result)
+    }
+
+    fn document_formatting(&self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
+        if !is_request {
+            return HandleOutcome::NoResponse;
+        }
+        if self.state != LifecycleState::Ready {
+            return self.state_error(id);
+        }
+        let uri = match parse_formatting_params(&params) {
+            Ok(uri) => uri,
+            Err(error) => {
+                let (code, message) = overlay_error_details(&error);
+                return error_or_none(true, id, code, message);
+            }
+        };
+        let Some(record) = self.documents.get(&uri) else {
+            return error_or_none(
+                true,
+                id,
+                INVALID_PARAMS,
+                "文档状态无效 / invalid document state",
+            );
+        };
+        if !record.open {
+            return error_or_none(
+                true,
+                id,
+                INVALID_PARAMS,
+                "文档状态无效 / invalid document state",
+            );
+        }
+        if !record.writable {
+            return error_or_none(
+                true,
+                id,
+                DOCUMENT_READ_ONLY,
+                "依赖文档只读 / dependency document is read-only",
+            );
+        }
+        let Some(snapshot) = self.vfs.snapshot(record.file) else {
+            return formatting_internal_error(id);
+        };
+        let source = match SourceFile::from_bytes(
+            record.file,
+            record.logical_name.clone(),
+            snapshot.bytes().to_vec(),
+        ) {
+            Ok(source) => source,
+            Err(_) => return formatting_internal_error(id),
+        };
+        let parsed = ling_syntax::parse(&source);
+        let document = match ling_format::build_format_ir(&source, &parsed) {
+            Ok(document) => document,
+            Err(_) => return formatting_internal_error(id),
+        };
+        let edit = match ling_format::format_core_edit(&document) {
+            Ok(edit) => edit,
+            Err(_) => return formatting_internal_error(id),
+        };
+        let Some(edit) = edit else {
+            return HandleOutcome::Response(success_response(id, json!([])));
+        };
+        let end =
+            match source.lsp_position(source.source_map().original_len(), self.position_encoding) {
+                Ok(position) => position,
+                Err(_) => return formatting_internal_error(id),
+            };
+        let replacement = if source.had_bom() {
+            edit.replacement().strip_prefix('\u{feff}')
+        } else {
+            Some(edit.replacement())
+        };
+        let Some(replacement) = replacement else {
+            return formatting_internal_error(id);
+        };
+        HandleOutcome::Response(success_response(
+            id,
+            json!([{
+                "newText": replacement,
+                "range": {
+                    "end": {"character": end.character(), "line": end.line()},
+                    "start": {"character": 0, "line": 0},
+                },
+            }]),
+        ))
     }
 
     fn open_document(
@@ -1064,6 +1156,36 @@ fn parse_close_params(params: &Value) -> Result<String, OverlayError> {
         .ok_or(OverlayError::InvalidParams)
 }
 
+fn parse_formatting_params(params: &Value) -> Result<String, OverlayError> {
+    let object = params.as_object().ok_or(OverlayError::InvalidParams)?;
+    if object.len() != 2 {
+        return Err(OverlayError::InvalidParams);
+    }
+    let text_document = object
+        .get("textDocument")
+        .and_then(Value::as_object)
+        .ok_or(OverlayError::InvalidParams)?;
+    if text_document.len() != 1 {
+        return Err(OverlayError::InvalidParams);
+    }
+    let uri = text_document
+        .get("uri")
+        .and_then(Value::as_str)
+        .ok_or(OverlayError::InvalidParams)?;
+    document_identity(uri)?;
+    let options = object
+        .get("options")
+        .and_then(Value::as_object)
+        .ok_or(OverlayError::InvalidParams)?;
+    if options.len() != 2
+        || options.get("tabSize").and_then(Value::as_u64) != Some(4)
+        || options.get("insertSpaces").and_then(Value::as_bool) != Some(true)
+    {
+        return Err(OverlayError::InvalidParams);
+    }
+    Ok(uri.to_owned())
+}
+
 fn parse_version(value: Option<&Value>) -> Result<i64, OverlayError> {
     let version = value
         .and_then(Value::as_i64)
@@ -1329,10 +1451,20 @@ fn error_response(id: Option<Value>, code: i32, message: &str) -> Vec<u8> {
     }))
 }
 
+fn formatting_internal_error(id: Value) -> HandleOutcome {
+    error_or_none(
+        true,
+        id,
+        INTERNAL_ERROR,
+        "文档格式化失败 / document formatting failed",
+    )
+}
+
 fn initialize_result(encoding: PositionEncoding) -> Value {
     json!({
         "capabilities": {
             "positionEncoding": encoding.wire_name(),
+            "documentFormattingProvider": true,
             "workspace": {
                 "workspaceFolders": {
                     "changeNotifications": false,

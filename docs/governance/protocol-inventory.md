@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 27 records: 22 current public, 1 internal, 4 Future.
-- Current public stability: 12 Experimental, 10 Preview, 0 Stable.
+- 28 records: 23 current public, 1 internal, 4 Future.
+- Current public stability: 13 Experimental, 10 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -17,6 +17,7 @@
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
+| `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
@@ -82,6 +83,19 @@
 - Sources: [`docs/RFC-0024.md`](../RFC-0024.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs)
 - Fixtures: [`crates/ling-cli/tests/project_check.rs`](../../crates/ling-cli/tests/project_check.rs), [`tests/protocols/project-check/README.md`](../../tests/protocols/project-check/README.md)
 - Notes: Graph validation only: semantic compilation, run/test/build, workspace search, registry/network behavior, and lock update mode remain deferred.
+
+### `PROTO-LSP-FORMATTING` — Ling LSP bounded document formatting
+
+- Producer: ling lsp --stdio; ling-lsp formatting adapter
+- Consumer: Preview LSP clients; editor and integration test harnesses
+- Reader policy: Accept only textDocument/formatting requests for a current open writable RFC-0023 overlay with exact textDocument.uri and fixed tabSize=4, insertSpaces=true options; reject notifications without work and reject malformed, closed, missing, or read-only requests without mutation.
+- Writer policy: Return zero edits for unchanged or invalid source and exactly one whole-document TextEdit for a safely published formatter candidate; project the original end in the negotiated encoding, preserve an existing BOM outside the edit, and never apply or persist the result.
+- Unknown-field policy: Reject unknown request, textDocument, and options fields in 0.1; emit no result extension fields, annotation, version, URI, WorkspaceEdit, or Semantic Transaction value.
+- Migration tool: None; ling.lsp.formatting/0.1 is Experimental with no predecessor, and incompatible option, range, cardinality, or snapshot behavior requires a new marker and migration evidence.
+- Authority: `RFC-0026`, `RFC-0023`, `DEC-0029`, `DEC-0023`, `DEC-0057`
+- Sources: [`docs/RFC-0026.md`](../RFC-0026.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-format/src/edit.rs`](../../crates/ling-format/src/edit.rs)
+- Fixtures: [`crates/ling-lsp/tests/formatting.rs`](../../crates/ling-lsp/tests/formatting.rs), [`tests/protocols/lsp-formatting/README.md`](../../tests/protocols/lsp-formatting/README.md)
+- Notes: Whole-document formatting only. Range/on-type formatting, format-on-save, minimal diffs, filesystem reads/writes, Workspace Edits, cancellation, and Semantic Transactions remain deferred.
 
 ### `PROTO-LSP-LIFECYCLE` — Ling LSP lifecycle and stdio transport
 

@@ -8,7 +8,9 @@ repository.workspace = true
 
 [dependencies]
 ling-diagnostics = { path = "../ling-diagnostics" }
+ling-format = { path = "../ling-format" }
 ling-source = { path = "../ling-source" }
+ling-syntax = { path = "../ling-syntax" }
 serde_json.workspace = true
 
 [lints]

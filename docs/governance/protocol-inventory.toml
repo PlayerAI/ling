@@ -134,6 +134,28 @@ authority = ["RFC-0023", "RFC-0004", "DEC-0019"]
 notes = ["Full-text Preview synchronization only. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, and Semantic Transactions remain deferred."]
 
 [[protocol]]
+id = "PROTO-LSP-FORMATTING"
+title = "Ling LSP bounded document formatting"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.formatting/0.1"
+stability = "Experimental"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp formatting adapter"]
+consumer = ["Preview LSP clients", "editor and integration test harnesses"]
+reader_policy = "Accept only textDocument/formatting requests for a current open writable RFC-0023 overlay with exact textDocument.uri and fixed tabSize=4, insertSpaces=true options; reject notifications without work and reject malformed, closed, missing, or read-only requests without mutation."
+writer_policy = "Return zero edits for unchanged or invalid source and exactly one whole-document TextEdit for a safely published formatter candidate; project the original end in the negotiated encoding, preserve an existing BOM outside the edit, and never apply or persist the result."
+unknown_field_policy = "Reject unknown request, textDocument, and options fields in 0.1; emit no result extension fields, annotation, version, URI, WorkspaceEdit, or Semantic Transaction value."
+migration_tool = "None; ling.lsp.formatting/0.1 is Experimental with no predecessor, and incompatible option, range, cardinality, or snapshot behavior requires a new marker and migration evidence."
+fixtures = ["crates/ling-lsp/tests/formatting.rs", "tests/protocols/lsp-formatting/README.md"]
+sources = ["docs/RFC-0026.md", "crates/ling-lsp/src/lib.rs", "crates/ling-format/src/edit.rs"]
+version_markers = ["ling.lsp.formatting/0.1", "textDocument/formatting", "documentFormattingProvider"]
+authority = ["RFC-0026", "RFC-0023", "DEC-0029", "DEC-0023", "DEC-0057"]
+notes = ["Whole-document formatting only. Range/on-type formatting, format-on-save, minimal diffs, filesystem reads/writes, Workspace Edits, cancellation, and Semantic Transactions remain deferred."]
+
+[[protocol]]
 id = "PROTO-CLI-EXIT"
 title = "Ling process exit-code mapping"
 category = "CLI"

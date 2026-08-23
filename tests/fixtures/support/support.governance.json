@@ -468,6 +468,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-FORMATTING",
+      "visibility": "Public",
+      "version": "ling.lsp.formatting/0.1",
+      "stability": "Experimental",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-LIFECYCLE",
       "visibility": "Public",
       "version": "ling.lsp.lifecycle/0.1",
@@ -597,7 +604,7 @@
       "id": "UNSUP-LSP-EDITOR",
       "area": "Tooling",
       "capability": "LSP document features, Zed extension, or semantic mutation",
-      "reason": "RFC-0004 implements only the Preview ling lsp --stdio lifecycle and transport. Document synchronization, diagnostics, editor features, semantic mutation, and transaction boundaries remain unresolved; the formatter CLI is Preview-only and does not provide editor transactions.",
+      "reason": "RFC-0004, RFC-0023, and RFC-0026 implement the bounded lifecycle, full-text overlay, and whole-document formatting response. Diagnostics, navigation, range/on-type formatting, Zed integration, semantic mutation, and transaction boundaries remain unresolved.",
       "blockers": [
         "GAP-LSP-TRANSACTION-PROTOCOL-001",
         "GAP-FORMATTER-AUTHOR-SOURCE-001",

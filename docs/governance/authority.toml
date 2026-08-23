@@ -925,6 +925,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0026"
+title = "Bounded LSP document formatting"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0026.md"
+covers = ["textDocument/formatting", "ling.lsp.formatting/0.1", "whole-document TextEdit projection"]
+depends_on = ["DEC-0002", "DEC-0023", "DEC-0029", "DEC-0057", "RFC-0004", "RFC-0023", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"
