@@ -23089,9 +23089,69 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "STAB-6102 is BlockedSpec by STAB-6101, the G6 dependency on G1-G5 exits, absent public-surface and cleanup authority, and unresolved false-entry classification, migration, diagnostic, editor, protocol, and support boundaries.",
-  "Targeted searches found no todo!/unimplemented!/unreachable! macros in the scoped repository paths and no stale zero command entry; remaining placeholder/future terms are language semantics, recovery, governance notes, or explicit negative evidence.",
+  "Targeted searches found no production todo!/unimplemented! macros and no stale zero command entry; CLI unreachable! sites are post-dispatch invariants, while remaining placeholder/future terms are language semantics, recovery, governance notes, or explicit negative evidence.",
   "The audit does not reinterpret the G6 cleanup list, AGENTS rules, accepted Seed/VM contracts, current CLI/editor behavior, or support matrix and creates no stale zero command or placeholder.",
   "The audit adds no public protocol, dependency, runtime, backend, target, schema, diagnostic, CLI, editor, or placeholder API; false-entry cleanup remains deferred until classification and executable evidence are accepted.",
+]
+
+[[task]]
+id = "STAB-6102-OBSERVATION"
+title = "Internal False-Entry-Point Audit boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["STAB-6101-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0036-cli-internal-command-catalog-boundary.md",
+  "docs/decisions/0040-cli-help-truth-fixture.md",
+  "docs/decisions/0216-support-matrix-item-audit-boundary-evidence.md",
+  "docs/decisions/0217-false-entry-point-audit-boundary-evidence.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-cli/tests/help.rs",
+  "crates/ling-types/tests/false_entry_point_audit_evidence.rs",
+  "docs/decisions/0217-false-entry-point-audit-boundary-evidence.md",
+  "docs/status/STAB-6102-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/STAB-6102-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0217 authorizes only bounded false-entry-point audit evidence and CLI negative regression; it grants no deletion, hiding, deprecation, migration, support, diagnostic, or protocol authority.",
+  "The test-local inventory covers sixty public-surface, placeholder, support-state, classification-action, authority, compatibility, and evidence boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "CLI help omits build/query/patch/replay/explain/evidence/version/support/features root commands, and each is rejected with exit code 2, empty stdout, and usage on stderr.",
+  "cargo test -p ling-types --test false_entry_point_audit_evidence --locked --offline passes.",
+  "cargo test -p ling-cli --test help --locked --offline passes.",
+  "cargo clippy -p ling-types -p ling-cli --all-targets --locked --offline -- -D warnings passes.",
+  "cargo xtask support verify passes against the unchanged 1.0-draft matrix.",
+]
+verified_against_commit = "5e3e93586768b10ad2e11805538a17c5cfcb0e7b"
+completion_commit = "5e3e93586768b10ad2e11805538a17c5cfcb0e7b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Regression/test-only under DEC-0217; STAB-6102 remains BlockedSpec for a complete public-surface inventory, cleanup classification, per-item action, compatibility/migration, diagnostics, editor/protocol coverage, and release evidence.",
+  "No command, API, grammar/completion item, backend/profile, default, diagnostic, protocol, support state, dependency, Semantic ID rule, source-span rule, or Unicode behavior changed.",
 ]
 
 [[task]]

@@ -423,6 +423,7 @@
 | `STAB-6101` | Support-Matrix Item Audit | `G6` | `L` | `BlockedSpec` | `CBK-5903` | `` |
 | `STAB-6101-OBSERVATION` | Internal Support-Matrix Item Audit boundary evidence | `G6` | `S` | `Done` | `CBK-5903-OBSERVATION` | `b6694aab307365446387551651545f2698846ad0` |
 | `STAB-6102` | Remove False Entry Points | `G6` | `L` | `BlockedSpec` | `STAB-6101` | `` |
+| `STAB-6102-OBSERVATION` | Internal False-Entry-Point Audit boundary evidence | `G6` | `S` | `Done` | `STAB-6101-OBSERVATION` | `5e3e93586768b10ad2e11805538a17c5cfcb0e7b` |
 | `STAB-6103` | Feature State Metadata | `G6` | `L` | `BlockedSpec` | `STAB-6102` | `` |
 | `STD-6301` | Stable Standard Library Audit | `G6` | `L` | `BlockedSpec` | `PROTO-6204` | `` |
 | `STD-6302` | Remove Convenience APIs | `G6` | `L` | `BlockedSpec` | `STD-6301` | `` |
