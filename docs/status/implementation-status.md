@@ -400,6 +400,7 @@
 | `REL-6601-SEED` | Seed fuzz inventory and corpus drift gate | `G6` | `S` | `Done` | `FMT-1506`, `GOV-0110`, `PRJ-1108`, `VM-1210` | `97a628311f50742730ba043131878d205f0f47d2` |
 | `REL-6601-SEMANTIC-SCHEMA` | Semantic Graph Reader Fuzz Coverage | `G6` | `S` | `Done` | `REL-6601-SEED` | `be20332ed1bed9becae115e211f1387e25799b17` |
 | `REL-6602` | Fault Injection | `G6` | `L` | `BlockedSpec` | `REL-6601` | `` |
+| `REL-6602-LOCK-PERSISTENCE` | Lock-persistence Fault Injection | `G6` | `S` | `Done` | `REL-6602-SEED` | `85fcbb3a4cf819560e4fa6663b1f21b089b74c0e` |
 | `REL-6602-SEED` | Seed fault-matrix drift gate | `G6` | `S` | `Done` | `REL-6601-SEED` | `201d9f7cfde5e6c2eebaa5b5324297b6a790d226` |
 | `REL-6603` | Security Audit | `G6` | `L` | `BlockedSpec` | `REL-6602` | `` |
 | `REL-6603-SEED` | Seed security-audit matrix drift gate | `G6` | `S` | `Done` | `REL-6602-SEED` | `d96bea813fb6576ef3212cbffeb478d9829210ec` |

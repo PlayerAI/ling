@@ -25086,6 +25086,7 @@ spec = [
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
   "docs/decisions/0022-disposable-persistent-query-cache.md",
   "docs/decisions/0042-seed-fault-matrix-gate.md",
+  "docs/decisions/0235-lock-persistence-fault-injection.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -25102,13 +25103,18 @@ spec = [
 artifacts = [
   "docs/status/REL-6602-AUTHORITY-AUDIT.md",
   "docs/status/REL-6602-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/REL-6602-LOCK-PERSISTENCE-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6602-LOCK-PERSISTENCE-IMPLEMENTATION-REPORT.md",
+  "crates/ling-project/src/lockfile.rs",
+  "crates/ling-project/src/discovery.rs",
+  "tools/xtask/src/fault.rs",
   "docs/testing/FAULT-INJECTION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The matrix records all eleven REL-6602 scenarios as Covered, Partial, or Deferred with current evidence, missing authority, and an owning area.",
-  "The matrix links cache corruption, lock failure-atomicity, and implemented VM resource-limit evidence without claiming an OS crash or unavailable runtime protocol.",
+  "The matrix links cache corruption, injected lock-persistence disk-full and interrupted-write failures, and implemented VM resource-limit evidence without claiming an OS crash or unavailable runtime protocol.",
   "The deterministic fault policy records injection point, recovery outcome, cleanup, compatibility, bounded resources, replay input, cross-process expectations, and triage ownership.",
   "The audit preserves Future/Experimental/Unsupported network, device, Actor, replay, proof/evidence, and LSP boundaries and records the G1-G5 release dependency.",
   "No fault-injection command, network adapter, device simulator, Actor API, replay/proof/evidence decoder, LSP server, diagnostic allocation, or placeholder public surface is added; DEC-0042 closes only the internal Seed matrix child.",
@@ -25119,7 +25125,8 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "REL-6602 is BlockedSpec because the G6 gate depends on G1-G5 exits and no accepted recovery/fault protocol exists for disk/process/remote/device/Actor/replay/proof/evidence/LSP scenarios.",
-  "Existing cache corruption, lock transaction, and VM resource tests remain the only Seed-level executable evidence; the matrix does not reinterpret them as a general crash or distributed-system contract.",
+  "Accepted DEC-0235 closes only a private library-level child for disk-full and interrupted-write lock persistence; it does not authorize OS/process-crash or distributed-system recovery semantics.",
+  "Existing cache corruption, lock transaction, injected lock-persistence, and VM resource tests remain bounded executable evidence; the matrix does not reinterpret them as a general crash or distributed-system contract.",
   "The audit changes no source semantics, public protocol, diagnostic/schema version, package/lock behavior, CLI, editor integration, dependency, or runtime API and preserves deterministic/offline boundaries.",
 ]
 
@@ -25165,6 +25172,50 @@ completed = "2026-08-22"
 notes = [
   "Accepted DEC-0042 closes only this internal Seed matrix gate; REL-6602 remains BlockedSpec for release-level fault seams and future recovery protocols.",
   "The verifier protects inventory consistency only; the existing Seed tests and later accepted fault seams remain execution evidence.",
+]
+
+[[task]]
+id = "REL-6602-LOCK-PERSISTENCE"
+title = "Lock-persistence Fault Injection"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REL-6602-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0042-seed-fault-matrix-gate.md",
+  "docs/decisions/0235-lock-persistence-fault-injection.md",
+  "docs/status/REL-6602-AUTHORITY-AUDIT.md",
+  "docs/ERROR-CODES.md",
+]
+artifacts = [
+  "crates/ling-project/src/lockfile.rs",
+  "crates/ling-project/src/discovery.rs",
+  "tools/xtask/src/fault.rs",
+  "docs/testing/FAULT-INJECTION.md",
+  "docs/status/REL-6602-LOCK-PERSISTENCE-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6602-LOCK-PERSISTENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0235 authorizes a private two-stage persistence seam that retains the production write-all, sync-all, and atomic-replace sequence.",
+  "The storage-full test writes a deterministic temporary-file prefix, returns L-IO-0002 with operation=write and io_kind=storage_full, preserves the prior target bytes exactly, and leaves no adjacent temporary file.",
+  "The interrupted-write test fails after temporary-file synchronization and before replacement, returns L-IO-0002 with operation=replace and io_kind=interrupted, preserves the prior target bytes exactly, and leaves no adjacent temporary file.",
+  "cargo xtask fault verify validates exactly three Covered, zero Partial, and eight Deferred scenarios.",
+  "Focused project tests and the workspace, CI, governance, status, formatting, and lint gates pass offline.",
+]
+verified_against_commit = "85fcbb3a4cf819560e4fa6663b1f21b089b74c0e"
+completion_commit = "85fcbb3a4cf819560e4fa6663b1f21b089b74c0e"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "REL-6602 remains BlockedSpec for OS/process-crash behavior and the eight future scenarios that still lack implemented surfaces or accepted recovery authority.",
+  "The injected seam is private and test-only; StorageFull is a compatible value in the existing io_kind string fact, and no error code, field, type, schema, dependency, runtime behavior, or Unicode version changes.",
 ]
 
 [[task]]
