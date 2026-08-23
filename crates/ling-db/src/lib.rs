@@ -38,6 +38,7 @@ mod project_snapshot;
 mod reference_index;
 mod reference_search_index;
 mod reference_span_index;
+mod rename_alias_index;
 mod rename_identifier;
 mod resolved_outline;
 mod token_source_index;
@@ -73,6 +74,9 @@ pub use reference_search_index::{
 };
 pub use reference_span_index::{
     ResolvedReferenceRelation, ResolvedReferenceSpan, ResolvedReferenceSpanIndex,
+};
+pub use rename_alias_index::{
+    CheckedRenameAliasIndex, RenameAliasIndexError, RenameAliasLocation, RenameAliasSelection,
 };
 pub use rename_identifier::{
     RenameIdentifierObservation, RenameIdentifierStatus, observe_rename_identifier,
@@ -535,6 +539,10 @@ pub enum QueryError {
         file: SourceId,
         error: ReferenceSearchIndexError,
     },
+    RenameAlias {
+        file: SourceId,
+        error: RenameAliasIndexError,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -618,6 +626,13 @@ impl fmt::Display for QueryError {
                 write!(
                     formatter,
                     "reference search index for source file {} failed: {error}",
+                    file.get()
+                )
+            }
+            Self::RenameAlias { file, error } => {
+                write!(
+                    formatter,
+                    "rename alias index for source file {} failed: {error}",
                     file.get()
                 )
             }
@@ -1271,6 +1286,22 @@ impl CompilerDb {
         ReferenceSearchIndex::from_checked(&checked)
             .map(Arc::new)
             .map_err(|error| QueryError::ReferenceSearch { file, error })
+    }
+
+    /// Builds exact checked import-alias declarations and qualified uses.
+    pub fn checked_rename_alias_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<CheckedRenameAliasIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+        CheckedRenameAliasIndex::from_checked(&checked)
+            .map(Arc::new)
+            .map_err(|error| QueryError::RenameAlias { file, error })
     }
 
     /// Builds an immutable inventory of resolver-backed names for future

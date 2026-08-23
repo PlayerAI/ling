@@ -559,6 +559,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-RENAME",
+      "visibility": "Public",
+      "version": "ling.lsp.rename/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-WORKSPACE",
       "visibility": "Public",
       "version": "ling.lsp.workspace/0.1",

@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 41 records: 37 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 21 Preview, 0 Stable.
+- 42 records: 38 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 22 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -29,6 +29,7 @@
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | Public | LSP | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | no | no | 4 |
 | `PROTO-LSP-PULL-DIAGNOSTICS` | Public | LSP | `ling.lsp.pull-diagnostics/0.2` | `Preview` | no | no | 5 |
 | `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
+| `PROTO-LSP-RENAME` | Public | LSP | `ling.lsp.rename/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
@@ -252,6 +253,19 @@
 - Sources: [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0037.md`](../RFC-0037.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0076-ide-resolved-reference-reverse-index.md`](../decisions/0076-ide-resolved-reference-reverse-index.md), [`docs/decisions/0078-ide-rename-reference-span-observation.md`](../decisions/0078-ide-rename-reference-span-observation.md), [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-db/src/reference_span_index.rs`](../../crates/ling-db/src/reference_span_index.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/references.rs`](../../crates/ling-lsp/src/references.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
 - Fixtures: [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-lsp/tests/references.rs`](../../crates/ling-lsp/tests/references.rs), [`tests/protocols/lsp-references/README.md`](../../tests/protocols/lsp-references/README.md), [`docs/status/IDE-2304-IMPLEMENTATION-REPORT.md`](../status/IDE-2304-IMPLEMENTATION-REPORT.md)
 - Notes: The full relation vocabulary is read/write/call/type/implementation; version 0.1 emits only read/write/call because type and implementation surfaces lack resolver-owned occurrence identities. No relation or identity metadata is added to standard Location results.
+
+### `PROTO-LSP-RENAME` — Ling checked transactional LSP rename
+
+- Producer: ling lsp --stdio; ling-lsp rename provider
+- Consumer: LSP 3.18 clients with transactional versioned Workspace Edit support; editor hosts; integration test harnesses
+- Reader policy: Validate object-valued workspace.workspaceEdit capability, boolean documentChanges, and the standard failureHandling vocabulary; enable Ready-state textDocument/rename only for documentChanges=true plus failureHandling=transactional, with exact URI, unsigned-u32 position, and string newName.
+- Writer policy: Capture and revalidate one immutable complete checked snapshot, select only resolver-owned writable definitions, bindings, or explicit import aliases, validate Unicode 17.0.0 policy, simulate all replacements through resolution/type/Effect checking and identity/topology checks, then emit deterministic URI-ordered versioned documentChanges or no result.
+- Unknown-field policy: Ignore ordinary unknown request and capability fields while rejecting malformed known members; capability, target, name, occurrence, simulation, identity, ordering, version, result, null, bound, snapshot, or failure changes require a new marker and migration evidence.
+- Migration tool: None; ling.lsp.rename/0.1 is Preview with no predecessor, no unversioned changes fallback, and clients gate on the exact transactional workspace capability plus lingRename discovery object.
+- Authority: `RFC-0041`, `RFC-0040`, `RFC-0039`, `RFC-0038`, `RFC-0004`, `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0075`, `DEC-0077`, `DEC-0078`
+- Sources: [`docs/RFC-0041.md`](../RFC-0041.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/RFC-0040.md`](../RFC-0040.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0077-ide-rename-identifier-observation.md`](../decisions/0077-ide-rename-identifier-observation.md), [`docs/decisions/0078-ide-rename-reference-span-observation.md`](../decisions/0078-ide-rename-reference-span-observation.md), [`crates/ling-db/src/rename_alias_index.rs`](../../crates/ling-db/src/rename_alias_index.rs), [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-lsp/src/rename.rs`](../../crates/ling-lsp/src/rename.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-db/src/rename_alias_index.rs`](../../crates/ling-db/src/rename_alias_index.rs), [`crates/ling-lsp/tests/rename.rs`](../../crates/ling-lsp/tests/rename.rs), [`tests/protocols/lsp-rename/README.md`](../../tests/protocols/lsp-rename/README.md), [`docs/status/IDE-2306-IMPLEMENTATION-REPORT.md`](../status/IDE-2306-IMPLEMENTATION-REPORT.md)
+- Notes: The bounded standard Workspace Edit is proposed to the client and is never applied by the server. General Semantic Transactions, language Alias syntax, localized Author Source, generated or dependency mutation, module/file rename, type-only identities, cancellation, annotations, and Stable lifecycle remain out of scope.
 
 ### `PROTO-LSP-WORKSPACE` — Ling LSP atomic workspace reload
 

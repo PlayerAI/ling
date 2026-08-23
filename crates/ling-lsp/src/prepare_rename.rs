@@ -1,13 +1,14 @@
 use ling_db::{QueryError, observe_rename_identifier};
-use ling_source::{SourceError, SourceFile, SourceId, Span, VfsError};
+use ling_source::{SourceError, SourceFile, VfsError};
 use serde_json::{Map, Value, json};
 
-use super::location_projection::{LocationProjectionError, range_value, target_document};
+use super::location_projection::{
+    LocationProjectionError, identifier_text, range_value, target_document,
+};
 use super::publication::compiler_for_snapshot;
 use super::{
-    HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES, RequestDocument,
-    RequestSnapshot, RequestSnapshotError, error_or_none, parse_text_document_position,
-    success_response,
+    HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES, RequestSnapshot,
+    RequestSnapshotError, error_or_none, parse_text_document_position, success_response,
 };
 
 /// Current Preview prepare-rename writer marker.
@@ -97,9 +98,11 @@ impl LspServer {
         let declaration_file = compiler.vfs().file_id(declaration.source_name()).ok_or(
             PrepareRenameError::Projection(LocationProjectionError::MissingTargetDocument),
         )?;
-        let placeholder = identifier_text(document, selection.span(), file)?;
+        let placeholder = identifier_text(document, selection.span(), file)
+            .map_err(PrepareRenameError::Projection)?;
         let declaration_name =
-            identifier_text(declaration_document, declaration.span(), declaration_file)?;
+            identifier_text(declaration_document, declaration.span(), declaration_file)
+                .map_err(PrepareRenameError::Projection)?;
         let selected = observe_rename_identifier(placeholder)
             .map_err(|_| PrepareRenameError::InvalidIdentifier)?;
         let declared = observe_rename_identifier(declaration_name)
@@ -152,25 +155,6 @@ pub(crate) fn parse_prepare_rename_capability(
         value.as_u64().filter(|value| *value == 1).ok_or(())?;
     }
     Ok(())
-}
-
-fn identifier_text(
-    document: &RequestDocument,
-    span: Span,
-    source: SourceId,
-) -> Result<&str, PrepareRenameError> {
-    if span.source() != source || span.start() >= span.end() {
-        return Err(PrepareRenameError::InvalidIdentifier);
-    }
-    let start =
-        usize::try_from(span.start().get()).map_err(|_| PrepareRenameError::InvalidIdentifier)?;
-    let end =
-        usize::try_from(span.end().get()).map_err(|_| PrepareRenameError::InvalidIdentifier)?;
-    document
-        .bytes()
-        .get(start..end)
-        .and_then(|bytes| std::str::from_utf8(bytes).ok())
-        .ok_or(PrepareRenameError::InvalidIdentifier)
 }
 
 fn prepare_rename_error(id: Value, error: &PrepareRenameError) -> HandleOutcome {

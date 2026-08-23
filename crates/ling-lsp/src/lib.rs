@@ -7,7 +7,8 @@
 //! RFC-0026 governs the bounded document-formatting response; DEC-0029 remains
 //! the authority for position projection; RFC-0036 governs Document Symbols;
 //! RFC-0037 governs checked Hover; RFC-0038 governs resolver navigation;
-//! RFC-0039 governs checked References; RFC-0040 governs Prepare Rename.
+//! RFC-0039 governs checked References; RFC-0040 governs Prepare Rename;
+//! RFC-0041 governs checked transactional Rename.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -63,6 +64,8 @@ mod references;
 pub use references::{MAX_REFERENCE_LOCATIONS, REFERENCES_PROTOCOL_VERSION};
 mod prepare_rename;
 pub use prepare_rename::PREPARE_RENAME_PROTOCOL_VERSION;
+mod rename;
+pub use rename::RENAME_PROTOCOL_VERSION;
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -584,6 +587,7 @@ pub struct LspServer {
     diagnostic_limits: DiagnosticLimits,
     hierarchical_document_symbols: bool,
     hover_markup: hover::HoverMarkup,
+    transactional_rename_supported: bool,
 }
 
 impl Default for LspServer {
@@ -610,6 +614,7 @@ impl LspServer {
             diagnostic_limits: DiagnosticLimits::DEFAULT,
             hierarchical_document_symbols: false,
             hover_markup: hover::HoverMarkup::Plaintext,
+            transactional_rename_supported: false,
         }
     }
 
@@ -809,6 +814,7 @@ impl LspServer {
             ),
             "textDocument/references" => self.references(id_present, id, params),
             "textDocument/prepareRename" => self.prepare_rename(id_present, id, params),
+            "textDocument/rename" => self.rename(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -835,6 +841,7 @@ impl LspServer {
             diagnostic_limits,
             hierarchical_document_symbols,
             hover_markup,
+            transactional_rename_supported,
         } = match parse_initialize_params(&params) {
             Ok(value) => value,
             Err(()) => {
@@ -852,6 +859,7 @@ impl LspServer {
         self.diagnostic_limits = diagnostic_limits;
         self.hierarchical_document_symbols = hierarchical_document_symbols;
         self.hover_markup = hover_markup;
+        self.transactional_rename_supported = transactional_rename_supported;
         self.state = LifecycleState::AwaitingInitialized;
         HandleOutcome::Response(success_response(
             id,
@@ -1403,6 +1411,7 @@ struct ParsedInitializeParams {
     diagnostic_limits: DiagnosticLimits,
     hierarchical_document_symbols: bool,
     hover_markup: hover::HoverMarkup,
+    transactional_rename_supported: bool,
 }
 
 fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()> {
@@ -1414,10 +1423,12 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
     let mut pull_diagnostics_supported = false;
     let mut hierarchical_document_symbols = false;
     let mut hover_markup = hover::HoverMarkup::Plaintext;
+    let mut transactional_rename_supported = false;
     if let Some(capabilities) = object.get("capabilities") {
         let Some(capabilities) = capabilities.as_object() else {
             return Err(());
         };
+        transactional_rename_supported = rename::parse_workspace_edit_capability(capabilities)?;
         if let Some(general) = capabilities.get("general") {
             let Some(general) = general.as_object() else {
                 return Err(());
@@ -1471,6 +1482,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
         diagnostic_limits,
         hierarchical_document_symbols,
         hover_markup,
+        transactional_rename_supported,
     })
 }
 
@@ -2037,6 +2049,12 @@ fn initialize_result(
                 "lingPrepareRename": {
                     "result": "rangeWithPlaceholder",
                     "version": PREPARE_RENAME_PROTOCOL_VERSION,
+                },
+                "lingRename": {
+                    "newName": "unicode17-xid-nfc-allowed-non-suspicious",
+                    "result": "versionedDocumentChanges",
+                    "transactional": true,
+                    "version": RENAME_PROTOCOL_VERSION,
                 },
                 "lingDocumentSymbols": {
                     "maxSymbols": MAX_DOCUMENT_SYMBOLS,

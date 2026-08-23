@@ -1,4 +1,4 @@
-use ling_source::{PositionError, SourceError, SourceFile, Span};
+use ling_source::{PositionError, SourceError, SourceFile, SourceId, Span};
 use serde_json::{Value, json};
 
 use super::{RequestDocument, RequestSnapshot};
@@ -62,6 +62,25 @@ pub(crate) fn target_document<'snapshot>(
         return Err(LocationProjectionError::DuplicateTargetDocument);
     }
     Ok(document)
+}
+
+pub(crate) fn identifier_text(
+    document: &RequestDocument,
+    span: Span,
+    source: SourceId,
+) -> Result<&str, LocationProjectionError> {
+    if span.source() != source || span.start() >= span.end() {
+        return Err(LocationProjectionError::InvalidSpan);
+    }
+    let start =
+        usize::try_from(span.start().get()).map_err(|_| LocationProjectionError::InvalidSpan)?;
+    let end =
+        usize::try_from(span.end().get()).map_err(|_| LocationProjectionError::InvalidSpan)?;
+    document
+        .bytes()
+        .get(start..end)
+        .and_then(|bytes| std::str::from_utf8(bytes).ok())
+        .ok_or(LocationProjectionError::InvalidSpan)
 }
 
 fn project_range(

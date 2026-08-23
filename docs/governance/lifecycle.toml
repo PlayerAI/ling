@@ -7115,3 +7115,31 @@ unresolved_alternatives = [
   "New-name validation, aliases, collisions, visibility/coherence simulation, generated documents, edits, DefinitionId migration, cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain IDE-2306 or later work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0041"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0041.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact discovery, transactional capability negotiation and malformed cases, lifecycle, notification silence, params, unknown URI and position, null behavior, and fixed failures.",
+  "Cover definitions and references, unreferenced targets, locals and parameters, multi-document edits, explicit import aliases and qualified uses, temporary documents, read-only dependencies, builtins, and checked failure.",
+  "Cover Unicode 17.0.0 XID, keyword, NFC, Identifier_Status, suspicious-script, normalized and confusable collision, visibility and coherence rejection, exact no-op, explicit DefinitionId migration, and relation-topology preservation.",
+  "Cover UTF-8/16/32, Chinese, combining marks, emoji prefixes, BOM, CRLF, open and closed document versions, deterministic ordering, malformed spans, overlap and size bounds, freshness, and absence of internal data.",
+  "Migrate exact initialize transcripts and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.rename/0.1 for standard textDocument/rename with no predecessor and requires negotiated transactional versioned documentChanges.",
+  "Adds a bounded immutable checked import-alias occurrence index and exposes a borrowed checked target group for simulation without persistence promises.",
+  "Makes definition rename-induced DefinitionId migration explicit while adding no Semantic ID schema, diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, package, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "General Semantic Transactions, Stable edit lifecycle, localized Author Source equivalence, language Alias declarations, generated or virtual mutation, module and file renames, type-only identities, cancellation, and change annotations remain deferred.",
+]
+superseded_by = ""

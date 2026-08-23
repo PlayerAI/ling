@@ -192,6 +192,14 @@ pub(crate) fn compiler_for_snapshot(
     snapshot: &RequestSnapshot,
     requested_temporary_uri: Option<&str>,
 ) -> Result<CompilerDb, VfsError> {
+    compiler_for_snapshot_with_overrides(snapshot, requested_temporary_uri, &BTreeMap::new())
+}
+
+pub(crate) fn compiler_for_snapshot_with_overrides(
+    snapshot: &RequestSnapshot,
+    requested_temporary_uri: Option<&str>,
+    overrides: &BTreeMap<String, Vec<u8>>,
+) -> Result<CompilerDb, VfsError> {
     let mut compiler = CompilerDb::new();
     for input in snapshot.inputs() {
         compiler.set_workspace_input(input.kind(), input.bytes().to_vec())?;
@@ -202,7 +210,10 @@ pub(crate) fn compiler_for_snapshot(
             |uri| document.is_temporary() && document.uri() == uri,
         )
     }) {
-        compiler.set_disk_snapshot(document.logical_name(), document.bytes().to_vec())?;
+        let bytes = overrides
+            .get(document.logical_name())
+            .map_or_else(|| document.bytes().to_vec(), Clone::clone);
+        compiler.set_disk_snapshot(document.logical_name(), bytes)?;
     }
     Ok(compiler)
 }

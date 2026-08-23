@@ -378,6 +378,13 @@ stability = "Preview"
 implemented = true
 
 [[protocol]]
+id = "PROTO-LSP-RENAME"
+visibility = "Public"
+version = "ling.lsp.rename/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 visibility = "Public"
 version = "ling.lsp.formatting/0.1"

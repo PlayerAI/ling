@@ -1120,6 +1120,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0041"
+title = "Checked Transactional LSP Rename Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0041.md"
+covers = ["ling.lsp.rename/0.1", "checked identity-based textDocument/rename over writable definition, binding, and resolved import-alias targets", "Unicode 17.0.0 new-name validation, whole-snapshot simulation, explicit DefinitionId migration, and deterministic versioned documentChanges"]
+depends_on = ["RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0038", "RFC-0039", "RFC-0040", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0075", "DEC-0077", "DEC-0078", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

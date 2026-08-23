@@ -75,6 +75,7 @@ pub struct ReferenceSearchIndex {
 pub struct ReferenceSearchSelection<'index> {
     source_name: &'index str,
     span: Span,
+    target: &'index ResolvedReferenceTargetKey,
     declaration: Option<&'index ReferenceSearchLocation>,
 }
 
@@ -87,6 +88,13 @@ impl<'index> ReferenceSearchSelection<'index> {
     #[must_use]
     pub const fn span(self) -> Span {
         self.span
+    }
+
+    /// Returns the existing resolver target key for checked identity
+    /// comparison. This is compiler-session data, not an LSP or Semantic ID.
+    #[must_use]
+    pub const fn target(self) -> &'index ResolvedReferenceTargetKey {
+        self.target
     }
 
     #[must_use]
@@ -108,6 +116,7 @@ impl ReferenceSearchIndex {
         Some(ReferenceSearchSelection {
             source_name: &selector.source_name,
             span: selector.span,
+            target: &self.groups[selector.group].target,
             declaration: self.groups[selector.group].declaration.as_ref(),
         })
     }
