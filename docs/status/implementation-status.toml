@@ -24581,6 +24581,8 @@ spec = [
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0015-audit-source-format.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md",
+  "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -24594,6 +24596,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/COMPAT-6502-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6502-CURRENT-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6502-CURRENT-IMPLEMENTATION-REPORT.md",
+  "docs/governance/compiler-compatibility-boundary.toml",
+  "docs/governance/compiler-compatibility-boundary.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -24610,9 +24616,62 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "COMPAT-6502 is BlockedSpec because no accepted 1.0 compiler compatibility matrix, historical version inventory, migration transaction, or general N-1 policy exists; the roadmap is planning authority only.",
-  "DEC-0001 governs diagnostic-code compatibility, RFC-0002 governs only manifest/lock version migration, and bytecode RFCs remain Experimental without a general release promise.",
-  "The active conformance corpus covers v0.0.1; SCHEMA-LIFECYCLE is Draft and cannot authorize compiler compatibility claims for Future/Unsupported Replay, evidence, package, or editor surfaces.",
-  "The audit changes no source, parser, resolver, evaluator, Semantic ID, diagnostic, schema, bytecode, package/lock, CLI, formatter, editor, dependency, or public API and creates no stale zero surface.",
+  "Accepted DEC-0231 and child COMPAT-6502-CURRENT bind v0.0.1 AcceptUnchanged to the frozen Seed corpus and record v0.1-v0.5 as NoReleasedVersion; they do not claim a 1.0 compiler.",
+  "DEC-0001 governs diagnostic-code compatibility, RFC-0002 governs only manifest/lock version migration, and bytecode RFCs remain Experimental without a general release promise or N-1 edge.",
+  "The bounded child adds an internal matrix drift gate only; it changes no source, parser, resolver, evaluator, Semantic ID, diagnostic, schema, bytecode, package/lock, CLI, formatter, editor, dependency, or public API and creates no stale zero surface.",
+]
+
+[[task]]
+id = "COMPAT-6502-CURRENT"
+title = "Current compiler compatibility-boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["COMPAT-6501-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEED-TRACEABILITY.md",
+  "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md",
+  "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md",
+  "docs/status/COMPAT-6502-AUTHORITY-AUDIT.md",
+  "docs/governance/seed-corpus-freeze.toml",
+  "docs/governance/protocol-inventory.toml",
+  "schemas/registry.toml",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "tools/xtask/src/compiler_compatibility.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/governance/compiler-compatibility-boundary.toml",
+  "docs/governance/compiler-compatibility-boundary.md",
+  "docs/status/COMPAT-6502-CURRENT-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6502-CURRENT-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0231 records the exact current compiler subject as 0.0.1-dev/Development and does not claim a Ling 1.0 compiler.",
+  "v0.0.1 is AcceptUnchanged under CONFORMANCE and is bound to DEC-0230's exact frozen Seed corpus SHA-256.",
+  "v0.1-v0.5 appear in canonical order as NoReleasedVersion under DEC-0231; that state is explicitly neither warning, auto-migration, nor actionable rejection.",
+  "The matrix records zero verified general N-1 compiler edges and does not reinterpret independently governed schema or bytecode readers as source-release compatibility.",
+  "The verifier rejects compiler/Unicode/authority/Seed-digest/N-1/release-order/outcome/evidence/report drift and is required by the always-on CI contract.",
+  "cargo test -p xtask --bin xtask --locked --offline passes with 145 tests.",
+  "cargo xtask compatibility verify, cargo xtask corpus verify, cargo xtask schema compatibility --from N-1 --to N, and cargo xtask ci verify pass.",
+  "workspace tests, clippy, governance, status, traceability, Seed reproduction, formatting, and diff checks pass without adding a 1.0, warning, migration, rejection, reader, schema, CLI, or support claim.",
+]
+verified_against_commit = "9a56e37933fd78c27fda3c30149f1ec2619855d9"
+completion_commit = "9a56e37933fd78c27fda3c30149f1ec2619855d9"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Internal evidence under DEC-0231; parent COMPAT-6502 remains BlockedSpec until an actual 1.0 compiler, released historical inputs, and accepted compatibility/migration semantics exist.",
+  "NoReleasedVersion is a non-claim and must not be presented as rejection, warning, migration, deprecation, or unsupported source behavior.",
+  "The matrix is internal governance evidence, not a public schema, protocol, compiler version promise, or Semantic ID.",
+  "No source, compiler, diagnostic, protocol, package, editor, CLI, dependency, Unicode, schema, or runtime behavior changed.",
 ]
 
 [[task]]
