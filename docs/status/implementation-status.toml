@@ -8602,7 +8602,7 @@ notes = [
 [[task]]
 id = "LSP-2504"
 title = "LSP memory and resource limits"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -8615,6 +8615,8 @@ spec = [
   "docs/ERROR-CODES.md",
   "docs/RFC-0002.md",
   "docs/RFC-0020.md",
+  "docs/RFC-0051.md",
+  "docs/decisions/0033-lsp-internal-byte-accounting-boundary.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -8622,27 +8624,37 @@ spec = [
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/src/request_cancellation.rs",
+  "crates/ling-lsp/src/resource.rs",
+  "crates/ling-lsp/tests/resource_limits.rs",
+  "docs/ERROR-CODES.md",
+  "docs/RFC-0051.md",
+  "docs/governance/protocol-inventory.toml",
   "docs/status/LSP-2504-AUTHORITY-AUDIT.md",
   "docs/status/LSP-2504-BYTE-ACCOUNTING-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2504-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-resource-limits/fixtures/v1.json",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing resource units/accounting, defaults/configuration, hard versus soft limits, failure precedence, cleanup, no-partial-publication, diagnostics, and protocol lifecycle contracts.",
-  "The audit distinguishes RFC-0002 project and bytecode limits, DEC-0019 internal query bounds, and RFC-0020 VM cancellation/resource behavior from the missing LSP quotas and tool diagnostic.",
-  "Accepted DEC-0033 closes only the internal deterministic UTF-8-byte accounting child; the parent remains blocked for public resource behavior.",
-  "The audit covers exact-boundary/over-limit, per-request versus aggregate, concurrent requests, dependency/generated files, partial result suppression, Unicode/CRLF/BOM bytes, cancellation/stale races, deterministic behavior, retry, and no-OOM fixtures.",
-  "No LSP limit constants, quota manager, tool diagnostic, request rejection response, protocol schema, diagnostic allocation, or placeholder server is added while the authority is absent.",
-  "The future implementation must use explicit versioned units and quotas, fail before partial publication, return registered bilingual tool diagnostics, and remain bounded and deterministic under adversarial input.",
+  "Accepted RFC-0051 defines the fixed ling.lsp.resource-limits/0.1 Preview discovery contract, UTF-8-byte/count units, accounting scopes, hard limits, precedence, cleanup, retry, and no-partial-publication rules.",
+  "Open and changed overlays enforce the 1 MiB per-document and 8 MiB session aggregate bounds atomically; close releases exact visible bytes, and failed admission leaves document state, versions, revisions, diagnostics, caches, and accounting unchanged.",
+  "The stdio router admits at most 128 distinct live string/number request IDs, checks duplicates first, creates no cancellation association for a rejected request, and releases capacity through the identity-safe completion path.",
+  "Request-form failures use JSON-RPC -32803 with registered bilingual L-LSP-0002 Facts, while notification failures remain response-free and disclose no URI, source, request ID, allocator, path, timing, or Rust/debug data.",
+  "Discovery composes the existing 256 completion, diagnostic default/hard-max, 1 MiB transport, and RFC-0005 64 nested-obligation limits without introducing editor-only language semantics.",
+  "Deterministic fixtures and tests cover exact and one-over byte boundaries, multibyte Unicode, atomic change failure, close/retry cleanup, exact discovery/error bytes, duplicate precedence, and framed 129th-request rejection without sleeps.",
+  "Workspace tests, strict clippy, CI/governance/LSP/support/status/RC0/traceability/Trait-performance verifiers, formatting, diff checks, and execution-plan checksums pass offline.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "b1fa575a533fbe60dfb48d29e0af287972a4a141"
+completion_commit = "b1fa575a533fbe60dfb48d29e0af287972a4a141"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "LSP-2504 remains BlockedSpec by the missing LSP quota/diagnostic contract and LSP-2501/LSP-2502/LSP-2503; RFC-0031 defines mapping but no memory/resource policy.",
-  "No public LSP resource accounting, request/queue quota, result-size policy, bilingual tool diagnostic, capability/configuration version, or protocol inventory entry exists; the DEC-0033 byte budget is not wired to LSP.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "RFC-0051 is Accepted and is the sole new public LSP resource-policy authority used by this implementation; DEC-0033 remains the internal checked byte-accounting foundation.",
+  "The additive Preview protocol and L-LSP-0002 allocation do not change successful compiler facts, source spans, standalone schemas, Semantic IDs, Definition IDs, runtime behavior, or Unicode 17.0.0.",
+  "Allocator/RSS guarantees, OOM recovery, configurable non-diagnostic quotas, eviction, partial results, deadlines, total compiler fuel, persistent sessions, Stable lifecycle, and Semantic Transactions remain intentionally deferred outside RFC-0051.",
 ]
 
 [[task]]
