@@ -493,6 +493,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EVD-5801` | G5 | Bundle Schema | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:518`, `docs/status/EVD-5801-AUTHORITY-AUDIT.md` |
 | `EVD-5801-OBSERVATION` | G5 | Internal Evidence Bundle Schema boundary evidence | S | Done | Accepted `DEC-0209`; see `crates/ling-types/tests/evidence_bundle_schema_evidence.rs` and `docs/status/EVD-5801-OBSERVATION-IMPLEMENTATION-REPORT.md`; schema/verifier/trust semantics remain BlockedSpec |
 | `EVD-5802` | G5 | 独立验证器 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:543`, `docs/status/EVD-5802-AUTHORITY-AUDIT.md` |
+| `EVD-5802-OBSERVATION` | G5 | Internal Independent Evidence Verifier boundary evidence | S | Done | Accepted `DEC-0210`; see `crates/ling-types/tests/independent_evidence_verifier_evidence.rs` and `docs/status/EVD-5802-OBSERVATION-IMPLEMENTATION-REPORT.md`; bundle/trust/result semantics remain BlockedSpec |
 | `EVD-5803` | G5 | 可重复构建绑定 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:557`, `docs/status/EVD-5803-AUTHORITY-AUDIT.md` |
 | `EVD-5804` | G5 | AI Provenance | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:566`, `docs/status/EVD-5804-AUTHORITY-AUDIT.md` |
 | `CBK-5901` | G5 | 可信编译路线决策 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:585`, `docs/status/CBK-5901-AUTHORITY-AUDIT.md` |

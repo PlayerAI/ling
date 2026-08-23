@@ -5375,3 +5375,27 @@ unresolved_alternatives = [
   "Versioned canonical container and manifest; required/optional fields, ordering, size limits, digest domains, references, unknown fields and migration; Program/Source/Semantic, authority, dependency/lock/build, Profile/target/toolchain/TCB and artifact identities; Audit Source, conformance/property/fuzz, Contract/proof, model-check/counterexample/replay, timing/memory, FFI/Target Package and assumption linkage; passed/failed/skipped/unavailable/assumed/unknown/bounded/non-claim polarity; source spans and cross-references; AI provenance, human review, privacy/redaction/retention; signatures, trust roots, independent offline verification and no-code-execution behavior; malformed/corrupt/unsupported-version and fail-closed outcomes; diagnostics, positive/negative/Unicode/determinism fixtures, protocol inventory, and public support remain open under EVD-5801, EVD-5802, EVD-5803, EVD-5804, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing evidence authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0210"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0210-independent-evidence-verifier-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty independent-verifier categories and local order; compare forward/reverse opaque bytes; reject duplicates; retain offline/network and no-code/command/FFI-execution boundaries together.",
+  "Defer verifier implementation, trust/certificate/result/exit semantics, diagnostics, protocols, and public support until Accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-local boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing bytecode/Audit verifiers, governance checks, and internal evidence are not reinterpreted as an Evidence Bundle verifier.",
+  "No bundle verifier/input/result, parser, certificate/signature dependency, trust root/TCB, diagnostic allocation, CLI/LSP route, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Versioned bundle/verifier input and canonical bytes; required fields, size limits, hash domains, unknown/missing fields and migration; artifact/source/Semantic/build/target/Profile/toolchain/dependency/test/proof/model/replay/timing/memory/FFI/TCB/assumption/provenance identities and recomputed links; evidence polarity and non-claims; certificate/signature formats, trust roots, keys, revocation, verifier identity/version and TCB; resource/network/offline isolation and prohibition of bundle code/plugins/commands/FFI/hooks; valid/invalid/unknown/unsupported, hash/link mismatch, invalid certificate, unavailable/stale/trust/resource/malformed/corrupt/unsupported-version and fail-closed behavior; diagnostics/exits, positive/negative/tampered-link/invalid-certificate/no-code-execution/Unicode/determinism fixtures, protocol inventory, and public support remain open under EVD-5802, EVD-5801, EVD-5803, EVD-5804, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing verifier authority.",
+]
+superseded_by = ""

@@ -240,6 +240,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0207` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0207](../decisions/0207-timing-analysis-separation-boundary-evidence.md) |
 | `DEC-0208` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0208](../decisions/0208-deadline-check-boundary-evidence.md) |
 | `DEC-0209` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0209](../decisions/0209-evidence-bundle-schema-boundary-evidence.md) |
+| `DEC-0210` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0210](../decisions/0210-independent-evidence-verifier-boundary-evidence.md) |
 
 ## Migration boundary
 

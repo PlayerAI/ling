@@ -3237,3 +3237,16 @@ covers = ["EVD-5801 bounded Evidence Bundle Schema boundary evidence", "test-onl
 depends_on = ["DEC-0208", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0210"
+title = "Internal Independent Evidence Verifier boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0210-independent-evidence-verifier-boundary-evidence.md"
+covers = ["EVD-5802 bounded Independent Verifier boundary evidence", "test-only evidence-verifier vocabulary", "verifier boundaries without bundle/trust/result semantics"]
+depends_on = ["DEC-0209", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
