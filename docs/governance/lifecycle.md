@@ -245,6 +245,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0212` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0212](../decisions/0212-ai-provenance-boundary-evidence.md) |
 | `DEC-0213` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0213](../decisions/0213-trusted-compiler-route-boundary-evidence.md) |
 | `DEC-0214` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0214](../decisions/0214-lowering-validator-boundary-evidence.md) |
+| `DEC-0215` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0215](../decisions/0215-critical-runtime-target-package-boundary-evidence.md) |
 
 ## Migration boundary
 

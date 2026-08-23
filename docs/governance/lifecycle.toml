@@ -5495,3 +5495,27 @@ unresolved_alternatives = [
   "Validated route and exact source/target/composed boundaries; versioned Typed Core/backend-neutral IR/Native IR/target-code representations; supported Core, target and profile; type/layout/control-flow/value/evaluation-order/Effect/Capability/Contract/memory/alias/ownership/Resource/Fault/thread/FFI/ABI semantics; source/Semantic/artifact/target/toolchain identity; original UTF-8 span and source/binary mapping; equivalence and soundness theorem; obligations, certificates, independent checker, trust, TCB, assumptions, optimizations and resource bounds; fail-closed unsupported/invalid/type-layout/control/value/preservation/alias/source-map/target/validator failures; bilingual stable diagnostics and exits; positive, negative, malformed, unsupported, control, Contract, alias, differential, cross-target, reproducibility, fuzz/property, Unicode 17.0.0, BOM/CRLF, and source-span fixtures; protocol inventory and truthful support remain open under CBK-5902, CBK-5901, CBK-5903, RFC-K508, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-CRITICAL-PROFILE-001, PROTO-ABI, PROTO-EVIDENCE, and missing validator authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0215"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0215-critical-runtime-target-package-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty Critical-runtime/Target-Package categories and local order; compare forward/reverse opaque bytes; reject duplicates; retain scheduler, heap/stack, startup, watchdog/safe-state, target primitive, host-service, evidence, and protocol boundaries together.",
+  "Defer runtime, scheduling/time, memory/resource, Target Package/ABI, watchdog/Fault, evidence/trust, diagnostics, protocols, and support until Accepted authority and offline target fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-local boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, interpreter/VM runtime, dependencies, support matrix, and Unicode 17.0.0 remain unchanged; existing VM limits, host effects, concurrency observations, and target-package planning are not reinterpreted as Critical runtime guarantees.",
+  "No Critical runtime/scheduler, heap/stack checker, startup/watchdog state machine, Target Package or primitive registry, ABI/FFI dependency, evidence verifier, diagnostic allocation, CLI/LSP route, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Critical Core/profile and permitted effects; startup/initialization/shutdown/reset/cancellation/Fault/overrun/watchdog/safe-state/recovery lifecycle; static schedule, admission, priority/tie-breaking, clock/tick/deadline/WCET, interrupt and I/O semantics; queue/recursion/heap/stack/frame/allocation bounds; ownership/alias/Resource/Drop/cleanup and host-service boundary; versioned Target Primitive Package, target/device/clock/watchdog primitive identities, capabilities, ABI/calling convention/layout/FFI/thread/reentry/toolchain/artifact identity; licensing and reproducible offline builds; timing/memory/target evidence, assumptions, TCB, independent verification, provenance, migration and nondeterminism; fail-closed profile/schedule/deadline/stack/heap/primitive/host-service/watchdog/target/evidence failures; bilingual stable diagnostics and exits; positive, negative, malformed, fault-injection, boundedness, reset, target, repeated-build, cross-target, Unicode 17.0.0, BOM/CRLF, and source-span fixtures; protocol inventory and truthful support remain open under CBK-5903, CBK-5901, CBK-5902, GAP-CRITICAL-PROFILE-001, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-KERNEL-DEVICE-001, PROTO-ABI, PROTO-EVIDENCE, and missing Critical runtime/target authority.",
+]
+superseded_by = ""

@@ -3302,3 +3302,16 @@ covers = ["CBK-5902 bounded Lowering Validator boundary evidence", "test-only va
 depends_on = ["DEC-0213", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0215"
+title = "Internal Critical Runtime/Target Package boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0215-critical-runtime-target-package-boundary-evidence.md"
+covers = ["CBK-5903 bounded Critical Runtime/Target Package boundary evidence", "test-only runtime/target/evidence vocabulary", "Critical runtime boundaries without schedule/resource/ABI semantics"]
+depends_on = ["DEC-0214", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
