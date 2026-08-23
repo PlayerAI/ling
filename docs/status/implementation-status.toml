@@ -22622,6 +22622,69 @@ notes = [
 ]
 
 [[task]]
+id = "CBK-5901-OBSERVATION"
+title = "Internal Trusted Compiler Route boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EVD-5804-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0212-ai-provenance-boundary-evidence.md",
+  "docs/decisions/0213-trusted-compiler-route-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/trusted_compiler_route_evidence.rs",
+  "docs/decisions/0213-trusted-compiler-route-boundary-evidence.md",
+  "docs/status/CBK-5901-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CBK-5901-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0213 authorizes only test-local Trusted Compiler Route boundary evidence; no route is selected and no Native IR, ABI/FFI, target, proof/equivalence, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty route, Core/target, IR/ABI, identity/build, equivalence/proof/trust, failure, fixture, protocol, and support boundaries.",
+  "Forward/reverse inputs emit the same opaque bytes and duplicates are rejected; all five route alternatives, checked-Typed-Core input, and support-matrix boundaries remain distinct; the tag has no route-selection or Native/Critical support authority.",
+  "cargo test -p ling-types --test trusted_compiler_route_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "9caebb42d8022fc8fdb6f1f7a06f128cd64d1a39"
+completion_commit = "9caebb42d8022fc8fdb6f1f7a06f128cd64d1a39"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0213; CBK-5901 remains BlockedSpec for route selection, Native IR/ABI/FFI/targets, equivalence/proof/trust/TCB, diagnostics, protocols, and support semantics.",
+  "No Native backend/IR, ABI/FFI dependency, target package, validator/proof tooling, C bridge, machine-code verifier, route selector, CLI route, diagnostic, public protocol, placeholder API, support-matrix change, or Unicode behavior was added.",
+]
+
+[[task]]
 id = "CBK-5902"
 title = "Lowering Validator"
 state = "BlockedSpec"

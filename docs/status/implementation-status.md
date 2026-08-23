@@ -66,6 +66,7 @@
 | `BND-5204` | Resource Budget Diagnostics | `G5` | `M` | `BlockedSpec` | `BND-5203` | `` |
 | `BND-5204-OBSERVATION` | Internal resource-budget diagnostic boundary evidence | `G5` | `S` | `Done` | `BND-5203-OBSERVATION` | `375ae71c51129051e7049e2379cd489833f0e6fd` |
 | `CBK-5901` | Trusted Compiler Route Decision | `G5` | `L` | `BlockedSpec` | `EVD-5804` | `` |
+| `CBK-5901-OBSERVATION` | Internal Trusted Compiler Route boundary evidence | `G5` | `S` | `Done` | `EVD-5804-OBSERVATION` | `9caebb42d8022fc8fdb6f1f7a06f128cd64d1a39` |
 | `CBK-5902` | Lowering Validator | `G5` | `L` | `BlockedSpec` | `CBK-5901` | `` |
 | `CBK-5903` | Critical Runtime/Target Package | `G5` | `L` | `BlockedSpec` | `CBK-5902` | `` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
