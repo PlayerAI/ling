@@ -229,3 +229,34 @@ fn formatting_rejects_invalid_state_read_only_and_options_without_mutation() {
     )));
     assert_eq!(closed["error"]["code"], -32_602);
 }
+
+#[test]
+fn formatting_obeys_preinitialize_and_shutdown_lifecycle_without_work() {
+    let uri = "ling://workspace/src/Main.ling";
+    let mut uninitialized = LspServer::new();
+    let preinitialize = response(uninitialized.handle_json(&request(
+        1,
+        "textDocument/formatting",
+        formatting_params(uri),
+    )));
+    assert_eq!(preinitialize["error"]["code"], -32_002);
+    assert!(uninitialized.document(uri).is_none());
+
+    let mut server = ready_server("utf-16");
+    open(&mut server, uri, 7, "let value=1\n");
+    let shutdown = response(server.handle_json(&request(2, "shutdown", Value::Null)));
+    assert_eq!(shutdown["result"], Value::Null);
+    assert_eq!(server.state(), LifecycleState::ShutdownRequested);
+
+    let post_shutdown = response(server.handle_json(&request(
+        3,
+        "textDocument/formatting",
+        formatting_params(uri),
+    )));
+    assert_eq!(post_shutdown["error"]["code"], -32_003);
+    let document = server
+        .document(uri)
+        .expect("open overlay remains observable");
+    assert_eq!(document.text(), "let value=1\n");
+    assert_eq!(document.version(), 7);
+}

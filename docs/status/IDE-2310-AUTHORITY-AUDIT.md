@@ -2,88 +2,85 @@
 
 ## Outcome
 
-`IDE-2310` is correctly recorded as `BlockedSpec`. The execution plan proposes
-calling `ling-fmt` for document formatting and enabling range formatting only
-after semantic-boundary decisions and tests exist. The repository does have an
-internal Author Source formatter governed by Accepted DEC-0023, but it has no
-accepted LSP formatting request/response, document-version, edit, CLI, or range
-formatting contract.
+`IDE-2310` is authorized and implemented for the bounded whole-document slice.
+Accepted RFC-0026 defines `ling.lsp.formatting/0.1`, and implementation commit
+`0421925f3a8e20f6bc951eff546b00523c3f36ff` already supplies the advertised
+`textDocument/formatting` method through the compiler-CST formatter.
 
-No LSP formatter adapter, `ling-fmt` command, range-formatting behavior,
-Workspace Edit schema, protocol field, or placeholder editor surface was added.
+The earlier BlockedSpec conclusion predated RFC-0026 and the completed
+FMT-1507 integration. It is no longer accurate. The execution plan requires
+document formatting and permits range formatting only after its boundary
+semantics and tests exist. RFC-0026 deliberately defers range formatting, so
+that deferred feature is not part of IDE-2310 completion.
 
-## Normative traceability
+## Authority reconciliation
 
-- The execution package is non-normative; its `ling-fmt` and range-formatting
-  wording does not authorize a public command or editor protocol.
-- DEC-0023 is Accepted: Author formatting consumes authoritative compiler CST
-  and spans, preserves identifier/literal/comment/documentation bytes and
-  localized spelling, is idempotent for valid source, and publishes no partial
-  output. It explicitly separates Author Source from Audit Source and leaves
-  broader formatter policy open.
-- DEC-0002 makes original UTF-8 `SourceId + Span` authoritative and requires an
-  explicit SourceMap projection for LSP UTF-16 positions. It does not define
-  formatting request ranges, URIs, versions, or edit application.
-- DEC-0015 fixes canonical Audit Source separately from Author Source.
-- `GAP-FORMATTER-AUTHOR-SOURCE-001` leaves broader normalization and
-  presentation policy open; `GAP-FORMATTER-CLI-PROTOCOL-001` leaves command,
-  stdin, check, exit, and report behavior open.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves snapshot/version preconditions and
-  Stable versus Experimental edit fields open, while
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves protocol migration open.
+- RFC-0026 §§1–5 is Accepted and defines the exact Experimental capability,
+  request, snapshot, formatter, `TextEdit`, failure, and compatibility rules.
+- RFC-0023 supplies the open-overlay URI, version, ownership, and writability
+  contract used by the handler.
+- DEC-0002 and DEC-0029 govern original UTF-8 spans and negotiated UTF-8,
+  UTF-16, or UTF-32 projection.
+- DEC-0023 defines the Author Source preservation and fail-closed publication
+  boundary; DEC-0057 exposes its deterministic whole-document `FormatEdit`.
+- Accepted DEC-0028 names the public formatter CLI `ling fmt`. The lower-
+  authority plan's `ling-fmt` spelling does not override that command name.
+  The IDE adapter correctly reuses the formatter library in process instead of
+  spawning a second parser or a subprocess.
+- FMT-1507 and LSP-2102, the two recorded dependencies of IDE-2310, are Done.
 
-## Current interface evidence
+## Current implementation evidence
 
-- `ling-format` implements the internal Author Source preservation boundary and
-  tests CST/comment/invalid-source behavior, but it exposes no LSP request,
-  negotiated position encoding, document version, or Workspace Edit adapter.
-- No `ling-fmt` public CLI contract exists in the protocol inventory; the
-  formatter CLI gap explicitly remains open.
-- Range formatting has no accepted boundary semantics for partial CST regions,
-  comment attachment, invalid/incomplete input, or overlapping ranges.
-- No executable editor fixture covers full/range requests, UTF-8/UTF-16
-  projection, BOM/CRLF, comments/docs/Unicode, invalid fallback, idempotence,
-  stale versions, deterministic edits, or migration.
+- `crates/ling-lsp/src/lib.rs` advertises
+  `documentFormattingProvider: true`, dispatches
+  `textDocument/formatting`, validates the exact fixed options, and formats
+  only a current open writable workspace or untitled overlay.
+- The adapter constructs `SourceFile`, parses with `ling-syntax`, builds the
+  existing `FormatDocument`, and calls `format_core_edit`. It has no regex,
+  Tree-sitter, unchecked AST, alternate style engine, or filesystem fallback.
+- Changed valid source returns exactly one whole-document `TextEdit`; unchanged,
+  invalid, or recovery source returns an empty array. The server never applies
+  the edit or changes text, version, VFS, disk, project, Semantic Graph, Audit,
+  or runtime state.
+- End positions are projected from the exact original snapshot in the
+  negotiated encoding. BOM is preserved outside LSP position zero, and CRLF
+  ranges are computed from original bytes while accepted formatter output uses
+  LF.
+- `PROTO-LSP-FORMATTING` registers the implemented Experimental
+  `ling.lsp.formatting/0.1` protocol and its executable fixtures.
 
-## Required authority before implementation
+## Conformance evidence
 
-An Accepted decision or RFC must define, at minimum:
+`crates/ling-lsp/tests/formatting.rs` directly covers:
 
-1. document/range formatting request scope, URI/package ownership, source
-   snapshot/version, position encoding, cancellation, limits, and stale-result
-   behavior;
-2. full-document and range boundaries, CST completeness/invalid-source fallback,
-   comment/doc attachment, line-ending/BOM policy, Unicode spelling, final-LF
-   policy, idempotence, semantic-equivalence checks, and deterministic edit
-   generation;
-3. Workspace Edit response schema, URI/path normalization, byte-to-position
-   conversion, edit ordering/overlap/atomicity, diagnostics, protocol inventory,
-   Stable versus Experimental fields, and migration;
-4. `ling-fmt` CLI/library ownership, stdin/logical filename behavior, check and
-   report semantics, and how editor formatting reuses the formatter without
-   becoming a second parser; and
-5. executable positive/negative full/range fixtures for valid, incomplete, and
-   invalid source, comments/docs, Unicode/NFC, BOM/CRLF, stale versions,
-   deterministic output, idempotence, semantic equivalence, and migration.
+1. exact capability and protocol marker discovery;
+2. hard-coded UTF-8, UTF-16, and UTF-32 ranges over Unicode source;
+3. BOM, CRLF, latest-overlay version, repeat determinism, and zero mutation;
+4. changed, unchanged, invalid, missing, closed, read-only, invalid-URI, and
+   malformed-option behavior; and
+5. notification, preinitialize, and post-shutdown fail-closed behavior.
 
-Until these decisions are Accepted, editor formatting could apply partial or
-stale edits, change author-controlled bytes, or make range formatting a second
-language/formatter authority.
+Formatter suites separately cover CST completeness, comments/documentation,
+literal and identifier preservation, invalid-source publication, idempotence,
+and semantic/Audit separation. Repository gates validate the protocol and
+support inventories.
 
-## Evidence and compatibility
+## Remaining gaps and compatibility
 
-This audit was checked against `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
-`docs/ROADMAP-1.0.md`, DEC-0002, DEC-0015, DEC-0023,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and `crates/ling-format`.
+`GAP-FORMATTER-AUTHOR-SOURCE-001`,
+`GAP-LSP-TRANSACTION-PROTOCOL-001`, and
+`GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` still govern broader formatting and editor
+work. They do not invalidate the explicitly bounded Accepted RFC-0026 slice.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+No compiler syntax or semantics, Typed Core evaluation, interpreter, VM,
+bytecode, ABI, diagnostic allocation, schema, Semantic ID, source-span unit,
+package behavior, runtime behavior, or Unicode 17.0.0 data changes as part of
+this reconciliation.
 
 ## Intentionally deferred
 
-`IDE-2310` can begin after formatter CLI/editor, LSP transaction, range-boundary,
-and protocol lifecycle decisions are Accepted. The future implementation must
-reuse `ling-format`'s checked CST boundary, preserve source bytes and spans,
-publish atomic versioned edits, and label experimental fields.
+Range/on-type formatting, format-on-save, configurable style, minimal diffs,
+closed-file or dependency formatting, filesystem mutation, `WorkspaceEdit`,
+general Semantic Transaction behavior, cancellation, asynchronous publication,
+multi-document edits, and Stable compatibility remain unimplemented and
+unclaimed. Each requires separate Accepted authority and executable evidence.
