@@ -21,7 +21,7 @@ const SURFACES: &[Surface] = &[
     },
     Surface {
         name: "LSP executable/version",
-        state: "Unsupported; no version range",
+        state: "Preview lifecycle/overlay only; no Zed compatibility range",
     },
     Surface {
         name: "Tree-sitter grammar",
@@ -41,11 +41,11 @@ const SURFACES: &[Surface] = &[
     },
     Surface {
         name: "Operating systems",
-        state: "Not established; Windows local run was lock-permission blocked; Linux/macOS not executed here",
+        state: "Windows grammar suite verified locally; no Zed OS support matrix",
     },
     Surface {
         name: "Binary acquisition",
-        state: "Not applicable; no download or execution path",
+        state: "Source-built ling CLI only; no Zed acquisition contract",
     },
     Surface {
         name: "Known limitations",
@@ -59,7 +59,8 @@ const REQUIRED_POLICY_PHRASES: &[&str] = &[
     "Unknown values are recorded as `Not established`",
     "No Zed protocol",
     "`ling.semantic/0.1` is Experimental and `ling.audit/0.1` is Preview",
-    "Windows error 5",
+    "`ling lsp --stdio`",
+    "Windows grammar suite passed",
     "Unicode 17.0.0",
     "original UTF-8 byte spans",
     "No placeholder command, download, protocol, backend, schema, or editor promise",
@@ -109,10 +110,27 @@ const REQUIRED_PACKAGE_MARKERS: &[(&str, &[&str])] = &[
     ),
 ];
 
+const REQUIRED_LSP_MARKERS: &[(&str, &[&str])] = &[
+    ("Cargo.toml", &["\"crates/ling-lsp\""]),
+    ("crates/ling-lsp/Cargo.toml", &["name = \"ling-lsp\""]),
+    (
+        "docs/governance/protocol-inventory.toml",
+        &[
+            "id = \"PROTO-LSP-LIFECYCLE\"",
+            "current_version = \"ling.lsp.lifecycle/0.1\"",
+            "id = \"PROTO-LSP-OVERLAY\"",
+            "current_version = \"ling.lsp.overlay/0.1\"",
+            "ling lsp --stdio",
+        ],
+    ),
+];
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckSummary {
     pub surface_count: usize,
     pub package_file_count: usize,
+    pub structured_json_count: usize,
+    pub lsp_evidence_file_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -123,9 +141,12 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_package(root));
+    errors.extend(validate_lsp_evidence(root));
     finish(errors).map(|()| CheckSummary {
         surface_count: SURFACES.len(),
         package_file_count: REQUIRED_PACKAGE_MARKERS.len(),
+        structured_json_count: 3,
+        lsp_evidence_file_count: REQUIRED_LSP_MARKERS.len(),
     })
 }
 
@@ -203,7 +224,179 @@ fn validate_package(root: &Path) -> Vec<String> {
         };
         errors.extend(validate_package_text(path, &text, markers));
     }
+    errors.extend(validate_package_json(root));
     errors
+}
+
+fn validate_lsp_evidence(root: &Path) -> Vec<String> {
+    let mut errors = Vec::new();
+    for (path, markers) in REQUIRED_LSP_MARKERS {
+        let text = match fs::read_to_string(root.join(path)) {
+            Ok(text) => text,
+            Err(error) => {
+                errors.push(format!(
+                    "GOV-ZED-MATRIX-0012: cannot read LSP evidence {path}: {error}"
+                ));
+                continue;
+            }
+        };
+        for marker in *markers {
+            if !text.contains(marker) {
+                errors.push(format!(
+                    "GOV-ZED-MATRIX-0013: {path} is missing LSP evidence marker {marker:?}"
+                ));
+            }
+        }
+    }
+    errors
+}
+
+fn validate_package_json(root: &Path) -> Vec<String> {
+    let mut errors = Vec::new();
+    let package = read_json(root, "editors/tree-sitter-ling/package.json", &mut errors);
+    if let Some(package) = package {
+        expect_json_string(&package, &["name"], "tree-sitter-ling", &mut errors);
+        expect_json_string(&package, &["version"], "0.0.1-dev", &mut errors);
+        expect_json_bool(&package, &["private"], true, &mut errors);
+        expect_json_string(
+            &package,
+            &["devDependencies", "tree-sitter-cli"],
+            "0.26.12",
+            &mut errors,
+        );
+        expect_json_string(&package, &["engines", "node"], ">=20", &mut errors);
+        expect_json_string(
+            &package,
+            &["scripts", "verify"],
+            "npm run generate && npm test && npm run parse:examples",
+            &mut errors,
+        );
+    }
+
+    let lock = read_json(
+        root,
+        "editors/tree-sitter-ling/package-lock.json",
+        &mut errors,
+    );
+    if let Some(lock) = lock {
+        expect_json_u64(&lock, &["lockfileVersion"], 3, &mut errors);
+        expect_json_string(
+            &lock,
+            &["packages", "", "devDependencies", "tree-sitter-cli"],
+            "0.26.12",
+            &mut errors,
+        );
+        expect_json_string(
+            &lock,
+            &["packages", "", "engines", "node"],
+            ">=20",
+            &mut errors,
+        );
+        expect_json_string(
+            &lock,
+            &["packages", "node_modules/tree-sitter-cli", "version"],
+            "0.26.12",
+            &mut errors,
+        );
+    }
+
+    let grammar = read_json(
+        root,
+        "editors/tree-sitter-ling/tree-sitter.json",
+        &mut errors,
+    );
+    if let Some(grammar) = grammar {
+        expect_json_string(&grammar, &["grammars", "0", "name"], "ling", &mut errors);
+        expect_json_string(
+            &grammar,
+            &["grammars", "0", "scope"],
+            "source.ling",
+            &mut errors,
+        );
+        expect_json_string(
+            &grammar,
+            &["grammars", "0", "file-types", "0"],
+            "ling",
+            &mut errors,
+        );
+        expect_json_string(
+            &grammar,
+            &["grammars", "0", "highlights"],
+            "queries/highlights.scm",
+            &mut errors,
+        );
+        expect_json_string(&grammar, &["metadata", "version"], "0.0.1-dev", &mut errors);
+    }
+    errors
+}
+
+fn read_json(root: &Path, path: &str, errors: &mut Vec<String>) -> Option<serde_json::Value> {
+    let source = match fs::read_to_string(root.join(path)) {
+        Ok(source) => source,
+        Err(error) => {
+            errors.push(format!("GOV-ZED-MATRIX-0010: cannot read {path}: {error}"));
+            return None;
+        }
+    };
+    match serde_json::from_str(&source) {
+        Ok(value) => Some(value),
+        Err(error) => {
+            errors.push(format!("GOV-ZED-MATRIX-0010: cannot parse {path}: {error}"));
+            None
+        }
+    }
+}
+
+fn json_value<'a>(value: &'a serde_json::Value, path: &[&str]) -> Option<&'a serde_json::Value> {
+    path.iter().try_fold(value, |current, component| {
+        component
+            .parse::<usize>()
+            .ok()
+            .and_then(|index| current.as_array()?.get(index))
+            .or_else(|| current.as_object()?.get(*component))
+    })
+}
+
+fn expect_json_string(
+    value: &serde_json::Value,
+    path: &[&str],
+    expected: &str,
+    errors: &mut Vec<String>,
+) {
+    if json_value(value, path).and_then(serde_json::Value::as_str) != Some(expected) {
+        errors.push(format!(
+            "GOV-ZED-MATRIX-0011: JSON field {} must equal {expected:?}",
+            path.join(".")
+        ));
+    }
+}
+
+fn expect_json_bool(
+    value: &serde_json::Value,
+    path: &[&str],
+    expected: bool,
+    errors: &mut Vec<String>,
+) {
+    if json_value(value, path).and_then(serde_json::Value::as_bool) != Some(expected) {
+        errors.push(format!(
+            "GOV-ZED-MATRIX-0011: JSON field {} must equal {expected}",
+            path.join(".")
+        ));
+    }
+}
+
+fn expect_json_u64(
+    value: &serde_json::Value,
+    path: &[&str],
+    expected: u64,
+    errors: &mut Vec<String>,
+) {
+    if json_value(value, path).and_then(serde_json::Value::as_u64) != Some(expected) {
+        errors.push(format!(
+            "GOV-ZED-MATRIX-0011: JSON field {} must equal {expected}",
+            path.join(".")
+        ));
+    }
 }
 
 fn validate_package_text(path: &str, text: &str, markers: &[&str]) -> Vec<String> {
@@ -259,6 +452,8 @@ mod tests {
         let summary = check_repository(root).expect("Zed matrix is valid");
         assert_eq!(summary.surface_count, 10);
         assert_eq!(summary.package_file_count, 5);
+        assert_eq!(summary.structured_json_count, 3);
+        assert_eq!(summary.lsp_evidence_file_count, 3);
     }
 
     #[test]
@@ -285,5 +480,24 @@ mod tests {
                 .iter()
                 .any(|error| error.contains("missing package marker"))
         );
+    }
+
+    #[test]
+    fn rejects_structured_package_metadata_drift() {
+        let value = serde_json::json!({
+            "name": "tree-sitter-ling",
+            "version": "0.0.1-dev",
+            "private": false
+        });
+        let mut errors = Vec::new();
+        expect_json_bool(&value, &["private"], true, &mut errors);
+        expect_json_string(
+            &value,
+            &["devDependencies", "tree-sitter-cli"],
+            "0.26.12",
+            &mut errors,
+        );
+        assert_eq!(errors.len(), 2);
+        assert!(errors.iter().all(|error| error.contains("JSON field")));
     }
 }

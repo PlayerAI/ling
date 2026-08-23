@@ -271,6 +271,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0238` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0238](../decisions/0238-documentation-evidence-path-gate.md) |
 | `DEC-0239` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0239](../decisions/0239-seed-example-execution-manifest.md) |
 | `DEC-0240` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0240](../decisions/0240-bilingual-tutorial-semantic-equivalence.md) |
+| `DEC-0241` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0241](../decisions/0241-current-zed-matrix-evidence.md) |
 
 ## Migration boundary
 

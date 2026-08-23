@@ -622,8 +622,11 @@ fn main() -> ExitCode {
             match zed_matrix::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "Zed compatibility matrix OK: {} surfaces, {} package evidence files",
-                        summary.surface_count, summary.package_file_count
+                        "Zed compatibility matrix OK: {} surfaces, {} package evidence files ({} structurally parsed JSON), {} LSP evidence files",
+                        summary.surface_count,
+                        summary.package_file_count,
+                        summary.structured_json_count,
+                        summary.lsp_evidence_file_count
                     );
                     ExitCode::SUCCESS
                 }

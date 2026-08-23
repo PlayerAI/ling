@@ -6181,3 +6181,30 @@ unresolved_alternatives = [
   "Stable localization policy; translated keyword or alias behavior; prose-level translation validation; public equivalence schema; future tutorials; profile/target and ownership guidance; cross-host release samples; and G6 sign-off remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0241"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0241-current-zed-matrix-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run the locked offline npm verify script on Windows and retain exact suite totals and zero tracked drift.",
+  "Parse all three package JSON files and validate the accepted exact fields.",
+  "Reject missing or changed structured fields in a focused test.",
+  "Validate the corrected ten-surface matrix and five package evidence files.",
+  "Run Zed, LSP, governance, status, workspace, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Corrects documentation and strengthens internal metadata validation only; Ling semantics, diagnostics, public schemas, Semantic IDs, packages, dependencies, CLI/LSP behavior, runtime, Unicode, protocols, support states, and editor APIs remain unchanged.",
+  "Adds no Zed compatibility claim, extension, document feature, acquisition contract, cross-host result, public metadata schema, or Stable grammar-node contract.",
+]
+unresolved_alternatives = [
+  "Zed version ranges; extension/package implementation; document features; position/edit protocol completion; standalone acquisition; Linux/macOS grammar evidence; per-OS Zed tests; signed releases; marketplace publication; migration policy; and G6 sign-off remain deferred.",
+]
+superseded_by = ""

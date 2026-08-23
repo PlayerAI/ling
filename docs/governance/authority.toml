@@ -3640,3 +3640,16 @@ covers = ["DOC-6703 bounded bilingual tutorial checked-shape equivalence", "actu
 depends_on = ["DEC-0047", "DEC-0239", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0241"
+title = "Current Zed-matrix evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0241-current-zed-matrix-evidence.md"
+covers = ["ZED-6801 bounded current LSP/grammar/package evidence", "corrected Preview lifecycle and Experimental overlay facts plus passing locked Windows grammar suite", "structured package JSON validation without Zed, cross-host, acquisition, document-feature, Stable-node, or G6 completion claims"]
+depends_on = ["DEC-0048", "RFC-0004", "RFC-0023", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
