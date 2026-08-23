@@ -477,7 +477,7 @@
     {
       "id": "PROTO-LSP-COMPLETION",
       "visibility": "Public",
-      "version": "ling.lsp.completion/0.1",
+      "version": "ling.lsp.completion/0.2",
       "stability": "Preview",
       "implemented": true
     },

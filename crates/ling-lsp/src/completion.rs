@@ -1,13 +1,18 @@
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::Arc;
 
 use ling_db::{
     CheckedCompletionCandidate, CheckedCompletionCatalog, CheckedCompletionKind,
-    MAX_CHECKED_COMPLETION_CANDIDATES, QueryError,
+    MAX_CHECKED_COMPLETION_CANDIDATES, QueryError, ResolvedCompletionSourceIdentity,
 };
 use ling_source::{SourceError, SourceFile, Span, VfsError};
 use ling_syntax::{CstNode, NodeKind, TokenKind};
 use serde_json::{Value, json};
 
+use super::completion_resolve::{
+    CompletionResolvePublishError, CompletionResolveRecord, completion_resolve_data,
+    completion_resolve_handle, completion_resolve_snapshot_digest,
+};
 use super::location_projection::{LocationProjectionError, range_value};
 use super::publication::{compiler_for_snapshot, compiler_for_snapshot_with_overrides};
 use super::{
@@ -50,7 +55,13 @@ struct CompletionSite {
 struct RankedCandidate {
     label: String,
     kind: CheckedCompletionKind,
+    metadata_identity: Option<ResolvedCompletionSourceIdentity>,
     rank: Rank,
+}
+
+struct CompletionBuild {
+    result: Value,
+    records: Vec<(String, CompletionResolveRecord)>,
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -74,12 +85,18 @@ enum CompletionError {
     Projection(LocationProjectionError),
     InvalidSource,
     CandidateBound,
+    ResolvePublish(CompletionResolvePublishError),
     Stale,
     ResponseTooLarge,
 }
 
 impl LspServer {
-    pub(crate) fn completion(&self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
+    pub(crate) fn completion(
+        &mut self,
+        is_request: bool,
+        id: Value,
+        params: Value,
+    ) -> HandleOutcome {
         if !is_request {
             return HandleOutcome::NoResponse;
         }
@@ -87,10 +104,13 @@ impl LspServer {
             return self.state_error(id);
         }
         match self.completion_result(&params) {
-            Ok(result) => {
-                let response = success_response(id.clone(), result);
+            Ok(build) => {
+                let response = success_response(id.clone(), build.result);
                 if response.len() > MAX_FRAME_BYTES {
                     return completion_error(id, &CompletionError::ResponseTooLarge);
+                }
+                if let Err(error) = self.completion_resolve.publish(build.records) {
+                    return completion_error(id, &CompletionError::ResolvePublish(error));
                 }
                 HandleOutcome::Response(response)
             }
@@ -98,7 +118,7 @@ impl LspServer {
         }
     }
 
-    fn completion_result(&self, params: &Value) -> Result<Value, CompletionError> {
+    fn completion_result(&self, params: &Value) -> Result<CompletionBuild, CompletionError> {
         validate_completion_context(params)?;
         let (uri, position) =
             parse_text_document_position(params).ok_or(CompletionError::InvalidParams)?;
@@ -187,27 +207,59 @@ impl LspServer {
             &compiler,
         )
         .map_err(CompletionError::Projection)?;
-        let items = valid
-            .into_iter()
-            .enumerate()
-            .map(|(ordinal, candidate)| {
-                json!({
-                    "filterText": candidate.label,
-                    "insertTextFormat": 1,
-                    "kind": completion_item_kind(candidate.kind),
-                    "label": candidate.label,
-                    "sortText": format!("{ordinal:06}"),
-                    "textEdit": {
-                        "newText": candidate.label,
-                        "range": range,
-                    },
-                })
-            })
-            .collect::<Vec<_>>();
-        self.finish_completion(
+        let resolve_options = self.completion_resolve.options();
+        let retained_snapshot = resolve_options
+            .enabled()
+            .then(|| Arc::new(snapshot.clone()));
+        let snapshot_digest = resolve_options
+            .enabled()
+            .then(|| completion_resolve_snapshot_digest(&snapshot));
+        let mut items = Vec::with_capacity(valid.len());
+        let mut records = Vec::with_capacity(valid.len());
+        for (ordinal, candidate) in valid.into_iter().enumerate() {
+            let mut item = json!({
+                "filterText": candidate.label,
+                "insertTextFormat": 1,
+                "kind": completion_item_kind(candidate.kind),
+                "label": candidate.label,
+                "sortText": format!("{ordinal:06}"),
+                "textEdit": {
+                    "newText": candidate.label,
+                    "range": range,
+                },
+            });
+            if let (Some(retained_snapshot), Some(snapshot_digest)) =
+                (&retained_snapshot, &snapshot_digest)
+            {
+                let handle = completion_resolve_handle(
+                    snapshot_digest,
+                    uri,
+                    site.replacement,
+                    offset.get(),
+                    u32::try_from(ordinal).map_err(|_| CompletionError::CandidateBound)?,
+                    completion_item_kind(candidate.kind),
+                    &candidate.rank.identity,
+                );
+                item["data"] = completion_resolve_data(&handle);
+                records.push((
+                    handle,
+                    CompletionResolveRecord::new(
+                        Arc::clone(retained_snapshot),
+                        uri.to_owned(),
+                        item.clone(),
+                        candidate.label.clone(),
+                        candidate.metadata_identity,
+                        resolve_options.documentation_format(),
+                    ),
+                ));
+            }
+            items.push(item);
+        }
+        let result = self.finish_completion(
             &snapshot,
             json!({"isIncomplete": is_incomplete, "items": items}),
-        )
+        )?;
+        Ok(CompletionBuild { result, records })
     }
 
     fn finish_completion(
@@ -396,6 +448,7 @@ fn candidate_pool(
         .map(|candidate| RankedCandidate {
             label: candidate.name().to_owned(),
             kind: candidate.kind(),
+            metadata_identity: candidate.metadata_identity().cloned(),
             rank: rank_candidate(site, candidate, current_module),
         })
         .collect::<Vec<_>>();
@@ -403,6 +456,7 @@ fn candidate_pool(
         candidates.push(RankedCandidate {
             label: "_".to_owned(),
             kind: CheckedCompletionKind::Keyword,
+            metadata_identity: None,
             rank: Rank {
                 prefix_class: u8::from(site.prefix != "_"),
                 scope_class: 9,
@@ -424,6 +478,7 @@ fn keyword_pool(site: &CompletionSite) -> Vec<RankedCandidate> {
         .map(|keyword| RankedCandidate {
             label: (*keyword).to_owned(),
             kind: CheckedCompletionKind::Keyword,
+            metadata_identity: None,
             rank: Rank {
                 prefix_class: u8::from(*keyword != site.prefix),
                 scope_class: 9,
@@ -591,6 +646,7 @@ fn completion_error(id: Value, error: &CompletionError) -> HandleOutcome {
         | CompletionError::Projection(_)
         | CompletionError::InvalidSource
         | CompletionError::CandidateBound
+        | CompletionError::ResolvePublish(_)
         | CompletionError::Stale
         | CompletionError::ResponseTooLarge => error_or_none(
             true,

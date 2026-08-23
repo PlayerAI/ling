@@ -85,7 +85,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-HUMAN-OUTPUT` | `Public` | `0.0.1-dev` | `Preview` | yes |
 | `PROTO-INTERNAL-INCIDENT` | `Internal` | `ling.internal-incident/0.1` | `Internal` | yes |
 | `PROTO-LOCKFILE` | `Public` | `ling.lock/1` | `Experimental` | yes |
-| `PROTO-LSP-COMPLETION` | `Public` | `ling.lsp.completion/0.1` | `Preview` | yes |
+| `PROTO-LSP-COMPLETION` | `Public` | `ling.lsp.completion/0.2` | `Preview` | yes |
 | `PROTO-LSP-DIAGNOSTIC` | `Public` | `ling.lsp.diagnostic/0.2` | `Experimental` | yes |
 | `PROTO-LSP-DIAGNOSTIC-CONTROL` | `Public` | `ling.lsp.diagnostic-control/0.1` | `Preview` | yes |
 | `PROTO-LSP-DOCUMENT-SYMBOL` | `Public` | `ling.lsp.document-symbol/0.1` | `Preview` | yes |

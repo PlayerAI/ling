@@ -2,16 +2,12 @@
 
 ## Outcome
 
-`IDE-2308` is correctly recorded as `BlockedSpec`. The execution plan asks for
-lazy completion-item resolution of documentation, full signatures,
-Effect/Capability information, and Unicode/formatter-safe insertion text. The
-repository has internal type/effect/capability results, but no accepted resolve
-handle, presentation schema, documentation source, insertion/edit, or snapshot
-contract.
-
-No completion-resolve handler, documentation renderer, signature formatter,
-capability disclosure, insertion-text API, protocol field, or placeholder editor
-surface was added.
+Historical audit outcome: `IDE-2308` was correctly recorded as `BlockedSpec`
+when this audit was written. Accepted RFC-0043 now supplies the bounded resolve
+handle, snapshot, checked presentation, documentation-absence, exact insertion
+preservation, failure, limit, and migration contract required below. The
+implementation evidence is recorded separately in
+`docs/status/IDE-2308-IMPLEMENTATION-REPORT.md`.
 
 The bounded child `IDE-2308-METADATA` only joins existing checked type, Effect
 Row, and module Capability facts to resolver-backed definitions and bindings.
@@ -58,7 +54,7 @@ It does not render, disclose, redact, or insert any completion item.
   signatures, effects/capabilities, localized/Unicode names, formatter-safe
   insertion, stale versions, deterministic output, or capability redaction.
 
-## Required authority before implementation
+## Authority requirements resolved by RFC-0043
 
 An Accepted decision or RFC must define, at minimum:
 
@@ -78,9 +74,10 @@ An Accepted decision or RFC must define, at minimum:
    formatter-safe insertion, deterministic rendering, resource limits, and
    migration.
 
-Until these decisions are Accepted, resolve could expose unstable type or
-capability details, render unapproved documentation, or insert text at a span
-that does not match the current source snapshot.
+RFC-0043 resolves these requirements only for its negotiated Preview. General
+Semantic Transactions, Author Source documentation/localization, formatter
+rewrites, generated/dependency/builtin presentation, persistent handles,
+asynchronous cancellation, and Stable lifecycle remain outside its scope.
 
 ## Evidence and compatibility
 
@@ -97,8 +94,8 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-`IDE-2308` can begin after completion-item lifecycle, presentation,
-LSP-position/version, formatter, and Semantic Graph protocol decisions are
-Accepted. The future implementation must consume checked data, preserve source
-span/identity truth, render effects/capabilities deterministically and safely,
-and label experimental fields.
+RFC-0043 intentionally defers Author Source documentation/localization,
+formatter-generated insertion, generated/dependency/builtin presentation,
+persistent handles, asynchronous cancellation, AI assistance, and Stable
+lifecycle. Later work must not broaden its bounded checked-fact and unchanged-
+edit contract without new Accepted authority.

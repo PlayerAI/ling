@@ -10,6 +10,8 @@ use ling_effects::CheckedProgram;
 use ling_resolve::{DefinitionKind, DefinitionOrigin};
 use ling_source::Span;
 
+use crate::completion_source_index::ResolvedCompletionSourceIdentity;
+
 /// Maximum number of compiler facts that one RFC-0042 request may inspect.
 pub const MAX_CHECKED_COMPLETION_CANDIDATES: usize = 512;
 
@@ -38,6 +40,7 @@ pub struct CheckedCompletionCandidate {
     source_name: Option<String>,
     span: Option<Span>,
     identity: String,
+    metadata_identity: Option<ResolvedCompletionSourceIdentity>,
 }
 
 impl CheckedCompletionCandidate {
@@ -80,6 +83,13 @@ impl CheckedCompletionCandidate {
     pub fn identity(&self) -> &str {
         &self.identity
     }
+
+    /// Returns the existing resolver identity when DEC-0080 checked metadata
+    /// may be selected for this candidate.
+    #[must_use]
+    pub fn metadata_identity(&self) -> Option<&ResolvedCompletionSourceIdentity> {
+        self.metadata_identity.as_ref()
+    }
 }
 
 /// Deterministic facts copied from one complete checked workspace.
@@ -116,6 +126,10 @@ impl CheckedCompletionCatalog {
                 DefinitionKind::Builtin => (CheckedCompletionKind::Builtin, None),
             };
             let (qualifier, name) = split_qualified_builtin(&definition.name, definition.origin);
+            let metadata_identity = matches!(definition.origin, DefinitionOrigin::User { .. })
+                .then(|| ResolvedCompletionSourceIdentity::Definition {
+                    definition_id: definition.id.as_str().to_owned(),
+                });
             candidates.push(CheckedCompletionCandidate {
                 name,
                 qualifier,
@@ -125,6 +139,7 @@ impl CheckedCompletionCatalog {
                 source_name: definition.source_name.clone(),
                 span: definition.span,
                 identity: format!("definition:{}", definition.id.as_str()),
+                metadata_identity,
             });
         }
 
@@ -141,6 +156,10 @@ impl CheckedCompletionCatalog {
                 source_name,
                 span: Some(binding.span),
                 identity: format!("binding:{}:{}", key.module().get(), key.local().get()),
+                metadata_identity: Some(ResolvedCompletionSourceIdentity::Binding {
+                    module_id: key.module().get(),
+                    binding_id: key.local().get(),
+                }),
             });
         }
 
@@ -154,6 +173,7 @@ impl CheckedCompletionCatalog {
                 source_name: Some(module.hir.source_name.clone()),
                 span: Some(module.hir.module.name.span),
                 identity: format!("module:{}", module.id.get()),
+                metadata_identity: None,
             });
             for import in &module.hir.imports {
                 let Some(target) = module.imports.get(&import.alias.normalized) else {
@@ -168,6 +188,7 @@ impl CheckedCompletionCatalog {
                     source_name: Some(module.hir.source_name.clone()),
                     span: Some(import.alias.span),
                     identity: format!("alias:{}:{}", module.id.get(), target.get()),
+                    metadata_identity: None,
                 });
             }
         }
@@ -183,6 +204,7 @@ impl CheckedCompletionCatalog {
                     source_name: None,
                     span: None,
                     identity: format!("field:{}:{}", record.definition.as_str(), field.name),
+                    metadata_identity: None,
                 });
             }
         }
@@ -303,6 +325,26 @@ mod tests {
             candidate.kind() == CheckedCompletionKind::Binding
                 && candidate.name() == "value"
                 && candidate.span().is_some()
+                && matches!(
+                    candidate.metadata_identity(),
+                    Some(ResolvedCompletionSourceIdentity::Binding { .. })
+                )
+        }));
+        assert!(first.candidates().iter().any(|candidate| {
+            candidate.name() == "answer"
+                && matches!(
+                    candidate.metadata_identity(),
+                    Some(ResolvedCompletionSourceIdentity::Definition { .. })
+                )
+        }));
+        assert!(first.candidates().iter().all(|candidate| {
+            matches!(
+                candidate.kind(),
+                CheckedCompletionKind::Value
+                    | CheckedCompletionKind::Type
+                    | CheckedCompletionKind::Constructor
+                    | CheckedCompletionKind::Binding
+            ) || candidate.metadata_identity().is_none()
         }));
     }
 
@@ -323,5 +365,6 @@ mod tests {
             .expect("qualified Console builtin");
         assert_eq!(write.name(), "write");
         assert_eq!(write.kind(), CheckedCompletionKind::Builtin);
+        assert!(write.metadata_identity().is_none());
     }
 }

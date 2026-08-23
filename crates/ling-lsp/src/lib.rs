@@ -9,7 +9,8 @@
 //! RFC-0037 governs checked Hover; RFC-0038 governs resolver navigation;
 //! RFC-0039 governs checked References; RFC-0040 governs Prepare Rename;
 //! RFC-0041 governs checked transactional Rename; RFC-0042 governs checked
-//! deterministic Completion.
+//! deterministic Completion; RFC-0043 governs snapshot-bound Completion
+//! Resolve.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -69,6 +70,12 @@ mod rename;
 pub use rename::RENAME_PROTOCOL_VERSION;
 mod completion;
 pub use completion::{COMPLETION_PROTOCOL_VERSION, MAX_COMPLETION_ITEMS};
+mod completion_resolve;
+pub use completion_resolve::{
+    COMPLETION_RESOLVE_COMPLETION_VERSION, COMPLETION_RESOLVE_PROTOCOL_VERSION,
+    MAX_COMPLETION_DETAIL_BYTES, MAX_COMPLETION_DOCUMENTATION_BYTES,
+    MAX_COMPLETION_RESOLVE_HANDLES,
+};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -591,6 +598,7 @@ pub struct LspServer {
     hierarchical_document_symbols: bool,
     hover_markup: hover::HoverMarkup,
     transactional_rename_supported: bool,
+    completion_resolve: completion_resolve::CompletionResolveState,
 }
 
 impl Default for LspServer {
@@ -618,6 +626,7 @@ impl LspServer {
             hierarchical_document_symbols: false,
             hover_markup: hover::HoverMarkup::Plaintext,
             transactional_rename_supported: false,
+            completion_resolve: completion_resolve::CompletionResolveState::new(),
         }
     }
 
@@ -819,6 +828,7 @@ impl LspServer {
             "textDocument/prepareRename" => self.prepare_rename(id_present, id, params),
             "textDocument/rename" => self.rename(id_present, id, params),
             "textDocument/completion" => self.completion(id_present, id, params),
+            "completionItem/resolve" => self.completion_resolve(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -846,6 +856,7 @@ impl LspServer {
             hierarchical_document_symbols,
             hover_markup,
             transactional_rename_supported,
+            completion_resolve,
         } = match parse_initialize_params(&params) {
             Ok(value) => value,
             Err(()) => {
@@ -864,6 +875,7 @@ impl LspServer {
         self.hierarchical_document_symbols = hierarchical_document_symbols;
         self.hover_markup = hover_markup;
         self.transactional_rename_supported = transactional_rename_supported;
+        self.completion_resolve.configure(completion_resolve);
         self.state = LifecycleState::AwaitingInitialized;
         HandleOutcome::Response(success_response(
             id,
@@ -873,6 +885,7 @@ impl LspServer {
                 diagnostic_limits,
                 hierarchical_document_symbols,
                 hover_markup,
+                completion_resolve,
             ),
         ))
     }
@@ -1416,6 +1429,7 @@ struct ParsedInitializeParams {
     hierarchical_document_symbols: bool,
     hover_markup: hover::HoverMarkup,
     transactional_rename_supported: bool,
+    completion_resolve: completion_resolve::CompletionResolveOptions,
 }
 
 fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()> {
@@ -1428,6 +1442,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
     let mut hierarchical_document_symbols = false;
     let mut hover_markup = hover::HoverMarkup::Plaintext;
     let mut transactional_rename_supported = false;
+    let mut completion_resolve = completion_resolve::CompletionResolveOptions::disabled();
     if let Some(capabilities) = object.get("capabilities") {
         let Some(capabilities) = capabilities.as_object() else {
             return Err(());
@@ -1470,6 +1485,8 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
             navigation::parse_navigation_capabilities(text_document)?;
             references::parse_references_capability(text_document)?;
             prepare_rename::parse_prepare_rename_capability(text_document)?;
+            completion_resolve =
+                completion_resolve::parse_completion_resolve_capability(text_document)?;
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -1487,6 +1504,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
         hierarchical_document_symbols,
         hover_markup,
         transactional_rename_supported,
+        completion_resolve,
     })
 }
 
@@ -2018,6 +2036,7 @@ fn initialize_result(
     diagnostic_limits: DiagnosticLimits,
     hierarchical_document_symbols: bool,
     hover_markup: hover::HoverMarkup,
+    completion_resolve: completion_resolve::CompletionResolveOptions,
 ) -> Value {
     let mut result = json!({
         "capabilities": {
@@ -2118,6 +2137,17 @@ fn initialize_result(
             "interFileDependencies": true,
             "workDoneProgress": false,
             "workspaceDiagnostics": true,
+        });
+    }
+    if completion_resolve.enabled() {
+        result["capabilities"]["completionProvider"]["resolveProvider"] = json!(true);
+        result["capabilities"]["experimental"]["lingCompletion"]["version"] =
+            json!(COMPLETION_RESOLVE_COMPLETION_VERSION);
+        result["capabilities"]["experimental"]["lingCompletion"]["resolve"] = json!({
+            "documentationFormat": completion_resolve.documentation_format().wire_name(),
+            "maxHandles": MAX_COMPLETION_RESOLVE_HANDLES,
+            "properties": ["detail", "documentation"],
+            "version": COMPLETION_RESOLVE_PROTOCOL_VERSION,
         });
     }
     result

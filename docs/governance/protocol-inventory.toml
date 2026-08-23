@@ -399,25 +399,25 @@ notes = ["The bounded standard Workspace Edit is proposed to the client and is n
 
 [[protocol]]
 id = "PROTO-LSP-COMPLETION"
-title = "Ling checked deterministic LSP completion"
+title = "Ling checked deterministic LSP completion and resolve"
 category = "LSP"
 visibility = "Public"
-current_version = "ling.lsp.completion/0.1"
+current_version = "ling.lsp.completion/0.2"
 stability = "Preview"
 implemented = true
 public_schema = false
 canonical = false
-producer = ["ling-lsp textDocument/completion"]
-consumer = ["LSP clients with standard completion support"]
-reader_policy = "Clients gate on exact ling.lsp.completion/0.1 discovery; completionItem/resolve is unsupported and items intentionally omit metadata and internal identities."
-writer_policy = "Emit a bounded deterministic Completion List from one completely checked immutable snapshot; validate each replacement through a fresh compiler, publish only exact PlainText text edits, and never use AI or unchecked fallback."
-unknown_field_policy = "Ignore ordinary unknown request fields while rejecting malformed known members; request, context, candidate, validation, ranking, field, kind, edit, bound, snapshot, or failure changes require a new marker and migration evidence."
-migration_tool = "None; ling.lsp.completion/0.1 is Preview with no predecessor and clients gate on the exact completionProvider plus lingCompletion discovery object."
-fixtures = ["crates/ling-db/src/checked_completion_catalog.rs", "crates/ling-lsp/tests/completion.rs", "tests/protocols/lsp-completion/README.md", "docs/status/IDE-2307-IMPLEMENTATION-REPORT.md"]
-sources = ["docs/RFC-0042.md", "docs/RFC-0004.md", "docs/RFC-0005.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0037.md", "docs/RFC-0038.md", "docs/RFC-0039.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0075-ide-resolved-reference-index.md", "docs/decisions/0079-ide-completion-source-inventory.md", "docs/decisions/0080-ide-completion-checked-metadata.md", "crates/ling-db/src/checked_completion_catalog.rs", "crates/ling-lsp/src/completion.rs", "crates/ling-lsp/src/lib.rs"]
-version_markers = ["ling.lsp.completion/0.1", "textDocument/completion", "completionProvider", "lingCompletion"]
-authority = ["RFC-0042", "RFC-0039", "RFC-0038", "RFC-0037", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0075", "DEC-0079", "DEC-0080"]
-notes = ["The Preview requires a fully checked baseline and existing-token replacement; incomplete-source recovery, zero-width insertion, auto-imports, snippets, resolve metadata, AI ranking, and Stable lifecycle remain out of scope."]
+producer = ["ling-lsp textDocument/completion", "ling-lsp completionItem/resolve"]
+consumer = ["LSP clients with standard completion support and optional detail/documentation resolveSupport"]
+reader_policy = "Clients without detail and documentation resolveSupport receive exact ling.lsp.completion/0.1 discovery and items; capable clients gate on ling.lsp.completion/0.2 plus ling.lsp.completion-resolve/0.1, preserve the opaque data object, and send the exact item to completionItem/resolve."
+writer_policy = "Emit a bounded deterministic Completion List from one completely checked immutable snapshot; validate each replacement through a fresh compiler; for negotiated 0.2 retain at most 1024 opaque snapshot-bound handles and resolve only DEC-0080 checked signature, Effect, and Capability facts plus RFC-0043-attached `///` text while preserving exact PlainText edits."
+unknown_field_policy = "Ignore ordinary unknown request fields while rejecting malformed known capability, completion, data, or lazy members; negotiation, request, context, candidate, validation, ranking, item, handle, expiry, snapshot, metadata, rendering, edit-preservation, bound, result, or failure changes require a new marker and migration evidence."
+migration_tool = "Automatic capability negotiation: clients lacking both detail and documentation resolveSupport retain exact ling.lsp.completion/0.1 behavior; capable clients receive ling.lsp.completion/0.2 items and gate resolve on ling.lsp.completion-resolve/0.1."
+fixtures = ["crates/ling-db/src/checked_completion_catalog.rs", "crates/ling-db/src/completion_metadata_index.rs", "crates/ling-lsp/tests/completion.rs", "crates/ling-lsp/tests/completion_resolve.rs", "tests/protocols/lsp-completion/README.md", "tests/protocols/lsp-completion-resolve/README.md", "docs/status/IDE-2307-IMPLEMENTATION-REPORT.md", "docs/status/IDE-2308-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0043.md", "docs/RFC-0042.md", "docs/RFC-0004.md", "docs/RFC-0005.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0037.md", "docs/RFC-0038.md", "docs/RFC-0039.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0010-state-and-capability-model.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0023-author-source-formatter-preservation.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0075-ide-resolved-reference-index.md", "docs/decisions/0079-ide-completion-source-inventory.md", "docs/decisions/0080-ide-completion-checked-metadata.md", "crates/ling-db/src/checked_completion_catalog.rs", "crates/ling-db/src/completion_metadata_index.rs", "crates/ling-format/src/comments.rs", "crates/ling-format/src/format_ir.rs", "crates/ling-lsp/src/completion.rs", "crates/ling-lsp/src/completion_resolve.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.completion/0.2", "ling.lsp.completion-resolve/0.1", "ling.lsp.completion/0.1", "textDocument/completion", "completionItem/resolve", "completionProvider", "lingCompletion"]
+authority = ["RFC-0043", "RFC-0042", "RFC-0039", "RFC-0038", "RFC-0037", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0019", "DEC-0023", "DEC-0029", "DEC-0071", "DEC-0075", "DEC-0079", "DEC-0080"]
+notes = ["The negotiated resolve Preview presents existing DEC-0080 facts and only directly attached `///` Author Source text; it never fabricates documentation or changes an RFC-0042 edit. Incomplete recovery, zero-width insertion, auto-imports, snippets, generated/dependency/builtin metadata, persistent handles, cancellation, AI ranking, and Stable lifecycle remain out of scope."]
 
 [[protocol]]
 id = "PROTO-LSP-FORMATTING"

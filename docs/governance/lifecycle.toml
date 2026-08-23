@@ -7171,3 +7171,31 @@ unresolved_alternatives = [
   "Incomplete-source recovery, zero-width sites, auto-imports, snippets, lazy metadata, documentation and signature rendering, AI ranking, generated sources, cancellation, dynamic registration, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0043"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0043.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact RFC-0042 fallback and resolve-enabled initialize shapes, malformed capabilities, documentation-format selection, lifecycle, notification silence, and unnegotiated failure.",
+  "Verify exact 0.2 items and opaque data, deterministic handles, valid resolve, malformed, modified, unknown, expired, and stale cases, fixed bilingual errors, and ignored ordinary fields.",
+  "Cover checked user definitions and bindings, full type display, canonical Effect and Capability facts, no-op unsupported candidate kinds, plaintext and safe Markdown, rendering and handle bounds, and absence of fabricated metadata or internal identities.",
+  "Cover UTF-8, UTF-16, and UTF-32 positions, Chinese and combining identifiers, BOM, CRLF, unchanged exact edits, temporary isolation, complete-snapshot staleness, insertion-order independence, and migration from 0.1.",
+  "Add exact protocol transcripts and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds capability-negotiated Preview ling.lsp.completion/0.2 and ling.lsp.completion-resolve/0.1 while retaining exact ling.lsp.completion/0.1 fallback behavior.",
+  "Consumes DEC-0080 checked metadata and adds bounded session-local opaque handle state without changing resolver or Semantic identities.",
+  "Adds no diagnostic allocation, Ling syntax or semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, package, filesystem/network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Author documentation, localized presentation, source excerpts, generated and dependency provenance, builtin and field metadata, snippets, additional edits, auto-imports, formatter integration, persistent handles, asynchronous cancellation, AI assistance, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""
