@@ -7087,3 +7087,31 @@ unresolved_alternatives = [
   "Emitting type/implementation occurrences, generated documents, custom relation results, persistent caches, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0040"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0040.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact provider and Experimental discovery, malformed capabilities, lifecycle, notification silence, params, unknown URI, invalid positions, null, and fixed failures.",
+  "Cover declaration/reference selection for values, parameters, locals, Trait and implementation members, including declarations without references.",
+  "Cover source-less builtins, read-only dependency selections and targets, workspace and temporary sources, complete checked failure, freshness, and atomic bounds.",
+  "Cover UTF-8/16/32, Chinese, decomposed/NFC identifiers, emoji prefixes, combining marks, BOM, CRLF, exact original-spelling placeholders, and repeated determinism.",
+  "Migrate exact initialize transcripts and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.prepare-rename/0.1 for standard textDocument/prepareRename with no predecessor.",
+  "Makes unreferenced source-backed declarations selectable in the bounded checked reference grouping and adds a borrowed selection view without persistence promises.",
+  "Adds no diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, Semantic/resolver ID behavior, runtime, bytecode, VM, ABI, package, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "New-name validation, aliases, collisions, visibility/coherence simulation, generated documents, edits, DefinitionId migration, cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain IDE-2306 or later work.",
+]
+superseded_by = ""

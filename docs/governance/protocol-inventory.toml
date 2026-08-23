@@ -354,6 +354,28 @@ authority = ["RFC-0039", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-00
 notes = ["The full relation vocabulary is read/write/call/type/implementation; version 0.1 emits only read/write/call because type and implementation surfaces lack resolver-owned occurrence identities. No relation or identity metadata is added to standard Location results."]
 
 [[protocol]]
+id = "PROTO-LSP-PREPARE-RENAME"
+title = "Ling checked LSP prepare rename"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.prepare-rename/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp prepare-rename provider"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Validate optional object-valued textDocument.rename capability, boolean dynamicRegistration/prepareSupport, and prepareSupportDefaultBehavior=1; accept only Ready-state textDocument/prepareRename requests with exact URI and unsigned-u32 position while notifications perform no work."
+writer_policy = "Capture and revalidate one immutable snapshot, require complete resolution/type/Effect checking, select one exact declaration or resolver expression reference, and return null or exactly one standard range-with-placeholder for a writable source-backed target."
+unknown_field_policy = "Ignore ordinary unknown request and capability fields while rejecting malformed known members; selection, writability, range, placeholder, null, bound, snapshot, or failure changes require a new marker and migration evidence."
+migration_tool = "None; ling.lsp.prepare-rename/0.1 is Preview with no predecessor and clients gate on renameProvider.prepareProvider plus the exact lingPrepareRename discovery object."
+fixtures = ["crates/ling-db/src/reference_search_index.rs", "crates/ling-lsp/tests/prepare_rename.rs", "tests/protocols/lsp-prepare-rename/README.md", "docs/status/IDE-2305-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0040.md", "docs/RFC-0004.md", "docs/RFC-0005.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0038.md", "docs/RFC-0039.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0075-ide-resolved-reference-index.md", "docs/decisions/0077-ide-rename-identifier-observation.md", "docs/decisions/0078-ide-rename-reference-span-observation.md", "crates/ling-db/src/reference_search_index.rs", "crates/ling-db/src/rename_identifier.rs", "crates/ling-lsp/src/prepare_rename.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.prepare-rename/0.1", "textDocument/prepareRename", "renameProvider", "lingPrepareRename"]
+authority = ["RFC-0040", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0038", "RFC-0039", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0075", "DEC-0077", "DEC-0078"]
+notes = ["Prepare Rename is read-only and receives no new name. New-name legality, confusable/collision policy, visibility/coherence simulation, edits, and DefinitionId migration remain IDE-2306 work rather than fabricated prepare-rename checks."]
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 title = "Ling LSP bounded document formatting"
 category = "LSP"

@@ -69,7 +69,7 @@ pub use reference_index::{
 };
 pub use reference_search_index::{
     MAX_REFERENCE_SEARCH_ENTRIES, ReferenceSearchIndex, ReferenceSearchIndexError,
-    ReferenceSearchLocation,
+    ReferenceSearchLocation, ReferenceSearchSelection,
 };
 pub use reference_span_index::{
     ResolvedReferenceRelation, ResolvedReferenceSpan, ResolvedReferenceSpanIndex,

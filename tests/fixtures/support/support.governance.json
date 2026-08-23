@@ -531,6 +531,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-PREPARE-RENAME",
+      "visibility": "Public",
+      "version": "ling.lsp.prepare-rename/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-PUBLISH-DIAGNOSTICS",
       "visibility": "Public",
       "version": "ling.lsp.publish-diagnostics/0.2",

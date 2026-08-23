@@ -67,7 +67,51 @@ pub struct ReferenceSearchIndex {
     selectors: Box<[ReferenceSearchSelector]>,
 }
 
+/// One exact selector and its optional source-backed declaration.
+///
+/// This view carries compiler source identity only. URI, mutability, position
+/// encoding, document versions, and editor policy remain adapter concerns.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ReferenceSearchSelection<'index> {
+    source_name: &'index str,
+    span: Span,
+    declaration: Option<&'index ReferenceSearchLocation>,
+}
+
+impl<'index> ReferenceSearchSelection<'index> {
+    #[must_use]
+    pub const fn source_name(self) -> &'index str {
+        self.source_name
+    }
+
+    #[must_use]
+    pub const fn span(self) -> Span {
+        self.span
+    }
+
+    #[must_use]
+    pub const fn declaration(self) -> Option<&'index ReferenceSearchLocation> {
+        self.declaration
+    }
+}
+
 impl ReferenceSearchIndex {
+    /// Selects one exact declaration or resolver reference at an original-byte
+    /// offset and exposes its source-backed declaration when one exists.
+    #[must_use]
+    pub fn selection_at(
+        &self,
+        source_name: &str,
+        offset: ByteOffset,
+    ) -> Option<ReferenceSearchSelection<'_>> {
+        let selector = self.selector_at(source_name, offset)?;
+        Some(ReferenceSearchSelection {
+            source_name: &selector.source_name,
+            span: selector.span,
+            declaration: self.groups[selector.group].declaration.as_ref(),
+        })
+    }
+
     /// Selects either a declaration identifier or resolver reference and
     /// returns the target's canonical source-ordered locations.
     #[must_use]
@@ -77,19 +121,7 @@ impl ReferenceSearchIndex {
         offset: ByteOffset,
         include_declaration: bool,
     ) -> Option<Vec<&ReferenceSearchLocation>> {
-        let selector = self
-            .selectors
-            .iter()
-            .filter(|selector| {
-                selector.source_name == source_name
-                    && selector.span.start() <= offset
-                    && offset < selector.span.end()
-            })
-            .min_by(|left, right| {
-                span_width(left.span)
-                    .cmp(&span_width(right.span))
-                    .then_with(|| selector_order(left, right))
-            })?;
+        let selector = self.selector_at(source_name, offset)?;
         let group = &self.groups[selector.group];
         let mut locations = Vec::with_capacity(
             group.references.len()
@@ -101,6 +133,25 @@ impl ReferenceSearchIndex {
         locations.extend(group.references.iter());
         locations.sort_by(|left, right| location_order(left, right));
         Some(locations)
+    }
+
+    fn selector_at(
+        &self,
+        source_name: &str,
+        offset: ByteOffset,
+    ) -> Option<&ReferenceSearchSelector> {
+        self.selectors
+            .iter()
+            .filter(|selector| {
+                selector.source_name == source_name
+                    && selector.span.start() <= offset
+                    && offset < selector.span.end()
+            })
+            .min_by(|left, right| {
+                span_width(left.span)
+                    .cmp(&span_width(right.span))
+                    .then_with(|| selector_order(left, right))
+            })
     }
 
     pub(crate) fn from_checked(
@@ -143,6 +194,21 @@ impl ReferenceSearchIndex {
                     span: span.span(),
                     relation: Some(span.relation()),
                 });
+        }
+        for definition in resolved.definitions().keys() {
+            grouped
+                .entry(ResolvedReferenceTargetKey::Definition(
+                    definition.as_str().to_owned(),
+                ))
+                .or_default();
+        }
+        for key in resolved.bindings().keys() {
+            grouped
+                .entry(ResolvedReferenceTargetKey::Binding {
+                    module_id: key.module().get(),
+                    binding_id: key.local().get(),
+                })
+                .or_default();
         }
 
         let mut groups = Vec::with_capacity(grouped.len());
@@ -443,13 +509,53 @@ mod tests {
             .expect("builtin reference");
         assert_eq!(builtin.len(), 1);
         assert_eq!(builtin[0].relation(), Some(ResolvedReferenceRelation::Call));
+
+        let unused_source = "module Main\n\nlet unused = 1\nlet main = 0\n";
+        let unused = ReferenceSearchIndex::from_checked(&checked(unused_source)).unwrap();
+        let selection = unused
+            .selection_at("Main.ling", offset(unused_source, "unused", 0))
+            .expect("unreferenced declaration remains selectable");
+        assert_eq!(
+            text(unused_source, selection.declaration().unwrap()),
+            "unused"
+        );
+    }
+
+    #[test]
+    fn trait_and_implementation_member_declarations_are_selectable() {
+        let source = concat!(
+            "module Main\n    requires Console.Write\n\n",
+            "trait Renderable<'a> =\n",
+            "    render: 'a -> Text\n\n",
+            "type Item = { name: Text }\n\n",
+            "impl Renderable Item =\n",
+            "    let render item = item.name\n\n",
+            "let main value =\n",
+            "    let local = Renderable.render { name = value }\n",
+            "    Console.write local\n",
+        );
+        let index = ReferenceSearchIndex::from_checked(&checked(source)).unwrap();
+        for occurrence in 0..3 {
+            let selection = index
+                .selection_at("Main.ling", offset(source, "render", occurrence))
+                .unwrap_or_else(|| panic!("render occurrence {occurrence} is selectable"));
+            assert!(
+                selection.declaration().is_some(),
+                "render occurrence {occurrence} has a declaration"
+            );
+        }
     }
 
     #[test]
     fn location_and_selector_bounds_fail_atomically() {
         let source = "module Main\n\nlet value = 1\nlet main = value\n";
         let index = ReferenceSearchIndex::from_checked(&checked(source)).unwrap();
-        let group = index.groups[0].clone();
+        let group = index
+            .groups
+            .iter()
+            .find(|group| !group.references.is_empty())
+            .expect("fixture has a referenced target")
+            .clone();
         let location = group.references[0].clone();
         let oversized_group = ReferenceSearchGroup {
             target: group.target.clone(),

@@ -2,98 +2,56 @@
 
 ## Outcome
 
-`IDE-2305` is correctly recorded as `BlockedSpec`. The execution plan requires
-an exact identifier range and placeholder, and rejection of keywords/builtins,
-generated definitions, read-only dependencies, confusable or invalid names,
-ambiguous snapshots, and visibility/coherence violations. There is no accepted
-prepare-rename request/response, rename target policy, or version precondition
-contract.
-
-No prepare-rename handler, name validator, placeholder editor API, diagnostic
-allocation, or protocol field was added. The bounded child
-`IDE-2305-IDENTIFIER-OBSERVATION` only copies Unicode facts from the existing
-authoritative implementation; it does not accept or reject a rename name.
+`IDE-2305` is implementation-ready and implemented under Accepted `RFC-0040`.
+Its plan dependencies `IDE-2304` and `LSP-2102` are Done. The earlier
+`BlockedSpec` audit over-scoped this read-only standard request with the
+new-name and mutation contracts owned by IDE-2306.
 
 ## Normative traceability
 
-- The execution package is non-normative; its rejection list does not authorize
-  a mutation or editor protocol.
-- DEC-0002 makes original UTF-8 `SourceId + Span` authoritative and requires an
-  explicit SourceMap projection for any future LSP UTF-16 position. It does not
-  define identifier-range requests, document versions, or stale responses.
-- DEC-0012 defines `DefinitionId` from normalized module/name identity and
-  explicitly states that renaming a definition changes its DefinitionId. The
-  plan's identity-based/behavior-preserving rename therefore needs an accepted
-  identity and migration policy rather than an implementation assumption.
-- `docs/SEMANTICS.md` fixes Seed keyword rejection, Unicode XID/NFC handling,
-  and the Seed boundary, but leaves alias syntax/display and several security
-  presentation questions open. `GAP-UNICODE-ALIAS-SYNTAX-001` records the
-  unresolved alias identity, collision, and confusable/rename consequences.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` explicitly blocks IDE-2305 and leaves
-  snapshot/version preconditions and Stable versus Experimental edit fields
-  open. `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves Semantic Graph/Transaction
-  stability and migration open for the subsequent rename operation.
-- RFC-0005 and DEC-0027 keep Trait witnesses internal and explicitly provide no
-  CLI/LSP integration; prepare rename cannot invent Trait/coherence projections.
+- RFC-0040 fixes capability validation/discovery, immutable checked snapshot
+  selection, writable source-backed eligibility, exact range and placeholder,
+  null behavior, bounds, freshness, failures, and migration.
+- RFC-0039 supplies the complete checked declaration/reference grouping and
+  canonical selector rules; RFC-0040 extends it only so declarations without
+  references remain selectable.
+- DEC-0077 supplies Unicode 17.0.0 identifier facts without turning security
+  observations into rename acceptance policy. DEC-0002 and DEC-0029 preserve
+  exact original-byte spans and negotiated projection.
+- DEC-0012 remains explicit that a later rename changes DefinitionId. Prepare
+  Rename returns no edit or identity-preservation promise.
 
-## Current interface evidence
+## Plan/repository drift resolved
 
-- `ling-source` and the lexer preserve byte spans and implement Seed identifier
-  normalization/validity boundaries, but expose no editor rename target or
-  localized failure model.
-- `ling-db::observe_rename_identifier` now exposes an owned, in-process
-  observation of raw spelling, NFC name, Script/Identifier_Type, status,
-  skeleton, and mixed-script facts. It returns existing Unicode validation
-  errors and intentionally has no target, span, keyword, edit, or protocol
-  policy.
-- `ling-resolve` and `ling-semantic` retain internal definitions, references,
-  and identities, but provide no prepare-rename service, exact identifier-range
-  projection, or generated/dependency mutability policy.
-- The VFS/revision implementation is internal; it does not define open-document
-  version checks, ambiguity handling, stale results, or a public edit protocol.
-- No executable fixture covers valid/invalid new names, keywords, Unicode
-  normalization/confusables, aliases, generated/dependency targets, visibility
-  or coherence failures, stale snapshots, or deterministic placeholders.
+LSP `textDocument/prepareRename` contains a document and position but no
+`newName`. It cannot evaluate a future spelling, collision, visibility, or
+coherence result. RFC-0040 keeps all such requirements for IDE-2306 and closes
+IDE-2305 as the exact standard target/range query.
 
-## Required authority before implementation
+The open general transaction gap remains valid for actual edits and does not
+block this bounded read-only response. The Unicode Alias gap does not authorize
+Alias syntax and is not consumed by this implementation.
 
-An Accepted decision or RFC must define, at minimum:
+## Current implementation evidence
 
-1. target selection and exact identifier range, including local, module, type,
-   constructor, import-alias, prelude/builtin, generated, and dependency cases;
-2. new-name grammar and Unicode 17.0.0/XID/NFC/confusable policy, keyword
-   handling, alias identity/collision rules, localized diagnostics, and stable
-   error behavior;
-3. visibility and coherence safety checks, unresolved/ambiguous target policy,
-   source/dependency read-only rules, and deterministic placeholder fields;
-4. snapshot identity, document versions, position encoding, cancellation,
-   stale-result behavior, protocol field stability, Semantic ID consequences,
-   and migration into the later Workspace Edit contract; and
-5. executable positive and negative fixtures for all target/name classes,
-   Unicode/CRLF/BOM positions, cross-package/generated cases, ambiguity,
-   visibility/coherence, stale versions, deterministic output, and migration.
+- `ling-db::ReferenceSearchIndex::selection_at` selects exact declarations or
+  resolver references, including unreferenced declarations, without publishing
+  target identity.
+- `ling-lsp::prepare_rename` requires complete resolution/type/Effect checking,
+  preserves temporary isolation, rejects stale completion, and returns either
+  exact standard range-with-placeholder or `null`.
+- Writable truth is captured in the immutable request document instead of
+  being reconstructed from URI spelling.
+- Executable tests cover capability shape, declarations/references/locals,
+  unreferenced targets, builtins, dependencies, temporary documents,
+  UTF-8/16/32, BOM/CRLF/Unicode, invalid requests, notifications, and checked
+  failure.
 
-Until these decisions are Accepted, prepare rename could promise an identity
-that DEC-0012 says will change, accept an alias/confusable collision, or return
-an edit placeholder that cannot be safely applied to the current snapshot.
+## Compatibility and deferrals
 
-## Evidence and compatibility
-
-This audit was checked against `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
-`docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, RFC-0005,
-`docs/decisions/0027-trait-checked-core-dictionary-witness.md`,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the `ling-source`, `ling-resolve`, `ling-semantic`, and `ling-project`
-crates.
-
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
-
-## Intentionally deferred
-
-`IDE-2305` can begin after the LSP transaction, rename identity, Unicode alias,
-and Semantic Graph lifecycle decisions are Accepted. The future implementation
-must use checked resolution, preserve byte-span truth, make DefinitionId changes
-explicit, reject unsafe/stale targets deterministically, and label experimental
-fields.
+No diagnostic allocation, language behavior, Semantic ID, source-span,
+runtime, bytecode, VM, ABI, package, filesystem/network, cache, or Unicode
+17.0.0 table changes. New-name policy, aliases, collisions,
+visibility/coherence, edits, DefinitionId migration, cancellation, Workspace
+Edits, Semantic Transactions, and Stable compatibility remain deferred to
+IDE-2306 or later Accepted authority.

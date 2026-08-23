@@ -7,7 +7,7 @@
 //! RFC-0026 governs the bounded document-formatting response; DEC-0029 remains
 //! the authority for position projection; RFC-0036 governs Document Symbols;
 //! RFC-0037 governs checked Hover; RFC-0038 governs resolver navigation;
-//! RFC-0039 governs checked References.
+//! RFC-0039 governs checked References; RFC-0040 governs Prepare Rename.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -61,6 +61,8 @@ mod navigation;
 pub use navigation::{MAX_NAVIGATION_TARGETS, NAVIGATION_PROTOCOL_VERSION};
 mod references;
 pub use references::{MAX_REFERENCE_LOCATIONS, REFERENCES_PROTOCOL_VERSION};
+mod prepare_rename;
+pub use prepare_rename::PREPARE_RENAME_PROTOCOL_VERSION;
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -162,6 +164,7 @@ pub struct RequestDocument {
     revision: Revision,
     origin: FileOrigin,
     open: bool,
+    writable: bool,
     temporary: bool,
     client_version: Option<i64>,
     bytes: Box<[u8]>,
@@ -196,6 +199,12 @@ impl RequestDocument {
     #[must_use]
     pub const fn is_open(&self) -> bool {
         self.open
+    }
+
+    /// Returns whether editor-originated changes may target this document.
+    #[must_use]
+    pub const fn is_writable(&self) -> bool {
+        self.writable
     }
 
     /// Returns whether this is an untitled editor-only document.
@@ -665,6 +674,7 @@ impl LspServer {
                 revision: snapshot.revision(),
                 origin: snapshot.origin(),
                 open: record.open,
+                writable: record.writable,
                 temporary: record.temporary,
                 client_version: record.open.then_some(record.version),
                 bytes: snapshot.bytes().into(),
@@ -798,6 +808,7 @@ impl LspServer {
                 navigation::NavigationMethod::TypeDefinition,
             ),
             "textDocument/references" => self.references(id_present, id, params),
+            "textDocument/prepareRename" => self.prepare_rename(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -1443,6 +1454,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
             hover_markup = hover::parse_hover_capability(text_document)?;
             navigation::parse_navigation_capabilities(text_document)?;
             references::parse_references_capability(text_document)?;
+            prepare_rename::parse_prepare_rename_capability(text_document)?;
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -2000,6 +2012,10 @@ fn initialize_result(
             "documentSymbolProvider": true,
             "hoverProvider": true,
             "referencesProvider": true,
+            "renameProvider": {
+                "prepareProvider": true,
+                "workDoneProgress": false,
+            },
             "typeDefinitionProvider": true,
             "experimental": {
                 "lingHover": {
@@ -2017,6 +2033,10 @@ fn initialize_result(
                     "maxLocations": MAX_REFERENCE_LOCATIONS,
                     "relationKinds": ["read", "write", "call", "type", "implementation"],
                     "version": REFERENCES_PROTOCOL_VERSION,
+                },
+                "lingPrepareRename": {
+                    "result": "rangeWithPlaceholder",
+                    "version": PREPARE_RENAME_PROTOCOL_VERSION,
                 },
                 "lingDocumentSymbols": {
                     "maxSymbols": MAX_DOCUMENT_SYMBOLS,

@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 40 records: 36 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 20 Preview, 0 Stable.
+- 41 records: 37 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 21 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -25,6 +25,7 @@
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
 | `PROTO-LSP-NAVIGATION` | Public | LSP | `ling.lsp.navigation/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
+| `PROTO-LSP-PREPARE-RENAME` | Public | LSP | `ling.lsp.prepare-rename/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | Public | LSP | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | no | no | 4 |
 | `PROTO-LSP-PULL-DIAGNOSTICS` | Public | LSP | `ling.lsp.pull-diagnostics/0.2` | `Preview` | no | no | 5 |
 | `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
@@ -199,6 +200,19 @@
 - Sources: [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/decisions/0069-lsp-utf8-edit-primitive.md`](../decisions/0069-lsp-utf8-edit-primitive.md), [`docs/decisions/0070-lsp-position-edit-projection.md`](../decisions/0070-lsp-position-edit-projection.md), [`docs/decisions/0259-current-lsp-open-document-overlay.md`](../decisions/0259-current-lsp-open-document-overlay.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-source/src/lib.rs`](../../crates/ling-source/src/lib.rs), [`crates/ling-source/src/position.rs`](../../crates/ling-source/src/position.rs), [`crates/ling-source/src/vfs.rs`](../../crates/ling-source/src/vfs.rs)
 - Fixtures: [`crates/ling-lsp/tests/overlay.rs`](../../crates/ling-lsp/tests/overlay.rs), [`crates/ling-lsp/tests/incremental_changes.rs`](../../crates/ling-lsp/tests/incremental_changes.rs), [`tests/protocols/lsp-overlay/README.md`](../../tests/protocols/lsp-overlay/README.md), [`docs/status/LSP-2103-IMPLEMENTATION-REPORT.md`](../status/LSP-2103-IMPLEMENTATION-REPORT.md), [`docs/status/LSP-2104-IMPLEMENTATION-REPORT.md`](../status/LSP-2104-IMPLEMENTATION-REPORT.md)
 - Notes: DEC-0259 accepts RFC-0023 full-text overlays as bounded LSP-2103. RFC-0029 implements LSP-2104 by advancing the Experimental marker to 0.2, advertising incremental sync, and adding bounded ordered UTF-8/16/32 range batches with failure-atomic publication and full-replacement equivalence. Compiler queries, snapshots, stale analysis, diagnostics, Workspace Edits, cancellation, Semantic Transactions, and Stable compatibility remain deferred.
+
+### `PROTO-LSP-PREPARE-RENAME` — Ling checked LSP prepare rename
+
+- Producer: ling lsp --stdio; ling-lsp prepare-rename provider
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Validate optional object-valued textDocument.rename capability, boolean dynamicRegistration/prepareSupport, and prepareSupportDefaultBehavior=1; accept only Ready-state textDocument/prepareRename requests with exact URI and unsigned-u32 position while notifications perform no work.
+- Writer policy: Capture and revalidate one immutable snapshot, require complete resolution/type/Effect checking, select one exact declaration or resolver expression reference, and return null or exactly one standard range-with-placeholder for a writable source-backed target.
+- Unknown-field policy: Ignore ordinary unknown request and capability fields while rejecting malformed known members; selection, writability, range, placeholder, null, bound, snapshot, or failure changes require a new marker and migration evidence.
+- Migration tool: None; ling.lsp.prepare-rename/0.1 is Preview with no predecessor and clients gate on renameProvider.prepareProvider plus the exact lingPrepareRename discovery object.
+- Authority: `RFC-0040`, `RFC-0004`, `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `RFC-0038`, `RFC-0039`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0075`, `DEC-0077`, `DEC-0078`
+- Sources: [`docs/RFC-0040.md`](../RFC-0040.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0077-ide-rename-identifier-observation.md`](../decisions/0077-ide-rename-identifier-observation.md), [`docs/decisions/0078-ide-rename-reference-span-observation.md`](../decisions/0078-ide-rename-reference-span-observation.md), [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-db/src/rename_identifier.rs`](../../crates/ling-db/src/rename_identifier.rs), [`crates/ling-lsp/src/prepare_rename.rs`](../../crates/ling-lsp/src/prepare_rename.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-lsp/tests/prepare_rename.rs`](../../crates/ling-lsp/tests/prepare_rename.rs), [`tests/protocols/lsp-prepare-rename/README.md`](../../tests/protocols/lsp-prepare-rename/README.md), [`docs/status/IDE-2305-IMPLEMENTATION-REPORT.md`](../status/IDE-2305-IMPLEMENTATION-REPORT.md)
+- Notes: Prepare Rename is read-only and receives no new name. New-name legality, confusable/collision policy, visibility/coherence simulation, edits, and DefinitionId migration remain IDE-2306 work rather than fabricated prepare-rename checks.
 
 ### `PROTO-LSP-PUBLISH-DIAGNOSTICS` — Ling LSP deterministic push diagnostics
 

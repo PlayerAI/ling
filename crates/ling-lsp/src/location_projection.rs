@@ -31,7 +31,23 @@ pub(crate) fn location_value(
     }))
 }
 
-fn target_document<'snapshot>(
+pub(crate) fn range_value(
+    source_name: &str,
+    span: Span,
+    snapshot: &RequestSnapshot,
+    compiler: &ling_db::CompilerDb,
+) -> Result<Value, LocationProjectionError> {
+    let document = target_document(snapshot, source_name)?;
+    let file = compiler
+        .vfs()
+        .file_id(source_name)
+        .ok_or(LocationProjectionError::MissingTargetDocument)?;
+    let source = SourceFile::from_bytes(file, source_name.to_owned(), document.bytes().to_vec())
+        .map_err(LocationProjectionError::Source)?;
+    project_range(&source, span, snapshot.position_encoding())
+}
+
+pub(crate) fn target_document<'snapshot>(
     snapshot: &'snapshot RequestSnapshot,
     source_name: &str,
 ) -> Result<&'snapshot RequestDocument, LocationProjectionError> {
