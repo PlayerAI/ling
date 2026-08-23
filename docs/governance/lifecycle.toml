@@ -7485,13 +7485,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0262"
 kind = "Decision"
-status = "Draft"
+status = "Accepted"
 path = "docs/decisions/0262-handler-cell-state-bytecode.md"
-history = ["Open", "Draft"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-24"
-proposed = ""
-decided = ""
-stable_basis = false
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Reject refutable Handler input patterns before checked publication with exact bilingual L-EFFECT-0005 facts and original UTF-8 spans.",

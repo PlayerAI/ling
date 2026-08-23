@@ -2,10 +2,10 @@
 
 ## Status and entry gate
 
-This is a non-normative engineering plan for Draft DEC-0262. None of the
-behavior below may be implemented until the decision advances through
-Proposed to Accepted and the lifecycle/authority reports are regenerated.
-EFF-2104 remains In Progress and `GAP-EFFECT-HANDLER-BYTECODE-001` remains Open.
+This is a non-normative engineering plan for Accepted DEC-0262. The accepted
+decision authorizes the behavior below; this plan defines implementation order
+but does not itself establish semantics or completion evidence. EFF-2104
+remains In Progress until the complete vertical slice passes its gates.
 
 The implementation starts only from a clean commit that passes governance and
 status verification. Each phase must keep bytecode 1.0–1.3 bytes and behavior
@@ -165,8 +165,8 @@ Required vertical fixtures:
 
 Deliver the smallest complete commits in this dependency order:
 
-1. Accepted authority/lifecycle/gap transition and negative checked-pattern
-   evidence.
+1. Accepted authority/lifecycle/gap transition, followed by negative
+   checked-pattern evidence.
 2. Format/model/codec/disassembly plus malformed verifier evidence.
 3. Binding-storage refactor with unchanged 1.0–1.3 golden evidence.
 4. Cell/State lowering and VM execution with differential/resource/cancellation
@@ -174,6 +174,6 @@ Deliver the smallest complete commits in this dependency order:
 5. Protocol inventory, support/status/traceability reports, complete EFF-2104
    implementation report, full repository gates, completion commit, and push.
 
-Only the fifth commit may mark EFF-2104 Done, resolve
-`GAP-EFFECT-HANDLER-BYTECODE-001`, or publish 1.4 as the current Experimental
-revision. EFF-2105 becomes dependency-ready only after that commit is recorded.
+The gap is now Accepted at the specification level through DEC-0262. Only the
+fifth commit may mark EFF-2104 Done, publish 1.4 as the current Experimental
+revision, or make EFF-2105 dependency-ready.

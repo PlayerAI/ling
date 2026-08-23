@@ -706,12 +706,12 @@ observed_markers = []
 [[gap]]
 id = "GAP-EFFECT-HANDLER-BYTECODE-001"
 title = "Handler bytecode Cell identity, State rows, and refutable clause parameters"
-status = "Open"
+status = "Accepted"
 priority = "P1"
 blocked_releases = ["v0.2"]
 blocked_tasks = ["EFF-2104", "EFF-2105"]
 observable_behavior = "Accepted DEC-0261 requires resumed VM continuations to preserve lexical Cell identities, keep State<T> unmasked, and execute every checked DEC-0260 clause, but ling.bytecode/1.3 records only ordinary value captures, Console effects, and operation signatures; it has no Cell capture/update representation, serialized State<T> row, or checked pattern-match or mismatch representation for refutable clause parameters."
-authority = ["RFC-0006", "DEC-0260", "DEC-0261"]
+authority = ["RFC-0006", "DEC-0260", "DEC-0261", "DEC-0262"]
 candidate_rfcs = []
 source_items = ["DEC-0261-5", "DEC-0261-9", "DEC-0261-10", "DEC-0261-11", "DEC-0261-CONFORMANCE"]
 options = [
@@ -721,8 +721,8 @@ options = [
 irreversible_consequences = ["Choosing a wire representation fixes continuation aliasing, mutation visibility, State row identity, verifier typing, malformed-artifact behavior, source mapping, and backward-reader compatibility."]
 required_evidence = ["positive", "negative", "mutable-cell", "state-row", "repeated-resume", "refutable-pattern", "malformed", "resource", "cancellation", "interpreter-vm-differential", "migration"]
 owner_role = "effect-runtime-design"
-next_action = "Review Draft DEC-0262; it must advance through Proposed to Accepted before complete Handler lowering or an EFF-2104 Done claim."
-resolution = []
+next_action = "Implement DEC-0262 as the complete Handler bytecode 1.4 vertical slice; retain EFF-2104 In Progress until all required conformance evidence and the completion commit exist."
+resolution = ["DEC-0262"]
 superseded_by = ""
 observed_markers = [
   "experimental:crates/ling-bytecode/src/lower/v1_1.rs",

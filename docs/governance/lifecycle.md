@@ -319,7 +319,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0259` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0259](../decisions/0259-current-lsp-open-document-overlay.md) |
 | `DEC-0260` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [DEC-0260](../decisions/0260-checked-handler-lowering.md) |
 | `DEC-0261` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [DEC-0261](../decisions/0261-handler-runtime-and-bytecode.md) |
-| `DEC-0262` | Decision | `Draft` | `Open` → `Draft` | no | no | — | [DEC-0262](../decisions/0262-handler-cell-state-bytecode.md) |
+| `DEC-0262` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [DEC-0262](../decisions/0262-handler-cell-state-bytecode.md) |
 
 ## Migration boundary
 

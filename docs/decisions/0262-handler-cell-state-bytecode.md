@@ -1,18 +1,18 @@
 # DEC-0262: Complete Handler Cell/State bytecode / 完整 Handler Cell/State 字节码
 
-> 状态：Draft
+> 状态：Accepted
 > 提出日期：2026-08-24
-> 决定日期：Pending
+> 决定日期：2026-08-24
 > Owner role：effect-runtime-design
 > 相关 RFC/缺口：RFC-0006 | DEC-0260 | DEC-0261 | GAP-EFFECT-HANDLER-BYTECODE-001
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This draft preserves DEC-0261's checked interpreter semantics while closing
-the implementation gap exposed by its exact bytecode 1.3 record. It is not
-implementation authority unless it becomes Accepted.
+This decision preserves DEC-0261's checked interpreter semantics while closing
+the implementation gap exposed by its exact bytecode 1.3 record. It is the
+accepted authority for complete Handler lowering and bytecode 1.4.
 
-本草案保留 DEC-0261 的已检查解释器语义，同时关闭其精确 bytecode 1.3 记录在实现中
-暴露的缺口；在进入 Accepted 之前，它不是实现权威。
+本决定保留 DEC-0261 的已检查解释器语义，同时关闭其精确 bytecode 1.3 记录在实现中
+暴露的缺口，并成为完整 Handler lowering 与 bytecode 1.4 的已接受实现权威。
 
 ## Question
 
@@ -23,7 +23,7 @@ changing an already implemented 1.3 wire under the same version number?
 
 ## Decision
 
-If accepted, this decision replaces DEC-0261 with the following refinements;
+This decision replaces DEC-0261 with the following refinements;
 all DEC-0261 interpreter, dispatch, continuation, Fault, Capability,
 cancellation, resource, determinism, and deferral rules not changed below are
 retained verbatim.
@@ -134,5 +134,5 @@ and evidence.
 
 ## Supersession
 
-- Intended to supersede on acceptance: `DEC-0261`
+- Supersedes: `DEC-0261`
 - Superseded by: `None`

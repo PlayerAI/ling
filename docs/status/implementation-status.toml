@@ -9222,10 +9222,10 @@ completed = ""
 notes = [
   "Accepted DEC-0261 removes the specification blocker after EFF-2103 commit 004538deec049446740a1d17ca57e5915c6d2777; implementation is now active.",
   "Current executable operation production is limited to Console.write. Clock/Random clauses remain checked-only until separately accepted producers exist.",
-  "No Done claim is permitted until interpreter, bytecode 1.3, verifier, VM, malformed/resource/cancellation, differential, governance, and full repository gates pass and an implementation commit is recorded.",
-  "The committed interpreter milestone and current working-tree bytecode/VM slice cover immutable, irrefutable Console handlers, deep restoration, Once cardinality, unmasked Capability preflight, malformed records, resource limits, cancellation, and differential Fault/event/span evidence.",
-  "GAP-EFFECT-HANDLER-BYTECODE-001 records that DEC-0261's exact 1.3 record cannot represent shared lexical Cell identity or checked refutable clause parameters; v1.3 lowering rejects both atomically and EFF-2104 remains In Progress pending an Accepted wire/ABI decision.",
-  "Draft DEC-0262 selects bytecode 1.4 Cell<T>/State<T> records and irrefutable operation inputs, but Draft status is not implementation authority.",
+  "No Done claim is permitted until bytecode 1.4 Cell/State lowering, verifier, VM, malformed/resource/cancellation, differential, governance, and full repository gates pass and an implementation commit is recorded.",
+  "The committed interpreter and bytecode/VM 1.3 milestones cover immutable, irrefutable Console handlers, deep restoration, Once cardinality, unmasked Capability preflight, malformed records, resource limits, cancellation, and differential Fault/event/span evidence.",
+  "Accepted DEC-0262 resolves GAP-EFFECT-HANDLER-BYTECODE-001 at the specification level with bytecode 1.4 Cell<T>/State<T> records and irrefutable operation inputs; v1.3 remains the bounded historical slice.",
+  "EFF-2104 remains In Progress because bytecode 1.4 lowering, verification, VM Cell identity, State rows, and the required conformance evidence are not yet implemented.",
   "The non-normative DEC-0262 implementation plan maps the checked pattern gate, isolated 1.4 codec/verifier, binding-storage refactor, non-cyclic VM Cell store, evidence matrix, and integration order without adding public placeholder APIs.",
 ]
 
