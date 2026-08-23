@@ -371,6 +371,7 @@
 | `PROOF-5503` | Assumption Registry | `G5` | `M` | `BlockedSpec` | `PROOF-5502` | `` |
 | `PROOF-5503-OBSERVATION` | Internal Assumption Registry boundary evidence | `G5` | `S` | `Done` | `PROOF-5502-OBSERVATION` | `2a34482fb99c7a045f99fd456cf68961aefdfcb6` |
 | `PROTO-6201` | Protocol Registry | `G6` | `L` | `BlockedSpec` | `STAB-6103` | `` |
+| `PROTO-6201-OBSERVATION` | Internal Protocol Registry boundary evidence | `G6` | `S` | `Done` | `STAB-6103-OBSERVATION` | `5c098c927fbae55cb2e984b6ab40cc983df742cd` |
 | `PROTO-6202` | Reader/Writer Compatibility Tests | `G6` | `L` | `BlockedSpec` | `PROTO-6201` | `` |
 | `PROTO-6203` | Semantic Hash Upgrade Rehearsal | `G6` | `L` | `BlockedSpec` | `PROTO-6202` | `` |
 | `PROTO-6204` | CLI and Exit-Code Freeze | `G6` | `L` | `BlockedSpec` | `PROTO-6203` | `` |

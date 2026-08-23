@@ -23324,9 +23324,70 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "PROTO-6201 is BlockedSpec by STAB-6103, absent public protocol-registry/lifecycle authority, the 1.0-draft support matrix, Draft schema lifecycle policy, open G1-G5/protocol gaps, and unresolved identity, compatibility, migration, diagnostic, and evidence boundaries.",
-  "The active docs/governance/protocol-inventory.toml and generated report record 21 protocols with 0 Stable current public protocols; Future records have no versions/fixtures, and schemas/registry.toml is a separate schema compatibility registry.",
+  "The active docs/governance/protocol-inventory.toml and generated report record 27 protocols (21 current public, 1 internal, 5 Future) with 0 Stable current public protocols; Future records have no versions/fixtures, and schemas/registry.toml is a separate schema compatibility registry.",
   "The audit does not reinterpret the G6 registry checklist, governance inventory, schema registry, accepted Seed/VM protocols, support matrix, or roadmap and creates no duplicate registry or stale zero command.",
   "The audit adds no public protocol, dependency, runtime, backend, target, schema, diagnostic, CLI, editor, package, registry, or placeholder API; Protocol Registry remains deferred until accepted authority and executable compatibility evidence exist.",
+]
+
+[[task]]
+id = "PROTO-6201-OBSERVATION"
+title = "Internal Protocol Registry boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["STAB-6103-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0218-feature-state-metadata-boundary-evidence.md",
+  "docs/decisions/0219-protocol-registry-boundary-evidence.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/governance/SCHEMA-LIFECYCLE.md",
+  "schemas/registry.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/protocol_registry_evidence.rs",
+  "tools/xtask/src/protocols.rs",
+  "docs/decisions/0219-protocol-registry-boundary-evidence.md",
+  "docs/status/PROTO-6201-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROTO-6201-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0219 authorizes only single-inventory and test-local Protocol Registry evidence; no Stable lifecycle, owner semantics, universal registry schema, public reader/writer, migration, diagnostic, or protocol is defined.",
+  "The test-local inventory covers sixty identity, lifecycle, policy, category, failure, linkage, and corpus boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "The repository test requires docs/governance/protocol-inventory.toml and its generated report and rejects creation of the lower-authority docs/protocols/registry.toml duplicate path.",
+  "The existing inventory remains 27 records: 21 current public (11 Experimental, 10 Preview, 0 Stable), 1 Internal, and 5 Future.",
+  "cargo test -p ling-types --test protocol_registry_evidence --locked --offline passes.",
+  "cargo test -p xtask protocols::tests --locked --offline passes.",
+  "cargo clippy -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "cargo xtask governance check-protocols, schema validate-all, support verify, and status verify pass without changing public claims.",
+]
+verified_against_commit = "5c098c927fbae55cb2e984b6ab40cc983df742cd"
+completion_commit = "5c098c927fbae55cb2e984b6ab40cc983df742cd"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0219; PROTO-6201 remains BlockedSpec for universal registry identity/ownership, lifecycle, public schema, compatibility/migration, diagnostics, per-protocol corpus, and release evidence.",
+  "No protocol record, version, lifecycle state, schema, public API, diagnostic, CLI/LSP route, dependency, Semantic ID, source-span, or Unicode behavior changed.",
 ]
 
 [[task]]
