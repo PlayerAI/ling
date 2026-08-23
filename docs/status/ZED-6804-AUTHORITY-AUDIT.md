@@ -12,7 +12,12 @@ debugger support must not block language/editor 1.0 support, and no debugger
 button or adapter may be presented as if it worked. The current DAP state is
 `Unavailable / Future`, not `Preview` or `Stable`, because DAP-3601 through
 DAP-3603 have no accepted protocol implementation, Zed registration, runtime
-debug hooks, or executable evidence.
+debug hooks, or executable debugger-behavior evidence.
+
+Accepted DEC-0144/0145/0146 now provide three test-only observation suites with
+sixty provisional boundaries each. They improve completeness evidence for
+future decisions but remain opaque, private, and explicitly non-authoritative;
+they do not change any DAP support state.
 
 ## Normative traceability
 
@@ -46,8 +51,12 @@ verification. DAP remains intentionally non-blocking for language/editor
 support until those conditions exist.
 
 The internal `cargo xtask dap verify` command protects the nine-surface
-inventory and three DAP authority-audit markers without registering DAP,
-starting a debugger, or exposing controls.
+inventory, three DAP authority audits, and six current observation test/report
+files without registering DAP, starting a debugger, or exposing controls.
+
+Accepted `DEC-0244` closes only the bounded
+`ZED-6804-CURRENT-EVIDENCE` child. DAP-3601/3602/3603 and the G6 parent remain
+blocked for actual protocols, implementation, integration, and release proof.
 
 ## Compatibility and deferred work
 

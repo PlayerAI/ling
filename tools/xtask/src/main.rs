@@ -69,13 +69,14 @@ fn main() -> ExitCode {
             match dap_status::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "DAP status inventory OK: {} surfaces ({} unavailable, {} future, {} partial, {} unsupported), {} audit files",
+                        "DAP status inventory OK: {} surfaces ({} unavailable, {} future, {} partial, {} unsupported), {} audit files, {} current observation files",
                         summary.surface_count,
                         summary.unavailable_count,
                         summary.future_count,
                         summary.partial_count,
                         summary.unsupported_count,
-                        summary.audit_file_count
+                        summary.audit_file_count,
+                        summary.observation_file_count
                     );
                     ExitCode::SUCCESS
                 }

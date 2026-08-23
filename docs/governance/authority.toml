@@ -3679,3 +3679,16 @@ covers = ["ZED-6803 bounded current grammar/LSP/position acceptance evidence", "
 depends_on = ["DEC-0050", "DEC-0241", "DEC-0242", "RFC-0004", "RFC-0023", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0244"
+title = "Current DAP boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0244-current-dap-boundary-evidence.md"
+covers = ["ZED-6804 bounded current DAP observation evidence", "three sixty-boundary test-only adapter/registration/capability inventories", "internal evidence without DAP implementation, Zed registration, protocol, support promotion, or G6 completion claims"]
+depends_on = ["DEC-0051", "DEC-0144", "DEC-0145", "DEC-0146", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

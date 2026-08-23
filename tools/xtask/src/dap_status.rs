@@ -80,6 +80,66 @@ const REQUIRED_AUDIT_MARKERS: &[(&str, &[&str])] = &[
     ),
 ];
 
+const REQUIRED_OBSERVATION_MARKERS: &[(&str, &[&str])] = &[
+    (
+        "crates/ling-types/tests/dap_debugger_boundary_evidence.rs",
+        &[
+            "const ALL: [Self; 60]",
+            "ling.dap-debugger-observation/0",
+            "proposed_dap_boundaries_are_complete_and_ordered",
+            "dap_evidence_is_order_independent_and_duplicate_checked",
+            "dap_evidence_has_no_debugger_protocol_authority",
+        ],
+    ),
+    (
+        "crates/ling-types/tests/zed_debugger_registration_evidence.rs",
+        &[
+            "const ALL: [Self; 60]",
+            "ling.zed-debugger-observation/0",
+            "proposed_zed_debugger_boundaries_are_complete_and_ordered",
+            "zed_debugger_evidence_is_order_independent_and_duplicate_checked",
+            "zed_debugger_evidence_has_no_extension_or_protocol_authority",
+        ],
+    ),
+    (
+        "crates/ling-types/tests/staged_debugger_capability_evidence.rs",
+        &[
+            "const ALL: [Self; 60]",
+            "ling.staged-debugger-observation/0",
+            "proposed_debugger_capabilities_are_complete_and_ordered",
+            "staged_debugger_evidence_is_order_independent_and_duplicate_checked",
+            "staged_debugger_evidence_has_no_capability_authority",
+        ],
+    ),
+    (
+        "docs/status/DAP-3601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+        &[
+            "Accepted `DEC-0144`",
+            "sixty proposed DAP/debugger boundaries",
+            "no debugger protocol or public API authority",
+            "Public `DAP-3601` remains `BlockedSpec`",
+        ],
+    ),
+    (
+        "docs/status/DAP-3602-OBSERVATION-IMPLEMENTATION-REPORT.md",
+        &[
+            "Accepted `DEC-0145`",
+            "sixty proposed Zed debugger-registration boundaries",
+            "no extension, debugger, or protocol authority",
+            "Public `DAP-3602` remains `BlockedSpec`",
+        ],
+    ),
+    (
+        "docs/status/DAP-3603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+        &[
+            "Accepted `DEC-0146`",
+            "sixty proposed staged-debugger boundaries",
+            "no debugger capability or protocol authority",
+            "Public `DAP-3603` remains `BlockedSpec`",
+        ],
+    ),
+];
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckSummary {
     pub surface_count: usize,
@@ -88,6 +148,7 @@ pub struct CheckSummary {
     pub partial_count: usize,
     pub unsupported_count: usize,
     pub audit_file_count: usize,
+    pub observation_file_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -98,6 +159,7 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_audits(root));
+    errors.extend(validate_observations(root));
     finish(errors).map(|()| CheckSummary {
         surface_count: DAP_SURFACES.len(),
         unavailable_count: count_state("Unavailable"),
@@ -105,6 +167,7 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
         partial_count: count_state("Partial foundation only"),
         unsupported_count: count_state("Unsupported"),
         audit_file_count: REQUIRED_AUDIT_MARKERS.len(),
+        observation_file_count: REQUIRED_OBSERVATION_MARKERS.len(),
     })
 }
 
@@ -187,8 +250,16 @@ fn validate_matrix(matrix: &str) -> Vec<String> {
 }
 
 fn validate_audits(root: &Path) -> Vec<String> {
+    validate_marker_files(root, REQUIRED_AUDIT_MARKERS)
+}
+
+fn validate_observations(root: &Path) -> Vec<String> {
+    validate_marker_files(root, REQUIRED_OBSERVATION_MARKERS)
+}
+
+fn validate_marker_files(root: &Path, evidence: &[(&str, &[&str])]) -> Vec<String> {
     let mut errors = Vec::new();
-    for (path, markers) in REQUIRED_AUDIT_MARKERS {
+    for (path, markers) in evidence {
         let text = match fs::read_to_string(root.join(path)) {
             Ok(text) => text,
             Err(error) => {
@@ -196,16 +267,18 @@ fn validate_audits(root: &Path) -> Vec<String> {
                 continue;
             }
         };
-        let normalized = normalize(&text);
-        for marker in *markers {
-            if !normalized.contains(&normalize(marker)) {
-                errors.push(format!(
-                    "GOV-DAP-STATUS-0010: {path} is missing audit marker {marker:?}"
-                ));
-            }
-        }
+        errors.extend(validate_marker_text(path, &text, markers));
     }
     errors
+}
+
+fn validate_marker_text(path: &str, text: &str, markers: &[&str]) -> Vec<String> {
+    let normalized = normalize(text);
+    markers
+        .iter()
+        .filter(|marker| !normalized.contains(&normalize(marker)))
+        .map(|marker| format!("GOV-DAP-STATUS-0010: {path} is missing evidence marker {marker:?}"))
+        .collect()
 }
 
 fn count_state(state: &str) -> usize {
@@ -263,6 +336,7 @@ mod tests {
         assert_eq!(summary.partial_count, 1);
         assert_eq!(summary.unsupported_count, 1);
         assert_eq!(summary.audit_file_count, 3);
+        assert_eq!(summary.observation_file_count, 6);
     }
 
     #[test]
@@ -279,20 +353,21 @@ mod tests {
 
     #[test]
     fn rejects_dap_audit_marker_drift() {
-        let errors = validate_audit_text("DAP-3601", "BlockedSpec", &["No DAP adapter"]);
+        let errors = validate_marker_text("DAP-3601", "BlockedSpec", &["No DAP adapter"]);
         assert!(
             errors
                 .iter()
-                .any(|error| error.contains("missing audit marker"))
+                .any(|error| error.contains("missing evidence marker"))
         );
     }
 
-    fn validate_audit_text(path: &str, text: &str, markers: &[&str]) -> Vec<String> {
-        let normalized = normalize(text);
-        markers
-            .iter()
-            .filter(|marker| !normalized.contains(&normalize(marker)))
-            .map(|marker| format!("GOV-DAP-STATUS-0010: {path} is missing audit marker {marker:?}"))
-            .collect()
+    #[test]
+    fn rejects_observation_marker_drift() {
+        let errors = validate_marker_text(
+            "dap_debugger_boundary_evidence.rs",
+            "ling.dap-debugger-observation/0",
+            &["const ALL: [Self; 60]", "no_debugger_protocol_authority"],
+        );
+        assert_eq!(errors.len(), 2);
     }
 }
