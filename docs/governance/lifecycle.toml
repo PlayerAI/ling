@@ -6286,3 +6286,29 @@ unresolved_alternatives = [
   "DAP wire/lifecycle; launch/attach/session; breakpoints/step; value/Fault/Task/Actor views; runtime/source-map and binary identity; security/resources; Zed registration; acquisition; platform fixtures; migration; and release support remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0245"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0245-current-rc0-registry-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc0 verify and require eight blocked criteria, ten audit files, and two current-evidence checks.",
+  "Compose the validated implementation-status and protocol summaries and reject stale rendered facts in a focused negative test.",
+  "Run the focused xtask, status, protocol, workspace, CI, governance, support, traceability, Clippy, formatting, deterministic, and offline gates.",
+  "Confirm no tag, artifact, protocol/support state, issue disposition, network resource, or system configuration changes.",
+]
+compatibility_impact = [
+  "Corrects documentation and strengthens internal evidence validation only; Ling semantics, diagnostics, public schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP behavior, runtime, Unicode, protocols, support states, and public APIs remain unchanged.",
+  "Adds no candidate identity, freeze, release exit, Stable protocol, support promotion, artifact, issue disposition, network behavior, or G6 completion claim.",
+]
+unresolved_alternatives = [
+  "Candidate identity/change control; accepted 1.0 scope; Stable protocols; Tier1 artifacts; P0/P1 disposition; historical corpus; security sign-off; artifact rehearsal; complete bilingual documentation; independent review; and the RC0 freeze remain deferred.",
+]
+superseded_by = ""

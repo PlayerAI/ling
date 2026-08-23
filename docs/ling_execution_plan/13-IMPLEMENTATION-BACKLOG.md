@@ -574,6 +574,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `ZED-6804-CURRENT-EVIDENCE` | G6 | Current DAP observation evidence | S | Done | Accepted `DEC-0244`; see the 180-boundary observation gate and `docs/status/ZED-6804-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md`; DAP implementation and the parent remain BlockedSpec |
 | `ZED-6804` | G6 | DAP 状态 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:473`, `docs/status/ZED-6804-AUTHORITY-AUDIT.md`, `docs/testing/DAP-STATUS.md` |
 | `RC-6901-SEED` | G6 | Seed RC0 internal-freeze inventory drift gate | S | Done | Accepted DEC-0052; see `cargo xtask rc0 verify`, `docs/testing/RC0-INTERNAL-FREEZE.md`, and `docs/status/RC-6901-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `RC-6901-CURRENT-EVIDENCE` | G6 | Current RC0 status/protocol evidence | S | Done | Accepted `DEC-0245`; see the composed status/protocol registry gate and `docs/status/RC-6901-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md`; no RC0 freeze or parent promotion |
 | `RC-6901` | G6 | RC0 内部冻结 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:479`, `docs/status/RC-6901-AUTHORITY-AUDIT.md`, `docs/testing/RC0-INTERNAL-FREEZE.md` |
 | `RC-6902-SEED` | G6 | Seed RC1 public-validation inventory drift gate | S | Done | Accepted DEC-0053; see `cargo xtask rc1 verify`, `docs/testing/RC1-PUBLIC-VALIDATION.md`, and `docs/status/RC-6902-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `RC-6902` | G6 | RC1 公开验证 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:490`, `docs/status/RC-6902-AUTHORITY-AUDIT.md`, `docs/testing/RC1-PUBLIC-VALIDATION.md` |

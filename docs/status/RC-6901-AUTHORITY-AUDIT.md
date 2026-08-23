@@ -51,6 +51,12 @@ The bounded `RC-6901-SEED` child is now protected by
 linked audit-marker files. It validates inventory drift only and does not
 create any of the missing release evidence.
 
+Accepted `DEC-0245` additionally authorizes the bounded
+`RC-6901-CURRENT-EVIDENCE` child. The same command composes the authoritative
+status and protocol validators and requires the matrix totals to match their
+current summaries. This corrects stale counts without changing any RC0 state
+or satisfying a release exit.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

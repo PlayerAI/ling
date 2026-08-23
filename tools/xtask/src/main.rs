@@ -524,8 +524,11 @@ fn main() -> ExitCode {
             match rc0_freeze::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "RC0 inventory OK: {} criteria ({} BlockedSpec), {} audit files",
-                        summary.criterion_count, summary.blocked_count, summary.audit_file_count
+                        "RC0 inventory OK: {} criteria ({} BlockedSpec), {} audit files, {} current evidence checks",
+                        summary.criterion_count,
+                        summary.blocked_count,
+                        summary.audit_file_count,
+                        summary.current_evidence_check_count
                     );
                     ExitCode::SUCCESS
                 }

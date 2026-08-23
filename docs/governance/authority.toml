@@ -3692,3 +3692,16 @@ covers = ["ZED-6804 bounded current DAP observation evidence", "three sixty-boun
 depends_on = ["DEC-0051", "DEC-0144", "DEC-0145", "DEC-0146", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0245"
+title = "Current RC0 registry evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0245-current-rc0-registry-evidence.md"
+covers = ["RC-6901 bounded current status/protocol registry evidence", "composed authoritative task and protocol summaries with fail-closed drift checks", "internal inventory evidence without candidate, freeze, release exit, protocol/support promotion, artifact, or G6 completion claims"]
+depends_on = ["DEC-0052", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

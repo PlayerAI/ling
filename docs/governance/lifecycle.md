@@ -275,6 +275,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0242` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0242](../decisions/0242-current-lsp-discovery-boundary.md) |
 | `DEC-0243` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0243](../decisions/0243-current-zed-acceptance-evidence.md) |
 | `DEC-0244` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0244](../decisions/0244-current-dap-boundary-evidence.md) |
+| `DEC-0245` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0245](../decisions/0245-current-rc0-registry-evidence.md) |
 
 ## Migration boundary
 

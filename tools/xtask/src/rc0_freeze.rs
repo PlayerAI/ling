@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+use crate::{protocols, status};
+
 const MATRIX_PATH: &str = "docs/testing/RC0-INTERNAL-FREEZE.md";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -110,6 +112,7 @@ pub struct CheckSummary {
     pub criterion_count: usize,
     pub blocked_count: usize,
     pub audit_file_count: usize,
+    pub current_evidence_check_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -120,6 +123,30 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_audits(root));
+
+    let status_summary = match status::check_repository(root) {
+        Ok(summary) => Some(summary),
+        Err(status_errors) => {
+            errors.extend(status_errors);
+            None
+        }
+    };
+    let protocol_summary = match protocols::check_repository(root) {
+        Ok(summary) => Some(summary),
+        Err(protocol_errors) => {
+            errors.extend(protocol_errors);
+            None
+        }
+    };
+    if let (Some(status_summary), Some(protocol_summary)) =
+        (status_summary.as_ref(), protocol_summary.as_ref())
+    {
+        errors.extend(validate_current_evidence(
+            &matrix,
+            status_summary,
+            protocol_summary,
+        ));
+    }
     finish(errors).map(|()| CheckSummary {
         criterion_count: CRITERIA.len(),
         blocked_count: CRITERIA
@@ -127,7 +154,40 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
             .filter(|criterion| criterion.state == "BlockedSpec")
             .count(),
         audit_file_count: REQUIRED_AUDIT_MARKERS.len(),
+        current_evidence_check_count: 2,
     })
+}
+
+fn validate_current_evidence(
+    matrix: &str,
+    status: &status::CheckSummary,
+    protocols: &protocols::CheckSummary,
+) -> Vec<String> {
+    let required = [
+        format!(
+            "The status registry has {} tasks and {} `Done` tasks",
+            status.task_count, status.done_task_count
+        ),
+        format!(
+            "The protocol inventory has {} records: {} Stable, {} Experimental, {} Preview, {} Internal, and {} Future",
+            protocols.protocol_count,
+            protocols.stable_count,
+            protocols.experimental_count,
+            protocols.preview_count,
+            protocols.internal_count,
+            protocols.future_count
+        ),
+    ];
+    let normalized = normalize(matrix);
+    required
+        .iter()
+        .filter(|marker| !normalized.contains(&normalize(marker)))
+        .map(|marker| {
+            format!(
+                "GOV-RC0-FREEZE-0011: {MATRIX_PATH} does not match current repository evidence {marker:?}"
+            )
+        })
+        .collect()
 }
 
 fn validate_matrix(matrix: &str) -> Vec<String> {
@@ -272,6 +332,7 @@ mod tests {
         assert_eq!(summary.criterion_count, 8);
         assert_eq!(summary.blocked_count, 8);
         assert_eq!(summary.audit_file_count, 10);
+        assert_eq!(summary.current_evidence_check_count, 2);
     }
 
     #[test]
@@ -293,6 +354,36 @@ mod tests {
             errors
                 .iter()
                 .any(|error| error.contains("missing audit marker"))
+        );
+    }
+
+    #[test]
+    fn rejects_current_repository_evidence_drift() {
+        let status = status::CheckSummary {
+            task_count: 12,
+            done_task_count: 7,
+            feature_count: 3,
+            blocked_feature_count: 2,
+        };
+        let protocols = protocols::CheckSummary {
+            protocol_count: 9,
+            public_count: 6,
+            preview_count: 2,
+            experimental_count: 4,
+            stable_count: 0,
+            internal_count: 1,
+            future_count: 2,
+        };
+        let errors = validate_current_evidence(
+            "The status registry has 11 tasks. The protocol inventory has 8 records.",
+            &status,
+            &protocols,
+        );
+        assert_eq!(errors.len(), 2);
+        assert!(
+            errors
+                .iter()
+                .all(|error| error.contains("GOV-RC0-FREEZE-0011"))
         );
     }
 
