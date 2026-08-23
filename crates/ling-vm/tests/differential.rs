@@ -198,6 +198,9 @@ fn eval_fault(error: &EvalRuntimeFault, committed: bool) -> FaultProjection {
         EvalFaultKind::InvalidFormatPlaceholderCount { .. } => ("invalid_format", "Text.format"),
         EvalFaultKind::DivisionByZero => ("division_by_zero", "Int.divide"),
         EvalFaultKind::InvalidCheckedCore { .. } => ("checked_core_invariant", "checked_core"),
+        EvalFaultKind::HandlerResumeCardinality { operation, .. } => {
+            ("handler_resume_cardinality", operation.as_str())
+        }
     };
     FaultProjection {
         category: category.to_owned(),

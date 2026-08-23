@@ -7,16 +7,18 @@ use std::fmt;
 use std::rc::Rc;
 
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
-use ling_effects::CheckedProgram;
+use ling_effects::{CheckedProgram, ResumeMode, ResumeUse};
 use ling_hir as hir;
 use ling_resolve::{
-    BindingKey, Builtin, DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey, ModuleId,
-    ReferenceTarget,
+    BindingKey, Builtin, DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey,
+    HandlerResumeMode, HandlerValueType, ModuleId, ReferenceTarget, resolve_handler_operation,
 };
 use ling_semantic::{ProgramSnapshot, ProjectProgramSnapshot};
 use ling_source::Span;
 use ling_types::Type;
 use num_bigint::BigInt;
+
+mod machine;
 
 /// Host console capability. `text` already contains Ling's canonical LF.
 pub trait Console {
@@ -88,6 +90,10 @@ pub enum RuntimeFaultKind {
     InvalidCheckedCore {
         invariant: &'static str,
     },
+    HandlerResumeCardinality {
+        operation: String,
+        mode: HandlerResumeMode,
+    },
 }
 
 impl RuntimeFault {
@@ -117,10 +123,21 @@ impl RuntimeFault {
                 format!("checked-core invariant failed: {invariant}"),
                 "checked_core_invariant",
             ),
+            RuntimeFaultKind::HandlerResumeCardinality { operation, mode } => (
+                format!("Handler operation“{operation}”的 {mode:?} continuation 被重复调用"),
+                format!(
+                    "the {mode:?} continuation for handler operation `{operation}` was invoked more than permitted"
+                ),
+                "handler_resume_cardinality",
+            ),
         };
-        Diagnostic::new(codes::RUNTIME_FAULT, Severity::Error, zh, en)
+        let mut diagnostic = Diagnostic::new(codes::RUNTIME_FAULT, Severity::Error, zh, en)
             .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span))
-            .with_fact("category", category)
+            .with_fact("category", category);
+        if let RuntimeFaultKind::HandlerResumeCardinality { operation, .. } = &self.kind {
+            diagnostic = diagnostic.with_fact("operation", operation.clone());
+        }
+        diagnostic
     }
 }
 
@@ -246,6 +263,10 @@ enum Value {
         definition: DefinitionId,
         case: String,
     },
+    Resume {
+        continuation: Rc<machine::ContinuationValue>,
+        source_span: Span,
+    },
 }
 
 #[derive(Clone, Debug)]
@@ -259,11 +280,16 @@ struct Closure {
 struct Interpreter<'snapshot, 'console> {
     checked: &'snapshot CheckedProgram,
     console: &'console mut dyn Console,
+    next_handler_id: u64,
 }
 
 impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     const fn new(checked: &'snapshot CheckedProgram, console: &'console mut dyn Console) -> Self {
-        Self { checked, console }
+        Self {
+            checked,
+            console,
+            next_handler_id: 0,
+        }
     }
 
     fn execute_main(&mut self, main: &DefinitionId) -> Result<(), RuntimeFault> {
@@ -295,6 +321,19 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     }
 
     fn eval_expression(
+        &mut self,
+        module: ModuleId,
+        expression: &hir::Expression,
+        environment: &mut Environment,
+    ) -> Result<Value, RuntimeFault> {
+        if self.checked.handler_cores().is_empty() {
+            self.eval_expression_direct(module, expression, environment)
+        } else {
+            machine::evaluate(self, module, expression.clone(), environment.clone())
+        }
+    }
+
+    fn eval_expression_direct(
         &mut self,
         module: ModuleId,
         expression: &hir::Expression,
@@ -1192,6 +1231,7 @@ fn render_value(value: &Value) -> String {
             format!("<builtin:{}:{}>", builtin.qualified_name(), arguments.len())
         }
         Value::Constructor { case, .. } => format!("<constructor:{case}>"),
+        Value::Resume { .. } => "<continuation>".to_owned(),
     }
 }
 
@@ -1270,25 +1310,183 @@ mod tests {
     }
 
     #[test]
-    fn checked_handler_execution_remains_a_structured_eff_2104_boundary() {
+    fn checked_handler_intercepts_console_write_without_host_output() {
         let snapshot = snapshot(concat!(
-            "module Main\n\n",
+            "module Main\n",
+            "    requires Console.Write\n\n",
             "let main () =\n",
-            "    handle () with\n",
-            "        operation Clock.now() -> ()\n",
+            "    handle Console.write \"handled\" with\n",
+            "        operation Console.Write.write(message, resume) -> ()\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("handler executes");
+        assert_eq!(console.output(), "");
+    }
+
+    #[test]
+    fn checked_handler_resume_restores_the_deep_handler_before_returning_to_the_clause() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    handle Console.write \"body\" with\n",
+            "        operation Console.Write.write(message, resume) ->\n",
+            "            resume ()\n",
+            "            Console.write \"clause\"\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("resumed handler executes");
+        assert_eq!(console.output(), "clause\n");
+    }
+
+    #[test]
+    fn nested_handlers_select_the_nearest_clause_and_expose_clause_effects_outward() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let inner () =\n",
+            "    handle Console.write \"body\" with\n",
+            "        operation Console.Write.write(message, resume) ->\n",
+            "            Console.write \"inner clause\"\n\n",
+            "let main () =\n",
+            "    handle inner () with\n",
+            "        operation Console.Write.write(message, resume) -> ()\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("nested handlers execute");
+        assert_eq!(console.output(), "");
+    }
+
+    #[test]
+    fn handler_intercepts_operations_reached_through_a_function_call() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let emit () = Console.write \"transitive\"\n\n",
+            "let main () =\n",
+            "    handle emit () with\n",
+            "        operation Console.Write.write(message, resume) -> ()\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("transitive handler executes");
+        assert_eq!(console.output(), "");
+    }
+
+    #[test]
+    fn once_continuation_rejects_repeated_dynamic_invocation() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    handle Console.write \"body\" with\n",
+            "        operation Console.Write.write(message, resume) ->\n",
+            "            let ignored = map resume [(); ()]\n",
+            "            ()\n",
         ));
         let main = locate_main(snapshot.checked()).expect("valid main");
         let mut console = MemoryConsole::default();
         let fault = execute_main(&snapshot, &main, &mut console)
-            .expect_err("EFF-2103 does not authorize Handler execution");
+            .expect_err("Once continuation must reject its second invocation");
         assert!(matches!(
             fault.kind,
-            RuntimeFaultKind::InvalidCheckedCore {
-                invariant: "checked handler execution requires accepted EFF-2104 authority"
-            }
+            RuntimeFaultKind::HandlerResumeCardinality {
+                ref operation,
+                mode: HandlerResumeMode::Once,
+            } if operation == "Console.Write.write"
         ));
-        assert_eq!(fault.to_diagnostic().code(), codes::RUNTIME_FAULT);
-        assert!(fault.span.start() < fault.span.end());
+        let diagnostic = fault.to_diagnostic();
+        assert_eq!(diagnostic.code(), codes::RUNTIME_FAULT);
+        assert_eq!(
+            diagnostic
+                .facts()
+                .get("operation")
+                .and_then(|value| value.as_str()),
+            Some("Console.Write.write")
+        );
+    }
+
+    #[test]
+    fn resumed_sequence_reinstalls_the_handler_for_later_operations() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let emitBoth () =\n",
+            "    Console.write \"first\"\n",
+            "    Console.write \"second\"\n\n",
+            "let main () =\n",
+            "    handle emitBoth () with\n",
+            "        operation Console.Write.write(message, resume) ->\n",
+            "            if message == \"first\" then resume () else ()\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("deep sequence executes");
+        assert_eq!(console.output(), "");
+    }
+
+    #[test]
+    fn resumed_continuation_observes_the_same_mutable_cells() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    let mutable cell = 0\n",
+            "    let body () =\n",
+            "        Console.write \"trigger\"\n",
+            "        cell <- 1\n",
+            "    handle body () with\n",
+            "        operation Console.Write.write(message, resume) ->\n",
+            "            resume ()\n",
+            "            if cell == 1 then Console.write \"shared\" else Console.write \"stale\"\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        execute_main(&snapshot, &main, &mut console).expect("stateful resume executes");
+        assert_eq!(console.output(), "shared\n");
+    }
+
+    #[test]
+    fn clause_fault_preserves_already_committed_host_output() {
+        let snapshot = snapshot(concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    handle Console.write \"trigger\" with\n",
+            "        operation Console.Write.write(message, resume) ->\n",
+            "            Console.write \"committed\"\n",
+            "            let ignored = 1 / 0\n",
+            "            ()\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        let fault = execute_main(&snapshot, &main, &mut console).expect_err("fault propagates");
+        assert!(matches!(fault.kind, RuntimeFaultKind::DivisionByZero));
+        assert_eq!(console.output(), "committed\n");
+    }
+
+    #[test]
+    fn handler_fault_preserves_original_bom_crlf_unicode_byte_span() {
+        let source = concat!(
+            "\u{feff}module Main\r\n",
+            "    requires Console.Write\r\n\r\n",
+            "let main () =\r\n",
+            "    handle Console.write \"你好\" with\r\n",
+            "        operation Console.Write.write(message, resume) ->\r\n",
+            "            let ignored = map resume [(); ()]\r\n",
+            "            ()\r\n",
+        );
+        let snapshot = snapshot(source);
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        let fault = execute_main(&snapshot, &main, &mut console).expect_err("second resume faults");
+        let resume_start = source.find("resume [").expect("resume call exists") as u32;
+        assert_eq!(fault.source_name, "test.ling");
+        assert_eq!(fault.span.start().get(), resume_start);
+        assert!(fault.span.end().get() > resume_start);
     }
 
     #[test]
