@@ -406,6 +406,7 @@
 | `REL-6603-SEED` | Seed security-audit matrix drift gate | `G6` | `S` | `Done` | `REL-6602-SEED` | `d96bea813fb6576ef3212cbffeb478d9829210ec` |
 | `REL-6603-UNSAFE-POLICY` | Workspace unsafe-policy drift gate | `G6` | `S` | `Done` | `REL-6603-SEED` | `1b6548eef4fdc3a6e46615bc7d36d4c06f6e2924` |
 | `REL-6604` | Performance Baseline | `G6` | `L` | `BlockedSpec` | `REL-6603` | `` |
+| `REL-6604-ARTIFACT` | Performance-baseline artifact integrity gate | `G6` | `S` | `Done` | `REL-6604-SEED` | `f6557b9ea238fbaa2a0c6b95d1be7ca43993e5c5` |
 | `REL-6604-SEED` | Seed performance-matrix drift gate | `G6` | `S` | `Done` | `REL-6603-SEED` | `1177fdf133de670ad039aac64aa1c8add92ab249` |
 | `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |
 | `REM-2601-OBSERVATION` | Internal RemoteRef and endpoint boundary evidence | `G2` | `S` | `Done` | `REP-2506-OBSERVATION` | `ab2f17e86bbeb105dc7bd35870d053897c7c66cd` |

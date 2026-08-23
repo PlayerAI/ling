@@ -25390,6 +25390,7 @@ spec = [
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
   "docs/decisions/0044-seed-performance-matrix-gate.md",
+  "docs/decisions/0237-performance-baseline-artifact-gate.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -25403,6 +25404,9 @@ spec = [
 artifacts = [
   "docs/status/REL-6604-AUTHORITY-AUDIT.md",
   "docs/status/REL-6604-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/REL-6604-ARTIFACT-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6604-ARTIFACT-IMPLEMENTATION-REPORT.md",
+  "tools/xtask/src/performance_matrix.rs",
   "docs/testing/PERFORMANCE-BASELINE.md",
   "docs/status/INC-1410-PERFORMANCE-BASELINE.json",
   "docs/status/INC-1410-IMPLEMENTATION-REPORT.md",
@@ -25412,6 +25416,7 @@ artifacts = [
 acceptance = [
   "The audit records the host, revision, toolchain, sample count, fixture scope, eight Seed scenarios, minimum/maximum/range dispersion, and observable hit/miss work.",
   "The existing opt-in performance command remains measurement-only, excludes fixture setup, emits the internal versioned JSON artifact, and makes no absolute latency or cross-host promise.",
+  "The historical artifact is strictly parsed and its schema, eight-scenario order, three-sample cardinality, 10,000-file fixture, timed-region exclusion, and deterministic query-work observations are verified without comparing elapsed times.",
   "The audit maps every REL-6604 planned measurement to Covered, Partial, or Deferred and identifies absent LSP, Native, Actor, Replay, device/kernel, Zed, memory, and package-build authority.",
   "The audit preserves deterministic/offline behavior, checked Typed Core boundaries, original UTF-8 spans, Unicode 17.0.0, and no host-specific timing as language semantics.",
   "No benchmark dependency, absolute threshold, public protocol, unsupported backend harness, memory claim, or placeholder API is added.",
@@ -25422,7 +25427,8 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "REL-6604 is BlockedSpec because G6 depends on G1-G5 exits and no Accepted performance policy defines hardware tiers, warm-up/sample/variance, memory/IO, thresholds, or the unimplemented LSP/Native/Actor/Replay/device/kernel/Zed surfaces.",
-  "INC-1410 already provides the authorized Seed query baseline; this audit adds contextual, reproducible trend evidence without converting local timings into release gates.",
+  "Accepted DEC-0237 closes only the historical-artifact integrity child; it does not authorize timing comparisons, thresholds, new measurements, or a public performance schema.",
+  "INC-1410 already provides the authorized Seed query baseline; this audit and artifact gate add contextual, reproducible trend evidence without converting local timings into release gates.",
   "The audit changes no source semantics, diagnostics, schemas, Semantic IDs, cache format, CLI, editor integration, package behavior, dependency, runtime, or public API and preserves deterministic/offline boundaries.",
 ]
 
@@ -25471,6 +25477,52 @@ completed = "2026-08-22"
 notes = [
   "The verifier protects plan-coverage inventory consistency only; the existing timing harness remains opt-in measurement evidence and no threshold is inferred.",
   "No benchmark dependency, absolute threshold, memory/IO claim, unsupported backend harness, public protocol, or placeholder is added.",
+]
+
+[[task]]
+id = "REL-6604-ARTIFACT"
+title = "Performance-baseline artifact integrity gate"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REL-6604-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0044-seed-performance-matrix-gate.md",
+  "docs/decisions/0237-performance-baseline-artifact-gate.md",
+  "docs/status/INC-1410-IMPLEMENTATION-REPORT.md",
+  "docs/status/REL-6604-AUTHORITY-AUDIT.md",
+  "docs/testing/PERFORMANCE-BASELINE.md",
+]
+artifacts = [
+  "tools/xtask/src/performance.rs",
+  "tools/xtask/src/performance_matrix.rs",
+  "tools/xtask/src/main.rs",
+  "docs/status/INC-1410-PERFORMANCE-BASELINE.json",
+  "docs/testing/PERFORMANCE-BASELINE.md",
+  "docs/status/REL-6604-ARTIFACT-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6604-ARTIFACT-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask performance verify strictly parses the historical artifact with unknown fields denied and requires internal schema ling.performance-baseline/1, three samples, 10,000 synthetic files, and fixture-setup exclusion.",
+  "The verifier binds the exact eight scenario names and order to shared harness constants and checks every numeric array has three samples with non-zero recorded durations.",
+  "Deterministic trace, miss, hit, and completed-work observations are checked while nanoseconds are never compared to a threshold, host, or prior run.",
+  "An isolated negative test rejects schema drift and changed cold-query miss counts; a fresh opt-in baseline run reproduces the structural and work invariants without replacing the historical artifact.",
+  "Focused xtask tests and the workspace, CI, governance, status, formatting, and lint gates pass offline.",
+]
+verified_against_commit = "f6557b9ea238fbaa2a0c6b95d1be7ca43993e5c5"
+completion_commit = "f6557b9ea238fbaa2a0c6b95d1be7ca43993e5c5"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "REL-6604 remains BlockedSpec for comparison policy, statistics, thresholds, hardware tiers, memory/IO, missing build/runtime/editor surfaces, cross-host evidence, and G6 release ownership.",
+  "This child changes only internal evidence validation and shared harness constants; no timing value, Ling semantic, diagnostic, schema, Semantic ID, cache/package format, dependency, CLI/editor protocol, runtime, Unicode behavior, or public performance promise changes.",
 ]
 
 [[task]]
