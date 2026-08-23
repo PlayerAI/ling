@@ -89,6 +89,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-LSP-DIAGNOSTIC-CONTROL` | `Public` | `ling.lsp.diagnostic-control/0.1` | `Preview` | yes |
 | `PROTO-LSP-DOCUMENT-SYMBOL` | `Public` | `ling.lsp.document-symbol/0.1` | `Preview` | yes |
 | `PROTO-LSP-FORMATTING` | `Public` | `ling.lsp.formatting/0.1` | `Experimental` | yes |
+| `PROTO-LSP-HOVER` | `Public` | `ling.lsp.hover/0.1` | `Preview` | yes |
 | `PROTO-LSP-LIFECYCLE` | `Public` | `ling.lsp.lifecycle/0.1` | `Preview` | yes |
 | `PROTO-LSP-OVERLAY` | `Public` | `ling.lsp.overlay/0.2` | `Experimental` | yes |
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | `Public` | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | yes |

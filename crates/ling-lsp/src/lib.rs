@@ -5,7 +5,8 @@
 //! authority for the full-text document overlay boundary; RFC-0029 extends it
 //! with bounded incremental changes; RFC-0030 governs atomic workspace reload;
 //! RFC-0026 governs the bounded document-formatting response; DEC-0029 remains
-//! the authority for position projection; RFC-0036 governs Document Symbols.
+//! the authority for position projection; RFC-0036 governs Document Symbols;
+//! RFC-0037 governs checked Hover.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -52,6 +53,8 @@ mod pull_diagnostics;
 pub use pull_diagnostics::{MAX_PULL_PREVIOUS_RESULTS, PULL_DIAGNOSTICS_PROTOCOL_VERSION};
 mod document_symbols;
 pub use document_symbols::{DOCUMENT_SYMBOL_PROTOCOL_VERSION, MAX_DOCUMENT_SYMBOLS};
+mod hover;
+pub use hover::{HOVER_PROTOCOL_VERSION, MAX_HOVER_CONTENT_BYTES, MAX_HOVER_ENTRIES};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -565,6 +568,7 @@ pub struct LspServer {
     pull_diagnostics_supported: bool,
     diagnostic_limits: DiagnosticLimits,
     hierarchical_document_symbols: bool,
+    hover_markup: hover::HoverMarkup,
 }
 
 impl Default for LspServer {
@@ -590,6 +594,7 @@ impl LspServer {
             pull_diagnostics_supported: false,
             diagnostic_limits: DiagnosticLimits::DEFAULT,
             hierarchical_document_symbols: false,
+            hover_markup: hover::HoverMarkup::Plaintext,
         }
     }
 
@@ -767,6 +772,7 @@ impl LspServer {
             "textDocument/formatting" => self.document_formatting(id_present, id, params),
             "textDocument/diagnostic" => self.document_diagnostic(id_present, id, params),
             "textDocument/documentSymbol" => self.document_symbols(id_present, id, params),
+            "textDocument/hover" => self.hover(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -786,13 +792,14 @@ impl LspServer {
             );
         }
 
-        let (
+        let ParsedInitializeParams {
             encoding,
             folders,
             pull_diagnostics_supported,
             diagnostic_limits,
             hierarchical_document_symbols,
-        ) = match parse_initialize_params(&params) {
+            hover_markup,
+        } = match parse_initialize_params(&params) {
             Ok(value) => value,
             Err(()) => {
                 return error_or_none(
@@ -808,6 +815,7 @@ impl LspServer {
         self.pull_diagnostics_supported = pull_diagnostics_supported;
         self.diagnostic_limits = diagnostic_limits;
         self.hierarchical_document_symbols = hierarchical_document_symbols;
+        self.hover_markup = hover_markup;
         self.state = LifecycleState::AwaitingInitialized;
         HandleOutcome::Response(success_response(
             id,
@@ -816,6 +824,7 @@ impl LspServer {
                 pull_diagnostics_supported,
                 diagnostic_limits,
                 hierarchical_document_symbols,
+                hover_markup,
             ),
         ))
     }
@@ -1351,18 +1360,16 @@ pub fn run_stdio<R: Read, W: Write>(input: R, output: W) -> Result<RunResult, Tr
     }
 }
 
-fn parse_initialize_params(
-    params: &Value,
-) -> Result<
-    (
-        PositionEncoding,
-        Vec<WorkspaceFolder>,
-        bool,
-        DiagnosticLimits,
-        bool,
-    ),
-    (),
-> {
+struct ParsedInitializeParams {
+    encoding: PositionEncoding,
+    folders: Vec<WorkspaceFolder>,
+    pull_diagnostics_supported: bool,
+    diagnostic_limits: DiagnosticLimits,
+    hierarchical_document_symbols: bool,
+    hover_markup: hover::HoverMarkup,
+}
+
+fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()> {
     let Some(object) = params.as_object() else {
         return Err(());
     };
@@ -1370,6 +1377,7 @@ fn parse_initialize_params(
     let mut labels = Vec::new();
     let mut pull_diagnostics_supported = false;
     let mut hierarchical_document_symbols = false;
+    let mut hover_markup = hover::HoverMarkup::Plaintext;
     if let Some(capabilities) = object.get("capabilities") {
         let Some(capabilities) = capabilities.as_object() else {
             return Err(());
@@ -1407,6 +1415,7 @@ fn parse_initialize_params(
                     hierarchical_document_symbols = hierarchical.as_bool().ok_or(())?;
                 }
             }
+            hover_markup = hover::parse_hover_capability(text_document)?;
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -1416,13 +1425,14 @@ fn parse_initialize_params(
         None | Some(Value::Null) => Vec::new(),
         Some(value) => parse_workspace_folders(value)?,
     };
-    Ok((
+    Ok(ParsedInitializeParams {
         encoding,
         folders,
         pull_diagnostics_supported,
         diagnostic_limits,
         hierarchical_document_symbols,
-    ))
+        hover_markup,
+    })
 }
 
 fn parse_open_params(params: &Value) -> Result<(String, i64, String), OverlayError> {
@@ -1933,13 +1943,21 @@ fn initialize_result(
     pull_diagnostics_supported: bool,
     diagnostic_limits: DiagnosticLimits,
     hierarchical_document_symbols: bool,
+    hover_markup: hover::HoverMarkup,
 ) -> Value {
     let mut result = json!({
         "capabilities": {
             "positionEncoding": encoding.wire_name(),
             "documentFormattingProvider": true,
             "documentSymbolProvider": true,
+            "hoverProvider": true,
             "experimental": {
+                "lingHover": {
+                    "maxContentBytes": MAX_HOVER_CONTENT_BYTES,
+                    "maxEntries": MAX_HOVER_ENTRIES,
+                    "markup": hover_markup.wire_name(),
+                    "version": HOVER_PROTOCOL_VERSION,
+                },
                 "lingDocumentSymbols": {
                     "maxSymbols": MAX_DOCUMENT_SYMBOLS,
                     "mode": if hierarchical_document_symbols { "hierarchical" } else { "flat" },

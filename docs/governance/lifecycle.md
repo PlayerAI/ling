@@ -44,6 +44,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `RFC-0034` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [RFC-0034](../RFC-0034.md) |
 | `RFC-0035` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [RFC-0035](../RFC-0035.md) |
 | `RFC-0036` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [RFC-0036](../RFC-0036.md) |
+| `RFC-0037` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [RFC-0037](../RFC-0037.md) |
 | `DEC-0001` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-18` | [DEC-0001](../decisions/0001-error-code-policy.md) |
 | `DEC-0002` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-18` | [DEC-0002](../decisions/0002-source-position-units.md) |
 | `DEC-0003` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-18` | [DEC-0003](../decisions/0003-m0-tooling.md) |

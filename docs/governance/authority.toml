@@ -1068,6 +1068,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0037"
+title = "Checked LSP Hover Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0037.md"
+covers = ["ling.lsp.hover/0.1", "checked declaration, binding, parameter, and resolved-reference hover", "normalized type, Effect, Capability, and concrete Trait-selection projection with negotiated plaintext or Markdown"]
+depends_on = ["RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0036", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0027", "DEC-0029", "DEC-0060", "DEC-0071", "DEC-0074", "DEC-0075", "DEC-0078", "DEC-0080", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

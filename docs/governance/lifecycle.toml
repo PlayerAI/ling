@@ -7003,3 +7003,31 @@ unresolved_alternatives = [
   "Local bindings, inferred details, documentation, tags, dynamic registration, progress, partial results, observable cancellation, caching promises, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0037"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0037.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify capability validation/default/selection, exact discovery, Ready-state request behavior, notification silence, params, unknown URI, invalid positions, null results, and fixed failures.",
+  "Cover declarations and references for values, types, constructors, Trait and implementation members, locals, parameters, Prelude entries, and builtins with canonical polymorphic types, Effects, Capabilities, and concrete Trait selection.",
+  "Cover plaintext/Markdown fact parity and safety, negotiated UTF-8/16/32 projection, Chinese, emoji, combining marks, BOM, CRLF, dependencies, temporary isolation, repeated output, insertion-order invariance, bounds, recovery, and freshness.",
+  "Prove that resolver/Semantic IDs, implementation ordinals, paths, debug values, undocumented facts, and partial failed results do not enter the wire.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.hover/0.1 with negotiated plaintext or Markdown and no predecessor.",
+  "Adds one bounded immutable compiler checked-hover index by joining existing accepted resolver and checked observations; no Semantic or resolver identity becomes public.",
+  "Adds no diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, filesystem/network/cache behavior, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Documentation, arbitrary expression hover, imports/modules, profile and resource facts, unresolved recovery, dynamic registration, progress, partial results, asynchronous cancellation, caching promises, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

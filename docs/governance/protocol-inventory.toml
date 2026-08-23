@@ -288,6 +288,28 @@ authority = ["RFC-0036", "RFC-0004", "RFC-0023", "RFC-0029", "RFC-0030", "DEC-00
 notes = ["Document symbols are presentation derived from resolved source structure, not Semantic ID publication. Local bindings, inferred details, dynamic registration, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred."]
 
 [[protocol]]
+id = "PROTO-LSP-HOVER"
+title = "Ling checked LSP hover"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.hover/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp hover provider"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Negotiate optional object-valued textDocument.hover capabilities and the first supported plaintext or markdown contentFormat in client order; accept only Ready-state textDocument/hover requests naming one exact current Ling URI and exact negotiated position, while notifications perform no work."
+writer_policy = "Capture and revalidate one immutable snapshot, consume a complete bounded compiler checked-hover index, select the smallest exact original-byte identifier span, and return deterministic bilingual checked type/kind/mutability/Effect/Capability/Trait-selection facts plus that exact range, or null when no target exists."
+unknown_field_policy = "Ignore ordinary unknown request and capability fields while rejecting malformed known members; incompatible target taxonomy, selection, type normalization, fact/markup order, bound, snapshot, temporary-isolation, projection, or failure behavior requires a new marker and migration evidence."
+migration_tool = "None; ling.lsp.hover/0.1 is Preview with no predecessor and clients gate on hoverProvider plus the exact lingHover discovery object."
+fixtures = ["crates/ling-db/src/checked_hover_index.rs", "crates/ling-lsp/tests/hover.rs", "tests/protocols/lsp-hover/README.md", "docs/status/IDE-2302-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0037.md", "docs/RFC-0004.md", "docs/RFC-0005.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0036.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0027-trait-checked-core-dictionary-witness.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0060-seed-effect-row-snapshot.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0074-ide-typed-definition-observation.md", "docs/decisions/0075-ide-resolved-reference-index.md", "docs/decisions/0078-ide-rename-reference-span-observation.md", "docs/decisions/0080-ide-completion-checked-metadata.md", "crates/ling-db/src/checked_hover_index.rs", "crates/ling-db/src/lib.rs", "crates/ling-lsp/src/hover.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.hover/0.1", "textDocument/hover", "hoverProvider", "lingHover"]
+authority = ["RFC-0037", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0036", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0027", "DEC-0029", "DEC-0060", "DEC-0071", "DEC-0074", "DEC-0075", "DEC-0078", "DEC-0080"]
+notes = ["Hover is a presentation projection of complete checked compiler facts. It deliberately omits documentation and profile/resource claims for which no accepted compiler observation exists, and never publishes resolver/Semantic IDs, implementation ordinals, paths, or debug output."]
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 title = "Ling LSP bounded document formatting"
 category = "LSP"

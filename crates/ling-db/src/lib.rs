@@ -27,6 +27,7 @@ use ling_source::{
 use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
 
+mod checked_hover_index;
 mod checked_token_source_index;
 mod completion_metadata_index;
 mod completion_source_index;
@@ -39,6 +40,10 @@ mod resolved_outline;
 mod token_source_index;
 mod typed_definition_index;
 
+pub use checked_hover_index::{
+    CheckedHoverEntry, CheckedHoverIndex, CheckedHoverIndexError, CheckedHoverKind,
+    CheckedHoverTraitSelection, MAX_CHECKED_HOVER_ENTRIES,
+};
 pub use checked_token_source_index::{CheckedTokenSource, CheckedTokenSourceIndex};
 pub use completion_metadata_index::{ResolvedCompletionMetadata, ResolvedCompletionMetadataIndex};
 pub use completion_source_index::{
@@ -505,6 +510,10 @@ pub enum QueryError {
         file: SourceId,
         error: ResolvedOutlineError,
     },
+    CheckedHover {
+        file: SourceId,
+        error: CheckedHoverIndexError,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -567,6 +576,13 @@ impl fmt::Display for QueryError {
                 write!(
                     formatter,
                     "resolved outline for source file {} failed: {error}",
+                    file.get()
+                )
+            }
+            Self::CheckedHover { file, error } => {
+                write!(
+                    formatter,
+                    "checked hover index for source file {} failed: {error}",
                     file.get()
                 )
             }
@@ -1221,6 +1237,25 @@ impl CompilerDb {
             .ok_or(QueryError::UnknownFile { file })?;
         let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
         Ok(Arc::new(TypedDefinitionIndex::from_checked(&checked)))
+    }
+
+    /// Builds deterministic checked hover targets for one resolved workspace.
+    ///
+    /// The result retains compiler facts and original byte spans only. It has
+    /// no URI, editor position, markup, localization, or wire behavior.
+    pub fn checked_hover_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<CheckedHoverIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+        CheckedHoverIndex::from_checked(&checked)
+            .map(Arc::new)
+            .map_err(|error| QueryError::CheckedHover { file, error })
     }
 
     /// Type-checks and effect-checks one module against the current resolved

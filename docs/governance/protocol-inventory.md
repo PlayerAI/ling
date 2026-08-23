@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 37 records: 33 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 17 Preview, 0 Stable.
+- 38 records: 34 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 18 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -21,6 +21,7 @@
 | `PROTO-LSP-DIAGNOSTIC-CONTROL` | Public | LSP | `ling.lsp.diagnostic-control/0.1` | `Preview` | no | no | 5 |
 | `PROTO-LSP-DOCUMENT-SYMBOL` | Public | LSP | `ling.lsp.document-symbol/0.1` | `Preview` | no | no | 3 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
+| `PROTO-LSP-HOVER` | Public | LSP | `ling.lsp.hover/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | Public | LSP | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | no | no | 4 |
@@ -144,6 +145,19 @@
 - Sources: [`docs/RFC-0026.md`](../RFC-0026.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-format/src/edit.rs`](../../crates/ling-format/src/edit.rs)
 - Fixtures: [`crates/ling-lsp/tests/formatting.rs`](../../crates/ling-lsp/tests/formatting.rs), [`tests/protocols/lsp-formatting/README.md`](../../tests/protocols/lsp-formatting/README.md)
 - Notes: Whole-document formatting only. Range/on-type formatting, format-on-save, minimal diffs, filesystem reads/writes, Workspace Edits, cancellation, and Semantic Transactions remain deferred.
+
+### `PROTO-LSP-HOVER` — Ling checked LSP hover
+
+- Producer: ling lsp --stdio; ling-lsp hover provider
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Negotiate optional object-valued textDocument.hover capabilities and the first supported plaintext or markdown contentFormat in client order; accept only Ready-state textDocument/hover requests naming one exact current Ling URI and exact negotiated position, while notifications perform no work.
+- Writer policy: Capture and revalidate one immutable snapshot, consume a complete bounded compiler checked-hover index, select the smallest exact original-byte identifier span, and return deterministic bilingual checked type/kind/mutability/Effect/Capability/Trait-selection facts plus that exact range, or null when no target exists.
+- Unknown-field policy: Ignore ordinary unknown request and capability fields while rejecting malformed known members; incompatible target taxonomy, selection, type normalization, fact/markup order, bound, snapshot, temporary-isolation, projection, or failure behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.hover/0.1 is Preview with no predecessor and clients gate on hoverProvider plus the exact lingHover discovery object.
+- Authority: `RFC-0037`, `RFC-0004`, `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `RFC-0036`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0027`, `DEC-0029`, `DEC-0060`, `DEC-0071`, `DEC-0074`, `DEC-0075`, `DEC-0078`, `DEC-0080`
+- Sources: [`docs/RFC-0037.md`](../RFC-0037.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0036.md`](../RFC-0036.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0027-trait-checked-core-dictionary-witness.md`](../decisions/0027-trait-checked-core-dictionary-witness.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0060-seed-effect-row-snapshot.md`](../decisions/0060-seed-effect-row-snapshot.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0074-ide-typed-definition-observation.md`](../decisions/0074-ide-typed-definition-observation.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0078-ide-rename-reference-span-observation.md`](../decisions/0078-ide-rename-reference-span-observation.md), [`docs/decisions/0080-ide-completion-checked-metadata.md`](../decisions/0080-ide-completion-checked-metadata.md), [`crates/ling-db/src/checked_hover_index.rs`](../../crates/ling-db/src/checked_hover_index.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/hover.rs`](../../crates/ling-lsp/src/hover.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-db/src/checked_hover_index.rs`](../../crates/ling-db/src/checked_hover_index.rs), [`crates/ling-lsp/tests/hover.rs`](../../crates/ling-lsp/tests/hover.rs), [`tests/protocols/lsp-hover/README.md`](../../tests/protocols/lsp-hover/README.md), [`docs/status/IDE-2302-IMPLEMENTATION-REPORT.md`](../status/IDE-2302-IMPLEMENTATION-REPORT.md)
+- Notes: Hover is a presentation projection of complete checked compiler facts. It deliberately omits documentation and profile/resource claims for which no accepted compiler observation exists, and never publishes resolver/Semantic IDs, implementation ordinals, paths, or debug output.
 
 ### `PROTO-LSP-LIFECYCLE` — Ling LSP lifecycle and stdio transport
 
