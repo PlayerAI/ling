@@ -1,6 +1,7 @@
 use ling_bytecode::{
     LoweringSource, VerifiedProgramV1, decode_and_verify_v1, decode_and_verify_v1_1,
-    decode_and_verify_v1_2, encode_v1, encode_v1_1, encode_v1_2, lower_v1, lower_v1_1, lower_v1_2,
+    decode_and_verify_v1_2, decode_and_verify_v1_3, encode_v1, encode_v1_1, encode_v1_2,
+    encode_v1_3, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
 };
 use ling_effects::locate_main;
 use ling_eval::{
@@ -74,6 +75,50 @@ const SOURCE_MUTATION: &str = concat!(
     "    counter.value <- 2\n",
     "    Console.write (Text.format \"{}\" counter.value)\n",
 );
+const SOURCE_HANDLER_RESUME: &str = concat!(
+    "module Main\n",
+    "    requires Console.Write\n\n",
+    "let main () =\n",
+    "    handle Console.write \"body\" with\n",
+    "        operation Console.Write.write(message, resume) ->\n",
+    "            resume ()\n",
+    "            Console.write \"clause\"\n",
+);
+const SOURCE_HANDLER_DEEP: &str = concat!(
+    "module Main\n",
+    "    requires Console.Write\n\n",
+    "let emitBoth () =\n",
+    "    Console.write \"first\"\n",
+    "    Console.write \"second\"\n\n",
+    "let main () =\n",
+    "    handle emitBoth () with\n",
+    "        operation Console.Write.write(message, resume) ->\n",
+    "            if message == \"first\" then\n",
+    "                resume ()\n",
+    "                Console.write \"after resume\"\n",
+    "            else\n",
+    "                ()\n",
+);
+const SOURCE_HANDLER_CARDINALITY: &str = concat!(
+    "module Main\n",
+    "    requires Console.Write\n\n",
+    "let invokeTwice callback =\n",
+    "    let ignored = callback ()\n",
+    "    callback ()\n\n",
+    "let main () =\n",
+    "    handle Console.write \"body\" with\n",
+    "        operation Console.Write.write(message, resume) -> invokeTwice resume\n",
+);
+const SOURCE_HANDLER_FAULT: &str = concat!(
+    "module Main\n",
+    "    requires Console.Write\n\n",
+    "let main () =\n",
+    "    handle Console.write \"trigger\" with\n",
+    "        operation Console.Write.write(message, resume) ->\n",
+    "            Console.write \"committed\"\n",
+    "            let ignored = 1 / 0\n",
+    "            ()\n",
+);
 
 const MAX_FIXTURES: usize = 16;
 const MAX_SOURCE_NAME_BYTES: usize = 256;
@@ -85,6 +130,7 @@ enum Revision {
     V1,
     V1_1,
     V1_2,
+    V1_3,
 }
 
 struct Case {
@@ -165,6 +211,11 @@ fn verified(fixture: &Fixture, revision: Revision) -> VerifiedProgramV1 {
             let bytes = encode_v1_2(&lowered).expect("fixture encodes as v1.2");
             decode_and_verify_v1_2(&bytes).expect("v1.2 artifact verifies")
         }
+        Revision::V1_3 => {
+            let lowered = lower_v1_3(&fixture.snapshot, &source).expect("fixture lowers to v1.3");
+            let bytes = encode_v1_3(&lowered).expect("fixture encodes as v1.3");
+            decode_and_verify_v1_3(&bytes).expect("v1.3 artifact verifies")
+        }
     }
 }
 
@@ -232,10 +283,15 @@ fn vm_fault(error: &VmRuntimeFault) -> FaultProjection {
             match resource {
                 ling_vm::RuntimeResource::Step => "step_limit",
                 ling_vm::RuntimeResource::Frame => "frame_limit",
+                ling_vm::RuntimeResource::HandlerDepth => "handler_depth_limit",
+                ling_vm::RuntimeResource::ContinuationFrame => "continuation_frame_limit",
             },
         ),
         VmFaultKind::OutOfMemory { operation } => ("out_of_memory", *operation),
         VmFaultKind::Cancelled => ("cancelled", "execution.cancelled"),
+        VmFaultKind::HandlerResumeCardinality { operation } => {
+            ("handler_resume_cardinality", *operation)
+        }
     };
     FaultProjection {
         category: category.to_owned(),
@@ -366,6 +422,26 @@ fn supported_bytecode_slices_match_the_checked_interpreter() {
             logical_name: "tests/bytecode/v1/source-mutation.ling",
             text: SOURCE_MUTATION,
             revision: Revision::V1_2,
+        },
+        Case {
+            logical_name: "tests/bytecode/v1/handler-resume.ling",
+            text: SOURCE_HANDLER_RESUME,
+            revision: Revision::V1_3,
+        },
+        Case {
+            logical_name: "tests/bytecode/v1/handler-deep.ling",
+            text: SOURCE_HANDLER_DEEP,
+            revision: Revision::V1_3,
+        },
+        Case {
+            logical_name: "tests/bytecode/v1/handler-cardinality.ling",
+            text: SOURCE_HANDLER_CARDINALITY,
+            revision: Revision::V1_3,
+        },
+        Case {
+            logical_name: "tests/bytecode/v1/handler-fault.ling",
+            text: SOURCE_HANDLER_FAULT,
+            revision: Revision::V1_3,
         },
     ];
     assert!(cases.len() <= MAX_FIXTURES);

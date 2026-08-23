@@ -2,7 +2,10 @@ use super::*;
 
 use ling_effects::{CheckedFunctionType, EffectRow};
 
-use crate::{CaptureOperand, Intrinsic, RecordField, RecordUpdate, VariantCase};
+use crate::{
+    CaptureOperand, HandlerClause as BytecodeHandlerClause, HandlerOperation, Intrinsic,
+    RecordField, RecordUpdate, VariantCase,
+};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LoweredProgramV1_1 {
@@ -34,6 +37,13 @@ pub(crate) fn lower_v1_2_model(
     ClosureLowerer::new_with_mode(snapshot, sources, true)?.run_model()
 }
 
+pub(crate) fn lower_v1_3_model(
+    snapshot: &ProgramSnapshot,
+    sources: &[LoweringSource<'_>],
+) -> Result<UnverifiedProgram, LoweringError> {
+    ClosureLowerer::new_with_modes(snapshot, sources, true, true)?.run_model()
+}
+
 #[derive(Clone)]
 struct NamedPlan<'a> {
     id: DefinitionId,
@@ -55,6 +65,23 @@ struct BuiltinPlan<'a> {
     builtin: Builtin,
     label: String,
     span: Span,
+}
+
+#[derive(Clone)]
+struct HandlerPlan<'a> {
+    key: ExpressionKey,
+    module: &'a ling_resolve::ResolvedModule,
+    expression: &'a hir::Expression,
+    body: &'a hir::Expression,
+    clauses: &'a [hir::HandlerClause],
+    body_label: String,
+    clause_labels: Vec<String>,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+enum HandlerFunctionKey {
+    Body(ExpressionKey),
+    Clause(ExpressionKey, usize),
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -155,12 +182,14 @@ enum OrderedPlan {
     Named(DefinitionId),
     Local(BindingKey),
     Builtin(ModuleId, Builtin),
+    Handler(HandlerFunctionKey),
 }
 
 struct ClosureLowerer<'snapshot, 'source> {
     snapshot: &'snapshot ProgramSnapshot,
     limits: DecodeLimits,
     aggregate_mode: bool,
+    handler_mode: bool,
     modules: Vec<&'snapshot ling_resolve::ResolvedModule>,
     module_indices: BTreeMap<ModuleId, ModuleIndex>,
     source_plans: Vec<SourcePlan<'source>>,
@@ -169,14 +198,18 @@ struct ClosureLowerer<'snapshot, 'source> {
     named: BTreeMap<DefinitionId, NamedPlan<'snapshot>>,
     locals: BTreeMap<BindingKey, LocalPlan<'snapshot>>,
     builtins: BTreeMap<(ModuleId, Builtin), BuiltinPlan<'snapshot>>,
+    handlers: BTreeMap<ExpressionKey, HandlerPlan<'snapshot>>,
     captures: BTreeMap<BindingKey, Vec<CapturePlan>>,
     named_signatures: BTreeMap<DefinitionId, SignatureKey>,
     local_signatures: BTreeMap<BindingKey, SignatureKey>,
     builtin_signatures: BTreeMap<Builtin, SignatureKey>,
+    handler_signatures: BTreeMap<HandlerFunctionKey, SignatureKey>,
+    handler_captures: BTreeMap<HandlerFunctionKey, Vec<CapturePlan>>,
     ordered: Vec<OrderedPlan>,
     function_indices: BTreeMap<DefinitionId, FunctionIndex>,
     local_indices: BTreeMap<BindingKey, FunctionIndex>,
     builtin_indices: BTreeMap<(ModuleId, Builtin), FunctionIndex>,
+    handler_indices: BTreeMap<HandlerFunctionKey, FunctionIndex>,
     types: Vec<ValueType>,
     type_indices: BTreeMap<TypeKey, TypeIndex>,
     strings: Vec<String>,
@@ -203,6 +236,15 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         snapshot: &'snapshot ProgramSnapshot,
         sources: &'source [LoweringSource<'source>],
         aggregate_mode: bool,
+    ) -> Result<Self, LoweringError> {
+        Self::new_with_modes(snapshot, sources, aggregate_mode, false)
+    }
+
+    fn new_with_modes(
+        snapshot: &'snapshot ProgramSnapshot,
+        sources: &'source [LoweringSource<'source>],
+        aggregate_mode: bool,
+        handler_mode: bool,
     ) -> Result<Self, LoweringError> {
         let limits = if aggregate_mode {
             DecodeLimits::rfc_0016()
@@ -299,6 +341,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         let mut locals = BTreeMap::new();
         let mut local_bindings = BTreeMap::new();
         let mut builtins = BTreeMap::new();
+        let mut handlers = BTreeMap::new();
         let mut binding_order = BTreeMap::new();
         let mut order = 0_usize;
         let mut ordinals = BTreeMap::<ModuleId, u64>::new();
@@ -306,6 +349,14 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             for definition in &module.hir.definitions {
                 for pattern in &definition.parameters {
                     collect_pattern_order(module.id, pattern, &mut binding_order, &mut order);
+                }
+                if handler_mode {
+                    collect_handler_plans(
+                        module,
+                        &definition.value,
+                        &mut handlers,
+                        ordinals.entry(module.id).or_default(),
+                    )?;
                 }
                 collect_lifted(
                     snapshot,
@@ -323,6 +374,14 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 for definition in &implementation.members {
                     for pattern in &definition.parameters {
                         collect_pattern_order(module.id, pattern, &mut binding_order, &mut order);
+                    }
+                    if handler_mode {
+                        collect_handler_plans(
+                            module,
+                            &definition.value,
+                            &mut handlers,
+                            ordinals.entry(module.id).or_default(),
+                        )?;
                     }
                     collect_lifted(
                         snapshot,
@@ -351,6 +410,55 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 &mut visiting,
             )?;
         }
+        let mut raw_handler_captures = BTreeMap::new();
+        for plan in handlers.values() {
+            let body_key = HandlerFunctionKey::Body(plan.key);
+            let mut declared = BTreeSet::new();
+            collect_declared_bindings(plan.module.id, plan.body, &mut declared);
+            let mut free = BTreeSet::new();
+            collect_free_bindings(
+                plan.module.id,
+                plan.body,
+                resolved,
+                &locals,
+                &binding_order,
+                &mut raw_captures,
+                &mut visiting,
+                &declared,
+                &mut free,
+            )?;
+            let mut free = free.into_iter().collect::<Vec<_>>();
+            free.sort_by_key(|binding| binding_order.get(binding).copied().unwrap_or(usize::MAX));
+            raw_handler_captures.insert(body_key, free);
+
+            for (index, clause) in plan.clauses.iter().enumerate() {
+                let mut declared = BTreeSet::new();
+                for parameter in &clause.parameters {
+                    collect_pattern_bindings(plan.module.id, parameter, &mut declared);
+                }
+                if let Some(resume) = &clause.resume {
+                    declared.insert(BindingKey::new(plan.module.id, resume.id));
+                }
+                collect_declared_bindings(plan.module.id, &clause.body, &mut declared);
+                let mut free = BTreeSet::new();
+                collect_free_bindings(
+                    plan.module.id,
+                    &clause.body,
+                    resolved,
+                    &locals,
+                    &binding_order,
+                    &mut raw_captures,
+                    &mut visiting,
+                    &declared,
+                    &mut free,
+                )?;
+                let mut free = free.into_iter().collect::<Vec<_>>();
+                free.sort_by_key(|binding| {
+                    binding_order.get(binding).copied().unwrap_or(usize::MAX)
+                });
+                raw_handler_captures.insert(HandlerFunctionKey::Clause(plan.key, index), free);
+            }
+        }
 
         let mut resolver =
             SignatureResolver::new(snapshot, &named, &locals, &local_bindings, aggregate_mode);
@@ -370,6 +478,19 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 entry.insert(resolver.builtin(builtin)?);
             }
         }
+        let mut handler_signatures = BTreeMap::new();
+        for plan in handlers.values() {
+            handler_signatures.insert(
+                HandlerFunctionKey::Body(plan.key),
+                resolver.handler_body(plan)?,
+            );
+            for (index, clause) in plan.clauses.iter().enumerate() {
+                handler_signatures.insert(
+                    HandlerFunctionKey::Clause(plan.key, index),
+                    resolver.handler_clause(plan, clause)?,
+                );
+            }
+        }
 
         let mut captures = BTreeMap::new();
         for (owner, keys) in raw_captures {
@@ -383,6 +504,8 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                         "captured binding metadata is absent",
                     )
                 })?;
+                // experimental: bounded 1.3 Handler lowering pending shared Cell and
+                // clause-pattern wire authority. TODO(spec:GAP-EFFECT-HANDLER-BYTECODE-001)
                 if info.mutable {
                     return Err(unsupported_module(
                         owner_plan.module,
@@ -411,6 +534,37 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             }
             captures.insert(owner, plans);
         }
+        let mut handler_captures = BTreeMap::new();
+        for (owner, keys) in raw_handler_captures {
+            let plan = match &owner {
+                HandlerFunctionKey::Body(key) | HandlerFunctionKey::Clause(key, _) => {
+                    &handlers[key]
+                }
+            };
+            let mut plans = Vec::with_capacity(keys.len());
+            for key in keys {
+                let info = resolved.bindings().get(&key).ok_or_else(|| {
+                    invalid_module(
+                        plan.module,
+                        plan.expression.span,
+                        "Handler capture binding metadata is absent",
+                    )
+                })?;
+                if info.mutable {
+                    return Err(unsupported_module(
+                        plan.module,
+                        info.span,
+                        "mutable Handler capture",
+                    ));
+                }
+                plans.push(CapturePlan {
+                    key,
+                    self_reference: false,
+                    value_type: resolver.binding_value_type(key)?,
+                });
+            }
+            handler_captures.insert(owner, plans);
+        }
 
         let mut ordered_keys = Vec::new();
         for plan in named.values() {
@@ -437,6 +591,22 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 OrderedPlan::Builtin(plan.module.id, plan.builtin),
             ));
         }
+        for plan in handlers.values() {
+            ordered_keys.push((
+                module_indices[&plan.module.id],
+                FunctionKind::ClosureBody,
+                plan.body_label.as_bytes().to_vec(),
+                OrderedPlan::Handler(HandlerFunctionKey::Body(plan.key)),
+            ));
+            for (index, label) in plan.clause_labels.iter().enumerate() {
+                ordered_keys.push((
+                    module_indices[&plan.module.id],
+                    FunctionKind::ClosureBody,
+                    label.as_bytes().to_vec(),
+                    OrderedPlan::Handler(HandlerFunctionKey::Clause(plan.key, index)),
+                ));
+            }
+        }
         ordered_keys.sort_by(|left, right| {
             (&left.0, &left.1, &left.2).cmp(&(&right.0, &right.1, &right.2))
         });
@@ -448,6 +618,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         let mut function_indices = BTreeMap::new();
         let mut local_indices = BTreeMap::new();
         let mut builtin_indices = BTreeMap::new();
+        let mut handler_indices = BTreeMap::new();
         for (index, plan) in ordered.iter().enumerate() {
             let index = FunctionIndex::new(to_u32(index, "function index")?);
             match plan {
@@ -459,6 +630,9 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 }
                 OrderedPlan::Builtin(module, builtin) => {
                     builtin_indices.insert((*module, *builtin), index);
+                }
+                OrderedPlan::Handler(key) => {
+                    handler_indices.insert(key.clone(), index);
                 }
             }
         }
@@ -498,6 +672,10 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         }
         for plan in builtins.values() {
             string_set.insert(plan.label.clone());
+        }
+        for plan in handlers.values() {
+            string_set.insert(plan.body_label.clone());
+            string_set.extend(plan.clause_labels.iter().cloned());
         }
         for source in &source_plans {
             string_set.insert(source.logical_name.to_owned());
@@ -551,7 +729,15 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         for signature in builtin_signatures.values() {
             type_builder.add_signature(signature)?;
         }
+        for signature in handler_signatures.values() {
+            type_builder.add_signature(signature)?;
+        }
         for plans in captures.values() {
+            for capture in plans {
+                type_builder.insert(capture.value_type.clone());
+            }
+        }
+        for plans in handler_captures.values() {
             for capture in plans {
                 type_builder.insert(capture.value_type.clone());
             }
@@ -600,6 +786,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             snapshot,
             limits,
             aggregate_mode,
+            handler_mode,
             modules,
             module_indices,
             source_plans,
@@ -608,14 +795,18 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             named,
             locals,
             builtins,
+            handlers,
             captures,
             named_signatures,
             local_signatures,
             builtin_signatures,
+            handler_signatures,
+            handler_captures,
             ordered,
             function_indices,
             local_indices,
             builtin_indices,
+            handler_indices,
             types,
             type_indices,
             strings,
@@ -695,6 +886,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 OrderedPlan::Named(id) => self.lower_named(id)?,
                 OrderedPlan::Local(key) => self.lower_local(*key)?,
                 OrderedPlan::Builtin(module, builtin) => self.lower_builtin(*module, *builtin)?,
+                OrderedPlan::Handler(key) => self.lower_handler_function(key)?,
             };
             source_map.append(&mut entries);
             functions.push(function);
@@ -728,7 +920,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             FunctionKind::Named,
             &plan.definition.name.normalized,
             &[],
-            &plan.definition.parameters,
+            (&plan.definition.parameters, None),
             &plan.definition.value,
             &self.named_signatures[id],
         )
@@ -743,7 +935,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             FunctionKind::ClosureBody,
             &plan.label,
             &self.captures[&key],
-            &plan.binding.parameters,
+            (&plan.binding.parameters, None),
             &plan.binding.value,
             &self.local_signatures[&key],
         )
@@ -757,6 +949,39 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         let plan = &self.builtins[&(module, builtin)];
         FunctionEmitter::new(self, plan.module, self.builtin_indices[&(module, builtin)])
             .lower_builtin(plan, &self.builtin_signatures[&builtin])
+    }
+
+    fn lower_handler_function(
+        &self,
+        key: &HandlerFunctionKey,
+    ) -> Result<(Function, Vec<SourceMapEntry>), LoweringError> {
+        let plan = match key {
+            HandlerFunctionKey::Body(expression) | HandlerFunctionKey::Clause(expression, _) => {
+                &self.handlers[expression]
+            }
+        };
+        let emitter = FunctionEmitter::new(self, plan.module, self.handler_indices[key]);
+        match key {
+            HandlerFunctionKey::Body(_) => emitter.lower_source(
+                FunctionKind::ClosureBody,
+                &plan.body_label,
+                &self.handler_captures[key],
+                (&[], None),
+                plan.body,
+                &self.handler_signatures[key],
+            ),
+            HandlerFunctionKey::Clause(_, index) => {
+                let clause = &plan.clauses[*index];
+                emitter.lower_source(
+                    FunctionKind::ClosureBody,
+                    &plan.clause_labels[*index],
+                    &self.handler_captures[key],
+                    (&clause.parameters, clause.resume.as_ref()),
+                    &clause.body,
+                    &self.handler_signatures[key],
+                )
+            }
+        }
     }
 }
 
@@ -874,6 +1099,127 @@ fn collect_pattern_order(
     }
 }
 
+fn collect_handler_plans<'a>(
+    module: &'a ling_resolve::ResolvedModule,
+    expression: &'a hir::Expression,
+    output: &mut BTreeMap<ExpressionKey, HandlerPlan<'a>>,
+    ordinal: &mut u64,
+) -> Result<(), LoweringError> {
+    let visit =
+        |value: &'a hir::Expression,
+         output: &mut BTreeMap<ExpressionKey, HandlerPlan<'a>>,
+         ordinal: &mut u64| { collect_handler_plans(module, value, output, ordinal) };
+    match &expression.kind {
+        hir::ExpressionKind::Sequence(elements) => {
+            for element in elements {
+                visit(
+                    match element {
+                        hir::SequenceElement::Let(binding) => &binding.value,
+                        hir::SequenceElement::Expression(value) => value,
+                    },
+                    output,
+                    ordinal,
+                )?;
+            }
+        }
+        hir::ExpressionKind::Handle { body, clauses } => {
+            let key = ExpressionKey::new(module.id, expression.id);
+            let body_label = closure_label(expression.span, *ordinal);
+            *ordinal = ordinal
+                .checked_add(1)
+                .ok_or_else(|| resource_error("closure_ordinal", u64::MAX, u64::MAX - 1))?;
+            let mut clause_labels = Vec::with_capacity(clauses.len());
+            for clause in clauses {
+                clause_labels.push(closure_label(clause.span, *ordinal));
+                *ordinal = ordinal
+                    .checked_add(1)
+                    .ok_or_else(|| resource_error("closure_ordinal", u64::MAX, u64::MAX - 1))?;
+            }
+            if output
+                .insert(
+                    key,
+                    HandlerPlan {
+                        key,
+                        module,
+                        expression,
+                        body,
+                        clauses,
+                        body_label,
+                        clause_labels,
+                    },
+                )
+                .is_some()
+            {
+                return Err(invalid_module(
+                    module,
+                    expression.span,
+                    "duplicate checked Handler expression identity",
+                ));
+            }
+            visit(body, output, ordinal)?;
+            for clause in clauses {
+                visit(&clause.body, output, ordinal)?;
+            }
+        }
+        hir::ExpressionKind::If {
+            condition,
+            then_branch,
+            else_branch,
+        } => {
+            visit(condition, output, ordinal)?;
+            visit(then_branch, output, ordinal)?;
+            visit(else_branch, output, ordinal)?;
+        }
+        hir::ExpressionKind::Match { scrutinee, cases } => {
+            visit(scrutinee, output, ordinal)?;
+            for case in cases {
+                if let Some(guard) = &case.guard {
+                    visit(guard, output, ordinal)?;
+                }
+                visit(&case.body, output, ordinal)?;
+            }
+        }
+        hir::ExpressionKind::Assignment { value, .. }
+        | hir::ExpressionKind::Unary { operand: value, .. }
+        | hir::ExpressionKind::Projection { target: value, .. } => {
+            visit(value, output, ordinal)?;
+        }
+        hir::ExpressionKind::Application {
+            function,
+            arguments,
+        } => {
+            visit(function, output, ordinal)?;
+            for argument in arguments {
+                visit(argument, output, ordinal)?;
+            }
+        }
+        hir::ExpressionKind::Binary { left, right, .. } => {
+            visit(left, output, ordinal)?;
+            visit(right, output, ordinal)?;
+        }
+        hir::ExpressionKind::Tuple(values) | hir::ExpressionKind::List(values) => {
+            for value in values {
+                visit(value, output, ordinal)?;
+            }
+        }
+        hir::ExpressionKind::Record(fields) => {
+            for field in fields {
+                visit(&field.value, output, ordinal)?;
+            }
+        }
+        hir::ExpressionKind::RecordUpdate { base, fields } => {
+            visit(base, output, ordinal)?;
+            for field in fields {
+                visit(&field.value, output, ordinal)?;
+            }
+        }
+        hir::ExpressionKind::Name { .. }
+        | hir::ExpressionKind::Literal(_)
+        | hir::ExpressionKind::Unit => {}
+    }
+    Ok(())
+}
+
 #[allow(clippy::too_many_arguments)]
 fn collect_lifted<'a>(
     snapshot: &'a ProgramSnapshot,
@@ -939,8 +1285,38 @@ fn collect_lifted<'a>(
                 }
             }
         }
-        hir::ExpressionKind::Handle { .. } => {
-            return Err(unsupported_module(module, expression.span, "handler"));
+        hir::ExpressionKind::Handle { body, clauses } => {
+            collect_lifted(
+                snapshot,
+                module,
+                body,
+                locals,
+                local_bindings,
+                builtins,
+                binding_order,
+                order,
+                ordinal,
+            )?;
+            for clause in clauses {
+                for parameter in &clause.parameters {
+                    collect_pattern_order(module.id, parameter, binding_order, order);
+                }
+                if let Some(resume) = &clause.resume {
+                    binding_order.insert(BindingKey::new(module.id, resume.id), *order);
+                    *order = order.saturating_add(1);
+                }
+                collect_lifted(
+                    snapshot,
+                    module,
+                    &clause.body,
+                    locals,
+                    local_bindings,
+                    builtins,
+                    binding_order,
+                    order,
+                    ordinal,
+                )?;
+            }
         }
         hir::ExpressionKind::If {
             condition,
@@ -1370,7 +1746,18 @@ fn collect_declared_bindings(
                 collect_declared_bindings(module, &field.value, output);
             }
         }
-        hir::ExpressionKind::Handle { .. } => {}
+        hir::ExpressionKind::Handle { body, clauses } => {
+            collect_declared_bindings(module, body, output);
+            for clause in clauses {
+                for parameter in &clause.parameters {
+                    collect_pattern_bindings(module, parameter, output);
+                }
+                if let Some(resume) = &clause.resume {
+                    output.insert(BindingKey::new(module, resume.id));
+                }
+                collect_declared_bindings(module, &clause.body, output);
+            }
+        }
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
         | hir::ExpressionKind::Unit => {}
@@ -1635,7 +2022,39 @@ fn collect_free_bindings(
                 )?;
             }
         }
-        hir::ExpressionKind::Handle { .. } => {}
+        hir::ExpressionKind::Handle { body, clauses } => {
+            collect_free_bindings(
+                module,
+                body,
+                resolved,
+                locals,
+                binding_order,
+                memo,
+                visiting,
+                declared,
+                output,
+            )?;
+            for clause in clauses {
+                let mut clause_declared = declared.clone();
+                for parameter in &clause.parameters {
+                    collect_pattern_bindings(module, parameter, &mut clause_declared);
+                }
+                if let Some(resume) = &clause.resume {
+                    clause_declared.insert(BindingKey::new(module, resume.id));
+                }
+                collect_free_bindings(
+                    module,
+                    &clause.body,
+                    resolved,
+                    locals,
+                    binding_order,
+                    memo,
+                    visiting,
+                    &clause_declared,
+                    output,
+                )?;
+            }
+        }
         hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
     }
     Ok(())
@@ -1821,6 +2240,127 @@ impl<'a> SignatureResolver<'a> {
         };
         self.builtin_cache.insert(builtin, signature.clone());
         Ok(signature)
+    }
+
+    fn handler_body(&mut self, plan: &HandlerPlan<'_>) -> Result<SignatureKey, LoweringError> {
+        let checked = self.snapshot.checked();
+        let result = checked.typed().expression_type(plan.key).ok_or_else(|| {
+            invalid_module(
+                plan.module,
+                plan.expression.span,
+                "checked Handler result type is absent",
+            )
+        })?;
+        let effects = checked
+            .expression_effect(ExpressionKey::new(plan.module.id, plan.body.id))
+            .ok_or_else(|| {
+                invalid_module(
+                    plan.module,
+                    plan.body.span,
+                    "checked Handler body Effect row is absent",
+                )
+            })?;
+        Ok(SignatureKey {
+            parameters: Vec::new(),
+            result: self.plain_type(result, Some(plan.module), Some(plan.expression.span))?,
+            effects: bytecode_effects(effects, plan.module, plan.body.span)?,
+        })
+    }
+
+    fn handler_clause(
+        &mut self,
+        plan: &HandlerPlan<'_>,
+        clause: &hir::HandlerClause,
+    ) -> Result<SignatureKey, LoweringError> {
+        let checked = self.snapshot.checked();
+        let operation =
+            resolve_handler_operation(&clause.operation.normalized()).ok_or_else(|| {
+                invalid_module(
+                    plan.module,
+                    clause.operation.span,
+                    "checked Handler operation is unregistered",
+                )
+            })?;
+        let result_id = checked.typed().expression_type(plan.key).ok_or_else(|| {
+            invalid_module(
+                plan.module,
+                plan.expression.span,
+                "checked Handler result type is absent",
+            )
+        })?;
+        let result = self.plain_type(result_id, Some(plan.module), Some(plan.expression.span))?;
+        let mut body_effects = checked
+            .expression_effect(ExpressionKey::new(plan.module.id, plan.body.id))
+            .map(|row| bytecode_effects(row, plan.module, plan.body.span))
+            .transpose()?
+            .ok_or_else(|| {
+                invalid_module(
+                    plan.module,
+                    plan.body.span,
+                    "checked Handler body Effect row is absent",
+                )
+            })?;
+        if plan
+            .clauses
+            .iter()
+            .any(|value| value.operation.normalized() == "Console.Write.write")
+        {
+            body_effects.retain(|effect| *effect != Effect::ConsoleWrite);
+        }
+        let mut parameters = operation
+            .inputs()
+            .iter()
+            .copied()
+            .map(handler_value_type_key)
+            .collect::<Vec<_>>();
+        if let Some(resume) = &clause.resume {
+            parameters.push(TypeKey::function(
+                vec![handler_value_type_key(operation.output())],
+                result.clone(),
+                body_effects.clone(),
+            )?);
+            if checked
+                .typed()
+                .resolved()
+                .handler_resume_uses(BindingKey::new(plan.module.id, resume.id))
+                .is_some_and(|uses| uses > 0)
+            {
+                let clause_effects = checked
+                    .expression_effect(ExpressionKey::new(plan.module.id, clause.body.id))
+                    .ok_or_else(|| {
+                        invalid_module(
+                            plan.module,
+                            clause.body.span,
+                            "checked Handler clause Effect row is absent",
+                        )
+                    })?;
+                let mut effects = bytecode_effects(clause_effects, plan.module, clause.body.span)?;
+                effects.extend(body_effects);
+                effects.sort();
+                effects.dedup();
+                return Ok(SignatureKey {
+                    parameters,
+                    result,
+                    effects,
+                });
+            }
+        }
+        let effects = checked
+            .expression_effect(ExpressionKey::new(plan.module.id, clause.body.id))
+            .map(|row| bytecode_effects(row, plan.module, clause.body.span))
+            .transpose()?
+            .ok_or_else(|| {
+                invalid_module(
+                    plan.module,
+                    clause.body.span,
+                    "checked Handler clause Effect row is absent",
+                )
+            })?;
+        Ok(SignatureKey {
+            parameters,
+            result,
+            effects,
+        })
     }
 
     fn signature_from_checked(
@@ -2214,6 +2754,14 @@ impl<'a> SignatureResolver<'a> {
             .module(key.module())
             .ok_or_else(|| invalid_without_span("function-valued local module is absent"))?;
         self.function_value_type(module, &binding.value)
+    }
+}
+
+const fn handler_value_type_key(value: HandlerValueType) -> TypeKey {
+    match value {
+        HandlerValueType::Unit => TypeKey::Unit,
+        HandlerValueType::Int => TypeKey::Int,
+        HandlerValueType::Text => TypeKey::Text,
     }
 }
 
@@ -2785,11 +3333,12 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         kind: FunctionKind,
         name: &str,
         captures: &[CapturePlan],
-        patterns: &[hir::Pattern],
+        parameters: (&[hir::Pattern], Option<&hir::HandlerResume>),
         body: &hir::Expression,
         signature: &SignatureKey,
     ) -> Result<(Function, Vec<SourceMapEntry>), LoweringError> {
-        if patterns.len() != signature.parameters.len() {
+        let (patterns, resume) = parameters;
+        if patterns.len() + usize::from(resume.is_some()) != signature.parameters.len() {
             return Err(invalid_module(
                 self.module,
                 body.span,
@@ -2821,6 +3370,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 hir::PatternKind::Binding { id, .. } => {
                     environment.insert(BindingKey::new(self.module.id, *id), register);
                 }
+                hir::PatternKind::Wildcard => {}
                 hir::PatternKind::Unit => {
                     return Err(invalid_module(
                         self.module,
@@ -2836,6 +3386,16 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                     ));
                 }
             }
+        }
+        if let Some(resume) = resume {
+            let value_type = self.type_index(&signature.parameters[patterns.len()])?;
+            let register = self.new_register(resume.name.span)?;
+            self.blocks[0].parameters.push(BlockParameter {
+                register,
+                value_type,
+            });
+            parameter_types.push(value_type);
+            environment.insert(BindingKey::new(self.module.id, resume.id), register);
         }
         let result = self.lower_expression(body, &mut environment)?;
         if self.blocks[self.current_block].terminator.is_some() {
@@ -2988,8 +3548,58 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 }
                 result.map_or_else(|| self.emit_constant(expression, Constant::Unit), Ok)
             }
-            hir::ExpressionKind::Handle { .. } => {
-                Err(unsupported_module(self.module, expression.span, "handler"))
+            hir::ExpressionKind::Handle { clauses, .. } => {
+                if !self.owner.handler_mode {
+                    return Err(unsupported_module(self.module, expression.span, "handler"));
+                }
+                let key = ExpressionKey::new(self.module.id, expression.id);
+                let body_key = HandlerFunctionKey::Body(key);
+                let destination = self.new_register(expression.span)?;
+                let body_captures = self.capture_operands(
+                    &self.owner.handler_captures[&body_key],
+                    environment,
+                    expression.span,
+                )?;
+                let mut lowered_clauses = clauses
+                    .iter()
+                    .enumerate()
+                    .map(|(index, clause)| {
+                        let operation = match clause.operation.normalized().as_str() {
+                            "Console.Write.write" => HandlerOperation::ConsoleWrite,
+                            "Clock.now" => HandlerOperation::ClockNow,
+                            "Random.next" => HandlerOperation::RandomNext,
+                            _ => {
+                                return Err(invalid_module(
+                                    self.module,
+                                    clause.operation.span,
+                                    "checked Handler operation is unregistered",
+                                ));
+                            }
+                        };
+                        let clause_key = HandlerFunctionKey::Clause(key, index);
+                        Ok(BytecodeHandlerClause {
+                            operation,
+                            resume_present: clause.resume.is_some(),
+                            function: self.owner.handler_indices[&clause_key],
+                            captures: self.capture_operands(
+                                &self.owner.handler_captures[&clause_key],
+                                environment,
+                                clause.span,
+                            )?,
+                        })
+                    })
+                    .collect::<Result<Vec<_>, LoweringError>>()?;
+                lowered_clauses.sort_by_key(|clause| clause.operation);
+                self.push_instruction(
+                    Instruction::Handle {
+                        destination,
+                        body_function: self.owner.handler_indices[&body_key],
+                        body_captures,
+                        clauses: lowered_clauses,
+                    },
+                    expression.span,
+                )?;
+                Ok(destination)
             }
             hir::ExpressionKind::Application {
                 function,
@@ -3077,6 +3687,34 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 Err(unsupported_module(self.module, expression.span, "list"))
             }
         }
+    }
+
+    fn capture_operands(
+        &self,
+        captures: &[CapturePlan],
+        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        span: Span,
+    ) -> Result<Vec<CaptureOperand>, LoweringError> {
+        captures
+            .iter()
+            .map(|capture| {
+                if capture.self_reference {
+                    Ok(CaptureOperand::SelfReference)
+                } else {
+                    environment
+                        .get(&capture.key)
+                        .copied()
+                        .map(CaptureOperand::Register)
+                        .ok_or_else(|| {
+                            invalid_module(
+                                self.module,
+                                span,
+                                "captured binding has no lexical register",
+                            )
+                        })
+                }
+            })
+            .collect()
     }
 
     fn mutable_binding_keys(
@@ -4411,7 +5049,11 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 callee,
                 arguments: values,
             },
-            expression.span,
+            if self.owner.handler_mode {
+                function.span
+            } else {
+                expression.span
+            },
         )?;
         Ok(destination)
     }
@@ -4988,8 +5630,11 @@ fn collect_type_shapes(
                 collect_type_shapes(snapshot, module, &field.value, builder)?;
             }
         }
-        hir::ExpressionKind::Handle { .. } => {
-            return Err(unsupported_module(module, expression.span, "handler"));
+        hir::ExpressionKind::Handle { body, clauses } => {
+            collect_type_shapes(snapshot, module, body, builder)?;
+            for clause in clauses {
+                collect_type_shapes(snapshot, module, &clause.body, builder)?;
+            }
         }
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
@@ -5068,8 +5713,18 @@ fn collect_constants_v1_1(
                 insert_constant(constants, Constant::Unit)?;
             }
         }
-        hir::ExpressionKind::Handle { .. } => {
-            return Err(unsupported_module(module, expression.span, "handler"));
+        hir::ExpressionKind::Handle { body, clauses } => {
+            collect_constants_v1_1(snapshot, module, body, strings, constants, aggregate_mode)?;
+            for clause in clauses {
+                collect_constants_v1_1(
+                    snapshot,
+                    module,
+                    &clause.body,
+                    strings,
+                    constants,
+                    aggregate_mode,
+                )?;
+            }
         }
         hir::ExpressionKind::Application {
             function,

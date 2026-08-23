@@ -702,3 +702,28 @@ next_action = "Draft RFC-0012 with explicit non-claims before any Critical publi
 resolution = []
 superseded_by = ""
 observed_markers = []
+
+[[gap]]
+id = "GAP-EFFECT-HANDLER-BYTECODE-001"
+title = "Handler bytecode Cell identity and refutable clause parameters"
+status = "Open"
+priority = "P1"
+blocked_releases = ["v0.2"]
+blocked_tasks = ["EFF-2104", "EFF-2105"]
+observable_behavior = "Accepted DEC-0261 requires resumed VM continuations to preserve lexical Cell identities and execute every checked DEC-0260 clause, but ling.bytecode/1.3 records only ordinary value captures and operation signatures; it has no Cell capture/update representation and no checked pattern-match or mismatch representation for refutable clause parameters."
+authority = ["RFC-0006", "DEC-0260", "DEC-0261"]
+candidate_rfcs = []
+source_items = ["DEC-0261-5", "DEC-0261-9", "DEC-0261-10", "DEC-0261-11", "DEC-0261-CONFORMANCE"]
+options = [
+  "Supersede the unpublished Experimental 1.3 design with explicit verifier-typed Cell capture/load/store and checked clause-pattern operations while preserving deep continuation identity.",
+  "Define a later bytecode revision for the missing state and pattern contracts and retain 1.3 only as a bounded immutable/irrefutable experimental slice that cannot complete EFF-2104.",
+]
+irreversible_consequences = ["Choosing a wire representation fixes continuation aliasing, mutation visibility, verifier typing, malformed-artifact behavior, source mapping, and backward-reader compatibility."]
+required_evidence = ["positive", "negative", "mutable-cell", "repeated-resume", "refutable-pattern", "malformed", "resource", "cancellation", "interpreter-vm-differential", "migration"]
+owner_role = "effect-runtime-design"
+next_action = "Draft DEC-0262 before claiming complete Handler lowering or marking EFF-2104 Done."
+resolution = []
+superseded_by = ""
+observed_markers = [
+  "experimental:crates/ling-bytecode/src/lower/v1_1.rs",
+]

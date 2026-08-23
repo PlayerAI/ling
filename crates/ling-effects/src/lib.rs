@@ -159,6 +159,7 @@ pub struct CheckedProgram {
     typed: TypedProgram,
     definition_effects: BTreeMap<DefinitionId, EffectRow>,
     binding_effects: BTreeMap<BindingKey, EffectRow>,
+    expression_effects: BTreeMap<ExpressionKey, EffectRow>,
     handler_cores: BTreeMap<ExpressionKey, HandlerCore>,
     module_capabilities: BTreeMap<ModuleId, BTreeSet<Capability>>,
     warnings: Vec<Diagnostic>,
@@ -230,6 +231,12 @@ impl CheckedProgram {
     #[must_use]
     pub fn binding_effect(&self, binding: BindingKey) -> Option<&EffectRow> {
         self.binding_effects.get(&binding)
+    }
+
+    /// Returns the checked residual Effect row of one exact HIR expression.
+    #[must_use]
+    pub fn expression_effect(&self, expression: ExpressionKey) -> Option<&EffectRow> {
+        self.expression_effects.get(&expression)
     }
 
     #[must_use]
@@ -518,6 +525,7 @@ impl Checker {
                 Callable::Definition(_) => None,
             })
             .collect();
+        let expression_effects = self.build_expression_effect_rows(&callable_effects);
         let handler_cores = self.build_handler_cores(&callable_effects);
         let capability_definition_effects = capability_effects
             .iter()
@@ -532,6 +540,7 @@ impl Checker {
                 typed: self.typed,
                 definition_effects,
                 binding_effects,
+                expression_effects,
                 handler_cores,
                 module_capabilities,
                 warnings: self.warnings,
@@ -845,6 +854,119 @@ impl Checker {
                 self.visit_expression(module, body, &inner, effects, calls);
                 for clause in clauses {
                     self.visit_expression(module, &clause.body, handled, effects, calls);
+                }
+            }
+            hir::ExpressionKind::Name { .. }
+            | hir::ExpressionKind::Literal(_)
+            | hir::ExpressionKind::Unit => {}
+        }
+    }
+
+    fn build_expression_effect_rows(
+        &self,
+        callable_effects: &BTreeMap<Callable, EffectRow>,
+    ) -> BTreeMap<ExpressionKey, EffectRow> {
+        let mut output = BTreeMap::new();
+        for module in self.typed.resolved().modules() {
+            for definition in &module.hir.definitions {
+                self.collect_expression_effect_rows(
+                    module.id,
+                    &definition.value,
+                    callable_effects,
+                    &mut output,
+                );
+            }
+            for implementation in &module.hir.impls {
+                for definition in &implementation.members {
+                    self.collect_expression_effect_rows(
+                        module.id,
+                        &definition.value,
+                        callable_effects,
+                        &mut output,
+                    );
+                }
+            }
+        }
+        output
+    }
+
+    fn collect_expression_effect_rows(
+        &self,
+        module: ModuleId,
+        expression: &hir::Expression,
+        callable_effects: &BTreeMap<Callable, EffectRow>,
+        output: &mut BTreeMap<ExpressionKey, EffectRow>,
+    ) {
+        output.insert(
+            ExpressionKey::new(module, expression.id),
+            self.expression_effects(module, expression, callable_effects),
+        );
+        let mut visit = |value: &hir::Expression| {
+            self.collect_expression_effect_rows(module, value, callable_effects, output);
+        };
+        match &expression.kind {
+            hir::ExpressionKind::Sequence(elements) => {
+                for element in elements {
+                    visit(match element {
+                        hir::SequenceElement::Let(binding) => &binding.value,
+                        hir::SequenceElement::Expression(value) => value,
+                    });
+                }
+            }
+            hir::ExpressionKind::Handle { body, clauses } => {
+                visit(body);
+                for clause in clauses {
+                    visit(&clause.body);
+                }
+            }
+            hir::ExpressionKind::If {
+                condition,
+                then_branch,
+                else_branch,
+            } => {
+                visit(condition);
+                visit(then_branch);
+                visit(else_branch);
+            }
+            hir::ExpressionKind::Match { scrutinee, cases } => {
+                visit(scrutinee);
+                for case in cases {
+                    if let Some(guard) = &case.guard {
+                        visit(guard);
+                    }
+                    visit(&case.body);
+                }
+            }
+            hir::ExpressionKind::Assignment { value, .. }
+            | hir::ExpressionKind::Unary { operand: value, .. }
+            | hir::ExpressionKind::Projection { target: value, .. } => visit(value),
+            hir::ExpressionKind::Application {
+                function,
+                arguments,
+            } => {
+                visit(function);
+                for argument in arguments {
+                    visit(argument);
+                }
+            }
+            hir::ExpressionKind::Binary { left, right, .. } => {
+                visit(left);
+                visit(right);
+            }
+            hir::ExpressionKind::Tuple(values) | hir::ExpressionKind::List(values) => {
+                for value in values {
+                    visit(value);
+                }
+            }
+            hir::ExpressionKind::Record(fields) => {
+                for field in fields {
+                    visit(&field.value);
+                }
+            }
+            hir::ExpressionKind::RecordUpdate { base, fields } => {
+                visit(base);
+                for field in fields {
+                    visit(&field.value);
                 }
             }
             hir::ExpressionKind::Name { .. }

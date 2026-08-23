@@ -24,6 +24,12 @@ pub fn disassemble_v1_2(program: &LoweredProgramV1_2) -> String {
     disassemble_model(program.model(), "1.2", true)
 }
 
+/// Renders a deterministic version-1.3 debug view; this text is not a wire protocol.
+#[must_use]
+pub fn disassemble_v1_3(program: &crate::LoweredProgramV1_3) -> String {
+    disassemble_model(program.model(), "1.3", true)
+}
+
 fn disassemble_model(
     model: &UnverifiedProgram,
     revision: &str,
@@ -401,6 +407,32 @@ fn instruction_text(value: &Instruction) -> String {
             callee.get(),
             register_list(arguments)
         ),
+        Instruction::Handle {
+            destination,
+            body_function,
+            body_captures,
+            clauses,
+        } => format!(
+            "%r{} = handle @f{} ({}) [{}]",
+            destination.get(),
+            body_function.get(),
+            capture_list(body_captures),
+            clauses
+                .iter()
+                .map(|clause| format!(
+                    "0x{:02x}:{}:@f{}({})",
+                    clause.operation.tag(),
+                    if clause.resume_present {
+                        "resume"
+                    } else {
+                        "no-resume"
+                    },
+                    clause.function.get(),
+                    capture_list(&clause.captures)
+                ))
+                .collect::<Vec<_>>()
+                .join(", ")
+        ),
         Instruction::MakeTuple {
             destination,
             tuple,
@@ -501,6 +533,17 @@ fn instruction_text(value: &Instruction) -> String {
             format!("%r{} = console.write %r{}", destination.get(), text.get())
         }
     }
+}
+
+fn capture_list(captures: &[CaptureOperand]) -> String {
+    captures
+        .iter()
+        .map(|capture| match capture {
+            CaptureOperand::Register(register) => format!("%r{}", register.get()),
+            CaptureOperand::SelfReference => "self".to_owned(),
+        })
+        .collect::<Vec<_>>()
+        .join(", ")
 }
 
 fn terminator_text(value: &Terminator) -> String {

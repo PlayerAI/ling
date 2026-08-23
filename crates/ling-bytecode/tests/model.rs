@@ -1,8 +1,9 @@
 use ling_bytecode::{
-    BYTECODE_MAGIC, BYTECODE_PROTOCOL, Capability, CompareOperator, Constant, ConstantIndex,
-    DecodeLimits, Effect, FORMAT_VERSION, Function, FunctionIndex, FunctionKind, Instruction,
-    IntBinaryOperator, IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module,
-    ModuleIndex, PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
+    BYTECODE_MAGIC, BYTECODE_PROTOCOL, BYTECODE_PROTOCOL_1_3, Capability, CompareOperator,
+    Constant, ConstantIndex, DecodeLimits, Effect, FORMAT_VERSION, FORMAT_VERSION_1_3, Function,
+    FunctionIndex, FunctionKind, HandlerClause, HandlerOperation, Instruction, IntBinaryOperator,
+    IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module, ModuleIndex,
+    PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
     SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex, UNICODE_VERSION,
     UnverifiedProgram, ValueType,
 };
@@ -13,6 +14,9 @@ fn freezes_the_version_and_resource_contract() {
     assert_eq!(BYTECODE_MAGIC, *b"LINGBC\0\0");
     assert_eq!(FORMAT_VERSION.major(), 1);
     assert_eq!(FORMAT_VERSION.minor(), 0);
+    assert_eq!(BYTECODE_PROTOCOL_1_3, "ling.bytecode/1.3");
+    assert_eq!(FORMAT_VERSION_1_3.major(), 1);
+    assert_eq!(FORMAT_VERSION_1_3.minor(), 3);
     assert_eq!(LANGUAGE_VERSION.major(), 0);
     assert_eq!(LANGUAGE_VERSION.minor(), 1);
     assert_eq!(UNICODE_VERSION.major(), 17);
@@ -63,6 +67,9 @@ fn freezes_explicit_tags_without_using_rust_layout() {
     assert_eq!(IntBinaryOperator::Remainder.tag(), 4);
     assert_eq!(SourceOrigin::Direct.tag(), 0);
     assert_eq!(SourceOrigin::LoweringDerived.tag(), 1);
+    assert_eq!(HandlerOperation::ConsoleWrite.tag(), 1);
+    assert_eq!(HandlerOperation::ClockNow.tag(), 2);
+    assert_eq!(HandlerOperation::RandomNext.tag(), 3);
 
     let instructions = [
         Instruction::Const {
@@ -91,6 +98,17 @@ fn freezes_explicit_tags_without_using_rust_layout() {
             function: FunctionIndex::new(0),
             arguments: vec![RegisterIndex::new(1)],
         },
+        Instruction::Handle {
+            destination: RegisterIndex::new(0),
+            body_function: FunctionIndex::new(0),
+            body_captures: Vec::new(),
+            clauses: vec![HandlerClause {
+                operation: HandlerOperation::ConsoleWrite,
+                resume_present: true,
+                function: FunctionIndex::new(1),
+                captures: Vec::new(),
+            }],
+        },
         Instruction::Intrinsic {
             destination: RegisterIndex::new(0),
             intrinsic: Intrinsic::MaxInt,
@@ -103,7 +121,7 @@ fn freezes_explicit_tags_without_using_rust_layout() {
     ];
     assert_eq!(
         instructions.map(|instruction| instruction.opcode()),
-        [0x01, 0x02, 0x03, 0x04, 0x10, 0x11, 0x20]
+        [0x01, 0x02, 0x03, 0x04, 0x10, 0x1c, 0x11, 0x20]
     );
 
     let terminators = [

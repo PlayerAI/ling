@@ -5,8 +5,8 @@ use std::fmt;
 use ling_effects::{Effect as CheckedEffect, EntryErrorKind};
 use ling_hir as hir;
 use ling_resolve::{
-    BindingKey, Builtin, DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey, ModuleId,
-    ReferenceTarget,
+    BindingKey, Builtin, DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey,
+    HandlerValueType, ModuleId, ReferenceTarget, resolve_handler_operation,
 };
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId, Span};
@@ -24,9 +24,11 @@ use crate::{
 
 mod v1_1;
 mod v1_2;
+mod v1_3;
 
 pub use v1_1::{LoweredProgramV1_1, lower_v1_1};
 pub use v1_2::{LoweredProgramV1_2, lower_v1_2};
+pub use v1_3::{LoweredProgramV1_3, lower_v1_3};
 
 /// Exact original source bytes and the logical name permitted in bytecode.
 ///
@@ -1203,7 +1205,12 @@ fn collect_text_strings(expression: &hir::Expression, strings: &mut BTreeSet<Str
                 collect_text_strings(&field.value, strings);
             }
         }
-        hir::ExpressionKind::Handle { .. } => {}
+        hir::ExpressionKind::Handle { body, clauses } => {
+            collect_text_strings(body, strings);
+            for clause in clauses {
+                collect_text_strings(&clause.body, strings);
+            }
+        }
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
         | hir::ExpressionKind::Unit => {}

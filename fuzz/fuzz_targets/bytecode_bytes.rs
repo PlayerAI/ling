@@ -3,7 +3,7 @@
 use std::borrow::Cow;
 
 use libfuzzer_sys::fuzz_target;
-use ling_bytecode::decode_and_verify_v1;
+use ling_bytecode::decode_and_verify_v1_3;
 
 const VALID_HELLO_HEX: &str =
     include_str!("../../tests/bytecode/v1/golden/hello.lbc.hex");
@@ -17,8 +17,8 @@ fuzz_target!(|input: &[u8]| {
 });
 
 fn check_deterministic(bytes: &[u8]) {
-    let first = decode_and_verify_v1(bytes);
-    let second = decode_and_verify_v1(bytes);
+    let first = decode_and_verify_v1_3(bytes);
+    let second = decode_and_verify_v1_3(bytes);
     assert_eq!(first, second, "bytecode verification must be deterministic");
 
     match first {

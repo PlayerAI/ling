@@ -46,6 +46,12 @@ impl Heap {
             .map(Value::Closure)
     }
 
+    pub(crate) fn continuation(&self, id: u64) -> Result<Value, ()> {
+        const CONTINUATION_HANDLE_BYTES: u64 = 16;
+        self.allocate(Continuation { id }, CONTINUATION_HANDLE_BYTES)
+            .map(Value::Continuation)
+    }
+
     pub(crate) fn tuple(&self, elements: Vec<Value>) -> Result<Value, ()> {
         const TUPLE_BASE_BYTES: u64 = 16;
         const VALUE_BYTES: u64 = 16;
@@ -118,6 +124,16 @@ pub(crate) struct Closure {
     bound: Vec<BoundValue>,
 }
 
+pub(crate) struct Continuation {
+    id: u64,
+}
+
+impl Continuation {
+    pub(crate) const fn id(&self) -> u64 {
+        self.id
+    }
+}
+
 pub(crate) struct Record {
     type_index: u32,
     fields: Vec<Value>,
@@ -188,6 +204,7 @@ pub(crate) enum Value {
     Int(Rc<Allocation<BigInt>>),
     Text(Rc<Allocation<String>>),
     Closure(Rc<Allocation<Closure>>),
+    Continuation(Rc<Allocation<Continuation>>),
     Tuple(Rc<Allocation<Vec<Value>>>),
     Record(Rc<Allocation<Record>>),
     Variant(Rc<Allocation<Variant>>),
@@ -201,6 +218,7 @@ impl Value {
             | Self::Int(_)
             | Self::Text(_)
             | Self::Closure(_)
+            | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_)
             | Self::Variant(_) => None,
@@ -214,6 +232,7 @@ impl Value {
             | Self::Bool(_)
             | Self::Text(_)
             | Self::Closure(_)
+            | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_)
             | Self::Variant(_) => None,
@@ -227,6 +246,7 @@ impl Value {
             | Self::Bool(_)
             | Self::Int(_)
             | Self::Closure(_)
+            | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_)
             | Self::Variant(_) => None,
@@ -240,6 +260,21 @@ impl Value {
             | Self::Bool(_)
             | Self::Int(_)
             | Self::Text(_)
+            | Self::Continuation(_)
+            | Self::Tuple(_)
+            | Self::Record(_)
+            | Self::Variant(_) => None,
+        }
+    }
+
+    pub(crate) fn as_continuation_id(&self) -> Option<u64> {
+        match self {
+            Self::Continuation(value) => Some(value.value().id()),
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Text(_)
+            | Self::Closure(_)
             | Self::Tuple(_)
             | Self::Record(_)
             | Self::Variant(_) => None,
@@ -254,6 +289,7 @@ impl Value {
             | Self::Int(_)
             | Self::Text(_)
             | Self::Closure(_)
+            | Self::Continuation(_)
             | Self::Record(_)
             | Self::Variant(_) => None,
         }
@@ -267,6 +303,7 @@ impl Value {
             | Self::Int(_)
             | Self::Text(_)
             | Self::Closure(_)
+            | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Variant(_) => None,
         }
@@ -280,6 +317,7 @@ impl Value {
             | Self::Int(_)
             | Self::Text(_)
             | Self::Closure(_)
+            | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_) => None,
         }

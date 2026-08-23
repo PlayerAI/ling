@@ -1,4 +1,4 @@
-//! Verifier-gated reference virtual machine for `ling.bytecode/1.0`.
+//! Verifier-gated reference virtual machine for `ling.bytecode/1.x`.
 //!
 //! The executor accepts only [`ling_bytecode::VerifiedProgramV1`]. It has no
 //! parser, HIR, checker, filesystem, environment, or ambient host-capability

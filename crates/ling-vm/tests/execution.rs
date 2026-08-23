@@ -2,8 +2,8 @@ mod support;
 
 use ling_bytecode::{
     Instruction, LoweringSource, SourceMapEntry, VerifiedProgramV1, decode_and_verify_v1,
-    decode_and_verify_v1_1, decode_and_verify_v1_2, encode_v1, encode_v1_1, encode_v1_2, lower_v1,
-    lower_v1_1, lower_v1_2,
+    decode_and_verify_v1_1, decode_and_verify_v1_2, decode_and_verify_v1_3, encode_v1, encode_v1_1,
+    encode_v1_2, encode_v1_3, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
 };
 use ling_diagnostics::codes;
 use ling_effects::locate_main;
@@ -68,6 +68,16 @@ fn verified_v1_2(fixture: &Fixture) -> VerifiedProgramV1 {
     .expect("fixture lowers to bytecode 1.2");
     let bytes = encode_v1_2(&lowered).expect("fixture encodes");
     decode_and_verify_v1_2(&bytes).expect("fixture independently verifies")
+}
+
+fn verified_v1_3(fixture: &Fixture) -> VerifiedProgramV1 {
+    let lowered = lower_v1_3(
+        &fixture.snapshot,
+        &[LoweringSource::new(&fixture.source, "src/Main.ling")],
+    )
+    .expect("fixture lowers to bytecode 1.3");
+    let bytes = encode_v1_3(&lowered).expect("fixture encodes");
+    decode_and_verify_v1_3(&bytes).expect("fixture independently verifies")
 }
 
 fn generous_limits() -> ExecutionLimits {
@@ -165,6 +175,203 @@ fn vm_matches_the_checked_interpreter_for_hello_and_direct_calls() {
         execute_v1(&program, generous_limits(), &mut host).expect("VM executes verified input");
         assert_eq!(vm_console.output, interpreter_console.output(), "{name}");
     }
+}
+
+#[test]
+fn vm_executes_checked_console_handlers_without_intercepted_host_output() {
+    for (name, clause) in [
+        (
+            "handler-zero.ling",
+            "        operation Console.Write.write(message, resume) -> ()\n",
+        ),
+        (
+            "handler-resume.ling",
+            "        operation Console.Write.write(message, resume) -> resume ()\n",
+        ),
+    ] {
+        let text = format!(
+            "module Main\n    requires Console.Write\n\nlet main () =\n    handle Console.write \"handled\" with\n{clause}"
+        );
+        let fixture = fixture(name, &text);
+        let program = verified_v1_3(&fixture);
+        assert!(program.entry_console_capability_required());
+        let mut console = RecordingConsole::default();
+        let mut host = HostCapabilities::with_console(&mut console);
+        execute_v1(&program, generous_limits(), &mut host).expect("Handler executes");
+        assert_eq!(console.output, "", "{name}");
+    }
+}
+
+#[test]
+fn masked_console_handler_still_requires_injected_capability() {
+    let fixture = fixture(
+        "handler-capability.ling",
+        concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    handle Console.write \"handled\" with\n",
+            "        operation Console.Write.write(message, resume) -> ()\n",
+        ),
+    );
+    let program = verified_v1_3(&fixture);
+    let mut host = HostCapabilities::none();
+    let fault = runtime(
+        execute_v1(&program, generous_limits(), &mut host)
+            .expect_err("unmasked capability closure requires injection"),
+    );
+    assert!(matches!(
+        fault.kind(),
+        RuntimeFaultKind::CapabilityUnavailable {
+            capability: "Console.Write"
+        }
+    ));
+}
+
+#[test]
+fn vm_reinstalls_deep_handlers_and_exposes_clause_effects_outward() {
+    for (name, text) in [
+        (
+            "handler-deep.ling",
+            concat!(
+                "module Main\n",
+                "    requires Console.Write\n\n",
+                "let emitBoth () =\n",
+                "    Console.write \"first\"\n",
+                "    Console.write \"second\"\n\n",
+                "let main () =\n",
+                "    handle emitBoth () with\n",
+                "        operation Console.Write.write(message, resume) ->\n",
+                "            if message == \"first\" then resume () else ()\n",
+            ),
+        ),
+        (
+            "handler-nested.ling",
+            concat!(
+                "module Main\n",
+                "    requires Console.Write\n\n",
+                "let inner () =\n",
+                "    handle Console.write \"body\" with\n",
+                "        operation Console.Write.write(message, resume) ->\n",
+                "            Console.write \"inner clause\"\n\n",
+                "let main () =\n",
+                "    handle inner () with\n",
+                "        operation Console.Write.write(message, resume) -> ()\n",
+            ),
+        ),
+    ] {
+        let fixture = fixture(name, text);
+        let program = verified_v1_3(&fixture);
+        let mut console = RecordingConsole::default();
+        let mut host = HostCapabilities::with_console(&mut console);
+        execute_v1(&program, generous_limits(), &mut host).expect("deep Handler executes");
+        assert_eq!(console.output, "", "{name}");
+    }
+}
+
+#[test]
+fn vm_rejects_a_second_once_resume_with_the_registered_fault_projection() {
+    let fixture = fixture(
+        "handler-cardinality.ling",
+        concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let invokeTwice callback =\n",
+            "    let ignored = callback ()\n",
+            "    callback ()\n\n",
+            "let main () =\n",
+            "    handle Console.write \"body\" with\n",
+            "        operation Console.Write.write(message, resume) -> invokeTwice resume\n",
+        ),
+    );
+    let program = verified_v1_3(&fixture);
+    let mut console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1(&program, generous_limits(), &mut host)
+            .expect_err("Once continuation rejects its second restoration"),
+    );
+    assert!(matches!(
+        fault.kind(),
+        RuntimeFaultKind::HandlerResumeCardinality {
+            operation: "Console.Write.write"
+        }
+    ));
+    let diagnostic = fault.to_diagnostic();
+    assert_eq!(diagnostic.code(), codes::RUNTIME_FAULT);
+    assert_eq!(
+        diagnostic
+            .facts()
+            .get("category")
+            .and_then(|value| value.as_str()),
+        Some("handler_resume_cardinality")
+    );
+}
+
+#[test]
+fn handler_and_continuation_limits_fail_before_the_bounded_action() {
+    let fixture = fixture(
+        "handler-limits.ling",
+        concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    handle Console.write \"body\" with\n",
+            "        operation Console.Write.write(message, resume) -> resume ()\n",
+        ),
+    );
+    let program = verified_v1_3(&fixture);
+    for (limits, expected) in [
+        (
+            generous_limits().with_handler_limits(0, 1_024),
+            RuntimeResource::HandlerDepth,
+        ),
+        (
+            generous_limits().with_handler_limits(1_024, 0),
+            RuntimeResource::ContinuationFrame,
+        ),
+    ] {
+        let mut console = RecordingConsole::default();
+        let mut host = HostCapabilities::with_console(&mut console);
+        let fault = runtime(
+            execute_v1(&program, limits, &mut host).expect_err("bounded Handler action faults"),
+        );
+        assert_eq!(
+            fault.kind(),
+            &RuntimeFaultKind::ResourceLimit { resource: expected }
+        );
+        assert_eq!(console.output, "");
+    }
+}
+
+#[test]
+fn cancellation_wins_before_continuation_restoration_and_preserves_committed_output() {
+    let fixture = fixture(
+        "handler-cancel.ling",
+        concat!(
+            "module Main\n",
+            "    requires Console.Write\n\n",
+            "let main () =\n",
+            "    handle Console.write \"trigger\" with\n",
+            "        operation Console.Write.write(message, resume) ->\n",
+            "            Console.write \"committed\"\n",
+            "            resume ()\n",
+        ),
+    );
+    let program = verified_v1_3(&fixture);
+    let token = CancellationToken::new();
+    let mut console = CancellingConsole {
+        output: String::new(),
+        token: token.clone(),
+    };
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1_with_cancellation(&program, generous_limits(), &mut host, &token)
+            .expect_err("cancellation precedes resume restoration"),
+    );
+    assert_eq!(fault.kind(), &RuntimeFaultKind::Cancelled);
+    assert!(fault.committed());
+    assert_eq!(console.output, "committed\n");
 }
 
 #[test]

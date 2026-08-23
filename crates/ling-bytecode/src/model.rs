@@ -380,6 +380,35 @@ pub enum Intrinsic {
     MinInt,
 }
 
+/// Canonical operation tags accepted by the bytecode-1.3 Handler instruction.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum HandlerOperation {
+    ConsoleWrite,
+    ClockNow,
+    RandomNext,
+}
+
+impl HandlerOperation {
+    /// Returns the DEC-0261 wire tag.
+    #[must_use]
+    pub const fn tag(self) -> u8 {
+        match self {
+            Self::ConsoleWrite => 1,
+            Self::ClockNow => 2,
+            Self::RandomNext => 3,
+        }
+    }
+}
+
+/// One ordered bytecode-1.3 Handler clause closure.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct HandlerClause {
+    pub operation: HandlerOperation,
+    pub resume_present: bool,
+    pub function: FunctionIndex,
+    pub captures: Vec<CaptureOperand>,
+}
+
 impl Intrinsic {
     /// Returns the explicit instruction operand tag.
     #[must_use]
@@ -430,6 +459,12 @@ pub enum Instruction {
         destination: RegisterIndex,
         callee: RegisterIndex,
         arguments: Vec<RegisterIndex>,
+    },
+    Handle {
+        destination: RegisterIndex,
+        body_function: FunctionIndex,
+        body_captures: Vec<CaptureOperand>,
+        clauses: Vec<HandlerClause>,
     },
     MakeTuple {
         destination: RegisterIndex,
@@ -496,6 +531,7 @@ impl Instruction {
             Self::Intrinsic { .. } => 0x11,
             Self::MakeClosure { .. } => 0x12,
             Self::CallClosure { .. } => 0x13,
+            Self::Handle { .. } => 0x1c,
             Self::MakeTuple { .. } => 0x14,
             Self::GetTuple { .. } => 0x15,
             Self::MakeRecord { .. } => 0x16,

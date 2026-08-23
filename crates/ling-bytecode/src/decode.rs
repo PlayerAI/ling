@@ -2,12 +2,12 @@ use crate::{
     BYTECODE_MAGIC, Block, BlockIndex, BlockParameter, BytecodeError, BytecodePhase,
     BytecodeReason, Capability, CaptureOperand, CompareOperator, Constant, ConstantIndex,
     DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FORMAT_VERSION_1_2,
-    FormatVersion, Function, FunctionIndex, FunctionKind, HEADER_BYTES, Instruction,
-    IntBinaryOperator, IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module,
-    ModuleIndex, NO_INDEX, Package, PackageContentDigest, PackageIndex, PackageReference,
-    ProgramParts, RecordField, RegisterIndex, Source, SourceDigest, SourceIndex, SourceMapEntry,
-    SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex, UNICODE_VERSION,
-    UnverifiedProgram, ValueType, VariantCase,
+    FORMAT_VERSION_1_3, FormatVersion, Function, FunctionIndex, FunctionKind, HEADER_BYTES,
+    HandlerClause, HandlerOperation, Instruction, IntBinaryOperator, IntUnaryOperator, IntegerSign,
+    Intrinsic, LANGUAGE_VERSION, Module, ModuleIndex, NO_INDEX, Package, PackageContentDigest,
+    PackageIndex, PackageReference, ProgramParts, RecordField, RegisterIndex, Source, SourceDigest,
+    SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex,
+    UNICODE_VERSION, UnverifiedProgram, ValueType, VariantCase,
 };
 
 /// Untrusted result of decoding one syntactically framed version-1.0 artifact.
@@ -108,6 +108,19 @@ pub fn decode_v1_2_with_limit(
     artifact_byte_limit: u64,
 ) -> Result<DecodedProgramV1, BytecodeError> {
     decode_with_limit(bytes, artifact_byte_limit, 2)
+}
+
+/// Decodes bytecode 1.0 through 1.3 under the DEC-0261/RFC-0016 hard limits.
+pub fn decode_v1_3(bytes: &[u8]) -> Result<DecodedProgramV1, BytecodeError> {
+    decode_v1_3_with_limit(bytes, DecodeLimits::rfc_0016().artifact_bytes())
+}
+
+/// Decodes bytecode 1.0 through 1.3 under a caller-capped hard limit.
+pub fn decode_v1_3_with_limit(
+    bytes: &[u8],
+    artifact_byte_limit: u64,
+) -> Result<DecodedProgramV1, BytecodeError> {
+    decode_with_limit(bytes, artifact_byte_limit, 3)
 }
 
 fn decode_with_limit(
@@ -220,7 +233,7 @@ fn decode_header(
         reader.u16(BytecodePhase::Envelope)?,
     );
     let supported_format =
-        format.major() == 1 && format.minor() <= maximum_minor && format.minor() <= 2;
+        format.major() == 1 && format.minor() <= maximum_minor && format.minor() <= 3;
     if !supported_format {
         let offset = if format.major() == 1 { 14 } else { 12 };
         return Err(BytecodeError::new(
@@ -1067,40 +1080,7 @@ fn decode_instruction(
         0x12 if version >= FORMAT_VERSION_1_1 => {
             let destination = RegisterIndex::new(reader.u32(BytecodePhase::Register)?);
             let function = FunctionIndex::new(reader.u32(BytecodePhase::Instruction)?);
-            let count_offset = reader.offset();
-            let count = reader.bounded_count(
-                BytecodePhase::Register,
-                "closure_captures",
-                limits.arguments_per_operation(),
-                8,
-                BytecodeReason::InvalidInstructionLength,
-            )?;
-            let mut captures = allocate_vec(
-                count,
-                "closure_captures",
-                limits.arguments_per_operation(),
-                count_offset,
-            )?;
-            for _ in 0..count {
-                let tag_offset = reader.offset();
-                let tag = reader.u8(BytecodePhase::Register)?;
-                reader.zeroes(3, BytecodePhase::Register)?;
-                let value = reader.u32(BytecodePhase::Register)?;
-                let capture = match tag {
-                    0 => CaptureOperand::Register(RegisterIndex::new(value)),
-                    1 if value == NO_INDEX => CaptureOperand::SelfReference,
-                    1 => {
-                        return Err(BytecodeError::new(
-                            BytecodePhase::Register,
-                            BytecodeReason::InvalidTag,
-                            tag_offset,
-                            8,
-                        ));
-                    }
-                    _ => return Err(invalid_tag(BytecodePhase::Register, tag_offset)),
-                };
-                captures.push(capture);
-            }
+            let captures = decode_captures(reader, limits)?;
             Ok(Instruction::MakeClosure {
                 destination,
                 function,
@@ -1159,6 +1139,55 @@ fn decode_instruction(
             variant: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
             case: reader.u32(BytecodePhase::Type)?,
         }),
+        0x1c if version >= FORMAT_VERSION_1_3 => {
+            let destination = RegisterIndex::new(reader.u32(BytecodePhase::Register)?);
+            let body_function = FunctionIndex::new(reader.u32(BytecodePhase::Instruction)?);
+            let body_captures = decode_captures(reader, limits)?;
+            let count_offset = reader.offset();
+            let count = reader.bounded_count(
+                BytecodePhase::Instruction,
+                "handler_clauses",
+                limits.arguments_per_operation(),
+                12,
+                BytecodeReason::InvalidInstructionLength,
+            )?;
+            let mut clauses = allocate_vec(
+                count,
+                "handler_clauses",
+                limits.arguments_per_operation(),
+                count_offset,
+            )?;
+            for _ in 0..count {
+                let tag_offset = reader.offset();
+                let operation = match reader.u8(BytecodePhase::Instruction)? {
+                    1 => HandlerOperation::ConsoleWrite,
+                    2 => HandlerOperation::ClockNow,
+                    3 => HandlerOperation::RandomNext,
+                    _ => return Err(invalid_tag(BytecodePhase::Instruction, tag_offset)),
+                };
+                let resume_offset = reader.offset();
+                let resume_present = match reader.u8(BytecodePhase::Instruction)? {
+                    0 => false,
+                    1 => true,
+                    _ => return Err(invalid_tag(BytecodePhase::Instruction, resume_offset)),
+                };
+                reader.zeroes(2, BytecodePhase::Instruction)?;
+                let function = FunctionIndex::new(reader.u32(BytecodePhase::Instruction)?);
+                let captures = decode_captures(reader, limits)?;
+                clauses.push(HandlerClause {
+                    operation,
+                    resume_present,
+                    function,
+                    captures,
+                });
+            }
+            Ok(Instruction::Handle {
+                destination,
+                body_function,
+                body_captures,
+                clauses,
+            })
+        }
         0x20 => Ok(Instruction::ConsoleWrite {
             destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
             text: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
@@ -1170,6 +1199,47 @@ fn decode_instruction(
             1,
         )),
     }
+}
+
+fn decode_captures(
+    reader: &mut Reader<'_>,
+    limits: DecodeLimits,
+) -> Result<Vec<CaptureOperand>, BytecodeError> {
+    let count_offset = reader.offset();
+    let count = reader.bounded_count(
+        BytecodePhase::Register,
+        "closure_captures",
+        limits.arguments_per_operation(),
+        8,
+        BytecodeReason::InvalidInstructionLength,
+    )?;
+    let mut captures = allocate_vec(
+        count,
+        "closure_captures",
+        limits.arguments_per_operation(),
+        count_offset,
+    )?;
+    for _ in 0..count {
+        let tag_offset = reader.offset();
+        let tag = reader.u8(BytecodePhase::Register)?;
+        reader.zeroes(3, BytecodePhase::Register)?;
+        let value = reader.u32(BytecodePhase::Register)?;
+        let capture = match tag {
+            0 => CaptureOperand::Register(RegisterIndex::new(value)),
+            1 if value == NO_INDEX => CaptureOperand::SelfReference,
+            1 => {
+                return Err(BytecodeError::new(
+                    BytecodePhase::Register,
+                    BytecodeReason::InvalidTag,
+                    tag_offset,
+                    8,
+                ));
+            }
+            _ => return Err(invalid_tag(BytecodePhase::Register, tag_offset)),
+        };
+        captures.push(capture);
+    }
+    Ok(captures)
 }
 
 fn decode_record_updates(

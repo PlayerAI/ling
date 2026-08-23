@@ -3,10 +3,10 @@ use std::fmt;
 
 use crate::{
     BYTECODE_MAGIC, Block, CaptureOperand, Constant, DecodeLimits, FORMAT_VERSION_1_0,
-    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FormatVersion, Function, FunctionKind, HEADER_BYTES,
-    Instruction, LANGUAGE_VERSION, LoweredProgramV1, LoweredProgramV1_1, NO_INDEX,
-    PackageReference, SourceMapEntry, Terminator, UNICODE_VERSION, UnverifiedProgram, ValueType,
-    VerifiedProgramV1,
+    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FORMAT_VERSION_1_3, FormatVersion, Function,
+    FunctionKind, HEADER_BYTES, Instruction, LANGUAGE_VERSION, LoweredProgramV1,
+    LoweredProgramV1_1, LoweredProgramV1_3, NO_INDEX, PackageReference, SourceMapEntry, Terminator,
+    UNICODE_VERSION, UnverifiedProgram, ValueType, VerifiedProgramV1,
 };
 
 /// Failure categories for deterministic bytecode writing.
@@ -136,6 +136,27 @@ pub fn encode_v1_2_with_limit(
     Ok(bytes)
 }
 
+/// Encodes canonical bytecode 1.3 using the DEC-0261/RFC-0016 hard limits.
+pub fn encode_v1_3(program: &LoweredProgramV1_3) -> Result<Vec<u8>, EncodingError> {
+    encode_v1_3_with_limit(program, DecodeLimits::rfc_0016().artifact_bytes())
+}
+
+/// Encodes canonical bytecode 1.3 under a caller-supplied bounded limit.
+pub fn encode_v1_3_with_limit(
+    program: &LoweredProgramV1_3,
+    artifact_byte_limit: u64,
+) -> Result<Vec<u8>, EncodingError> {
+    let hard_limit = DecodeLimits::rfc_0016().artifact_bytes();
+    let bytes = encode_model(program.model(), FORMAT_VERSION_1_3, hard_limit)?;
+    let actual =
+        u64::try_from(bytes.len()).map_err(|_| EncodingError::resource(u64::MAX, hard_limit))?;
+    let effective_limit = artifact_byte_limit.min(hard_limit);
+    if actual > effective_limit {
+        return Err(EncodingError::resource(actual, effective_limit));
+    }
+    Ok(bytes)
+}
+
 /// Re-encodes a verified program using the canonical version-1.0 writer.
 pub fn encode_verified_v1(program: &VerifiedProgramV1) -> Result<Vec<u8>, EncodingError> {
     encode_verified_v1_with_limit(program, DecodeLimits::rfc_0014().artifact_bytes())
@@ -146,7 +167,7 @@ pub fn encode_verified_v1_with_limit(
     program: &VerifiedProgramV1,
     artifact_byte_limit: u64,
 ) -> Result<Vec<u8>, EncodingError> {
-    let limits = if program.version() == FORMAT_VERSION_1_2 {
+    let limits = if program.version() >= FORMAT_VERSION_1_2 {
         DecodeLimits::rfc_0016()
     } else if program.version() == FORMAT_VERSION_1_1 {
         DecodeLimits::rfc_0015()
@@ -172,6 +193,7 @@ pub(crate) fn encode_model(
     if version != FORMAT_VERSION_1_0
         && version != FORMAT_VERSION_1_1
         && version != FORMAT_VERSION_1_2
+        && version != FORMAT_VERSION_1_3
     {
         return Err(EncodingError::invariant(
             "unsupported bytecode writer version",
@@ -463,16 +485,7 @@ fn encode_instruction(
         } if version >= FORMAT_VERSION_1_1 => {
             writer.u32(destination.get())?;
             writer.u32(function.get())?;
-            writer.length(captures.len(), "closure capture count")?;
-            for capture in captures {
-                writer.u8(capture.tag())?;
-                writer.bytes(&[0; 3])?;
-                match capture {
-                    CaptureOperand::Register(register) => writer.u32(register.get())?,
-                    CaptureOperand::SelfReference => writer.u32(NO_INDEX)?,
-                }
-            }
-            Ok(())
+            encode_captures(writer, captures)
         }
         Instruction::CallClosure {
             destination,
@@ -483,6 +496,28 @@ fn encode_instruction(
             writer.u32(callee.get())?;
             writer.registers(arguments)
         }
+        Instruction::Handle {
+            destination,
+            body_function,
+            body_captures,
+            clauses,
+        } if version >= FORMAT_VERSION_1_3 => {
+            writer.u32(destination.get())?;
+            writer.u32(body_function.get())?;
+            encode_captures(writer, body_captures)?;
+            writer.length(clauses.len(), "handler clause count")?;
+            for clause in clauses {
+                writer.u8(clause.operation.tag())?;
+                writer.u8(u8::from(clause.resume_present))?;
+                writer.bytes(&[0; 2])?;
+                writer.u32(clause.function.get())?;
+                encode_captures(writer, &clause.captures)?;
+            }
+            Ok(())
+        }
+        Instruction::Handle { .. } => Err(EncodingError::invariant(
+            "bytecode 1.0-1.2 cannot encode Handler instructions",
+        )),
         Instruction::MakeClosure { .. } | Instruction::CallClosure { .. } => Err(
             EncodingError::invariant("bytecode 1.0 cannot encode closure instructions"),
         ),
@@ -590,6 +625,19 @@ fn encode_instruction(
             writer.u32(text.get())
         }
     }
+}
+
+fn encode_captures(writer: &mut Writer, captures: &[CaptureOperand]) -> Result<(), EncodingError> {
+    writer.length(captures.len(), "closure capture count")?;
+    for capture in captures {
+        writer.u8(capture.tag())?;
+        writer.bytes(&[0; 3])?;
+        match capture {
+            CaptureOperand::Register(register) => writer.u32(register.get())?,
+            CaptureOperand::SelfReference => writer.u32(NO_INDEX)?,
+        }
+    }
+    Ok(())
 }
 
 fn encode_terminator(writer: &mut Writer, terminator: &Terminator) -> Result<(), EncodingError> {

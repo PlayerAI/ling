@@ -11,6 +11,8 @@ use crate::HostErrorCategory;
 pub enum RuntimeResource {
     Step,
     Frame,
+    HandlerDepth,
+    ContinuationFrame,
 }
 
 impl RuntimeResource {
@@ -18,11 +20,13 @@ impl RuntimeResource {
         match self {
             Self::Step => "step_limit",
             Self::Frame => "frame_limit",
+            Self::HandlerDepth => "handler_depth_limit",
+            Self::ContinuationFrame => "continuation_frame_limit",
         }
     }
 }
 
-/// Runtime failures defined by RFC-0014 for bytecode version 1.0.
+/// Runtime failures defined for the verified bytecode 1.x execution boundary.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum RuntimeFaultKind {
     DivisionByZero {
@@ -45,6 +49,9 @@ pub enum RuntimeFaultKind {
         operation: &'static str,
     },
     Cancelled,
+    HandlerResumeCardinality {
+        operation: &'static str,
+    },
 }
 
 impl RuntimeFaultKind {
@@ -57,6 +64,7 @@ impl RuntimeFaultKind {
             Self::ResourceLimit { .. } => "resource_limit",
             Self::OutOfMemory { .. } => "out_of_memory",
             Self::Cancelled => "cancelled",
+            Self::HandlerResumeCardinality { .. } => "handler_resume_cardinality",
         }
     }
 
@@ -64,6 +72,7 @@ impl RuntimeFaultKind {
         match self {
             Self::DivisionByZero { operation }
             | Self::HostCapability { operation, .. }
+            | Self::HandlerResumeCardinality { operation }
             | Self::OutOfMemory { operation } => operation,
             Self::InvalidFormatPlaceholderCount { .. } => "Text.format",
             Self::CapabilityUnavailable { capability } => capability,
@@ -151,6 +160,10 @@ impl RuntimeFault {
             RuntimeFaultKind::Cancelled => (
                 "运行时执行已取消".to_owned(),
                 "runtime execution was cancelled".to_owned(),
+            ),
+            RuntimeFaultKind::HandlerResumeCardinality { operation } => (
+                format!("Handler operation“{operation}”的 continuation 只能恢复一次"),
+                format!("handler operation `{operation}` continuation may be resumed only once"),
             ),
         };
         Diagnostic::new(

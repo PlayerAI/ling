@@ -1,8 +1,10 @@
 use ling_bytecode::{
-    CaptureOperand, Constant, EncodingErrorKind, FunctionKind, Instruction, LoweringErrorKind,
-    LoweringSource, decode_and_verify_v1_1, decode_and_verify_v1_2, disassemble_v1,
-    disassemble_v1_1, disassemble_v1_2, encode_v1, encode_v1_1, encode_v1_2, encode_v1_with_limit,
-    lower_v1, lower_v1_1, lower_v1_2,
+    BytecodeReason, CaptureOperand, Constant, EncodingErrorKind, FORMAT_VERSION_1_0,
+    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FunctionKind, Instruction, LoweringErrorKind,
+    LoweringSource, decode_and_verify_v1_1, decode_and_verify_v1_2, decode_and_verify_v1_3,
+    disassemble_v1, disassemble_v1_1, disassemble_v1_2, disassemble_v1_3, encode_v1, encode_v1_1,
+    encode_v1_2, encode_v1_3, encode_v1_with_limit, encode_verified_v1, lower_v1, lower_v1_1,
+    lower_v1_2, lower_v1_3,
 };
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId};
@@ -29,6 +31,20 @@ fn checked_source(display_name: &str, text: &str) -> (SourceFile, ProgramSnapsho
         .expect("fixture is valid source");
     let snapshot = snapshot(&source);
     (source, snapshot)
+}
+
+fn unique_bytes(bytes: &[u8], needle: &[u8]) -> usize {
+    let positions = bytes
+        .windows(needle.len())
+        .enumerate()
+        .filter_map(|(index, value)| (value == needle).then_some(index))
+        .collect::<Vec<_>>();
+    assert_eq!(positions.len(), 1, "byte pattern must be unique");
+    positions[0]
+}
+
+fn overwrite_u32(bytes: &mut [u8], offset: usize, value: u32) {
+    bytes[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
 }
 
 fn hex(bytes: &[u8]) -> String {
@@ -202,7 +218,7 @@ fn unsupported_checked_features_fail_atomically_with_original_span() {
 }
 
 #[test]
-fn every_bytecode_revision_rejects_checked_handlers_atomically() {
+fn bytecode_1_3_alone_lowers_checked_handlers() {
     let text = concat!(
         "module Main\n\n",
         "let main () =\n",
@@ -227,6 +243,281 @@ fn every_bytecode_revision_rejects_checked_handlers_atomically() {
             }
         );
     }
+    let lowered = lower_v1_3(&snapshot, &sources).expect("bytecode 1.3 lowers Handler");
+    let handle = lowered
+        .model()
+        .functions()
+        .iter()
+        .flat_map(|function| &function.blocks)
+        .flat_map(|block| &block.instructions)
+        .find(|instruction| matches!(instruction, Instruction::Handle { .. }))
+        .expect("one Handle instruction");
+    assert_eq!(handle.opcode(), 0x1c);
+    let bytes = encode_v1_3(&lowered).expect("bytecode 1.3 encodes");
+    assert!(decode_and_verify_v1_2(&bytes).is_err(), "1.2 rejects 1.3");
+    let verified = decode_and_verify_v1_3(&bytes).expect("bytecode 1.3 verifies");
+    assert_eq!(verified.version().minor(), 3);
+    assert!(disassemble_v1_3(&lowered).contains(" = handle "));
+}
+
+#[test]
+fn bytecode_1_3_reader_accepts_every_earlier_minor_revision() {
+    let (source, snapshot) = checked_source("compatibility.ling", HELLO);
+    let sources = [LoweringSource::new(&source, "src/Main.ling")];
+    let v1 = encode_v1(&lower_v1(&snapshot, &sources).expect("v1 lowers")).expect("v1 encodes");
+    let v1_1 =
+        encode_v1_1(&lower_v1_1(&snapshot, &sources).expect("v1.1 lowers")).expect("v1.1 encodes");
+    let v1_2 =
+        encode_v1_2(&lower_v1_2(&snapshot, &sources).expect("v1.2 lowers")).expect("v1.2 encodes");
+    for (bytes, version) in [
+        (v1, FORMAT_VERSION_1_0),
+        (v1_1, FORMAT_VERSION_1_1),
+        (v1_2, FORMAT_VERSION_1_2),
+    ] {
+        assert_eq!(
+            decode_and_verify_v1_3(&bytes)
+                .expect("1.3 reader accepts earlier revision")
+                .version(),
+            version
+        );
+    }
+}
+
+#[test]
+fn bytecode_1_3_lowers_console_resume_and_lexical_captures() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let suffix = \"captured\"\n",
+        "    handle Console.write suffix with\n",
+        "        operation Console.Write.write(message, resume) -> resume ()\n",
+    );
+    let (source, snapshot) = checked_source("handler-resume.ling", text);
+    let lowered = lower_v1_3(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("bytecode 1.3 lowers captured resume Handler");
+    let handle = lowered
+        .model()
+        .functions()
+        .iter()
+        .flat_map(|function| &function.blocks)
+        .flat_map(|block| &block.instructions)
+        .find_map(|instruction| match instruction {
+            Instruction::Handle {
+                body_captures,
+                clauses,
+                ..
+            } => Some((body_captures, clauses)),
+            _ => None,
+        })
+        .expect("Handle instruction exists");
+    assert_eq!(handle.0.len(), 1);
+    assert_eq!(handle.1.len(), 1);
+    assert!(handle.1[0].resume_present);
+    assert_eq!(handle.1[0].captures.len(), 0);
+    let bytes = encode_v1_3(&lowered).expect("Handler artifact encodes");
+    let verified = decode_and_verify_v1_3(&bytes).expect("Handler artifact verifies");
+    assert_eq!(
+        encode_verified_v1(&verified).expect("canonical re-encoding"),
+        bytes
+    );
+
+    let (other_source, other_snapshot) = checked_source("D:/other/checkout/Main.ling", text);
+    let other = lower_v1_3(
+        &other_snapshot,
+        &[LoweringSource::new(&other_source, "src/Main.ling")],
+    )
+    .expect("path-independent Handler lowers");
+    assert_eq!(
+        encode_v1_3(&other).expect("other Handler encodes"),
+        bytes,
+        "physical display paths cannot affect 1.3 bytes"
+    );
+}
+
+#[test]
+fn bytecode_1_3_handler_source_maps_preserve_bom_crlf_and_resume_identifier_spans() {
+    let text = concat!(
+        "\u{feff}module Main\r\n",
+        "    requires Console.Write\r\n\r\n",
+        "let main () =\r\n",
+        "    handle Console.write \"你好🙂\" with\r\n",
+        "        operation Console.Write.write(message, resume) -> resume ()\r\n",
+    );
+    let (source, snapshot) = checked_source("C:/checkout/处理.ling", text);
+    let lowered = lower_v1_3(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("Unicode Handler lowers");
+    let mut handle_location = None;
+    let mut resume_location = None;
+    for (function, definition) in lowered.model().functions().iter().enumerate() {
+        for (block, body) in definition.blocks.iter().enumerate() {
+            for (ordinal, instruction) in body.instructions.iter().enumerate() {
+                let location = (function as u32, block as u32, ordinal as u32);
+                match instruction {
+                    Instruction::Handle { .. } => handle_location = Some(location),
+                    Instruction::CallClosure { .. } => resume_location = Some(location),
+                    _ => {}
+                }
+            }
+        }
+    }
+    let mapped_span = |location: (u32, u32, u32)| {
+        lowered
+            .model()
+            .source_map()
+            .iter()
+            .find(|entry| (entry.function.get(), entry.block.get(), entry.ordinal) == location)
+            .expect("executable location is mapped")
+            .span
+    };
+    let handle_span = mapped_span(handle_location.expect("Handle instruction"));
+    assert_eq!(
+        handle_span.start_byte(),
+        text.find("handle").unwrap() as u64
+    );
+    assert!(text.is_char_boundary(handle_span.start_byte() as usize));
+    assert!(text.is_char_boundary(handle_span.end_byte() as usize));
+
+    let resume_span = mapped_span(resume_location.expect("resume CallClosure"));
+    let resume_start = text.rfind("resume ()").unwrap() as u64;
+    assert_eq!(resume_span.start_byte(), resume_start);
+    assert_eq!(resume_span.end_byte(), resume_start + "resume".len() as u64);
+}
+
+#[test]
+fn bytecode_1_3_rejects_malformed_handler_records_without_partial_publication() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let suffix = \"captured\"\n",
+        "    handle Console.write suffix with\n",
+        "        operation Console.Write.write(message, resume) -> resume ()\n",
+    );
+    let (source, snapshot) = checked_source("handler-malformed.ling", text);
+    let lowered = lower_v1_3(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("Handler lowers");
+    let bytes = encode_v1_3(&lowered).expect("Handler encodes");
+    let opcode = unique_bytes(&bytes, &[0x1c, 0, 0, 0]);
+    let cases = [
+        ("operation_tag", BytecodeReason::InvalidTag, {
+            let mut corrupt = bytes.clone();
+            corrupt[opcode + 28] = 0xff;
+            corrupt
+        }),
+        ("resume_boolean", BytecodeReason::InvalidTag, {
+            let mut corrupt = bytes.clone();
+            corrupt[opcode + 29] = 2;
+            corrupt
+        }),
+        ("clause_reserved", BytecodeReason::ReservedNonzero, {
+            let mut corrupt = bytes.clone();
+            corrupt[opcode + 30] = 1;
+            corrupt
+        }),
+        (
+            "body_capture_register",
+            BytecodeReason::InvalidRegisterIndex,
+            {
+                let mut corrupt = bytes.clone();
+                overwrite_u32(&mut corrupt, opcode + 20, u32::MAX);
+                corrupt
+            },
+        ),
+    ];
+    for (name, reason, corrupt) in cases {
+        let error = decode_and_verify_v1_3(&corrupt).expect_err(name);
+        assert_eq!(error.reason(), reason, "{name}");
+    }
+    assert!(decode_and_verify_v1_3(&bytes).is_ok());
+}
+
+#[test]
+fn bytecode_1_3_verifies_clause_order_uniqueness_signature_and_bounds() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    handle Console.write \"body\" with\n",
+        "        operation Console.Write.write(message) -> ()\n",
+        "        operation Clock.now() -> ()\n",
+    );
+    let (source, snapshot) = checked_source("handler-table.ling", text);
+    let lowered = lower_v1_3(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("two-clause Handler lowers");
+    let bytes = encode_v1_3(&lowered).expect("two-clause Handler encodes");
+    let opcode = unique_bytes(&bytes, &[0x1c, 0, 0, 0]);
+    assert_eq!(
+        u32::from_le_bytes(bytes[opcode + 16..opcode + 20].try_into().unwrap()),
+        2
+    );
+
+    let mut duplicate = bytes.clone();
+    duplicate[opcode + 32] = 1;
+    assert_eq!(
+        decode_and_verify_v1_3(&duplicate)
+            .expect_err("duplicate operation is rejected")
+            .reason(),
+        BytecodeReason::InvalidTableOrder
+    );
+
+    let mut wrong_signature = bytes.clone();
+    let body_function = u32::from_le_bytes(bytes[opcode + 8..opcode + 12].try_into().unwrap());
+    overwrite_u32(&mut wrong_signature, opcode + 24, body_function);
+    assert_eq!(
+        decode_and_verify_v1_3(&wrong_signature)
+            .expect_err("clause signature is exact")
+            .reason(),
+        BytecodeReason::CallSignatureMismatch
+    );
+
+    let mut excessive = bytes.clone();
+    overwrite_u32(&mut excessive, opcode + 16, u32::MAX);
+    let excessive_error = decode_and_verify_v1_3(&excessive).expect_err("clause count is bounded");
+    assert!(matches!(
+        excessive_error.reason(),
+        BytecodeReason::ResourceLimit | BytecodeReason::InvalidInstructionLength
+    ));
+}
+
+#[test]
+fn bytecode_1_3_rejects_unrepresentable_handler_state_and_refutable_parameters() {
+    let mutable = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let mutable cell = 0\n",
+        "    handle Console.write \"body\" with\n",
+        "        operation Console.Write.write(message, resume) ->\n",
+        "            resume ()\n",
+        "            if cell == 0 then () else ()\n",
+    );
+    let (source, snapshot) = checked_source("handler-state.ling", mutable);
+    let error = lower_v1_3(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect_err("the accepted wire has no shared Cell capture representation");
+    assert_eq!(
+        error.kind(),
+        &LoweringErrorKind::UnsupportedFeature {
+            feature: "mutable Handler capture".to_owned()
+        }
+    );
+
+    let refutable = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    handle Console.write \"body\" with\n",
+        "        operation Console.Write.write(\"expected\", resume) -> resume ()\n",
+    );
+    let (source, snapshot) = checked_source("handler-pattern.ling", refutable);
+    let error = lower_v1_3(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect_err("the accepted wire has no refutable parameter representation");
+    assert_eq!(
+        error.kind(),
+        &LoweringErrorKind::UnsupportedFeature {
+            feature: "parameter destructuring".to_owned()
+        }
+    );
 }
 
 #[test]

@@ -8,9 +8,10 @@ use crate::path::validate_logical_name;
 use crate::{
     Block, BytecodeError, BytecodePhase, BytecodeReason, Capability, CaptureOperand, Constant,
     DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FORMAT_VERSION_1_2,
-    FormatVersion, Function, FunctionKind, Instruction, IntegerSign, Intrinsic, PackageReference,
-    RegisterIndex, Terminator, TypeIndex, UnverifiedProgram, ValueType, decode_v1, decode_v1_1,
-    decode_v1_1_with_limit, decode_v1_2, decode_v1_2_with_limit, decode_v1_with_limit,
+    FORMAT_VERSION_1_3, FormatVersion, Function, FunctionKind, HandlerOperation, Instruction,
+    IntegerSign, Intrinsic, PackageReference, RegisterIndex, Terminator, TypeIndex,
+    UnverifiedProgram, ValueType, decode_v1, decode_v1_1, decode_v1_1_with_limit, decode_v1_2,
+    decode_v1_2_with_limit, decode_v1_3, decode_v1_3_with_limit, decode_v1_with_limit,
 };
 
 /// Immutable bytecode state that has passed every RFC-0014 verifier phase.
@@ -18,6 +19,7 @@ use crate::{
 pub struct VerifiedProgramV1 {
     model: UnverifiedProgram,
     version: FormatVersion,
+    entry_console_capability_required: bool,
 }
 
 impl VerifiedProgramV1 {
@@ -32,13 +34,24 @@ impl VerifiedProgramV1 {
     pub const fn version(&self) -> FormatVersion {
         self.version
     }
+
+    /// Returns whether the entry's unmasked checked closure requires Console authority.
+    #[must_use]
+    pub const fn entry_console_capability_required(&self) -> bool {
+        self.entry_console_capability_required
+    }
 }
 
 /// Independently verifies a decoded, untrusted version-1.0 program.
 pub fn verify_v1(decoded: DecodedProgramV1) -> Result<VerifiedProgramV1, BytecodeError> {
-    Verifier::new(decoded.model(), decoded.version(), &decoded.offsets).verify()?;
+    let entry_console_capability_required =
+        Verifier::new(decoded.model(), decoded.version(), &decoded.offsets).verify()?;
     let (model, version, _) = decoded.into_parts();
-    Ok(VerifiedProgramV1 { model, version })
+    Ok(VerifiedProgramV1 {
+        model,
+        version,
+        entry_console_capability_required,
+    })
 }
 
 /// Decodes and independently verifies one version-1.0 artifact.
@@ -80,6 +93,19 @@ pub fn decode_and_verify_v1_2_with_limit(
     verify_v1(decode_v1_2_with_limit(bytes, artifact_byte_limit)?)
 }
 
+/// Decodes and independently verifies bytecode 1.0 through 1.3.
+pub fn decode_and_verify_v1_3(bytes: &[u8]) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_3(bytes)?)
+}
+
+/// Decodes and verifies bytecode 1.0 through 1.3 under a bounded limit.
+pub fn decode_and_verify_v1_3_with_limit(
+    bytes: &[u8],
+    artifact_byte_limit: u64,
+) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_3_with_limit(bytes, artifact_byte_limit)?)
+}
+
 struct Verifier<'a> {
     model: &'a UnverifiedProgram,
     version: FormatVersion,
@@ -99,12 +125,13 @@ impl<'a> Verifier<'a> {
         }
     }
 
-    fn verify(&self) -> Result<(), BytecodeError> {
+    fn verify(&self) -> Result<bool, BytecodeError> {
         self.verify_tables()?;
         self.verify_function_shapes()?;
         self.verify_control_flow_and_types()?;
-        self.verify_effects_capabilities_and_entry()?;
-        self.verify_source_map()
+        let entry_console_capability_required = self.verify_effects_capabilities_and_entry()?;
+        self.verify_source_map()?;
+        Ok(entry_console_capability_required)
     }
 
     fn verify_tables(&self) -> Result<(), BytecodeError> {
@@ -614,7 +641,9 @@ impl<'a> Verifier<'a> {
             if function.capture_count > to_u32(function.parameter_types.len())
                 || (function.kind == FunctionKind::Named && function.capture_count != 0)
                 || (function.kind == FunctionKind::ClosureBody
-                    && to_usize(function.capture_count) >= function.parameter_types.len())
+                    && ((self.version < FORMAT_VERSION_1_3
+                        && to_usize(function.capture_count) >= function.parameter_types.len())
+                        || to_usize(function.capture_count) > function.parameter_types.len()))
                 || (self.version == FORMAT_VERSION_1_0 && function.kind != FunctionKind::Named)
             {
                 return Err(error(
@@ -626,6 +655,8 @@ impl<'a> Verifier<'a> {
             }
             if function.kind == FunctionKind::ClosureBody
                 && self.complete_function_type(function).is_none()
+                && !(self.version == FORMAT_VERSION_1_3
+                    && to_usize(function.capture_count) == function.parameter_types.len())
             {
                 return Err(error(
                     BytecodePhase::Type,
@@ -895,6 +926,56 @@ impl<'a> Verifier<'a> {
                     function_index,
                     block_index,
                 )
+            }
+            Instruction::Handle {
+                body_function,
+                body_captures,
+                clauses,
+                ..
+            } => {
+                self.ensure_index(
+                    body_function.get(),
+                    self.model.functions().len(),
+                    BytecodePhase::Instruction,
+                    BytecodeReason::InvalidFunctionIndex,
+                    instruction_offset,
+                    [to_u32(function_index), body_function.get()],
+                )?;
+                for capture in body_captures
+                    .iter()
+                    .chain(clauses.iter().flat_map(|clause| clause.captures.iter()))
+                {
+                    if let CaptureOperand::Register(register) = capture {
+                        self.ensure_register(
+                            function,
+                            *register,
+                            instruction_offset,
+                            function_index,
+                            block_index,
+                        )?;
+                    }
+                }
+                let mut previous = None;
+                for clause in clauses {
+                    self.ensure_index(
+                        clause.function.get(),
+                        self.model.functions().len(),
+                        BytecodePhase::Instruction,
+                        BytecodeReason::InvalidFunctionIndex,
+                        instruction_offset,
+                        [to_u32(function_index), clause.function.get()],
+                    )?;
+                    if previous.is_some_and(|tag| tag >= clause.operation.tag()) {
+                        return Err(error(
+                            BytecodePhase::Instruction,
+                            BytecodeReason::InvalidTableOrder,
+                            instruction_offset,
+                            [to_u32(function_index), clause.operation.tag().into()],
+                        ));
+                    }
+                    previous = Some(clause.operation.tag());
+                }
+                Ok(())
             }
             Instruction::Intrinsic { arguments, .. } => self.ensure_registers(
                 function,
@@ -1324,7 +1405,7 @@ impl<'a> Verifier<'a> {
     #[allow(clippy::too_many_arguments)]
     fn verify_instruction_uses(
         &self,
-        _function: &Function,
+        function: &Function,
         instruction: &Instruction,
         function_index: usize,
         block_index: usize,
@@ -1811,6 +1892,119 @@ impl<'a> Verifier<'a> {
                 }
                 check(*variant, variant_type, BytecodeReason::InvalidRegisterType)
             }
+            Instruction::Handle {
+                destination,
+                body_function,
+                body_captures,
+                clauses,
+            } => {
+                let body = &self.model.functions()[to_usize(body_function.get())];
+                let result_type = definitions[to_usize(destination.get())].value_type;
+                if self.version != FORMAT_VERSION_1_3
+                    || body.kind != FunctionKind::ClosureBody
+                    || body.module != function.module
+                    || body.capture_count != to_u32(body_captures.len())
+                    || to_usize(body.capture_count) != body.parameter_types.len()
+                    || body.result_type != result_type
+                    || clauses.is_empty()
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::CallSignatureMismatch,
+                        instruction_offset,
+                        [to_u32(function_index), body_function.get()],
+                    ));
+                }
+                for (capture, expected) in body_captures.iter().zip(&body.parameter_types) {
+                    match capture {
+                        CaptureOperand::Register(register) => {
+                            check(*register, *expected, BytecodeReason::CallSignatureMismatch)?;
+                        }
+                        CaptureOperand::SelfReference => {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::CallSignatureMismatch,
+                                instruction_offset,
+                                [to_u32(function_index), expected.get()],
+                            ));
+                        }
+                    }
+                }
+                let handles_console = clauses
+                    .iter()
+                    .any(|clause| clause.operation == HandlerOperation::ConsoleWrite);
+                let resume_effects = body
+                    .effects
+                    .iter()
+                    .copied()
+                    .filter(|effect| !(handles_console && *effect == Effect::ConsoleWrite))
+                    .collect::<Vec<_>>();
+                for clause in clauses {
+                    let target = &self.model.functions()[to_usize(clause.function.get())];
+                    let (inputs, output) = match clause.operation {
+                        HandlerOperation::ConsoleWrite => (&[3_u32][..], 0_u32),
+                        HandlerOperation::ClockNow => (&[][..], 2_u32),
+                        HandlerOperation::RandomNext => (&[2_u32][..], 2_u32),
+                    };
+                    let capture_count = to_usize(target.capture_count);
+                    let source_parameters = target.parameter_types.get(capture_count..);
+                    let expected_parameter_count =
+                        inputs.len() + usize::from(clause.resume_present);
+                    if target.kind != FunctionKind::ClosureBody
+                        || target.module != function.module
+                        || target.capture_count != to_u32(clause.captures.len())
+                        || target.result_type != result_type
+                        || source_parameters.is_none_or(|parameters| {
+                            parameters.len() != expected_parameter_count
+                                || parameters
+                                    .iter()
+                                    .zip(inputs)
+                                    .any(|(actual, expected)| actual.get() != *expected)
+                        })
+                    {
+                        return Err(error(
+                            BytecodePhase::Type,
+                            BytecodeReason::CallSignatureMismatch,
+                            instruction_offset,
+                            [to_u32(function_index), clause.function.get()],
+                        ));
+                    }
+                    if clause.resume_present {
+                        let resume_type = source_parameters
+                            .and_then(|parameters| parameters.last())
+                            .copied();
+                        let expected_resume = self.find_function_type(
+                            &[TypeIndex::new(output)],
+                            result_type,
+                            &resume_effects,
+                        );
+                        if resume_type != expected_resume {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::CallSignatureMismatch,
+                                instruction_offset,
+                                [to_u32(function_index), clause.function.get()],
+                            ));
+                        }
+                    }
+                    for (capture, expected) in clause.captures.iter().zip(&target.parameter_types) {
+                        match capture {
+                            CaptureOperand::Register(register) => {
+                                check(*register, *expected, BytecodeReason::CallSignatureMismatch)?;
+                            }
+                            CaptureOperand::SelfReference => {
+                                return Err(error(
+                                    BytecodePhase::Type,
+                                    BytecodeReason::CallSignatureMismatch,
+                                    instruction_offset,
+                                    [to_u32(function_index), expected.get()],
+                                ));
+                            }
+                        }
+                    }
+                }
+                Ok(())
+            }
             Instruction::ConsoleWrite { text, .. } => check(
                 *text,
                 TypeIndex::new(3),
@@ -1937,14 +2131,18 @@ impl<'a> Verifier<'a> {
         Ok(())
     }
 
-    fn verify_effects_capabilities_and_entry(&self) -> Result<(), BytecodeError> {
+    fn verify_effects_capabilities_and_entry(&self) -> Result<bool, BytecodeError> {
         let mut required = vec![false; self.model.functions().len()];
+        let mut capability_required = vec![false; self.model.functions().len()];
         let mut reverse_calls = vec![Vec::new(); self.model.functions().len()];
         for (caller, function) in self.model.functions().iter().enumerate() {
             for block in &function.blocks {
                 for instruction in &block.instructions {
                     match instruction {
-                        Instruction::ConsoleWrite { .. } => required[caller] = true,
+                        Instruction::ConsoleWrite { .. } => {
+                            required[caller] = true;
+                            capability_required[caller] = true;
+                        }
                         Instruction::Call {
                             function: callee, ..
                         } => push_fallible(
@@ -1970,7 +2168,27 @@ impl<'a> Verifier<'a> {
                                 && effects.contains(&Effect::ConsoleWrite)
                             {
                                 required[caller] = true;
+                                capability_required[caller] = true;
                             }
+                        }
+                        Instruction::Handle {
+                            body_function,
+                            clauses,
+                            ..
+                        } => {
+                            let body = &self.model.functions()[to_usize(body_function.get())];
+                            let body_console = body.effects.contains(&Effect::ConsoleWrite);
+                            let handles_console = clauses
+                                .iter()
+                                .any(|clause| clause.operation == HandlerOperation::ConsoleWrite);
+                            let clause_console = clauses.iter().any(|clause| {
+                                self.model.functions()[to_usize(clause.function.get())]
+                                    .effects
+                                    .contains(&Effect::ConsoleWrite)
+                            });
+                            required[caller] |=
+                                (body_console && !handles_console) || clause_console;
+                            capability_required[caller] |= body_console || clause_console;
                         }
                         Instruction::Const { .. }
                         | Instruction::IntUnary { .. }
@@ -2004,6 +2222,19 @@ impl<'a> Verifier<'a> {
                 }
             }
         }
+        let mut pending = capability_required
+            .iter()
+            .enumerate()
+            .filter_map(|(index, value)| value.then_some(index))
+            .collect::<VecDeque<_>>();
+        while let Some(callee) = pending.pop_front() {
+            for caller in &reverse_calls[callee] {
+                if !capability_required[*caller] {
+                    capability_required[*caller] = true;
+                    pending.push_back(*caller);
+                }
+            }
+        }
 
         for (index, function) in self.model.functions().iter().enumerate() {
             let declared = function.effects.as_slice();
@@ -2020,7 +2251,7 @@ impl<'a> Verifier<'a> {
                     [to_u32(index)],
                 ));
             }
-            if required[index] {
+            if capability_required[index] {
                 let module = &self.model.modules()[to_usize(function.module.get())];
                 if !module.capabilities.contains(&Capability::ConsoleWrite) {
                     return Err(error(
@@ -2032,7 +2263,8 @@ impl<'a> Verifier<'a> {
                 }
             }
         }
-        self.verify_entry()
+        self.verify_entry()?;
+        Ok(capability_required[to_usize(self.model.entry().get())])
     }
 
     fn verify_entry(&self) -> Result<(), BytecodeError> {
@@ -2212,6 +2444,9 @@ impl<'a> Verifier<'a> {
             }
             Instruction::MakeClosure { function, .. } => {
                 self.complete_function_type(&self.model.functions()[to_usize(function.get())])
+            }
+            Instruction::Handle { body_function, .. } => {
+                Some(self.model.functions()[to_usize(body_function.get())].result_type)
             }
             Instruction::CallClosure {
                 callee, arguments, ..
@@ -2856,6 +3091,7 @@ fn instruction_destination(instruction: &Instruction) -> RegisterIndex {
         | Instruction::Call { destination, .. }
         | Instruction::MakeClosure { destination, .. }
         | Instruction::CallClosure { destination, .. }
+        | Instruction::Handle { destination, .. }
         | Instruction::MakeTuple { destination, .. }
         | Instruction::GetTuple { destination, .. }
         | Instruction::MakeRecord { destination, .. }

@@ -9194,6 +9194,15 @@ spec = [
 artifacts = [
   "docs/decisions/0261-handler-runtime-and-bytecode.md",
   "docs/status/EFF-2104-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2104-BYTECODE-VM-MILESTONE.md",
+  "crates/ling-eval/src/machine.rs",
+  "crates/ling-effects/src/lib.rs",
+  "crates/ling-bytecode/src/lower/v1_3.rs",
+  "crates/ling-bytecode/src/verify.rs",
+  "crates/ling-bytecode/tests/lowering.rs",
+  "crates/ling-vm/src/execute.rs",
+  "crates/ling-vm/tests/execution.rs",
+  "crates/ling-vm/tests/differential.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -9212,6 +9221,8 @@ notes = [
   "Accepted DEC-0261 removes the specification blocker after EFF-2103 commit 004538deec049446740a1d17ca57e5915c6d2777; implementation is now active.",
   "Current executable operation production is limited to Console.write. Clock/Random clauses remain checked-only until separately accepted producers exist.",
   "No Done claim is permitted until interpreter, bytecode 1.3, verifier, VM, malformed/resource/cancellation, differential, governance, and full repository gates pass and an implementation commit is recorded.",
+  "The committed interpreter milestone and current working-tree bytecode/VM slice cover immutable, irrefutable Console handlers, deep restoration, Once cardinality, unmasked Capability preflight, malformed records, resource limits, cancellation, and differential Fault/event/span evidence.",
+  "GAP-EFFECT-HANDLER-BYTECODE-001 records that DEC-0261's exact 1.3 record cannot represent shared lexical Cell identity or checked refutable clause parameters; v1.3 lowering rejects both atomically and EFF-2104 remains In Progress pending an Accepted wire/ABI decision.",
 ]
 
 [[task]]

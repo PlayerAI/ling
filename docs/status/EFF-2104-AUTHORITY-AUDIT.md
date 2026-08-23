@@ -27,26 +27,29 @@ Fault catching, rollback, and Stable behavior remain outside EFF-2104.
   contracts; DEC-0261 composes handlers with them without making Fault or
   cancellation catchable Effects.
 - `GAP-EFFECT-HANDLER-001` is resolved for the Experimental model by RFC-0006
-  and DEC-0261; execution and differential implementation evidence remains to
-  be produced. `GAP-EFFECT-STATE-MASKING-001` is resolved by the accepted
-  visible-State rule, while its runtime evidence remains to be implemented.
+  and DEC-0261. Implementation exposed the narrower
+  `GAP-EFFECT-HANDLER-BYTECODE-001`: the accepted 1.3 record has neither a
+  shared lexical Cell representation nor a checked representation for
+  refutable clause parameters. `GAP-EFFECT-STATE-MASKING-001` is resolved by
+  the accepted visible-State rule, but complete VM evidence depends on that
+  new wire/ABI decision.
 - Accepted DEC-0088 remains historical rejection evidence for unchecked input;
   DEC-0261 never weakens the no-unchecked-AST execution boundary.
 
 ## Current implementation evidence
 
-- `ling-eval` evaluates checked Seed `ProgramSnapshot` expressions and has no
-  handler stack, operation dispatch, continuation/resume object, or residual
-  Effect result.
-- `ling-bytecode`/`ling-vm` lower and execute the accepted Seed bytecode
-  instruction set. No handler instruction, effect operation table, continuation
-  ABI, bytecode schema version, or source-mapped handler Fault exists.
-- Existing VM cancellation and runtime Fault code is a separate host-control
-  boundary; it cannot be reused as compiler Effect handling or cancellation
-  semantics.
-- No differential fixture covers a handler in either backend, nested dispatch,
-  propagation, resume cardinality, Fault/mutable State, cancellation,
-  deterministic residual rows, or malformed/unsupported handler bytecode.
+- The committed interpreter milestone executes checked Handler Core through an
+  explicit continuation machine, including deep/nested dispatch, zero/one
+  resume, Once cardinality, shared lexical Cells, Fault/committed-output, and
+  original UTF-8 span evidence.
+- The current working tree implements the bounded immutable/irrefutable
+  `ling.bytecode/1.3` slice: exact Handle encoding/decoding/disassembly,
+  independent verification, unmasked Capability preflight, private VM
+  continuations, deep restoration, malformed records, limits, cancellation,
+  and interpreter/VM differential fixtures.
+- The 1.3 lowerer fails atomically for mutable Handler captures and refutable
+  clause parameters. Those failures are evidence of the wire gap, not a claim
+  that the accepted source behavior is unsupported or that EFF-2104 is Done.
 - The rejection-gate child covers only the negative compile boundary and
   diagnostic serialization; it has no checked snapshot, runtime, bytecode, VM,
   Fault, cancellation, or differential behavior.
@@ -72,9 +75,11 @@ Accepted DEC-0261 defines:
    mutable State, Unicode/CRLF/BOM spans, deterministic output, and the
    no-unchecked-AST boundary.
 
-Implementation must now follow those accepted rules exactly and publish no
-partial public execution claim before interpreter, 1.3 verifier/VM, malformed
-input, cancellation/resource, and differential evidence all pass.
+Implementation must follow those accepted rules exactly. EFF-2104 cannot be
+marked Done until an Accepted decision resolves
+`GAP-EFFECT-HANDLER-BYTECODE-001`, the VM preserves shared Cell identity and
+checked clause-pattern behavior, all differential evidence passes, and the
+completion commit is recorded.
 
 ## Evidence and compatibility
 
@@ -85,10 +90,10 @@ This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and `crates/ling-eval`, `crates/ling-bytecode`, and `crates/ling-vm`.
 
-The authority milestone changes specifications and plans `ling.bytecode/1.3`;
-it does not itself claim an implemented evaluator, writer, reader, verifier, or
-VM. Current code continues to reject handler execution until implementation
-evidence is complete.
+The accepted authority planned `ling.bytecode/1.3`; the committed interpreter
+and current bytecode/VM working tree provide implementation evidence without
+making a complete EFF-2104 or Stable protocol claim. Bytecode 1.0 through 1.2
+remain byte-compatible and reject 1.3.
 
 ## Intentionally deferred
 
