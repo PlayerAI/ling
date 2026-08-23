@@ -12,11 +12,10 @@ This milestone implements only the bounded Preview lifecycle for
 handling, initialize/initialized/shutdown/exit state transitions, position
 encoding negotiation, bounded opaque workspace folders, and stdio purity.
 
-The parent `LSP-2101` task remains `BlockedSpec` because its broader CLI command
-model and the remaining editor protocol surfaces are not yet accepted as a
-single 1.0 contract. Document synchronization, diagnostics, edits, semantic
-transactions, snapshots, cancellation, and filesystem resolution are not
-implemented here.
+Accepted DEC-0257 subsequently composes this exact slice as the complete
+bounded LSP-2101 parent after CLI-1701 closed. Document synchronization,
+diagnostics, edits, semantic transactions, snapshots, cancellation, and
+filesystem resolution remain separately governed and are not implied here.
 
 ## Normative clauses covered
 
@@ -48,6 +47,6 @@ request IDs are preserved, and URI values never become host paths or identity.
 
 The implementation commit passed `cargo test --workspace --all-targets --locked
 --offline`, workspace clippy with `-D warnings`, `cargo fmt --all -- --check`,
-and the governance, support, schema, traceability, status, and diff checks. The
-parent `LSP-2101` remains `BlockedSpec`; this report closes only the independently
-authorized lifecycle/transport slice.
+and the governance, support, schema, traceability, status, and diff checks.
+DEC-0257 now closes the parent using this independently authorized
+lifecycle/transport slice without duplicating implementation.

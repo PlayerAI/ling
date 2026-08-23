@@ -18,7 +18,7 @@
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 4 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
-| `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
+| `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
@@ -108,10 +108,10 @@
 - Writer policy: Emit only framed compact UTF-8 JSON-RPC responses for initialize and shutdown; preserve request IDs, flush each response, and write no unframed protocol bytes or human text to stdout.
 - Unknown-field policy: Unknown JSON-RPC object fields and ASCII transport headers are ignored for this Preview; unknown methods are rejected only when they are requests, and future incompatible fields require a new protocol version.
 - Migration tool: None; `ling.lsp.lifecycle/0.1` is current-writer-only and a future Stable/editor contract requires an accepted migration specification.
-- Authority: `RFC-0004`, `DEC-0029`
-- Sources: [`docs/RFC-0004.md`](../RFC-0004.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
-- Fixtures: [`crates/ling-lsp/tests/lifecycle.rs`](../../crates/ling-lsp/tests/lifecycle.rs), [`crates/ling-cli/tests/lsp.rs`](../../crates/ling-cli/tests/lsp.rs), [`tests/protocols/lsp-lifecycle/README.md`](../../tests/protocols/lsp-lifecycle/README.md)
-- Notes: Preview lifecycle only: initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity. Document synchronization, diagnostics, edits, snapshots, cancellation, and Semantic Transactions remain deferred.
+- Authority: `RFC-0004`, `DEC-0029`, `DEC-0257`
+- Sources: [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0257-current-lsp-lifecycle-skeleton.md`](../decisions/0257-current-lsp-lifecycle-skeleton.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
+- Fixtures: [`crates/ling-lsp/tests/lifecycle.rs`](../../crates/ling-lsp/tests/lifecycle.rs), [`crates/ling-cli/tests/lsp.rs`](../../crates/ling-cli/tests/lsp.rs), [`tests/protocols/lsp-lifecycle/README.md`](../../tests/protocols/lsp-lifecycle/README.md), [`docs/status/LSP-2101-IMPLEMENTATION-REPORT.md`](../status/LSP-2101-IMPLEMENTATION-REPORT.md)
+- Notes: DEC-0257 accepts this RFC-0004 implementation as the complete bounded LSP-2101 parent. The Preview lifecycle covers initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity; later methods retain independent authorities, while snapshots, cancellation, Workspace Edits, and Semantic Transactions remain deferred.
 
 ### `PROTO-LSP-OVERLAY` — Ling LSP Preview document overlay
 

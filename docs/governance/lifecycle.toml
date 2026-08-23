@@ -6652,6 +6652,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0257"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0257-current-lsp-lifecycle-skeleton.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Retain bounded lifecycle, workspace, position-encoding, malformed transport, ordering, Unicode, early-exit, and clean-shutdown transcripts.",
+  "Retain the real ling lsp --stdio process fixture, strict parser forms, framed stdout, quiet stderr, deterministic errors, and exact request IDs.",
+  "Verify later Accepted overlay and formatting methods do not bypass lifecycle gates, mutate workspace URI meaning, or change exit/channel ownership.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Accepts existing RFC-0004 Preview behavior as the complete bounded LSP-2101 parent without changing any command, frame, method, field, error, channel, or exit.",
+  "Changes no Ling semantics, diagnostics, schemas, Semantic IDs, spans, runtime, bytecode, VM, ABI, filesystem/network behavior, or Unicode 17.0.0 data.",
+]
+unresolved_alternatives = [
+  "Document/edit/analysis methods, workspace reload, concurrency, cancellation, Workspace Edits, Semantic Transactions, and Stable editor compatibility remain separately governed.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0027"
 kind = "RFC"
 status = "Accepted"

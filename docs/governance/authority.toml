@@ -3900,3 +3900,16 @@ covers = ["CLI-1704 standalone and explicit project test-mode composition", "det
 depends_on = ["DEC-0039", "RFC-0025", "DEC-0253", "DEC-0254", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0257"
+title = "Current LSP lifecycle skeleton"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0257-current-lsp-lifecycle-skeleton.md"
+covers = ["LSP-2101 current lifecycle skeleton", "RFC-0004 transport and lifecycle parent composition", "independent later-method authority without duplicate server infrastructure"]
+depends_on = ["RFC-0004", "DEC-0029", "DEC-0253", "RFC-0023", "RFC-0026", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
