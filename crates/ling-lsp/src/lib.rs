@@ -11,7 +11,8 @@
 //! RFC-0041 governs checked transactional Rename; RFC-0042 governs checked
 //! deterministic Completion; RFC-0043 governs snapshot-bound Completion
 //! Resolve; RFC-0044 governs bounded transactional Code Actions; RFC-0045
-//! governs snapshot-indexed Workspace Symbols.
+//! governs snapshot-indexed Workspace Symbols; RFC-0048 governs bounded
+//! semantic-token full and delta transport.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -82,6 +83,12 @@ pub use code_action::{CODE_ACTION_PROTOCOL_VERSION, FORMAT_ACTION_KIND};
 mod workspace_symbols;
 pub use workspace_symbols::{
     MAX_WORKSPACE_SYMBOL_QUERY_BYTES, MAX_WORKSPACE_SYMBOLS, WORKSPACE_SYMBOL_PROTOCOL_VERSION,
+};
+mod semantic_tokens;
+pub use semantic_tokens::{
+    MAX_SEMANTIC_TOKEN_DATA_ELEMENTS, MAX_SEMANTIC_TOKEN_RESULT_ID_BYTES,
+    MAX_SEMANTIC_TOKEN_RESULTS, MAX_SEMANTIC_TOKENS, SEMANTIC_TOKEN_PROTOCOL_VERSION,
+    SEMANTIC_TOKEN_TAXONOMY_VERSION,
 };
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
@@ -609,6 +616,7 @@ pub struct LspServer {
     completion_resolve: completion_resolve::CompletionResolveState,
     code_action: code_action::CodeActionOptions,
     workspace_symbol_state: workspace_symbols::WorkspaceSymbolState,
+    semantic_token_state: semantic_tokens::SemanticTokenState,
 }
 
 impl Default for LspServer {
@@ -639,6 +647,7 @@ impl LspServer {
             completion_resolve: completion_resolve::CompletionResolveState::new(),
             code_action: code_action::CodeActionOptions::disabled(),
             workspace_symbol_state: workspace_symbols::WorkspaceSymbolState::new(),
+            semantic_token_state: semantic_tokens::SemanticTokenState::new(),
         }
     }
 
@@ -857,6 +866,12 @@ impl LspServer {
             "completionItem/resolve" => self.completion_resolve(id_present, id, params),
             "textDocument/codeAction" => self.code_action(id_present, id, params),
             "workspace/symbol" => self.workspace_symbols(id_present, id, params, cancellation),
+            "textDocument/semanticTokens/full" => {
+                self.semantic_tokens_full(id_present, id, params, cancellation)
+            }
+            "textDocument/semanticTokens/full/delta" => {
+                self.semantic_tokens_delta(id_present, id, params, cancellation)
+            }
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -876,17 +891,7 @@ impl LspServer {
             );
         }
 
-        let ParsedInitializeParams {
-            encoding,
-            folders,
-            pull_diagnostics_supported,
-            diagnostic_limits,
-            hierarchical_document_symbols,
-            hover_markup,
-            transactional_rename_supported,
-            completion_resolve,
-            code_action,
-        } = match parse_initialize_params(&params) {
+        let parsed = match parse_initialize_params(&params) {
             Ok(value) => value,
             Err(()) => {
                 return error_or_none(
@@ -897,28 +902,19 @@ impl LspServer {
                 );
             }
         };
-        self.position_encoding = encoding;
-        self.workspace_folders = folders;
-        self.pull_diagnostics_supported = pull_diagnostics_supported;
-        self.diagnostic_limits = diagnostic_limits;
-        self.hierarchical_document_symbols = hierarchical_document_symbols;
-        self.hover_markup = hover_markup;
-        self.transactional_rename_supported = transactional_rename_supported;
-        self.completion_resolve.configure(completion_resolve);
-        self.code_action = code_action;
+        let result = initialize_result(&parsed);
+        self.position_encoding = parsed.encoding;
+        self.workspace_folders = parsed.folders;
+        self.pull_diagnostics_supported = parsed.pull_diagnostics_supported;
+        self.diagnostic_limits = parsed.diagnostic_limits;
+        self.hierarchical_document_symbols = parsed.hierarchical_document_symbols;
+        self.hover_markup = parsed.hover_markup;
+        self.transactional_rename_supported = parsed.transactional_rename_supported;
+        self.completion_resolve.configure(parsed.completion_resolve);
+        self.code_action = parsed.code_action;
+        self.semantic_token_state.configure(parsed.semantic_tokens);
         self.state = LifecycleState::AwaitingInitialized;
-        HandleOutcome::Response(success_response(
-            id,
-            initialize_result(
-                encoding,
-                pull_diagnostics_supported,
-                diagnostic_limits,
-                hierarchical_document_symbols,
-                hover_markup,
-                completion_resolve,
-                code_action,
-            ),
-        ))
+        HandleOutcome::Response(success_response(id, result))
     }
 
     fn initialized(&mut self, is_request: bool, id: Value) -> HandleOutcome {
@@ -1549,6 +1545,7 @@ struct ParsedInitializeParams {
     transactional_rename_supported: bool,
     completion_resolve: completion_resolve::CompletionResolveOptions,
     code_action: code_action::CodeActionOptions,
+    semantic_tokens: semantic_tokens::SemanticTokenOptions,
 }
 
 fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()> {
@@ -1563,6 +1560,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
     let mut transactional_rename_supported = false;
     let mut completion_resolve = completion_resolve::CompletionResolveOptions::disabled();
     let mut code_action = code_action::CodeActionOptions::disabled();
+    let mut semantic_tokens = semantic_tokens::SemanticTokenOptions::disabled();
     if let Some(capabilities) = object.get("capabilities") {
         let Some(capabilities) = capabilities.as_object() else {
             return Err(());
@@ -1611,6 +1609,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
                 text_document,
                 transactional_rename_supported,
             )?;
+            semantic_tokens = semantic_tokens::parse_capability(text_document)?;
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -1630,6 +1629,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
         transactional_rename_supported,
         completion_resolve,
         code_action,
+        semantic_tokens,
     })
 }
 
@@ -2155,15 +2155,15 @@ fn formatting_internal_error(id: Value) -> HandleOutcome {
     )
 }
 
-fn initialize_result(
-    encoding: PositionEncoding,
-    pull_diagnostics_supported: bool,
-    diagnostic_limits: DiagnosticLimits,
-    hierarchical_document_symbols: bool,
-    hover_markup: hover::HoverMarkup,
-    completion_resolve: completion_resolve::CompletionResolveOptions,
-    code_action: code_action::CodeActionOptions,
-) -> Value {
+fn initialize_result(parsed: &ParsedInitializeParams) -> Value {
+    let encoding = parsed.encoding;
+    let pull_diagnostics_supported = parsed.pull_diagnostics_supported;
+    let diagnostic_limits = parsed.diagnostic_limits;
+    let hierarchical_document_symbols = parsed.hierarchical_document_symbols;
+    let hover_markup = parsed.hover_markup;
+    let completion_resolve = parsed.completion_resolve;
+    let code_action = parsed.code_action;
+    let semantic_tokens = &parsed.semantic_tokens;
     let mut result = json!({
         "capabilities": {
             "declarationProvider": true,
@@ -2302,6 +2302,12 @@ fn initialize_result(
             "transactional": true,
             "version": CODE_ACTION_PROTOCOL_VERSION,
         });
+    }
+    if let Some(provider) = semantic_tokens.provider_value() {
+        result["capabilities"]["semanticTokensProvider"] = provider;
+        result["capabilities"]["experimental"]["lingSemanticTokens"] = semantic_tokens
+            .discovery_value(encoding)
+            .expect("enabled semantic tokens have discovery");
     }
     result
 }
