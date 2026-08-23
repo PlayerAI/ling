@@ -25,6 +25,12 @@ internal `cargo xtask docs verify` command prevents drift in the twelve-row
 formal-set inventory and its anti-promotion policy text. It does not generate
 manuals or promote any future state to a G6 documentation sign-off.
 
+Accepted `DEC-0238` additionally closes only the bounded
+`DOC-6701-EVIDENCE-PATHS` child. The verifier now requires every inventory row
+to cite exact existing repository evidence and rejects shorthand globs,
+traversal, non-portable spellings, and missing paths. Existence does not prove
+content completeness or promote the parent.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:389-404` is a non-normative documentation
@@ -52,8 +58,9 @@ The Seed set includes `LANGUAGE.md`, `SEMANTICS.md`, `ERROR-CODES.md`, RFCs and
 decisions, package/lock/effect/VM/formatter reports, governance registries,
 Tree-sitter grammar documentation, and the new reliability/security/performance
 audits.
-`cargo xtask docs verify` checks only the deterministic manual/state inventory
-and the policy phrases that keep future chapters and stale names explicit.
+`cargo xtask docs verify` checks the deterministic manual/state inventory, the
+policy phrases that keep future chapters and stale names explicit, and the
+bounded exact-path evidence integrity authorized by DEC-0238.
 
 The future manuals remain planning/status evidence only. No stable Task,
 Actor, Replay, Native, FFI, Kernel, Device, Critical, proof/evidence, LSP,

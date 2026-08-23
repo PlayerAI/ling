@@ -6101,3 +6101,29 @@ unresolved_alternatives = [
   "New captures; retention and replacement policy; warm-up/statistics; thresholds; hardware tiers; memory/IO; package build, LSP, VM, Native, Actor, Replay, device/Kernel, and Zed measurements; cross-host execution; and release ownership remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0238"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0238-documentation-evidence-path-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Validate all twelve formal-document rows and all forty-six exact evidence paths.",
+  "Require at least one exact existing repository citation per row.",
+  "Reject wildcard, traversal, non-portable, empty-component, and missing evidence paths in focused tests.",
+  "Run documentation, xtask, governance, status, workspace, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Replaces ambiguous documentation citations with exact repository paths and adds an internal path-existence gate; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/editor, runtime, Unicode, protocols, and support states remain unchanged.",
+  "Existing manual states remain unchanged and no future manual or G6 documentation claim is promoted.",
+]
+unresolved_alternatives = [
+  "Content completeness; Markdown anchors; external links; recursive directory manifests; generated references; bilingual parity; future manual authority; publication; and G6 sign-off remain deferred.",
+]
+superseded_by = ""

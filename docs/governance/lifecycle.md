@@ -268,6 +268,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0235` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0235](../decisions/0235-lock-persistence-fault-injection.md) |
 | `DEC-0236` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0236](../decisions/0236-workspace-unsafe-policy-gate.md) |
 | `DEC-0237` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0237](../decisions/0237-performance-baseline-artifact-gate.md) |
+| `DEC-0238` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0238](../decisions/0238-documentation-evidence-path-gate.md) |
 
 ## Migration boundary
 

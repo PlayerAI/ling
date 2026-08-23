@@ -72,6 +72,7 @@ const REQUIRED_POLICY_PHRASES: &[&str] = &[
 pub struct CheckSummary {
     pub manual_count: usize,
     pub future_unsupported_count: usize,
+    pub evidence_path_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -80,26 +81,30 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
             "GOV-DOCS-MATRIX-0001: cannot read {INVENTORY_PATH}: {error}"
         )]
     })?;
-    let errors = validate(&inventory);
+    let (errors, evidence_path_count) = validate(root, &inventory);
     finish(errors).map(|()| CheckSummary {
         manual_count: MANUALS.len(),
         future_unsupported_count: MANUALS
             .iter()
             .filter(|manual| manual.state == "Future / Unsupported")
             .count(),
+        evidence_path_count,
     })
 }
 
-fn validate(inventory: &str) -> Vec<String> {
+fn validate(root: &Path, inventory: &str) -> (Vec<String>, usize) {
     let mut errors = Vec::new();
     let Some(formal_set) = inventory
         .split_once("## Formal set")
         .and_then(|(_, remainder)| remainder.split_once("## Required form"))
         .map(|(section, _)| section)
     else {
-        return vec![format!(
-            "GOV-DOCS-MATRIX-0002: {INVENTORY_PATH} is missing the Formal set section"
-        )];
+        return (
+            vec![format!(
+                "GOV-DOCS-MATRIX-0002: {INVENTORY_PATH} is missing the Formal set section"
+            )],
+            0,
+        );
     };
 
     let rows = formal_set.lines().filter_map(parse_row).collect::<Vec<_>>();
@@ -108,10 +113,12 @@ fn validate(inventory: &str) -> Vec<String> {
         .map(|manual| (manual.name, manual.state))
         .collect::<BTreeMap<_, _>>();
     let mut actual = BTreeMap::new();
-    for (name, state) in rows {
+    let mut evidence_path_count = 0;
+    for (name, evidence, state) in rows {
         if actual.insert(name.to_owned(), state.to_owned()).is_some() {
             errors.push(format!("GOV-DOCS-MATRIX-0003: duplicate manual {name:?}"));
         }
+        evidence_path_count += validate_evidence_paths(root, name, evidence, &mut errors);
     }
 
     let actual_names = actual.keys().map(String::as_str).collect::<Vec<_>>();
@@ -138,10 +145,56 @@ fn validate(inventory: &str) -> Vec<String> {
             ));
         }
     }
-    errors
+    (errors, evidence_path_count)
 }
 
-fn parse_row(line: &str) -> Option<(&str, &str)> {
+fn validate_evidence_paths(
+    root: &Path,
+    manual: &str,
+    evidence: &str,
+    errors: &mut Vec<String>,
+) -> usize {
+    let paths = evidence
+        .split('`')
+        .enumerate()
+        .filter_map(|(index, token)| (index % 2 == 1 && evidence_path(token)).then_some(token))
+        .collect::<Vec<_>>();
+    if paths.is_empty() {
+        errors.push(format!(
+            "GOV-DOCS-MATRIX-0007: manual {manual:?} must cite at least one exact repository path"
+        ));
+    }
+    for path in &paths {
+        if !safe_evidence_path(path) {
+            errors.push(format!(
+                "GOV-DOCS-MATRIX-0007: manual {manual:?} has unsafe or non-exact evidence path {path:?}"
+            ));
+        } else if !root.join(path.trim_end_matches('/')).exists() {
+            errors.push(format!(
+                "GOV-DOCS-MATRIX-0008: manual {manual:?} evidence path does not exist: {path}"
+            ));
+        }
+    }
+    paths.len()
+}
+
+fn evidence_path(token: &str) -> bool {
+    token == "README.md"
+        || ["docs/", "tests/", "crates/", "tools/", "editors/"]
+            .iter()
+            .any(|prefix| token.starts_with(prefix))
+}
+
+fn safe_evidence_path(path: &str) -> bool {
+    !path.is_empty()
+        && !path.contains(['*', '?', '[', ']', '\\', ':'])
+        && path
+            .trim_end_matches('/')
+            .split('/')
+            .all(|component| !component.is_empty() && component != "." && component != "..")
+}
+
+fn parse_row(line: &str) -> Option<(&str, &str, &str)> {
     let cells = line
         .trim()
         .strip_prefix('|')?
@@ -155,7 +208,7 @@ fn parse_row(line: &str) -> Option<(&str, &str)> {
     {
         return None;
     }
-    Some((cells[0], cells[2]))
+    Some((cells[0], cells[1], cells[2]))
 }
 
 fn finish(errors: Vec<String>) -> Result<(), Vec<String>> {
@@ -179,12 +232,17 @@ mod tests {
         let summary = check_repository(root).expect("documentation inventory is valid");
         assert_eq!(summary.manual_count, 12);
         assert_eq!(summary.future_unsupported_count, 4);
+        assert_eq!(summary.evidence_path_count, 46);
     }
 
     #[test]
     fn rejects_documentation_state_drift() {
         let inventory = "## Formal set\n| Planned manual | Current source and evidence | State | Boundary / missing work |\n| --- | --- | --- | --- |\n| Language Reference | x | Future / Unsupported | y |\n## Required form\n";
-        let errors = validate(inventory);
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("xtask is under tools/xtask");
+        let (errors, _) = validate(root, inventory);
         assert!(
             errors
                 .iter()
@@ -195,5 +253,25 @@ mod tests {
                 .iter()
                 .any(|error| error.contains("must be \"Seed\""))
         );
+    }
+
+    #[test]
+    fn rejects_non_exact_and_missing_evidence_paths() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("xtask is under tools/xtask");
+        let mut errors = Vec::new();
+        assert_eq!(
+            validate_evidence_paths(
+                root,
+                "fixture",
+                "`docs/*.md`, `docs/not-present.md`, `README.md`",
+                &mut errors,
+            ),
+            3
+        );
+        assert!(errors.iter().any(|error| error.contains("non-exact")));
+        assert!(errors.iter().any(|error| error.contains("does not exist")));
     }
 }

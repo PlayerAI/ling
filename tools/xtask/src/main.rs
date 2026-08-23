@@ -315,8 +315,10 @@ fn main() -> ExitCode {
             match documentation_matrix::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "documentation inventory OK: {} manuals ({} Future / Unsupported)",
-                        summary.manual_count, summary.future_unsupported_count
+                        "documentation inventory OK: {} manuals ({} Future / Unsupported), {} exact evidence paths",
+                        summary.manual_count,
+                        summary.future_unsupported_count,
+                        summary.evidence_path_count
                     );
                     ExitCode::SUCCESS
                 }

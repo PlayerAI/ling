@@ -3601,3 +3601,16 @@ covers = ["REL-6604 bounded performance-baseline artifact integrity evidence", "
 depends_on = ["DEC-0019", "DEC-0021", "DEC-0044", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0238"
+title = "Documentation evidence-path gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0238-documentation-evidence-path-gate.md"
+covers = ["DOC-6701 bounded formal-inventory evidence-path integrity", "twelve rows with forty-six exact existing repository citations", "internal path gate without content-completeness, authority-promotion, future-manual, publication, or G6 documentation claims"]
+depends_on = ["DEC-0045", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
