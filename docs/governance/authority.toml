@@ -3289,3 +3289,16 @@ covers = ["CBK-5901 bounded Trusted Compiler Route boundary evidence", "test-onl
 depends_on = ["DEC-0212", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0214"
+title = "Internal Lowering Validator boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0214-lowering-validator-boundary-evidence.md"
+covers = ["CBK-5902 bounded Lowering Validator boundary evidence", "test-only validation/equivalence vocabulary", "validator boundaries without Native/IR/correspondence semantics"]
+depends_on = ["DEC-0213", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
