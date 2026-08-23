@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 31 records: 27 current public, 1 internal, 3 Future.
-- Current public stability: 13 Experimental, 14 Preview, 0 Stable.
+- 32 records: 28 current public, 1 internal, 3 Future.
+- Current public stability: 14 Experimental, 14 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -20,6 +20,7 @@
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
+| `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-CLI-TEST` | Public | JSON | `ling.test/0.1` | `Preview` | yes | no | 5 |
@@ -125,6 +126,19 @@
 - Sources: [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/decisions/0069-lsp-utf8-edit-primitive.md`](../decisions/0069-lsp-utf8-edit-primitive.md), [`docs/decisions/0070-lsp-position-edit-projection.md`](../decisions/0070-lsp-position-edit-projection.md), [`docs/decisions/0259-current-lsp-open-document-overlay.md`](../decisions/0259-current-lsp-open-document-overlay.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-source/src/lib.rs`](../../crates/ling-source/src/lib.rs), [`crates/ling-source/src/position.rs`](../../crates/ling-source/src/position.rs), [`crates/ling-source/src/vfs.rs`](../../crates/ling-source/src/vfs.rs)
 - Fixtures: [`crates/ling-lsp/tests/overlay.rs`](../../crates/ling-lsp/tests/overlay.rs), [`crates/ling-lsp/tests/incremental_changes.rs`](../../crates/ling-lsp/tests/incremental_changes.rs), [`tests/protocols/lsp-overlay/README.md`](../../tests/protocols/lsp-overlay/README.md), [`docs/status/LSP-2103-IMPLEMENTATION-REPORT.md`](../status/LSP-2103-IMPLEMENTATION-REPORT.md), [`docs/status/LSP-2104-IMPLEMENTATION-REPORT.md`](../status/LSP-2104-IMPLEMENTATION-REPORT.md)
 - Notes: DEC-0259 accepts RFC-0023 full-text overlays as bounded LSP-2103. RFC-0029 implements LSP-2104 by advancing the Experimental marker to 0.2, advertising incremental sync, and adding bounded ordered UTF-8/16/32 range batches with failure-atomic publication and full-replacement equivalence. Compiler queries, snapshots, stale analysis, diagnostics, Workspace Edits, cancellation, Semantic Transactions, and Stable compatibility remain deferred.
+
+### `PROTO-LSP-WORKSPACE` — Ling LSP atomic workspace reload
+
+- Producer: ling lsp --stdio; ling-lsp workspace reload adapter
+- Consumer: Preview LSP clients; editor hosts; integration test harnesses
+- Reader policy: Accept only Ready-state ling/workspace/reload requests with an exact canonical-decimal base revision, one to 1029 unique logical source/project-input deltas, per-text and aggregate bounds, and restricted non-temporary Ling URIs; reject stale, malformed, duplicate, unsupported, missing-source-removal, and open-overlay-removal batches without mutation.
+- Writer policy: Canonicalize source URIs and declared input kinds, apply the batch to a private VFS/server candidate, preserve open-overlay visibility and document version history, publish exactly once after complete success, and return only changed plus the canonical-decimal session revision.
+- Unknown-field policy: Ignore unknown ordinary request and entry fields in 0.1 while validating every required field and exact type; unknown input names and incompatible identity, limit, result, or revision evolution require a new protocol version.
+- Migration tool: None; ling.lsp.workspace/0.1 is Experimental with no predecessor and is discovered through the exact initialize capability.
+- Authority: `RFC-0030`, `RFC-0002`, `RFC-0004`, `RFC-0023`, `RFC-0025`, `DEC-0019`, `DEC-0071`
+- Sources: [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-source/src/vfs.rs`](../../crates/ling-source/src/vfs.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs)
+- Fixtures: [`crates/ling-lsp/tests/workspace_reload.rs`](../../crates/ling-lsp/tests/workspace_reload.rs), [`tests/protocols/lsp-workspace/README.md`](../../tests/protocols/lsp-workspace/README.md), [`docs/status/LSP-2105-IMPLEMENTATION-REPORT.md`](../status/LSP-2105-IMPLEMENTATION-REPORT.md)
+- Notes: Client/host publication keeps watcher timing, paths, symlinks, and filesystem reads outside Ling semantics. Reload revisions invalidate exact source and manifest/lock/config/profile/target inputs without eager full compilation. Diagnostics, cancellation, compiler-result staleness, file URI mapping, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
 
 ### `PROTO-HUMAN-OUTPUT` — Human-readable CLI and diagnostic output
 

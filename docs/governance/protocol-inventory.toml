@@ -156,6 +156,28 @@ authority = ["RFC-0023", "RFC-0029", "RFC-0004", "DEC-0019", "DEC-0029", "DEC-00
 notes = ["DEC-0259 accepts RFC-0023 full-text overlays as bounded LSP-2103. RFC-0029 implements LSP-2104 by advancing the Experimental marker to 0.2, advertising incremental sync, and adding bounded ordered UTF-8/16/32 range batches with failure-atomic publication and full-replacement equivalence. Compiler queries, snapshots, stale analysis, diagnostics, Workspace Edits, cancellation, Semantic Transactions, and Stable compatibility remain deferred."]
 
 [[protocol]]
+id = "PROTO-LSP-WORKSPACE"
+title = "Ling LSP atomic workspace reload"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.workspace/0.1"
+stability = "Experimental"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp workspace reload adapter"]
+consumer = ["Preview LSP clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Accept only Ready-state ling/workspace/reload requests with an exact canonical-decimal base revision, one to 1029 unique logical source/project-input deltas, per-text and aggregate bounds, and restricted non-temporary Ling URIs; reject stale, malformed, duplicate, unsupported, missing-source-removal, and open-overlay-removal batches without mutation."
+writer_policy = "Canonicalize source URIs and declared input kinds, apply the batch to a private VFS/server candidate, preserve open-overlay visibility and document version history, publish exactly once after complete success, and return only changed plus the canonical-decimal session revision."
+unknown_field_policy = "Ignore unknown ordinary request and entry fields in 0.1 while validating every required field and exact type; unknown input names and incompatible identity, limit, result, or revision evolution require a new protocol version."
+migration_tool = "None; ling.lsp.workspace/0.1 is Experimental with no predecessor and is discovered through the exact initialize capability."
+fixtures = ["crates/ling-lsp/tests/workspace_reload.rs", "tests/protocols/lsp-workspace/README.md", "docs/status/LSP-2105-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0030.md", "docs/RFC-0002.md", "docs/RFC-0004.md", "docs/RFC-0023.md", "docs/RFC-0025.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "crates/ling-lsp/src/lib.rs", "crates/ling-source/src/vfs.rs", "crates/ling-db/src/lib.rs"]
+version_markers = ["ling.lsp.workspace/0.1", "ling/workspace/reload"]
+authority = ["RFC-0030", "RFC-0002", "RFC-0004", "RFC-0023", "RFC-0025", "DEC-0019", "DEC-0071"]
+notes = ["Client/host publication keeps watcher timing, paths, symlinks, and filesystem reads outside Ling semantics. Reload revisions invalidate exact source and manifest/lock/config/profile/target inputs without eager full compilation. Diagnostics, cancellation, compiler-result staleness, file URI mapping, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred."]
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 title = "Ling LSP bounded document formatting"
 category = "LSP"

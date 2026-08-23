@@ -5,8 +5,8 @@
 The compiler now has a deterministic, immutable observation value for the
 visible VFS workspace state. It captures source files, non-source workspace
 inputs, and the session revision high-water mark while preserving exact bytes
-and overlay precedence. This completes only the bounded internal child; the
-public `LSP-2105` workspace-reload target remains `BlockedSpec`.
+and overlay precedence. This completes the bounded internal child; Accepted
+RFC-0030 now consumes it in the public `LSP-2105` reload implementation.
 
 ## Implementation
 
@@ -40,7 +40,7 @@ hash-map iteration effects.
 
 ## Intentionally deferred
 
-Watcher/reload notifications, workspace-folder identity, event coalescing,
-dependency graph publication, stale-result rejection, cancellation, URI and
-document versions, JSON-RPC methods, and public compatibility remain deferred
-to the blocked parent and its registered gaps.
+Host watcher adapters, file URI/path identity, debounce, compiler-result
+staleness, cancellation, diagnostics refresh, Workspace Edits, Semantic
+Transactions, and Stable compatibility remain deferred. Bounded logical
+reload publication is now complete under RFC-0030.

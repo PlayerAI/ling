@@ -88,6 +88,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-LSP-FORMATTING` | `Public` | `ling.lsp.formatting/0.1` | `Experimental` | yes |
 | `PROTO-LSP-LIFECYCLE` | `Public` | `ling.lsp.lifecycle/0.1` | `Preview` | yes |
 | `PROTO-LSP-OVERLAY` | `Public` | `ling.lsp.overlay/0.2` | `Experimental` | yes |
+| `PROTO-LSP-WORKSPACE` | `Public` | `ling.lsp.workspace/0.1` | `Experimental` | yes |
 | `PROTO-PACKAGE-IDENTITY` | `Public` | `v1 domain encodings` | `Experimental` | yes |
 | `PROTO-PACKAGE-MANIFEST` | `Public` | `ling.manifest/1` | `Experimental` | yes |
 | `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | `Public` | `ling.semantic/0.2` | `Experimental` | yes |

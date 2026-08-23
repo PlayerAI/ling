@@ -977,6 +977,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0030"
+title = "LSP atomic workspace reload"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0030.md"
+covers = ["ling.lsp.workspace/0.1", "revision-guarded logical source and project-input reload", "canonical failure-atomic workspace publication"]
+depends_on = ["RFC-0002", "RFC-0004", "RFC-0023", "RFC-0025", "DEC-0019", "DEC-0071", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

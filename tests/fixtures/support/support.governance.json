@@ -496,6 +496,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-WORKSPACE",
+      "visibility": "Public",
+      "version": "ling.lsp.workspace/0.1",
+      "stability": "Experimental",
+      "implemented": true
+    },
+    {
       "id": "PROTO-PACKAGE-IDENTITY",
       "visibility": "Public",
       "version": "v1 domain encodings",

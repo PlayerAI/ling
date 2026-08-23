@@ -3,8 +3,9 @@
 //!
 //! RFC-0004 is the authority for lifecycle and transport; RFC-0023 is the
 //! authority for the full-text document overlay boundary; RFC-0029 extends it
-//! with bounded incremental changes; RFC-0026 governs the bounded document-
-//! formatting response; DEC-0029 remains the authority for position projection.
+//! with bounded incremental changes; RFC-0030 governs atomic workspace reload;
+//! RFC-0026 governs the bounded document-formatting response; DEC-0029 remains
+//! the authority for position projection.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -12,10 +13,10 @@ use std::io::{self, BufRead, BufReader, BufWriter, Read, Write};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-pub use ling_source::{FileOrigin, PositionEncoding, Revision};
+pub use ling_source::{FileOrigin, PositionEncoding, Revision, WorkspaceInput};
 use ling_source::{
     LspPosition, LspPositionEdit, SourceFile, SourceId, VfsError, VirtualFileSystem,
-    negotiate_position_encoding, validate_logical_name,
+    WorkspaceSnapshot, negotiate_position_encoding, validate_logical_name,
 };
 use serde_json::{Map, Value, json};
 
@@ -42,6 +43,8 @@ pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";
 pub const OVERLAY_PROTOCOL_VERSION: &str = "ling.lsp.overlay/0.2";
 /// Version marker for the bounded document-formatting Experimental extension.
 pub const FORMATTING_PROTOCOL_VERSION: &str = "ling.lsp.formatting/0.1";
+/// Version marker for the atomic workspace-reload Experimental extension.
+pub const WORKSPACE_PROTOCOL_VERSION: &str = "ling.lsp.workspace/0.1";
 /// JSON-RPC protocol version accepted by this server.
 pub const JSON_RPC_VERSION: &str = "2.0";
 /// Maximum JSON body size accepted by the transport.
@@ -58,6 +61,10 @@ pub const MAX_WORKSPACE_NAME_BYTES: usize = 256;
 pub const MAX_DOCUMENT_BYTES: usize = MAX_FRAME_BYTES;
 /// Maximum number of ordered entries accepted in one incremental change batch.
 pub const MAX_CONTENT_CHANGES: usize = 64;
+/// Maximum number of source deltas in one workspace reload.
+pub const MAX_RELOAD_SOURCES: usize = 1_024;
+/// Maximum combined UTF-8 bytes across workspace reload text fields.
+pub const MAX_RELOAD_TEXT_BYTES: usize = MAX_FRAME_BYTES;
 
 const PARSE_ERROR: i32 = -32_700;
 const INVALID_REQUEST: i32 = -32_600;
@@ -69,6 +76,7 @@ const SERVER_SHUTTING_DOWN: i32 = -32_003;
 const DOCUMENT_STALE: i32 = -32_004;
 const DOCUMENT_READ_ONLY: i32 = -32_005;
 const DOCUMENT_URI: i32 = -32_006;
+const WORKSPACE_STALE: i32 = -32_007;
 
 /// Lifecycle state of one LSP server process.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -202,6 +210,7 @@ pub struct RequestSnapshot {
     position_encoding: PositionEncoding,
     revision: Revision,
     documents: Box<[RequestDocument]>,
+    inputs: Box<[WorkspaceSnapshot]>,
 }
 
 impl RequestSnapshot {
@@ -236,6 +245,18 @@ impl RequestSnapshot {
             .binary_search_by(|document| document.uri().cmp(uri))
             .ok()
             .map(|index| &self.documents[index])
+    }
+
+    /// Returns project inputs in the declared canonical input order.
+    #[must_use]
+    pub fn inputs(&self) -> &[WorkspaceSnapshot] {
+        &self.inputs
+    }
+
+    /// Returns one captured project input.
+    #[must_use]
+    pub fn input(&self, kind: WorkspaceInput) -> Option<&WorkspaceSnapshot> {
+        self.inputs.iter().find(|input| input.kind() == kind)
     }
 }
 
@@ -354,6 +375,38 @@ struct DocumentIdentity {
 enum DocumentChange {
     Full(String),
     Range(LspPositionEdit),
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct SourceReload {
+    uri: String,
+    text: Option<String>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct InputReload {
+    kind: WorkspaceInput,
+    text: Option<String>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct WorkspaceReload {
+    base_revision: u64,
+    sources: Vec<SourceReload>,
+    inputs: Vec<InputReload>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct WorkspaceReloadResult {
+    changed: bool,
+    revision: Revision,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+enum WorkspaceReloadError {
+    InvalidParams,
+    Stale { current: Revision, requested: u64 },
+    Vfs(VfsError),
 }
 
 /// Errors raised while publishing or applying an RFC-0023/RFC-0029 document overlay.
@@ -537,6 +590,7 @@ impl LspServer {
     /// server can continue publishing later VFS changes after this method
     /// returns without mutating the captured bytes.
     pub fn capture_request_snapshot(&self) -> Result<RequestSnapshot, RequestSnapshotError> {
+        let workspace = self.vfs.workspace_snapshot();
         let mut documents = Vec::with_capacity(self.documents.len());
         for (uri, record) in &self.documents {
             let snapshot = self
@@ -556,8 +610,9 @@ impl LspServer {
         Ok(RequestSnapshot {
             state: self.state,
             position_encoding: self.position_encoding,
-            revision: self.vfs.revision(),
+            revision: workspace.revision(),
             documents: documents.into_boxed_slice(),
+            inputs: workspace.inputs().to_vec().into_boxed_slice(),
         })
     }
 
@@ -654,6 +709,7 @@ impl LspServer {
             "textDocument/didChange" => self.did_change(id_present, id, params),
             "textDocument/didClose" => self.did_close(id_present, id, params),
             "textDocument/formatting" => self.document_formatting(id_present, id, params),
+            "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
         }
     }
@@ -760,6 +816,45 @@ impl LspServer {
         }
         let result = parse_close_params(&params).and_then(|uri| self.close_document(&uri));
         self.overlay_outcome(is_request, id, result)
+    }
+
+    fn workspace_reload_request(
+        &mut self,
+        is_request: bool,
+        id: Value,
+        params: Value,
+    ) -> HandleOutcome {
+        if !is_request {
+            return HandleOutcome::NoResponse;
+        }
+        if self.state != LifecycleState::Ready {
+            return self.state_error(id);
+        }
+        let result =
+            parse_workspace_reload(&params).and_then(|reload| self.reload_workspace(reload));
+        match result {
+            Ok(result) => HandleOutcome::Response(success_response(
+                id,
+                json!({
+                    "changed": result.changed,
+                    "revision": result.revision.get().to_string(),
+                }),
+            )),
+            Err(WorkspaceReloadError::Stale { .. }) => error_or_none(
+                true,
+                id,
+                WORKSPACE_STALE,
+                "工作区基准版本过旧 / workspace base revision is stale",
+            ),
+            Err(WorkspaceReloadError::InvalidParams | WorkspaceReloadError::Vfs(_)) => {
+                error_or_none(
+                    true,
+                    id,
+                    INVALID_PARAMS,
+                    "工作区重载参数无效 / invalid workspace reload parameters",
+                )
+            }
+        }
     }
 
     fn document_formatting(&self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
@@ -945,6 +1040,69 @@ impl LspServer {
         current.version = version;
         self.last_versions.insert(uri.to_owned(), version);
         Ok(())
+    }
+
+    fn reload_workspace(
+        &mut self,
+        reload: WorkspaceReload,
+    ) -> Result<WorkspaceReloadResult, WorkspaceReloadError> {
+        let current = self.vfs.revision();
+        if reload.base_revision != current.get() {
+            return Err(WorkspaceReloadError::Stale {
+                current,
+                requested: reload.base_revision,
+            });
+        }
+
+        let mut candidate = self.clone();
+        for source in reload.sources {
+            match source.text {
+                Some(text) => candidate
+                    .publish_disk_snapshot(&source.uri, &text)
+                    .map_err(|error| match error {
+                        OverlayError::Vfs(error) => WorkspaceReloadError::Vfs(error),
+                        _ => WorkspaceReloadError::InvalidParams,
+                    })?,
+                None => {
+                    let record = candidate
+                        .documents
+                        .get(&source.uri)
+                        .ok_or(WorkspaceReloadError::InvalidParams)?;
+                    if record.open || record.temporary {
+                        return Err(WorkspaceReloadError::InvalidParams);
+                    }
+                    candidate
+                        .vfs
+                        .remove_disk_snapshot(record.file)
+                        .map_err(WorkspaceReloadError::Vfs)?;
+                    candidate.documents.remove(&source.uri);
+                }
+            }
+        }
+        for input in reload.inputs {
+            match input.text {
+                Some(text) => {
+                    candidate
+                        .vfs
+                        .set_workspace_input(input.kind, text.into_bytes())
+                        .map_err(WorkspaceReloadError::Vfs)?;
+                }
+                None => {
+                    candidate
+                        .vfs
+                        .remove_workspace_input(input.kind)
+                        .map_err(WorkspaceReloadError::Vfs)?;
+                }
+            }
+        }
+
+        let revision = candidate.vfs.revision();
+        let result = WorkspaceReloadResult {
+            changed: revision != current,
+            revision,
+        };
+        *self = candidate;
+        Ok(result)
     }
 
     fn close_document(&mut self, uri: &str) -> Result<(), OverlayError> {
@@ -1187,6 +1345,109 @@ fn parse_change_params(params: &Value) -> Result<(String, i64, Vec<DocumentChang
         }
     }
     Ok((uri, version, parsed))
+}
+
+fn parse_workspace_reload(params: &Value) -> Result<WorkspaceReload, WorkspaceReloadError> {
+    let object = params
+        .as_object()
+        .ok_or(WorkspaceReloadError::InvalidParams)?;
+    let base_revision = object
+        .get("baseRevision")
+        .and_then(parse_canonical_revision)
+        .ok_or(WorkspaceReloadError::InvalidParams)?;
+    let source_values = object
+        .get("sources")
+        .and_then(Value::as_array)
+        .ok_or(WorkspaceReloadError::InvalidParams)?;
+    let input_values = object
+        .get("inputs")
+        .and_then(Value::as_array)
+        .ok_or(WorkspaceReloadError::InvalidParams)?;
+    if source_values.len() > MAX_RELOAD_SOURCES
+        || input_values.len() > 5
+        || source_values.is_empty() && input_values.is_empty()
+    {
+        return Err(WorkspaceReloadError::InvalidParams);
+    }
+
+    let mut total_bytes = 0usize;
+    let mut sources = Vec::with_capacity(source_values.len());
+    for value in source_values {
+        let entry = value
+            .as_object()
+            .ok_or(WorkspaceReloadError::InvalidParams)?;
+        let uri = entry
+            .get("uri")
+            .and_then(Value::as_str)
+            .ok_or(WorkspaceReloadError::InvalidParams)?
+            .to_owned();
+        let identity = document_identity(&uri).map_err(|_| WorkspaceReloadError::InvalidParams)?;
+        if identity.temporary {
+            return Err(WorkspaceReloadError::InvalidParams);
+        }
+        let text = parse_reload_text(entry.get("text"), &mut total_bytes)?;
+        sources.push(SourceReload { uri, text });
+    }
+    sources.sort_by(|left, right| left.uri.cmp(&right.uri));
+    if sources.windows(2).any(|pair| pair[0].uri == pair[1].uri) {
+        return Err(WorkspaceReloadError::InvalidParams);
+    }
+
+    let mut inputs = Vec::with_capacity(input_values.len());
+    for value in input_values {
+        let entry = value
+            .as_object()
+            .ok_or(WorkspaceReloadError::InvalidParams)?;
+        let kind = match entry.get("name").and_then(Value::as_str) {
+            Some("manifest") => WorkspaceInput::PackageManifest,
+            Some("lock") => WorkspaceInput::PackageLock,
+            Some("config") => WorkspaceInput::Config,
+            Some("profile") => WorkspaceInput::Profile,
+            Some("target") => WorkspaceInput::Target,
+            _ => return Err(WorkspaceReloadError::InvalidParams),
+        };
+        let text = parse_reload_text(entry.get("text"), &mut total_bytes)?;
+        inputs.push(InputReload { kind, text });
+    }
+    inputs.sort_by_key(|input| input.kind);
+    if inputs.windows(2).any(|pair| pair[0].kind == pair[1].kind) {
+        return Err(WorkspaceReloadError::InvalidParams);
+    }
+
+    Ok(WorkspaceReload {
+        base_revision,
+        sources,
+        inputs,
+    })
+}
+
+fn parse_reload_text(
+    value: Option<&Value>,
+    total_bytes: &mut usize,
+) -> Result<Option<String>, WorkspaceReloadError> {
+    match value {
+        Some(Value::Null) => Ok(None),
+        Some(Value::String(text)) if text.len() <= MAX_DOCUMENT_BYTES => {
+            *total_bytes = total_bytes
+                .checked_add(text.len())
+                .filter(|total| *total <= MAX_RELOAD_TEXT_BYTES)
+                .ok_or(WorkspaceReloadError::InvalidParams)?;
+            Ok(Some(text.clone()))
+        }
+        _ => Err(WorkspaceReloadError::InvalidParams),
+    }
+}
+
+fn parse_canonical_revision(value: &Value) -> Option<u64> {
+    let text = value.as_str()?;
+    if text == "0" {
+        return Some(0);
+    }
+    let bytes = text.as_bytes();
+    if !matches!(bytes.first(), Some(b'1'..=b'9')) || !bytes.iter().all(u8::is_ascii_digit) {
+        return None;
+    }
+    text.parse().ok()
 }
 
 fn parse_range(value: &Value) -> Result<(LspPosition, LspPosition), OverlayError> {
@@ -1542,6 +1803,12 @@ fn initialize_result(encoding: PositionEncoding) -> Value {
                 "lingOverlay": {
                     "changeLimit": MAX_CONTENT_CHANGES,
                     "version": OVERLAY_PROTOCOL_VERSION,
+                },
+                "lingWorkspaceReload": {
+                    "inputLimit": 5,
+                    "sourceLimit": MAX_RELOAD_SOURCES,
+                    "totalByteLimit": MAX_RELOAD_TEXT_BYTES,
+                    "version": WORKSPACE_PROTOCOL_VERSION,
                 },
             },
             "textDocumentSync": {

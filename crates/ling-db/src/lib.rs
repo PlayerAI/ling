@@ -1584,6 +1584,7 @@ impl CompilerDb {
 
     fn persistent_cache_key(&self, query: &str, snapshot: &FileSnapshot) -> CacheKey {
         let package = self.workspace_cache_dimension(WorkspaceInput::PackageManifest);
+        let lock = self.workspace_cache_dimension(WorkspaceInput::PackageLock);
         let config = self.workspace_cache_dimension(WorkspaceInput::Config);
         let profile = self.workspace_cache_dimension(WorkspaceInput::Profile);
         let target = self.workspace_cache_dimension(WorkspaceInput::Target);
@@ -1592,7 +1593,7 @@ impl CompilerDb {
             [LANGUAGE_VERSION.0, LANGUAGE_VERSION.1, LANGUAGE_VERSION.2],
             [UNICODE_VERSION.0, UNICODE_VERSION.1, UNICODE_VERSION.2],
             QUERY_SCHEMA_VERSION,
-            format!("profile={profile};package={package};config={config}"),
+            format!("profile={profile};package={package};lock={lock};config={config}"),
             format!("target={target}"),
             query,
             snapshot.logical_name(),
@@ -2032,6 +2033,7 @@ mod tests {
         }
         for kind in [
             WorkspaceInput::PackageManifest,
+            WorkspaceInput::PackageLock,
             WorkspaceInput::Config,
             WorkspaceInput::Profile,
             WorkspaceInput::Target,

@@ -6807,3 +6807,31 @@ unresolved_alternatives = [
   "Concurrent changes, version vectors, rangeLength, save semantics, host-file resolution, project reload, compiler snapshots, diagnostics, cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0030"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0030.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact capability, request/result bytes, canonical decimal revisions, lifecycle restrictions, and current-writer-only discovery.",
+  "Cover canonical source/input add, change, removal, no-op, revision allocation, open-overlay precedence, immutable snapshots, Unicode, BOM, and CRLF.",
+  "Reject stale, malformed, duplicate, unsupported, missing/open-removal, and individual/aggregate over-limit batches while proving complete failure atomicity.",
+  "Exercise manifest, lock, config, profile, and target invalidation plus workspace/dependency sources across different client array orders and repeated runs.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, support, status, RC0, traceability, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds Experimental current-writer-only ling.lsp.workspace/0.1; there is no earlier reader or migration path.",
+  "Adds package-lock bytes to disposable internal workspace query identity without introducing a public cache format or cross-process revision.",
+  "Adds no Ling syntax, CLI, diagnostic allocation, public schema, Semantic ID, runtime, bytecode, VM, ABI, network/filesystem, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Host watcher adapters, file URI mapping, symlink policy, multi-root projects, network dependencies, compiler-result cancellation and staleness, diagnostics refresh, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.",
+]
+superseded_by = ""

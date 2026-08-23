@@ -74,6 +74,7 @@ impl FileSnapshot {
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum WorkspaceInput {
     PackageManifest,
+    PackageLock,
     Config,
     Profile,
     Target,
@@ -216,6 +217,7 @@ pub enum VfsError {
     NonCanonicalLogicalName { name: String },
     UnknownFile { file: SourceId },
     NoOpenOverlay { file: SourceId },
+    OpenOverlay { file: SourceId },
     FileIdExhausted,
     RevisionExhausted,
 }
@@ -230,6 +232,9 @@ impl fmt::Display for VfsError {
             Self::UnknownFile { file } => write!(formatter, "unknown source file {}", file.get()),
             Self::NoOpenOverlay { file } => {
                 write!(formatter, "source file {} has no open overlay", file.get())
+            }
+            Self::OpenOverlay { file } => {
+                write!(formatter, "source file {} has an open overlay", file.get())
             }
             Self::FileIdExhausted => formatter.write_str("source file ID space is exhausted"),
             Self::RevisionExhausted => formatter.write_str("revision space is exhausted"),
@@ -383,6 +388,27 @@ impl VirtualFileSystem {
         Ok(())
     }
 
+    /// Removes one closed disk source and advances the workspace revision.
+    ///
+    /// Open overlays are rejected so a host reload cannot discard unsaved
+    /// editor bytes. Source IDs and revisions are never reused.
+    pub fn remove_disk_snapshot(&mut self, file: SourceId) -> Result<Revision, VfsError> {
+        let entry = self
+            .files
+            .get(&file)
+            .ok_or(VfsError::UnknownFile { file })?;
+        if entry.overlay.is_some() {
+            return Err(VfsError::OpenOverlay { file });
+        }
+        let logical_name = entry.logical_name.clone();
+        let revision = self.next_revision()?;
+        self.files
+            .remove(&file)
+            .ok_or(VfsError::UnknownFile { file })?;
+        self.names.remove(&logical_name);
+        Ok(revision)
+    }
+
     /// Returns the currently visible immutable snapshot.
     #[must_use]
     pub fn snapshot(&self, file: SourceId) -> Option<FileSnapshot> {
@@ -509,6 +535,19 @@ impl VirtualFileSystem {
             },
         );
         Ok(InputChange::Added { kind, revision })
+    }
+
+    /// Removes one workspace input and advances the revision when it existed.
+    pub fn remove_workspace_input(
+        &mut self,
+        kind: WorkspaceInput,
+    ) -> Result<Option<Revision>, VfsError> {
+        if !self.inputs.contains_key(&kind) {
+            return Ok(None);
+        }
+        let revision = self.next_revision()?;
+        self.inputs.remove(&kind);
+        Ok(Some(revision))
     }
 
     /// Returns an immutable workspace-input snapshot.
@@ -750,6 +789,53 @@ mod tests {
             other => panic!("expected Added, got {other:?}"),
         };
         assert!(second > first);
+    }
+
+    #[test]
+    fn reload_removals_are_revisioned_and_preserve_open_overlays() {
+        let mut vfs = VirtualFileSystem::new();
+        let closed = match vfs
+            .set_disk_snapshot("src/Closed.ling", b"closed".to_vec())
+            .unwrap()
+        {
+            ChangeEvent::Added { file, .. } => file,
+            other => panic!("expected Added, got {other:?}"),
+        };
+        let open = match vfs
+            .set_disk_snapshot("src/Open.ling", b"disk".to_vec())
+            .unwrap()
+        {
+            ChangeEvent::Added { file, .. } => file,
+            other => panic!("expected Added, got {other:?}"),
+        };
+        vfs.open_overlay(open, b"editor".to_vec()).unwrap();
+        vfs.set_workspace_input(WorkspaceInput::PackageLock, b"lock".to_vec())
+            .unwrap();
+
+        let before_closed_removal = vfs.revision();
+        let removed_at = vfs
+            .remove_disk_snapshot(closed)
+            .expect("closed source can be removed");
+        assert!(removed_at > before_closed_removal);
+        assert!(vfs.snapshot(closed).is_none());
+        assert!(matches!(
+            vfs.remove_disk_snapshot(open),
+            Err(VfsError::OpenOverlay { file }) if file == open
+        ));
+        assert_eq!(vfs.snapshot(open).unwrap().bytes(), b"editor");
+
+        let removed_input_at = vfs
+            .remove_workspace_input(WorkspaceInput::PackageLock)
+            .expect("input removal succeeds")
+            .expect("input existed");
+        assert!(removed_input_at > removed_at);
+        let revision = vfs.revision();
+        assert_eq!(
+            vfs.remove_workspace_input(WorkspaceInput::PackageLock)
+                .expect("absent input removal is a no-op"),
+            None
+        );
+        assert_eq!(vfs.revision(), revision);
     }
 
     #[test]

@@ -308,6 +308,13 @@ stability = "Experimental"
 implemented = true
 
 [[protocol]]
+id = "PROTO-LSP-WORKSPACE"
+visibility = "Public"
+version = "ling.lsp.workspace/0.1"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 visibility = "Public"
 version = "ling.lsp.formatting/0.1"

@@ -2,10 +2,10 @@
 
 ## Outcome
 
-`LSP-2105-WORKSPACE-SNAPSHOT` is a bounded child of the blocked `LSP-2105`
-target, authorized by Accepted `DEC-0071` and the internal revision boundary
-in `DEC-0019`. It captures compiler-owned workspace state without accepting or
-implementing a public workspace reload, watcher, or LSP notification contract.
+`LSP-2105-WORKSPACE-SNAPSHOT` is a bounded child authorized by Accepted
+`DEC-0071` and the internal revision boundary in `DEC-0019`. Accepted RFC-0030
+now consumes this compiler-owned capture in the public `LSP-2105` reload
+boundary without changing the child's original scope or evidence.
 
 ## Normative traceability
 
@@ -18,7 +18,7 @@ implementing a public workspace reload, watcher, or LSP notification contract.
   `GAP-LSP-TRANSACTION-PROTOCOL-001` keep public reload identity, event
   sources, publication, and version semantics open.
 - Accepted `DEC-0071` authorizes only the immutable source/input/revision
-  capture and explicitly preserves the blocked parent.
+  capture; Accepted `RFC-0030` separately authorizes its reload consumer.
 
 ## Current interface evidence
 
@@ -37,7 +37,7 @@ language behavior, runtime, bytecode, VM, ABI, or Unicode table changed.
 
 ## Intentionally deferred
 
-Workspace roots, watcher/event sources, symlink/path policy, coalescing and
-debounce, dependency graph reload scope, failure-atomic publication, stale
-request results, cancellation, diagnostics refresh, URI/version fields, JSON-
-RPC methods, and Stable 1.0 claims remain in the blocked `LSP-2105` parent.
+Host watcher/event sources, file URI mapping, symlink/path policy, debounce,
+compiler-result staleness, cancellation, diagnostics refresh, Workspace Edits,
+Semantic Transactions, and Stable claims remain deferred. RFC-0030 now owns
+bounded logical reload publication and failure atomicity.
