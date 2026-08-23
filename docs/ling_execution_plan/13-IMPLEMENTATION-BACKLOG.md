@@ -46,7 +46,7 @@
 | 24 | `ZQ-3202` | brackets | TS grammar | 与 ZQ-3201 | pair fixtures |
 | 25 | `ZQ-3204` | outline | TS declarations | 与 query tasks | symbols visible in Zed |
 | 26 | `VM-1204` | VM 基础执行 | VM-1202/1203 | 否 | **Done**；verifier-gated `ling-vm`、全 1.0 scalar operator/control flow、Capability preflight、budget/Fault/source-map 与 interpreter differential evidence |
-| 27 | `LSP-2202` | push diagnostics | LSP-2201 | 与 hover | stale diagnostics handled |
+| 27 | `LSP-2202` | push diagnostics | LSP-2201 | 与 hover | **Done**；Accepted RFC-0032；确定性 message-boundary debounce、完整 snapshot freshness、版本化 replace/clear 与 locked-offline compiler diagnostics |
 | 28 | `ZEXT-3302` | Zed Wasm extension | grammar-only stable | 与 LSP | wasm32-wasip2 build |
 | 29 | `ZEXT-3303` | 查找本地 zero | extension skeleton | 与 queries | setting/PATH behavior |
 | 30 | `ZEXT-3304` | 启动 `zero lsp --stdio` | LSP command stable | 否 | diagnostics in Zed |
@@ -165,8 +165,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | Done | Accepted `RFC-0031`; implementation `9a5310fbe48fd40ae5c3d05c7720656361f0b08f`; see `docs/status/LSP-2201-IMPLEMENTATION-REPORT.md` |
 | `LSP-2201-DIAGNOSTIC-POSITION` | G1/Editor | Bounded internal diagnostic span projection | S | Done | Accepted `DEC-0072`; consumed by Accepted `RFC-0031`; see `docs/status/LSP-2201-DIAGNOSTIC-POSITION-IMPLEMENTATION-REPORT.md` |
 | `LSP-2201-ORDERING` | G1/Editor | Internal canonical diagnostic ordering | S | Done | Accepted DEC-0034; consumed by Accepted `RFC-0031`; see `docs/status/LSP-2201-ORDERING-IMPLEMENTATION-REPORT.md` |
-| `LSP-2202` | G1/Editor | Push diagnostics v0 | — | BlockedSpec | Accepted DEC-0035 closes only the internal diagnostic-batch child; public publish/trigger/version/clear behavior remains open; see `docs/status/LSP-2202-AUTHORITY-AUDIT.md` |
-| `LSP-2202-BATCH` | G1/Editor | Internal immutable diagnostic batch | S | Done | Accepted DEC-0035; see `crates/ling-lsp/src/diagnostic_batch.rs` and `docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `LSP-2202` | G1/Editor | Push diagnostics v0 | — | Done | Accepted RFC-0032; implementation `4914d2346f5647f2cdfad85ef4f1335bd44b9f12`; see `docs/status/LSP-2202-IMPLEMENTATION-REPORT.md` |
+| `LSP-2202-BATCH` | G1/Editor | Internal immutable diagnostic batch | S | Done | Accepted DEC-0035; see `crates/ling-lsp/src/diagnostic_batch.rs` and `docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md`; RFC-0032 separately implements the parent without broadening this child |
 | `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:215`, `docs/status/LSP-2203-AUTHORITY-AUDIT.md` |
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:219`, `docs/status/LSP-2204-AUTHORITY-AUDIT.md` |
 | `LSP-2205` | G1/Editor | Diagnostic fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:227`, `docs/status/LSP-2205-AUTHORITY-AUDIT.md` |

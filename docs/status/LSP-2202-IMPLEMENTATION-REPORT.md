@@ -1,6 +1,6 @@
 # LSP-2202 implementation report
 
-> Status: implementation complete; registry binding pending
+> Status: Done / 已完成
 > Task: `LSP-2202`
 > Authority: Accepted `RFC-0032`, `RFC-0031`, `RFC-0030`, `RFC-0029`,
 > `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0034`, `DEC-0035`, `DEC-0071`,
@@ -60,9 +60,9 @@ general cancellation requests, or Workspace Edits.
   isolation/clearance, close-to-disk and multi-document URI-ordered disk
   publication, disk/reload no-ops, source removal, workspace-input staleness,
   response-before-notification order, and oversized-output failure atomicity.
-- The focused locked-offline tests and strict Clippy checks pass. The full
-  repository gates and exact implementation commit are recorded during the
-  follow-up status-binding step.
+- The focused and full locked-offline repository gates pass. The exact
+  implementation commit is `4914d2346f5647f2cdfad85ef4f1335bd44b9f12`,
+  bound in `docs/status/implementation-status.toml`.
 
 ## Compatibility, schemas, and Semantic IDs
 

@@ -6342,8 +6342,8 @@ integration_state = "committed"
 completed = "2026-08-23"
 notes = [
   "Implementation commit: 9a5310fbe48fd40ae5c3d05c7720656361f0b08f (`feat(lsp): add compiler diagnostic adapter`).",
-  "PROTO-LSP-DIAGNOSTIC registers current-writer-only Experimental ling.lsp.diagnostic/0.1; existing ling.diagnostic/0.1 and compiler diagnostic allocation remain unchanged.",
-  "LSP-2202 owns publishDiagnostics, debounce, snapshot/document versions, stale-result handling, replacement/clearance, and cancellation; LSP-2204 owns suppression and error-storm caps.",
+  "PROTO-LSP-DIAGNOSTIC was introduced as ling.lsp.diagnostic/0.1 and Accepted RFC-0032 later advanced it compatibly to 0.2 only for validated temporary sources; existing ling.diagnostic/0.1 and compiler diagnostic allocation remain unchanged.",
+  "Accepted RFC-0032/LSP-2202 now owns publishDiagnostics, logical debounce, snapshot/document versions, stale-result handling, and replacement/clearance; cancellation requests remain deferred and LSP-2204 owns suppression and error-storm caps.",
   "No Ling syntax/semantics, Typed Core, interpreter, runtime, bytecode, VM, ABI, filesystem/network, or Unicode 17.0.0 contract changes.",
 ]
 
@@ -6394,7 +6394,7 @@ notes = [
 [[task]]
 id = "LSP-2202"
 title = "LSP push diagnostics v0"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6405,6 +6405,12 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/ERROR-CODES.md",
+  "docs/RFC-0032.md",
+  "docs/RFC-0031.md",
+  "docs/RFC-0030.md",
+  "docs/RFC-0029.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0004.md",
   "docs/decisions/0035-lsp-internal-diagnostic-batch-boundary.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -6412,26 +6418,37 @@ spec = [
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-db/tests/workspace_diagnostics.rs",
+  "crates/ling-lsp/src/diagnostics.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/src/publication.rs",
+  "crates/ling-lsp/tests/diagnostic_adapter.rs",
+  "crates/ling-lsp/tests/push_diagnostics.rs",
+  "docs/RFC-0032.md",
   "docs/status/LSP-2202-AUTHORITY-AUDIT.md",
   "docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2202-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-publish-diagnostics/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing publishDiagnostics trigger, debounce/cancellation, snapshot/version, stale-result replacement, clear semantics, and related-file contracts.",
-  "The audit covers diagnostic adapter dependencies, syntax/workspace timing, deterministic ordering, edit bursts, stale results, and required fixtures.",
-  "Accepted DEC-0035 closes only the internal immutable diagnostic-batch child; the parent remains blocked for public publication behavior.",
-  "No publisher, scheduler, version field, protocol entry, diagnostic allocation, Semantic ID change, or placeholder LSP handler is added while the authority is absent.",
-  "The future implementation must publish snapshot-associated results and replace/clear atomically without making host timing Ling semantics.",
+  "Accepted RFC-0032 defines Experimental ling.lsp.publish-diagnostics/0.1 triggers, logical message-boundary debounce, immutable complete-state tickets, exact freshness, compiler-result precedence, notification shape, versioning, URI order, replacement, clearance, and failure atomicity.",
+  "ling-db publishes registered lexical, parse, HIR, resolution, type, and Effect diagnostics for the captured workspace, skips semantic analysis after any syntax error, and never interprets unchecked AST nodes.",
+  "ling-lsp coalesces successful state changes, rejects stale or oversized results without ledger mutation or pending-work loss, publishes exact changed URI entries, and writes caused request responses before notifications.",
+  "Adapter ling.lsp.diagnostic/0.2 preserves every valid 0.1 non-temporary result and adds only exact validated temporary-source identities; push publication is separately inventoried and supported as Experimental.",
+  "Focused tests cover compiler stages, adapter compatibility, versions, no-ops, edit bursts, disk/temporary/removed sources, URI order, workspace-input staleness, wire ordering, and resource-limit atomicity; all locked-offline repository gates pass.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "4914d2346f5647f2cdfad85ef4f1335bd44b9f12"
+completion_commit = "4914d2346f5647f2cdfad85ef4f1335bd44b9f12"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2202 remains BlockedSpec on the missing Accepted publication/scheduling/version/stale-result contract in GAP-LSP-TRANSACTION-PROTOCOL-001; RFC-0031 now satisfies its diagnostic-adapter dependency.",
-  "The current compiler and diagnostic registry remain unchanged; the DEC-0035 batch is not wired to LSP and no push publication or stale-result policy is claimed.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit: 4914d2346f5647f2cdfad85ef4f1335bd44b9f12 (`feat(lsp): add push diagnostics`).",
+  "PROTO-LSP-PUBLISH-DIAGNOSTICS registers current-writer-only Experimental ling.lsp.publish-diagnostics/0.1; PROTO-LSP-DIAGNOSTIC advances compatibly to 0.2, while registered compiler diagnostic codes and ling.diagnostic/0.1 remain unchanged.",
+  "Pull diagnostics, cancellation requests, partial results, progress, root-cause grouping, deduplication, caps, suppression, fixes, Workspace Edits, Semantic Transactions, worker pools, wall-clock timing, and Stable compatibility remain deferred.",
+  "No Ling syntax/semantics, Typed Core, interpreter, runtime, bytecode, VM, ABI, filesystem/network, Semantic ID, or Unicode 17.0.0 contract changes.",
 ]
 
 [[task]]
@@ -6466,14 +6483,14 @@ acceptance = [
   "DiagnosticBatch is pub(crate), owns opaque IDs with DEC-0034 ordering keys, and returns an immutable boxed slice on finish.",
   "Finish sorts canonically, retains equal keys distinctly in insertion order, and performs no deduplication, suppression, truncation, conversion, serialization, or publication.",
   "The batch has no request/version, position, cancellation, timer, snapshot, clear/replace, diagnostic-allocation, or host-memory state.",
-  "Focused ling-lsp tests cover empty batches, canonical ordering, duplicate/equal-key stability, and repeated immutable output; parent public diagnostics remain deferred.",
+  "Focused ling-lsp tests cover empty batches, canonical ordering, duplicate/equal-key stability, and repeated immutable output; RFC-0032 later connected a separate push publisher without changing this child.",
 ]
 verified_against_commit = "15f8461582281ae1f9e99250ca6288a8b2d5f3b4"
 completion_commit = "15f8461582281ae1f9e99250ca6288a8b2d5f3b4"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This child implements only DEC-0035's internal immutable collection; LSP-2202 remains BlockedSpec for public publish/trigger/version/clear behavior.",
+  "This child implements only DEC-0035's internal immutable collection; Accepted RFC-0032 now separately implements LSP-2202 public push/trigger/version/clear behavior without broadening the child API.",
   "The batch is intentionally not added to the protocol inventory or support matrix and does not allocate diagnostics or alter source-span identity.",
 ]
 
@@ -6512,7 +6529,7 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2203 remains BlockedSpec by the missing Accepted pull-diagnostic lifecycle and parity contract; RFC-0031 supplies only the shared diagnostic value adapter.",
+  "LSP-2203 remains BlockedSpec by the missing Accepted pull-diagnostic lifecycle, result-ID, unchanged-result, workspace-report, and push/pull parity contract; RFC-0032 supplies only the completed push side.",
   "The current diagnostic and query services remain internal/CLI-facing and make no pull result-id or workspace report claim.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
@@ -6552,7 +6569,7 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2204 remains BlockedSpec by the missing Accepted root-cause/deduplication/cap/suppression contract and LSP-2202; RFC-0031 deliberately performs none of those transformations.",
+  "LSP-2204 now has its LSP-2202 dependency satisfied but remains BlockedSpec by the missing Accepted root-cause/deduplication/cap/suppression contract; RFC-0032 deliberately performs none of those transformations.",
   "No editor-specific suppression or error-storm semantics are claimed, and no registered diagnostic code is changed.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
@@ -6592,7 +6609,7 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2205 remains BlockedSpec downstream of LSP-2202 through LSP-2204 and their missing publication/pull/error-storm authorities; RFC-0031 fixtures cover only the completed adapter.",
+  "LSP-2205 now has its LSP-2202 push-fixture dependency satisfied but remains BlockedSpec downstream of LSP-2203/LSP-2204 and their missing pull/error-storm authorities.",
   "Current compiler/CLI diagnostic fixtures remain valid evidence for their own protocols and are not relabeled as editor fixtures.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
 ]
@@ -7467,7 +7484,7 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "IDE-2309 remains BlockedSpec by its unresolved repair/edit/localization authorities, FMT-1507, LSP-2202, and IDE-2308; RFC-0031 exposes repair metadata but authorizes no code action or edit application.",
+  "IDE-2309 now has its LSP-2202 dependency satisfied but remains BlockedSpec by unresolved repair/edit/localization authorities, FMT-1507, and IDE-2308; RFC-0031 exposes repair metadata but authorizes no code action or edit application.",
   "Current diagnostics and compiler services expose registered facts but no approved FixPlan, action applicability, structured edit, formatter bridge, or snapshot/version contract.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostic codes, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
@@ -8233,8 +8250,8 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "LSP-2503 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2202, LSP-2501, LSP-2502, and the missing LSP event/scheduling contract; DEC-0021 and DEC-0032 are internal only.",
-  "ling-db provides internal deterministic query scheduling and ling-diagnostics provides checked diagnostic facts; the DEC-0032 queue is not wired to LSP and no debounce, fairness, stale replacement, or publication protocol exists.",
+  "LSP-2503 now has LSP-2202, LSP-2501, and LSP-2502 implemented prerequisites but remains BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and the missing general LSP event/fairness/cancellation scheduling contract.",
+  "RFC-0032 provides only deterministic push-diagnostic message-boundary debounce and stale replacement; it does not authorize the general priority, fairness, cancellation, backpressure, or multi-service scheduling surface owned here.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 

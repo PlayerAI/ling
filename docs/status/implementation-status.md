@@ -267,7 +267,7 @@
 | `LSP-2201` | LSP compiler diagnostic adapter | `G1` | `M` | `Done` | `LSP-2101`, `LSP-2102` | `9a5310fbe48fd40ae5c3d05c7720656361f0b08f` |
 | `LSP-2201-DIAGNOSTIC-POSITION` | Bounded internal diagnostic span projection | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2201-ORDERING` | `e66669142f5b8720a39157532edd77b8bc46269a` |
 | `LSP-2201-ORDERING` | Internal canonical diagnostic ordering | `G1` | `S` | `Done` | `LSP-2102-NEGOTIATION`, `LSP-2102-SOURCE-MAP` | `9bf092f0fe6fa0c0cabc371c42392d78ad3d3d53` |
-| `LSP-2202` | LSP push diagnostics v0 | `G1` | `M` | `BlockedSpec` | `LSP-2103`, `LSP-2201` | `` |
+| `LSP-2202` | LSP push diagnostics v0 | `G1` | `M` | `Done` | `LSP-2103`, `LSP-2201` | `4914d2346f5647f2cdfad85ef4f1335bd44b9f12` |
 | `LSP-2202-BATCH` | Internal immutable diagnostic batch | `G1` | `S` | `Done` | `LSP-2201-ORDERING`, `LSP-2501-SNAPSHOT` | `15f8461582281ae1f9e99250ca6288a8b2d5f3b4` |
 | `LSP-2203` | LSP pull diagnostics Preview | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2201` | `` |
 | `LSP-2204` | LSP root-cause and error-storm control | `G1` | `M` | `BlockedSpec` | `LSP-2201`, `LSP-2202` | `` |
