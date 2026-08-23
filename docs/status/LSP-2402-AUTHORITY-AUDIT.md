@@ -1,108 +1,89 @@
-# LSP-2402 Authority Audit: Typed Token Generation
+# LSP-2402 Authority Audit: Typed Semantic-Token Generation
 
 ## Outcome
 
-`LSP-2402` is correctly recorded as `BlockedSpec`. The execution plan requires
-semantic tokens to come from Checked Core/Resolved HIR rather than Tree-sitter,
-with a clearly marked fallback to already-parsed tokens in syntax-error
-regions. The repository has checked compiler and syntax/token data, but no
-accepted token taxonomy, source-origin marker, fallback schema, position/version
-binding, or semantic-token protocol.
+`LSP-2402` is authorized and implemented. Accepted RFC-0046 fixes taxonomy
+revision `ling.semantic-token-taxonomy/0.1`; Accepted RFC-0047 fixes the
+snapshot-bound in-process generation revision
+`ling.semantic-token-generation/0.1`. The implementation is a compiler-owned
+`ling-db` index and does not advertise an LSP semantic-token provider.
 
-No typed-token generator, syntax-error fallback adapter, source marker,
-protocol field, diagnostic allocation, or placeholder LSP surface was added.
-Accepted DEC-0085 and the bounded `LSP-2402-CHECKED-IDENTITY` child now add
-only an exact join between lexical tokens and existing checked definition
-facts; public typed-token generation remains blocked.
+The earlier `BlockedSpec` conclusion was correct before RFC-0046 and RFC-0047
+were accepted. Those authorities now close the taxonomy, source-evidence,
+fallback, span, ordering, privacy, and internal lifecycle questions required by
+typed generation. Full/delta transport remains separately blocked under
+LSP-2403.
 
 ## Normative traceability
 
-- The execution package is non-normative; its Checked Core/fallback wording does
-  not authorize a public token protocol.
-- Repository authority requires evaluation and public projections to consume
-  checked Typed Core, never unchecked AST nodes. This permits the proposed
-  boundary but does not define token categories or fallback presentation.
-- DEC-0002 makes original UTF-8 `SourceId + Span` authoritative and requires an
-  explicit SourceMap projection for LSP UTF-16 positions. It does not define
-  token origin, version, overlap, or ordering fields.
-- DEC-0012 fixes Semantic IDs/canonical bytes. The registered Semantic Graph
-  projections are Experimental and do not define typed-token output or source
-  provenance labels.
-- Accepted DEC-0085 authorizes only
-  `CompilerDb::checked_token_source_index`: it joins an existing lexical token
-  with a checked definition when source name and original UTF-8 span are exact,
-  preserving existing Definition ID/type/effect/capability facts without
-  defining presentation categories or fallback states.
-- `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` and
-  `GAP-LSP-TRANSACTION-PROTOCOL-001` leave token/graph field stability,
-  snapshot/version, stale handling, and migration open. LSP-2401's taxonomy
-  decision is an unsatisfied prerequisite. RFC-0005/DEC-0027 provide no public
-  Trait token projection.
+- RFC-0046 §1–3 fixes the canonical types, modifiers, Seed source-role mapping,
+  and modifier exclusivity.
+- RFC-0046 §4 permits complete checked generation and only six conservative
+  lexer families when checking fails; unresolved identifiers and synthetic or
+  erroneous tokens emit nothing.
+- RFC-0046 §6–7 fixes original UTF-8 spans, multiline line-local splitting,
+  non-overlap, deterministic order, and identity/metadata redaction.
+- RFC-0047 §1–4 defines one exact source/revision result, typed versus
+  whole-source lexical-fallback mode, checked-identity versus checked-structure
+  evidence, HIR/resolver role specialization, and exact modifier propagation.
+- RFC-0047 §5 rejects parsed or mixed partial fallback and forbids fallback
+  modifiers.
+- RFC-0047 §6–7 defines atomic failure, source-span validation, deterministic
+  cache identity, privacy, and the non-wire boundary.
+- DEC-0084 through DEC-0087 supply the accepted lexical, checked-identity,
+  snapshot, and source-fixture observations used by the generator.
 
-## Current interface evidence
+## Implemented boundary
 
-- `ling-types`, `ling-effects`, and `ling-semantic` compute checked types,
-  effects, capabilities, definitions, nodes, and references, but expose no
-  token-generation or source-origin presentation API.
-- `ling-syntax` and Tree-sitter fixtures provide lexical/CST tokens and error
-  nodes; they are not a semantic-token authority and no adapter labels their
-  output as fallback data.
-- `ling-source` preserves original byte spans and scalar columns, but no
-  negotiated UTF-16 mapping, same-document-version requirement, non-overlap
-  validation, or cancellation behavior exists.
-- No fixture covers typed-versus-fallback origin, incomplete/error regions,
-  generic/effect/capability categories, Unicode/CRLF/BOM spans, shadowing,
-  deterministic order, stale versions, or the prohibition on unchecked AST
-  interpretation.
-- The checked-identity child does not classify references or non-definition
-  tokens and has no fallback, position, version, legend, modifier, or transport
-  fields.
+`CompilerDb::semantic_token_index` captures the exact source query key and
+complete workspace resolve key. A successful parse → AST → HIR → resolve →
+type → effect pipeline produces `typed` mode. Failure at any analysis stage
+produces a new whole-source `lexical-fallback` result; it never reuses typed
+entries from a failed workspace.
 
-## Required authority before implementation
+The abstract result retains only source identity, VFS revision, logical source
+name, mode, original-byte spans, canonical token kinds/modifiers, and internal
+evidence class. It retains no Definition/Binding/Reference/Semantic ID, source
+text, type display, Effect/Capability metadata, URI, LSP position, document
+version, legend index, result ID, path discovery, or transport state.
 
-An Accepted decision or RFC must define, at minimum:
+## Evidence
 
-1. taxonomy and modifier mapping from Checked Core/Resolved HIR constructs,
-   including declarations, references, types, effects, capabilities,
-   mutability, generated/dependency/builtin regions, and client fallback;
-2. precise source-origin states (`typed`, `parsed-fallback`, and no-token),
-   allowed syntax-error boundaries, error-region preservation, and a guarantee
-   that unresolved/unchecked AST is never interpreted;
-3. source-span truth, UTF-8/UTF-16 conversion, same snapshot/document version,
-   non-overlap and deterministic position ordering, duplicate/conflict rules,
-   Semantic ID/provenance and redaction;
-4. request/response, cancellation/limits, protocol inventory, Stable versus
-   Experimental fields, client negotiation, diagnostics interaction, and
-   migration; and
-5. executable positive/negative fixtures for valid typed programs, each
-   semantic category, syntax-error fallback, CRLF/BOM/Unicode/emoji columns,
-   nested/shadowed symbols, stale versions, deterministic ordering, and
-   unchecked-AST rejection.
+- `crates/ling-db/src/semantic_token_index.rs` owns classification, fallback,
+  line splitting, conflict detection, ordering, and redaction.
+- `crates/ling-db/src/lib.rs` owns exact workspace-keyed typed cache reuse and
+  failure-isolated fallback construction.
+- `crates/ling-db/tests/semantic_tokens.rs` covers current Seed roles,
+  callable/non-callable identity, Trait and implementation members, parameters,
+  fields, variants and constructor patterns, mutable assignment targets,
+  builtin/Prelude identity, user shadowing, parse/resolution/type/effect
+  failures, dependency invalidation, Unicode, combining text, emoji, BOM,
+  CRLF, multiline splitting, deterministic reuse, and original-byte spans.
 
-Until these decisions are Accepted, a generator could mislabel syntax as
-semantically checked, interpret an unresolved node, or emit spans that do not
-belong to the requested document version.
+## Specification gaps and conflicts
 
-## Evidence and compatibility
+The lower-authority execution plan requested parsed fallback in syntax-error
+regions and named Effect/Capability/future token categories. The repository has
+no Accepted partial-checked-AST boundary for mixed output, and current inferred
+Effect/Capability facts have no exact token role. RFC-0046 and RFC-0047 therefore
+require whole-source lexical fallback and exclude those categories.
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, RFC-0005,
-DEC-0085,
-`docs/decisions/0027-trait-checked-core-dictionary-witness.md`,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the `ling-syntax`, `ling-types`, `ling-effects`, `ling-semantic`, and
-`ling-source` crates.
+This resolution changes no Ling language semantics. It narrows the plan to the
+provable current Seed source roles instead of fabricating semantic success.
 
-Only the internal checked-token identity observation changed; no compiler
-language semantics, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-public source-span projection, runtime, or Unicode 17.0.0 behavior changed.
+## Compatibility impact
+
+- Adds internal `ling.semantic-token-generation/0.1` and no public wire version.
+- Adds no provider, request, response, full/delta result, JSON schema,
+  diagnostic allocation, Semantic ID, Definition ID, or canonical bytes.
+- Original UTF-8 span truth and Unicode 17.0.0 remain unchanged.
+- Runtime, interpreter, VM, bytecode, ABI, packages, filesystem, network, and
+  language behavior are unaffected.
 
 ## Intentionally deferred
 
-The bounded checked-identity child is complete under DEC-0085. Public
-`LSP-2402` can begin only after LSP-2401 taxonomy, position/version, Semantic
-Graph lifecycle, and fallback-source decisions are Accepted. The future
-implementation must consume checked Typed Core/Resolved HIR, mark parsed
-fallback explicitly, preserve source-span/identity truth, and reject unchecked
-AST interpretation.
+Provider discovery and client legend materialization, URI/document-version and
+position projection, full/delta/result-ID transport, cancellation, limits,
+freshness publication, wire fixtures, Zed presentation, and Stable lifecycle
+remain LSP-2403 through LSP-2504 work. Mixed partial checked/error output also
+remains deferred pending separate Accepted authority.

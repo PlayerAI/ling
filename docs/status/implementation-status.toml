@@ -7873,7 +7873,7 @@ completion_commit = "cdc70731f75e27fc508402304e628dcc334c20fb"
 integration_state = "committed"
 completed = "2026-08-24"
 notes = [
-  "LSP-2401 is the taxonomy RFC/decision milestone; typed classification remains LSP-2402 and full/delta wire transport remains LSP-2403, so no semanticTokensProvider is advertised by this completion.",
+  "LSP-2401 is the taxonomy RFC/decision milestone; typed classification was subsequently completed by LSP-2402, while full/delta wire transport remains LSP-2403, so no semanticTokensProvider is advertised by this completion.",
   "RFC-0046 uses existing DEC-0084 through DEC-0087 compiler observations and treats Tree-sitter captures only as separate lexical editor fallback, never semantic truth.",
   "No diagnostic allocation, schema, Semantic ID/canonical-byte, compiler language semantics, Typed Core evaluation, interpreter/VM/bytecode/ABI/package, filesystem/network, source-span truth, or Unicode 17.0.0 table changes.",
 ]
@@ -7927,14 +7927,14 @@ completion_commit = "135bfb07bb8f824f1ab119b5e0f765c674d6f294"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This child is complete under DEC-0084; public LSP-2401 remains BlockedSpec for taxonomy, mapping, negotiation, position/version, fallback, and transport contracts.",
+  "This child is complete under DEC-0084 and is consumed by completed LSP-2401/LSP-2402; provider position/version and transport contracts remain LSP-2403 work.",
   "The index is an internal lexical source observation, not semantic-token generation, an LSP range list, or a protocol schema.",
 ]
 
 [[task]]
 id = "LSP-2402"
 title = "Typed semantic-token generation"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -7947,32 +7947,45 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/RFC-0046.md",
+  "docs/RFC-0047.md",
   "docs/RFC-0005.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/decisions/0084-lsp-lexical-token-source-index.md",
+  "docs/decisions/0085-lsp-checked-token-identity-observation.md",
+  "docs/decisions/0086-lsp-checked-token-snapshot-identity.md",
+  "docs/decisions/0087-lsp-checked-token-source-fixtures.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/semantic_token_index.rs",
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-db/tests/semantic_tokens.rs",
+  "docs/RFC-0047.md",
   "docs/status/LSP-2402-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2402-IMPLEMENTATION-REPORT.md",
+  "docs/governance/protocol-inventory.toml",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing Checked Core/Resolved HIR mapping, token source-origin/fallback, source-span/position/version, taxonomy, Semantic ID/provenance, redaction, and protocol lifecycle contracts.",
-  "The audit covers typed versus parsed-fallback regions, syntax errors/incomplete input, effects/capabilities, declarations/mutability/generated data, Unicode/CRLF/BOM/emoji, overlap/order, stale versions, deterministic output, and unchecked-AST rejection fixtures.",
-  "No typed-token generator, syntax-error fallback adapter, protocol field, diagnostic allocation, Semantic ID change, or placeholder LSP API is added while the authority is absent.",
-  "The future implementation must consume checked Typed Core/Resolved HIR, mark parsed fallback explicitly, preserve source-span/ID truth, and reject unchecked AST interpretation.",
+  "Accepted RFC-0046 and RFC-0047 authorize ling.semantic-token-generation/0.1 with canonical taxonomy/modifiers, checked-identity and checked-structure precedence, whole-source lexical fallback, original-span truth, deterministic ordering, and identity redaction.",
+  "CompilerDb::semantic_token_index consumes the complete checked workspace and exact source/revision; typed results are cached by the complete workspace resolve key, while any parse, lowering, resolution, type, effect, or dependency failure yields an unmodified identifier-free lexical fallback.",
+  "The generator covers current Seed module/import/type/Trait/implementation/value/binding/parameter/field/constructor/pattern/reference/call/write/type-syntax and builtin/Prelude roles without interpreting unchecked AST or Tree-sitter captures.",
+  "Eight integration tests cover role/modifier mapping, user shadowing, all analysis-failure classes, dependency invalidation, Unicode/emoji/combining text, BOM, CRLF, multiline splitting, exact bytes, order, non-overlap, cache reuse, and restoration.",
+  "Full locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, diff, and execution-package checksum gates pass.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "899d00f56d444f43a5128da844e517ef3a85e186"
+completion_commit = "899d00f56d444f43a5128da844e517ef3a85e186"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "LSP-2402 is BlockedSpec by LSP-2401, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and LSP-2101/LSP-2102; no semantic-token protocol or fallback source contract is accepted.",
-  "Current checked pipeline and syntax tokens remain separate internal inputs; no public typed-token generator or explicit parsed-fallback source marker exists.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "This task implements only the abstract compiler-owned generator. PROTO-LSP-SEMANTIC-TOKENS remains Future and unimplemented until LSP-2403 defines provider and full/delta transport.",
+  "Whole-source lexical fallback replaces the lower-authority plan's parsed-error-region proposal because no Accepted partial checked-AST boundary exists.",
+  "No diagnostic allocation, public schema, Semantic ID/canonical-byte, language semantics, interpreter/runtime/VM/bytecode/ABI/package, filesystem/network, dependency, source-position, or Unicode 17.0.0 table change is introduced.",
 ]
 
 [[task]]
@@ -8026,7 +8039,7 @@ completion_commit = "bbb0786453b8fefee974b4137b47587ff636c60c"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This bounded child is complete under DEC-0085; public LSP-2402 remains BlockedSpec for taxonomy, fallback-source, position/version, negotiation, and transport contracts.",
+  "This bounded child is complete under DEC-0085 and is consumed by completed LSP-2402; provider position/version, negotiation, and transport contracts remain LSP-2403 work.",
   "The index is an internal checked-identity observation, not semantic-token generation, a legend/modifier model, an LSP range list, or a protocol schema.",
 ]
 

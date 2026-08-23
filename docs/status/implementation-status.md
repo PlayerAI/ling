@@ -274,7 +274,7 @@
 | `LSP-2205` | LSP diagnostic fixtures | `G1` | `M` | `Done` | `LSP-2201`, `LSP-2202`, `LSP-2203`, `LSP-2204` | `93a58e9090ce5a3be17bcfb8569d7246ce7d71ec` |
 | `LSP-2401` | Semantic token taxonomy RFC/decision | `G1` | `M` | `Done` | `IDE-2311`, `LSP-2101`, `LSP-2102` | `cdc70731f75e27fc508402304e628dcc334c20fb` |
 | `LSP-2401-LEXICAL-SOURCE` | Internal lexical token source index | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP` | `135bfb07bb8f824f1ab119b5e0f765c674d6f294` |
-| `LSP-2402` | Typed semantic-token generation | `G1` | `L` | `BlockedSpec` | `LSP-2101`, `LSP-2102`, `LSP-2401` | `` |
+| `LSP-2402` | Typed semantic-token generation | `G1` | `L` | `Done` | `LSP-2101`, `LSP-2102`, `LSP-2401` | `899d00f56d444f43a5128da844e517ef3a85e186` |
 | `LSP-2402-CHECKED-IDENTITY` | Internal checked-token identity observation | `G1` | `S` | `Done` | `LSP-2401-LEXICAL-SOURCE` | `bbb0786453b8fefee974b4137b47587ff636c60c` |
 | `LSP-2403` | Semantic token full and delta transport | `G1` | `L` | `BlockedSpec` | `LSP-2401`, `LSP-2402` | `` |
 | `LSP-2403-SNAPSHOT-IDENTITY` | Internal checked-token snapshot identity | `G1` | `S` | `Done` | `LSP-2402-CHECKED-IDENTITY` | `74b3135ef51558a151af2d4a064f907281e4a32e` |
