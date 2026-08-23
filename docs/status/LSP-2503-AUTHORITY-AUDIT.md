@@ -1,104 +1,78 @@
-# LSP-2503 Authority Audit: Debounce and Priority
+# LSP-2503 Authority Audit: Debounce and Priority Scheduling
 
 ## Outcome
 
-`LSP-2503` is correctly recorded as `BlockedSpec`. The execution plan proposes
-high-priority typing diagnostics, low-priority workspace indexing, cancellation
-of older analysis after a new revision, and responsive definition/hover
-requests that do not wait for unrelated workspace builds. No accepted LSP
-event, scheduling, debounce, freshness, fairness, or publication contract
-defines those observable choices.
+LSP-2503 is authorized by Accepted RFC-0050. The RFC closes the previously
+missing observable scheduling boundary without introducing host-time-dependent
+behavior: request/state execution stays in wire order, derived compiler work
+has three logical classes, priority bursts have fixed fairness limits,
+diagnostic debounce stays at the RFC-0032 message boundary, and newer accepted
+source state cancels an older diagnostic ticket.
 
-Accepted DEC-0032 closes only the bounded `LSP-2503-SCHEDULER` child: an
-internal deterministic priority/FIFO ordering queue over opaque work IDs. No
-debounce timer, public priority queue, scheduler policy, stale-result
-publisher, cancellation integration, diagnostic allocation, protocol schema,
-or placeholder LSP service was added.
+## Authority and dependency resolution
 
-## Normative traceability
+- RFC-0004 owns lifecycle, framing, ordered mutable execution, and response
+  behavior.
+- RFC-0023/RFC-0029/RFC-0030 own source overlays, revisions, atomic changes,
+  and complete request snapshots.
+- RFC-0032 owns message-boundary diagnostic debounce, immutable tickets,
+  current-snapshot validation, replacement/clearance, and atomic publication.
+- RFC-0045 makes `workspace/symbol` a bounded snapshot-indexed low-priority
+  work family without proactive filesystem indexing.
+- RFC-0049 owns live request cancellation, compiler propagation, and atomic
+  request publication.
+- DEC-0032 supplies the deterministic FIFO/priority primitive; RFC-0050 adds
+  fixed fairness bounds, class mapping, wire-order precedence, diagnostic
+  supersession, and exact Preview discovery.
+- All declared LSP-2503 dependencies are Done. The remaining general LSP
+  transaction gap covers broader mutation, quotas, Semantic Transactions, and
+  Stable lifecycle rather than this bounded scheduling revision.
 
-- The execution package is non-normative; its priority labels and debounce
-  bullets do not authorize wall-clock behavior, request ordering, or a public
-  scheduling API.
-- Accepted DEC-0019 defines internal query invalidation and cooperative
-  cancellation at publication boundaries. Accepted DEC-0021 defines
-  deterministic bounded parallelism for internal pure query jobs. Both
-  explicitly keep LSP fields and public protocols out of scope.
-- Accepted DEC-0032 defines only local `Interactive`/`Analysis`/`Background`
-  ordering and FIFO sequencing for an unconnected internal queue; it leaves
-  event timing, fairness, freshness, and publication out of scope.
-- Existing diagnostic semantics and `PROTO-DIAGNOSTIC-JSON` define checked
-  diagnostic facts, not `didOpen`/`didChange` triggers, debounce intervals,
-  priority classes, or stale replacement.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` and
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leave request/snapshot/version,
-  publication, lifecycle, and migration fields open.
-- LSP-2202 push diagnostics, LSP-2501 request snapshots, and LSP-2502
-  cancellation are `BlockedSpec`; scheduling cannot safely publish or suppress
-  their results before those authorities exist.
+## Resolved contract
 
-## Current interface evidence
+RFC-0050 fixes:
 
-- `ling-db` has internal revisions, query invalidation, and deterministic query
-  scheduling, but no LSP event stream, debounce policy, priority classes,
-  request queue, or result publication boundary.
-- `ling-diagnostics` produces deterministic checked diagnostics, but no
-  `publishDiagnostics` event, document-version association, stale replacement,
-  or clear policy exists.
-- No LSP server or editor transport defines whether typing, definition/hover,
-  workspace indexing, cancellation, and dependency work share queues or
-  budgets, and no implementation can prove that a new revision suppresses all
-  older analysis.
-- The scheduler child is deliberately not wired to `LspServer`; it cannot
-  claim debounce, fairness, supersession, cancellation association, or editor
-  latency behavior.
-- No fixture covers edit bursts, timer coalescing, priority inversion or
-  starvation, new-revision cancellation, stale results, concurrent requests,
-  workspace/index throttling, Unicode/CRLF/BOM, or deterministic scheduling
-  independent of host timing.
+1. exact `ling.lsp.scheduling/0.1` discovery;
+2. Interactive, Analysis, and Background class membership;
+3. wire-order request/state barriers and no response reordering;
+4. Analysis-before-Background service at a common executor boundary;
+5. message-boundary debounce with no timer or latency promise;
+6. cancellation of superseded diagnostic tickets plus stale-result rejection;
+7. an Analysis admission after at most 8 Interactive selections and a
+   Background admission after at most 16 non-Background selections; and
+8. non-serialization of queue sequence, counters, tokens, timing, revisions,
+   paths, source bytes, and compiler identities.
 
-## Required authority before implementation
+## Implementation evidence reviewed
 
-An Accepted RFC or decision must define, at minimum:
+- `crates/ling-lsp/src/scheduler.rs` implements canonical strict ordering,
+  bounded-fair selection, explicit method classification, and fixed limits.
+- `crates/ling-lsp/src/publication.rs` rotates diagnostic cancellation tokens
+  on successful mutations, checks cancellation through source/compiler/
+  adaptation stages, rejects stale results, and mutates the publication ledger
+  only after a final checkpoint.
+- `crates/ling-db/src/lib.rs` exposes cancellable complete workspace
+  diagnostics and routes semantic checking through the existing typed
+  cancellation path without returning a partial collection.
+- `crates/ling-lsp/src/lib.rs` advertises exact discovery, retains a single
+  wire-order mutable executor, and services pending Analysis before Background
+  requests.
+- Scheduling, push-diagnostic, cancellation, exact transcript, and compiler DB
+  tests cover discovery, class mapping, fairness, coalescing, supersession,
+  stale completion, atomic publication, Unicode position behavior, and repeat
+  determinism without sleeps.
 
-1. event triggers and debounce/coalescing semantics for open/change/workspace
-   updates, including whether intervals are configurable, logical, or
-   wall-clock and how immediate requests bypass a pending batch;
-2. priority classes, queue ordering, fairness/starvation bounds, dependency
-   expansion, worker/resource budgets, and interaction with DEC-0021 internal
-   scheduling without exposing host CPU/timing as Ling behavior;
-3. revision/request snapshot and cancellation association, supersession rules,
-   stale-result rejection, and publication ordering for diagnostics, symbols,
-   tokens, completion, hover, indexing, progress, and Workspace Edits;
-4. diagnostics trigger/clear/replace behavior, related-file scope, generated
-   and dependency policy, capability/configuration negotiation, errors,
-   limits, and Stable versus Experimental lifecycle; and
-5. executable positive/negative/edit-burst/stale/cancellation/priority,
-   starvation, clear/replace, Unicode/CRLF/BOM, deterministic, and migration
-   fixtures that do not rely on machine timing.
+## Compatibility assessment
 
-Until these decisions are Accepted, a scheduler could publish stale results,
-starve interactive requests, clear a newer diagnostic set, or make host timer
-and CPU behavior an accidental editor compatibility contract.
-
-## Evidence and compatibility
-
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/ERROR-CODES.md`, `docs/ROADMAP-1.0.md`, DEC-0019, DEC-0021,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-the LSP-2202/LSP-2501/LSP-2502 authority boundaries, `crates/ling-db`, and
-`crates/ling-diagnostics`.
-
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+The change adds one Preview discovery marker and cancellable diagnostic-query
+entry point. It adds no JSON-RPC method, Ling diagnostic, standalone schema,
+Semantic ID, Definition ID, source-span rule, language behavior, Typed Core
+evaluation, interpreter/runtime/bytecode/VM/ABI behavior, package or host I/O,
+or Unicode 17.0.0 change.
 
 ## Intentionally deferred
 
-The parent `LSP-2503` can begin after LSP snapshot/version, cancellation,
-diagnostics, overlay/change, and Semantic Transaction lifecycle decisions are
-Accepted. The future implementation must coalesce revisions explicitly,
-prioritize interactive work without starvation, cancel superseded analysis,
-publish only current snapshot results, and keep scheduling timing out of Ling
-semantics. The `LSP-2503-SCHEDULER` child is complete only for the internal
-ordering primitive authorized by DEC-0032.
+Wall-clock/configurable debounce, deadlines, dynamic priorities, host-load
+adaptation, worker pools, parallel mutable requests, response reordering,
+progress, partial results, quotas, persistent queues/indexes, Stable editor
+compatibility, and Semantic Transactions require later accepted authority.

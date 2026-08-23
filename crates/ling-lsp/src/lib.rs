@@ -13,7 +13,8 @@
 //! Resolve; RFC-0044 governs bounded transactional Code Actions; RFC-0045
 //! governs snapshot-indexed Workspace Symbols; RFC-0048 governs bounded
 //! semantic-token full and delta transport; RFC-0049 governs Preview stdio
-//! request cancellation and atomic publication.
+//! request cancellation and atomic publication; RFC-0050 governs logical
+//! debounce, priority classes, bounded fairness, and analysis supersession.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -28,10 +29,9 @@ use ling_source::{
 };
 use serde_json::{Map, Value, json};
 
-// DEC-0032 is an internal child boundary; transport/server wiring remains
-// deferred until the parent LSP scheduling contract is Accepted.
 #[allow(dead_code)]
 mod scheduler;
+pub use scheduler::{MAX_INTERACTIVE_BURST, MAX_NON_BACKGROUND_BURST, SCHEDULING_PROTOCOL_VERSION};
 // DEC-0033 is an internal arithmetic child; public quota and diagnostic
 // behavior remains deferred to the parent LSP-2504 contract.
 #[allow(dead_code)]
@@ -346,6 +346,14 @@ pub struct CancellationToken {
     cancelled: Arc<AtomicBool>,
 }
 
+impl PartialEq for CancellationToken {
+    fn eq(&self, other: &Self) -> bool {
+        self.is_cancelled() == other.is_cancelled()
+    }
+}
+
+impl Eq for CancellationToken {}
+
 impl Default for CancellationToken {
     fn default() -> Self {
         Self::new()
@@ -617,6 +625,7 @@ pub struct LspServer {
     documents: BTreeMap<String, DocumentRecord>,
     last_versions: BTreeMap<String, i64>,
     diagnostics_pending: bool,
+    diagnostic_cancellation: Option<CancellationToken>,
     published_diagnostics: BTreeMap<String, Value>,
     outbound_notifications: Vec<Vec<u8>>,
     pull_diagnostics_supported: bool,
@@ -648,6 +657,7 @@ impl LspServer {
             documents: BTreeMap::new(),
             last_versions: BTreeMap::new(),
             diagnostics_pending: false,
+            diagnostic_cancellation: None,
             published_diagnostics: BTreeMap::new(),
             outbound_notifications: Vec::new(),
             pull_diagnostics_supported: false,
@@ -1556,6 +1566,11 @@ fn execute_routed_frames<W: Write>(
     let mut server = LspServer::new();
 
     while let Ok(frame) = receiver.recv() {
+        if scheduler::priority_for_body(&frame.body) == scheduler::WorkPriority::Background
+            && server.state() == LifecycleState::Ready
+        {
+            flush_and_write_diagnostics(&mut server, &mut writer)?;
+        }
         let outcome = if let Some(id) = frame.duplicate_id {
             HandleOutcome::Response(error_response(
                 Some(id),
@@ -1581,10 +1596,7 @@ fn execute_routed_frames<W: Write>(
             }
         }
         if server.state() == LifecycleState::Ready {
-            server.flush_pending_diagnostics()?;
-            for notification in server.take_notifications() {
-                write_frame(&mut writer, &notification)?;
-            }
+            flush_and_write_diagnostics(&mut server, &mut writer)?;
         }
     }
 
@@ -1593,6 +1605,17 @@ fn execute_routed_frames<W: Write>(
         exit_code: 0,
         state: server.state(),
     })
+}
+
+fn flush_and_write_diagnostics<W: Write>(
+    server: &mut LspServer,
+    writer: &mut BufWriter<W>,
+) -> Result<(), TransportError> {
+    server.flush_pending_diagnostics()?;
+    for notification in server.take_notifications() {
+        write_frame(writer, &notification)?;
+    }
+    Ok(())
 }
 
 struct ParsedInitializeParams {
@@ -2311,6 +2334,15 @@ fn initialize_result(parsed: &ParsedInitializeParams) -> Value {
                     "requestCancelledCode": REQUEST_CANCELLED,
                     "requestIds": ["number", "string"],
                     "version": REQUEST_CANCELLATION_PROTOCOL_VERSION,
+                },
+                "lingScheduling": {
+                    "classes": ["interactive", "analysis", "background"],
+                    "debounce": "message-boundary",
+                    "maxInteractiveBurst": MAX_INTERACTIVE_BURST,
+                    "maxNonBackgroundBurst": MAX_NON_BACKGROUND_BURST,
+                    "requestOrder": "wire-order",
+                    "supersession": "cancel-stale-analysis",
+                    "version": SCHEDULING_PROTOCOL_VERSION,
                 },
                 "lingOverlay": {
                     "changeLimit": MAX_CONTENT_CHANGES,

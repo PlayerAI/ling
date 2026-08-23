@@ -1119,10 +1119,25 @@ impl CompilerDb {
     /// any source has a syntax error, semantic checking is skipped for the
     /// complete workspace so unchecked syntax cannot create cascades.
     pub fn workspace_diagnostics(&mut self) -> Result<Box<[Diagnostic]>, QueryError> {
+        self.workspace_diagnostics_with_cancellation(&never_cancelled)
+    }
+
+    /// Computes workspace diagnostics with cooperative stage-boundary
+    /// cancellation and never publishes a partial diagnostic collection.
+    pub fn workspace_diagnostics_with_cancellation<F>(
+        &mut self,
+        cancelled: &F,
+    ) -> Result<Box<[Diagnostic]>, QueryError>
+    where
+        F: Fn() -> bool,
+    {
+        check_query_cancellation(cancelled)?;
         let snapshots = self.vfs.snapshots();
         let mut diagnostics = Vec::new();
         for snapshot in &snapshots {
+            check_query_cancellation(cancelled)?;
             let parsed = self.parse(snapshot.id())?;
+            check_query_cancellation(cancelled)?;
             if parsed.lexical_errors().is_empty() {
                 diagnostics.extend(
                     parsed
@@ -1140,9 +1155,11 @@ impl CompilerDb {
             }
         }
         if !diagnostics.is_empty() || snapshots.is_empty() {
+            check_query_cancellation(cancelled)?;
             return Ok(diagnostics.into_boxed_slice());
         }
 
+        check_query_cancellation(cancelled)?;
         let (graph_key, graph) = match self.module_graph_query() {
             Ok(graph) => graph,
             Err(QueryError::HirLowering { file, error }) => {
@@ -1157,6 +1174,7 @@ impl CompilerDb {
             }
             Err(error) => return Err(error),
         };
+        check_query_cancellation(cancelled)?;
         let entry = graph
             .nodes()
             .first()
@@ -1165,7 +1183,10 @@ impl CompilerDb {
             })?
             .name()
             .to_owned();
-        match self.checked_workspace(&graph_key, &graph, &entry) {
+        let checked =
+            self.checked_workspace_with_cancellation(&graph_key, &graph, &entry, cancelled);
+        check_query_cancellation(cancelled)?;
+        match checked {
             Ok(_) => Ok(Box::new([])),
             Err(QueryError::Resolution { errors }) => Ok(errors
                 .iter()
@@ -3173,6 +3194,36 @@ mod tests {
             .checked_completion_catalog(file)
             .expect("a later uncancelled query completes independently");
         assert!(!catalog.candidates().is_empty());
+    }
+
+    #[test]
+    fn cancellable_workspace_diagnostics_never_returns_a_partial_collection() {
+        use std::cell::Cell;
+
+        let mut db = CompilerDb::new();
+        db.set_disk_snapshot(
+            "cancel/Main.ling",
+            b"module Main\n\nlet first = 1\nlet second = first\nlet main () = second\n".to_vec(),
+        )
+        .unwrap();
+        let observations = Cell::new(0_u32);
+        let cancelled = || {
+            let next = observations.get().saturating_add(1);
+            observations.set(next);
+            next >= 4
+        };
+
+        assert_eq!(
+            db.workspace_diagnostics_with_cancellation(&cancelled),
+            Err(QueryError::Cancelled)
+        );
+        assert!(observations.get() >= 4);
+        assert!(db.checked_programs.is_empty());
+        assert!(
+            db.workspace_diagnostics()
+                .expect("later diagnostics complete independently")
+                .is_empty()
+        );
     }
 
     #[test]

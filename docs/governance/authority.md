@@ -1,7 +1,7 @@
 # Ling 规范权威索引 / Specification Authority Index
 
 > 状态：由 `authority.toml` 确定性生成
-> 更新日期：2026-08-23
+> 更新日期：2026-08-24
 > 本索引描述现有权威关系，不新增语言语义。
 
 ## Authority order
@@ -320,6 +320,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `RFC-0047` | RFC | `Accepted` | `1` | `Accepted` | yes | [Snapshot-Bound Typed Semantic-Token Generation](../RFC-0047.md) | `ling.semantic-token-generation/0.1`, `snapshot-bound typed semantic-token generation from checked identity and checked HIR structure`, `whole-source lexical fallback, canonical modifiers, original-span splitting, deterministic ordering, overlap rejection, and identity redaction` | `RFC-0046`, `RFC-0004`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `RFC-0036`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0073`, `DEC-0075`, `DEC-0084`, `DEC-0085`, `DEC-0086`, `DEC-0087`, `GAP-REGISTER` | — |
 | `RFC-0048` | RFC | `Accepted` | `1` | `Accepted` | yes | [Bounded Semantic-Token Full and Delta Transport](../RFC-0048.md) | `ling.lsp.semantic-tokens/0.1`, `static client-selected semantic-token provider with negotiated relative positions`, `bounded deterministic full and canonical delta responses with result-base validation, freshness, cancellation, limits, and privacy` | `RFC-0047`, `RFC-0046`, `RFC-0004`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0031`, `DEC-0071`, `DEC-0084`, `DEC-0085`, `DEC-0086`, `DEC-0087`, `GAP-REGISTER` | — |
 | `RFC-0049` | RFC | `Accepted` | `1` | `Accepted` | yes | [Preview LSP Request Cancellation](../RFC-0049.md) | `ling.lsp.request-cancellation/0.1`, `standard stdio $/cancelRequest association for exact live string and number request IDs`, `typed cooperative compiler-backed cancellation with atomic response, Workspace Edit, completion-resolve, index-cache, and semantic-token-history publication` | `RFC-0048`, `RFC-0045`, `RFC-0044`, `RFC-0043`, `RFC-0041`, `RFC-0030`, `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0021`, `DEC-0030`, `DEC-0031`, `DEC-0032`, `GAP-REGISTER` | — |
+| `RFC-0050` | RFC | `Accepted` | `1` | `Accepted` | yes | [Deterministic Preview LSP Scheduling](../RFC-0050.md) | `ling.lsp.scheduling/0.1`, `wire-order logical Interactive, Analysis, and Background work classification with fixed bounded-fairness bursts`, `message-boundary diagnostic debounce with cancellable superseded tickets and atomic current-snapshot publication` | `RFC-0049`, `RFC-0045`, `RFC-0034`, `RFC-0033`, `RFC-0032`, `RFC-0030`, `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0021`, `DEC-0030`, `DEC-0031`, `DEC-0032`, `GAP-REGISTER` | — |
 | `SEMANTICS` | Core specification | `Draft` | `0.1` | `Semantics` | no | [Ling core semantics](../SEMANTICS.md) | `language semantics`, `Semantic Graph`, `execution profiles` | — | — |
 | `LANGUAGE` | Design specification | `Draft` | `0.1` | `Language` | no | [Ling language design](../LANGUAGE.md) | `language goals`, `surface design`, `roadmap` | — | — |
 | `CONFORMANCE` | Conformance corpus | `Active` | `0.0.1` | `Conformance` | no | [Ling conformance corpus](../../tests/conformance) | `observable Seed behavior`, `positive and negative cases` | `SEMANTICS`, `LANGUAGE` | — |

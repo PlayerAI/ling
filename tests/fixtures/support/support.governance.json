@@ -587,6 +587,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-SCHEDULING",
+      "visibility": "Public",
+      "version": "ling.lsp.scheduling/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-SEMANTIC-TOKENS",
       "visibility": "Public",
       "version": "ling.lsp.semantic-tokens/0.1",

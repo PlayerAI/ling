@@ -1,7 +1,7 @@
 # RFC 与 Decision 生命周期 / Lifecycle Registry
 
 > 状态：由 `lifecycle.toml` 确定性生成
-> 更新日期：2026-08-23
+> 更新日期：2026-08-24
 > 本文件定义治理状态和证据要求，不新增语言语义。
 
 ## State machine
@@ -57,6 +57,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `RFC-0047` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [RFC-0047](../RFC-0047.md) |
 | `RFC-0048` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [RFC-0048](../RFC-0048.md) |
 | `RFC-0049` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [RFC-0049](../RFC-0049.md) |
+| `RFC-0050` | RFC | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [RFC-0050](../RFC-0050.md) |
 | `DEC-0001` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-18` | [DEC-0001](../decisions/0001-error-code-policy.md) |
 | `DEC-0002` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-18` | [DEC-0002](../decisions/0002-source-position-units.md) |
 | `DEC-0003` | Decision | `Accepted` | `Accepted` | yes | yes | `2026-08-18` | [DEC-0003](../decisions/0003-m0-tooling.md) |

@@ -210,6 +210,22 @@ fn stale_completion_emits_nothing_and_preserves_newer_pending_work() {
 }
 
 #[test]
+fn superseded_ticket_cancels_before_compiler_publication() {
+    let uri = "ling://workspace/src/Main.ling";
+    let mut server = ready();
+    open(&mut server, uri, 1, "module Main\n\nlet value = missing\n");
+    let ticket = server
+        .begin_diagnostic_analysis()
+        .unwrap()
+        .expect("analysis pending");
+    change(&mut server, uri, 2, "module Main\n\nlet value = @\n");
+
+    assert_eq!(ticket.compile(), Err(DiagnosticAnalysisError::Cancelled));
+    assert!(server.diagnostics_pending());
+    assert!(notifications(&mut server).is_empty());
+}
+
+#[test]
 fn temporary_documents_are_syntax_only_and_clear_on_close() {
     let workspace = "ling://workspace/src/Main.ling";
     let temporary = "untitled://ling/scratch/Main.ling";

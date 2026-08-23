@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-22"
+updated = "2026-08-24"
 
 [[protocol]]
 id = "PROTO-CLI-INIT"
@@ -352,6 +352,28 @@ sources = ["docs/RFC-0049.md", "docs/RFC-0004.md", "docs/RFC-0023.md", "docs/RFC
 version_markers = ["ling.lsp.request-cancellation/0.1", "$/cancelRequest", "lingRequestCancellation", "-32800"]
 authority = ["RFC-0049", "RFC-0048", "RFC-0045", "RFC-0044", "RFC-0043", "RFC-0041", "RFC-0030", "RFC-0029", "RFC-0023", "RFC-0004", "DEC-0019", "DEC-0021", "DEC-0030", "DEC-0031", "DEC-0032"]
 notes = ["The Preview adds no deadline, timeout, progress, quota, server-initiated cancellation, parallel compiler mutation, persistent state, VM/runtime cancellation, Stable editor compatibility, or general Semantic Transaction claim."]
+
+[[protocol]]
+id = "PROTO-LSP-SCHEDULING"
+title = "Ling deterministic Preview LSP scheduling"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.scheduling/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp logical scheduler"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Preserve JSON-RPC request and state wire order, classify current compiler work as Interactive, Analysis, or Background, service ready diagnostics before Background work, and apply fixed logical fairness bursts without observing host timing."
+writer_policy = "Advertise the exact Preview marker, retain message-boundary diagnostic debounce, cancel superseded diagnostic tickets through compiler stage checkpoints, reject stale completion, and publish only complete current-snapshot results atomically."
+unknown_field_policy = "The marker has an exact fixed shape; clients may ignore Experimental discovery, while incompatible class, bound, ordering, debounce, supersession, publication, or privacy behavior requires a new marker and migration evidence."
+migration_tool = "None; ling.lsp.scheduling/0.1 is Preview with no predecessor and adds no JSON-RPC method or client configuration."
+fixtures = ["crates/ling-lsp/tests/scheduling.rs", "crates/ling-lsp/tests/push_diagnostics.rs", "tests/protocols/lsp-scheduling/fixtures/v1.json", "tests/protocols/lsp-scheduling/README.md", "docs/status/LSP-2503-SCHEDULER-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0050.md", "docs/RFC-0049.md", "docs/RFC-0045.md", "docs/RFC-0034.md", "docs/RFC-0033.md", "docs/RFC-0032.md", "docs/RFC-0030.md", "docs/RFC-0029.md", "docs/RFC-0023.md", "docs/RFC-0004.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0021-deterministic-parallel-scheduling.md", "docs/decisions/0030-lsp-request-snapshot-boundary.md", "docs/decisions/0031-lsp-internal-cancellation-boundary.md", "docs/decisions/0032-lsp-internal-scheduling-boundary.md", "crates/ling-db/src/lib.rs", "crates/ling-lsp/src/scheduler.rs", "crates/ling-lsp/src/publication.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.scheduling/0.1", "lingScheduling", "message-boundary", "cancel-stale-analysis"]
+authority = ["RFC-0050", "RFC-0049", "RFC-0045", "RFC-0034", "RFC-0033", "RFC-0032", "RFC-0030", "RFC-0029", "RFC-0023", "RFC-0004", "DEC-0019", "DEC-0021", "DEC-0030", "DEC-0031", "DEC-0032"]
+notes = ["The Preview adds no wall-clock duration, latency SLA, deadline, dynamic priority, host-load adaptation, worker pool, parallel mutable request, response reordering, progress, partial result, quota, persistent queue, Stable lifecycle, or Semantic Transaction claim."]
 
 [[protocol]]
 id = "PROTO-LSP-HOVER"

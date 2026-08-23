@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-22"
+updated = "2026-08-24"
 matrix_target = "1.0-draft"
 status = "Draft"
 product = "ling"
@@ -367,6 +367,13 @@ implemented = true
 id = "PROTO-LSP-REQUEST-CANCELLATION"
 visibility = "Public"
 version = "ling.lsp.request-cancellation/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-LSP-SCHEDULING"
+visibility = "Public"
+version = "ling.lsp.scheduling/0.1"
 stability = "Preview"
 implemented = true
 

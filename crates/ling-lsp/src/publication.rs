@@ -6,9 +6,9 @@ use ling_source::{SourceError, SourceFile, SourceId, VfsError};
 use serde_json::{Map, Value, json};
 
 use super::{
-    AdaptedDiagnostic, DiagnosticAdapterError, DiagnosticAdapterInput, DiagnosticControlError,
-    DiagnosticSource, JSON_RPC_VERSION, LifecycleState, LspServer, MAX_FRAME_BYTES,
-    RequestSnapshot, RequestSnapshotError, adapt_diagnostics, encode,
+    AdaptedDiagnostic, CancellationToken, DiagnosticAdapterError, DiagnosticAdapterInput,
+    DiagnosticControlError, DiagnosticSource, JSON_RPC_VERSION, LifecycleState, LspServer,
+    MAX_FRAME_BYTES, RequestSnapshot, RequestSnapshotError, adapt_diagnostics, encode,
 };
 use crate::diagnostic_control::{DiagnosticLimits, controlled_diagnostics};
 
@@ -19,6 +19,7 @@ pub const PUBLISH_DIAGNOSTICS_PROTOCOL_VERSION: &str = "ling.lsp.publish-diagnos
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DiagnosticAnalysisTicket {
     snapshot: RequestSnapshot,
+    cancellation: CancellationToken,
 }
 
 impl DiagnosticAnalysisTicket {
@@ -30,9 +31,15 @@ impl DiagnosticAnalysisTicket {
 
     /// Runs the locked-offline compiler pipeline against only captured bytes.
     pub fn compile(self) -> Result<DiagnosticAnalysisResult, DiagnosticAnalysisError> {
+        self.cancellation
+            .check()
+            .map_err(|_| DiagnosticAnalysisError::Cancelled)?;
         let mut sources = Vec::with_capacity(self.snapshot.documents().len());
         let mut syntax_diagnostics = Vec::new();
         for (ordinal, document) in self.snapshot.documents().iter().enumerate() {
+            self.cancellation
+                .check()
+                .map_err(|_| DiagnosticAnalysisError::Cancelled)?;
             let source_id = u32::try_from(ordinal)
                 .map(SourceId::new)
                 .map_err(|_| DiagnosticAnalysisError::TooManySources)?;
@@ -64,8 +71,11 @@ impl DiagnosticAnalysisTicket {
             sources.push(DiagnosticSource::new(document.uri(), source));
         }
 
+        self.cancellation
+            .check()
+            .map_err(|_| DiagnosticAnalysisError::Cancelled)?;
         let diagnostics = if syntax_diagnostics.is_empty() {
-            compile_checked_workspace(&self.snapshot)?
+            compile_checked_workspace(&self.snapshot, &self.cancellation)?
         } else {
             syntax_diagnostics
         };
@@ -78,9 +88,13 @@ impl DiagnosticAnalysisTicket {
         } else {
             adapt_diagnostics(self.snapshot.position_encoding(), &sources, &inputs)?
         };
+        self.cancellation
+            .check()
+            .map_err(|_| DiagnosticAnalysisError::Cancelled)?;
         Ok(DiagnosticAnalysisResult {
             snapshot: self.snapshot,
             diagnostics: adapted,
+            cancellation: self.cancellation,
         })
     }
 }
@@ -90,6 +104,7 @@ impl DiagnosticAnalysisTicket {
 pub struct DiagnosticAnalysisResult {
     snapshot: RequestSnapshot,
     diagnostics: Box<[AdaptedDiagnostic]>,
+    cancellation: CancellationToken,
 }
 
 impl DiagnosticAnalysisResult {
@@ -108,6 +123,7 @@ impl DiagnosticAnalysisResult {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DiagnosticAnalysisError {
     NotReady,
+    Cancelled,
     Snapshot(RequestSnapshotError),
     TooManySources,
     Source { uri: String, error: SourceError },
@@ -124,6 +140,7 @@ impl std::fmt::Display for DiagnosticAnalysisError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::NotReady => formatter.write_str("LSP diagnostic analysis requires Ready state"),
+            Self::Cancelled => formatter.write_str("LSP diagnostic analysis was cancelled"),
             Self::Snapshot(error) => error.fmt(formatter),
             Self::TooManySources => formatter.write_str("diagnostic source count exceeds u32"),
             Self::Source { uri, error } => {
@@ -157,6 +174,7 @@ impl std::error::Error for DiagnosticAnalysisError {
             Self::Adapter(error) => Some(error),
             Self::Control(error) => Some(error),
             Self::NotReady
+            | Self::Cancelled
             | Self::TooManySources
             | Self::Stale
             | Self::UnknownResultUri { .. }
@@ -179,13 +197,17 @@ impl From<DiagnosticAdapterError> for DiagnosticAnalysisError {
 
 fn compile_checked_workspace(
     snapshot: &RequestSnapshot,
+    cancellation: &CancellationToken,
 ) -> Result<Vec<Diagnostic>, DiagnosticAnalysisError> {
     let mut compiler =
         compiler_for_snapshot(snapshot, None).map_err(DiagnosticAnalysisError::CompilerInput)?;
     compiler
-        .workspace_diagnostics()
+        .workspace_diagnostics_with_cancellation(&|| cancellation.is_cancelled())
         .map(Vec::from)
-        .map_err(DiagnosticAnalysisError::Compiler)
+        .map_err(|error| match error {
+            QueryError::Cancelled => DiagnosticAnalysisError::Cancelled,
+            error => DiagnosticAnalysisError::Compiler(error),
+        })
 }
 
 pub(crate) fn compiler_for_snapshot(
@@ -229,6 +251,7 @@ impl LspServer {
         }
         let result = DiagnosticAnalysisTicket {
             snapshot: self.capture_request_snapshot()?,
+            cancellation: CancellationToken::new(),
         }
         .compile()?;
         if self.capture_request_snapshot()? != result.snapshot {
@@ -255,6 +278,7 @@ impl LspServer {
         }
         Ok(Some(DiagnosticAnalysisTicket {
             snapshot: self.capture_request_snapshot()?,
+            cancellation: self.diagnostic_cancellation.clone().unwrap_or_default(),
         }))
     }
 
@@ -269,6 +293,10 @@ impl LspServer {
         if self.capture_request_snapshot()? != result.snapshot {
             return Err(DiagnosticAnalysisError::Stale);
         }
+        result
+            .cancellation
+            .check()
+            .map_err(|_| DiagnosticAnalysisError::Cancelled)?;
 
         let candidate = publication_params(&result, self.diagnostic_limits)?;
         let mut changed = BTreeMap::new();
@@ -300,6 +328,10 @@ impl LspServer {
                 length: notification.len(),
             });
         }
+        result
+            .cancellation
+            .check()
+            .map_err(|_| DiagnosticAnalysisError::Cancelled)?;
         let count = notifications.len();
         self.published_diagnostics = candidate;
         self.diagnostics_pending = false;
@@ -312,8 +344,15 @@ impl LspServer {
         let Some(ticket) = self.begin_diagnostic_analysis()? else {
             return Ok(0);
         };
-        let result = ticket.compile()?;
-        self.complete_diagnostic_analysis(result)
+        let result = match ticket.compile() {
+            Ok(result) => result,
+            Err(DiagnosticAnalysisError::Cancelled) => return Ok(0),
+            Err(error) => return Err(error),
+        };
+        match self.complete_diagnostic_analysis(result) {
+            Err(DiagnosticAnalysisError::Cancelled | DiagnosticAnalysisError::Stale) => Ok(0),
+            result => result,
+        }
     }
 
     /// Drains complete encoded JSON-RPC notification bodies in wire order.
@@ -322,6 +361,10 @@ impl LspServer {
     }
 
     pub(crate) fn mark_diagnostics_pending(&mut self) {
+        if let Some(cancellation) = &self.diagnostic_cancellation {
+            cancellation.cancel();
+        }
+        self.diagnostic_cancellation = Some(CancellationToken::new());
         self.diagnostics_pending = true;
     }
 }

@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-23"
+updated = "2026-08-24"
 
 [[document]]
 id = "RFC-0001"
@@ -1233,6 +1233,19 @@ authority = "Accepted"
 path = "docs/RFC-0049.md"
 covers = ["ling.lsp.request-cancellation/0.1", "standard stdio $/cancelRequest association for exact live string and number request IDs", "typed cooperative compiler-backed cancellation with atomic response, Workspace Edit, completion-resolve, index-cache, and semantic-token-history publication"]
 depends_on = ["RFC-0048", "RFC-0045", "RFC-0044", "RFC-0043", "RFC-0041", "RFC-0030", "RFC-0029", "RFC-0023", "RFC-0004", "DEC-0019", "DEC-0021", "DEC-0030", "DEC-0031", "DEC-0032", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
+id = "RFC-0050"
+title = "Deterministic Preview LSP Scheduling"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0050.md"
+covers = ["ling.lsp.scheduling/0.1", "wire-order logical Interactive, Analysis, and Background work classification with fixed bounded-fairness bursts", "message-boundary diagnostic debounce with cancellable superseded tickets and atomic current-snapshot publication"]
+depends_on = ["RFC-0049", "RFC-0045", "RFC-0034", "RFC-0033", "RFC-0032", "RFC-0030", "RFC-0029", "RFC-0023", "RFC-0004", "DEC-0019", "DEC-0021", "DEC-0030", "DEC-0031", "DEC-0032", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
 

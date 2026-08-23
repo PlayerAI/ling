@@ -8,7 +8,7 @@
 - Current compiler: `0.0.1-dev`
 - Current language: `0.0.1-dev`
 - Unicode: `17.0.0`
-- Updated: `2026-08-22`
+- Updated: `2026-08-24`
 
 This draft separates current evidence from candidate 1.0 scope. Empty current-profile lists mean the Seed implementation is unprofiled; candidate profile entries are planning input, not support claims. No Native target, VM, device backend, or Critical guarantee is currently supported.
 
@@ -101,6 +101,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-LSP-REFERENCES` | `Public` | `ling.lsp.references/0.1` | `Preview` | yes |
 | `PROTO-LSP-RENAME` | `Public` | `ling.lsp.rename/0.1` | `Preview` | yes |
 | `PROTO-LSP-REQUEST-CANCELLATION` | `Public` | `ling.lsp.request-cancellation/0.1` | `Preview` | yes |
+| `PROTO-LSP-SCHEDULING` | `Public` | `ling.lsp.scheduling/0.1` | `Preview` | yes |
 | `PROTO-LSP-SEMANTIC-TOKENS` | `Public` | `ling.lsp.semantic-tokens/0.1` | `Preview` | yes |
 | `PROTO-LSP-WORKSPACE` | `Public` | `ling.lsp.workspace/0.1` | `Experimental` | yes |
 | `PROTO-LSP-WORKSPACE-SYMBOL` | `Public` | `ling.lsp.workspace-symbol/0.1` | `Preview` | yes |

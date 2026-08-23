@@ -1,13 +1,13 @@
 # Ling 公开接口与协议清单 / Public Protocol Inventory
 
 > 状态：由 `protocol-inventory.toml` 确定性生成
-> 更新日期：2026-08-22
+> 更新日期：2026-08-24
 > 本清单记录当前兼容边界，不新增语言语义或协议承诺。
 
 ## Summary
 
-- 47 records: 43 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 27 Preview, 0 Stable.
+- 48 records: 44 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 28 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -33,6 +33,7 @@
 | `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-RENAME` | Public | LSP | `ling.lsp.rename/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-REQUEST-CANCELLATION` | Public | LSP | `ling.lsp.request-cancellation/0.1` | `Preview` | no | no | 4 |
+| `PROTO-LSP-SCHEDULING` | Public | LSP | `ling.lsp.scheduling/0.1` | `Preview` | no | no | 5 |
 | `PROTO-LSP-SEMANTIC-TOKENS` | Public | LSP | `ling.lsp.semantic-tokens/0.1` | `Preview` | no | no | 6 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-WORKSPACE-SYMBOL` | Public | LSP | `ling.lsp.workspace-symbol/0.1` | `Preview` | no | no | 3 |
@@ -310,6 +311,19 @@
 - Sources: [`docs/RFC-0049.md`](../RFC-0049.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0041.md`](../RFC-0041.md), [`docs/RFC-0043.md`](../RFC-0043.md), [`docs/RFC-0044.md`](../RFC-0044.md), [`docs/RFC-0045.md`](../RFC-0045.md), [`docs/RFC-0048.md`](../RFC-0048.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0021-deterministic-parallel-scheduling.md`](../decisions/0021-deterministic-parallel-scheduling.md), [`docs/decisions/0030-lsp-request-snapshot-boundary.md`](../decisions/0030-lsp-request-snapshot-boundary.md), [`docs/decisions/0031-lsp-internal-cancellation-boundary.md`](../decisions/0031-lsp-internal-cancellation-boundary.md), [`docs/decisions/0032-lsp-internal-scheduling-boundary.md`](../decisions/0032-lsp-internal-scheduling-boundary.md), [`crates/ling-types/src/solver.rs`](../../crates/ling-types/src/solver.rs), [`crates/ling-types/src/lib.rs`](../../crates/ling-types/src/lib.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/request_cancellation.rs`](../../crates/ling-lsp/src/request_cancellation.rs), [`crates/ling-lsp/src/rename.rs`](../../crates/ling-lsp/src/rename.rs), [`crates/ling-lsp/src/completion.rs`](../../crates/ling-lsp/src/completion.rs), [`crates/ling-lsp/src/completion_resolve.rs`](../../crates/ling-lsp/src/completion_resolve.rs), [`crates/ling-lsp/src/workspace_symbols.rs`](../../crates/ling-lsp/src/workspace_symbols.rs), [`crates/ling-lsp/src/semantic_tokens.rs`](../../crates/ling-lsp/src/semantic_tokens.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
 - Fixtures: [`crates/ling-lsp/tests/cancellation.rs`](../../crates/ling-lsp/tests/cancellation.rs), [`tests/protocols/lsp-request-cancellation/fixtures/v1.json`](../../tests/protocols/lsp-request-cancellation/fixtures/v1.json), [`tests/protocols/lsp-request-cancellation/README.md`](../../tests/protocols/lsp-request-cancellation/README.md), [`docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md`](../status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md)
 - Notes: The Preview adds no deadline, timeout, progress, quota, server-initiated cancellation, parallel compiler mutation, persistent state, VM/runtime cancellation, Stable editor compatibility, or general Semantic Transaction claim.
+
+### `PROTO-LSP-SCHEDULING` — Ling deterministic Preview LSP scheduling
+
+- Producer: ling lsp --stdio; ling-lsp logical scheduler
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Preserve JSON-RPC request and state wire order, classify current compiler work as Interactive, Analysis, or Background, service ready diagnostics before Background work, and apply fixed logical fairness bursts without observing host timing.
+- Writer policy: Advertise the exact Preview marker, retain message-boundary diagnostic debounce, cancel superseded diagnostic tickets through compiler stage checkpoints, reject stale completion, and publish only complete current-snapshot results atomically.
+- Unknown-field policy: The marker has an exact fixed shape; clients may ignore Experimental discovery, while incompatible class, bound, ordering, debounce, supersession, publication, or privacy behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.scheduling/0.1 is Preview with no predecessor and adds no JSON-RPC method or client configuration.
+- Authority: `RFC-0050`, `RFC-0049`, `RFC-0045`, `RFC-0034`, `RFC-0033`, `RFC-0032`, `RFC-0030`, `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0021`, `DEC-0030`, `DEC-0031`, `DEC-0032`
+- Sources: [`docs/RFC-0050.md`](../RFC-0050.md), [`docs/RFC-0049.md`](../RFC-0049.md), [`docs/RFC-0045.md`](../RFC-0045.md), [`docs/RFC-0034.md`](../RFC-0034.md), [`docs/RFC-0033.md`](../RFC-0033.md), [`docs/RFC-0032.md`](../RFC-0032.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0021-deterministic-parallel-scheduling.md`](../decisions/0021-deterministic-parallel-scheduling.md), [`docs/decisions/0030-lsp-request-snapshot-boundary.md`](../decisions/0030-lsp-request-snapshot-boundary.md), [`docs/decisions/0031-lsp-internal-cancellation-boundary.md`](../decisions/0031-lsp-internal-cancellation-boundary.md), [`docs/decisions/0032-lsp-internal-scheduling-boundary.md`](../decisions/0032-lsp-internal-scheduling-boundary.md), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/scheduler.rs`](../../crates/ling-lsp/src/scheduler.rs), [`crates/ling-lsp/src/publication.rs`](../../crates/ling-lsp/src/publication.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-lsp/tests/scheduling.rs`](../../crates/ling-lsp/tests/scheduling.rs), [`crates/ling-lsp/tests/push_diagnostics.rs`](../../crates/ling-lsp/tests/push_diagnostics.rs), [`tests/protocols/lsp-scheduling/fixtures/v1.json`](../../tests/protocols/lsp-scheduling/fixtures/v1.json), [`tests/protocols/lsp-scheduling/README.md`](../../tests/protocols/lsp-scheduling/README.md), [`docs/status/LSP-2503-SCHEDULER-IMPLEMENTATION-REPORT.md`](../status/LSP-2503-SCHEDULER-IMPLEMENTATION-REPORT.md)
+- Notes: The Preview adds no wall-clock duration, latency SLA, deadline, dynamic priority, host-load adaptation, worker pool, parallel mutable request, response reordering, progress, partial result, quota, persistent queue, Stable lifecycle, or Semantic Transaction claim.
 
 ### `PROTO-LSP-SEMANTIC-TOKENS` — Ling bounded LSP semantic tokens
 

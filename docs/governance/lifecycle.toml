@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-23"
+updated = "2026-08-24"
 
 # RFC-0001 and DEC-0001 through DEC-0016 predate the checked section
 # templates. This is a closed migration set; the checker rejects any new
@@ -7370,5 +7370,33 @@ compatibility_impact = [
 ]
 unresolved_alternatives = [
   "Parallel request execution, general scheduler fairness and priorities, deadlines, quotas, progress, server-initiated cancellation, async non-stdio transports, Stable editor compatibility, and general Semantic Transactions remain deferred.",
+]
+superseded_by = ""
+
+[[record]]
+id = "RFC-0050"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0050.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact scheduling discovery, fixed class mapping, and fixture bytes.",
+  "Verify priority-before-FIFO selection plus the 8-item Interactive and 16-item non-Background bounded-starvation limits without clocks or sleeps.",
+  "Verify wire-order state and responses, response-before-caused-publication, and Analysis-before-Background service.",
+  "Cover coalesced changes, cancelled superseded diagnostic tickets, stale completion, current replacement and clearance, and failure atomicity.",
+  "Repeat Unicode, BOM, CRLF, UTF-8/16/32, cancellation, malformed-message, and writer-failure evidence under the locked offline repository gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.scheduling/0.1 discovery with fixed logical classes and fairness bounds but no new JSON-RPC method.",
+  "Adds cancellable complete workspace diagnostics and diagnostic-ticket supersession without changing successful compiler facts, keys, spans, or diagnostic shapes.",
+  "Adds no Ling diagnostic, standalone JSON schema, Semantic ID, Definition ID, canonical byte, language, runtime, bytecode, VM, ABI, package, filesystem, network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Wall-clock timers, configurable debounce, deadlines, dynamic priority, host-load adaptation, worker pools, parallel mutable requests, response reordering, progress, partial results, quotas, persistence, Stable lifecycle, and Semantic Transactions remain deferred.",
 ]
 superseded_by = ""

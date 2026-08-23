@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-22"
+updated = "2026-08-24"
 
 [[gate]]
 id = "G1-PACKAGE"
@@ -342,9 +342,9 @@ status = "Open"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["LSP-2102", "LSP-2103", "LSP-2104", "LSP-2201", "LSP-2204", "IDE-2309", "LSP-2501", "LSP-2502", "LSP-2503", "LSP-2504"]
-observable_behavior = "RFC-0049 accepts bounded stdio $/cancelRequest association, cooperative compiler-backed cancellation, and atomic publication; RFC-0041 accepts one bounded checked rename response using negotiated transactional versioned documentChanges; RFC-0040 accepts read-only prepare rename, RFC-0026 accepts synchronous whole-document formatting, and RFC-0027 accepts a disjoint file-CLI proposal validator. General LSP mutation, Semantic Transaction projection, resource operations, scheduler policy, and Stable edit lifecycle remain unresolved."
-authority = ["ROADMAP-1.0", "DEC-0001", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0021", "DEC-0029", "DEC-0030", "DEC-0031", "DEC-0032", "DEC-0033", "DEC-0034", "DEC-0035", "RFC-0004", "RFC-0023", "RFC-0026", "RFC-0027", "RFC-0040", "RFC-0041", "RFC-0049"]
-candidate_rfcs = ["RFC-0004", "RFC-0023", "RFC-0026", "RFC-0027", "RFC-0040", "RFC-0041", "RFC-0049"]
+observable_behavior = "RFC-0050 accepts bounded deterministic logical LSP scheduling, message-boundary debounce, fixed fairness bursts, and diagnostic supersession; RFC-0049 accepts bounded stdio $/cancelRequest association, cooperative compiler-backed cancellation, and atomic publication; RFC-0041 accepts one bounded checked rename response using negotiated transactional versioned documentChanges; RFC-0040 accepts read-only prepare rename, RFC-0026 accepts synchronous whole-document formatting, and RFC-0027 accepts a disjoint file-CLI proposal validator. General LSP mutation, Semantic Transaction projection, resource operations, quotas, and Stable edit lifecycle remain unresolved."
+authority = ["ROADMAP-1.0", "DEC-0001", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0021", "DEC-0029", "DEC-0030", "DEC-0031", "DEC-0032", "DEC-0033", "DEC-0034", "DEC-0035", "RFC-0004", "RFC-0023", "RFC-0026", "RFC-0027", "RFC-0040", "RFC-0041", "RFC-0049", "RFC-0050"]
+candidate_rfcs = ["RFC-0004", "RFC-0023", "RFC-0026", "RFC-0027", "RFC-0040", "RFC-0041", "RFC-0049", "RFC-0050"]
 source_items = ["ROADMAP-5.2:lsp-transaction", "DEC-0029:position-projection"]
 options = [
   "Use versioned LSP Workspace Edits as the initial public mutation contract and defer Semantic Transaction.",
@@ -353,7 +353,7 @@ options = [
 irreversible_consequences = ["An underspecified edit protocol can apply stale or mispositioned changes to user files and freeze unstable fields."]
 required_evidence = ["positive", "negative", "migration", "utf8-utf16", "stale-edit", "emoji", "crlf"]
 owner_role = "ide-protocol-design"
-next_action = "Retain RFC-0049 for bounded request cancellation, RFC-0041 for bounded checked rename, RFC-0040 for read-only prepare rename, RFC-0026 for synchronous formatting, and RFC-0027 for disjoint proposal-only CLI validation; specify general mutation, resource operations, Semantic Transaction projection, field stability, and failure behavior before broader editor mutation."
+next_action = "Retain RFC-0050 for bounded logical scheduling, RFC-0049 for bounded request cancellation, RFC-0041 for bounded checked rename, RFC-0040 for read-only prepare rename, RFC-0026 for synchronous formatting, and RFC-0027 for disjoint proposal-only CLI validation; specify general mutation, resource operations, quotas, Semantic Transaction projection, field stability, and failure behavior before broader editor mutation."
 resolution = []
 superseded_by = ""
 observed_markers = ["experimental:crates/ling-lsp/tests/formatting.rs"]

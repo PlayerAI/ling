@@ -1,0 +1,28 @@
+{
+  "schema": "ling.test.lsp-scheduling/1",
+  "discovery": {
+    "classes": ["interactive", "analysis", "background"],
+    "debounce": "message-boundary",
+    "maxInteractiveBurst": 8,
+    "maxNonBackgroundBurst": 16,
+    "requestOrder": "wire-order",
+    "supersession": "cancel-stale-analysis",
+    "version": "ling.lsp.scheduling/0.1"
+  },
+  "methodClasses": {
+    "completionItem/resolve": "interactive",
+    "textDocument/completion": "interactive",
+    "textDocument/declaration": "interactive",
+    "textDocument/definition": "interactive",
+    "textDocument/diagnostic": "analysis",
+    "textDocument/hover": "interactive",
+    "textDocument/prepareRename": "interactive",
+    "textDocument/references": "interactive",
+    "textDocument/rename": "interactive",
+    "textDocument/semanticTokens/full": "analysis",
+    "textDocument/semanticTokens/full/delta": "analysis",
+    "textDocument/typeDefinition": "interactive",
+    "workspace/diagnostic": "analysis",
+    "workspace/symbol": "background"
+  }
+}

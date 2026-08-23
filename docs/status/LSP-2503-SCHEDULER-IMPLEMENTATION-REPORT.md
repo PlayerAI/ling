@@ -1,54 +1,97 @@
-# LSP-2503-SCHEDULER implementation report
+# LSP-2503 Implementation Report: Deterministic Scheduling
 
-Status: Done (bounded internal child only)
+## Status
 
-This report records the implementation authorized by Accepted DEC-0032. The
-parent `LSP-2503` task remains `BlockedSpec`: no public LSP debounce, priority,
-fairness, freshness, cancellation, or publication behavior is implemented.
+Implemented under Accepted RFC-0050. The earlier DEC-0032 child remains the
+strict internal queue foundation; this parent milestone adds bounded fairness,
+public Preview discovery, compiler-aware diagnostic supersession, and concrete
+server service-order integration.
 
-## Normative scope
+## Normative clauses covered
 
-- DEC-0021 §3 supplies canonical internal ordering and serial publication
-  principles for deterministic work; it does not authorize an LSP wire API.
-- DEC-0032 §§1–5 authorize only a `pub(crate)` in-process queue over opaque
-  work IDs with three logical priorities and a local monotonic FIFO sequence.
-- The execution-plan bullets in `04-LSP-IMPLEMENTATION.md` remain
-  non-normative and cannot define timers, event triggers, or editor behavior.
+- RFC-0050 §1: exact `ling.lsp.scheduling/0.1` initialize discovery.
+- RFC-0050 §2–§3: explicit method classes, wire-order state/request execution,
+  response ordering, and Analysis-before-Background service.
+- RFC-0050 §4: deterministic message-boundary debounce, mutation-driven token
+  rotation, cancellable diagnostic stages, stale rejection, and current-only
+  atomic ledger publication.
+- RFC-0050 §5: FIFO within class plus fixed 8-Interactive and
+  16-non-Background fairness bounds.
+- RFC-0050 §6: typed sequence/cancellation failures and non-public scheduling
+  state.
 
 ## Implementation
 
-- `crates/ling-lsp/src/scheduler.rs` implements `InternalWorkQueue`,
-  `WorkPriority`, `ScheduledWork`, and the typed sequence-exhaustion error.
-- Queue keys are `(priority rank, local enqueue sequence)`, so ordering is
-  independent of map insertion order and equal-priority items are FIFO.
-- The queue does not spawn workers, sleep, inspect host timing/CPU state,
-  coalesce identifiers, carry revisions/request IDs, or execute work.
-- `crates/ling-lsp/src/lib.rs` keeps the module internal and intentionally does
-  not wire it into `LspServer` or the stdio transport pending parent authority.
+- `scheduler.rs` retains DEC-0032 strict `pop` and adds `pop_fair`, explicit
+  method classification, fixed bounds, and the Preview marker. Selection uses
+  only class and monotonic local sequence.
+- The stdio executor classifies each body without changing wire order. Pending
+  push-diagnostic Analysis is flushed before Background work; ordinary
+  response-before-caused-notification behavior remains unchanged.
+- Each successful mutation cancels the prior diagnostic token and installs a
+  fresh token. A ticket checks before and during source traversal, around the
+  compiler, after adaptation, and before publication.
+- `CompilerDb::workspace_diagnostics_with_cancellation` checks between sources,
+  parse/module stages, cancellable type/Trait work, and final complete result.
+  Existing `workspace_diagnostics` delegates to a never-cancelled probe.
 
-## Evidence
+## Executable evidence
 
-Focused commands executed:
+- Scheduler unit tests cover strict priority/FIFO, duplicate IDs, clear and
+  monotonic sequence behavior, method classification, and both fairness bounds.
+- `scheduling.rs` consumes the exact fixture and verifies initialize discovery.
+- Push-diagnostic tests prove multi-mutation coalescing, cancellation of an old
+  ticket before compilation/publication, stale completed-result rejection,
+  preservation of newer pending work, and atomic current publication.
+- Compiler DB tests prove cancellation yields typed `QueryError::Cancelled`,
+  returns no partial diagnostic collection, publishes no partial checked cache,
+  and permits a later independent successful query.
+- Exact diagnostic transcripts include the additive scheduling discovery and
+  remain repeat-byte deterministic.
+
+Focused commands executed successfully during implementation:
 
 ```text
-cargo test -p ling-lsp --all-features --locked --offline
-cargo clippy -p ling-lsp --all-targets --all-features --locked --offline -- -D warnings
-cargo fmt --all -- --check
+cargo check -p ling-db -p ling-lsp --all-targets --locked --offline
+cargo test -p ling-lsp --lib --test push_diagnostics --test scheduling --locked --offline --quiet
+cargo test -p ling-db --lib --locked --offline --quiet
+cargo xtask governance check-all
 ```
 
-The focused suite covers priority-before-FIFO ordering, duplicate identifiers
-as independent items, deterministic clear behavior, and sequence monotonicity.
+The final repository-wide gate set also passed:
+
+```text
+cargo test --workspace --all-targets --locked --offline --quiet
+cargo clippy --workspace --all-targets --locked --offline -- -D warnings
+cargo xtask ci verify
+cargo xtask governance check-all
+cargo xtask lsp verify
+cargo xtask support verify
+cargo xtask status verify
+cargo xtask rc0 verify
+cargo xtask traceability verify --release v0.0.1
+cargo fmt --all -- --check
+git diff --check
+manual SHA-256 verification of docs/ling_execution_plan/SHA256SUMS.txt
+```
 
 ## Compatibility and determinism
 
-No language syntax, Typed Core, interpreter, VM, bytecode, diagnostics,
-schemas, Semantic IDs, source spans, CLI, JSON-RPC methods, protocol inventory,
-support matrix, or Unicode 17.0.0 data changed. The queue's sequence is local
-to one process and is not serialized or observable through the editor protocol.
+- **Protocol:** adds Preview `ling.lsp.scheduling/0.1`; no new method or client
+  configuration.
+- **Compiler:** adds cooperative complete-diagnostic cancellation without
+  changing successful facts, keys, spans, cache values, or output order.
+- **Diagnostics/schema/identity:** no Ling code, diagnostic shape, standalone
+  schema, Semantic ID, Definition ID, or canonical byte changes.
+- **Language/runtime/Unicode:** no syntax, semantics, Typed Core evaluation,
+  interpreter, runtime, bytecode, VM, ABI, package, host I/O, or Unicode 17.0.0
+  change.
+- **Determinism/privacy:** selection never observes a clock, CPU/load, thread,
+  allocation, map iteration, path, source text, or persistent sequence.
 
-## Deferred work
+## Intentionally deferred
 
-Public event triggers, debounce/coalescing, priority fairness and starvation
-bounds, worker/resource budgets, dependency expansion, revision supersession,
-cancellation/result precedence, diagnostic replacement, progress, and Stable
-versus Experimental lifecycle remain deferred to the parent `LSP-2503` task.
+Wall-clock/configurable debounce, deadlines, dynamic priorities, host-load
+adaptation, worker pools, parallel mutable requests, response reordering,
+progress, partial results, quotas, persistent scheduling/indexes, Stable
+lifecycle, and Semantic Transactions remain outside RFC-0050.
