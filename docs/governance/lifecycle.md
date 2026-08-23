@@ -267,6 +267,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0234` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0234](../decisions/0234-semantic-schema-reader-fuzz-coverage.md) |
 | `DEC-0235` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0235](../decisions/0235-lock-persistence-fault-injection.md) |
 | `DEC-0236` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0236](../decisions/0236-workspace-unsafe-policy-gate.md) |
+| `DEC-0237` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0237](../decisions/0237-performance-baseline-artifact-gate.md) |
 
 ## Migration boundary
 

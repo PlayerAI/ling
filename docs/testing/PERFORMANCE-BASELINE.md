@@ -90,9 +90,14 @@ cargo xtask performance verify
 ```
 
 The check validates the exact twelve planned-measurement rows and their current
-Covered/Partial/Deferred states. It protects the documented boundary only; it
-does not run the timing harness, freeze a threshold, make a cross-host claim,
-or turn the Seed trend baseline into a release gate. A missing memory
-measurement is recorded as Deferred until an Accepted resource policy exists.
+Covered/Partial/Deferred states. It also strictly parses the checked-in
+`ling.performance-baseline/1` artifact and verifies its eight-scenario order,
+three-sample cardinality, 10,000-file fixture, timed-region exclusion, and
+deterministic trace/hit/miss/completed-work observations. Nanosecond values are
+required only to be non-zero; they are never compared to a threshold or host.
+The check does not run the timing harness, freeze a threshold, make a
+cross-host claim, or turn the Seed trend baseline into a release gate. A
+missing memory measurement is recorded as Deferred until an Accepted resource
+policy exists.
 Fixture construction is excluded from timed regions, and the harness makes no absolute performance claim. Do not convert this baseline into a hard gate
 until an Accepted performance policy defines the release comparison rules.

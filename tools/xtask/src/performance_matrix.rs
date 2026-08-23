@@ -2,7 +2,13 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+use serde::Deserialize;
+
+use crate::performance::{SAMPLE_COUNT, SCENARIO_NAMES, SYNTHETIC_FILE_COUNT};
+
 const MATRIX_PATH: &str = "docs/testing/PERFORMANCE-BASELINE.md";
+const ARTIFACT_PATH: &str = "docs/status/INC-1410-PERFORMANCE-BASELINE.json";
+const ARTIFACT_SCHEMA: &str = "ling.performance-baseline/1";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct Measurement {
@@ -69,12 +75,93 @@ const REQUIRED_POLICY_PHRASES: &[&str] = &[
     "Accepted performance policy",
 ];
 
+#[derive(Debug, Clone, Copy)]
+struct ScenarioContract {
+    trace_events: usize,
+    misses: usize,
+    hits: usize,
+    synthetic: bool,
+}
+
+const SCENARIO_CONTRACTS: [ScenarioContract; 8] = [
+    ScenarioContract {
+        trace_events: 24,
+        misses: 9,
+        hits: 15,
+        synthetic: false,
+    },
+    ScenarioContract {
+        trace_events: 8,
+        misses: 0,
+        hits: 8,
+        synthetic: false,
+    },
+    ScenarioContract {
+        trace_events: 20,
+        misses: 5,
+        hits: 15,
+        synthetic: false,
+    },
+    ScenarioContract {
+        trace_events: 20,
+        misses: 5,
+        hits: 15,
+        synthetic: false,
+    },
+    ScenarioContract {
+        trace_events: 24,
+        misses: 9,
+        hits: 15,
+        synthetic: false,
+    },
+    ScenarioContract {
+        trace_events: 20_000,
+        misses: 20_000,
+        hits: 0,
+        synthetic: true,
+    },
+    ScenarioContract {
+        trace_events: 20_000,
+        misses: 0,
+        hits: 20_000,
+        synthetic: true,
+    },
+    ScenarioContract {
+        trace_events: 20_000,
+        misses: 2,
+        hits: 19_998,
+        synthetic: true,
+    },
+];
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BaselineArtifact {
+    schema: String,
+    sample_count: usize,
+    synthetic_file_count: usize,
+    timed_region_excludes_fixture_setup: bool,
+    scenarios: Vec<ScenarioArtifact>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ScenarioArtifact {
+    name: String,
+    samples_ns: Vec<u128>,
+    trace_events: Vec<usize>,
+    misses: Vec<usize>,
+    hits: Vec<usize>,
+    completed_items: Vec<usize>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckSummary {
     pub measurement_count: usize,
     pub covered_count: usize,
     pub partial_count: usize,
     pub deferred_count: usize,
+    pub artifact_scenario_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -83,7 +170,8 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
             "GOV-PERF-MATRIX-0001: cannot read {MATRIX_PATH}: {error}"
         )]
     })?;
-    let errors = validate(&matrix);
+    let mut errors = validate(&matrix);
+    let artifact_scenario_count = validate_artifact(root, &mut errors);
     finish(errors).map(|()| CheckSummary {
         measurement_count: MEASUREMENTS.len(),
         covered_count: MEASUREMENTS
@@ -98,7 +186,139 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
             .iter()
             .filter(|measurement| measurement.state == "Deferred")
             .count(),
+        artifact_scenario_count,
     })
+}
+
+fn validate_artifact(root: &Path, errors: &mut Vec<String>) -> usize {
+    let text = match fs::read_to_string(root.join(ARTIFACT_PATH)) {
+        Ok(text) => text,
+        Err(error) => {
+            errors.push(format!(
+                "GOV-PERF-MATRIX-0007: cannot read {ARTIFACT_PATH}: {error}"
+            ));
+            return 0;
+        }
+    };
+    validate_artifact_text(&text, errors)
+}
+
+fn validate_artifact_text(text: &str, errors: &mut Vec<String>) -> usize {
+    let artifact: BaselineArtifact = match serde_json::from_str(text) {
+        Ok(artifact) => artifact,
+        Err(error) => {
+            errors.push(format!(
+                "GOV-PERF-MATRIX-0007: cannot parse {ARTIFACT_PATH}: {error}"
+            ));
+            return 0;
+        }
+    };
+
+    if artifact.schema != ARTIFACT_SCHEMA {
+        errors.push(format!(
+            "GOV-PERF-MATRIX-0008: artifact schema must be {ARTIFACT_SCHEMA:?}, found {:?}",
+            artifact.schema
+        ));
+    }
+    if artifact.sample_count != SAMPLE_COUNT {
+        errors.push(format!(
+            "GOV-PERF-MATRIX-0008: artifact sample_count must be {SAMPLE_COUNT}, found {}",
+            artifact.sample_count
+        ));
+    }
+    if artifact.synthetic_file_count != SYNTHETIC_FILE_COUNT {
+        errors.push(format!(
+            "GOV-PERF-MATRIX-0008: artifact synthetic_file_count must be {SYNTHETIC_FILE_COUNT}, found {}",
+            artifact.synthetic_file_count
+        ));
+    }
+    if !artifact.timed_region_excludes_fixture_setup {
+        errors.push(
+            "GOV-PERF-MATRIX-0008: artifact must exclude fixture setup from timed regions"
+                .to_owned(),
+        );
+    }
+
+    let actual_names = artifact
+        .scenarios
+        .iter()
+        .map(|scenario| scenario.name.as_str())
+        .collect::<Vec<_>>();
+    if actual_names != SCENARIO_NAMES {
+        errors.push(format!(
+            "GOV-PERF-MATRIX-0009: artifact scenarios must be {SCENARIO_NAMES:?}, found {actual_names:?}"
+        ));
+    }
+
+    for (index, scenario) in artifact.scenarios.iter().enumerate() {
+        let Some(contract) = SCENARIO_CONTRACTS.get(index) else {
+            continue;
+        };
+        validate_samples(scenario, *contract, errors);
+    }
+    artifact.scenarios.len()
+}
+
+fn validate_samples(
+    scenario: &ScenarioArtifact,
+    contract: ScenarioContract,
+    errors: &mut Vec<String>,
+) {
+    for (field, length) in [
+        ("samples_ns", scenario.samples_ns.len()),
+        ("trace_events", scenario.trace_events.len()),
+        ("misses", scenario.misses.len()),
+        ("hits", scenario.hits.len()),
+        ("completed_items", scenario.completed_items.len()),
+    ] {
+        if length != SAMPLE_COUNT {
+            errors.push(format!(
+                "GOV-PERF-MATRIX-0010: scenario {:?} field {field} must contain {SAMPLE_COUNT} samples, found {length}",
+                scenario.name
+            ));
+        }
+    }
+    if scenario.samples_ns.contains(&0) {
+        errors.push(format!(
+            "GOV-PERF-MATRIX-0010: scenario {:?} contains a zero-duration sample",
+            scenario.name
+        ));
+    }
+    for (field, values, expected) in [
+        (
+            "trace_events",
+            &scenario.trace_events,
+            contract.trace_events,
+        ),
+        ("misses", &scenario.misses, contract.misses),
+        ("hits", &scenario.hits, contract.hits),
+    ] {
+        if values.iter().any(|value| *value != expected) {
+            errors.push(format!(
+                "GOV-PERF-MATRIX-0011: scenario {:?} field {field} must contain only {expected}, found {values:?}",
+                scenario.name
+            ));
+        }
+    }
+    if contract.synthetic {
+        if scenario
+            .completed_items
+            .iter()
+            .any(|value| *value != SYNTHETIC_FILE_COUNT)
+        {
+            errors.push(format!(
+                "GOV-PERF-MATRIX-0011: synthetic scenario {:?} must complete {SYNTHETIC_FILE_COUNT} items, found {:?}",
+                scenario.name, scenario.completed_items
+            ));
+        }
+    } else if scenario.completed_items.first().is_none_or(|first| {
+        *first == 0 || scenario.completed_items.iter().any(|value| value != first)
+    }) {
+        errors.push(format!(
+            "GOV-PERF-MATRIX-0011: checked scenario {:?} must report one stable non-zero completed-item count, found {:?}",
+            scenario.name, scenario.completed_items
+        ));
+    }
 }
 
 fn validate(matrix: &str) -> Vec<String> {
@@ -193,6 +413,7 @@ mod tests {
         assert_eq!(summary.covered_count, 2);
         assert_eq!(summary.partial_count, 2);
         assert_eq!(summary.deferred_count, 8);
+        assert_eq!(summary.artifact_scenario_count, 8);
     }
 
     #[test]
@@ -208,6 +429,31 @@ mod tests {
             errors
                 .iter()
                 .any(|error| error.contains("must be \"Partial\""))
+        );
+    }
+
+    #[test]
+    fn rejects_baseline_schema_and_work_drift() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("xtask is under tools/xtask");
+        let artifact =
+            fs::read_to_string(root.join(ARTIFACT_PATH)).expect("performance artifact is readable");
+        let mutated = artifact
+            .replacen(ARTIFACT_SCHEMA, "ling.performance-baseline/2", 1)
+            .replacen("\"misses\": [9, 9, 9]", "\"misses\": [8, 8, 8]", 1);
+        let mut errors = Vec::new();
+        assert_eq!(validate_artifact_text(&mutated, &mut errors), 8);
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.contains("artifact schema must be"))
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.contains("field misses must contain only 9"))
         );
     }
 }

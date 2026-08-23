@@ -26,6 +26,12 @@ twelve-row plan-coverage matrix and its measurement-only guardrails. It does
 not run the timing harness, freeze a threshold, or promote `REL-6604` to a G6
 performance sign-off.
 
+Accepted `DEC-0237` additionally closes only the bounded
+`REL-6604-ARTIFACT` child. The verifier now reads the historical INC-1410 JSON
+and protects its internal schema, scenario/sample shape, timed-region
+exclusion, and deterministic query-work observations. It does not compare
+timings, run benchmarks, freeze thresholds, or promote the parent.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:368-387` is a non-normative measurement list.
@@ -50,9 +56,10 @@ scenarios, three samples each, observed work, and dispersion ranges. The
 existing `tools/xtask/src/performance.rs` command emits the versioned internal
 JSON artifact with fixture setup excluded from timed regions. It makes no
 absolute performance claim and has no benchmark dependency.
-`cargo xtask performance verify` checks only the deterministic plan-coverage
-row/state inventory and preserves the Deferred state for memory until an
-Accepted resource policy exists.
+`cargo xtask performance verify` checks the deterministic plan-coverage
+row/state inventory plus the bounded historical-artifact integrity authorized
+by DEC-0237, and preserves the Deferred state for memory until an Accepted
+resource policy exists.
 
 The command and relevant test/gate evidence are reproducible with locked
 offline dependencies. They do not measure memory peak, storage/thermal state,

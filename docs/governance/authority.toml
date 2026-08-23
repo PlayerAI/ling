@@ -3588,3 +3588,16 @@ covers = ["REL-6602 bounded lock-persistence fault injection", "deterministic pa
 depends_on = ["RFC-0002", "DEC-0001", "DEC-0042", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0237"
+title = "Performance-baseline artifact gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0237-performance-baseline-artifact-gate.md"
+covers = ["REL-6604 bounded performance-baseline artifact integrity evidence", "strict eight-scenario internal schema and deterministic query-work validation", "historical evidence gate without timing comparison, threshold, new measurement, public protocol, or G6 performance claim"]
+depends_on = ["DEC-0019", "DEC-0021", "DEC-0044", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

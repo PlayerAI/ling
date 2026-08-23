@@ -813,11 +813,12 @@ fn main() -> ExitCode {
             match performance_matrix::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "performance matrix OK: {} measurements ({} Covered, {} Partial, {} Deferred)",
+                        "performance matrix OK: {} measurements ({} Covered, {} Partial, {} Deferred); {} baseline scenarios structurally verified",
                         summary.measurement_count,
                         summary.covered_count,
                         summary.partial_count,
-                        summary.deferred_count
+                        summary.deferred_count,
+                        summary.artifact_scenario_count
                     );
                     ExitCode::SUCCESS
                 }

@@ -551,6 +551,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REL-6603-UNSAFE-POLICY` | G6 | Workspace unsafe-policy drift gate | S | Done | Accepted `DEC-0236`; see `cargo xtask security verify` and `docs/status/REL-6603-UNSAFE-POLICY-IMPLEMENTATION-REPORT.md`; dependency/generated-code/cross-target audits and the parent gate remain BlockedSpec |
 | `REL-6604` | G6 | 性能基线 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:368`, `docs/status/REL-6604-AUTHORITY-AUDIT.md`, `docs/testing/PERFORMANCE-BASELINE.md` |
 | `REL-6604-SEED` | G6 | Seed performance-matrix drift gate | S | Done | Accepted DEC-0044; see `cargo xtask performance verify` and `docs/status/REL-6604-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `REL-6604-ARTIFACT` | G6 | Performance-baseline artifact integrity gate | S | Done | Accepted `DEC-0237`; see `cargo xtask performance verify`, `INC-1410-PERFORMANCE-BASELINE.json`, and `docs/status/REL-6604-ARTIFACT-IMPLEMENTATION-REPORT.md`; timing thresholds and the parent gate remain BlockedSpec |
 | `DOC-6701` | G6 | 正式文档集 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:391`, `docs/status/DOC-6701-AUTHORITY-AUDIT.md`, `docs/testing/DOCUMENTATION-INVENTORY.md` |
 | `DOC-6701-SEED` | G6 | Seed documentation-inventory drift gate | S | Done | Accepted DEC-0045; see `cargo xtask docs verify` and `docs/status/DOC-6701-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `DOC-6702` | G6 | 双层示例 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:406`, `docs/status/DOC-6702-AUTHORITY-AUDIT.md`, `docs/testing/EXAMPLE-COVERAGE.md` |

@@ -6075,3 +6075,29 @@ unresolved_alternatives = [
   "Directory sync; replacement durability; OS quota harnesses; power loss; abrupt process kill; retry policy; failed-temporary retention; cross-process recovery; and future-system fault seams remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0237"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0237-performance-baseline-artifact-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Accept the current internal schema, eight-scenario order, three-sample arrays, 10000-file fixture, and timed-region exclusion.",
+  "Verify deterministic trace, miss, hit, and completed-work observations without comparing nanoseconds.",
+  "Mutate schema and work counts in an isolated test and verify fail-closed errors.",
+  "Run performance, xtask, governance, status, workspace, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds an internal historical-artifact integrity check and shares existing harness constants; no timing value is rewritten and no Ling semantic, diagnostic, schema, Semantic ID, package, dependency, CLI/editor, runtime, or Unicode behavior changes.",
+  "Adds no threshold, regression policy, hardware tier, new measurement, public protocol, support promise, or G6 performance claim.",
+]
+unresolved_alternatives = [
+  "New captures; retention and replacement policy; warm-up/statistics; thresholds; hardware tiers; memory/IO; package build, LSP, VM, Native, Actor, Replay, device/Kernel, and Zed measurements; cross-host execution; and release ownership remain deferred.",
+]
+superseded_by = ""

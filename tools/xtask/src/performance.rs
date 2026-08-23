@@ -11,8 +11,18 @@ use std::time::Instant;
 use ling_db::{CompilerDb, QueryOutcome};
 use ling_source::{ChangeEvent, SourceId, WorkspaceInput};
 
-const SAMPLE_COUNT: usize = 3;
-const SYNTHETIC_FILE_COUNT: usize = 10_000;
+pub(crate) const SAMPLE_COUNT: usize = 3;
+pub(crate) const SYNTHETIC_FILE_COUNT: usize = 10_000;
+pub(crate) const SCENARIO_NAMES: [&str; 8] = [
+    "cold_check",
+    "warm_check",
+    "single_character_edit",
+    "signature_edit",
+    "cross_package_edit",
+    "synthetic_10k_cold_parse",
+    "synthetic_10k_warm_parse",
+    "synthetic_10k_single_edit",
+];
 
 #[derive(Clone, Copy, Debug)]
 struct Observation {
@@ -34,14 +44,14 @@ struct Measurement {
 /// the output records that scope explicitly.
 pub fn baseline() -> Result<String, String> {
     let measurements = [
-        measure("cold_check", cold_check)?,
-        measure("warm_check", warm_check)?,
-        measure("single_character_edit", single_character_edit)?,
-        measure("signature_edit", signature_edit)?,
-        measure("cross_package_edit", cross_package_edit)?,
-        measure("synthetic_10k_cold_parse", synthetic_10k_cold_parse)?,
-        measure("synthetic_10k_warm_parse", synthetic_10k_warm_parse)?,
-        measure("synthetic_10k_single_edit", synthetic_10k_single_edit)?,
+        measure(SCENARIO_NAMES[0], cold_check)?,
+        measure(SCENARIO_NAMES[1], warm_check)?,
+        measure(SCENARIO_NAMES[2], single_character_edit)?,
+        measure(SCENARIO_NAMES[3], signature_edit)?,
+        measure(SCENARIO_NAMES[4], cross_package_edit)?,
+        measure(SCENARIO_NAMES[5], synthetic_10k_cold_parse)?,
+        measure(SCENARIO_NAMES[6], synthetic_10k_warm_parse)?,
+        measure(SCENARIO_NAMES[7], synthetic_10k_single_edit)?,
     ];
     Ok(render(&measurements))
 }
