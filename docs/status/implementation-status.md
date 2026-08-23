@@ -138,6 +138,7 @@
 | `DOC-6701-EVIDENCE-PATHS` | Formal inventory evidence-path gate | `G6` | `S` | `Done` | `DOC-6701-SEED` | `6d04b188c7ddd7be1de6e5ac61bfa51d98b4b36b` |
 | `DOC-6701-SEED` | Seed documentation-inventory drift gate | `G6` | `S` | `Done` | `REL-6604-SEED` | `77a905bbac64aaa7e9b6a56f8952a045d2760d87` |
 | `DOC-6702` | Two-layer Examples | `G6` | `M` | `BlockedSpec` | `DOC-6701` | `` |
+| `DOC-6702-EXECUTION-MANIFEST` | Seed example execution manifest | `G6` | `S` | `Done` | `DOC-6702-SEED` | `b228a382505964705596f8e797084f4d131f5431` |
 | `DOC-6702-SEED` | Seed example-matrix drift gate | `G6` | `S` | `Done` | `DOC-6701-SEED` | `dab9a240c3f83c3e671449b318ca9425df57df32` |
 | `DOC-6703` | Bilingual Chinese-first Tutorial | `G6` | `M` | `BlockedSpec` | `DOC-6702` | `` |
 | `DOC-6703-SEED` | Seed bilingual tutorial coverage drift gate | `G6` | `S` | `Done` | `DOC-6702-SEED` | `9f3386bab5c8f06c7ce76ac0ab5c66f8b8695ca4` |

@@ -25685,6 +25685,7 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/decisions/0046-seed-example-matrix-gate.md",
+  "docs/decisions/0239-seed-example-execution-manifest.md",
   "docs/ERROR-CODES.md",
   "docs/SEED-TRACEABILITY.md",
   "docs/SEED-RELEASE-REPORT.md",
@@ -25709,6 +25710,11 @@ spec = [
 artifacts = [
   "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
   "docs/status/DOC-6702-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/DOC-6702-EXECUTION-MANIFEST-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6702-EXECUTION-MANIFEST-IMPLEMENTATION-REPORT.md",
+  "tests/examples/seed-cases.toml",
+  "tools/xtask/src/examples_matrix.rs",
+  "crates/ling-cli/tests/conformance.rs",
   "docs/testing/EXAMPLE-COVERAGE.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
@@ -25717,6 +25723,7 @@ acceptance = [
   "The inventory maps the six requested example dimensions to current Seed examples, negative conformance fixtures, Semantic/Audit evidence, and explicit profile/Effect/ownership boundaries.",
   "The current support matrix is checked before claiming coverage; all current Seed features remain Experimental and no future capability is presented as Stable.",
   "Minimal, realistic, correct-error, Chinese-identifier, Effect/Capability, and Semantic/Audit paths link to reproducible locked offline commands and registered evidence.",
+  "One strict six-case manifest now binds the documented minimal, realistic, and tutorial sources to exact stdout and Semantic witnesses consumed by both governance validation and real CLI process tests.",
   "The audit records G1-G5 and future Accepted-authority dependencies; unsupported ownership, profile, backend, package, concurrency, and editor examples remain deferred.",
   "No placeholder syntax, API, protocol, backend, migration promise, security claim, or stale legacy name is added.",
 ]
@@ -25726,7 +25733,8 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "DOC-6702 is BlockedSpec because no current feature is Stable and G6 depends on G1-G5 exits before a 1.0 support matrix can freeze the required example layers.",
-  "The Seed matrix reuses existing examples, conformance positives/negatives, process-level Semantic checks, and deterministic Audit evidence without inventing syntax or public behavior.",
+  "Accepted DEC-0239 closes only the six-case execution-manifest child; successful current Seed execution does not establish Stable support or G6 completion.",
+  "The Seed matrix and manifest reuse existing examples, conformance positives/negatives, process-level Semantic checks, and deterministic Audit evidence without inventing syntax or public behavior.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, or public API.",
 ]
 
@@ -25774,6 +25782,48 @@ completed = "2026-08-22"
 notes = [
   "The verifier protects example inventory consistency only; current examples and outputs remain Experimental/Preview evidence.",
   "No example, syntax, API, profile, ownership rule, migration promise, security claim, or placeholder public surface is added.",
+]
+
+[[task]]
+id = "DOC-6702-EXECUTION-MANIFEST"
+title = "Seed example execution manifest"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DOC-6702-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0046-seed-example-matrix-gate.md",
+  "docs/decisions/0239-seed-example-execution-manifest.md",
+  "docs/testing/EXAMPLE-COVERAGE.md",
+  "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "tests/examples/seed-cases.toml",
+  "tools/xtask/src/examples_matrix.rs",
+  "tools/xtask/src/main.rs",
+  "crates/ling-cli/tests/conformance.rs",
+  "docs/status/DOC-6702-EXECUTION-MANIFEST-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6702-EXECUTION-MANIFEST-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The strict ling.seed-example-cases/0 manifest contains exactly six unique cases: one core-minimal, three core-realistic, and two tutorial examples.",
+  "Every record has its accepted exact examples/*.ling path, role, ASCII/Chinese identifier classification, LF-terminated stdout, and Semantic definition witness; unknown fields, duplicates, drift, traversal, missing files, and malformed observations fail closed.",
+  "The CLI process test consumes the same manifest and all six cases pass ling check, ling run with exact UTF-8 stdout and empty stderr, and ling semantic with schema ling.semantic/0.1 and the recorded witness.",
+  "The negative conformance corpus and deterministic Audit process test remain covered by the full workspace gate.",
+  "Focused examples/CLI tests and workspace, CI, governance, status, formatting, lint, deterministic, and offline gates pass.",
+]
+verified_against_commit = "b228a382505964705596f8e797084f4d131f5431"
+completion_commit = "b228a382505964705596f8e797084f4d131f5431"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "DOC-6702 remains BlockedSpec for a Stable 1.0 support matrix, future feature examples, profile/target and ownership notes, public schema commitments, cross-host release fixtures, and G6 sign-off.",
+  "This child changes only internal example metadata, validation, and process-test coverage; no Ling semantic, diagnostic, schema, Semantic ID, package, dependency, CLI/editor, runtime, Unicode, protocol, support, or public API changes.",
 ]
 
 [[task]]
