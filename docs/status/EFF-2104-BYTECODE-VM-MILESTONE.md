@@ -57,8 +57,9 @@ milestone commit evidence; this report does not claim future CI execution.
 implementation:
 
 1. DEC-0261 requires repeated restoration to retain the same lexical Cell
-   identities, but its exact 1.3 record has ordinary value captures and no
-   verifier-typed Cell construction/load/store representation.
+   identities and keep `State<T>` unmasked, but its exact 1.3 record has
+   ordinary value captures, only the Console Effect tag, and no verifier-typed
+   Cell construction/load/store or serialized State row representation.
 2. DEC-0260 accepts checked clause patterns, but DEC-0261 carries only operation
    signatures and has no representation or accepted failure rule for a
    refutable parameter that does not match an operation input.

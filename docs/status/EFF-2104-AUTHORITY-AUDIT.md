@@ -81,6 +81,10 @@ marked Done until an Accepted decision resolves
 checked clause-pattern behavior, all differential evidence passes, and the
 completion commit is recorded.
 
+Draft DEC-0262 selects a backward-reading `ling.bytecode/1.4` Cell/State
+representation and total binding/wildcard operation inputs. It is reviewable
+design evidence only and does not authorize implementation while Draft.
+
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,

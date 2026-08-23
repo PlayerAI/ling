@@ -7481,3 +7481,30 @@ unresolved_alternatives = [
   "Clock/Random producers, Never and user-defined operations, shallow/dynamic handlers, continuation serialization or cross-task transfer, rollback/cleanup, catchable Fault/cancellation, Native/Wasm lowering, migration, and Stable compatibility remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0262"
+kind = "Decision"
+status = "Draft"
+path = "docs/decisions/0262-handler-cell-state-bytecode.md"
+history = ["Open", "Draft"]
+opened = "2026-08-24"
+proposed = ""
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Reject refutable Handler input patterns before checked publication with exact bilingual L-EFFECT-0005 facts and original UTF-8 spans.",
+  "Freeze bytecode 1.4 Cell<T>, State<T>, and Cell instruction tags with canonical/malformed/backward-reader evidence.",
+  "Execute shared mutation across nested/deep continuation restoration, Fault, cancellation, and resource boundaries without rollback.",
+  "Compare interpreter and VM values, events, resume counts, committed mutation observations, Fault projections, spans, Program IDs, and deterministic bytes.",
+]
+compatibility_impact = [
+  "Narrows Experimental Handler operation inputs to total binding/wildcard forms and adds no Seed syntax.",
+  "Adds backward-reading ling.bytecode/1.4 while preserving exact 1.0 through 1.3 bytes and older-reader rejection.",
+  "Adds private Cell identities and State<T> wire rows without a new diagnostic code, Semantic ID/schema, CLI/LSP/package, Native/Wasm, Stable, or Unicode change.",
+]
+unresolved_alternatives = [
+  "Changing 1.3 in place, new capture tags, copied Cells, dynamic checked-pattern mismatch, State masking, rollback, public references, general mutable closure capture, Many producers, and Native/Wasm remain rejected or separate.",
+]
+superseded_by = ""

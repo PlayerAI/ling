@@ -4264,3 +4264,16 @@ covers = ["EFF-2104 checked interpreter handler execution", "deep delimited cont
 depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "RFC-0014", "RFC-0015", "RFC-0016", "RFC-0018", "RFC-0019", "RFC-0020", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0063", "DEC-0088", "DEC-0260", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0262"
+title = "Complete Handler Cell/State bytecode"
+kind = "Decision"
+status = "Draft"
+version = "1-draft"
+authority = "Draft"
+path = "docs/decisions/0262-handler-cell-state-bytecode.md"
+covers = ["Handler irrefutable operation inputs", "ling.bytecode/1.4 Cell and State representation", "shared lexical Cell VM identity", "EFF-2104 completion gap"]
+depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "RFC-0014", "RFC-0015", "RFC-0016", "RFC-0018", "RFC-0019", "RFC-0020", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0260", "DEC-0261", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false
