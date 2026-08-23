@@ -3893,6 +3893,53 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6901-CURRENT-EVIDENCE"
+title = "Current RC0 status/protocol evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6901-SEED", "ZED-6804-CURRENT-EVIDENCE"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0052-seed-rc0-internal-freeze-inventory-gate.md",
+  "docs/decisions/0245-current-rc0-registry-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/status/implementation-status.toml",
+  "docs/testing/RC0-INTERNAL-FREEZE.md",
+  "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/rc0_freeze.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "docs/testing/RC0-INTERNAL-FREEZE.md",
+  "docs/status/RC-6901-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6901-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc0 verify composes the validated status and protocol registries and requires the RC0 matrix task/done totals and protocol stability distribution to match their current summaries.",
+  "The gate retains exactly eight BlockedSpec criteria, ten linked audit files, and the explicit no-freeze/no-publication boundary.",
+  "A focused negative test rejects stale status and protocol evidence with GOV-RC0-FREEZE-0011.",
+  "Focused RC0/status/protocol checks plus workspace, CI, governance, support, traceability, formatting, lint, deterministic, and offline gates pass.",
+  "No candidate, freeze, release exit, artifact, issue disposition, protocol/support promotion, network request, or system change is created.",
+]
+verified_against_commit = "a72dc4baf5efc2bceabd03e074b36b87cb47b36b"
+completion_commit = "a72dc4baf5efc2bceabd03e074b36b87cb47b36b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "RC-6901 remains BlockedSpec for candidate identity/change control, Stable protocols, final support scope, P0/P1 sign-off, historical corpus, security sign-off, artifacts, complete 1.0 documentation, independent verification, and the freeze itself.",
+  "This child corrects and binds internal inventory facts only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, Unicode, protocol states, support states, and public APIs are unchanged.",
+]
+
+[[task]]
 id = "RC-6901"
 title = "RC0 Internal Freeze"
 state = "BlockedSpec"
@@ -3900,7 +3947,7 @@ release = "G6"
 size = "L"
 owner = "Codex"
 branch = "main"
-depends_on = ["ZED-6804"]
+depends_on = ["RC-6901-CURRENT-EVIDENCE", "ZED-6804"]
 spec = [
   "AGENTS.md",
   "docs/ROADMAP-1.0.md",
@@ -3909,6 +3956,7 @@ spec = [
   "docs/governance/support-matrix.toml",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
+  "docs/decisions/0245-current-rc0-registry-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/COMPAT-6501-AUTHORITY-AUDIT.md",
@@ -3917,12 +3965,14 @@ spec = [
   "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
   "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6804-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6901-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
   "docs/SEED-RELEASE-REPORT.md",
   "docs/testing/RC0-INTERNAL-FREEZE.md",
   "docs/testing/SECURITY-AUDIT.md",
 ]
 artifacts = [
   "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6901-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/RC0-INTERNAL-FREEZE.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
@@ -3940,7 +3990,7 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "RC-6901 is BlockedSpec because the G6 RC0 checklist has no accepted candidate identity, freeze/change-control protocol, P0/P1 registry, historical corpus contract, security sign-off package, v1.0 artifact protocol, or complete 1.0 documentation authority.",
-  "Current evidence is limited to the v0.0.1 Seed release report, the 1.0 support-matrix draft, the 21-record protocol inventory, and bounded G6 audit documents; these do not promote any capability to Stable or complete RC0.",
+  "Current evidence includes the v0.0.1 Seed release report, the 1.0 support-matrix draft, the validated 27-record protocol inventory, the 492-task status registry, and bounded G6 audit documents; these do not promote any capability to Stable or complete RC0.",
   "The authority audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, release tag, or public API and performs no external network/system mutation.",
 ]
 

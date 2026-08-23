@@ -389,7 +389,8 @@
 | `PROTO-6203-OBSERVATION` | Internal Semantic Hash Upgrade Rehearsal boundary evidence | `G6` | `S` | `Done` | `PROTO-6202-OBSERVATION` | `37aa6b4cc623fe1322e2806c71f7be349373117b` |
 | `PROTO-6204` | CLI and Exit-Code Freeze | `G6` | `L` | `BlockedSpec` | `PROTO-6203` | `` |
 | `PROTO-6204-OBSERVATION` | Internal CLI and Exit-Code Freeze boundary evidence | `G6` | `S` | `Done` | `PROTO-6203-OBSERVATION` | `dfc288270f58029ddcb454eda5a7936a931b8c83` |
-| `RC-6901` | RC0 Internal Freeze | `G6` | `L` | `BlockedSpec` | `ZED-6804` | `` |
+| `RC-6901` | RC0 Internal Freeze | `G6` | `L` | `BlockedSpec` | `RC-6901-CURRENT-EVIDENCE`, `ZED-6804` | `` |
+| `RC-6901-CURRENT-EVIDENCE` | Current RC0 status/protocol evidence | `G6` | `S` | `Done` | `RC-6901-SEED`, `ZED-6804-CURRENT-EVIDENCE` | `a72dc4baf5efc2bceabd03e074b36b87cb47b36b` |
 | `RC-6901-SEED` | Seed RC0 internal-freeze inventory drift gate | `G6` | `S` | `Done` | `ZED-6804-SEED` | `dc0f2e5ca98b9c705b9932267011c246058db4ec` |
 | `RC-6902` | RC1 Public Validation | `G6` | `L` | `BlockedSpec` | `RC-6901` | `` |
 | `RC-6902-SEED` | Seed RC1 public-validation inventory drift gate | `G6` | `S` | `Done` | `RC-6901-SEED` | `056c6afb17fd1e8656b825e2c2a4f70b4173f2d8` |
