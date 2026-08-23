@@ -454,7 +454,7 @@ sources = [
 ]
 version_markers = ["ling.manifest/1", "manifest-version = 1"]
 authority = ["RFC-0002", "ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, content/package-graph identities, exported-module visibility, checked package-aware resolution, the canonical local lock protocol, the complete named project fixture matrix, generated path/cycle/order properties, and deterministic manifest fuzz coverage. Manifest writing, ambient or CLI project selection, and build integration remain later PRJ tasks."]
+notes = ["PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated reader/model, explicit-root source discovery, deterministic module/import graphs, recursive vendored dependency traversal, content/package-graph identities, exported-module visibility, checked package-aware resolution, the canonical local lock protocol, the complete named project fixture matrix, generated path/cycle/order properties, and deterministic manifest fuzz coverage. Manifest writing and build integration remain later tasks. Accepted DEC-0228 keeps publication, installation, and registry distribution Unsupported through Ling 1.0."]
 
 [[protocol]]
 id = "PROTO-PACKAGE-IDENTITY"
@@ -490,7 +490,7 @@ sources = [
 ]
 version_markers = ["ling.package-content/1", "ling.package-graph/1", "sha256:"]
 authority = ["RFC-0002"]
-notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2; PRJ-1105 projects them into canonical ling.lock/1 bytes; PRJ-1106 freezes the named end-to-end project graph and failure matrix; PRJ-1108 verifies generated cycle/oracle and filesystem-enumeration invariance properties. CLI project selection, registry/network sources, and publication remain deferred."]
+notes = ["PRJ-1104 implements recursive local path resolution and freezes independent content/graph vectors; PRJ-1103 consumes those identities for cross-package resolution and ling.semantic/0.2; PRJ-1105 projects them into canonical ling.lock/1 bytes; PRJ-1106 freezes the named end-to-end project graph and failure matrix; PRJ-1108 verifies generated cycle/oracle and filesystem-enumeration invariance properties. Accepted DEC-0228 keeps registry/network sources, installation, and publication Unsupported through Ling 1.0."]
 
 [[protocol]]
 id = "PROTO-LOCKFILE"
@@ -527,7 +527,7 @@ sources = [
 ]
 version_markers = ["ling.lock/1", "sha256:"]
 authority = ["RFC-0002"]
-notes = ["PRJ-1105 implements the library reader, writer, Update/Locked policy, local-only offline guarantee, and corruption corpus. PRJ-1106 adds end-to-end update, failure-atomicity, and checked-in offline-lock fixtures. PRJ-1108 adds generated model/canonical-byte round trips and enumeration-invariant lock evidence. CLI --locked/--offline selection remains owned by PRJ-1107."]
+notes = ["PRJ-1105 implements the library reader, writer, Update/Locked policy, local-only offline guarantee, and corruption corpus. PRJ-1106 adds end-to-end update, failure-atomicity, and checked-in offline-lock fixtures. PRJ-1108 adds generated model/canonical-byte round trips and enumeration-invariant lock evidence. Accepted DEC-0228 keeps publication, installation, and registry distribution Unsupported through Ling 1.0."]
 
 [[protocol]]
 id = "PROTO-BUILD-METADATA"

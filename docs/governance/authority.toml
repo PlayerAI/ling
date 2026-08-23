@@ -3471,3 +3471,16 @@ covers = ["PKG-6402 bounded hermetic-build exclusion evidence", "RFC-0002 manife
 depends_on = ["RFC-0002", "DEC-0010", "DEC-0019", "DEC-0022", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0228"
+title = "Registry deferred through Ling 1.0"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0228-registry-deferred-through-v1.md"
+covers = ["PKG-6403 registry-deferred product strategy", "publication, installation, and registry distribution Unsupported through Ling 1.0", "local RFC-0002 protocol preservation without registry or Stable promotion"]
+depends_on = ["RFC-0002", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

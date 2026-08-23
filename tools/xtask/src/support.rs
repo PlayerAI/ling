@@ -1607,4 +1607,49 @@ mod tests {
         assert_eq!(package.authorities, ["DEC-0014"]);
         assert_eq!(package.explicitly_unsupported.len(), 3);
     }
+
+    #[test]
+    fn repository_registry_deferment_is_explicit_and_local_protocols_stay_experimental() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("xtask is under tools/xtask");
+        let matrix = load_matrix(root).expect("repository matrix parses");
+        let unsupported = matrix
+            .unsupported
+            .iter()
+            .find(|item| item.id == "UNSUP-PACKAGES")
+            .expect("package registry deferment is recorded");
+        assert_eq!(
+            unsupported.capability,
+            "Package installation, publication, or registry distribution"
+        );
+        assert!(unsupported.reason.contains("DEC-0228"));
+        assert!(unsupported.reason.contains("Ling 1.0"));
+        assert!(
+            unsupported
+                .sources
+                .iter()
+                .any(|source| source == "docs/decisions/0228-registry-deferred-through-v1.md")
+        );
+        assert!(
+            matrix
+                .protocol
+                .iter()
+                .all(|protocol| protocol.id != "PROTO-PACKAGE-REGISTRY")
+        );
+        for id in [
+            "PROTO-PACKAGE-MANIFEST",
+            "PROTO-PACKAGE-IDENTITY",
+            "PROTO-LOCKFILE",
+        ] {
+            let protocol = matrix
+                .protocol
+                .iter()
+                .find(|protocol| protocol.id == id)
+                .unwrap_or_else(|| panic!("missing local package protocol {id}"));
+            assert!(protocol.implemented, "{id}");
+            assert_eq!(protocol.stability, "Experimental", "{id}");
+        }
+    }
 }

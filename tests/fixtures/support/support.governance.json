@@ -623,12 +623,13 @@
     {
       "id": "UNSUP-PACKAGES",
       "area": "Project/package",
-      "capability": "CLI project selection, package installation, publication, or registry",
-      "reason": "PRJ-1101 through PRJ-1106 plus PRJ-1108 implement the isolated manifest, deterministic package graph, exported-module visibility, checked cross-package resolution, package-aware Semantic Graph, canonical local lock protocol, complete named project fixture matrix, and project graph/lock property and manifest fuzz coverage. CLI selection/build integration, publication, and registry installation remain out of scope.",
+      "capability": "Package installation, publication, or registry distribution",
+      "reason": "Accepted DEC-0228 defers registry behavior through Ling 1.0. RFC-0002 local manifest, content identity, vendored dependency, project-check, and lock workflows remain available at their recorded stability, while publication, installation, and registry distribution remain Unsupported.",
       "blockers": [],
       "sources": [
         "docs/RFC-0002.md",
-        "docs/ling_execution_plan/03-G1-V0.1-LIVING.md"
+        "docs/decisions/0228-registry-deferred-through-v1.md",
+        "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md"
       ]
     },
     {

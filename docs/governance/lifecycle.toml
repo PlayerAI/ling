@@ -5833,3 +5833,29 @@ unresolved_alternatives = [
   "Typed build nodes and graphs; inputs/outputs and Capabilities; sandbox and resource policies; plugins/generators; environment/network/filesystem/process authority; build-plan and artifact identities; cache/replay/corruption; profiles/targets/toolchains; CLI and diagnostics; compatibility, migration, cross-process, cross-platform, and security fixtures remain open under PKG-6402, later package tasks, and future Accepted authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0228"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0228-registry-deferred-through-v1.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert UNSUP-PACKAGES exactly covers publication, installation, and registry distribution and cites DEC-0228.",
+  "Assert no package-registry protocol exists while local manifest, identity, and lock protocols remain implemented and Experimental.",
+  "Assert all sixty deferment boundaries, exact ordering, duplicate rejection, and order-independent opaque bytes.",
+  "Run support, protocol, governance, status, workspace, lint, formatting, and offline gates.",
+]
+compatibility_impact = [
+  "Changes the product roadmap/support classification by explicitly deferring registry behavior through Ling 1.0; manifest, lock, identity, resolver, compiler, diagnostics, CLI, Semantic IDs, spans, dependencies, Unicode 17.0.0, and existing protocol stability remain unchanged.",
+  "Adds no registry protocol, schema, service, publisher coordinate, source kind, archive, artifact, signature/provenance, install/update/yank operation, mirror/cache, CLI, diagnostic, dependency, public API, or Stable claim.",
+]
+unresolved_alternatives = [
+  "A Preview or Stable registry; authenticated publisher/source coordinates; ownership/key lifecycle; archive/artifact/signature/provenance; registry and installation operations; mirrors/caches; availability; CLI, diagnostics, schemas, migration, and security fixtures require a future Accepted RFC.",
+]
+superseded_by = ""
