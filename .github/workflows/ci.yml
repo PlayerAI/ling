@@ -50,6 +50,7 @@ jobs:
               cargo xtask corpus verify
               cargo xtask compatibility verify
               cargo xtask migration verify
+              cargo xtask deprecation verify
           - name: support-matrix
             command: |
               cargo xtask support verify

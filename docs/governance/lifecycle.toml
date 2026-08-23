@@ -5967,3 +5967,31 @@ unresolved_alternatives = [
   "Concrete source-version pairs; parser/checked-semantic transformations; equivalence and semantic diff; stale edits; atomic writes; backup/rollback; formatter/post-check/test orchestration; public CLI/report schema; diagnostics; ambiguity handling; and resumable human decisions remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0233"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0233-deprecation-policy-readiness-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify zero released major versions, an absent public policy, and the exact seven rows in canonical order and state.",
+  "Validate every blocker/evidence path and generated report drift.",
+  "Verify the retired diagnostic table and lock retain L-IMPL-0001 as retired.",
+  "Verify schema lifecycle and support-matrix authorities remain Draft and non-stable, and migration readiness still records no pair or command.",
+  "Require cargo xtask deprecation verify in the always-on CI contract.",
+  "Run error-code, schema, support, migration, compatibility, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds internal evidence and explicit non-claims only; source, diagnostics, schemas, protocols, support states, profiles, targets, packages, CLI, Semantic IDs, dependencies, Unicode 17.0.0, compiler, and runtime behavior remain unchanged.",
+  "Adds no public policy, compatibility promise, minimum period, warning, transition, removal, N-1 range, security exception, or migration commitment.",
+]
+unresolved_alternatives = [
+  "Eligible subjects; 1.x ranges; minimum periods; warnings and suppressions; replacement/removal obligations; schema/protocol N-1; target/profile transitions; security exceptions; migration commitments; distribution; and cross-version/platform evidence remain deferred.",
+]
+superseded_by = ""

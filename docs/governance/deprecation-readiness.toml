@@ -1,0 +1,47 @@
+schema_version = 1
+authority = "DEC-0233"
+released_major_versions = 0
+public_policy = "Absent"
+report = "docs/governance/deprecation-readiness.md"
+
+[[requirement]]
+id = "one-x-compatibility-promise"
+state = "Unavailable"
+blocker = "Ling has no released major version and no Accepted 1.x compatibility contract."
+evidence = ["docs/status/COMPAT-6504-AUTHORITY-AUDIT.md", "docs/governance/compiler-compatibility-boundary.toml"]
+
+[[requirement]]
+id = "minimum-deprecation-period"
+state = "Unavailable"
+blocker = "No Accepted version cadence, eligible subject inventory, or minimum notice interval exists."
+evidence = ["docs/status/COMPAT-6504-AUTHORITY-AUDIT.md"]
+
+[[requirement]]
+id = "diagnostic-lifecycle"
+state = "GuardedSubset"
+blocker = "DEC-0001 guards code non-reuse and retired-code exclusion only; warning, notice, replacement, and removal semantics remain undefined."
+evidence = ["docs/decisions/0001-error-code-policy.md", "docs/ERROR-CODES.md", "docs/governance/error-code-lock.toml"]
+
+[[requirement]]
+id = "schema-n-minus-one-policy"
+state = "Unavailable"
+blocker = "The schema lifecycle authority remains Draft; schema-specific evidence does not establish a general N-1 promise."
+evidence = ["docs/status/COMPAT-6504-AUTHORITY-AUDIT.md", "docs/governance/authority.toml", "schemas/registry.toml"]
+
+[[requirement]]
+id = "target-profile-support-lifecycle"
+state = "Unavailable"
+blocker = "The support matrix remains Draft and defines no accepted deprecation or removal transitions."
+evidence = ["docs/status/COMPAT-6504-AUTHORITY-AUDIT.md", "docs/governance/authority.toml", "docs/governance/support-matrix.toml"]
+
+[[requirement]]
+id = "security-exception"
+state = "Unavailable"
+blocker = "No Accepted authority defines who may shorten a lifecycle, required evidence, notification, or replacement obligations."
+evidence = ["docs/status/COMPAT-6504-AUTHORITY-AUDIT.md", "docs/testing/SECURITY-AUDIT.md"]
+
+[[requirement]]
+id = "migration-tooling-commitment"
+state = "Unavailable"
+blocker = "Migration tooling has no accepted version pair, command, transformation contract, or report protocol."
+evidence = ["docs/decisions/0232-migration-tool-deferred-until-version-pair.md", "docs/governance/migration-readiness.toml"]

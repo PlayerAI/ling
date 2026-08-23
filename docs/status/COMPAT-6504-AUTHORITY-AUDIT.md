@@ -7,7 +7,8 @@
 
 ## Decision
 
-`COMPAT-6504` is `BlockedSpec`. The G6 checklist requests a 1.x
+`COMPAT-6504` is `BlockedSpec`. Accepted `DEC-0233` now authorizes a bounded
+readiness-evidence child, but not the public policy. The G6 checklist requests a 1.x
 compatibility promise, a minimum deprecation period, diagnostic lifecycle,
 schema N-1 policy, target/profile support lifecycle, security exceptions, and a
 migration-tooling commitment. It does not define the public subjects of
@@ -21,6 +22,11 @@ therefore create new language or public-protocol semantics from a
 non-normative checklist. The existing surface-specific registries must remain
 explicitly Experimental, Preview, Future, or Unsupported where their accepted
 authority and fixtures are not complete.
+
+The completed `COMPAT-6504-READINESS` child records all seven requested areas:
+six are `Unavailable`, while diagnostic lifecycle is a `GuardedSubset` limited
+to DEC-0001 code non-reuse and retired-code exclusion. This evidence does not
+reduce the blocked public-policy scope.
 
 ## Normative traceability
 
@@ -67,6 +73,9 @@ The repository currently provides bounded compatibility evidence:
 4. Accepted source-position, formatter-preservation, and package/lock
    decisions preserve their own byte-span, canonicalization, and migration
    boundaries; none provides a general deprecation API.
+5. Accepted `DEC-0233`, `docs/governance/deprecation-readiness.toml`, and
+   `cargo xtask deprecation verify` preserve the exact readiness states and
+   Draft/absent boundaries without publishing lifecycle semantics.
 
 No accepted artifact currently defines:
 

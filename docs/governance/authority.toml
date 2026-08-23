@@ -3536,3 +3536,16 @@ covers = ["COMPAT-6503 bounded migration-readiness evidence", "public migration 
 depends_on = ["DEC-0002", "DEC-0012", "DEC-0015", "DEC-0023", "DEC-0230", "DEC-0231", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0233"
+title = "Deprecation-policy readiness boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0233-deprecation-policy-readiness-boundary-evidence.md"
+covers = ["COMPAT-6504 bounded deprecation-policy readiness evidence", "exact seven-area inventory with six unavailable rows and the DEC-0001 diagnostic retirement guarded subset", "internal drift gate without 1.x compatibility, lifecycle, warning, removal, N-1, support, security-exception, or migration commitments"]
+depends_on = ["DEC-0001", "DEC-0231", "DEC-0232", "ROADMAP-1.0", "SCHEMA-LIFECYCLE-POLICY", "SUPPORT-MATRIX"]
+supersedes = []
+stable_basis = true

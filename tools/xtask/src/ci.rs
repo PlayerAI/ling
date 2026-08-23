@@ -50,6 +50,7 @@ const REQUIRED_GATES: &[GateContract] = &[
             "cargo xtask corpus verify",
             "cargo xtask compatibility verify",
             "cargo xtask migration verify",
+            "cargo xtask deprecation verify",
         ],
     },
     GateContract {
