@@ -24918,6 +24918,7 @@ spec = [
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0015-audit-source-format.md",
   "docs/decisions/0041-seed-fuzz-inventory-gate.md",
+  "docs/decisions/0234-semantic-schema-reader-fuzz-coverage.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -24931,11 +24932,14 @@ spec = [
 artifacts = [
   "docs/status/REL-6601-AUTHORITY-AUDIT.md",
   "docs/status/REL-6601-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/REL-6601-SEMANTIC-SCHEMA-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6601-SEMANTIC-SCHEMA-IMPLEMENTATION-REPORT.md",
   "docs/testing/FUZZ-COVERAGE.md",
   "fuzz/Cargo.toml",
   "fuzz/README.md",
   "fuzz/fuzz_targets/formatter_utf8.rs",
   "fuzz/fuzz_targets/audit_schema_bytes.rs",
+  "fuzz/fuzz_targets/semantic_schema_bytes.rs",
   "fuzz/fuzz_targets/lock_bytes.rs",
   "fuzz/corpus/formatter_utf8",
   "fuzz/corpus/audit_schema_bytes",
@@ -24946,7 +24950,7 @@ artifacts = [
 ]
 acceptance = [
   "The inventory records every planned REL-6601 entry point with current harness, corpus, dictionary, timeout, RSS, crash-triage owner, and an explicit state for missing future surfaces.",
-  "Available Seed harnesses cover source/lexer/parser, formatter Format IR, Audit schema diagnostics, project manifest/lock, and bytecode decoder/verifier paths with deterministic repeated-input checks and bounded diagnostics.",
+  "Available harnesses cover source/lexer/parser, formatter Format IR, Audit and isolated Semantic Graph schema readers, project manifest/lock, and bytecode decoder/verifier paths with deterministic repeated-input checks and bounded diagnostics.",
   "Pinned cargo-fuzz and nightly toolchain, corpus replay commands, timeout/RSS limits, crash-retention policy, and the offline local compile gate are recorded in fuzz documentation and CI.",
   "The audit preserves unsupported/future protocol boundaries and records the G1-G5 dependency; it does not claim complete G6 or v1.0 fuzz coverage.",
   "No public protocol, language semantic, diagnostic allocation, placeholder binary, support claim, or unimplemented-surface API is introduced; DEC-0041 closes only the internal Seed inventory child.",
@@ -24957,7 +24961,7 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "REL-6601 is BlockedSpec as a G6 release gate because G1-G5 exits and release-level authority for replay/evidence, FFI, device, archive, LSP/DAP, and editor surfaces are not complete.",
-  "The Seed-level inventory and three additional test-only harnesses make current formatter, Audit schema, and lock decoding coverage explicit without fabricating missing protocols.",
+  "The Seed-level inventory and bounded implementation children make current formatter, Audit/Semantic schema, lock, and bytecode decoding coverage explicit without fabricating missing protocols.",
   "The audit changes no source semantics, public protocol, diagnostic/schema version, package behavior, CLI, editor integration, dependency, or runtime API and preserves deterministic/offline evidence.",
 ]
 
@@ -25008,6 +25012,58 @@ completed = "2026-08-22"
 notes = [
   "Accepted DEC-0041 closes only this internal Seed inventory gate; REL-6601 remains BlockedSpec for future protocol harnesses and the G6 release gate.",
   "The verifier records metadata consistency only; pinned libFuzzer execution and sanitizer availability remain separate CI evidence.",
+]
+
+[[task]]
+id = "REL-6601-SEMANTIC-SCHEMA"
+title = "Semantic Graph Reader Fuzz Coverage"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["REL-6601-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/RFC-0002.md",
+  "docs/decisions/0041-seed-fuzz-inventory-gate.md",
+  "docs/decisions/0234-semantic-schema-reader-fuzz-coverage.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/status/REL-6601-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "fuzz/Cargo.toml",
+  "fuzz/Cargo.lock",
+  "fuzz/README.md",
+  "fuzz/fuzz_targets/semantic_schema_bytes.rs",
+  "fuzz/corpus/semantic_schema_bytes/minimal-valid-seed.json",
+  "fuzz/corpus/semantic_schema_bytes/malformed.json",
+  "crates/ling-semantic/tests/fuzz_corpus.rs",
+  "tools/xtask/src/fuzz.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/testing/FUZZ-COVERAGE.md",
+  "docs/status/REL-6601-SEMANTIC-SCHEMA-AUTHORITY-AUDIT.md",
+  "docs/status/REL-6601-SEMANTIC-SCHEMA-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0234 authorizes a fuzz-only, data-only consumer of the implemented exact-version ling.semantic/0.1 and ling.semantic/0.2 readers.",
+  "semantic_schema_bytes rejects inputs above 1 MiB, preserves reader isolation, and compares repeated success/error results without feeding decoded graphs into evaluation or Typed Core.",
+  "The reviewed corpus contains one minimal valid Seed graph and one malformed JSON input; a normal semantic regression test proves successful Seed decoding, deterministic cross-reader rejection, and deterministic malformed-input failure.",
+  "cargo xtask fuzz verify now validates exactly nine harnesses and twenty regular corpus files, and the pinned Ubuntu CI job replays the semantic corpus with the shared run/timeout/RSS policy.",
+  "Locked offline fuzz compilation, semantic corpus tests, fuzz/CI-contract/governance checks, Clippy, formatting, and diff checks pass without changing public semantics or protocols.",
+]
+verified_against_commit = "be20332ed1bed9becae115e211f1387e25799b17"
+completion_commit = "be20332ed1bed9becae115e211f1387e25799b17"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test and governance evidence under DEC-0234; REL-6601 remains BlockedSpec for archive, replay/evidence, FFI, device, LSP/DAP, Zed fuzzing, and final G6 release evidence.",
+  "The fuzz workspace gains a direct internal ling-semantic dependency only; no shipped dependency, schema, reader behavior, migration, Semantic ID, diagnostic, CLI, runtime, support, or Unicode claim changes.",
+  "The Windows host verified compilation only; the configured Ubuntu job owns libFuzzer replay, so no local sanitizer execution is claimed.",
 ]
 
 [[task]]
