@@ -354,7 +354,30 @@ impl Diagnostic {
             MessageLanguage::Chinese => &self.message_zh,
             MessageLanguage::English => &self.message_en,
         };
-        let mut rendered = format!("{}[{}]: {message}", self.severity, self.code);
+        self.finish_human(format!("{}[{}]: {message}", self.severity, self.code))
+    }
+
+    /// Renders both public diagnostic languages in the requested stable order.
+    #[must_use]
+    pub fn render_human_bilingual(&self, order: MessageOrder) -> String {
+        let rendered = match order {
+            MessageOrder::Bilingual => format!(
+                "{}[{}]: {} / {}",
+                self.severity, self.code, self.message_zh, self.message_en
+            ),
+            MessageOrder::ChineseFirst => format!(
+                "{}[{}]: {}\n = English: {}",
+                self.severity, self.code, self.message_zh, self.message_en
+            ),
+            MessageOrder::EnglishFirst => format!(
+                "{}[{}]: {}\n = 中文: {}",
+                self.severity, self.code, self.message_en, self.message_zh
+            ),
+        };
+        self.finish_human(rendered)
+    }
+
+    fn finish_human(&self, mut rendered: String) -> String {
         if let Some(span) = &self.primary_span {
             rendered.push_str(&format!(
                 "\n --> {}:{}..{}",
@@ -369,6 +392,13 @@ impl Diagnostic {
 pub enum MessageLanguage {
     Chinese,
     English,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MessageOrder {
+    Bilingual,
+    ChineseFirst,
+    EnglishFirst,
 }
 
 #[derive(Debug)]
@@ -530,6 +560,30 @@ mod tests {
         assert_eq!(
             diagnostic.render_human(MessageLanguage::English),
             "error[L-TYPE-0001]: type mismatch"
+        );
+    }
+
+    #[test]
+    fn bilingual_human_output_retains_both_languages_in_stable_order() {
+        let diagnostic = Diagnostic::new(
+            codes::TYPE_MISMATCH,
+            Severity::Error,
+            "类型不匹配",
+            "type mismatch",
+        )
+        .with_primary_span(DiagnosticSpan::at("main.ling", 3, 7));
+
+        assert_eq!(
+            diagnostic.render_human_bilingual(MessageOrder::Bilingual),
+            "error[L-TYPE-0001]: 类型不匹配 / type mismatch\n --> main.ling:3..7"
+        );
+        assert_eq!(
+            diagnostic.render_human_bilingual(MessageOrder::ChineseFirst),
+            "error[L-TYPE-0001]: 类型不匹配\n = English: type mismatch\n --> main.ling:3..7"
+        );
+        assert_eq!(
+            diagnostic.render_human_bilingual(MessageOrder::EnglishFirst),
+            "error[L-TYPE-0001]: type mismatch\n = 中文: 类型不匹配\n --> main.ling:3..7"
         );
     }
 }

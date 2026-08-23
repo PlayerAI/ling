@@ -6572,3 +6572,29 @@ unresolved_alternatives = [
   "Unified output/language/color/verbosity, Semantic Query and Transaction commands, completion/help fixtures, future explain/replay/evidence/support/migration/plugin/daemon surfaces, and Stable compatibility remain separately governed.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0254"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0254-cli-output-policy.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact output-policy defaults, values, duplicates, incompatible combinations, and LSP rejection.",
+  "Verify bilingual language ordering, human-only diagnostic color, ANSI-free JSON, quiet summary suppression, and one deterministic path-free verbose event.",
+  "Retain command-specific schemas, stdout/stderr ownership, program output, diagnostics, exits, offline behavior, determinism, and nonmutation evidence.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview language, color, quiet, and verbose controls to current non-LSP commands and makes human diagnostics bilingual by default.",
+  "Changes no JSON schema, diagnostic identity, Semantic ID, source span, language semantic, runtime Fault, artifact, bytecode, VM, ABI, exit mapping, or Unicode 17.0.0 behavior.",
+]
+unresolved_alternatives = [
+  "Localized help grammar, locale inference, themes, progress events, tracing, retries, future command output, shell completion, and Stable byte compatibility remain separately governed.",
+]
+superseded_by = ""

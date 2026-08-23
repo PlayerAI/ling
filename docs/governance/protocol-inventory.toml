@@ -57,15 +57,15 @@ public_schema = false
 canonical = false
 producer = ["ling executable"]
 consumer = ["humans", "shell scripts", "editor and build integrations"]
-reader_policy = "The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; unknown commands/options, mixed file/project selection, unsupported build profiles/targets, and invalid arity are rejected with exit 2."
-writer_policy = "Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines, semantic project commands emit ling.project.command/0.1 results, project graph check retains ling.project.check/0.1, and lsp --stdio retains protocol-only framed output."
+reader_policy = "The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; current non-LSP commands accept the DEC-0254 format/language/color/verbosity policy, while unknown, duplicate, mixed, or incompatible forms are rejected with exit 2."
+writer_policy = "Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines; non-LSP output follows DEC-0254 without changing machine schemas or exit classes; and lsp --stdio rejects output-policy flags and retains protocol-only framed output."
 unknown_field_policy = "Not field-based: unknown commands, options, formats, and capabilities are rejected."
 migration_tool = "None; incompatible command or option changes require an accepted specification and release migration notes."
-fixtures = ["crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/project_commands.rs", "tests/protocols/project-command/README.md"]
-sources = ["Cargo.toml", "docs/decisions/0253-current-cli-command-model.md", "docs/RFC-0025.md", "crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/project.rs"]
+fixtures = ["crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/output_policy.rs", "crates/ling-cli/tests/project_commands.rs", "tests/protocols/cli-output-policy/README.md", "tests/protocols/project-command/README.md"]
+sources = ["Cargo.toml", "docs/decisions/0253-current-cli-command-model.md", "docs/decisions/0254-cli-output-policy.md", "docs/RFC-0025.md", "crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/output_policy.rs", "crates/ling-cli/src/project.rs"]
 version_markers = ["0.0.1-dev", "ling.project.command/0.1"]
-authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "DEC-0028", "DEC-0038", "DEC-0039", "DEC-0253", "RFC-0004", "RFC-0024", "RFC-0025"]
-notes = ["The compiler package version remains the broad CLI version. DEC-0253 accepts the existing single parser/dispatcher and exact implemented command catalog without adding planned roots; command-specific authorities retain their own input, output, exit, schema, stability, and migration rules."]
+authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "DEC-0028", "DEC-0037", "DEC-0038", "DEC-0039", "DEC-0253", "DEC-0254", "RFC-0004", "RFC-0024", "RFC-0025"]
+notes = ["The compiler package version remains the broad CLI version. DEC-0253 accepts the current command model; DEC-0254 adds one non-LSP output policy while preserving command-specific schemas and exit classes."]
 
 [[protocol]]
 id = "PROTO-PROJECT-CHECK"
@@ -171,11 +171,11 @@ reader_policy = "Interpret 0 as success, 1 as compile/check failure or an early 
 writer_policy = "Human versus JSON rendering never changes the exit class; run and scripted REPL preserve the accepted compile/runtime distinction, while the LSP lifecycle preserves shutdown-before-exit status."
 unknown_field_policy = "Not field-based: unassigned exit values have no compatibility meaning."
 migration_tool = "None; changing an assigned meaning requires an accepted decision and explicit compatibility guidance."
-fixtures = ["crates/ling-cli/tests/conformance.rs", "tests/conformance/p7-hello-run/expect.toml", "tests/conformance/p12-text-format-fault/expect.toml"]
-sources = ["Cargo.toml", "crates/ling-cli/src/main.rs"]
+fixtures = ["crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/output_policy.rs", "tests/conformance/p7-hello-run/expect.toml", "tests/conformance/p12-text-format-fault/expect.toml"]
+sources = ["Cargo.toml", "docs/decisions/0254-cli-output-policy.md", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/output_policy.rs"]
 version_markers = ["0.0.1-dev"]
-authority = ["DEC-0013", "DEC-0016", "RFC-0004"]
-notes = ["Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior."]
+authority = ["DEC-0013", "DEC-0016", "DEC-0037", "DEC-0254", "RFC-0004"]
+notes = ["Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior; DEC-0254 requires rendering policy to leave every assigned exit unchanged."]
 
 [[protocol]]
 id = "PROTO-FORMAT-CLI"
@@ -212,14 +212,14 @@ canonical = false
 producer = ["ling CLI", "ling-diagnostics human renderer", "Ling REPL"]
 consumer = ["humans"]
 reader_policy = "Human output is not a machine-readable input protocol; automation must use the versioned JSON or Audit interfaces and process exit code."
-writer_policy = "Public diagnostics remain bilingual and preserve stable codes and meanings, while wording, punctuation, layout, prompts, and optional context may improve."
+writer_policy = "Public diagnostics always retain Chinese and English and preserve stable codes and meanings. DEC-0254 permits bilingual, Chinese-first, or English-first human order and ANSI color only for human diagnostics on stderr; wording, punctuation, layout, prompts, and optional context may improve."
 unknown_field_policy = "Not applicable because human output has no field schema."
 migration_tool = "Not applicable; no byte-for-byte compatibility is promised."
-fixtures = ["crates/ling-diagnostics/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
-sources = ["Cargo.toml", "crates/ling-diagnostics/src/lib.rs", "crates/ling-cli/src/main.rs"]
+fixtures = ["crates/ling-diagnostics/src/lib.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/output_policy.rs", "tests/protocols/cli-output-policy/README.md"]
+sources = ["Cargo.toml", "docs/decisions/0254-cli-output-policy.md", "crates/ling-diagnostics/src/lib.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/output_policy.rs"]
 version_markers = ["0.0.1-dev"]
-authority = ["DEC-0001", "DEC-0002", "DEC-0013", "DEC-0015", "DEC-0016"]
-notes = ["Stable diagnostic code meanings are a compatibility subset; the surrounding human bytes are not Stable or canonical."]
+authority = ["DEC-0001", "DEC-0002", "DEC-0013", "DEC-0015", "DEC-0016", "DEC-0254"]
+notes = ["Stable diagnostic code meanings are a compatibility subset; the surrounding human bytes, message order, and ANSI decoration are Preview, non-canonical human presentation."]
 
 [[protocol]]
 id = "PROTO-DIAGNOSTIC-JSON"

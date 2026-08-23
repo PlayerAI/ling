@@ -3835,3 +3835,16 @@ covers = ["CLI-1701 current single parser and dispatcher", "exact implemented co
 depends_on = ["DEC-0003", "DEC-0028", "DEC-0036", "DEC-0038", "DEC-0039", "RFC-0004", "RFC-0024", "RFC-0025", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0254"
+title = "CLI output policy"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0254-cli-output-policy.md"
+covers = ["CLI-1702 unified non-LSP output policy", "bilingual human language ordering and diagnostic color", "quiet and verbose channel behavior with unchanged exit classes and protocol-pure LSP isolation"]
+depends_on = ["DEC-0003", "DEC-0013", "DEC-0037", "DEC-0253", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

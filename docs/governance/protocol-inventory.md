@@ -14,13 +14,13 @@
 
 | ID | Visibility | Category | Current version | Stability | Public schema | Canonical | Fixtures |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 5 |
-| `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
+| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 7 |
+| `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 4 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
-| `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 2 |
+| `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-CLI-TEST` | Public | JSON | `ling.test/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
@@ -49,14 +49,14 @@
 
 - Producer: ling executable
 - Consumer: humans; shell scripts; editor and build integrations
-- Reader policy: The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; unknown commands/options, mixed file/project selection, unsupported build profiles/targets, and invalid arity are rejected with exit 2.
-- Writer policy: Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines, semantic project commands emit ling.project.command/0.1 results, project graph check retains ling.project.check/0.1, and lsp --stdio retains protocol-only framed output.
+- Reader policy: The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; current non-LSP commands accept the DEC-0254 format/language/color/verbosity policy, while unknown, duplicate, mixed, or incompatible forms are rejected with exit 2.
+- Writer policy: Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines; non-LSP output follows DEC-0254 without changing machine schemas or exit classes; and lsp --stdio rejects output-policy flags and retains protocol-only framed output.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
-- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0028`, `DEC-0038`, `DEC-0039`, `DEC-0253`, `RFC-0004`, `RFC-0024`, `RFC-0025`
-- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0253-current-cli-command-model.md`](../decisions/0253-current-cli-command-model.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs)
-- Fixtures: [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
-- Notes: The compiler package version remains the broad CLI version. DEC-0253 accepts the existing single parser/dispatcher and exact implemented command catalog without adding planned roots; command-specific authorities retain their own input, output, exit, schema, stability, and migration rules.
+- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0028`, `DEC-0037`, `DEC-0038`, `DEC-0039`, `DEC-0253`, `DEC-0254`, `RFC-0004`, `RFC-0024`, `RFC-0025`
+- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0253-current-cli-command-model.md`](../decisions/0253-current-cli-command-model.md), [`docs/decisions/0254-cli-output-policy.md`](../decisions/0254-cli-output-policy.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/output_policy.rs`](../../crates/ling-cli/src/output_policy.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs)
+- Fixtures: [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/output_policy.rs`](../../crates/ling-cli/tests/output_policy.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/cli-output-policy/README.md`](../../tests/protocols/cli-output-policy/README.md), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
+- Notes: The compiler package version remains the broad CLI version. DEC-0253 accepts the current command model; DEC-0254 adds one non-LSP output policy while preserving command-specific schemas and exit classes.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 
@@ -66,10 +66,10 @@
 - Writer policy: Human versus JSON rendering never changes the exit class; run and scripted REPL preserve the accepted compile/runtime distinction, while the LSP lifecycle preserves shutdown-before-exit status.
 - Unknown-field policy: Not field-based: unassigned exit values have no compatibility meaning.
 - Migration tool: None; changing an assigned meaning requires an accepted decision and explicit compatibility guidance.
-- Authority: `DEC-0013`, `DEC-0016`, `RFC-0004`
-- Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
-- Fixtures: [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`tests/conformance/p7-hello-run/expect.toml`](../../tests/conformance/p7-hello-run/expect.toml), [`tests/conformance/p12-text-format-fault/expect.toml`](../../tests/conformance/p12-text-format-fault/expect.toml)
-- Notes: Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior.
+- Authority: `DEC-0013`, `DEC-0016`, `DEC-0037`, `DEC-0254`, `RFC-0004`
+- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0254-cli-output-policy.md`](../decisions/0254-cli-output-policy.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/output_policy.rs`](../../crates/ling-cli/src/output_policy.rs)
+- Fixtures: [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/output_policy.rs`](../../crates/ling-cli/tests/output_policy.rs), [`tests/conformance/p7-hello-run/expect.toml`](../../tests/conformance/p7-hello-run/expect.toml), [`tests/conformance/p12-text-format-fault/expect.toml`](../../tests/conformance/p12-text-format-fault/expect.toml)
+- Notes: Exit 3 remains reserved for a future accepted Result-returning main and is not current behavior; DEC-0254 requires rendering policy to leave every assigned exit unchanged.
 
 ### `PROTO-PROJECT-CHECK` — Ling project graph check
 
@@ -128,13 +128,13 @@
 - Producer: ling CLI; ling-diagnostics human renderer; Ling REPL
 - Consumer: humans
 - Reader policy: Human output is not a machine-readable input protocol; automation must use the versioned JSON or Audit interfaces and process exit code.
-- Writer policy: Public diagnostics remain bilingual and preserve stable codes and meanings, while wording, punctuation, layout, prompts, and optional context may improve.
+- Writer policy: Public diagnostics always retain Chinese and English and preserve stable codes and meanings. DEC-0254 permits bilingual, Chinese-first, or English-first human order and ANSI color only for human diagnostics on stderr; wording, punctuation, layout, prompts, and optional context may improve.
 - Unknown-field policy: Not applicable because human output has no field schema.
 - Migration tool: Not applicable; no byte-for-byte compatibility is promised.
-- Authority: `DEC-0001`, `DEC-0002`, `DEC-0013`, `DEC-0015`, `DEC-0016`
-- Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
-- Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
-- Notes: Stable diagnostic code meanings are a compatibility subset; the surrounding human bytes are not Stable or canonical.
+- Authority: `DEC-0001`, `DEC-0002`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0254`
+- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0254-cli-output-policy.md`](../decisions/0254-cli-output-policy.md), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/output_policy.rs`](../../crates/ling-cli/src/output_policy.rs)
+- Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/output_policy.rs`](../../crates/ling-cli/tests/output_policy.rs), [`tests/protocols/cli-output-policy/README.md`](../../tests/protocols/cli-output-policy/README.md)
+- Notes: Stable diagnostic code meanings are a compatibility subset; the surrounding human bytes, message order, and ANSI decoration are Preview, non-canonical human presentation.
 
 ### `PROTO-CLI-INIT` — Ling project initialization report
 

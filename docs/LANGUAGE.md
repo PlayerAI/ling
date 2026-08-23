@@ -1339,9 +1339,20 @@ Semantic Transaction.
 ```bash
 --format human
 --format json
+--language bilingual|zh-CN|en
+--color auto|always|never
+--quiet
+--verbose
 ```
 
 结构化输出不是附加功能，而是稳定工具协议。
+
+Accepted DEC-0254 narrows this rule to every currently implemented non-LSP
+command. Human diagnostics always retain Chinese and English; language selects
+their order. Color applies only to human diagnostics on stderr. Quiet suppresses
+only auxiliary successful summaries, while verbose emits one deterministic
+path-free policy event. JSON remains ANSI-free and schema-compatible. The
+protocol-only `ling lsp --stdio` launcher rejects all output-policy flags.
 
 ---
 

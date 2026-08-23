@@ -8,6 +8,7 @@ use std::process::ExitCode;
 mod command_catalog;
 mod exit_catalog;
 mod init;
+mod output_policy;
 mod test_runner;
 
 use command_catalog::Command;
@@ -19,7 +20,7 @@ use ling_cli::incident::{InternalIncident, Reproduction};
 use ling_cli::project::{self, BUILD_PROFILE, BUILD_TARGET, CheckedProject, ProjectFailure};
 use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
 use ling_cli::{CompileFailure, compile_path};
-use ling_diagnostics::{Diagnostic, MessageLanguage};
+use ling_diagnostics::Diagnostic;
 use ling_effects::locate_main;
 use ling_eval::{Console, HostError, HostErrorCategory, MemoryConsole};
 use ling_format::{FormatDisposition, build_format_ir, format_core_with_disposition};
@@ -28,6 +29,7 @@ use ling_project::{
     resolve_package_graph_with_lock,
 };
 use ling_unicode::UNICODE_VERSION;
+use output_policy::{ColorChoice, HumanLanguage, OutputFormat, OutputPolicy, Verbosity};
 
 const CLI_NAME: &str = "ling";
 fn main() -> ExitCode {
@@ -77,9 +79,12 @@ fn run(arguments: Vec<OsString>) -> u8 {
 }
 
 fn execute(options: Options) -> u8 {
+    if options.policy.is_verbose() {
+        eprintln!("{}", options.policy.verbose_event(options.command.name()));
+    }
     if options.command == Command::Init {
         return execute_init(
-            options.format,
+            options.policy,
             options.path.expect("init requires a destination"),
             options.init_name,
             options.init_display_name,
@@ -95,13 +100,13 @@ fn execute(options: Options) -> u8 {
     }
     if options.command == Command::Test {
         return execute_test(
-            options.format,
+            options.policy,
             options.path.expect("test requires an input path"),
         );
     }
     if options.command == Command::ProjectCheck {
         return execute_project_check(
-            options.format,
+            options.policy,
             options
                 .manifest_path
                 .expect("project check requires a manifest path"),
@@ -114,12 +119,12 @@ fn execute(options: Options) -> u8 {
     }
 
     if options.command == Command::Repl {
-        return execute_repl(options.format, options.capabilities);
+        return execute_repl(options.policy, options.capabilities);
     }
 
     if options.command == Command::Format {
         return execute_format(
-            options.format,
+            options.policy,
             options.check,
             options.path.expect("format requires an input"),
             options.stdin_name,
@@ -135,25 +140,25 @@ fn execute(options: Options) -> u8 {
     let compiled = match compile_path(path) {
         Ok(compiled) => compiled,
         Err(CompileFailure::Diagnostics(diagnostics)) => {
-            return emit_compile_errors(&diagnostics, options.format);
+            return emit_compile_errors(&diagnostics, options.policy);
         }
         Err(CompileFailure::Internal(message)) => {
             return emit_internal_incident(
                 "compile.pipeline",
                 message,
                 reproduction,
-                options.format,
+                options.policy,
             );
         }
         Err(CompileFailure::SnapshotMismatch(message)) => {
-            return emit_snapshot_mismatch(&message, options.format);
+            return emit_snapshot_mismatch(&message, options.policy);
         }
     };
 
     if !compiled.snapshot.checked().warnings().is_empty() {
         let status = emit_diagnostics(
             compiled.snapshot.checked().warnings(),
-            options.format,
+            options.policy,
             EXIT_SUCCESS,
         );
         if status != EXIT_SUCCESS {
@@ -170,7 +175,7 @@ fn execute(options: Options) -> u8 {
                 .and_then(|()| stdout.write_all(b"\n"))
             {
                 Ok(()) => EXIT_SUCCESS,
-                Err(error) => emit_host_io_failure("semantic.stdout", &error, options.format),
+                Err(error) => emit_host_io_failure("semantic.stdout", &error, options.policy),
             }
         }
         Command::Audit => {
@@ -182,28 +187,28 @@ fn execute(options: Options) -> u8 {
                         "audit.render",
                         error.to_string(),
                         reproduction,
-                        options.format,
+                        options.policy,
                     );
                 }
             };
             let mut stdout = std::io::stdout().lock();
             match stdout.write_all(rendered.as_bytes()) {
                 Ok(()) => EXIT_SUCCESS,
-                Err(error) => emit_host_io_failure("audit.stdout", &error, options.format),
+                Err(error) => emit_host_io_failure("audit.stdout", &error, options.policy),
             }
         }
         Command::Run => {
             let main = match locate_main(compiled.snapshot.checked()) {
                 Ok(main) => main,
                 Err(error) => {
-                    return emit_compile_error(error.to_diagnostic(), options.format);
+                    return emit_compile_error(error.to_diagnostic(), options.policy);
                 }
             };
             let mut console = StdoutConsole;
             match ling_eval::execute_main(&compiled.snapshot, &main, &mut console) {
                 Ok(()) => EXIT_SUCCESS,
                 Err(fault) => {
-                    emit_diagnostics(&[fault.to_diagnostic()], options.format, EXIT_RUNTIME_FAULT)
+                    emit_diagnostics(&[fault.to_diagnostic()], options.policy, EXIT_RUNTIME_FAULT)
                 }
             }
         }
@@ -225,12 +230,12 @@ fn execute_project_command(options: Options) -> u8 {
         .expect("project commands require a manifest path");
     let project = match project::compile(manifest_path) {
         Ok(project) => project,
-        Err(failure) => return emit_project_command_failure(operation, failure, options.format),
+        Err(failure) => return emit_project_command_failure(operation, failure, options.policy),
     };
     if !project.snapshot().checked().warnings().is_empty() {
         let status = emit_diagnostics(
             project.snapshot().checked().warnings(),
-            options.format,
+            options.policy,
             EXIT_SUCCESS,
         );
         if status != EXIT_SUCCESS {
@@ -239,19 +244,19 @@ fn execute_project_command(options: Options) -> u8 {
     }
 
     match options.command {
-        Command::Check => emit_project_check_success(&project, options.format),
-        Command::Run => execute_project_run(&project, options.format),
-        Command::Test => execute_project_test(&project, options.format),
+        Command::Check => emit_project_check_success(&project, options.policy),
+        Command::Run => execute_project_run(&project, options.policy),
+        Command::Test => execute_project_test(&project, options.policy),
         Command::Build => execute_project_build(
             &project,
             options.output.expect("project build requires output"),
-            options.format,
+            options.policy,
         ),
         _ => unreachable!("only semantic project commands reach this function"),
     }
 }
 
-fn execute_project_run(project: &CheckedProject, format: OutputFormat) -> u8 {
+fn execute_project_run(project: &CheckedProject, policy: OutputPolicy) -> u8 {
     let main = match locate_main(project.snapshot().checked()) {
         Ok(main) => main,
         Err(error) => {
@@ -259,36 +264,36 @@ fn execute_project_run(project: &CheckedProject, format: OutputFormat) -> u8 {
                 "run",
                 &[error.to_diagnostic()],
                 None,
-                format,
+                policy,
                 EXIT_COMPILE_ERROR,
             );
         }
     };
     let mut console = MemoryConsole::default();
     match ling_eval::execute_project_main(project.snapshot(), &main, &mut console) {
-        Ok(()) => match format {
+        Ok(()) => match policy.format() {
             OutputFormat::Human => match write_stdout(console.output().as_bytes()) {
                 Ok(()) => EXIT_SUCCESS,
-                Err(error) => emit_host_io_failure("project.run.stdout", &error, format),
+                Err(error) => emit_host_io_failure("project.run.stdout", &error, policy),
             },
             OutputFormat::Json => emit_project_command_success(
                 project,
                 "run",
                 serde_json::json!({"stdout": console.output()}),
-                format,
+                policy,
             ),
         },
         Err(fault) => emit_project_command_diagnostics(
             "run",
             &[fault.to_diagnostic()],
             Some(console.output()),
-            format,
+            policy,
             EXIT_RUNTIME_FAULT,
         ),
     }
 }
 
-fn execute_project_test(project: &CheckedProject, format: OutputFormat) -> u8 {
+fn execute_project_test(project: &CheckedProject, policy: OutputPolicy) -> u8 {
     let name = format!(
         "{}::{}",
         project.manifest().package().name(),
@@ -301,18 +306,22 @@ fn execute_project_test(project: &CheckedProject, format: OutputFormat) -> u8 {
                 "test",
                 &[error.to_diagnostic()],
                 None,
-                format,
+                policy,
                 EXIT_COMPILE_ERROR,
             );
         }
     };
     let mut console = MemoryConsole::default();
     match ling_eval::execute_project_main(project.snapshot(), &main, &mut console) {
-        Ok(()) => match format {
+        Ok(()) => match policy.format() {
             OutputFormat::Human => {
-                println!(
-                    "工程测试通过 / project test passed: name={name} total=1 passed=1 failed=0"
-                );
+                if !policy.is_quiet() {
+                    let facts = format!("name={name} total=1 passed=1 failed=0");
+                    println!(
+                        "{}",
+                        policy.human_summary("工程测试通过", "project test passed", &facts)
+                    );
+                }
                 EXIT_SUCCESS
             }
             OutputFormat::Json => emit_project_command_success(
@@ -322,34 +331,40 @@ fn execute_project_test(project: &CheckedProject, format: OutputFormat) -> u8 {
                     "tests": [{"name": name, "status": "passed", "stdout": console.output()}],
                     "counts": {"total": 1, "passed": 1, "failed": 0},
                 }),
-                format,
+                policy,
             ),
         },
         Err(fault) => emit_project_command_diagnostics(
             "test",
             &[fault.to_diagnostic()],
             Some(console.output()),
-            format,
+            policy,
             EXIT_RUNTIME_FAULT,
         ),
     }
 }
 
-fn execute_project_build(checked: &CheckedProject, output: PathBuf, format: OutputFormat) -> u8 {
+fn execute_project_build(checked: &CheckedProject, output: PathBuf, policy: OutputPolicy) -> u8 {
     let artifact = match project::build(checked, output) {
         Ok(artifact) => artifact,
-        Err(failure) => return emit_project_command_failure("build", failure, format),
+        Err(failure) => return emit_project_command_failure("build", failure, policy),
     };
-    match format {
+    match policy.format() {
         OutputFormat::Human => {
-            println!(
-                "工程构建完成 / project build completed: artifact={} identity={} bytes={} profile={} target={}",
-                project::ARTIFACT_PROTOCOL,
-                artifact.identity(),
-                artifact.bytes().len(),
-                BUILD_PROFILE,
-                BUILD_TARGET,
-            );
+            if !policy.is_quiet() {
+                let facts = format!(
+                    "artifact={} identity={} bytes={} profile={} target={}",
+                    project::ARTIFACT_PROTOCOL,
+                    artifact.identity(),
+                    artifact.bytes().len(),
+                    BUILD_PROFILE,
+                    BUILD_TARGET,
+                );
+                println!(
+                    "{}",
+                    policy.human_summary("工程构建完成", "project build completed", &facts)
+                );
+            }
             EXIT_SUCCESS
         }
         OutputFormat::Json => emit_project_command_success(
@@ -364,28 +379,38 @@ fn execute_project_build(checked: &CheckedProject, output: PathBuf, format: Outp
                     "target": BUILD_TARGET,
                 }
             }),
-            format,
+            policy,
         ),
     }
 }
 
-fn emit_project_check_success(project: &CheckedProject, format: OutputFormat) -> u8 {
-    match format {
+fn emit_project_check_success(project: &CheckedProject, policy: OutputPolicy) -> u8 {
+    match policy.format() {
         OutputFormat::Human => {
-            println!(
-                "工程语义检查通过 / project semantic check passed: package={} version={} entry={} packages={} modules={} graph={} program={}",
-                project.manifest().package().name(),
-                project.manifest().package().version(),
-                project.manifest().source().entry(),
-                project.locked().graph().packages().len(),
-                project.snapshot().graph().modules.len(),
-                project.locked().graph().id(),
-                project.snapshot().program_id(),
-            );
+            if !policy.is_quiet() {
+                let facts = format!(
+                    "package={} version={} entry={} packages={} modules={} graph={} program={}",
+                    project.manifest().package().name(),
+                    project.manifest().package().version(),
+                    project.manifest().source().entry(),
+                    project.locked().graph().packages().len(),
+                    project.snapshot().graph().modules.len(),
+                    project.locked().graph().id(),
+                    project.snapshot().program_id(),
+                );
+                println!(
+                    "{}",
+                    policy.human_summary(
+                        "工程语义检查通过",
+                        "project semantic check passed",
+                        &facts
+                    )
+                );
+            }
             EXIT_SUCCESS
         }
         OutputFormat::Json => {
-            emit_project_command_success(project, "check", serde_json::json!({}), format)
+            emit_project_command_success(project, "check", serde_json::json!({}), policy)
         }
     }
 }
@@ -394,9 +419,9 @@ fn emit_project_command_success(
     project: &CheckedProject,
     operation: &str,
     extra: serde_json::Value,
-    format: OutputFormat,
+    policy: OutputPolicy,
 ) -> u8 {
-    debug_assert_eq!(format, OutputFormat::Json);
+    debug_assert_eq!(policy.format(), OutputFormat::Json);
     let mut report = serde_json::json!({
         "protocol": project::COMMAND_PROTOCOL,
         "operation": operation,
@@ -417,14 +442,14 @@ fn emit_project_command_success(
             rendered.push(b'\n');
             match write_stdout(&rendered) {
                 Ok(()) => EXIT_SUCCESS,
-                Err(error) => emit_host_io_failure("project.success.stdout", &error, format),
+                Err(error) => emit_host_io_failure("project.success.stdout", &error, policy),
             }
         }
         Err(error) => emit_internal_incident(
             "project.success-json",
             error.to_string(),
             Reproduction::new(format!("ling {operation} --manifest-path ling.toml")),
-            format,
+            policy,
         ),
     }
 }
@@ -432,21 +457,21 @@ fn emit_project_command_success(
 fn emit_project_command_failure(
     operation: &str,
     failure: ProjectFailure,
-    format: OutputFormat,
+    policy: OutputPolicy,
 ) -> u8 {
     match failure {
         ProjectFailure::Diagnostics(diagnostics) => emit_project_command_diagnostics(
             operation,
             &diagnostics,
             None,
-            format,
+            policy,
             EXIT_COMPILE_ERROR,
         ),
         ProjectFailure::SnapshotMismatch(message) => emit_project_command_diagnostics(
             operation,
             &[snapshot_mismatch_diagnostic(&message)],
             None,
-            format,
+            policy,
             EXIT_SNAPSHOT_MISMATCH,
         ),
         ProjectFailure::ArtifactIo {
@@ -465,7 +490,7 @@ fn emit_project_command_failure(
                 operation,
                 &[diagnostic],
                 None,
-                format,
+                policy,
                 EXIT_RUNTIME_FAULT,
             )
         }
@@ -479,7 +504,7 @@ fn emit_project_command_failure(
                 operation,
                 &[incident.diagnostic()],
                 None,
-                format,
+                policy,
                 EXIT_INTERNAL_ERROR,
             )
         }
@@ -490,11 +515,11 @@ fn emit_project_command_diagnostics(
     operation: &str,
     diagnostics: &[Diagnostic],
     stdout: Option<&str>,
-    format: OutputFormat,
+    policy: OutputPolicy,
     exit_code: u8,
 ) -> u8 {
-    match format {
-        OutputFormat::Human => emit_diagnostics(diagnostics, format, exit_code),
+    match policy.format() {
+        OutputFormat::Human => emit_diagnostics(diagnostics, policy, exit_code),
         OutputFormat::Json => {
             let values = match diagnostic_values(diagnostics) {
                 Ok(values) => values,
@@ -517,7 +542,7 @@ fn emit_project_command_diagnostics(
                         Err(error) => emit_host_io_failure(
                             "project.failure.stderr",
                             &error,
-                            OutputFormat::Human,
+                            OutputPolicy::human(),
                         ),
                     }
                 }
@@ -525,14 +550,14 @@ fn emit_project_command_diagnostics(
                     "project.failure-json",
                     error.to_string(),
                     Reproduction::new(format!("ling {operation} --manifest-path ling.toml")),
-                    format,
+                    policy,
                 ),
             }
         }
     }
 }
 
-fn execute_test(format: OutputFormat, root: PathBuf) -> u8 {
+fn execute_test(policy: OutputPolicy, root: PathBuf) -> u8 {
     let summary = match test_runner::run(root) {
         Ok(summary) => summary,
         Err(test_runner::Failure::Usage(message)) => return invalid_usage(&message),
@@ -543,7 +568,7 @@ fn execute_test(format: OutputFormat, root: PathBuf) -> u8 {
                 .expect("test discovery failures always have a diagnostic");
             return emit_diagnostics(
                 &[diagnostic],
-                format,
+                policy,
                 if matches!(failure, test_runner::Failure::NoCases { .. }) {
                     EXIT_COMPILE_ERROR
                 } else {
@@ -556,31 +581,38 @@ fn execute_test(format: OutputFormat, root: PathBuf) -> u8 {
                 "test.runner",
                 message,
                 Reproduction::new("ling test"),
-                format,
+                policy,
             );
         }
         Err(test_runner::Failure::Snapshot(message)) => {
-            return emit_snapshot_mismatch(&message, format);
+            return emit_snapshot_mismatch(&message, policy);
         }
     };
 
     let exit_code = summary.exit_code();
     let diagnostics = summary.diagnostics();
     if !diagnostics.is_empty() {
-        let rendered_status = emit_diagnostics(&diagnostics, format, exit_code);
+        let rendered_status = emit_diagnostics(&diagnostics, policy, exit_code);
         if rendered_status != exit_code {
             return rendered_status;
         }
     }
 
-    match format {
+    match policy.format() {
         OutputFormat::Human => {
-            println!(
-                "测试完成 / tests completed: root={} total={} passed={} failed={}",
+            if policy.is_quiet() && exit_code == EXIT_SUCCESS {
+                return exit_code;
+            }
+            let facts = format!(
+                "root={} total={} passed={} failed={}",
                 summary.root(),
                 summary.total(),
                 summary.passed(),
                 summary.failed()
+            );
+            println!(
+                "{}",
+                policy.human_summary("测试完成", "tests completed", &facts)
             );
             exit_code
         }
@@ -610,13 +642,13 @@ fn execute_test(format: OutputFormat, root: PathBuf) -> u8 {
             match serde_json::to_string(&report) {
                 Ok(rendered) => match write_stdout(format!("{rendered}\n").as_bytes()) {
                     Ok(()) => exit_code,
-                    Err(error) => emit_host_io_failure("test.stdout", &error, format),
+                    Err(error) => emit_host_io_failure("test.stdout", &error, policy),
                 },
                 Err(error) => emit_internal_incident(
                     "test.success-json",
                     error.to_string(),
                     Reproduction::new("ling test --format json"),
-                    format,
+                    policy,
                 ),
             }
         }
@@ -624,19 +656,26 @@ fn execute_test(format: OutputFormat, root: PathBuf) -> u8 {
 }
 
 fn execute_init(
-    format: OutputFormat,
+    policy: OutputPolicy,
     destination: PathBuf,
     package_name: Option<String>,
     display_name: Option<String>,
 ) -> u8 {
     match init::create(destination, package_name, display_name) {
-        Ok(summary) => match format {
+        Ok(summary) => match policy.format() {
             OutputFormat::Human => {
-                println!(
-                    "已创建 Ling 工程 / created Ling project: directory={} package={} files={}",
+                if policy.is_quiet() {
+                    return EXIT_SUCCESS;
+                }
+                let facts = format!(
+                    "directory={} package={} files={}",
                     summary.directory,
                     summary.package_name,
                     summary.files.join(",")
+                );
+                println!(
+                    "{}",
+                    policy.human_summary("已创建 Ling 工程", "created Ling project", &facts)
                 );
                 EXIT_SUCCESS
             }
@@ -652,31 +691,31 @@ fn execute_init(
                 match serde_json::to_string(&report) {
                     Ok(rendered) => match write_stdout(format!("{rendered}\n").as_bytes()) {
                         Ok(()) => EXIT_SUCCESS,
-                        Err(error) => emit_host_io_failure("init.stdout", &error, format),
+                        Err(error) => emit_host_io_failure("init.stdout", &error, policy),
                     },
                     Err(error) => emit_internal_incident(
                         "init.success-json",
                         error.to_string(),
                         Reproduction::new("ling init --format json"),
-                        format,
+                        policy,
                     ),
                 }
             }
         },
         Err(init::Failure::Usage(message)) => invalid_usage(&message),
         Err(init::Failure::Diagnostics(diagnostics)) => {
-            emit_diagnostics(&diagnostics, format, EXIT_COMPILE_ERROR)
+            emit_diagnostics(&diagnostics, policy, EXIT_COMPILE_ERROR)
         }
         Err(init::Failure::Internal(message)) => emit_internal_incident(
             "init.template",
             message,
             Reproduction::new("ling init"),
-            format,
+            policy,
         ),
         Err(failure @ init::Failure::Io { .. }) => {
             let diagnostic = init::diagnostic_for_failure(&failure)
                 .expect("I/O init failures always have a diagnostic");
-            emit_diagnostics(&[diagnostic], format, EXIT_RUNTIME_FAULT)
+            emit_diagnostics(&[diagnostic], policy, EXIT_RUNTIME_FAULT)
         }
     }
 }
@@ -691,7 +730,7 @@ fn execute_lsp() -> u8 {
     }
 }
 
-fn execute_project_check(format: OutputFormat, manifest_path: PathBuf) -> u8 {
+fn execute_project_check(policy: OutputPolicy, manifest_path: PathBuf) -> u8 {
     let project_root = manifest_path
         .parent()
         .filter(|path| !path.as_os_str().is_empty())
@@ -703,61 +742,61 @@ fn execute_project_check(format: OutputFormat, manifest_path: PathBuf) -> u8 {
                 "project.manifest-read",
                 error.to_string(),
                 Reproduction::new("ling project check"),
-                format,
+                policy,
             );
         }
     };
     let manifest = match parse_manifest("ling.toml", &bytes) {
         Ok(manifest) => manifest,
-        Err(error) => return emit_project_manifest_failure(format, error),
+        Err(error) => return emit_project_manifest_failure(policy, error),
     };
 
     if let Err(error) = discover_modules(project_root, &manifest) {
-        return emit_project_discovery_failure(format, error);
+        return emit_project_discovery_failure(policy, error);
     }
     let graph = match resolve_package_graph_with_lock(project_root, &manifest, LockMode::Locked) {
         Ok(graph) => graph,
-        Err(error) => return emit_project_locked_failure(format, error),
+        Err(error) => return emit_project_locked_failure(policy, error),
     };
-    emit_project_success(format, &graph)
+    emit_project_success(policy, &graph)
 }
 
-fn emit_project_manifest_failure(format: OutputFormat, error: ManifestError) -> u8 {
-    emit_project_diagnostics(format, &[error.diagnostic()])
+fn emit_project_manifest_failure(policy: OutputPolicy, error: ManifestError) -> u8 {
+    emit_project_diagnostics(policy, &[error.diagnostic()])
 }
 
 fn emit_project_discovery_failure(
-    format: OutputFormat,
+    policy: OutputPolicy,
     error: ling_project::DiscoveryFailure,
 ) -> u8 {
     match error {
         ling_project::DiscoveryFailure::Diagnostics(diagnostics) => {
-            emit_project_diagnostics(format, &diagnostics)
+            emit_project_diagnostics(policy, &diagnostics)
         }
         ling_project::DiscoveryFailure::Internal(message) => emit_internal_incident(
             "project.module-discovery",
             message,
             Reproduction::new("ling project check"),
-            format,
+            policy,
         ),
     }
 }
 
-fn emit_project_locked_failure(format: OutputFormat, error: LockedGraphFailure) -> u8 {
+fn emit_project_locked_failure(policy: OutputPolicy, error: LockedGraphFailure) -> u8 {
     match error.diagnostics() {
-        Some(diagnostics) => emit_project_diagnostics(format, diagnostics),
+        Some(diagnostics) => emit_project_diagnostics(policy, diagnostics),
         None => emit_internal_incident(
             "project.locked-resolution",
             error.to_string(),
             Reproduction::new("ling project check"),
-            format,
+            policy,
         ),
     }
 }
 
-fn emit_project_diagnostics(format: OutputFormat, diagnostics: &[Diagnostic]) -> u8 {
-    match format {
-        OutputFormat::Human => emit_diagnostics(diagnostics, format, EXIT_COMPILE_ERROR),
+fn emit_project_diagnostics(policy: OutputPolicy, diagnostics: &[Diagnostic]) -> u8 {
+    match policy.format() {
+        OutputFormat::Human => emit_diagnostics(diagnostics, policy, EXIT_COMPILE_ERROR),
         OutputFormat::Json => {
             let values = match diagnostic_values(diagnostics) {
                 Ok(values) => values,
@@ -777,20 +816,20 @@ fn emit_project_diagnostics(format: OutputFormat, diagnostics: &[Diagnostic]) ->
                     "project.error-json",
                     error.to_string(),
                     Reproduction::new("ling project check --format json"),
-                    format,
+                    policy,
                 ),
             }
         }
     }
 }
 
-fn emit_project_success(format: OutputFormat, graph: &PackageGraph) -> u8 {
+fn emit_project_success(policy: OutputPolicy, graph: &PackageGraph) -> u8 {
     let Some(root_package) = graph.package(graph.root()) else {
         return emit_internal_incident(
             "project.root-package",
             "locked graph omitted its root package",
             Reproduction::new("ling project check"),
-            format,
+            policy,
         );
     };
     let module_count = graph
@@ -802,11 +841,17 @@ fn emit_project_success(format: OutputFormat, graph: &PackageGraph) -> u8 {
     let version = root_package.identity().version().to_string();
     let package = root_package.identity().name().as_str();
     let entry = root_package.entry().as_str();
-    match format {
+    match policy.format() {
         OutputFormat::Human => {
-            println!(
-                "项目检查通过 / project check passed: package={package}@{version} entry={entry} modules={module_count} packages={package_count}"
-            );
+            if !policy.is_quiet() {
+                let facts = format!(
+                    "package={package}@{version} entry={entry} modules={module_count} packages={package_count}"
+                );
+                println!(
+                    "{}",
+                    policy.human_summary("项目检查通过", "project check passed", &facts)
+                );
+            }
             EXIT_SUCCESS
         }
         OutputFormat::Json => {
@@ -822,13 +867,13 @@ fn emit_project_success(format: OutputFormat, graph: &PackageGraph) -> u8 {
             match serde_json::to_string(&report) {
                 Ok(rendered) => match write_stdout(format!("{rendered}\n").as_bytes()) {
                     Ok(()) => EXIT_SUCCESS,
-                    Err(error) => emit_host_io_failure("project.stdout", &error, format),
+                    Err(error) => emit_host_io_failure("project.stdout", &error, policy),
                 },
                 Err(error) => emit_internal_incident(
                     "project.success-json",
                     error.to_string(),
                     Reproduction::new("ling project check --format json"),
-                    format,
+                    policy,
                 ),
             }
         }
@@ -836,7 +881,7 @@ fn emit_project_success(format: OutputFormat, graph: &PackageGraph) -> u8 {
 }
 
 fn execute_format(
-    format: OutputFormat,
+    policy: OutputPolicy,
     check: bool,
     path: PathBuf,
     stdin_name: Option<String>,
@@ -844,7 +889,7 @@ fn execute_format(
     let (source_name, bytes) = match read_format_input(&path, stdin_name.as_deref()) {
         Ok(input) => input,
         Err((source_name, diagnostics)) => {
-            return emit_format_failure(format, source_name, check, diagnostics);
+            return emit_format_failure(policy, source_name, check, diagnostics);
         }
     };
 
@@ -856,7 +901,7 @@ fn execute_format(
         Ok(source) => source,
         Err(error) => {
             return emit_format_failure(
-                format,
+                policy,
                 source_name.clone(),
                 check,
                 vec![format_source_error_diagnostic(&source_name, error)],
@@ -876,7 +921,7 @@ fn execute_format(
             .map(|error| error.to_diagnostic(source.name())),
     );
     if !diagnostics.is_empty() {
-        return emit_format_failure(format, source_name, check, diagnostics);
+        return emit_format_failure(policy, source_name, check, diagnostics);
     }
 
     let document = match build_format_ir(&source, &parsed) {
@@ -886,7 +931,7 @@ fn execute_format(
                 "format.ir",
                 error.to_string(),
                 Reproduction::new("ling fmt").with_input(source_name),
-                format,
+                policy,
             );
         }
     };
@@ -896,7 +941,7 @@ fn execute_format(
         FormatDisposition::OriginalInvalidSource | FormatDisposition::OriginalRejectedCandidate
     ) {
         return emit_format_failure(
-            format,
+            policy,
             source_name,
             check,
             vec![format_rejected_diagnostic()],
@@ -905,7 +950,7 @@ fn execute_format(
 
     let changed = result.text() != source.original_text();
     let disposition = if changed { "formatted" } else { "unchanged" };
-    if format == OutputFormat::Json {
+    if policy.format() == OutputFormat::Json {
         return emit_format_report(
             source_name,
             check,
@@ -917,7 +962,13 @@ fn execute_format(
     }
     if check {
         if changed {
-            eprintln!("需要格式化：{source_name}\nwould reformat: {source_name}");
+            eprintln!(
+                "{}",
+                policy.human_text(
+                    &format!("需要格式化：{source_name}"),
+                    &format!("would reformat: {source_name}")
+                )
+            );
             EXIT_COMPILE_ERROR
         } else {
             EXIT_SUCCESS
@@ -925,7 +976,7 @@ fn execute_format(
     } else {
         match write_stdout(result.text().as_bytes()) {
             Ok(()) => EXIT_SUCCESS,
-            Err(error) => emit_host_io_failure("format.stdout", &error, format),
+            Err(error) => emit_host_io_failure("format.stdout", &error, policy),
         }
     }
 }
@@ -994,18 +1045,18 @@ fn read_format_input(
 }
 
 fn emit_format_failure(
-    format: OutputFormat,
+    policy: OutputPolicy,
     source_name: String,
     check: bool,
     diagnostics: Vec<Diagnostic>,
 ) -> u8 {
-    if format == OutputFormat::Json {
+    if policy.format() == OutputFormat::Json {
         return match diagnostic_values(&diagnostics) {
             Ok(values) => emit_format_report(source_name, check, false, "invalid", None, values),
             Err(status) => status,
         };
     }
-    emit_compile_errors(&diagnostics, OutputFormat::Human)
+    emit_compile_errors(&diagnostics, policy)
 }
 
 fn emit_format_report(
@@ -1040,7 +1091,7 @@ fn emit_format_report(
                 "format.report",
                 error.to_string(),
                 Reproduction::new("ling fmt --format json"),
-                OutputFormat::Json,
+                OutputPolicy::json(),
             );
         }
     };
@@ -1053,7 +1104,7 @@ fn emit_format_report(
                 EXIT_SUCCESS
             }
         }
-        Err(error) => emit_host_io_failure("format.stdout", &error, OutputFormat::Json),
+        Err(error) => emit_host_io_failure("format.stdout", &error, OutputPolicy::json()),
     }
 }
 
@@ -1121,7 +1172,7 @@ fn format_source_error_diagnostic(path: &str, error: ling_source::SourceError) -
     }
 }
 
-fn execute_repl(format: OutputFormat, capabilities: Vec<String>) -> u8 {
+fn execute_repl(policy: OutputPolicy, capabilities: Vec<String>) -> u8 {
     let stdin = std::io::stdin();
     let interactive = stdin.is_terminal() && std::io::stdout().is_terminal();
     let mut session = Session::new(capabilities);
@@ -1133,7 +1184,7 @@ fn execute_repl(format: OutputFormat, capabilities: Vec<String>) -> u8 {
         execute_interactive_repl(
             &mut session,
             &mut buffer,
-            format,
+            policy,
             &mut had_compile_failure,
             &mut had_runtime_failure,
         )
@@ -1142,7 +1193,7 @@ fn execute_repl(format: OutputFormat, capabilities: Vec<String>) -> u8 {
             &mut stdin.lock(),
             &mut session,
             &mut buffer,
-            format,
+            policy,
             &mut had_compile_failure,
             &mut had_runtime_failure,
         )
@@ -1163,14 +1214,14 @@ fn execute_repl(format: OutputFormat, capabilities: Vec<String>) -> u8 {
 fn execute_interactive_repl(
     session: &mut Session,
     buffer: &mut String,
-    format: OutputFormat,
+    policy: OutputPolicy,
     had_compile_failure: &mut bool,
     had_runtime_failure: &mut bool,
 ) -> Result<(), u8> {
     let mut editor = rustyline::DefaultEditor::new()
-        .map_err(|_| emit_host_failure("repl.terminal-init", "other", format))?;
+        .map_err(|_| emit_host_failure("repl.terminal-init", "other", policy))?;
     loop {
-        let prompt = if format == OutputFormat::Json {
+        let prompt = if policy.format() == OutputFormat::Json {
             ""
         } else if buffer.is_empty() {
             "ling> "
@@ -1182,7 +1233,7 @@ fn execute_interactive_repl(
                 session,
                 buffer,
                 &line,
-                format,
+                policy,
                 had_compile_failure,
                 had_runtime_failure,
             )?,
@@ -1193,15 +1244,15 @@ fn execute_interactive_repl(
                 return process_pending_submission(
                     session,
                     buffer,
-                    format,
+                    policy,
                     had_compile_failure,
                     had_runtime_failure,
                 );
             }
             Err(rustyline::error::ReadlineError::Io(error)) => {
-                return Err(emit_host_io_failure("repl.terminal-input", &error, format));
+                return Err(emit_host_io_failure("repl.terminal-input", &error, policy));
             }
-            Err(_) => return Err(emit_host_failure("repl.terminal-input", "other", format)),
+            Err(_) => return Err(emit_host_failure("repl.terminal-input", "other", policy)),
         }
     }
 }
@@ -1210,7 +1261,7 @@ fn execute_script_repl(
     input: &mut impl BufRead,
     session: &mut Session,
     buffer: &mut String,
-    format: OutputFormat,
+    policy: OutputPolicy,
     had_compile_failure: &mut bool,
     had_runtime_failure: &mut bool,
 ) -> Result<(), u8> {
@@ -1223,7 +1274,7 @@ fn execute_script_repl(
                 return process_pending_submission(
                     session,
                     buffer,
-                    format,
+                    policy,
                     had_compile_failure,
                     had_runtime_failure,
                 );
@@ -1232,7 +1283,7 @@ fn execute_script_repl(
                 session,
                 buffer,
                 &line,
-                format,
+                policy,
                 had_compile_failure,
                 had_runtime_failure,
             )?,
@@ -1240,7 +1291,7 @@ fn execute_script_repl(
                 cancel_repl_submission(buffer);
             }
             Err(error) => {
-                return Err(emit_host_io_failure("repl.script-input", &error, format));
+                return Err(emit_host_io_failure("repl.script-input", &error, policy));
             }
         }
     }
@@ -1250,7 +1301,7 @@ fn handle_repl_line(
     session: &mut Session,
     buffer: &mut String,
     line: &str,
-    format: OutputFormat,
+    policy: OutputPolicy,
     had_compile_failure: &mut bool,
     had_runtime_failure: &mut bool,
 ) -> Result<(), u8> {
@@ -1258,7 +1309,7 @@ fn handle_repl_line(
         process_submission(
             session,
             buffer,
-            format,
+            policy,
             had_compile_failure,
             had_runtime_failure,
         )?;
@@ -1275,7 +1326,7 @@ fn handle_repl_line(
 fn process_pending_submission(
     session: &mut Session,
     buffer: &str,
-    format: OutputFormat,
+    policy: OutputPolicy,
     had_compile_failure: &mut bool,
     had_runtime_failure: &mut bool,
 ) -> Result<(), u8> {
@@ -1285,7 +1336,7 @@ fn process_pending_submission(
         process_submission(
             session,
             buffer,
-            format,
+            policy,
             had_compile_failure,
             had_runtime_failure,
         )
@@ -1299,17 +1350,17 @@ fn cancel_repl_submission(buffer: &mut String) {
 fn process_submission(
     session: &mut Session,
     source: &str,
-    format: OutputFormat,
+    policy: OutputPolicy,
     had_compile_failure: &mut bool,
     had_runtime_failure: &mut bool,
 ) -> Result<(), u8> {
     let mut console = ling_eval::MemoryConsole::default();
     let outcome = session.submit(source.trim_end(), &mut console);
     if !console.output().is_empty() {
-        match format {
+        match policy.format() {
             OutputFormat::Human => {
                 write_stdout(console.output().as_bytes())
-                    .map_err(|error| emit_host_io_failure("repl.console", &error, format))?;
+                    .map_err(|error| emit_host_io_failure("repl.console", &error, policy))?;
             }
             OutputFormat::Json => {
                 let submission = match &outcome {
@@ -1323,23 +1374,23 @@ fn process_submission(
                     "submission": submission,
                     "console": console.output(),
                 }))
-                .map_err(|error| emit_host_io_failure("repl.console-json", &error, format))?;
+                .map_err(|error| emit_host_io_failure("repl.console-json", &error, policy))?;
             }
         }
     }
 
     match outcome {
-        Ok(success) => emit_repl_success(&success, format)?,
+        Ok(success) => emit_repl_success(&success, policy)?,
         Err(SubmissionFailure::Compile {
             submission,
             diagnostics,
         }) => {
             *had_compile_failure = true;
-            emit_repl_failure(submission, &diagnostics, format)?;
+            emit_repl_failure(submission, &diagnostics, policy)?;
         }
         Err(SubmissionFailure::Runtime { submission, fault }) => {
             *had_runtime_failure = true;
-            emit_repl_runtime_failure(submission, &fault, format)?;
+            emit_repl_runtime_failure(submission, &fault, policy)?;
         }
         Err(SubmissionFailure::Internal {
             submission,
@@ -1351,42 +1402,42 @@ fn process_submission(
                 Reproduction::new("ling repl")
                     .with_submission(submission)
                     .with_source(source),
-                format,
+                policy,
             ));
         }
         Err(SubmissionFailure::SnapshotMismatch {
             submission,
             message,
         }) => {
-            return Err(emit_repl_snapshot_mismatch(submission, &message, format));
+            return Err(emit_repl_snapshot_mismatch(submission, &message, policy));
         }
     }
     Ok(())
 }
 
-fn emit_repl_success(success: &SubmissionSuccess, format: OutputFormat) -> Result<(), u8> {
-    match format {
+fn emit_repl_success(success: &SubmissionSuccess, policy: OutputPolicy) -> Result<(), u8> {
+    match policy.format() {
         OutputFormat::Human => {
             if !success.warnings.is_empty() {
-                let _ = emit_diagnostics(&success.warnings, OutputFormat::Human, EXIT_SUCCESS);
+                let _ = emit_diagnostics(&success.warnings, policy, EXIT_SUCCESS);
             }
             match success.kind {
                 SubmissionKind::Expression => {
                     if let (Some(value), Some(type_name)) = (&success.value, &success.type_name) {
                         write_stdout(format!("{value} : {type_name}\n").as_bytes())
-                            .map_err(|error| emit_host_io_failure("repl.result", &error, format))?;
+                            .map_err(|error| emit_host_io_failure("repl.result", &error, policy))?;
                     }
                 }
                 SubmissionKind::ValueDeclaration => {
                     if let (Some(name), Some(type_name)) = (&success.name, &success.type_name) {
                         write_stdout(format!("{name} : {type_name}\n").as_bytes())
-                            .map_err(|error| emit_host_io_failure("repl.result", &error, format))?;
+                            .map_err(|error| emit_host_io_failure("repl.result", &error, policy))?;
                     }
                 }
                 SubmissionKind::TypeDeclaration => {
                     if let Some(name) = &success.name {
                         write_stdout(format!("type {name}\n").as_bytes())
-                            .map_err(|error| emit_host_io_failure("repl.result", &error, format))?;
+                            .map_err(|error| emit_host_io_failure("repl.result", &error, policy))?;
                     }
                 }
             }
@@ -1420,7 +1471,7 @@ fn emit_repl_success(success: &SubmissionSuccess, format: OutputFormat) -> Resul
                 );
             }
             emit_repl_json(&event)
-                .map_err(|error| emit_host_io_failure("repl.result-json", &error, format))?;
+                .map_err(|error| emit_host_io_failure("repl.result-json", &error, policy))?;
         }
     }
     Ok(())
@@ -1429,11 +1480,11 @@ fn emit_repl_success(success: &SubmissionSuccess, format: OutputFormat) -> Resul
 fn emit_repl_failure(
     submission: u64,
     diagnostics: &[Diagnostic],
-    format: OutputFormat,
+    policy: OutputPolicy,
 ) -> Result<(), u8> {
-    match format {
+    match policy.format() {
         OutputFormat::Human => {
-            let _ = emit_compile_errors(diagnostics, OutputFormat::Human);
+            let _ = emit_compile_errors(diagnostics, policy);
         }
         OutputFormat::Json => {
             emit_repl_json(&serde_json::json!({
@@ -1443,7 +1494,7 @@ fn emit_repl_failure(
                 "submission": submission,
                 "diagnostics": diagnostic_values(diagnostics)?,
             }))
-            .map_err(|error| emit_host_io_failure("repl.compile-error-json", &error, format))?;
+            .map_err(|error| emit_host_io_failure("repl.compile-error-json", &error, policy))?;
         }
     }
     Ok(())
@@ -1452,12 +1503,12 @@ fn emit_repl_failure(
 fn emit_repl_runtime_failure(
     submission: u64,
     fault: &ling_eval::RuntimeFault,
-    format: OutputFormat,
+    policy: OutputPolicy,
 ) -> Result<(), u8> {
     let diagnostic = fault.to_diagnostic().with_fact("committed", false);
-    match format {
+    match policy.format() {
         OutputFormat::Human => {
-            let _ = emit_diagnostics(&[diagnostic], OutputFormat::Human, EXIT_RUNTIME_FAULT);
+            let _ = emit_diagnostics(&[diagnostic], policy, EXIT_RUNTIME_FAULT);
         }
         OutputFormat::Json => {
             emit_repl_json(&serde_json::json!({
@@ -1467,18 +1518,16 @@ fn emit_repl_runtime_failure(
                 "submission": submission,
                 "diagnostics": diagnostic_values(&[diagnostic])?,
             }))
-            .map_err(|error| emit_host_io_failure("repl.runtime-error-json", &error, format))?;
+            .map_err(|error| emit_host_io_failure("repl.runtime-error-json", &error, policy))?;
         }
     }
     Ok(())
 }
 
-fn emit_repl_snapshot_mismatch(submission: u64, message: &str, format: OutputFormat) -> u8 {
+fn emit_repl_snapshot_mismatch(submission: u64, message: &str, policy: OutputPolicy) -> u8 {
     let diagnostic = snapshot_mismatch_diagnostic(message).with_fact("committed", false);
-    match format {
-        OutputFormat::Human => {
-            emit_diagnostics(&[diagnostic], OutputFormat::Human, EXIT_SNAPSHOT_MISMATCH)
-        }
+    match policy.format() {
+        OutputFormat::Human => emit_diagnostics(&[diagnostic], policy, EXIT_SNAPSHOT_MISMATCH),
         OutputFormat::Json => {
             let event = serde_json::json!({
                 "schema": "ling.repl/0.1",
@@ -1492,7 +1541,7 @@ fn emit_repl_snapshot_mismatch(submission: u64, message: &str, format: OutputFor
             });
             match emit_repl_json(&event) {
                 Ok(()) => EXIT_SNAPSHOT_MISMATCH,
-                Err(error) => emit_host_io_failure("repl.snapshot-mismatch-json", &error, format),
+                Err(error) => emit_host_io_failure("repl.snapshot-mismatch-json", &error, policy),
             }
         }
     }
@@ -1509,7 +1558,7 @@ fn diagnostic_values(diagnostics: &[Diagnostic]) -> Result<Vec<serde_json::Value
                         "diagnostic.render",
                         error.to_string(),
                         Reproduction::new("ling repl --format json"),
-                        OutputFormat::Json,
+                        OutputPolicy::json(),
                     )
                 })
                 .and_then(|rendered| {
@@ -1518,7 +1567,7 @@ fn diagnostic_values(diagnostics: &[Diagnostic]) -> Result<Vec<serde_json::Value
                             "diagnostic.parse-rendered-json",
                             error.to_string(),
                             Reproduction::new("ling repl --format json"),
-                            OutputFormat::Json,
+                            OutputPolicy::json(),
                         )
                     })
                 })
@@ -1619,18 +1668,18 @@ const fn host_error_category(kind: std::io::ErrorKind) -> HostErrorCategory {
     }
 }
 
-fn emit_compile_error(diagnostic: Diagnostic, format: OutputFormat) -> u8 {
-    emit_compile_errors(&[diagnostic], format)
+fn emit_compile_error(diagnostic: Diagnostic, policy: OutputPolicy) -> u8 {
+    emit_compile_errors(&[diagnostic], policy)
 }
 
-fn emit_compile_errors(diagnostics: &[Diagnostic], format: OutputFormat) -> u8 {
-    emit_diagnostics(diagnostics, format, EXIT_COMPILE_ERROR)
+fn emit_compile_errors(diagnostics: &[Diagnostic], policy: OutputPolicy) -> u8 {
+    emit_diagnostics(diagnostics, policy, EXIT_COMPILE_ERROR)
 }
 
-fn emit_snapshot_mismatch(message: &str, format: OutputFormat) -> u8 {
+fn emit_snapshot_mismatch(message: &str, policy: OutputPolicy) -> u8 {
     emit_diagnostics(
         &[snapshot_mismatch_diagnostic(message)],
-        format,
+        policy,
         EXIT_SNAPSHOT_MISMATCH,
     )
 }
@@ -1645,12 +1694,12 @@ fn snapshot_mismatch_diagnostic(message: &str) -> Diagnostic {
     .with_fact("detail", message)
 }
 
-fn emit_host_io_failure(operation: &str, error: &std::io::Error, format: OutputFormat) -> u8 {
+fn emit_host_io_failure(operation: &str, error: &std::io::Error, policy: OutputPolicy) -> u8 {
     let category = host_error_category(error.kind()).name();
-    emit_host_failure(operation, category, format)
+    emit_host_failure(operation, category, policy)
 }
 
-fn emit_host_failure(operation: &str, category: &str, format: OutputFormat) -> u8 {
+fn emit_host_failure(operation: &str, category: &str, policy: OutputPolicy) -> u8 {
     let diagnostic = Diagnostic::new(
         ling_diagnostics::codes::RUNTIME_FAULT,
         ling_diagnostics::Severity::Error,
@@ -1659,13 +1708,13 @@ fn emit_host_failure(operation: &str, category: &str, format: OutputFormat) -> u
     )
     .with_fact("category", category)
     .with_fact("operation", operation);
-    emit_diagnostics(&[diagnostic], format, EXIT_RUNTIME_FAULT)
+    emit_diagnostics(&[diagnostic], policy, EXIT_RUNTIME_FAULT)
 }
 
-fn emit_diagnostics(diagnostics: &[Diagnostic], format: OutputFormat, exit_code: u8) -> u8 {
+fn emit_diagnostics(diagnostics: &[Diagnostic], policy: OutputPolicy, exit_code: u8) -> u8 {
     for diagnostic in diagnostics {
-        let rendered = match format {
-            OutputFormat::Human => Ok(diagnostic.render_human(MessageLanguage::Chinese)),
+        let rendered = match policy.format() {
+            OutputFormat::Human => Ok(policy.render_diagnostic(diagnostic)),
             OutputFormat::Json => diagnostic.render_json().map_err(|error| error.to_string()),
         };
         match rendered {
@@ -1675,7 +1724,7 @@ fn emit_diagnostics(diagnostics: &[Diagnostic], format: OutputFormat, exit_code:
                     "diagnostic.render",
                     error,
                     Reproduction::new("ling diagnostics"),
-                    format,
+                    policy,
                 );
             }
         }
@@ -1687,12 +1736,12 @@ fn emit_internal_incident(
     stage: &str,
     detail: impl Into<String>,
     reproduction: Reproduction,
-    format: OutputFormat,
+    policy: OutputPolicy,
 ) -> u8 {
     let incident = InternalIncident::capture(stage, detail, reproduction);
     let diagnostic = incident.diagnostic();
-    let rendered = match format {
-        OutputFormat::Human => Ok(diagnostic.render_human(MessageLanguage::Chinese)),
+    let rendered = match policy.format() {
+        OutputFormat::Human => Ok(policy.render_diagnostic(&diagnostic)),
         OutputFormat::Json => diagnostic.render_json().map_err(|error| error.to_string()),
     };
     match rendered {
@@ -1712,30 +1761,14 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} test [--format human|json] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [--format human|json]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [--format human|json]\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} init [--format human|json] [--name package] [--display-name text] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [OUTPUT] <file>\n  {CLI_NAME} test [OUTPUT] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [OUTPUT]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [OUTPUT]\n  {CLI_NAME} fmt [--check] [--stdin-name name] [OUTPUT] <file|->\n  {CLI_NAME} init [--name package] [--display-name text] [OUTPUT] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [OUTPUT]\n  {CLI_NAME} repl [--capability Console.Write] [OUTPUT]\n  {CLI_NAME} lsp --stdio\n\nOUTPUT:\n  [--format human|json] [--language bilingual|zh-CN|en]\n  [--color auto|always|never] [--quiet|--verbose]"
     )
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum OutputFormat {
-    Human,
-    Json,
-}
-
-impl OutputFormat {
-    fn parse(value: &str) -> Option<Self> {
-        match value {
-            "human" => Some(Self::Human),
-            "json" => Some(Self::Json),
-            _ => None,
-        }
-    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct Options {
     command: Command,
-    format: OutputFormat,
+    policy: OutputPolicy,
     path: Option<PathBuf>,
     manifest_path: Option<PathBuf>,
     capabilities: Vec<String>,
@@ -1755,6 +1788,11 @@ impl Options {
     fn parse(command: Command, arguments: &[OsString]) -> Result<Self, String> {
         let mut format = OutputFormat::Human;
         let mut format_seen = false;
+        let mut language = HumanLanguage::Bilingual;
+        let mut language_seen = false;
+        let mut color = ColorChoice::Auto;
+        let mut color_seen = false;
+        let mut verbosity = Verbosity::Normal;
         let mut path = None;
         let mut manifest_path = None;
         let mut capabilities = Vec::new();
@@ -1792,6 +1830,72 @@ impl Options {
                     .ok_or_else(|| format!("unsupported output format `{value}`"))?;
                 format_seen = true;
                 index += 2;
+                continue;
+            }
+
+            if argument == "--language" {
+                if command == Command::Lsp {
+                    return Err(
+                        "`lsp --stdio` does not accept `--language`; stdout is protocol-only"
+                            .to_owned(),
+                    );
+                }
+                if language_seen {
+                    return Err("only one `--language` may be provided".to_owned());
+                }
+                let value = arguments.get(index + 1).ok_or_else(|| {
+                    "`--language` requires `bilingual`, `zh-CN`, or `en`".to_owned()
+                })?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the output language must be valid Unicode".to_owned())?;
+                language = HumanLanguage::parse(value)
+                    .ok_or_else(|| format!("unsupported output language `{value}`"))?;
+                language_seen = true;
+                index += 2;
+                continue;
+            }
+
+            if argument == "--color" {
+                if command == Command::Lsp {
+                    return Err(
+                        "`lsp --stdio` does not accept `--color`; stdout is protocol-only"
+                            .to_owned(),
+                    );
+                }
+                if color_seen {
+                    return Err("only one `--color` may be provided".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--color` requires `auto`, `always`, or `never`".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the color choice must be valid Unicode".to_owned())?;
+                color = ColorChoice::parse(value)
+                    .ok_or_else(|| format!("unsupported color choice `{value}`"))?;
+                color_seen = true;
+                index += 2;
+                continue;
+            }
+
+            if argument == "--quiet" || argument == "--verbose" {
+                if command == Command::Lsp {
+                    return Err(format!(
+                        "`lsp --stdio` does not accept `{}`; stdout is protocol-only",
+                        argument.to_string_lossy()
+                    ));
+                }
+                let requested = if argument == "--quiet" {
+                    Verbosity::Quiet
+                } else {
+                    Verbosity::Verbose
+                };
+                if verbosity != Verbosity::Normal {
+                    return Err("only one of `--quiet` or `--verbose` may be provided".to_owned());
+                }
+                verbosity = requested;
+                index += 1;
                 continue;
             }
 
@@ -2129,10 +2233,16 @@ impl Options {
         if command == Command::Init && path.as_deref() == Some(Path::new("-")) {
             return Err("`init` requires a destination directory, not `-`".to_owned());
         }
+        if format == OutputFormat::Json && verbosity != Verbosity::Normal {
+            return Err("`--quiet` and `--verbose` are not valid with `--format json`".to_owned());
+        }
+        if format == OutputFormat::Json && color_seen && color != ColorChoice::Never {
+            return Err("`--format json` accepts only an explicit `--color never`".to_owned());
+        }
 
         Ok(Self {
             command,
-            format,
+            policy: OutputPolicy::new(format, language, color, verbosity),
             path,
             manifest_path,
             capabilities,
@@ -2180,7 +2290,7 @@ mod tests {
         .unwrap();
 
         assert_eq!(before, after);
-        assert_eq!(before.format, OutputFormat::Json);
+        assert_eq!(before.policy.format(), OutputFormat::Json);
         assert_eq!(
             before.path.as_deref(),
             Some(std::path::Path::new("main.ling"))
@@ -2208,7 +2318,7 @@ mod tests {
         )
         .unwrap();
         assert!(file.check);
-        assert_eq!(file.format, OutputFormat::Json);
+        assert_eq!(file.policy.format(), OutputFormat::Json);
         assert_eq!(file.path.as_deref(), Some(Path::new("main.ling")));
         assert!(file.stdin_name.is_none());
 
@@ -2248,6 +2358,139 @@ mod tests {
             Options::parse(Command::Lsp, &["--format".into(), "human".into()]).unwrap_err(),
             "`lsp --stdio` does not accept `--format`; stdout is protocol-only"
         );
+        for (argument, error) in [
+            (
+                vec!["--language".into(), "en".into()],
+                "`lsp --stdio` does not accept `--language`; stdout is protocol-only",
+            ),
+            (
+                vec!["--color".into(), "never".into()],
+                "`lsp --stdio` does not accept `--color`; stdout is protocol-only",
+            ),
+            (
+                vec!["--quiet".into()],
+                "`lsp --stdio` does not accept `--quiet`; stdout is protocol-only",
+            ),
+            (
+                vec!["--verbose".into()],
+                "`lsp --stdio` does not accept `--verbose`; stdout is protocol-only",
+            ),
+        ] {
+            assert_eq!(Options::parse(Command::Lsp, &argument).unwrap_err(), error);
+        }
+    }
+
+    #[test]
+    fn parses_output_policy_defaults_and_explicit_values() {
+        let defaults = Options::parse(Command::Check, &["main.ling".into()]).unwrap();
+        assert_eq!(defaults.policy.format(), OutputFormat::Human);
+        assert_eq!(defaults.policy.language(), HumanLanguage::Bilingual);
+        assert_eq!(defaults.policy.color(), ColorChoice::Auto);
+        assert_eq!(defaults.policy.verbosity(), Verbosity::Normal);
+
+        let explicit = Options::parse(
+            Command::Check,
+            &[
+                "--verbose".into(),
+                "--color".into(),
+                "never".into(),
+                "main.ling".into(),
+                "--language".into(),
+                "en".into(),
+            ],
+        )
+        .unwrap();
+        assert_eq!(explicit.policy.language(), HumanLanguage::English);
+        assert_eq!(explicit.policy.color(), ColorChoice::Never);
+        assert_eq!(explicit.policy.verbosity(), Verbosity::Verbose);
+    }
+
+    #[test]
+    fn rejects_incompatible_or_repeated_output_options() {
+        for arguments in [
+            vec!["--quiet".into(), "--verbose".into(), "main.ling".into()],
+            vec!["--quiet".into(), "--quiet".into(), "main.ling".into()],
+        ] {
+            assert_eq!(
+                Options::parse(Command::Check, &arguments).unwrap_err(),
+                "only one of `--quiet` or `--verbose` may be provided"
+            );
+        }
+        assert_eq!(
+            Options::parse(
+                Command::Check,
+                &[
+                    "--format".into(),
+                    "json".into(),
+                    "--quiet".into(),
+                    "main.ling".into(),
+                ],
+            )
+            .unwrap_err(),
+            "`--quiet` and `--verbose` are not valid with `--format json`"
+        );
+        assert_eq!(
+            Options::parse(
+                Command::Check,
+                &[
+                    "--format".into(),
+                    "json".into(),
+                    "--color".into(),
+                    "always".into(),
+                    "main.ling".into(),
+                ],
+            )
+            .unwrap_err(),
+            "`--format json` accepts only an explicit `--color never`"
+        );
+        let json = Options::parse(
+            Command::Check,
+            &[
+                "--color".into(),
+                "never".into(),
+                "--format".into(),
+                "json".into(),
+                "main.ling".into(),
+            ],
+        )
+        .unwrap();
+        assert_eq!(json.policy.format(), OutputFormat::Json);
+
+        for (arguments, expected) in [
+            (
+                vec!["--language".into(), "fr".into(), "main.ling".into()],
+                "unsupported output language `fr`",
+            ),
+            (
+                vec!["--color".into(), "sometimes".into(), "main.ling".into()],
+                "unsupported color choice `sometimes`",
+            ),
+            (
+                vec![
+                    "--language".into(),
+                    "en".into(),
+                    "--language".into(),
+                    "zh-CN".into(),
+                    "main.ling".into(),
+                ],
+                "only one `--language` may be provided",
+            ),
+            (
+                vec![
+                    "--color".into(),
+                    "never".into(),
+                    "--color".into(),
+                    "auto".into(),
+                    "main.ling".into(),
+                ],
+                "only one `--color` may be provided",
+            ),
+        ] {
+            assert_eq!(
+                Options::parse(Command::Check, &arguments).unwrap_err(),
+                expected
+            );
+        }
     }
 
     #[test]
