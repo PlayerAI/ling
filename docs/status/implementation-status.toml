@@ -7459,7 +7459,7 @@ notes = [
 [[task]]
 id = "IDE-2308"
 title = "IDE completion resolve"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -7475,31 +7475,47 @@ spec = [
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/decisions/0023-author-source-formatter-preservation.md",
   "docs/RFC-0005.md",
+  "docs/RFC-0043.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/decisions/0080-ide-completion-checked-metadata.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/checked_completion_catalog.rs",
+  "crates/ling-lsp/src/completion.rs",
+  "crates/ling-lsp/src/completion_resolve.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/completion_resolve.rs",
+  "docs/RFC-0043.md",
   "docs/status/IDE-2308-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2308-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "tests/protocols/lsp-completion/README.md",
+  "tests/protocols/lsp-completion-resolve/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing resolve-handle, lazy documentation, full signature, Effect/Capability presentation, insert-text, formatter, Unicode, position/version, provenance, capability, and protocol lifecycle contracts.",
-  "The audit covers generic signatures, effects/capabilities, docs/localization, Unicode/CRLF/BOM, stale/missing handles, formatter/comment preservation, dependency/generated/builtin policy, deterministic rendering, resource limits, and migration fixtures.",
-  "No completion-resolve handler, documentation renderer, signature formatter, capability disclosure, insertion-text API, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must consume checked data, preserve source-span/ID truth, render effects/capabilities deterministically and safely, and label experimental fields.",
+  "Accepted RFC-0043 defines capability-negotiated ling.lsp.completion/0.2 and ling.lsp.completion-resolve/0.1 while preserving the exact RFC-0042 version-0.1 fallback for clients without detail and documentation resolve support.",
+  "The LSP stores at most 1024 opaque BLAKE3 handles bound to the complete request snapshot, URI, replacement span, cursor byte offset, item ordinal, candidate kind, and checked source identity; malformed, missing, modified, and stale handles return fixed bilingual failures.",
+  "Resolve derives deterministic checked signatures, Effects, Capabilities, and attached Author Source documentation after full checking, escapes Markdown safely, enforces field bounds, and never changes the RFC-0042 text edit or exposes internal identities.",
+  "Nine completion-resolve integration tests plus compiler catalog tests cover negotiation, fallback, exact fields, definitions, bindings, no-op candidates, Unicode BOM/CRLF, detached docs, bounds, version/cursor/workspace staleness, malformed requests, and notifications.",
+  "Locked/offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass for implementation commit 523c9de626c4a320028e6457676e526bfa53f247.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "523c9de626c4a320028e6457676e526bfa53f247"
+completion_commit = "523c9de626c4a320028e6457676e526bfa53f247"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "IDE-2308 is BlockedSpec by the absent completion-item resolve/presentation contract, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-FORMATTER-AUTHOR-SOURCE-001, GAP-UNICODE-ALIAS-SYNTAX-001, GAP-AUTHOR-SOURCE-LOCALIZATION-001, LSP-2101/LSP-2102, and IDE-2307.",
-  "Current type/effect/capability, semantic graph, and source code provides internal checked values but no approved lazy handle, documentation/signature display, insertion, redaction, or stale-version contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "RFC-0043 authorizes only completion resolve and its negotiated completion transport; snippets, auto-imports, generated-source documentation, localization, AI ranking, and Stable lifecycle remain deferred.",
+  "Documentation is projected from compiler CST through Format IR only for contiguous attached /// Author Source; no DocumentationId is constructed or serialized and no prose is inferred.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime/VM/bytecode/ABI/package behavior, public Semantic ID schema, source-position unit, or Unicode 17.0.0 table changed.",
 ]
 
 [[task]]
