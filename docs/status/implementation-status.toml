@@ -5596,7 +5596,7 @@ notes = [
 [[task]]
 id = "LSP-2101"
 title = "LSP lifecycle skeleton"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "S"
 owner = "Codex"
@@ -5607,30 +5607,52 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0026.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0253-current-cli-command-model.md",
+  "docs/decisions/0257-current-lsp-lifecycle-skeleton.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/Cargo.toml",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/lifecycle.rs",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/tests/lsp.rs",
+  "tests/protocols/lsp-lifecycle/README.md",
+  "docs/RFC-0004.md",
+  "docs/decisions/0257-current-lsp-lifecycle-skeleton.md",
   "docs/status/LSP-2101-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2101-LIFECYCLE-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2101-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the absent accepted JSON-RPC framing, lifecycle state machine, capability/workspace schema, snapshot/cancellation boundary, and protocol inventory entry.",
-  "The audit covers pre-initialize and post-shutdown rejection, exit behavior, stdio purity, malformed framing, deterministic fixtures, and Stable/Experimental lifecycle requirements.",
-  "No LSP crate, transport loop, lifecycle API, capability field, workspace resolver, diagnostic allocation, or placeholder protocol is added while the authority and fixtures are absent.",
-  "The future implementation must use the approved compiler/VFS snapshot boundary and avoid a competing semantic or diagnostic authority.",
+  "Accepted RFC-0004 defines the bounded Preview `ling lsp --stdio` framing, lifecycle state machine, server information, position negotiation, opaque workspace folders, deterministic errors, exit behavior, and stdio purity required by LSP-2101.",
+  "Accepted DEC-0257 composes the existing RFC-0004 implementation and completed CLI-1701 dispatcher as the complete parent without duplicating transport or promoting later editor methods.",
+  "Executable lifecycle and real-process fixtures cover positive and malformed framing, pre-initialize/post-shutdown rejection, Unicode/limits/workspace validation, early/clean exit, request IDs, deterministic responses, and protocol-only stdout.",
+  "Later Accepted overlay/formatting methods retain independent authorities; snapshots, cancellation, diagnostics, Workspace Edits, Semantic Transactions, filesystem workspace resolution, and Stable editor compatibility remain explicit non-claims.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "eb71c9db15263a38b070962efde9efb04144bcee"
+completion_commit = "eb71c9db15263a38b070962efde9efb04144bcee"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2101 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001 and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no LSP protocol is currently inventoried.",
-  "The current repository has compiler/VFS query foundations but no JSON-RPC transport or editor lifecycle implementation; no public LSP claim is made.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Parent acceptance commit: eb71c9db15263a38b070962efde9efb04144bcee (`docs(lsp): accept current lifecycle skeleton`); the underlying implementation remains commit 38d95fb7b91c2035bd2b1b4ebf864c1693050925.",
+  "Verified with all `ling-lsp` targets, the real CLI stdio fixture, all workspace targets, Clippy with warnings denied, and CI/governance/support/status/RC0/traceability/formatting/diff gates; the final status-bound full gate is recorded by the following status commit.",
+  "No command, protocol byte, method, field, diagnostic, schema, Semantic ID, source span, runtime, bytecode, VM, ABI, filesystem/network behavior, or Unicode 17.0.0 data changed.",
 ]
 
 [[task]]
