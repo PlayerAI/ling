@@ -27,7 +27,7 @@ to Stable by inventory alone.
 - `docs/governance/support-matrix.toml` keeps the support report at
   `1.0-draft`, marks profiles unavailable and hosts Tier2 without release
   artifacts, and explicitly excludes package publication and Zed/LSP support.
-- `docs/governance/protocol-inventory.toml` records 21 non-Stable/current or
+- `docs/governance/protocol-inventory.toml` records 27 non-Stable/current or
   Future protocols; `PROTO-EVIDENCE` is Future with no schema or fixtures.
 - `docs/status/COMPAT-6502-AUTHORITY-AUDIT.md` through
   `COMPAT-6504-AUTHORITY-AUDIT.md`, the PKG/REL/ZED/RC audits, and
@@ -54,6 +54,12 @@ release items, their documented non-Stable/blocked states, the immutable-
 Seed/no-publication boundary, and nine linked audit-marker files. It validates
 inventory drift only and does not create a v1.0 manifest, artifact, or Stable
 claim.
+
+Accepted `DEC-0249` additionally authorizes the bounded
+`RC-6905-CURRENT-EVIDENCE` child. The v1 verifier composes the current
+RC2→RC3→RC1→RC0 chain, corrects the protocol total from 21 to 27, and replaces
+the false no-LSP-executable statement with the precise source-built Preview
+server boundary. No distributable LSP artifact or release exit is created.
 
 ## Compatibility and deferred work
 

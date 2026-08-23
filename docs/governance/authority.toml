@@ -3744,3 +3744,16 @@ covers = ["RC-6904 bounded current RC3-to-RC1-to-RC0 and protocol evidence", "co
 depends_on = ["DEC-0055", "DEC-0247", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0249"
+title = "Current v1 artifact boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0249-current-v1-artifact-boundary-evidence.md"
+covers = ["RC-6905 bounded current predecessor, LSP, and protocol evidence", "composed RC2-to-RC0 inventories plus corrected Preview-server and 27-protocol facts", "internal evidence without artifact distribution, Stable promotion, publication, or G6 completion claims"]
+depends_on = ["DEC-0056", "DEC-0242", "DEC-0248", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

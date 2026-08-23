@@ -1,6 +1,6 @@
 # RC-6905 v1.0 Release Artifact Inventory
 
-Status: `BlockedSpec` (2026-08-22). This inventory records the required v1.0
+Status: `BlockedSpec` (2026-08-23). This inventory records the required v1.0
 publication set and current evidence; it is not a release manifest, download
 index, signature, or Stable-support claim.
 
@@ -14,16 +14,20 @@ index, signature, or Stable-support claim.
 | SBOM/licenses/provenance | `docs/DEPENDENCIES.md` and Seed license inventories are engineering evidence; no generated v1.0 SBOM/provenance bundle exists. | Partial Seed evidence | Versioned SBOM, license report, provenance attestation, signing identity, and independent verification. |
 | Standard library | `Ling.Prelude` is builtin-only `0.0.1-dev` with Preview stability and no package publication. | Preview / not packaged | Accepted stable symbol/effect/capability surface, versioned package, profile limits, and conformance. |
 | Zed extension | Tree-sitter grammar/query assets exist; ZED audits record no Zed extension package or marketplace artifact. | Unsupported | Accepted extension package, metadata/license, installation and compatibility fixtures. |
-| Language server | No LSP executable, acquisition manifest, or public LSP protocol is present. | Unsupported | Accepted LSP lifecycle/position/schema, signed per-platform binaries, discovery, and crash/restart evidence. |
+| Language server | A source-built `ling lsp --stdio` Preview server exists with verified lifecycle/position prerequisites; no acquisition manifest, signed per-platform binary set, editor discovery package, or Stable public distribution exists. | Unsupported | Accepted distribution/acquisition contract, signed per-platform binaries, editor discovery, document features, and crash/restart evidence. |
 | Reference documentation | `LANGUAGE.md`, `TUTORIAL.md`, examples, and inventories document Seed; a complete 1.0 reference/tool/package/migration set is absent. | Partial Seed evidence | Bilingual 1.0 manuals linked to accepted clauses, symbols, diagnostics, fixtures, and support limits. |
 | Migration guide | COMPAT-6502 through COMPAT-6504 remain blocked; RFC-0002 only covers bounded manifest/lock evolution. | BlockedSpec | Accepted source/protocol migration policy, tooling, diagnostics, rollback, and versioned fixtures. |
 | Support matrix | Generated support report is `1.0-draft`; all hosts are Tier2 without release artifacts, profiles are unavailable, and no Stable feature is listed. | Draft | Final feature/profile/target matrix with Tier1 evidence, limitations, and review. |
-| Protocol schemas/golden corpus | 21 protocol records and many current golden/corruption fixtures exist, but none is Stable and `PROTO-EVIDENCE` is Future. | Experimental / Preview / Future | Stable schemas, compatibility/N-1 policy, golden/corrupt corpus, migration, and release binding. |
+| Protocol schemas/golden corpus | The 27 protocol records and many current golden/corruption fixtures exist, but none is Stable and `PROTO-EVIDENCE` is Future. | Experimental / Preview / Future | Stable schemas, compatibility/N-1 policy, golden/corrupt corpus, migration, and release binding. |
 | Conformance suite | v0.0.1 Seed conformance is executable and traced; no v1.0 Stable scope or Tier1 matrix is accepted. | Partial Seed evidence | Candidate-wide Stable conformance suite, host runs, negative/security cases, and independent results. |
 | Security policy | Security audit documents Seed controls and gaps; no accepted 1.0 threat/disclosure/response policy or complete SBOM/advisory result exists. | BlockedSpec | Accepted security policy, threat model, advisory/license scan, disclosure SLA, and response fixtures. |
 | Release evidence bundle | `PROTO-EVIDENCE` is Planned public/Future with no schema, reader, writer, or fixtures; Markdown reports are not a public bundle. | Unavailable | Versioned evidence schema, provenance, checksums, test/proof links, redaction, independent verifier, and manifest identity. |
 
 ## Publication boundary
+
+The current RC2→RC3→RC1→RC0 bounded inventory chain passes, while all four
+release parents remain `BlockedSpec`. That repository evidence does not create
+or authorize any item in this publication inventory.
 
 The v0.0.1 Seed tag and reports must remain immutable historical evidence. A
 v1.0 publication may not reuse the Seed tag, silently promote Experimental or
@@ -48,7 +52,8 @@ cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 `cargo xtask v1 verify` deterministically checks the exact fourteen release
 items, their partial/unavailable/unsupported/draft/experimental/blocked
 states, the no-publication boundary, and nine linked audit-marker files. It
-is an inventory check only; it does not build, sign, upload, install, or
+also composes the current RC2 gate (which composes RC3, RC1, and RC0). It is an
+inventory check only; it does not build, sign, upload, install, or
 advertise a v1.0 release.
 
 No package upload, installer, signing service, release tag, network request,

@@ -608,13 +608,14 @@ fn main() -> ExitCode {
             match v1_artifact_inventory::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "v1.0 artifact inventory OK: {} items ({} partial, {} unavailable, {} unsupported, {} BlockedSpec), {} audit files",
+                        "v1.0 artifact inventory OK: {} items ({} partial, {} unavailable, {} unsupported, {} BlockedSpec), {} audit files, {} upstream gate",
                         summary.release_item_count,
                         summary.partial_count,
                         summary.unavailable_count,
                         summary.unsupported_count,
                         summary.blocked_count,
-                        summary.audit_file_count
+                        summary.audit_file_count,
+                        summary.upstream_gate_count
                     );
                     ExitCode::SUCCESS
                 }

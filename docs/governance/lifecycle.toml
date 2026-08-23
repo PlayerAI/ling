@@ -6390,3 +6390,29 @@ unresolved_alternatives = [
   "Blocker taxonomy/disposition; candidate baseline; regression/risk/impact/rollback records; matrix rerun; immutable candidate/provenance; reviewer approval; regeneration; and Final/Go remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0249"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0249-current-v1-artifact-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask v1 verify and require fourteen items, nine audit files, and one composed upstream gate.",
+  "Run RC2, RC3, RC1, RC0, protocol, LSP-discovery, and Zed verification independently.",
+  "Supply stale no-LSP, 21-protocol, and upstream facts in a focused test and require fail-closed errors.",
+  "Run workspace, CI, governance, support, status, traceability, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Corrects documentation and composes internal evidence only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP behavior, runtime, Unicode, protocol states, support states, and public APIs remain unchanged.",
+  "Adds no artifact distribution, Stable promotion, publication, network behavior, or G6 completion claim.",
+]
+unresolved_alternatives = [
+  "Every v1 candidate, artifact, signing/SBOM/provenance, standard-library package, Zed/LSP distribution, documentation/migration, final support, Stable protocol corpus, Tier1 conformance, security policy, evidence bundle, and publication remains deferred.",
+]
+superseded_by = ""

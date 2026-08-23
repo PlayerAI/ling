@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+use crate::rc2_change_control;
+
 const MATRIX_PATH: &str = "docs/testing/V1-RELEASE-ARTIFACT-INVENTORY.md";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -129,6 +131,7 @@ pub struct CheckSummary {
     pub unsupported_count: usize,
     pub blocked_count: usize,
     pub audit_file_count: usize,
+    pub upstream_gate_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -139,6 +142,10 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_audits(root));
+    if let Err(upstream_errors) = rc2_change_control::check_repository(root) {
+        errors.extend(upstream_errors);
+    }
+    errors.extend(validate_current_evidence(&matrix));
     finish(errors).map(|()| CheckSummary {
         release_item_count: RELEASE_ITEMS.len(),
         partial_count: count_prefix("Partial"),
@@ -146,7 +153,27 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
         unsupported_count: count_state("Unsupported"),
         blocked_count: count_state("BlockedSpec"),
         audit_file_count: REQUIRED_AUDIT_MARKERS.len(),
+        upstream_gate_count: 1,
     })
+}
+
+fn validate_current_evidence(matrix: &str) -> Vec<String> {
+    const REQUIRED: &[&str] = &[
+        "A source-built `ling lsp --stdio` Preview server exists",
+        "The 27 protocol records",
+        "The current RC2→RC3→RC1→RC0 bounded inventory chain passes",
+        "all four release parents remain `BlockedSpec`",
+    ];
+    let normalized = normalize(matrix);
+    REQUIRED
+        .iter()
+        .filter(|marker| !normalized.contains(&normalize(marker)))
+        .map(|marker| {
+            format!(
+                "GOV-V1-ARTIFACT-0011: {MATRIX_PATH} is missing current evidence marker {marker:?}"
+            )
+        })
+        .collect()
 }
 
 fn validate_matrix(matrix: &str) -> Vec<String> {
@@ -305,6 +332,7 @@ mod tests {
         assert_eq!(summary.unsupported_count, 2);
         assert_eq!(summary.blocked_count, 2);
         assert_eq!(summary.audit_file_count, 9);
+        assert_eq!(summary.upstream_gate_count, 1);
     }
 
     #[test]
@@ -326,6 +354,17 @@ mod tests {
             errors
                 .iter()
                 .any(|error| error.contains("missing audit marker"))
+        );
+    }
+
+    #[test]
+    fn rejects_stale_lsp_protocol_and_upstream_evidence() {
+        let errors = validate_current_evidence("No LSP executable; 21 protocols");
+        assert_eq!(errors.len(), 4);
+        assert!(
+            errors
+                .iter()
+                .all(|error| error.contains("GOV-V1-ARTIFACT-0011"))
         );
     }
 
