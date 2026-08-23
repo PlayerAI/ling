@@ -5519,3 +5519,28 @@ unresolved_alternatives = [
   "Critical Core/profile and permitted effects; startup/initialization/shutdown/reset/cancellation/Fault/overrun/watchdog/safe-state/recovery lifecycle; static schedule, admission, priority/tie-breaking, clock/tick/deadline/WCET, interrupt and I/O semantics; queue/recursion/heap/stack/frame/allocation bounds; ownership/alias/Resource/Drop/cleanup and host-service boundary; versioned Target Primitive Package, target/device/clock/watchdog primitive identities, capabilities, ABI/calling convention/layout/FFI/thread/reentry/toolchain/artifact identity; licensing and reproducible offline builds; timing/memory/target evidence, assumptions, TCB, independent verification, provenance, migration and nondeterminism; fail-closed profile/schedule/deadline/stack/heap/primitive/host-service/watchdog/target/evidence failures; bilingual stable diagnostics and exits; positive, negative, malformed, fault-injection, boundedness, reset, target, repeated-build, cross-target, Unicode 17.0.0, BOM/CRLF, and source-span fixtures; protocol inventory and truthful support remain open under CBK-5903, CBK-5901, CBK-5902, GAP-CRITICAL-PROFILE-001, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-KERNEL-DEVICE-001, PROTO-ABI, PROTO-EVIDENCE, and missing Critical runtime/target authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0216"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0216-support-matrix-item-audit-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty support-matrix-item-audit categories and local order; compare forward/reverse opaque bytes; reject duplicates; retain candidate, authority, all current support states, Stable, missing-field, fail-closed, and protocol boundaries together.",
+  "Run the existing draft support-matrix verifier without changing its matrix target or claims.",
+  "Defer candidate inventory, Stable promotion/demotion, compatibility, diagnostics, release binding, public protocols, and support claims until Accepted authority and per-row executable evidence exist.",
+]
+compatibility_impact = [
+  "Adds only test-local boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP/Zed, runtime, bytecode, VM, dependencies, support-matrix states, and Unicode 17.0.0 remain unchanged; the current draft matrix and internal support fixtures are not reinterpreted as 1.0 Stable contracts.",
+  "No Stable row, candidate registry, compatibility promise, release artifact, diagnostic allocation, CLI/LSP/Zed route, public protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Candidate Stable Feature/Profile/Target inventory; stable identity/version; inclusion, exclusion, promotion, demotion and removal rules; Accepted clauses; parser/checker/Typed-Core and Interpreter/VM/Native/Device evidence; positive/negative/differential conformance; diagnostic, LSP and Zed coverage; bidirectional clause/symbol/test traceability; evidence polarity; known limitations; source/Semantic/canonical/schema/CLI/package/bytecode/replay/ABI/profile/target compatibility and migration; protocol readers/writers and golden corpora; deterministic offline builds; Tier scope, target/toolchain and artifact identity; independent review, security, fuzz/fault/TCB/licensing and release-candidate binding; fail-closed missing/conflicting/stale/unverifiable rows; bilingual stable diagnostics and machine schema; per-row positive, negative, migration, corruption, Unicode 17.0.0, BOM/CRLF, source-span and determinism fixtures; protocol inventory and public support remain open under STAB-6101, STAB-6102, STAB-6103, ROADMAP-1.0, all incomplete G1-G5 exits, open gaps, the draft SUPPORT-MATRIX, and missing G6 stabilization authority.",
+]
+superseded_by = ""

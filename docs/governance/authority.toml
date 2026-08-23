@@ -3315,3 +3315,16 @@ covers = ["CBK-5903 bounded Critical Runtime/Target Package boundary evidence", 
 depends_on = ["DEC-0214", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0216"
+title = "Internal Support-Matrix Item Audit boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0216-support-matrix-item-audit-boundary-evidence.md"
+covers = ["STAB-6101 bounded Support-Matrix Item Audit boundary evidence", "test-only per-item audit/support-state vocabulary", "audit boundaries without Stable candidate/promotion semantics"]
+depends_on = ["DEC-0215", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
