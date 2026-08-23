@@ -7287,3 +7287,32 @@ unresolved_alternatives = [
   "Effect, Capability, resource, actor, node, kernel, Semantic ID, ownership, borrow, unsafe, and generated categories remain excluded until exact source-span, privacy, fallback, negotiation, and migration authority exists.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0047"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0047.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Cover every current Seed declaration and reference role, exact modifiers, callable values, Trait and implementation members, fields, constructors, patterns, type syntax, aliases, builtins, Prelude values, and user shadowing.",
+  "Verify checked identity precedence, nested same-spelling identity separation, exact assignment modification, unresolved-name omission, and the prohibition on unchecked AST interpretation.",
+  "Cover all conservative lexical families and exclusions across lexer, parse, resolution, type, and effect failures with whole-source lexical-fallback evidence and no modifiers.",
+  "Cover Unicode, emoji and combining prefixes, BOM, CRLF, multiline splitting, original-byte slicing, non-overlap, deterministic order, cache reuse, and revision invalidation.",
+  "Prove no compiler identity, source text, type, Effect, Capability, path, URI, document version, LSP legend index, result ID, or partial transport state is retained.",
+]
+compatibility_impact = [
+  "Adds internal ling.semantic-token-generation/0.1 and one snapshot-keyed abstract token index without changing checked facts or language semantics.",
+  "Adds no provider, request, response, full or delta transport, result ID, current public semantic-token protocol, diagnostic allocation, JSON schema, Semantic ID, Definition ID, or canonical bytes.",
+  "Adds no runtime, bytecode, VM, ABI, package, filesystem, network, dependency, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Provider negotiation, URI and document versions, wire positions, full and delta, result IDs, cancellation, limits, freshness publication, wire fixtures, Zed presentation, Stable lifecycle, and Semantic Transactions remain deferred.",
+  "Mixed checked and error-region output, parsed fallback, and custom future categories remain excluded until Accepted authority proves their partial-analysis and source-role boundaries.",
+]
+superseded_by = ""

@@ -321,15 +321,15 @@ public_schema = false
 canonical = false
 producer = ["Future ling-lsp typed semantic-token provider"]
 consumer = ["Future LSP 3.17 clients and editor hosts"]
-reader_policy = "Accepted RFC-0046 defines taxonomy and deterministic client-supported legend projection only; request, document, full/delta, result-ID, stale, cancellation, and limit semantics remain undefined."
-writer_policy = "No writer exists. A future writer must consume compiler-owned checked, structural, and lexical evidence under RFC-0046 and must obtain Accepted LSP-2402/LSP-2403 transport authority before advertising a provider."
+reader_policy = "Accepted RFC-0046 defines taxonomy and legend projection; Accepted RFC-0047 defines an in-process snapshot-bound generator only. Request, document, full/delta, result-ID, stale, cancellation, and limit semantics remain undefined."
+writer_policy = "No LSP writer exists. A future writer must consume the RFC-0047 compiler-owned generation result and must obtain Accepted LSP-2403 transport authority before advertising a provider."
 unknown_field_policy = "Not yet defined for the future request protocol; RFC-0046 requires ordinary unknown initialize capability members to be ignored and malformed known semantic-token capability members to fail initialization."
 migration_tool = "Not defined; ling.semantic-token-taxonomy/0.1 is an Accepted taxonomy basis, not a current public wire version."
 fixtures = []
-sources = ["docs/RFC-0046.md", "docs/RFC-0004.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0084-lsp-lexical-token-source-index.md", "docs/decisions/0085-lsp-checked-token-identity-observation.md", "docs/decisions/0086-lsp-checked-token-snapshot-identity.md", "docs/decisions/0087-lsp-checked-token-source-fixtures.md"]
+sources = ["docs/RFC-0046.md", "docs/RFC-0047.md", "docs/RFC-0004.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0084-lsp-lexical-token-source-index.md", "docs/decisions/0085-lsp-checked-token-identity-observation.md", "docs/decisions/0086-lsp-checked-token-snapshot-identity.md", "docs/decisions/0087-lsp-checked-token-source-fixtures.md"]
 version_markers = []
-authority = ["RFC-0046", "RFC-0004", "DEC-0002", "DEC-0012", "DEC-0029", "DEC-0084", "DEC-0085", "DEC-0086", "DEC-0087"]
-notes = ["No semanticTokensProvider, request method, legend, result, protocol marker, custom token type, or compatibility claim is implemented. Effect, Capability, resource, actor, node, kernel, Semantic ID, ownership, borrow, unsafe, and generated categories remain excluded."]
+authority = ["RFC-0047", "RFC-0046", "RFC-0004", "DEC-0002", "DEC-0012", "DEC-0029", "DEC-0084", "DEC-0085", "DEC-0086", "DEC-0087"]
+notes = ["RFC-0047 authorizes only an in-process generation marker; no semanticTokensProvider, request method, client legend, result, public protocol marker, custom token type, or compatibility claim is implemented. Effect, Capability, resource, actor, node, kernel, Semantic ID, ownership, borrow, unsafe, and generated categories remain excluded."]
 
 [[protocol]]
 id = "PROTO-LSP-HOVER"
