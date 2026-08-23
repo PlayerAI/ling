@@ -1,11 +1,10 @@
 # LSP-2201-ORDERING implementation report
 
-Status: Done (bounded internal child only)
+Status: Done (bounded internal child consumed by RFC-0031)
 
 This report records the implementation authorized by Accepted DEC-0034. The
-parent `LSP-2201` task remains `BlockedSpec`: no public LSP diagnostic adapter,
-range projection, severity mapping, fix-data field, or publication behavior is
-implemented.
+parent `LSP-2201` now consumes this primitive under Accepted RFC-0031. This
+child itself still defines no field mapping or publication behavior.
 
 ## Normative scope
 
@@ -13,8 +12,8 @@ implemented.
   compatibility; DEC-0002 preserves original UTF-8 byte spans.
 - DEC-0034 §§1–4 authorize only a path-free internal ordering key over logical
   file text, byte offsets, code text, and an explicit local tie-breaker.
-- The execution-plan diagnostic mapping remains non-normative and cannot
-  authorize an LSP wire schema or editor-visible result.
+- Accepted RFC-0031, rather than the execution-plan checklist, authorizes the
+  separate public adapter schema and editor-facing value.
 
 ## Implementation
 
@@ -22,8 +21,8 @@ implemented.
   canonical `(file, start byte, code, end byte, tie-breaker)` ordering.
 - The key preserves supplied UTF-8 byte offsets and does not normalize paths,
   convert positions, inspect map order, or use severity/messages/facts/repairs.
-- The module is internal and intentionally not wired to `LspServer`, compiler
-  diagnostics, transport, protocol inventory, or result publication.
+- The key remains internal and is consumed by RFC-0031's pure adapter. It is
+  not wired to `LspServer`, transport, or result publication.
 
 ## Evidence
 
@@ -47,8 +46,6 @@ was allocated and no LSP position encoding was selected.
 
 ## Deferred work
 
-Public diagnostic field mapping, severity/tags, localization, URI policy,
-position conversion, snapshot/version association, related information,
-root-cause/deduplication, caps/truncation, clear/replace, cancellation,
-publication, and Stable versus Experimental lifecycle remain deferred to
-parent `LSP-2201` and `LSP-2204`.
+Snapshot/version association, root-cause/deduplication, caps/truncation,
+clear/replace, cancellation, publication, tags, repair application, and Stable
+lifecycle remain deferred to LSP-2202 through LSP-2205.

@@ -475,6 +475,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-DIAGNOSTIC",
+      "visibility": "Public",
+      "version": "ling.lsp.diagnostic/0.1",
+      "stability": "Experimental",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-FORMATTING",
       "visibility": "Public",
       "version": "ling.lsp.formatting/0.1",

@@ -6835,3 +6835,31 @@ unresolved_alternatives = [
   "Host watcher adapters, file URI mapping, symlink policy, multi-root projects, network dependencies, compiler-result cancellation and staleness, diagnostics refresh, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0031"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0031.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact JSON fields and Error, Warning, Note, stable-code, bilingual-message, Facts, Semantic ID, and repair mappings.",
+  "Cover UTF-8/16/32 primary and related ranges across Chinese, emoji, combining marks, BOM, CRLF, final lines, and multiple logical sources.",
+  "Verify canonical diagnostic order, preserved related-label order, repeated byte identity, and insertion-order independence where the normative key differs.",
+  "Reject empty or duplicate source sets, missing primaries, unknown or mismatched sources, invalid boundaries, and invalid later inputs without partial output.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, support, status, RC0, traceability, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds Experimental in-process ling.lsp.diagnostic/0.1 with no predecessor or reader migration.",
+  "Leaves ling.diagnostic/0.1 unchanged; related labels are explicit adapter input and existing codes, messages, severity, Facts, Semantic IDs, and repairs are preserved.",
+  "Adds no diagnostic allocation, language semantic, public schema, runtime, bytecode, VM, ABI, host filesystem/network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Push and pull publication, document versions, stale results, cancellation, root-cause grouping, caps, omission reporting, codeDescription, tags, fix application, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

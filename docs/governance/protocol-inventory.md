@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 32 records: 28 current public, 1 internal, 3 Future.
-- Current public stability: 14 Experimental, 14 Preview, 0 Stable.
+- 33 records: 29 current public, 1 internal, 3 Future.
+- Current public stability: 15 Experimental, 14 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -17,6 +17,7 @@
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 10 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 4 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
+| `PROTO-LSP-DIAGNOSTIC` | Public | LSP | `ling.lsp.diagnostic/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
@@ -87,6 +88,19 @@
 - Sources: [`docs/RFC-0024.md`](../RFC-0024.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs)
 - Fixtures: [`crates/ling-cli/tests/project_check.rs`](../../crates/ling-cli/tests/project_check.rs), [`tests/protocols/project-check/README.md`](../../tests/protocols/project-check/README.md)
 - Notes: Graph validation only: semantic compilation, run/test/build, workspace search, registry/network behavior, and lock update mode remain deferred.
+
+### `PROTO-LSP-DIAGNOSTIC` — Ling LSP compiler diagnostic adapter
+
+- Producer: ling-lsp diagnostic adapter
+- Consumer: future LSP diagnostic publishers; editor and integration test harnesses
+- Reader policy: Accept a non-empty set of unique exact non-temporary Ling URI/source identities and existing registered compiler diagnostics with required primary spans; project every primary and related span strictly through the explicit negotiated encoding, rejecting the complete call on any identity, range, or boundary failure.
+- Writer policy: Emit exactly one path-free URI plus LSP Diagnostic JSON value per input in DEC-0034 order; preserve registered code, bilingual message, severity, Facts, Semantic ID, repairs, explicit related-label order, and original-byte position truth without publication or mutation.
+- Unknown-field policy: The 0.1 adapter has no JSON reader; its exact output keys are current-writer-only, and incompatible field, severity, message, data, URI, ordering, or projection evolution requires a new protocol marker and migration evidence.
+- Migration tool: None; ling.lsp.diagnostic/0.1 is Experimental with no predecessor and is not yet published on JSON-RPC.
+- Authority: `RFC-0031`, `DEC-0001`, `DEC-0002`, `DEC-0029`, `DEC-0034`, `DEC-0072`
+- Sources: [`docs/RFC-0031.md`](../RFC-0031.md), [`docs/SEMANTICS.md`](../SEMANTICS.md), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/decisions/0001-error-code-policy.md`](../decisions/0001-error-code-policy.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md`](../decisions/0034-lsp-internal-diagnostic-ordering-boundary.md), [`docs/decisions/0072-lsp-diagnostic-span-projection.md`](../decisions/0072-lsp-diagnostic-span-projection.md), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-lsp/src/diagnostics.rs`](../../crates/ling-lsp/src/diagnostics.rs)
+- Fixtures: [`crates/ling-lsp/tests/diagnostic_adapter.rs`](../../crates/ling-lsp/tests/diagnostic_adapter.rs), [`tests/protocols/lsp-diagnostic/README.md`](../../tests/protocols/lsp-diagnostic/README.md), [`docs/status/LSP-2201-IMPLEMENTATION-REPORT.md`](../status/LSP-2201-IMPLEMENTATION-REPORT.md)
+- Notes: This is a pure in-process adapter, not a JSON-RPC method. Publication, debounce, snapshot/document versions, stale-result handling, replacement/clearance, deduplication, root-cause caps, suppression, tags, code-description URLs, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
 
 ### `PROTO-LSP-FORMATTING` — Ling LSP bounded document formatting
 

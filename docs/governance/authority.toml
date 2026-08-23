@@ -990,6 +990,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0031"
+title = "LSP compiler diagnostic adapter"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0031.md"
+covers = ["ling.lsp.diagnostic/0.1", "bilingual registered diagnostic field mapping", "strict primary and related span projection with canonical ordering"]
+depends_on = ["SEMANTICS", "ERROR-CODES", "RFC-0004", "RFC-0023", "DEC-0001", "DEC-0002", "DEC-0029", "DEC-0034", "DEC-0072", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

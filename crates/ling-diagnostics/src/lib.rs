@@ -337,8 +337,23 @@ impl Diagnostic {
     }
 
     #[must_use]
+    pub fn message_zh(&self) -> &str {
+        &self.message_zh
+    }
+
+    #[must_use]
+    pub fn message_en(&self) -> &str {
+        &self.message_en
+    }
+
+    #[must_use]
     pub const fn primary_span(&self) -> Option<&DiagnosticSpan> {
         self.primary_span.as_ref()
+    }
+
+    #[must_use]
+    pub fn semantic_id(&self) -> Option<&str> {
+        self.semantic_id.as_deref()
     }
 
     #[must_use]

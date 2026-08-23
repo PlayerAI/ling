@@ -28,10 +28,14 @@ mod scheduler;
 // behavior remains deferred to the parent LSP-2504 contract.
 #[allow(dead_code)]
 mod resource;
-// DEC-0034 is an internal ordering child; diagnostic projection and
-// publication remain deferred to the parent LSP contracts.
+// RFC-0031 owns the public compiler-diagnostic adapter. Publication remains a
+// separate LSP-2202 concern.
 #[allow(dead_code)]
 mod diagnostics;
+pub use diagnostics::{
+    AdaptedDiagnostic, DIAGNOSTIC_PROTOCOL_VERSION, DiagnosticAdapterError, DiagnosticAdapterInput,
+    DiagnosticProjectionError, DiagnosticSource, RelatedDiagnosticLabel, adapt_diagnostics,
+};
 // DEC-0035 is an internal immutable collection child; public diagnostics
 // publication remains deferred to the parent LSP contracts.
 #[allow(dead_code)]

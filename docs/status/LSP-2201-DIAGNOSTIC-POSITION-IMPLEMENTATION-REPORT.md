@@ -5,8 +5,8 @@
 `ling-lsp` now contains a private, deterministic helper that projects a
 compiler `DiagnosticSpan` from original UTF-8 byte offsets into an explicit
 `LspPosition` range. It validates logical source identity, range order, offset
-width, and source-map boundaries without clamping or mutating state. The
-public `LSP-2201` adapter remains `BlockedSpec`.
+width, and source-map boundaries without clamping or mutating state. Accepted
+RFC-0031 now consumes this helper in the public adapter.
 
 ## Implementation
 
@@ -39,8 +39,7 @@ allocation order, and map iteration are not observable.
 
 ## Intentionally deferred
 
-Public LSP diagnostic fields and publication, severity/tags, related
-information, localized messages, Facts/repairs, URI/document versions,
-snapshot freshness, stale-result handling, cancellation, suppression,
-root-cause grouping, and JSON-RPC compatibility remain deferred to accepted
-parent decisions.
+Publication, URI/document versions, snapshot freshness, stale-result handling,
+cancellation, suppression, root-cause grouping, caps, tags, repair application,
+and JSON-RPC publication compatibility remain deferred to LSP-2202 through
+LSP-2205 and future Accepted decisions.

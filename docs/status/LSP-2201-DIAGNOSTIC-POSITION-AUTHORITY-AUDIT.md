@@ -2,10 +2,10 @@
 
 ## Outcome
 
-`LSP-2201-DIAGNOSTIC-POSITION` is a bounded child of the blocked `LSP-2201`
-target, authorized by Accepted `DEC-0072`. It projects one existing compiler
-diagnostic span through an explicit source position encoding, but it does not
-accept or implement the public LSP diagnostic adapter.
+`LSP-2201-DIAGNOSTIC-POSITION` is a bounded child of `LSP-2201`, authorized by
+Accepted `DEC-0072`. It projects one existing compiler diagnostic span through
+an explicit source position encoding. Accepted RFC-0031 now consumes this
+primitive in the public adapter without changing the child's contract.
 
 ## Normative traceability
 
@@ -17,8 +17,8 @@ accept or implement the public LSP diagnostic adapter.
   authorize field mapping or publication.
 - `PROTO-DIAGNOSTIC-JSON` remains a separate Preview writer; it does not
   define an LSP diagnostic schema.
-- Accepted `DEC-0072` authorizes only the private source-layer projection and
-  explicitly preserves the blocked parent.
+- Accepted `DEC-0072` authorizes the private source-layer projection; Accepted
+  RFC-0031 separately authorizes its use by the public adapter.
 
 ## Current interface evidence
 
@@ -37,7 +37,6 @@ source span, CLI, runtime, bytecode, VM, ABI, or Unicode table changed.
 
 ## Intentionally deferred
 
-Severity/tags, bilingual message selection, related information, Facts,
-repairs, Semantic IDs, URI/version and snapshot association, stale results,
-publication/clearance, cancellation, suppression, root-cause grouping, and
-JSON-RPC fixtures remain in the blocked `LSP-2201`/`LSP-2204` parents.
+URI/version and snapshot association, stale results, publication/clearance,
+cancellation, suppression, root-cause grouping, caps, tags, repair application,
+and JSON-RPC publication fixtures remain in LSP-2202 through LSP-2205.

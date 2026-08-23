@@ -2,81 +2,73 @@
 
 ## Outcome
 
-`LSP-2202` is correctly recorded as `BlockedSpec`. The execution plan proposes
-`publishDiagnostics` after open-file edits, debounce, fast syntax results,
-workspace type results, document-version tagging, and replacement of older
-results. These behaviors depend on unaccepted LSP lifecycle, overlay/version,
-position, and diagnostic-adapter contracts.
+`LSP-2202` remains `BlockedSpec`, but its foundational dependencies are now
+implemented: RFC-0004/RFC-0023/RFC-0029/RFC-0030 govern lifecycle, overlays,
+incremental edits, and workspace snapshots, while Accepted RFC-0031 defines
+the compiler diagnostic adapter. The remaining blocker is narrower and
+substantive: no Accepted authority defines push publication, trigger/debounce,
+document-version association, stale-result rejection, replacement, or clear
+semantics.
 
-Accepted DEC-0035 closes only the bounded `LSP-2202-BATCH` child: an internal
-immutable batch over opaque diagnostic IDs and DEC-0034 ordering keys. No
-push-diagnostics publisher, debounce scheduler, version tag, clear-result
-policy, or placeholder LSP handler was added. Existing compiler/CLI diagnostic
-behavior remains unchanged.
+Accepted DEC-0035 closes only the bounded `LSP-2202-BATCH` child: an immutable
+internal batch over opaque diagnostic IDs and DEC-0034 order keys. It is not a
+publication contract and cannot be inferred into one.
 
 ## Normative traceability
 
-- `docs/SEMANTICS.md` and `docs/ERROR-CODES.md` define deterministic,
-  root-cause-first, bilingual diagnostic facts and byte spans, but not an LSP
-  publication lifecycle or incremental-result policy.
-- `PROTO-DIAGNOSTIC-JSON` is a Preview writer and does not define
-  `publishDiagnostics`, document versions, or stale-result replacement.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves document/snapshot/version and
-  Workspace Edit behavior open; `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves
-  public semantic lifecycle fields open.
-- LSP-2101 through LSP-2104 and LSP-2201 remain blocked on lifecycle, position,
-  overlay, change, and adapter authorities. A lower-level plan cannot publish
-  diagnostics without those dependencies.
+- `docs/SEMANTICS.md`, `docs/ERROR-CODES.md`, and RFC-0031 define deterministic
+  bilingual compiler diagnostics and their exact LSP value projection.
+- RFC-0004 defines lifecycle/transport and negotiated position encoding;
+  RFC-0023/RFC-0029 define versioned open-document changes; RFC-0030 defines
+  atomic workspace input snapshots.
+- DEC-0019 and DEC-0071 define revision-aware invalidation and immutable
+  observation, but not asynchronous publication ownership.
+- `GAP-LSP-TRANSACTION-PROTOCOL-001` still leaves event scheduling,
+  snapshot/client-version association, stale completion, and publication
+  replacement behavior open.
+- `PROTO-DIAGNOSTIC-JSON` is a separate Preview compiler writer;
+  `PROTO-LSP-DIAGNOSTIC` is a pure adapter, not `publishDiagnostics`.
 
 ## Current interface evidence
 
-The current repository confirms the missing boundary:
-
-- `ling-diagnostics` produces deterministic human/JSON diagnostics from checked
-  compiler results; no `publishDiagnostics` event or document-version field is
-  emitted.
-- `ling-db` exposes query revisions and traces internally, but no LSP debounce,
-  cancellation, result replacement, or snapshot association exists.
-- The batch child is deliberately disconnected from `LspServer`; it cannot
-  claim `publishDiagnostics`, trigger/debounce, clear/replace, stale-result, or
-  client-version behavior.
-- No fixture defines syntax-only versus workspace-type timing, stale result
-  suppression, empty-diagnostics clearing, or related-document publication.
+- `ling-lsp::adapt_diagnostics` can build exact ordered LSP diagnostic values
+  from immutable source inputs, but it accepts no request snapshot or client
+  version and sends no JSON-RPC notification.
+- `LspServer` tracks lifecycle, overlays, versions, and workspace revisions,
+  but has no compile scheduler, debounce state, published-result identity, or
+  replacement/clear ledger.
+- `ling-db` exposes revisioned queries and cancellation primitives internally;
+  no Accepted rule chooses syntax-only versus workspace analysis timing or
+  defines which completed result may still be published.
+- The DEC-0035 batch remains disconnected from transport and cannot establish
+  document-version, stale-result, or empty-clear behavior.
 
 ## Required authority before implementation
 
-An implementation-ready decision or RFC must define, at minimum:
+An implementation-ready RFC must define, at minimum:
 
-1. trigger and debounce policy for `didOpen`/`didChange`, syntax versus
-   workspace diagnostics, scheduling/cancellation, and resource limits;
-2. document/project snapshot and version association, stale-result rejection,
-   replacement/clear semantics, ordering, and related-document scope;
-3. diagnostic adapter field mappings, negotiated positions, stable/experimental
-   data, localization, root-cause/error-storm rules, and URI identity;
-4. transport/lifecycle behavior, failure responses, offline/project policy,
-   and Stable versus Experimental protocol fields; and
-5. positive, negative, edit-burst, stale-version, cancellation, clear/replace,
-   related-file, Unicode/CRLF, deterministic, and migration fixtures.
+1. exact `didOpen`/`didChange`/workspace-reload triggers, deterministic debounce
+   and cancellation checkpoints, and bounded work/resource policy;
+2. immutable request/workspace snapshot identity, optional LSP document
+   version mapping, and stale completion rejection;
+3. `publishDiagnostics` URI/version/diagnostics shape, ordering, related-file
+   scope, replacement and empty-clear semantics, and failure atomicity;
+4. syntax-fast-path versus workspace semantic result precedence without
+   allowing older/narrower results to overwrite newer/complete results; and
+5. positive, negative, edit-burst, cancellation, stale, clear/replace,
+   multi-file, Unicode/CRLF, deterministic, and migration fixtures.
 
-Until those decisions and fixtures are Accepted, pushing results could publish
-stale diagnostics, clear a newer snapshot, or freeze an unsupported debounce
-and ordering contract.
+## Compatibility and determinism
 
-## Evidence and compatibility
-
-This audit was checked against `docs/SEMANTICS.md`, `docs/ERROR-CODES.md`,
-`docs/ROADMAP-1.0.md`, `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-diagnostics`, `crates/ling-db`, and the LSP-2101/2104/2201 audit
-boundaries.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+The future publisher must reuse RFC-0031 values unchanged, expose no host
+paths or scheduler timing as Ling semantics, and prevent cancelled or stale
+work from clearing a newer result. Any public extension field requires an
+explicit Experimental version marker and migration evidence. No diagnostic
+code or core diagnostic schema should be allocated for transport bookkeeping.
 
 ## Intentionally deferred
 
-The parent `LSP-2202` can begin after lifecycle, overlay/version, position, and
-diagnostic adapter decisions are Accepted. The implementation must publish
-only snapshot-associated results, replace/clear atomically, and keep debounce
-and timing choices out of Ling semantics. The `LSP-2202-BATCH` child is complete
-only for DEC-0035's internal immutable collection boundary.
+Until the publication RFC is Accepted, no `publishDiagnostics` handler,
+background compiler job, timer/debounce mechanism, version tag, result ledger,
+or placeholder public API may be added. Root-cause/error-storm caps and
+suppression remain LSP-2204; pull diagnostics remain LSP-2203.
