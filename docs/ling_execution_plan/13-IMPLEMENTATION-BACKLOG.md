@@ -519,6 +519,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PROTO-6204` | G6 | CLI 与退出码冻结 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:136`, `docs/status/PROTO-6204-AUTHORITY-AUDIT.md` |
 | `PROTO-6204-OBSERVATION` | G6 | Internal CLI and Exit-Code Freeze boundary evidence | S | Done | Accepted `DEC-0222`; see `crates/ling-types/tests/cli_exit_freeze_evidence.rs`, `crates/ling-cli/src/command_catalog.rs`, `crates/ling-cli/src/exit_catalog.rs`, and `docs/status/PROTO-6204-OBSERVATION-IMPLEMENTATION-REPORT.md`; Stable 1.0 matrix and plan-only commands remain BlockedSpec |
 | `STD-6301` | G6 | 稳定标准库审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:164`, `docs/status/STD-6301-AUTHORITY-AUDIT.md` |
+| `STD-6301-OBSERVATION` | G6 | Internal Stable Standard Library Audit boundary evidence | S | Done | Accepted `DEC-0223`; see `crates/ling-types/tests/stable_standard_library_audit_evidence.rs`, `crates/ling-resolve/src/lib.rs`, `tools/xtask/src/support.rs`, and `docs/status/STD-6301-OBSERVATION-IMPLEMENTATION-REPORT.md`; packaged/Profile/Stable library semantics remain BlockedSpec |
 | `STD-6302` | G6 | 删除过度便利 API | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:180`, `docs/status/STD-6302-AUTHORITY-AUDIT.md` |
 | `STD-6303` | G6 | Unicode 与中文编程稳定性 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:195`, `docs/status/STD-6303-AUTHORITY-AUDIT.md` |
 | `PKG-6401` | G6 | 包发布协议 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:210`, `docs/status/PKG-6401-AUTHORITY-AUDIT.md` |

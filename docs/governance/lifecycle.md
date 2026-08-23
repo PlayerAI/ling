@@ -253,6 +253,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0220` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0220](../decisions/0220-reader-writer-compatibility-boundary-evidence.md) |
 | `DEC-0221` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0221](../decisions/0221-semantic-hash-upgrade-rehearsal-boundary-evidence.md) |
 | `DEC-0222` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0222](../decisions/0222-cli-exit-freeze-boundary-evidence.md) |
+| `DEC-0223` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0223](../decisions/0223-stable-standard-library-audit-boundary-evidence.md) |
 
 ## Migration boundary
 

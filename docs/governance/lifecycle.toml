@@ -5700,3 +5700,29 @@ unresolved_alternatives = [
   "The Stable 1.0 command matrix; plan-only commands; shared option grammar; defaults and environment precedence; color/path policy; project run/test/build and workspace selection; output byte compatibility; human/JSON lifecycle; cancellation and future exits; shell completion; locale; migration; and release policy remain open under PROTO-6204, incomplete G1-G5 exits, ROADMAP-1.0, support blockers, and protocol lifecycle work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0223"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0223-stable-standard-library-audit-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert exact six built-ins and six Prelude definitions, origins, kinds, logical modules, and absence of invented source locations.",
+  "Assert the exact single standard-package record and its non-Stable, un-packaged, unprofiled state.",
+  "Assert all sixty local boundaries, exact ordering, duplicate rejection, and order-independent opaque bytes.",
+  "Run resolver, support, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds only exact-scope and test-local evidence. Existing built-ins, Prelude definitions, signatures, Effects, Capabilities, Faults, resolver/evaluator behavior, Semantic IDs, support claims, source spans, diagnostics, and Unicode 17.0.0 remain unchanged.",
+  "No symbol, package, manifest, profile, target, complexity claim, locale API, migration, diagnostic, public API, or Stable support claim is added.",
+]
+unresolved_alternatives = [
+  "A complete public symbol table; packaged distribution and versioning; profiles and targets; complexity/resource, panic/termination, locale/text behavior; deprecation and migration; stable diagnostics; compatibility fixtures; and release policy remain open under STD-6301 through STD-6303, incomplete G1-G5 exits, ROADMAP-1.0, and future Accepted standard-library authority.",
+]
+superseded_by = ""

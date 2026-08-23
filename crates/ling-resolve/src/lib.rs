@@ -2146,6 +2146,72 @@ mod tests {
     }
 
     #[test]
+    fn seed_builtin_and_prelude_inventories_are_exact() {
+        let program = hir_program(0, "inventory.ling", "module Main\n\nlet main () = ()\n");
+        let resolved = resolve(vec![program], "Main").expect("inventory resolves");
+
+        let builtins = [
+            Builtin::ConsoleWrite,
+            Builtin::TextFormat,
+            Builtin::Max,
+            Builtin::Min,
+            Builtin::Map,
+            Builtin::Sum,
+        ];
+        assert_eq!(
+            builtins.map(Builtin::qualified_name),
+            ["Console.write", "Text.format", "max", "min", "map", "sum"]
+        );
+        let builtin_definitions = resolved
+            .definitions()
+            .values()
+            .filter(|definition| matches!(definition.origin, DefinitionOrigin::Builtin(_)))
+            .collect::<Vec<_>>();
+        assert_eq!(builtin_definitions.len(), builtins.len());
+        for builtin in builtins {
+            let definition = resolved
+                .definition(resolved.builtin_id(builtin))
+                .expect("builtin definition exists");
+            assert_eq!(definition.name, builtin.qualified_name());
+            assert_eq!(definition.kind, DefinitionKind::Builtin);
+            assert_eq!(definition.origin, DefinitionOrigin::Builtin(builtin));
+            assert_eq!(definition.module_name, "<builtin>");
+            assert!(definition.source_name.is_none());
+            assert!(definition.span.is_none());
+        }
+
+        let prelude = [
+            PreludeDefinition::Option,
+            PreludeDefinition::Some,
+            PreludeDefinition::None,
+            PreludeDefinition::Result,
+            PreludeDefinition::Ok,
+            PreludeDefinition::Error,
+        ];
+        assert_eq!(
+            prelude.map(PreludeDefinition::name),
+            ["Option", "Some", "None", "Result", "Ok", "Error"]
+        );
+        let prelude_definitions = resolved
+            .definitions()
+            .values()
+            .filter(|definition| matches!(definition.origin, DefinitionOrigin::Prelude(_)))
+            .collect::<Vec<_>>();
+        assert_eq!(prelude_definitions.len(), prelude.len());
+        for definition in prelude {
+            let info = resolved
+                .definition(resolved.prelude_id(definition))
+                .expect("Prelude definition exists");
+            assert_eq!(info.name, definition.name());
+            assert_eq!(info.kind, definition.kind());
+            assert_eq!(info.origin, DefinitionOrigin::Prelude(definition));
+            assert_eq!(info.module_name, PRELUDE_MODULE);
+            assert!(info.source_name.is_none());
+            assert!(info.span.is_none());
+        }
+    }
+
+    #[test]
     fn rejects_module_scope_prelude_redefinition() {
         let program = hir_program(
             0,

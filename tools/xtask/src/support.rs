@@ -1586,4 +1586,25 @@ mod tests {
         assert_eq!(summary.protocol_count, 27);
         assert_eq!(summary.unsupported_count, 9);
     }
+
+    #[test]
+    fn repository_standard_package_scope_is_exact_and_not_stable() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("xtask is under tools/xtask");
+        let matrix = load_matrix(root).expect("repository matrix parses");
+        assert_eq!(matrix.standard_package.len(), 1);
+        let package = &matrix.standard_package[0];
+        assert_eq!(package.id, "STD-LING-PRELUDE");
+        assert_eq!(package.package, "Ling.Prelude");
+        assert_eq!(package.version, "0.0.1-dev");
+        assert_eq!(package.state, "BuiltinOnly");
+        assert_eq!(package.stability, "Preview");
+        assert!(package.implemented);
+        assert!(!package.packaged);
+        assert!(package.profiles.is_empty());
+        assert_eq!(package.authorities, ["DEC-0014"]);
+        assert_eq!(package.explicitly_unsupported.len(), 3);
+    }
 }

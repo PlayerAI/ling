@@ -3406,3 +3406,16 @@ covers = ["PROTO-6204 bounded CLI and Exit-Code Freeze boundary evidence", "exac
 depends_on = ["DEC-0013", "DEC-0036", "DEC-0037", "DEC-0040", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0223"
+title = "Internal Stable Standard Library Audit boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0223-stable-standard-library-audit-boundary-evidence.md"
+covers = ["STD-6301 bounded Stable Standard Library Audit boundary evidence", "exact Seed built-in and Prelude inventory plus truthful support state", "test-only audit boundaries without packaged or Stable library semantics"]
+depends_on = ["DEC-0011", "DEC-0014", "ROADMAP-1.0", "SUPPORT-MATRIX"]
+supersedes = []
+stable_basis = true
