@@ -23989,6 +23989,56 @@ notes = [
 ]
 
 [[task]]
+id = "STD-6303-OBSERVATION"
+title = "Internal Unicode and Chinese-programming stability boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["STD-6302-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0225-unicode-chinese-stability-boundary-evidence.md",
+  "docs/status/STD-6303-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "crates/ling-unicode/tests/unicode_chinese_stability.rs",
+  "crates/ling-types/tests/unicode_chinese_stability_evidence.rs",
+  "docs/status/STD-6303-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/STD-6303-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0225 authorizes only bounded regression evidence for already-accepted Seed Unicode behavior; STD-6303 remains BlockedSpec for stabilization beyond that boundary.",
+  "The exact Unicode version tuple is 17.0.0 and the exact eleven input path/SHA-256 pairs match the generated Unicode data manifest.",
+  "Representative Chinese XID, original spelling, NFC equality, Script Set, confusable skeleton, suspicious mixed-script, all ten forbidden-property classes, and original UTF-8 byte offsets are executable.",
+  "The test-local inventory covers sixty Unicode, text, Chinese-name, tooling, migration, authority, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "cargo test -p ling-unicode --locked --offline passes, including exhaustive Unicode 17 XID and NFC conformance.",
+  "cargo test -p ling-types --test unicode_chinese_stability_evidence --locked --offline passes.",
+  "cargo test -p ling-syntax --test unicode_identifier_differential --locked --offline passes.",
+  "cargo run -p unicode-gen --locked --offline reproduces the tracked Rust and Tree-sitter Unicode tables without drift.",
+  "cargo clippy -p ling-unicode -p ling-types -p unicode-gen -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "governance, formatting, and diff checks pass without adding upgrade, localization, formatter/editor/CLI, path, migration, or Stable semantics.",
+]
+verified_against_commit = "e4d1aa815a6f9da69dfe6036d73e7fa9a1a8ef47"
+completion_commit = "e4d1aa815a6f9da69dfe6036d73e7fa9a1a8ef47"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0225; STD-6303 remains BlockedSpec for Unicode upgrades, localized aliases/views, profile policy, diagnostics stabilization, cross-tool protocols, path rules, and migration evidence.",
+  "The opaque ling.unicode-chinese-stability-observation/0 bytes are test evidence only and are not a manifest format, Unicode upgrade record, Semantic ID input, localization schema, or public protocol.",
+  "No Unicode data, generated table, dependency, identifier behavior, diagnostic, Semantic ID, source span, package, profile, formatter/editor/CLI behavior, Windows-path rule, migration behavior, or support claim changed.",
+]
+
+[[task]]
 id = "PKG-6401"
 title = "Package Publication Protocol"
 state = "BlockedSpec"

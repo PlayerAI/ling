@@ -435,6 +435,7 @@
 | `STD-6302` | Remove Convenience APIs | `G6` | `L` | `BlockedSpec` | `STD-6301` | `` |
 | `STD-6302-OBSERVATION` | Internal Convenience API Removal Audit boundary evidence | `G6` | `S` | `Done` | `STD-6301-OBSERVATION` | `74eff3886fd9305f1c4bdc3c78025a7289200a81` |
 | `STD-6303` | Unicode and Chinese-Programming Stability | `G6` | `L` | `BlockedSpec` | `STD-6302` | `` |
+| `STD-6303-OBSERVATION` | Internal Unicode and Chinese-programming stability boundary evidence | `G6` | `S` | `Done` | `STD-6302-OBSERVATION` | `e4d1aa815a6f9da69dfe6036d73e7fa9a1a8ef47` |
 | `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `SUP-2401-OBSERVATION` | Internal Supervisor observation | `G2` | `S` | `Done` | `ACT-2306-PROPERTY-OBSERVATION` | `c29d95c7bc7b926c92757b2c32fccf960500e421` |
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
