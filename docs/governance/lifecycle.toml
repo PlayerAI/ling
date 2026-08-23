@@ -5886,3 +5886,30 @@ unresolved_alternatives = [
   "Authenticated publisher namespaces; registry and installer threat models; archive/artifact formats; signing and trust; yanking and rollback; package-cache repair; hermetic build capabilities; stable diagnostics; migration; and complete 1.0 supply-chain claims require future Accepted authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0230"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact v0.0.1 case/file shape, reject symlinks and extra/missing entries, and hash sorted canonical relative paths plus original bytes.",
+  "Freeze the current 42 cases, 84 files, and domain-separated digest in one machine-readable source and generated report.",
+  "Verify the exact ten-surface SeedFrozen, NotFrozen, SeparateProtocol, and Unavailable classification and all evidence paths.",
+  "Require cargo xtask corpus verify in the always-on CI contract.",
+  "Run traceability, Seed reproduction, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Freezes existing test evidence only; source, parser, resolver, Typed Core, evaluator, diagnostics, Semantic IDs, schemas, bytecode, package/lock, editors, CLI, dependencies, Unicode 17.0.0, and runtime behavior remain unchanged.",
+  "The internal digest carries no reader, migration, deprecation, release-history, or 1.x compatibility promise.",
+]
+unresolved_alternatives = [
+  "Accepted v0.1-v0.5 release inventories and artifacts; complete per-surface historical corpora; compatibility outcomes, readers, migrations, deprecations, provenance, rollback, and unavailable protocol fixtures remain deferred.",
+]
+superseded_by = ""

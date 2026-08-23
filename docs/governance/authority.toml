@@ -3497,3 +3497,16 @@ covers = ["PKG-6404 bounded local supply-chain attack evidence", "exact classifi
 depends_on = ["RFC-0002", "DEC-0022", "DEC-0228", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0230"
+title = "Seed historical-corpus freeze evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md"
+covers = ["COMPAT-6501 bounded v0.0.1 Seed corpus freeze evidence", "canonical content digest and exact classification of all ten requested historical surfaces", "internal drift gate without v0.1-v0.5 history, compatibility, migration, or unavailable protocol semantics"]
+depends_on = ["CONFORMANCE", "DEC-0001", "DEC-0002", "DEC-0012", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

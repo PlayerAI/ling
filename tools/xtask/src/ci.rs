@@ -45,7 +45,10 @@ const REQUIRED_GATES: &[GateContract] = &[
     },
     GateContract {
         name: "traceability-links",
-        commands: &["cargo xtask traceability verify --release v0.0.1"],
+        commands: &[
+            "cargo xtask traceability verify --release v0.0.1",
+            "cargo xtask corpus verify",
+        ],
     },
     GateContract {
         name: "support-matrix",

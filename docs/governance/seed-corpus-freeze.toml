@@ -1,0 +1,59 @@
+schema_version = 1
+authority = "DEC-0230"
+release = "v0.0.1"
+unicode_version = "17.0.0"
+corpus_root = "tests/conformance"
+case_count = 42
+file_count = 84
+sha256 = "caafb863d530bddd7b22a2de4aa0a8db374bd46f407e602fa78276a126442cd8"
+report = "docs/governance/seed-corpus-freeze.md"
+
+[[surface]]
+name = "source programs"
+state = "SeedFrozen"
+evidence = ["tests/conformance"]
+
+[[surface]]
+name = "parser trees"
+state = "NotFrozen"
+evidence = ["crates/ling-syntax/tests/conformance_syntax_differential.rs", "docs/status/COMPAT-6501-AUTHORITY-AUDIT.md"]
+
+[[surface]]
+name = "diagnostics"
+state = "SeedFrozen"
+evidence = ["tests/conformance", "docs/ERROR-CODES.md"]
+
+[[surface]]
+name = "Semantic Graph"
+state = "SeparateProtocol"
+evidence = ["crates/ling-semantic/tests/project_snapshot.rs", "docs/governance/protocol-inventory.toml"]
+
+[[surface]]
+name = "Audit"
+state = "SeparateProtocol"
+evidence = ["crates/ling-format/src/lib.rs", "docs/governance/protocol-inventory.toml"]
+
+[[surface]]
+name = "bytecode"
+state = "SeparateProtocol"
+evidence = ["crates/ling-bytecode/tests/decode_verify.rs", "docs/governance/protocol-inventory.toml"]
+
+[[surface]]
+name = "package/lock"
+state = "SeparateProtocol"
+evidence = ["crates/ling-project/tests/lockfile_fixtures.rs", "docs/governance/protocol-inventory.toml"]
+
+[[surface]]
+name = "replay"
+state = "Unavailable"
+evidence = ["docs/status/COMPAT-6501-AUTHORITY-AUDIT.md", "docs/governance/support-matrix.toml"]
+
+[[surface]]
+name = "evidence"
+state = "Unavailable"
+evidence = ["docs/status/COMPAT-6501-AUTHORITY-AUDIT.md", "docs/governance/support-matrix.toml"]
+
+[[surface]]
+name = "Zed/LSP fixtures"
+state = "Unavailable"
+evidence = ["docs/status/COMPAT-6501-AUTHORITY-AUDIT.md", "docs/governance/support-matrix.toml"]

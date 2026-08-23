@@ -45,7 +45,9 @@ jobs:
           - name: error-code-registry
             command: cargo xtask governance check-error-codes
           - name: traceability-links
-            command: cargo xtask traceability verify --release v0.0.1
+            command: |
+              cargo xtask traceability verify --release v0.0.1
+              cargo xtask corpus verify
           - name: support-matrix
             command: |
               cargo xtask support verify

@@ -20,7 +20,9 @@ The list also includes Replay, evidence bundles, Zed/LSP, package publication,
 and other surfaces that the current support matrix marks Future or Unsupported.
 Creating fixtures for those names would imply semantic or public-protocol
 support that is not authorized. Existing v0.0.1 fixtures remain valid evidence
-and must not be relabeled as a v0.5 historical corpus.
+and must not be relabeled as a v0.5 historical corpus. Accepted `DEC-0230` now
+authorizes a bounded child that freezes their actual bytes and classifies every
+requested surface without claiming nonexistent release history.
 
 ## Normative traceability
 
@@ -86,7 +88,7 @@ Copying current fixtures into new version directories would create false
 historical claims, while adding future fixtures would blur Unsupported and
 Experimental boundaries.
 
-## Required authority before implementation
+## Required authority for the blocked remainder
 
 An accepted compatibility and corpus decision must define, at minimum:
 
@@ -120,6 +122,7 @@ Experimental/Preview/Future/Unsupported states.
 It deliberately adds no historical-version directory, corpus manifest,
 compatibility matrix, migration tool, warning/rejection diagnostic, Replay or
 evidence schema, package/editor fixture, dependency, protocol, or placeholder.
-Future corpus freezing remains deferred until release authorities, per-surface
-compatibility rules, and executable migration/equivalence evidence are
-Accepted.
+The bounded `COMPAT-6501-SEED` child freezes only v0.0.1. Cross-release corpus
+freezing remains deferred until release authorities, per-surface compatibility
+rules, original historical artifacts, and executable migration/equivalence
+evidence are Accepted.
