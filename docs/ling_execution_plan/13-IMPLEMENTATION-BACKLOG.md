@@ -521,6 +521,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `STD-6301` | G6 | 稳定标准库审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:164`, `docs/status/STD-6301-AUTHORITY-AUDIT.md` |
 | `STD-6301-OBSERVATION` | G6 | Internal Stable Standard Library Audit boundary evidence | S | Done | Accepted `DEC-0223`; see `crates/ling-types/tests/stable_standard_library_audit_evidence.rs`, `crates/ling-resolve/src/lib.rs`, `tools/xtask/src/support.rs`, and `docs/status/STD-6301-OBSERVATION-IMPLEMENTATION-REPORT.md`; packaged/Profile/Stable library semantics remain BlockedSpec |
 | `STD-6302` | G6 | 删除过度便利 API | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:180`, `docs/status/STD-6302-AUTHORITY-AUDIT.md` |
+| `STD-6302-OBSERVATION` | G6 | Internal Convenience API Removal Audit boundary evidence | S | Done | Accepted `DEC-0224`; see `crates/ling-types/tests/convenience_api_removal_audit_evidence.rs`, `crates/ling-resolve/src/lib.rs`, and `docs/status/STD-6302-OBSERVATION-IMPLEMENTATION-REPORT.md`; current removal set is empty and real lifecycle/migration semantics remain BlockedSpec |
 | `STD-6303` | G6 | Unicode 与中文编程稳定性 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:195`, `docs/status/STD-6303-AUTHORITY-AUDIT.md` |
 | `PKG-6401` | G6 | 包发布协议 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:210`, `docs/status/PKG-6401-AUTHORITY-AUDIT.md` |
 | `PKG-6402` | G6 | Hermetic Build | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:226`, `docs/status/PKG-6402-AUTHORITY-AUDIT.md` |

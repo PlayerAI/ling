@@ -2212,6 +2212,39 @@ mod tests {
     }
 
     #[test]
+    fn seed_injected_surface_has_no_plan_only_convenience_names() {
+        let program = hir_program(0, "surface.ling", "module Main\n\nlet main () = ()\n");
+        let resolved = resolve(vec![program], "Main").expect("surface resolves");
+        let injected_names = resolved
+            .definitions()
+            .values()
+            .filter(|definition| {
+                matches!(
+                    definition.origin,
+                    DefinitionOrigin::Builtin(_) | DefinitionOrigin::Prelude(_)
+                )
+            })
+            .map(|definition| definition.name.as_str())
+            .collect::<BTreeSet<_>>();
+        for plan_only in [
+            "Clock.now",
+            "Random.next",
+            "Network.get",
+            "Network.retry",
+            "Runtime.global",
+            "Reflect.dynamic",
+            "Ffi.call",
+            "Collection.unbounded",
+        ] {
+            assert!(
+                !injected_names.contains(plan_only),
+                "plan-only convenience API entered the Seed surface: {plan_only}"
+            );
+        }
+        assert_eq!(injected_names.len(), 12);
+    }
+
+    #[test]
     fn rejects_module_scope_prelude_redefinition() {
         let program = hir_program(
             0,

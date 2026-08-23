@@ -5726,3 +5726,29 @@ unresolved_alternatives = [
   "A complete public symbol table; packaged distribution and versioning; profiles and targets; complexity/resource, panic/termination, locale/text behavior; deprecation and migration; stable diagnostics; compatibility fixtures; and release policy remain open under STD-6301 through STD-6303, incomplete G1-G5 exits, ROADMAP-1.0, and future Accepted standard-library authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0224"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0224-convenience-api-removal-audit-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert the twelve Accepted injected symbols remain exact and no plan-only convenience name enters that surface.",
+  "Assert all sixty local boundaries, exact ordering, duplicate rejection, and order-independent opaque bytes.",
+  "Run resolver, support, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+  "Defer every real removal, deprecation, replacement, or migration until Accepted authority names exact symbols and executable compatibility evidence.",
+]
+compatibility_impact = [
+  "Adds only empty-set and test-local evidence. Existing symbols, types, Effects, Capabilities, Faults, resolver/evaluator behavior, packages, profiles, diagnostics, Semantic IDs, source spans, and Unicode 17.0.0 remain unchanged.",
+  "No API is deleted, hidden, rejected, deprecated, migrated, replaced, or added.",
+]
+unresolved_alternatives = [
+  "Public/internal ownership; core/Preview packages; exact future removal set; delete/hide/reject/retain/deprecate/migrate rules; replacements; compatibility windows; diagnostics; package/lock effects; migration fixtures; complexity/resource contracts; profiles; and release policy remain open under STD-6302, STD-6303, incomplete G1-G5 exits, and future API-lifecycle authority.",
+]
+superseded_by = ""

@@ -3419,3 +3419,16 @@ covers = ["STD-6301 bounded Stable Standard Library Audit boundary evidence", "e
 depends_on = ["DEC-0011", "DEC-0014", "ROADMAP-1.0", "SUPPORT-MATRIX"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0224"
+title = "Internal Convenience API Removal Audit boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0224-convenience-api-removal-audit-boundary-evidence.md"
+covers = ["STD-6302 bounded Convenience API Removal Audit boundary evidence", "empty current removal set and absence of plan-only injected convenience names", "test-only audit boundaries without API lifecycle semantics"]
+depends_on = ["DEC-0011", "DEC-0014", "DEC-0223", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
