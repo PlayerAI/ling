@@ -3211,3 +3211,16 @@ covers = ["TIM-5702 bounded timing-analysis separation boundary evidence", "test
 depends_on = ["DEC-0206", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0208"
+title = "Internal Deadline Check boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0208-deadline-check-boundary-evidence.md"
+covers = ["TIM-5703 bounded Deadline Check boundary evidence", "test-only deadline-comparison vocabulary", "deadline boundaries without Node/schedulability/WCET semantics"]
+depends_on = ["DEC-0207", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

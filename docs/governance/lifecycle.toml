@@ -5327,3 +5327,27 @@ unresolved_alternatives = [
   "Versioned canonical timing-result schema; exact label meanings and transitions; measurement, estimation, static-analysis, proof and assumption separation; sampling, aggregation, confidence, uncertainty, calibration, clock and instrumentation perturbation; static-analysis soundness and WCET wording; target/profile/build/toolchain, scheduler/interrupt/cache/memory/device/FFI, input/environment and TCB identity; Timing IR/path, Semantic ID and original UTF-8 span linkage; provenance/checksum/signature/redaction and independent verification; unknown, invalid, unsupported, malformed, contradictory, unknown-field, migration and fail-closed behavior; diagnostics, positive/negative/calibration/Unicode/differential fixtures, protocol inventory, and public support remain open under TIM-5702, TIM-5701, TIM-5703, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing timing-result authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0208"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0208-deadline-check-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty deadline-check categories and local order; compare forward/reverse opaque bytes; reject duplicates; retain comparison inputs, validity, and target/profile/build identity as distinct categories.",
+  "Defer deadline-check implementation, Node/clock/overrun and schedulability semantics, schemas, diagnostics, protocols, and public support until Accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-only boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing VM limits, scheduler observations, performance trends, Node/timing inventories, and differential results are not reinterpreted as deadline conclusions.",
+  "No Node syntax/Core/runtime, logical clock, deadline comparison, schedulability result, WCET certificate, overrun Fault, evidence schema, diagnostic allocation, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Node period/deadline/overrun syntax and Checked Core; logical-clock units, activation/release and state/input/output rules; cancellation/Fault and skip/queue/abort/degrade behavior; WCET result and assumption validity; scheduler, interrupt and resource-interference accounting; I/O/device/FFI bounds; margin, equation, inequality, rounding and acceptance policy; satisfied/missed/unknown/invalid/unsupported result semantics; target/profile/build, processor, toolchain, scheduler, clock, device package and TCB compatibility; Timing IR/path, assumption/evidence/Semantic IDs and original UTF-8 spans; stale build, target mismatch, missing/contradictory assumption, unknown path, malformed, unsupported-version, migration and fail-closed behavior; diagnostics, positive/negative/overrun/Unicode/differential fixtures, protocol inventory, and public support remain open under TIM-5703, TIM-5702, TIM-5701, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing deadline authority.",
+]
+superseded_by = ""

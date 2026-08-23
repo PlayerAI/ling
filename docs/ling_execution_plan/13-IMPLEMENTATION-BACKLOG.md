@@ -489,6 +489,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `TIM-5702` | G5 | 测量与静态分析分离 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:489`, `docs/status/TIM-5702-AUTHORITY-AUDIT.md` |
 | `TIM-5702-OBSERVATION` | G5 | Internal timing-analysis separation boundary evidence | S | Done | Accepted `DEC-0207`; see `crates/ling-types/tests/timing_analysis_separation_evidence.rs` and `docs/status/TIM-5702-OBSERVATION-IMPLEMENTATION-REPORT.md`; result/WCET semantics remain BlockedSpec |
 | `TIM-5703` | G5 | Deadline Check | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:503`, `docs/status/TIM-5703-AUTHORITY-AUDIT.md` |
+| `TIM-5703-OBSERVATION` | G5 | Internal Deadline Check boundary evidence | S | Done | Accepted `DEC-0208`; see `crates/ling-types/tests/deadline_check_evidence.rs` and `docs/status/TIM-5703-OBSERVATION-IMPLEMENTATION-REPORT.md`; Node/schedulability/WCET semantics remain BlockedSpec |
 | `EVD-5801` | G5 | Bundle Schema | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:518`, `docs/status/EVD-5801-AUTHORITY-AUDIT.md` |
 | `EVD-5802` | G5 | 独立验证器 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:543`, `docs/status/EVD-5802-AUTHORITY-AUDIT.md` |
 | `EVD-5803` | G5 | 可重复构建绑定 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:557`, `docs/status/EVD-5803-AUTHORITY-AUDIT.md` |
