@@ -6208,3 +6208,29 @@ unresolved_alternatives = [
   "Zed version ranges; extension/package implementation; document features; position/edit protocol completion; standalone acquisition; Linux/macOS grammar evidence; per-OS Zed tests; signed releases; marketplace publication; migration policy; and G6 sign-off remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0242"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0242-current-lsp-discovery-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify four exact priority rows: three Not established and one Unavailable.",
+  "Structurally parse current Cargo manifests and the protocol inventory and validate exact LSP identity fields.",
+  "Validate CLI dispatch and real-process lifecycle test markers and reject false evidence in a focused unit test.",
+  "Run LSP, CLI process, workspace, CI, governance, status, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Corrects documentation and strengthens internal evidence validation only; Ling semantics, diagnostics, public schemas, Semantic IDs, packages, dependencies, CLI/LSP behavior, runtime, Unicode, protocols, support states, and editor APIs remain unchanged.",
+  "Adds no setting, PATH search, standalone binary, release URL, installer, public error schema, Zed extension, network behavior, or Stable support claim.",
+]
+unresolved_alternatives = [
+  "Executable identity/version negotiation; configuration and PATH precedence; signed release artifacts; secure download/install; offline fallback; bilingual diagnostics; Zed packaging/tests; cross-host evidence; and G6 sign-off remain deferred.",
+]
+superseded_by = ""

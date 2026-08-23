@@ -1,21 +1,24 @@
 # ZED-6802 Language-Server Discovery and Acquisition
 
-Status: boundary inventory (2026-08-22). This document records what is and is
+Status: current-evidence boundary inventory (2026-08-23). This document records what is and is
 not implemented for language-server discovery and acquisition. It is not an
 installer design, download manifest, or public command contract.
 
 ## Current state
 
-The repository contains no dedicated discovery/acquisition implementation,
-distributed language-server release artifact, Zed extension package, download
-manifest, checksum/signature registry, or accepted discovery protocol.
-`UNSUP-LSP-EDITOR` in the support matrix explicitly covers this absence. The
-existing Preview `ling lsp --stdio` lifecycle is not an acquisition source,
-and the local Tree-sitter grammar is an editor parser only, not a language
-server.
+The repository contains a source-built Ling CLI whose Preview
+`ling lsp --stdio` entry point is implemented and process-tested. It contains
+no dedicated editor discovery/acquisition implementation, distributed
+language-server release artifact, Zed extension package, download manifest,
+checksum/signature registry, or accepted discovery protocol.
+`UNSUP-LSP-EDITOR` in the support matrix explicitly covers the absent document
+features and editor integration. The existing Preview lifecycle is an adjacent
+server surface, not an acquisition source, and the local Tree-sitter grammar
+is an editor parser only, not a language server.
 
 Accordingly, all discovery/acquisition rows are `Unavailable` or `Not
-established`. No setting key, PATH name, URL, protocol field, diagnostic code,
+established`. Source-built CLI availability does not establish discovery or
+acquisition. No setting key, PATH name, URL, protocol field, diagnostic code,
 installer, or fallback executable is invented here.
 
 ## Required priority matrix
@@ -23,13 +26,34 @@ installer, or fallback executable is invented here.
 | Planned source | Current repository evidence | State | Required authority before implementation |
 | --- | --- | --- | --- |
 | User-configured executable | No accepted setting key or workspace configuration exists | Not established | Accepted Zed/LSP decision defining key, path validation, version check, and error schema |
-| PATH lookup | No LSP binary is built or published; the compiler CLI is not an LSP server | Unavailable | Accepted executable identity/version contract and bounded process-start policy |
+| PATH lookup | The source-built `ling` CLI implements Preview `ling lsp --stdio`, but no extension performs PATH lookup and no accepted editor executable identity/version/start contract exists | Not established | Accepted executable identity/version contract and bounded process-start policy |
 | Official release download | No official LSP release, platform manifest, URL, checksum, signature, or trust root exists | Unavailable | Release/provenance decision defining HTTPS, version selection, digest/signature verification, and supported targets |
 | Explicit failure/install guidance | No public LSP error or installation protocol is registered | Not established | Bilingual registered diagnostics, exit/JSON schema, remediation text, and offline behavior |
 
-The priority order is therefore documentation only. A future implementation must
-stop at the first usable, verified source and must never silently fall back to
-an unrelated executable or to the compiler CLI.
+The priority order is therefore documentation only. A future implementation
+must stop at the first usable, verified source and must never infer an editor
+acquisition contract merely from an unrelated executable or from the presence
+of the source-built compiler CLI.
+
+## Current adjacent LSP evidence
+
+The internal verifier binds the non-acquisition distinction to six current
+repository files:
+
+- `Cargo.toml` contains both `ling-cli` and `ling-lsp` workspace members;
+- `crates/ling-cli/Cargo.toml` binds the CLI to the local `ling-lsp` crate;
+- `crates/ling-cli/src/main.rs` exposes only `ling lsp --stdio` and calls the
+  stdio server;
+- `crates/ling-cli/tests/lsp.rs` starts the real CLI and exercises a framed
+  initialize/shutdown/exit session;
+- `crates/ling-lsp/Cargo.toml` identifies the `ling-lsp` implementation crate;
+  and
+- `docs/governance/protocol-inventory.toml` records
+  `ling.lsp.lifecycle/0.1` as implemented and Preview.
+
+These files prove a source-built server entry point. They do not prove a Zed
+extension, PATH lookup, configuration setting, released artifact, installer,
+or editor compatibility policy.
 
 ## Security and operational contract (future work)
 
@@ -67,21 +91,19 @@ cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 cargo xtask lsp verify
 ```
 
-The internal `cargo xtask lsp verify` command checks this inventory only. The
-Zed compatibility matrix records the local Tree-sitter package and the Windows
-cache-lock limitation of its npm verification. No language-server discovery
-test is claimed because there is no acquisition executable or protocol to
-test.
+The internal `cargo xtask lsp verify` command checks the four-row inventory and
+the six adjacent LSP evidence files. No language-server discovery test is
+claimed because no discovery/acquisition implementation or protocol exists.
 
 ## Completion gate
 
 `ZED-6802` can leave `BlockedSpec` only after an Accepted discovery/acquisition
-decision, a versioned protocol and diagnostic schema, a real LSP executable or
-release artifact, positive/negative/malformed/offline/security fixtures,
-per-platform installation evidence, and a Zed integration test prove the
-priority and verification rules. Until then the correct user-facing behavior
-is an explicit unavailable/installation message documented by the future
-protocol, not a guessed fallback.
+decision, a versioned protocol and diagnostic schema, an accepted launcher or
+release-artifact identity, positive/negative/malformed/offline/security
+fixtures, per-platform acquisition evidence, and a Zed integration test prove
+the priority and verification rules. Until then the correct user-facing
+behavior is an explicit unavailable/installation message documented by the
+future protocol, not a guessed fallback.
 
 No stale legacy CLI/source name, placeholder command, download URL, checksum,
 signature, binary, backend, or editor API is added by this inventory.

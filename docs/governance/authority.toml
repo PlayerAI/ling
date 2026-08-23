@@ -3653,3 +3653,16 @@ covers = ["ZED-6801 bounded current LSP/grammar/package evidence", "corrected Pr
 depends_on = ["DEC-0048", "RFC-0004", "RFC-0023", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0242"
+title = "Current LSP discovery boundary"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0242-current-lsp-discovery-boundary.md"
+covers = ["ZED-6802 bounded current Preview server/discovery boundary", "source-built ling lsp --stdio evidence without an editor acquisition claim", "structured Cargo/protocol evidence and current CLI/process-test wiring"]
+depends_on = ["DEC-0049", "RFC-0004", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

@@ -503,10 +503,11 @@ fn main() -> ExitCode {
             match lsp_discovery::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "LSP discovery inventory OK: {} priority sources ({} unavailable, {} not established)",
+                        "LSP discovery inventory OK: {} priority sources ({} unavailable, {} not established), {} current LSP evidence files",
                         summary.priority_count,
                         summary.unavailable_count,
-                        summary.not_established_count
+                        summary.not_established_count,
+                        summary.current_evidence_file_count
                     );
                     ExitCode::SUCCESS
                 }
