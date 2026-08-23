@@ -4544,6 +4544,54 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6905-CURRENT-EVIDENCE"
+title = "Current v1 upstream/LSP/protocol evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6904-CURRENT-EVIDENCE", "RC-6905-SEED", "ZED-6802-CURRENT-EVIDENCE"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0056-seed-v1-release-artifact-inventory-gate.md",
+  "docs/decisions/0242-current-lsp-discovery-boundary.md",
+  "docs/decisions/0248-current-rc2-boundary-evidence.md",
+  "docs/decisions/0249-current-v1-artifact-boundary-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/testing/V1-RELEASE-ARTIFACT-INVENTORY.md",
+  "docs/status/RC-6905-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/v1_artifact_inventory.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "docs/testing/V1-RELEASE-ARTIFACT-INVENTORY.md",
+  "docs/status/RC-6905-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6905-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask v1 verify composes the current RC2-to-RC3-to-RC1-to-RC0 inventory chain and retains fourteen exact publication states and nine linked audits.",
+  "The language-server row accurately records the source-built ling lsp --stdio Preview server while keeping absent signed distribution/acquisition Unsupported.",
+  "The protocol row accurately records 27 non-Stable entries and Future PROTO-EVIDENCE.",
+  "A focused negative test rejects stale LSP/protocol/upstream markers with GOV-V1-ARTIFACT-0011.",
+  "Focused v1/RC/LSP/Zed/protocol checks plus workspace, CI, governance, support, status, traceability, formatting, lint, deterministic, and offline gates pass without publication.",
+]
+verified_against_commit = "c0aeb02c2f2d0b28dffefdb61c9b19814909e4bb"
+completion_commit = "c0aeb02c2f2d0b28dffefdb61c9b19814909e4bb"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "RC-6905 remains BlockedSpec for every actual v1 candidate, artifact, signature/SBOM/provenance, package/distribution, documentation/migration, Stable support/protocol, Tier1 conformance, security policy, evidence bundle, and publication exit.",
+  "This child corrects and composes internal evidence only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, Unicode, protocol states, support states, and public APIs are unchanged.",
+]
+
+[[task]]
 id = "RC-6905"
 title = "v1.0 Release Artifacts"
 state = "BlockedSpec"
@@ -4551,7 +4599,7 @@ release = "G6"
 size = "L"
 owner = "Codex"
 branch = "main"
-depends_on = ["RC-6904"]
+depends_on = ["RC-6904", "RC-6905-CURRENT-EVIDENCE"]
 spec = [
   "AGENTS.md",
   "docs/ROADMAP-1.0.md",
@@ -4559,6 +4607,7 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/governance/support-matrix.toml",
   "docs/governance/protocol-inventory.toml",
+  "docs/decisions/0249-current-v1-artifact-boundary-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/COMPAT-6502-AUTHORITY-AUDIT.md",
@@ -4572,6 +4621,7 @@ spec = [
   "docs/status/RC-6902-AUTHORITY-AUDIT.md",
   "docs/status/RC-6903-AUTHORITY-AUDIT.md",
   "docs/status/RC-6904-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6905-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
   "docs/status/REL-6603-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6801-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
@@ -4582,6 +4632,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/RC-6905-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6905-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/V1-RELEASE-ARTIFACT-INVENTORY.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
@@ -4599,7 +4650,7 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "RC-6905 is BlockedSpec because RC0-RC4 and G1-G5 exits are incomplete and no accepted v1.0 artifact, acquisition, signature/provenance, stable standard-library, Zed/LSP, migration, security, support, or evidence-bundle authority exists.",
-  "The repository has the published v0.0.1 Seed tag, 21 non-Stable protocol records, a 1.0-draft support matrix, and bounded Seed reports; these do not constitute the v1.0 publication set.",
+  "The repository has the published v0.0.1 Seed tag, 27 non-Stable protocol records, a source-built Preview LSP server without distribution, a 1.0-draft support matrix, and bounded Seed reports; these do not constitute the v1.0 publication set.",
   "The authority audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, release tag, or public API and performs no external network/system mutation.",
 ]
 

@@ -401,7 +401,8 @@
 | `RC-6904` | RC2 / Final Change Control | `G6` | `L` | `BlockedSpec` | `RC-6903`, `RC-6904-CURRENT-EVIDENCE` | `` |
 | `RC-6904-CURRENT-EVIDENCE` | Current RC2 upstream/protocol evidence | `G6` | `S` | `Done` | `RC-6903-CURRENT-EVIDENCE`, `RC-6904-SEED` | `ced71085cd75b24ffc3d9104ade896b1f0c40463` |
 | `RC-6904-SEED` | Seed RC2/final change-control inventory drift gate | `G6` | `S` | `Done` | `RC-6903-SEED` | `b8660b524e103b615f9df332b55b4da8b3638c8b` |
-| `RC-6905` | v1.0 Release Artifacts | `G6` | `L` | `BlockedSpec` | `RC-6904` | `` |
+| `RC-6905` | v1.0 Release Artifacts | `G6` | `L` | `BlockedSpec` | `RC-6904`, `RC-6905-CURRENT-EVIDENCE` | `` |
+| `RC-6905-CURRENT-EVIDENCE` | Current v1 upstream/LSP/protocol evidence | `G6` | `S` | `Done` | `RC-6904-CURRENT-EVIDENCE`, `RC-6905-SEED`, `ZED-6802-CURRENT-EVIDENCE` | `c0aeb02c2f2d0b28dffefdb61c9b19814909e4bb` |
 | `RC-6905-SEED` | Seed v1 release-artifact inventory drift gate | `G6` | `S` | `Done` | `RC-6904-SEED` | `7b2803ddce930278b03d43aacdbf1e3883532b1d` |
 | `REL-6601` | Fuzz Coverage Inventory | `G6` | `L` | `BlockedSpec` | `COMPAT-6504` | `` |
 | `REL-6601-SEED` | Seed fuzz inventory and corpus drift gate | `G6` | `S` | `Done` | `FMT-1506`, `GOV-0110`, `PRJ-1108`, `VM-1210` | `97a628311f50742730ba043131878d205f0f47d2` |
