@@ -3354,3 +3354,16 @@ covers = ["STAB-6103 bounded Feature-State Metadata boundary evidence", "test-on
 depends_on = ["DEC-0217", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0219"
+title = "Internal Protocol Registry boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0219-protocol-registry-boundary-evidence.md"
+covers = ["PROTO-6201 bounded Protocol Registry boundary evidence", "single protocol-inventory source and test-only registry vocabulary", "registry boundaries without Stable lifecycle or owner semantics"]
+depends_on = ["DEC-0218", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -511,6 +511,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `STAB-6103` | G6 | Feature State 元数据 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:63`, `docs/status/STAB-6103-AUTHORITY-AUDIT.md` |
 | `STAB-6103-OBSERVATION` | G6 | Internal Feature-State Metadata boundary evidence | S | Done | Accepted `DEC-0218`; see `crates/ling-types/tests/feature_state_metadata_evidence.rs`, `tools/xtask/src/status.rs`, and `docs/status/STAB-6103-OBSERVATION-IMPLEMENTATION-REPORT.md`; public schema/lifecycle/consumer semantics remain BlockedSpec |
 | `PROTO-6201` | G6 | 协议注册表 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:86`, `docs/status/PROTO-6201-AUTHORITY-AUDIT.md` |
+| `PROTO-6201-OBSERVATION` | G6 | Internal Protocol Registry boundary evidence | S | Done | Accepted `DEC-0219`; see `crates/ling-types/tests/protocol_registry_evidence.rs`, `tools/xtask/src/protocols.rs`, and `docs/status/PROTO-6201-OBSERVATION-IMPLEMENTATION-REPORT.md`; Stable lifecycle/owner/universal compatibility semantics remain BlockedSpec |
 | `PROTO-6202` | G6 | Reader/Writer 兼容测试 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:109`, `docs/status/PROTO-6202-AUTHORITY-AUDIT.md` |
 | `PROTO-6203` | G6 | Semantic Hash 升级演练 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:123`, `docs/status/PROTO-6203-AUTHORITY-AUDIT.md` |
 | `PROTO-6204` | G6 | CLI 与退出码冻结 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:136`, `docs/status/PROTO-6204-AUTHORITY-AUDIT.md` |

@@ -670,7 +670,9 @@ fn finish(mut errors: Vec<String>) -> Result<(), Vec<String>> {
 
 #[cfg(test)]
 mod tests {
-    use super::{ProtocolInventory, check_repository, render, validate};
+    use super::{
+        MANIFEST_PATH, ProtocolInventory, REPORT_PATH, check_repository, render, validate,
+    };
     use std::collections::BTreeMap;
     use std::fs;
     use std::path::{Path, PathBuf};
@@ -845,5 +847,19 @@ notes = []
         assert_eq!(summary.stable_count, 0);
         assert_eq!(summary.internal_count, 1);
         assert_eq!(summary.future_count, 5);
+    }
+
+    #[test]
+    fn repository_has_one_protocol_inventory_source_of_truth() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .expect("xtask is under tools/xtask");
+        assert!(root.join(MANIFEST_PATH).is_file());
+        assert!(root.join(REPORT_PATH).is_file());
+        assert!(
+            !root.join("docs/protocols/registry.toml").exists(),
+            "the non-normative G6 path must not become a second protocol registry"
+        );
     }
 }

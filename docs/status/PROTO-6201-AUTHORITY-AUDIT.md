@@ -17,8 +17,9 @@ allow protocol/version drift.
 
 The repository already has an active governance registry at
 `docs/governance/protocol-inventory.toml`, a generated report, and
-`schemas/registry.toml`. The inventory records 21 protocols, 0 Stable current
-public protocols, and Future records with no versions or fixtures. It is
+`schemas/registry.toml`. The inventory records 27 protocols: 21 current public,
+1 internal, and 5 Future, with 0 Stable current public protocols. Future
+records have no versions or fixtures. It is
 governance evidence, not an accepted 1.0 public protocol registry. No task may
 promote it or the proposed path to Stable without the missing G1-G5 exits,
 Accepted protocol decisions, and executable compatibility evidence.
@@ -41,8 +42,8 @@ Accepted protocol decisions, and executable compatibility evidence.
   Future boundaries. `SCHEMA-LIFECYCLE-POLICY` is Draft and
   `SCHEMA-REGISTRY` is an active compatibility registry dependent on it, so
   neither supplies a Stable protocol decision.
-- The generated `docs/governance/protocol-inventory.md` reports 21 records,
-  15 current public, 1 internal, 5 Future, and 0 Stable. It states that Stable
+- The generated `docs/governance/protocol-inventory.md` reports 27 records,
+  21 current public, 1 internal, 5 Future, and 0 Stable. It states that Stable
   means the ROADMAP-1.0 commitment and that no current Seed protocol has passed
   that gate.
 - `docs/governance/support-matrix.toml` marks CLI and diagnostics Preview,

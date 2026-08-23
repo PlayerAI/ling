@@ -5596,3 +5596,29 @@ unresolved_alternatives = [
   "Public feature/profile/target identities; canonical source of truth; lifecycle transition and ownership rules; public schema and version; unknown/missing/conflicting fields and states; reader/writer/N-1/migration policy; CLI, build, package, LSP, documentation and Zed consumers; diagnostics; compatibility and release binding; positive, negative, malformed, migration, repeated-build, Unicode, source-span and cross-tool fixtures remain open under STAB-6103, STAB-6102, incomplete G1-G5 exits, ROADMAP-1.0, the draft SUPPORT-MATRIX, and registered gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0219"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0219-protocol-registry-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty local registry categories, explicit order, duplicate rejection, and order-independent opaque bytes.",
+  "Assert the canonical inventory and report exist and the proposed duplicate registry path does not.",
+  "Run protocol, schema, support, status, and governance gates without changing the current 27-record lifecycle counts.",
+  "Defer owner semantics, Stable registry contracts, migrations, and universal compatibility corpora until Accepted authority and per-protocol evidence exist.",
+]
+compatibility_impact = [
+  "Adds only single-inventory and test-local evidence. Existing protocol records, versions, lifecycle states, public schemas, canonical encodings, language/runtime behavior, diagnostics, CLI/LSP, dependencies, Semantic IDs, source spans, and Unicode 17.0.0 remain unchanged.",
+  "No owner-field semantics, universal schema, public reader/writer, migration tool, Stable promotion, diagnostic, CLI route, or new protocol is added.",
+]
+unresolved_alternatives = [
+  "Registry owner identity and responsibility; stable registry identity/version; public versus internal/planned lifecycle transitions; supersession; missing and unknown fields; reader/writer/N-1/migration rules; canonical registry encoding; size/depth/security limits; per-protocol Accepted authority, compatibility, golden/corrupt corpus, diagnostics, release artifacts and independent review remain open under PROTO-6201, PROTO-6202 through PROTO-6204, incomplete G1-G5 exits, ROADMAP-1.0, Draft schema policy, and registered gaps.",
+]
+superseded_by = ""
