@@ -95,6 +95,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-LSP-OVERLAY` | `Public` | `ling.lsp.overlay/0.2` | `Experimental` | yes |
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | `Public` | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | yes |
 | `PROTO-LSP-PULL-DIAGNOSTICS` | `Public` | `ling.lsp.pull-diagnostics/0.2` | `Preview` | yes |
+| `PROTO-LSP-REFERENCES` | `Public` | `ling.lsp.references/0.1` | `Preview` | yes |
 | `PROTO-LSP-WORKSPACE` | `Public` | `ling.lsp.workspace/0.1` | `Experimental` | yes |
 | `PROTO-PACKAGE-IDENTITY` | `Public` | `v1 domain encodings` | `Experimental` | yes |
 | `PROTO-PACKAGE-MANIFEST` | `Public` | `ling.manifest/1` | `Experimental` | yes |

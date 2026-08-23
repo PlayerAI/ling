@@ -5,6 +5,20 @@ use ling_hir::{Expression, ExpressionKind, Program, SequenceElement};
 use ling_resolve::{ModuleId, ReferenceKey, ResolvedProgram};
 use ling_source::Span;
 
+/// Syntax-directed relation of one resolver-owned expression reference.
+///
+/// `Type` and `Implementation` are reserved by the accepted references
+/// taxonomy, but Seed's resolver does not assign reference identities to those
+/// surfaces yet. They therefore cannot be fabricated by this index.
+#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub enum ResolvedReferenceRelation {
+    Read,
+    Write,
+    Call,
+    Type,
+    Implementation,
+}
+
 /// One resolver reference paired with its exact original UTF-8 identifier span.
 ///
 /// The span is copied from HIR name metadata. It is not converted to an LSP
@@ -15,6 +29,7 @@ pub struct ResolvedReferenceSpan {
     reference_id: u32,
     source_name: String,
     span: Span,
+    relation: ResolvedReferenceRelation,
 }
 
 impl ResolvedReferenceSpan {
@@ -36,6 +51,11 @@ impl ResolvedReferenceSpan {
     #[must_use]
     pub const fn span(&self) -> Span {
         self.span
+    }
+
+    #[must_use]
+    pub const fn relation(&self) -> ResolvedReferenceRelation {
+        self.relation
     }
 }
 
@@ -71,14 +91,14 @@ impl ResolvedReferenceSpanIndex {
     }
 
     pub(crate) fn from_resolved(resolved: &ResolvedProgram) -> Self {
-        let mut spans = BTreeMap::<ReferenceKey, Span>::new();
+        let mut spans = BTreeMap::<ReferenceKey, (Span, ResolvedReferenceRelation)>::new();
         for module in resolved.modules() {
             collect_program(module.id, &module.hir, &mut spans);
         }
 
         let mut entries = spans
             .into_iter()
-            .filter_map(|(key, span)| {
+            .filter_map(|(key, (span, relation))| {
                 if !resolved.references().contains_key(&key) {
                     return None;
                 }
@@ -88,6 +108,7 @@ impl ResolvedReferenceSpanIndex {
                     reference_id: key.local().get(),
                     source_name,
                     span,
+                    relation,
                 })
             })
             .collect::<Vec<_>>();
@@ -103,13 +124,27 @@ impl ResolvedReferenceSpanIndex {
     }
 }
 
-fn collect_program(module: ModuleId, program: &Program, spans: &mut BTreeMap<ReferenceKey, Span>) {
+fn collect_program(
+    module: ModuleId,
+    program: &Program,
+    spans: &mut BTreeMap<ReferenceKey, (Span, ResolvedReferenceRelation)>,
+) {
     for definition in &program.definitions {
-        collect_expression(module, &definition.value, spans);
+        collect_expression(
+            module,
+            &definition.value,
+            ResolvedReferenceRelation::Read,
+            spans,
+        );
     }
     for implementation in &program.impls {
         for definition in &implementation.members {
-            collect_expression(module, &definition.value, spans);
+            collect_expression(
+                module,
+                &definition.value,
+                ResolvedReferenceRelation::Read,
+                spans,
+            );
         }
     }
 }
@@ -117,25 +152,36 @@ fn collect_program(module: ModuleId, program: &Program, spans: &mut BTreeMap<Ref
 fn collect_expression(
     module: ModuleId,
     expression: &Expression,
-    spans: &mut BTreeMap<ReferenceKey, Span>,
+    root_relation: ResolvedReferenceRelation,
+    spans: &mut BTreeMap<ReferenceKey, (Span, ResolvedReferenceRelation)>,
 ) {
     match &expression.kind {
         ExpressionKind::Sequence(elements) => {
             for element in elements {
                 match element {
                     SequenceElement::Let(binding) => {
-                        collect_expression(module, &binding.value, spans);
+                        collect_expression(
+                            module,
+                            &binding.value,
+                            ResolvedReferenceRelation::Read,
+                            spans,
+                        );
                     }
                     SequenceElement::Expression(expression) => {
-                        collect_expression(module, expression, spans);
+                        collect_expression(
+                            module,
+                            expression,
+                            ResolvedReferenceRelation::Read,
+                            spans,
+                        );
                     }
                 }
             }
         }
         ExpressionKind::Handle { body, clauses } => {
-            collect_expression(module, body, spans);
+            collect_expression(module, body, ResolvedReferenceRelation::Read, spans);
             for clause in clauses {
-                collect_expression(module, &clause.body, spans);
+                collect_expression(module, &clause.body, ResolvedReferenceRelation::Read, spans);
             }
         }
         ExpressionKind::If {
@@ -143,32 +189,32 @@ fn collect_expression(
             then_branch,
             else_branch,
         } => {
-            collect_expression(module, condition, spans);
-            collect_expression(module, then_branch, spans);
-            collect_expression(module, else_branch, spans);
+            collect_expression(module, condition, ResolvedReferenceRelation::Read, spans);
+            collect_expression(module, then_branch, ResolvedReferenceRelation::Read, spans);
+            collect_expression(module, else_branch, ResolvedReferenceRelation::Read, spans);
         }
         ExpressionKind::Match { scrutinee, cases } => {
-            collect_expression(module, scrutinee, spans);
+            collect_expression(module, scrutinee, ResolvedReferenceRelation::Read, spans);
             for case in cases {
                 if let Some(guard) = &case.guard {
-                    collect_expression(module, guard, spans);
+                    collect_expression(module, guard, ResolvedReferenceRelation::Read, spans);
                 }
-                collect_expression(module, &case.body, spans);
+                collect_expression(module, &case.body, ResolvedReferenceRelation::Read, spans);
             }
         }
         ExpressionKind::Assignment { place, value } => {
             spans
                 .entry(ReferenceKey::new(module, place.root_reference))
-                .or_insert(place.root.span);
-            collect_expression(module, value, spans);
+                .or_insert((place.root.span, ResolvedReferenceRelation::Write));
+            collect_expression(module, value, ResolvedReferenceRelation::Read, spans);
         }
         ExpressionKind::Application {
             function,
             arguments,
         } => {
-            collect_expression(module, function, spans);
+            collect_expression(module, function, ResolvedReferenceRelation::Call, spans);
             for argument in arguments {
-                collect_expression(module, argument, spans);
+                collect_expression(module, argument, ResolvedReferenceRelation::Read, spans);
             }
         }
         ExpressionKind::Projection {
@@ -178,33 +224,35 @@ fn collect_expression(
         } => {
             spans
                 .entry(ReferenceKey::new(module, *reference))
-                .or_insert(field.span);
-            collect_expression(module, target, spans);
+                .or_insert((field.span, root_relation));
+            collect_expression(module, target, ResolvedReferenceRelation::Read, spans);
         }
         ExpressionKind::Name { reference, name } => {
             spans
                 .entry(ReferenceKey::new(module, *reference))
-                .or_insert(name.span);
+                .or_insert((name.span, root_relation));
         }
         ExpressionKind::Binary { left, right, .. } => {
-            collect_expression(module, left, spans);
-            collect_expression(module, right, spans);
+            collect_expression(module, left, ResolvedReferenceRelation::Read, spans);
+            collect_expression(module, right, ResolvedReferenceRelation::Read, spans);
         }
-        ExpressionKind::Unary { operand, .. } => collect_expression(module, operand, spans),
+        ExpressionKind::Unary { operand, .. } => {
+            collect_expression(module, operand, ResolvedReferenceRelation::Read, spans);
+        }
         ExpressionKind::Tuple(elements) | ExpressionKind::List(elements) => {
             for element in elements {
-                collect_expression(module, element, spans);
+                collect_expression(module, element, ResolvedReferenceRelation::Read, spans);
             }
         }
         ExpressionKind::Record(fields) => {
             for field in fields {
-                collect_expression(module, &field.value, spans);
+                collect_expression(module, &field.value, ResolvedReferenceRelation::Read, spans);
             }
         }
         ExpressionKind::RecordUpdate { base, fields } => {
-            collect_expression(module, base, spans);
+            collect_expression(module, base, ResolvedReferenceRelation::Read, spans);
             for field in fields {
-                collect_expression(module, &field.value, spans);
+                collect_expression(module, &field.value, ResolvedReferenceRelation::Read, spans);
             }
         }
         ExpressionKind::Literal(_) | ExpressionKind::Unit => {}

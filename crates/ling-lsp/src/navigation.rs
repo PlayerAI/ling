@@ -1,12 +1,12 @@
-use ling_db::{NavigationLocation, QueryError};
-use ling_source::{PositionError, SourceError, SourceFile, Span, VfsError};
-use serde_json::{Map, Value, json};
+use ling_db::QueryError;
+use ling_source::{SourceError, SourceFile, VfsError};
+use serde_json::{Map, Value};
 
+use super::location_projection::{LocationProjectionError, location_value};
 use super::publication::compiler_for_snapshot;
 use super::{
-    HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES, RequestDocument,
-    RequestSnapshot, RequestSnapshotError, error_or_none, parse_text_document_position,
-    success_response,
+    HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES,
+    RequestSnapshotError, error_or_none, parse_text_document_position, success_response,
 };
 
 /// Current Preview resolver-navigation writer marker.
@@ -30,10 +30,7 @@ enum NavigationError {
     CompilerInput(VfsError),
     Compiler(QueryError),
     Source(SourceError),
-    Position(PositionError),
-    MissingTargetDocument,
-    DuplicateTargetDocument,
-    InvalidSpan,
+    Projection(LocationProjectionError),
     Stale,
     ResponseTooLarge,
 }
@@ -108,7 +105,15 @@ impl LspServer {
                 NavigationMethod::TypeDefinition => entry.type_definition(),
             });
         let result = location
-            .map(|location| location_value(location, &snapshot, &compiler))
+            .map(|location| {
+                location_value(
+                    location.source_name(),
+                    location.span(),
+                    &snapshot,
+                    &compiler,
+                )
+                .map_err(NavigationError::Projection)
+            })
             .transpose()?
             .unwrap_or(Value::Null);
         if self
@@ -135,65 +140,6 @@ pub(crate) fn parse_navigation_capabilities(text_document: &Map<String, Value>) 
     Ok(())
 }
 
-fn location_value(
-    location: &NavigationLocation,
-    snapshot: &RequestSnapshot,
-    compiler: &ling_db::CompilerDb,
-) -> Result<Value, NavigationError> {
-    let document = target_document(snapshot, location.source_name())?;
-    let file = compiler
-        .vfs()
-        .file_id(location.source_name())
-        .ok_or(NavigationError::MissingTargetDocument)?;
-    let source = SourceFile::from_bytes(
-        file,
-        location.source_name().to_owned(),
-        document.bytes().to_vec(),
-    )
-    .map_err(NavigationError::Source)?;
-    Ok(json!({
-        "range": project_range(&source, location.span(), snapshot.position_encoding())?,
-        "uri": document.uri(),
-    }))
-}
-
-fn target_document<'snapshot>(
-    snapshot: &'snapshot RequestSnapshot,
-    source_name: &str,
-) -> Result<&'snapshot RequestDocument, NavigationError> {
-    let mut matching = snapshot
-        .documents()
-        .iter()
-        .filter(|document| document.logical_name() == source_name);
-    let document = matching
-        .next()
-        .ok_or(NavigationError::MissingTargetDocument)?;
-    if matching.next().is_some() {
-        return Err(NavigationError::DuplicateTargetDocument);
-    }
-    Ok(document)
-}
-
-fn project_range(
-    source: &SourceFile,
-    span: Span,
-    encoding: ling_source::PositionEncoding,
-) -> Result<Value, NavigationError> {
-    if span.source() != source.id() || span.start() >= span.end() {
-        return Err(NavigationError::InvalidSpan);
-    }
-    let start = source
-        .lsp_position(span.start(), encoding)
-        .map_err(NavigationError::Position)?;
-    let end = source
-        .lsp_position(span.end(), encoding)
-        .map_err(NavigationError::Position)?;
-    Ok(json!({
-        "end": {"character": end.character(), "line": end.line()},
-        "start": {"character": start.character(), "line": start.line()},
-    }))
-}
-
 fn navigation_error(id: Value, error: &NavigationError) -> HandleOutcome {
     match error {
         NavigationError::InvalidParams => error_or_none(
@@ -206,10 +152,7 @@ fn navigation_error(id: Value, error: &NavigationError) -> HandleOutcome {
         | NavigationError::CompilerInput(_)
         | NavigationError::Compiler(_)
         | NavigationError::Source(_)
-        | NavigationError::Position(_)
-        | NavigationError::MissingTargetDocument
-        | NavigationError::DuplicateTargetDocument
-        | NavigationError::InvalidSpan
+        | NavigationError::Projection(_)
         | NavigationError::Stale
         | NavigationError::ResponseTooLarge => error_or_none(
             true,

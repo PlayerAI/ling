@@ -36,6 +36,7 @@ mod definition_projection;
 mod navigation_index;
 mod project_snapshot;
 mod reference_index;
+mod reference_search_index;
 mod reference_span_index;
 mod rename_identifier;
 mod resolved_outline;
@@ -66,7 +67,13 @@ pub use reference_index::{
     ResolvedReferenceSource, ResolvedReferenceTarget, ResolvedReferenceTargetKey,
     ResolvedReferenceTargetKind,
 };
-pub use reference_span_index::{ResolvedReferenceSpan, ResolvedReferenceSpanIndex};
+pub use reference_search_index::{
+    MAX_REFERENCE_SEARCH_ENTRIES, ReferenceSearchIndex, ReferenceSearchIndexError,
+    ReferenceSearchLocation,
+};
+pub use reference_span_index::{
+    ResolvedReferenceRelation, ResolvedReferenceSpan, ResolvedReferenceSpanIndex,
+};
 pub use rename_identifier::{
     RenameIdentifierObservation, RenameIdentifierStatus, observe_rename_identifier,
 };
@@ -524,6 +531,10 @@ pub enum QueryError {
         file: SourceId,
         error: NavigationIndexError,
     },
+    ReferenceSearch {
+        file: SourceId,
+        error: ReferenceSearchIndexError,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -600,6 +611,13 @@ impl fmt::Display for QueryError {
                 write!(
                     formatter,
                     "navigation index for source file {} failed: {error}",
+                    file.get()
+                )
+            }
+            Self::ReferenceSearch { file, error } => {
+                write!(
+                    formatter,
+                    "reference search index for source file {} failed: {error}",
                     file.get()
                 )
             }
@@ -1237,6 +1255,22 @@ impl CompilerDb {
         NavigationIndex::from_checked(&checked)
             .map(Arc::new)
             .map_err(|error| QueryError::Navigation { file, error })
+    }
+
+    /// Builds exact checked declaration/reference groups for one workspace.
+    pub fn checked_reference_search_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<ReferenceSearchIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+        ReferenceSearchIndex::from_checked(&checked)
+            .map(Arc::new)
+            .map_err(|error| QueryError::ReferenceSearch { file, error })
     }
 
     /// Builds an immutable inventory of resolver-backed names for future

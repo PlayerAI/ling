@@ -7059,3 +7059,31 @@ unresolved_alternatives = [
   "Generated/primitive virtual documents, alias hops, multiple targets, LocationLink, declaration-source selection, nested composite type search, implementation witnesses, dynamic registration, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0039"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0039.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact provider and Experimental discovery, malformed capabilities, lifecycle, notification silence, params, unknown URI, invalid positions, empty results, and fixed failures.",
+  "Cover declaration/reference selection, includeDeclaration, values, parameters, locals, constructors, Trait members, read/write/call classification, and source-less builtins under complete checking.",
+  "Cover workspace/dependency and temporary isolation, insertion-order and repeated-result determinism, UTF-8/16/32, Chinese, emoji, combining marks, BOM, CRLF, exact member spans, bounds, freshness, and URI reuse.",
+  "Prove type/implementation remain explicitly non-emitted and that IDs, ordinals, paths, relation metadata, custom data, and partial results do not enter standard Location arrays.",
+  "Migrate exact initialize transcripts and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.references/0.1 for standard textDocument/references with no predecessor.",
+  "Adds a bounded checked declaration/reference index and exact syntax-directed read/write/call classification while keeping resolver/Semantic identities internal and promising no persistent cache.",
+  "Adds no diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, package format, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Emitting type/implementation occurrences, generated documents, custom relation results, persistent caches, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

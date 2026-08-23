@@ -364,6 +364,13 @@ stability = "Preview"
 implemented = true
 
 [[protocol]]
+id = "PROTO-LSP-REFERENCES"
+visibility = "Public"
+version = "ling.lsp.references/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 visibility = "Public"
 version = "ling.lsp.formatting/0.1"

@@ -6,7 +6,8 @@
 //! with bounded incremental changes; RFC-0030 governs atomic workspace reload;
 //! RFC-0026 governs the bounded document-formatting response; DEC-0029 remains
 //! the authority for position projection; RFC-0036 governs Document Symbols;
-//! RFC-0037 governs checked Hover; RFC-0038 governs resolver navigation.
+//! RFC-0037 governs checked Hover; RFC-0038 governs resolver navigation;
+//! RFC-0039 governs checked References.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -55,8 +56,11 @@ mod document_symbols;
 pub use document_symbols::{DOCUMENT_SYMBOL_PROTOCOL_VERSION, MAX_DOCUMENT_SYMBOLS};
 mod hover;
 pub use hover::{HOVER_PROTOCOL_VERSION, MAX_HOVER_CONTENT_BYTES, MAX_HOVER_ENTRIES};
+mod location_projection;
 mod navigation;
 pub use navigation::{MAX_NAVIGATION_TARGETS, NAVIGATION_PROTOCOL_VERSION};
+mod references;
+pub use references::{MAX_REFERENCE_LOCATIONS, REFERENCES_PROTOCOL_VERSION};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -793,6 +797,7 @@ impl LspServer {
                 params,
                 navigation::NavigationMethod::TypeDefinition,
             ),
+            "textDocument/references" => self.references(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -1437,6 +1442,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
             }
             hover_markup = hover::parse_hover_capability(text_document)?;
             navigation::parse_navigation_capabilities(text_document)?;
+            references::parse_references_capability(text_document)?;
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -1993,6 +1999,7 @@ fn initialize_result(
             "documentFormattingProvider": true,
             "documentSymbolProvider": true,
             "hoverProvider": true,
+            "referencesProvider": true,
             "typeDefinitionProvider": true,
             "experimental": {
                 "lingHover": {
@@ -2004,6 +2011,12 @@ fn initialize_result(
                 "lingNavigation": {
                     "maxTargets": MAX_NAVIGATION_TARGETS,
                     "version": NAVIGATION_PROTOCOL_VERSION,
+                },
+                "lingReferences": {
+                    "emittedRelationKinds": ["read", "write", "call"],
+                    "maxLocations": MAX_REFERENCE_LOCATIONS,
+                    "relationKinds": ["read", "write", "call", "type", "implementation"],
+                    "version": REFERENCES_PROTOCOL_VERSION,
                 },
                 "lingDocumentSymbols": {
                     "maxSymbols": MAX_DOCUMENT_SYMBOLS,

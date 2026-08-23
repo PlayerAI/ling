@@ -545,6 +545,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-REFERENCES",
+      "visibility": "Public",
+      "version": "ling.lsp.references/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-WORKSPACE",
       "visibility": "Public",
       "version": "ling.lsp.workspace/0.1",

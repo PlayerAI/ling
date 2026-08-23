@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 39 records: 35 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 19 Preview, 0 Stable.
+- 40 records: 36 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 20 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -27,6 +27,7 @@
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | Public | LSP | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | no | no | 4 |
 | `PROTO-LSP-PULL-DIAGNOSTICS` | Public | LSP | `ling.lsp.pull-diagnostics/0.2` | `Preview` | no | no | 5 |
+| `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
@@ -224,6 +225,19 @@
 - Sources: [`docs/RFC-0034.md`](../RFC-0034.md), [`docs/RFC-0033.md`](../RFC-0033.md), [`docs/RFC-0032.md`](../RFC-0032.md), [`docs/RFC-0031.md`](../RFC-0031.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md`](../decisions/0034-lsp-internal-diagnostic-ordering-boundary.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0072-lsp-diagnostic-span-projection.md`](../decisions/0072-lsp-diagnostic-span-projection.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-lsp/src/publication.rs`](../../crates/ling-lsp/src/publication.rs), [`crates/ling-lsp/src/pull_diagnostics.rs`](../../crates/ling-lsp/src/pull_diagnostics.rs), [`crates/ling-lsp/src/diagnostic_control.rs`](../../crates/ling-lsp/src/diagnostic_control.rs)
 - Fixtures: [`crates/ling-lsp/tests/pull_diagnostics.rs`](../../crates/ling-lsp/tests/pull_diagnostics.rs), [`crates/ling-lsp/tests/push_diagnostics.rs`](../../crates/ling-lsp/tests/push_diagnostics.rs), [`crates/ling-lsp/tests/diagnostic_adapter.rs`](../../crates/ling-lsp/tests/diagnostic_adapter.rs), [`tests/protocols/lsp-pull-diagnostics/README.md`](../../tests/protocols/lsp-pull-diagnostics/README.md), [`docs/status/LSP-2203-IMPLEMENTATION-REPORT.md`](../status/LSP-2203-IMPLEMENTATION-REPORT.md)
 - Notes: The 0.2 provider preserves 0.1 stateless request/report/result-ID behavior and consumes the same RFC-0034 controlled arrays as push without changing pending work or the ledger. Dynamic registration, cancellation, progress, partial results, refresh, related-document maps, notebooks, fixes, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
+
+### `PROTO-LSP-REFERENCES` — Ling checked LSP references
+
+- Producer: ling lsp --stdio; ling-lsp references provider
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Validate optional object-valued textDocument.references capability and optional boolean dynamicRegistration; accept only Ready-state requests with exact URI/u32 position and required boolean context.includeDeclaration, while notifications perform no work.
+- Writer policy: Capture and revalidate one immutable snapshot, require complete resolution/type/Effect checking, select an exact declaration or resolver expression reference, and return canonical URI/range Location arrays for every same-target expression reference plus the optional declaration, bounded at 16384.
+- Unknown-field policy: Ignore ordinary unknown request and capability fields while rejecting malformed known members; relation vocabulary/emission, precedence, selection, declaration policy, order, cardinality, bound, snapshot, URI, range, empty-result, or failure changes require a new marker and migration evidence.
+- Migration tool: None; ling.lsp.references/0.1 is Preview with no predecessor and clients gate on referencesProvider plus the exact lingReferences discovery object.
+- Authority: `RFC-0039`, `RFC-0004`, `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `RFC-0037`, `RFC-0038`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0075`, `DEC-0076`, `DEC-0078`
+- Sources: [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0037.md`](../RFC-0037.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0076-ide-resolved-reference-reverse-index.md`](../decisions/0076-ide-resolved-reference-reverse-index.md), [`docs/decisions/0078-ide-rename-reference-span-observation.md`](../decisions/0078-ide-rename-reference-span-observation.md), [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-db/src/reference_span_index.rs`](../../crates/ling-db/src/reference_span_index.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/references.rs`](../../crates/ling-lsp/src/references.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-lsp/tests/references.rs`](../../crates/ling-lsp/tests/references.rs), [`tests/protocols/lsp-references/README.md`](../../tests/protocols/lsp-references/README.md), [`docs/status/IDE-2304-IMPLEMENTATION-REPORT.md`](../status/IDE-2304-IMPLEMENTATION-REPORT.md)
+- Notes: The full relation vocabulary is read/write/call/type/implementation; version 0.1 emits only read/write/call because type and implementation surfaces lack resolver-owned occurrence identities. No relation or identity metadata is added to standard Location results.
 
 ### `PROTO-LSP-WORKSPACE` — Ling LSP atomic workspace reload
 
