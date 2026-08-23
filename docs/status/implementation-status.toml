@@ -24089,6 +24089,55 @@ notes = [
 ]
 
 [[task]]
+id = "PKG-6401-OBSERVATION"
+title = "Local package and publication-exclusion boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["STD-6303-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0007-module-and-file-boundaries.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0226-local-package-publication-boundary-evidence.md",
+  "docs/status/PKG-6401-AUTHORITY-AUDIT.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-project/tests/package_publication_boundary.rs",
+  "crates/ling-types/tests/package_publication_boundary_evidence.rs",
+  "docs/status/PKG-6401-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PKG-6401-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0226 authorizes only bounded evidence for RFC-0002's local project protocol and explicit publication exclusions; PKG-6401 remains BlockedSpec for a real publication protocol.",
+  "The exact local markers remain ling.toml, manifest version 1, ling.lock, and ling.lock/1; representative Chinese display metadata remains non-identity data.",
+  "Manifest version 1 rejects representative registry, publisher, namespace, artifact, checksum, signature, provenance, yanking, deprecation, mirror, and cache fields at top-level and package boundaries.",
+  "Dependency entries accept the local path form and reject representative version, registry, Git, and checksum locators; ling-project contains no registry, network, process, publication, installation, or signing route.",
+  "The test-local inventory covers sixty local-protocol, publication, supply-chain, compatibility, authority, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "cargo test -p ling-project --locked --offline passes.",
+  "cargo test -p ling-types --test package_publication_boundary_evidence --locked --offline passes.",
+  "cargo clippy -p ling-project -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "governance, formatting, and diff checks pass without adding publication, registry, supply-chain, installation, migration, diagnostic, dependency, or support semantics.",
+]
+verified_against_commit = "a2b6d478256fe2578ba2ddccf2b38399a3b6b6f0"
+completion_commit = "a2b6d478256fe2578ba2ddccf2b38399a3b6b6f0"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0226; PKG-6401 remains BlockedSpec for authenticated publisher coordinates, namespace ownership, archives/artifacts, trust/signing/provenance, registry/install operations, yanking, mirrors/caches, CLI, migration, and security evidence.",
+  "The opaque ling.package-publication-boundary-observation/0 bytes are test evidence only and are not a manifest, lock, archive, artifact, registry, signature, provenance, installation, or migration protocol.",
+  "No manifest, lock, package identity, graph identity, dependency resolution, diagnostic, CLI, Semantic ID, source span, registry, publisher, artifact, signing/provenance, installation, cache, dependency, or support claim changed.",
+]
+
+[[task]]
 id = "PKG-6402"
 title = "Hermetic Build"
 state = "BlockedSpec"

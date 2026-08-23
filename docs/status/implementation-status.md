@@ -332,6 +332,7 @@
 | `OWN-3207` | Negative corpus and property tests | `G3` | `L` | `BlockedSpec` | `OWN-3201`, `OWN-3202`, `OWN-3203`, `OWN-3204`, `OWN-3205`, `OWN-3206` | `` |
 | `OWN-3207-OBSERVATION` | Internal ownership corpus and property boundary evidence | `G3` | `S` | `Done` | `OWN-3206-OBSERVATION` | `a905fc3d8efd7a04d39767a02c662de2d8bf4a5f` |
 | `PKG-6401` | Package Publication Protocol | `G6` | `L` | `BlockedSpec` | `STD-6303` | `` |
+| `PKG-6401-OBSERVATION` | Local package and publication-exclusion boundary evidence | `G6` | `S` | `Done` | `STD-6303-OBSERVATION` | `a2b6d478256fe2578ba2ddccf2b38399a3b6b6f0` |
 | `PKG-6402` | Hermetic Build | `G6` | `L` | `BlockedSpec` | `PKG-6401` | `` |
 | `PKG-6403` | Registry Minimum Implementation or Deferment Strategy | `G6` | `L` | `BlockedSpec` | `PKG-6402` | `` |
 | `PKG-6404` | Supply-Chain Attack Tests | `G6` | `L` | `BlockedSpec` | `PKG-6403` | `` |
