@@ -3380,3 +3380,16 @@ covers = ["PROTO-6202 bounded Reader/Writer Compatibility boundary evidence", "e
 depends_on = ["DEC-0219", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0221"
+title = "Internal Semantic Hash Upgrade Rehearsal boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0221-semantic-hash-upgrade-rehearsal-boundary-evidence.md"
+covers = ["PROTO-6203 bounded Semantic Hash Upgrade Rehearsal boundary evidence", "exact current hash-scheme declarations without migration edges", "test-only rehearsal boundaries without algorithm or identity semantics"]
+depends_on = ["DEC-0012", "DEC-0220", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

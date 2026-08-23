@@ -1751,6 +1751,60 @@ mod tests {
     }
 
     #[test]
+    fn repository_hash_schemes_are_explicit_without_a_migration_edge() {
+        let registry = load_registry(repository_root()).expect("registry parses");
+        let expected = [
+            (
+                "SCHEMA-SEMANTIC-GRAPH-JSON",
+                "ling.semantic/0.1",
+                &[
+                    "experimental:blake3:",
+                    "ling.body-id/v1",
+                    "ling.definition-id/v1",
+                    "ling.program-id/v1",
+                    "ling.semantic-node-id/v1",
+                ][..],
+            ),
+            (
+                "SCHEMA-PACKAGE-SEMANTIC-GRAPH-JSON",
+                "ling.semantic/0.2",
+                &[
+                    "experimental:blake3:",
+                    "ling.body-id/v2",
+                    "ling.definition-id/v2",
+                    "ling.program-id/v2",
+                    "ling.semantic-node-id/v2",
+                ][..],
+            ),
+            ("SCHEMA-LOCKFILE-JSON", "ling.lock/1", &["sha256:"][..]),
+        ];
+
+        for (id, marker, schemes) in expected {
+            let record = registry
+                .schema
+                .iter()
+                .find(|record| record.id == id)
+                .unwrap_or_else(|| panic!("missing hash-bearing schema {id}"));
+            assert_eq!(record.marker, marker);
+            assert_eq!(record.hash_scheme_ids, schemes);
+            assert_eq!(record.compatibility, "NoPreviousVersion");
+            assert!(record.previous_version.is_empty());
+            assert!(record.previous_marker.is_empty());
+            assert!(record.compatibility_dir.is_empty());
+            assert_eq!(record.migration_adapter, "None");
+        }
+
+        assert_eq!(
+            registry
+                .schema
+                .iter()
+                .filter(|record| !record.hash_scheme_ids.is_empty())
+                .count(),
+            expected.len()
+        );
+    }
+
+    #[test]
     fn deterministic_corruptions_have_the_declared_outcomes() {
         let summary =
             corrupt_inputs(repository_root()).expect("corruptions are rejected correctly");
