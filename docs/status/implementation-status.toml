@@ -26210,6 +26210,55 @@ notes = [
 ]
 
 [[task]]
+id = "ZED-6802-CURRENT-EVIDENCE"
+title = "Current Preview server and discovery boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ZED-6801-CURRENT-EVIDENCE", "ZED-6802-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0004.md",
+  "docs/decisions/0049-seed-lsp-discovery-inventory-gate.md",
+  "docs/decisions/0242-current-lsp-discovery-boundary.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/testing/LSP-DISCOVERY-ACQUISITION.md",
+  "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "Cargo.toml",
+  "crates/ling-cli/Cargo.toml",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/tests/lsp.rs",
+  "crates/ling-lsp/Cargo.toml",
+  "docs/governance/protocol-inventory.toml",
+  "tools/xtask/src/lsp_discovery.rs",
+  "tools/xtask/src/main.rs",
+  "docs/status/ZED-6802-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6802-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The four-source matrix records user configuration, PATH lookup, and failure/install guidance as Not established and official release download as Unavailable.",
+  "The matrix records the implemented process-tested Preview ling lsp --stdio entry point as adjacent evidence without treating it as editor discovery or acquisition.",
+  "cargo xtask lsp verify parses current Cargo and protocol TOML evidence and validates six exact files covering workspace membership, CLI dependency/dispatch/process test, LSP crate identity, and the registered Preview lifecycle.",
+  "A focused negative test rejects missing or false workspace, dependency, crate, lifecycle, CLI, and process-test evidence, while the verifier retains all security/no-placeholder/stale-name boundaries.",
+  "Focused LSP and CLI process checks plus workspace, CI, governance, status, formatting, lint, deterministic, and offline gates pass.",
+]
+verified_against_commit = "f2ced28b6863c9694583883fe9daee114a3adab5"
+completion_commit = "f2ced28b6863c9694583883fe9daee114a3adab5"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "ZED-6802 remains BlockedSpec for accepted configuration/PATH precedence, executable identity/version policy, bounded process start, signed releases, secure download/install, offline fallback, public diagnostics, per-platform/Zed fixtures, and G6 sign-off.",
+  "This child corrects evidence and strengthens internal validation only; no Ling semantic, diagnostic, public schema, Semantic ID, package, dependency, CLI/LSP/editor behavior, runtime, Unicode, protocol, support, network, or public API changes.",
+]
+
+[[task]]
 id = "ZED-6802"
 title = "Language-server Discovery and Acquisition"
 state = "BlockedSpec"
@@ -26234,18 +26283,22 @@ spec = [
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
   "docs/testing/LSP-DISCOVERY-ACQUISITION.md",
   "docs/decisions/0049-seed-lsp-discovery-inventory-gate.md",
+  "docs/decisions/0242-current-lsp-discovery-boundary.md",
 ]
 artifacts = [
   "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6802-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6802-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/LSP-DISCOVERY-ACQUISITION.md",
+  "tools/xtask/src/lsp_discovery.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The inventory maps user override, PATH lookup, official release acquisition, and explicit failure/install guidance to current evidence and Not established/Unavailable states.",
   "The future security contract covers HTTPS, version selection, checksum/signature verification, atomic install, no execution before verification, override precedence, offline behavior, redaction, and bounded process/resource handling without claiming implementation.",
-  "The compiler CLI and Tree-sitter grammar are explicitly excluded as language-server fallbacks; no setting key, URL, binary, protocol, diagnostic, or installer is invented.",
-  "The audit records the absence of accepted LSP/Zed authority, implementation, protocol/schema, and release evidence and preserves the G1-G5/G6 dependency.",
+  "The implemented source-built Preview ling lsp --stdio entry point and Tree-sitter grammar are explicitly separated from editor discovery/acquisition; no setting key, URL, standalone binary, protocol, diagnostic, or installer is invented.",
+  "The audit records the absence of accepted discovery/Zed authority, acquisition implementation, public discovery/error schema, and release evidence and preserves the G1-G5/G6 dependency.",
   "No network request, installer, executable, system configuration, placeholder API, migration promise, or stale legacy name is added.",
 ]
 verified_against_commit = ""
@@ -26254,6 +26307,7 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "ZED-6802 is BlockedSpec because no dedicated discovery/acquisition implementation, Zed extension, discovery key, release artifact, provenance manifest, or public installation/error protocol exists; the Preview ling lsp --stdio lifecycle is not an acquisition source.",
+  "Accepted DEC-0242 closes only current source-built Preview server/discovery-boundary evidence and does not authorize editor acquisition behavior.",
   "The inventory is negative-boundary and security evidence only; future process/network behavior requires accepted protocol, diagnostic, and provenance decisions before implementation.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor protocol, dependencies, or public API and performs no external network mutation.",
 ]

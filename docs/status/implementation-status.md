@@ -509,6 +509,7 @@
 | `ZED-6801-CURRENT-EVIDENCE` | Current LSP, grammar, and package compatibility evidence | `G6` | `S` | `Done` | `ZED-6801-SEED` | `892bcb4287d7c2538495cafa6b34c78c28283a6b` |
 | `ZED-6801-SEED` | Seed Zed compatibility-matrix drift gate | `G6` | `S` | `Done` | `DOC-6703-SEED` | `3ed4af01362d2a0e906acd40cff863237e355303` |
 | `ZED-6802` | Language-server Discovery and Acquisition | `G6` | `L` | `BlockedSpec` | `ZED-6801` | `` |
+| `ZED-6802-CURRENT-EVIDENCE` | Current Preview server and discovery boundary evidence | `G6` | `S` | `Done` | `ZED-6801-CURRENT-EVIDENCE`, `ZED-6802-SEED` | `f2ced28b6863c9694583883fe9daee114a3adab5` |
 | `ZED-6802-SEED` | Seed language-server discovery inventory drift gate | `G6` | `S` | `Done` | `ZED-6801-SEED` | `c058d49001fe24b0d6f22c4850025414451c04d3` |
 | `ZED-6803` | Full Zed Extension Acceptance | `G6` | `L` | `BlockedSpec` | `ZED-6802` | `` |
 | `ZED-6803-SEED` | Seed Zed extension acceptance inventory drift gate | `G6` | `S` | `Done` | `ZED-6802-SEED` | `75b6dd213dc1b07717f8cf2718dbe939176b76ae` |
