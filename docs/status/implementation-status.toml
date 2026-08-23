@@ -23655,7 +23655,7 @@ artifacts = [
 ]
 acceptance = [
   "The audit records that CLI and Exit-Code Freeze remains non-normative until an accepted versioned CLI decision defines the complete command matrix, syntax, flags, defaults, exit classes, stdout/stderr, human/JSON, color, path, offline, and compatibility rules.",
-  "The audit distinguishes accepted DEC-0003/DEC-0013/DEC-0015/DEC-0016 Seed contracts from Preview PROTO-CLI/PROTO-CLI-EXIT records, open project and formatter CLI gaps, and explicitly Unsupported/Future support-matrix commands.",
+  "The audit distinguishes accepted scoped Seed, formatter, init, standalone-test, project-check, and LSP contracts from Preview PROTO-CLI/PROTO-CLI-EXIT records, bounded project/formatter gap resolutions, and explicitly Unsupported/Future support-matrix commands.",
   "The audit requires stable bilingual L-<DOMAIN>-<NUMBER> diagnostics, deterministic/offline fixtures, Unicode 17.0.0 and original UTF-8 spans, checked Typed Core boundaries, no host-path/environment leakage, and generated protocol/support/status drift checks.",
   "No command, flag, default, backend selector, project/formatter integration, JSON/report protocol, migration adapter, diagnostic, dependency, public API, or placeholder is added while the command-family authority is unresolved.",
   "The future implementation must preserve accepted ling/.ling naming, current Seed exit distinctions, explicit Preview/Future/Unsupported states, and fail closed for unknown commands/options, versions, and malformed arguments.",
@@ -23665,10 +23665,61 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "PROTO-6204 is BlockedSpec by PROTO-6203, GAP-PROJECT-CLI-INTERFACE-001, GAP-FORMATTER-CLI-PROTOCOL-001, STAB-6103/support-matrix gaps, Preview PROTO-CLI/PROTO-CLI-EXIT records, and absent accepted 1.0 command-matrix authority.",
-  "DEC-0003, DEC-0013, DEC-0015, and DEC-0016 remain the scoped Seed parser, exit, Audit Source, and REPL authorities; they do not silently authorize project, formatter, package, support, bytecode, backend, or registry commands.",
+  "PROTO-6204 is BlockedSpec by incomplete G1-G5 exits, STAB-6103/support-matrix gaps, Preview PROTO-CLI/PROTO-CLI-EXIT records, unresolved project/formatter extensions, and absent Accepted 1.0 command-matrix authority.",
+  "Accepted scoped parser, exit, Audit, REPL, formatter, init, standalone-test, project-check, and LSP authorities do not silently authorize project run/test/build, workspace selection, package, support, bytecode, backend, registry, or other plan-only commands.",
   "The audit does not reinterpret accepted Seed fixtures, protocol inventory, support matrix, RFC-0001/0002, or the G6 freeze checklist and creates no stale zero command.",
   "The audit adds no public protocol, dependency, runtime, backend, schema, diagnostic, CLI, editor, package, migration, or placeholder API; the freeze remains deferred until command-family decisions and executable compatibility fixtures exist.",
+]
+
+[[task]]
+id = "PROTO-6204-OBSERVATION"
+title = "Internal CLI and Exit-Code Freeze boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROTO-6203-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0036-cli-internal-command-catalog-boundary.md",
+  "docs/decisions/0037-cli-internal-exit-catalog-boundary.md",
+  "docs/decisions/0040-cli-help-truth-fixture.md",
+  "docs/decisions/0222-cli-exit-freeze-boundary-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/status/PROTO-6204-AUTHORITY-AUDIT.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-cli/src/command_catalog.rs",
+  "crates/ling-cli/src/exit_catalog.rs",
+  "crates/ling-types/tests/cli_exit_freeze_evidence.rs",
+  "docs/status/PROTO-6204-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROTO-6204-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0222 authorizes only bounded CLI/exit freeze evidence; no Stable 1.0 command matrix, plan-only command, shared option contract, color/path policy, or output compatibility promise is defined.",
+  "The internal command catalog remains exactly nine parseable roots plus hierarchical project check, in deterministic order, with no duplicate command identity.",
+  "Plan-only roots project, build, query, patch, replay, explain, evidence, version, and support remain rejected by the root command catalog; --version remains a flag rather than a version command.",
+  "Assigned process exits remain exactly 0, 1, 2, 4, 5, and 6; value 3 remains unassigned and has no current compatibility meaning.",
+  "The test-local inventory covers sixty command, option, output, exit, policy, lifecycle, determinism, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "cargo test -p ling-cli --locked --offline passes.",
+  "cargo test -p ling-types --test cli_exit_freeze_evidence --locked --offline passes.",
+  "cargo clippy -p ling-cli -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "protocol, support, governance, formatting, and diff checks pass without changing public CLI behavior or lifecycle claims.",
+]
+verified_against_commit = "dfc288270f58029ddcb454eda5a7936a931b8c83"
+completion_commit = "dfc288270f58029ddcb454eda5a7936a931b8c83"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0222; PROTO-6204 remains BlockedSpec for the Stable 1.0 command matrix, plan-only commands, shared options/defaults, color/path/offline policy, output compatibility, shell completion, migration, and release evidence.",
+  "The opaque ling.cli-exit-freeze-observation/0 bytes are test evidence only and are not a CLI schema, completion format, output contract, command registry, or compatibility marker.",
+  "No command, alias, option, default, output byte, exit meaning, schema, diagnostic, project/formatter behavior, color/path/offline policy, source span, or Unicode behavior changed.",
 ]
 
 [[task]]
