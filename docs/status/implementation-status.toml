@@ -7634,7 +7634,7 @@ notes = [
 [[task]]
 id = "IDE-2310"
 title = "IDE formatting"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -7645,33 +7645,47 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0026.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0015-audit-source-format.md",
   "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/decisions/0028-formatter-cli-contract.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0057-formatter-in-process-edit-projection.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/formatting.rs",
   "docs/status/IDE-2310-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2310-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-formatting/README.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing formatting request/range, CST boundary, source-preservation, URI/position/version, edit, CLI, protocol lifecycle, and migration contracts.",
-  "The audit covers document/range behavior, valid/incomplete/invalid source, comments/docs, Unicode/NFC, BOM/CRLF, final LF, idempotence, semantic equivalence, deterministic edits, stale versions, and required fixtures.",
-  "No LSP formatter adapter, ling-fmt command, range-formatting behavior, Workspace Edit schema, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must reuse ling-format's checked CST boundary, preserve source bytes/spans, publish atomic versioned edits, and label experimental fields.",
+  "Accepted RFC-0026 defines Experimental ling.lsp.formatting/0.1 with exact discovery, request, immutable overlay snapshot, compiler-CST formatter, whole-document TextEdit, failure, and migration behavior.",
+  "The adapter formats only current open writable workspace or untitled overlays through SourceFile, ling-syntax, FormatDocument, and format_core_edit; it never reads closed files, spawns a formatter, or mutates server or filesystem state.",
+  "Five integration tests cover exact UTF-8/UTF-16/UTF-32 Unicode results, BOM/CRLF, latest versions, repeat determinism, unchanged/invalid input, ownership/URI/options, notifications, preinitialize, and post-shutdown behavior.",
+  "Range/on-type formatting remains intentionally absent because the execution plan makes it conditional and RFC-0026 explicitly defers its boundary; no placeholder range provider or unsupported Stable claim is exposed.",
+  "Locked/offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass for milestone d8e2a377830d0e34f27603036253e649214bdcaf.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "d8e2a377830d0e34f27603036253e649214bdcaf"
+completion_commit = "d8e2a377830d0e34f27603036253e649214bdcaf"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "IDE-2310 is BlockedSpec by GAP-FORMATTER-AUTHOR-SOURCE-001, GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, FMT-1507, and LSP-2102; DEC-0023 governs the internal formatter but not the editor wire contract.",
-  "Current ling-format code implements the internal Author Source preservation boundary, while no accepted ling-fmt CLI, LSP request/response, range policy, or versioned edit adapter exists.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "The document-formatting behavior originated in implementation commit 0421925f3a8e20f6bc951eff546b00523c3f36ff under FMT-1507; d8e2a377830d0e34f27603036253e649214bdcaf reconciles the stale IDE-2310 audit and adds direct lifecycle conformance evidence.",
+  "Accepted DEC-0028 fixes the CLI spelling as ling fmt; the LSP adapter reuses the same formatter library in process, so the lower-authority plan's ling-fmt wording does not create a second command or subprocess boundary.",
+  "General transaction, configurable-style, range/on-type, format-on-save, closed-file, dependency, WorkspaceEdit, cancellation, asynchronous, multi-document, and Stable behavior remains deferred and unclaimed.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime/VM/bytecode/ABI/package behavior, Semantic ID schema, source-position unit, filesystem/network mutation, or Unicode 17.0.0 table changed.",
 ]
 
 [[task]]

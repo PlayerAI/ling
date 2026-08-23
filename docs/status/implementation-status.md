@@ -229,7 +229,7 @@
 | `IDE-2308-METADATA` | Internal completion checked-metadata observation | `G1` | `S` | `Done` | `IDE-2307-SOURCE-INDEX` | `c528bf7bd7292ff681b41bb4e274ba417f84cdbd` |
 | `IDE-2309` | IDE code actions | `G1` | `L` | `Done` | `FMT-1507`, `IDE-2308`, `LSP-2201`, `LSP-2202` | `369432ef6146a27e236276ced2ab14e9065ca5af` |
 | `IDE-2309-REPAIR-INDEX` | Internal structured diagnostic repair index | `G1` | `S` | `Done` | `IDE-2308-METADATA` | `fa54770a8ab71dd93eb6c0a7239153851d0c9593` |
-| `IDE-2310` | IDE formatting | `G1` | `M` | `BlockedSpec` | `FMT-1507`, `LSP-2102` | `` |
+| `IDE-2310` | IDE formatting | `G1` | `M` | `Done` | `FMT-1507`, `LSP-2102` | `d8e2a377830d0e34f27603036253e649214bdcaf` |
 | `IDE-2311` | IDE workspace symbols | `G1` | `L` | `BlockedSpec` | `IDE-2301`, `LSP-2101`, `LSP-2102` | `` |
 | `IDE-2311-SOURCE-LOOKUPS` | Internal exact workspace-symbol source lookups | `G1` | `S` | `Done` | `IDE-2301-INDEX` | `bf44203af7d2548b768b496c5bf09b0eb3452731` |
 | `INC-1401` | Incremental query boundary ADR | `G1` | `M` | `Done` | `GOV-0110` | `dcb3fc5c148d0b90a3481a736113c4551a35cf17` |
