@@ -587,6 +587,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-WORKSPACE-SYMBOL",
+      "visibility": "Public",
+      "version": "ling.lsp.workspace-symbol/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-PACKAGE-IDENTITY",
       "visibility": "Public",
       "version": "v1 domain encodings",

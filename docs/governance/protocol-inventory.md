@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 44 records: 40 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 24 Preview, 0 Stable.
+- 45 records: 41 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 25 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -33,6 +33,7 @@
 | `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-RENAME` | Public | LSP | `ling.lsp.rename/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
+| `PROTO-LSP-WORKSPACE-SYMBOL` | Public | LSP | `ling.lsp.workspace-symbol/0.1` | `Preview` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-CLI-TEST` | Public | JSON | `ling.test/0.1` | `Preview` | yes | no | 5 |
@@ -307,6 +308,19 @@
 - Sources: [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-source/src/vfs.rs`](../../crates/ling-source/src/vfs.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs)
 - Fixtures: [`crates/ling-lsp/tests/workspace_reload.rs`](../../crates/ling-lsp/tests/workspace_reload.rs), [`tests/protocols/lsp-workspace/README.md`](../../tests/protocols/lsp-workspace/README.md), [`docs/status/LSP-2105-IMPLEMENTATION-REPORT.md`](../status/LSP-2105-IMPLEMENTATION-REPORT.md)
 - Notes: Client/host publication keeps watcher timing, paths, symlinks, and filesystem reads outside Ling semantics. Reload revisions invalidate exact source and manifest/lock/config/profile/target inputs without eager full compilation. Diagnostics, cancellation, compiler-result staleness, file URI mapping, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
+
+### `PROTO-LSP-WORKSPACE-SYMBOL` — Ling snapshot-indexed LSP workspace symbols
+
+- Producer: ling lsp --stdio; ling-lsp workspace-symbol provider
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Accept only Ready-state workspace/symbol requests with one required string query of at most 256 UTF-8 bytes and no NUL; match the exact source spelling or a case-sensitive prefix, ignore ordinary unknown members, and perform no work for notifications.
+- Writer policy: Capture and revalidate one complete immutable RequestSnapshot, resolve user definitions from tracked non-temporary writable workspace sources, reuse at most one exact snapshot-keyed plan, project original spans through the negotiated encoding, sort exact matches before prefixes, and return the first 256 standard SymbolInformation items or one atomic fixed failure.
+- Unknown-field policy: Ignore ordinary unknown request members, including progress tokens; incompatible provider, discovery, scope, matching, kind, field, ordering, limit, cache-key, cancellation, position, freshness, or failure behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.workspace-symbol/0.1 is Preview with no predecessor and clients gate on workspaceSymbolProvider plus the exact lingWorkspaceSymbols discovery object.
+- Authority: `RFC-0045`, `RFC-0036`, `RFC-0030`, `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0031`, `DEC-0071`, `DEC-0073`, `DEC-0082`
+- Sources: [`docs/RFC-0045.md`](../RFC-0045.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0036.md`](../RFC-0036.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0031-lsp-internal-cancellation-boundary.md`](../decisions/0031-lsp-internal-cancellation-boundary.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0073-ide-resolved-definition-index.md`](../decisions/0073-ide-resolved-definition-index.md), [`docs/decisions/0082-ide-workspace-symbol-lookups.md`](../decisions/0082-ide-workspace-symbol-lookups.md), [`crates/ling-db/src/definition_index.rs`](../../crates/ling-db/src/definition_index.rs), [`crates/ling-lsp/src/workspace_symbols.rs`](../../crates/ling-lsp/src/workspace_symbols.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-lsp/tests/workspace_symbols.rs`](../../crates/ling-lsp/tests/workspace_symbols.rs), [`tests/protocols/lsp-workspace-symbol/README.md`](../../tests/protocols/lsp-workspace-symbol/README.md), [`docs/status/IDE-2311-IMPLEMENTATION-REPORT.md`](../status/IDE-2311-IMPLEMENTATION-REPORT.md)
+- Notes: The Preview publishes no Semantic ID or host path and does not claim dependency, generated, temporary, builtin, Prelude, filesystem-discovered, fuzzy, normalized, persistent, partial-result, resolve, work-done, stdio cancellation, Semantic Transaction, or Stable behavior.
 
 ### `PROTO-HUMAN-OUTPUT` — Human-readable CLI and diagnostic output
 

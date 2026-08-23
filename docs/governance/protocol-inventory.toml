@@ -288,6 +288,28 @@ authority = ["RFC-0036", "RFC-0004", "RFC-0023", "RFC-0029", "RFC-0030", "DEC-00
 notes = ["Document symbols are presentation derived from resolved source structure, not Semantic ID publication. Local bindings, inferred details, dynamic registration, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred."]
 
 [[protocol]]
+id = "PROTO-LSP-WORKSPACE-SYMBOL"
+title = "Ling snapshot-indexed LSP workspace symbols"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.workspace-symbol/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp workspace-symbol provider"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Accept only Ready-state workspace/symbol requests with one required string query of at most 256 UTF-8 bytes and no NUL; match the exact source spelling or a case-sensitive prefix, ignore ordinary unknown members, and perform no work for notifications."
+writer_policy = "Capture and revalidate one complete immutable RequestSnapshot, resolve user definitions from tracked non-temporary writable workspace sources, reuse at most one exact snapshot-keyed plan, project original spans through the negotiated encoding, sort exact matches before prefixes, and return the first 256 standard SymbolInformation items or one atomic fixed failure."
+unknown_field_policy = "Ignore ordinary unknown request members, including progress tokens; incompatible provider, discovery, scope, matching, kind, field, ordering, limit, cache-key, cancellation, position, freshness, or failure behavior requires a new marker and migration evidence."
+migration_tool = "None; ling.lsp.workspace-symbol/0.1 is Preview with no predecessor and clients gate on workspaceSymbolProvider plus the exact lingWorkspaceSymbols discovery object."
+fixtures = ["crates/ling-lsp/tests/workspace_symbols.rs", "tests/protocols/lsp-workspace-symbol/README.md", "docs/status/IDE-2311-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0045.md", "docs/RFC-0004.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0036.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0031-lsp-internal-cancellation-boundary.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0073-ide-resolved-definition-index.md", "docs/decisions/0082-ide-workspace-symbol-lookups.md", "crates/ling-db/src/definition_index.rs", "crates/ling-lsp/src/workspace_symbols.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.workspace-symbol/0.1", "workspace/symbol", "workspaceSymbolProvider", "lingWorkspaceSymbols"]
+authority = ["RFC-0045", "RFC-0036", "RFC-0030", "RFC-0029", "RFC-0023", "RFC-0004", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0031", "DEC-0071", "DEC-0073", "DEC-0082"]
+notes = ["The Preview publishes no Semantic ID or host path and does not claim dependency, generated, temporary, builtin, Prelude, filesystem-discovered, fuzzy, normalized, persistent, partial-result, resolve, work-done, stdio cancellation, Semantic Transaction, or Stable behavior."]
+
+[[protocol]]
 id = "PROTO-LSP-HOVER"
 title = "Ling checked LSP hover"
 category = "LSP"

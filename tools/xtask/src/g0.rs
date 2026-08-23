@@ -71,7 +71,7 @@ mod tests {
         assert_eq!(summary.document_count, 320);
         assert_eq!(summary.gap_count, 28);
         assert_eq!(summary.lifecycle_count, 295);
-        assert_eq!(summary.protocol_count, 44);
+        assert_eq!(summary.protocol_count, 45);
         assert_eq!(summary.diagnostic_code_count, 95);
     }
 }

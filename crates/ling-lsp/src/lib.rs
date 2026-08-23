@@ -10,7 +10,8 @@
 //! RFC-0039 governs checked References; RFC-0040 governs Prepare Rename;
 //! RFC-0041 governs checked transactional Rename; RFC-0042 governs checked
 //! deterministic Completion; RFC-0043 governs snapshot-bound Completion
-//! Resolve; RFC-0044 governs bounded transactional Code Actions.
+//! Resolve; RFC-0044 governs bounded transactional Code Actions; RFC-0045
+//! governs snapshot-indexed Workspace Symbols.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -78,6 +79,10 @@ pub use completion_resolve::{
 };
 mod code_action;
 pub use code_action::{CODE_ACTION_PROTOCOL_VERSION, FORMAT_ACTION_KIND};
+mod workspace_symbols;
+pub use workspace_symbols::{
+    MAX_WORKSPACE_SYMBOL_QUERY_BYTES, MAX_WORKSPACE_SYMBOLS, WORKSPACE_SYMBOL_PROTOCOL_VERSION,
+};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -603,6 +608,7 @@ pub struct LspServer {
     transactional_rename_supported: bool,
     completion_resolve: completion_resolve::CompletionResolveState,
     code_action: code_action::CodeActionOptions,
+    workspace_symbol_state: workspace_symbols::WorkspaceSymbolState,
 }
 
 impl Default for LspServer {
@@ -632,6 +638,7 @@ impl LspServer {
             transactional_rename_supported: false,
             completion_resolve: completion_resolve::CompletionResolveState::new(),
             code_action: code_action::CodeActionOptions::disabled(),
+            workspace_symbol_state: workspace_symbols::WorkspaceSymbolState::new(),
         }
     }
 
@@ -753,6 +760,20 @@ impl LspServer {
     /// responses. Framing remains the responsibility of [`run_stdio`].
     #[must_use]
     pub fn handle_json(&mut self, body: &[u8]) -> HandleOutcome {
+        self.handle_json_with_cancellation(body, &CancellationToken::new())
+    }
+
+    /// Handles one JSON-RPC body with an owner-provided cooperative analysis token.
+    ///
+    /// RFC-0045 consumes this token for `workspace/symbol`. Other current
+    /// methods retain their existing synchronous behavior. This in-process
+    /// entry point does not claim a `$/cancelRequest` wire protocol.
+    #[must_use]
+    pub fn handle_json_with_cancellation(
+        &mut self,
+        body: &[u8],
+        cancellation: &CancellationToken,
+    ) -> HandleOutcome {
         let value = match serde_json::from_slice::<Value>(body) {
             Ok(value) => value,
             Err(_) => {
@@ -835,6 +856,7 @@ impl LspServer {
             "textDocument/completion" => self.completion(id_present, id, params),
             "completionItem/resolve" => self.completion_resolve(id_present, id, params),
             "textDocument/codeAction" => self.code_action(id_present, id, params),
+            "workspace/symbol" => self.workspace_symbols(id_present, id, params, cancellation),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -2151,6 +2173,10 @@ fn initialize_result(
             "documentSymbolProvider": true,
             "hoverProvider": true,
             "referencesProvider": true,
+            "workspaceSymbolProvider": {
+                "resolveProvider": false,
+                "workDoneProgress": false,
+            },
             "completionProvider": {
                 "resolveProvider": false,
                 "triggerCharacters": ["."],
@@ -2197,6 +2223,15 @@ fn initialize_result(
                     "maxSymbols": MAX_DOCUMENT_SYMBOLS,
                     "mode": if hierarchical_document_symbols { "hierarchical" } else { "flat" },
                     "version": DOCUMENT_SYMBOL_PROTOCOL_VERSION,
+                },
+                "lingWorkspaceSymbols": {
+                    "cache": "complete-snapshot",
+                    "cancellation": "cooperative-host-token",
+                    "matching": "exact-or-prefix-case-sensitive",
+                    "maxQueryBytes": MAX_WORKSPACE_SYMBOL_QUERY_BYTES,
+                    "maxSymbols": MAX_WORKSPACE_SYMBOLS,
+                    "scope": "tracked-workspace-sources",
+                    "version": WORKSPACE_SYMBOL_PROTOCOL_VERSION,
                 },
                 "lingOverlay": {
                     "changeLimit": MAX_CONTENT_CHANGES,
