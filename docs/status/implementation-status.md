@@ -146,7 +146,7 @@
 | `EFF-2101` | Effect core model freeze | `G2` | `M` | `Done` | — | `61f68a93844431265eca725ee66aab894394c982` |
 | `EFF-2101-SEED-ROW` | Seed EffectRow canonical snapshot | `G2` | `S` | `Done` | — | `fb949ce2b28fc73a1668806952c3f8e790cd6d7a` |
 | `EFF-2102` | Effect inference and constraint solving | `G2` | `L` | `Done` | `EFF-2101` | `e1827e7ceee6ffba9d40d882119a949d4af65a00` |
-| `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `BlockedSpec` | `EFF-2101`, `EFF-2102` | `` |
+| `EFF-2103` | Handler Typed Core representation | `G2` | `L` | `Done` | `EFF-2101`, `EFF-2102` | `004538deec049446740a1d17ca57e5915c6d2777` |
 | `EFF-2103-AST` | Handler unresolved AST projection | `G2` | `S` | `Done` | `EFF-2103-SYNTAX` | `225cc9fecabcdb1a3274ee6dc576f9120143584c` |
 | `EFF-2103-CORE` | First-order handler Typed Core projection | `G2` | `S` | `Done` | `EFF-2101`, `EFF-2102` | `e1dc5334d15e25e959fa0da6e3462a90210c6fdf` |
 | `EFF-2103-HIR` | Handler unresolved HIR projection | `G2` | `S` | `Done` | `EFF-2103-AST` | `fa988aab85a96d3e7c257c630b84acb985639064` |

@@ -242,11 +242,11 @@ G6 Blocked：只在 G1～G5 完成后稳定化
   | `EFF-2101` | G2 | Effect 核心模型冻结 | M | Done | `06-G2-V0.2-CONCURRENT.md:81`, `docs/RFC-0006.md`, `docs/status/EFF-2101-AUTHORITY-AUDIT.md`, `docs/status/EFF-2101-IMPLEMENTATION-REPORT.md` |
 | `EFF-2101-SEED-ROW` | G2 | Seed EffectRow canonical snapshot | S | Done | Accepted DEC-0060; see `docs/status/EFF-2101-SEED-ROW-IMPLEMENTATION-REPORT.md`; v0.2 Effect model remains in `EFF-2101` |
 | `EFF-2102` | G2 | Effect 推导和约束求解 | L | Done | `06-G2-V0.2-CONCURRENT.md:105`, `DEC-0062`, `docs/status/EFF-2102-AUTHORITY-AUDIT.md`, `docs/status/EFF-2102-IMPLEMENTATION-REPORT.md` |
-| `EFF-2103` | G2 | Handler Typed Core 表示 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:115`, `docs/status/EFF-2103-AUTHORITY-AUDIT.md` |
-| `EFF-2103-CORE` | G2 | First-order handler Typed Core projection | S | Done | Accepted `DEC-0063`; see `docs/status/EFF-2103-CORE-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for source syntax/lowering |
-| `EFF-2103-SYNTAX` | G2 | Handler source CST projection | S | Done | Accepted `DEC-0064`; see `docs/status/EFF-2103-SYNTAX-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for AST/HIR lowering and checking |
-| `EFF-2103-AST` | G2 | Handler unresolved AST projection | S | Done | Accepted `DEC-0065`; see `docs/status/EFF-2103-AST-IMPLEMENTATION-REPORT.md`; HIR/checking and parent remain BlockedSpec |
-| `EFF-2103-HIR` | G2 | Handler unresolved HIR projection | S | Done | Accepted `DEC-0066`; see `docs/status/EFF-2103-HIR-IMPLEMENTATION-REPORT.md`; resolver rejects before checked semantics and parent remains BlockedSpec |
+| `EFF-2103` | G2 | Handler Typed Core 表示 | L | Done | Accepted `RFC-0006` and `DEC-0260`; implementation `004538de`; see `docs/status/EFF-2103-IMPLEMENTATION-REPORT.md` |
+| `EFF-2103-CORE` | G2 | First-order handler Typed Core projection | S | Done | Accepted `DEC-0063`; see `docs/status/EFF-2103-CORE-IMPLEMENTATION-REPORT.md`; integrated by `EFF-2103` |
+| `EFF-2103-SYNTAX` | G2 | Handler source CST projection | S | Done | Accepted `DEC-0064`; see `docs/status/EFF-2103-SYNTAX-IMPLEMENTATION-REPORT.md`; integrated by `EFF-2103` |
+| `EFF-2103-AST` | G2 | Handler unresolved AST projection | S | Done | Accepted `DEC-0065`; see `docs/status/EFF-2103-AST-IMPLEMENTATION-REPORT.md`; integrated by `EFF-2103` |
+| `EFF-2103-HIR` | G2 | Handler unresolved HIR projection | S | Done | Accepted `DEC-0066`; see `docs/status/EFF-2103-HIR-IMPLEMENTATION-REPORT.md`; integrated by `EFF-2103` |
 | `EFF-2105-MODEL-PROPERTIES` | G2 | Effect model deterministic property corpus | S | Done | Accepted `DEC-0067`; see `docs/status/EFF-2105-MODEL-PROPERTIES-IMPLEMENTATION-REPORT.md`; full EFF-2105 runtime/differential target remains BlockedSpec |
 | `EFF-2104` | G2 | 解释器与 VM Handler 执行 | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:131`, `docs/status/EFF-2104-AUTHORITY-AUDIT.md` |
 | `EFF-2104-REJECTION-GATE` | G2 | Internal unresolved-handler execution rejection gate | S | Done | Accepted `DEC-0088`; see `crates/ling-cli/tests/handler_boundary.rs` and `docs/status/EFF-2104-REJECTION-GATE-IMPLEMENTATION-REPORT.md`; handler runtime remains BlockedSpec |

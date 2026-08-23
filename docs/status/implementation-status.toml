@@ -8849,7 +8849,7 @@ notes = [
 [[task]]
 id = "EFF-2103"
 title = "Handler Typed Core representation"
-state = "BlockedSpec"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -8860,33 +8860,52 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
+  "docs/RFC-0006.md",
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0062-effect-row-constraint-solver.md",
+  "docs/decisions/0063-first-order-handler-core.md",
+  "docs/decisions/0064-handler-source-cst-projection.md",
+  "docs/decisions/0065-handler-ast-projection.md",
+  "docs/decisions/0066-handler-hir-projection.md",
+  "docs/decisions/0260-checked-handler-lowering.md",
+  "docs/ERROR-CODES.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
-  "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-hir/src/lib.rs",
+  "crates/ling-resolve/src/lib.rs",
+  "crates/ling-types/src/lib.rs",
+  "crates/ling-effects/src/lib.rs",
+  "crates/ling-effects/tests/checked_handlers.rs",
+  "crates/ling-semantic/src/lib.rs",
+  "crates/ling-format/src/lib.rs",
+  "crates/ling-cli/tests/handler_boundary.rs",
+  "crates/ling-eval/src/lib.rs",
+  "crates/ling-bytecode/tests/lowering.rs",
+  "docs/decisions/0260-checked-handler-lowering.md",
   "docs/status/EFF-2103-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2103-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing handler grammar/Core shape, operation signatures, scope, effect matching/elimination, residual rows, resume typing/cardinality, unhandled failure, Task/Actor boundary, and source/schema contracts.",
-  "The audit distinguishes current Seed closed-row Capability checking from the missing RFC-0006 handler and Typed Core authority and preserves the checked-only evaluation boundary.",
-  "The audit covers single/nested handlers, propagation, linear/multiple resume, residual rows, missing/unhandled effects, Fault/mutable State, cancellation, Task/Actor crossing, Unicode/CRLF/BOM spans, canonical Audit output, and interpreter/VM differential fixtures.",
-  "No handler syntax, AST/HIR/Typed Core node, effect-discharge rule, resume checker, Audit Source field, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
-  "The future implementation must lower only accepted syntax into checked Typed Core, preserve residual effects and source identity, reject unhandled effects, and prove interpreter/VM equivalence before runtime exposure.",
+  "The DEC-0260 registry resolves exactly Console.Write.write, Clock.now, and Random.next, creates independent lexical clause scopes, checks operation arity, and records exact resume-binding reference counts with registered bilingual L-EFFECT-0005 diagnostics.",
+  "Type checking binds clause parameters to registered inputs, types resume as Output -> R, unifies all clause bodies with the handled result R, and publishes no CheckedProgram after resolution, typing, Effect, or Core failure.",
+  "Effect checking subtracts handled labels from direct and transitive body uses, preserves clause-body and State<T> effects, and computes host Capability closure from the unmasked reachable row.",
+  "Each valid handler publishes deterministic HandlerCore, existing Semantic Graph expression/binding/reference identities, and canonical ling.audit/0.2 evidence with original UTF-8 byte spans; handler-free Audit output remains byte-compatible ling.audit/0.1.",
+  "Focused handler tests and the full locked-offline workspace, Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, diff, and execution-plan checksum gates pass; evaluator and all bytecode revisions retain structured EFF-2104 rejection.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "004538deec049446740a1d17ca57e5915c6d2777"
+completion_commit = "004538deec049446740a1d17ca57e5915c6d2777"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "EFF-2103 is BlockedSpec by EFF-2101/EFF-2102, GAP-EFFECT-HANDLER-001, GAP-EFFECT-STATE-MASKING-001, absent RFC-C201/RFC-0006, and unaccepted Task/Actor boundary RFCs; no handler protocol or Core schema exists.",
-  "Current syntax/AST/HIR/types/effects have no handler node or resume semantics; ling-effects only propagates Seed rows and Capability closure.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "Implementation commit 004538deec049446740a1d17ca57e5915c6d2777 closes only EFF-2103's accepted source-to-checked-Core boundary under DEC-0260.",
+  "Interpreter/VM continuation execution, Fault and cancellation behavior, mutable-State masking, Task/Actor crossing, package-aware Handler Audit, and Stable compatibility remain assigned to later accepted work.",
+  "The milestone adds ling.audit/0.2 and Handler-aware semantic identities while preserving non-handler Audit/graph bytes, runtime and ABI behavior, deterministic ordering, original UTF-8 spans, and Unicode 17.0.0.",
 ]
 
 [[task]]
