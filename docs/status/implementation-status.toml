@@ -7341,7 +7341,7 @@ notes = [
 [[task]]
 id = "IDE-2307"
 title = "IDE completion v0"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -7356,31 +7356,50 @@ spec = [
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/RFC-0005.md",
+  "docs/RFC-0042.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
+  "docs/decisions/0079-ide-completion-source-inventory.md",
+  "docs/decisions/0080-ide-completion-checked-metadata.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/checked_completion_catalog.rs",
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-lsp/src/completion.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/completion.rs",
+  "docs/RFC-0042.md",
   "docs/status/IDE-2307-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2307-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "tests/fixtures/lsp-diagnostics-v1/manifest.json",
+  "tests/protocols/lsp-completion/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing completion request/context, candidate visibility and ranking, insertion-text, position/version, Semantic ID/provenance, capability, and protocol lifecycle contracts.",
-  "The audit covers expression/member/type/pattern/variant/import/module/keyword contexts, scope and type/effect/capability ranking, aliases, Unicode/CRLF/BOM, shadowing/visibility, stale results, resource limits, deterministic ties, migration, and no-AI behavior.",
-  "No completion handler, candidate ranking, insertion-text API, capability disclosure, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must use checked data, preserve source-span/ID truth, rank deterministically without AI, disclose capabilities explicitly, and label experimental fields.",
+  "Accepted RFC-0042 defines Public Preview ling.lsp.completion/0.1, the six checked contexts, exact request and item fields, snapshot and position behavior, candidate sources, fresh checked probes, deterministic ranking, bounds, fixed failures, migration, and the no-AI boundary.",
+  "The compiler catalog deterministically records checked definitions, bindings, resolved import aliases, modules, record fields, constructors, Prelude entries, and builtins while keeping identities, spans, types, Effects, Capabilities, paths, and provenance off the wire.",
+  "The standard textDocument/completion handler validates request contexts, classifies the valid CST, projects original-byte replacement ranges through UTF-8/16/32, validates every candidate in a fresh compiler, ranks and deduplicates deterministically, caps results, and rechecks snapshot freshness.",
+  "Executable compiler, JSON-RPC, and exact stdio transcript tests cover expression/member/type/pattern/variant/import/module/keyword contexts, aliases, record fields, wildcard and keyword kinds, checked failures, exact edits, notification silence, and absence of resolve metadata.",
+  "Locked/offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass for implementation commit 360315e4ec52b7e19ecdb475629d0fe71c1594e4.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "360315e4ec52b7e19ecdb475629d0fe71c1594e4"
+completion_commit = "360315e4ec52b7e19ecdb475629d0fe71c1594e4"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "IDE-2307 is BlockedSpec by the absent completion protocol and context/ranking decision, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-UNICODE-ALIAS-SYNTAX-001, GAP-AUTHOR-SOURCE-LOCALIZATION-001, LSP-2101/LSP-2102, and IDE-2304.",
-  "Current resolver/type/effect/source code has internal candidate inputs but no approved visibility, presentation, insertion, capability, snapshot, or deterministic ranking contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "RFC-0042 removes IDE-2307 from broader gap blocker lists only for fully checked existing-token completion; incomplete recovery, zero-width insertion, auto-imports, snippets, lazy resolve metadata, generated sources, AI ranking, and Stable lifecycle remain deferred.",
+  "IDE-2308 remains a separate presentation/resolve target and cannot infer documentation, signature, Effect, Capability, handle, or migration behavior from completion v0.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime/VM/bytecode/ABI/package behavior, filesystem/network mutation, Semantic ID schema, or Unicode 17.0.0 table change is introduced.",
 ]
 
 [[task]]
