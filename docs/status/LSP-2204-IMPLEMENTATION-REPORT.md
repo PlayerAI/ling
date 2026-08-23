@@ -1,6 +1,6 @@
 # LSP-2204 implementation report
 
-> Status: implementation complete; status binding pending
+> Status: Done
 > Task: `LSP-2204`
 > Authority: Accepted `RFC-0034`, `RFC-0033`, `RFC-0032`, `RFC-0031`,
 > `RFC-0004`, `DEC-0001`, `DEC-0019`, `DEC-0034`, `DEC-0071`, and `DEC-0072`
@@ -45,8 +45,9 @@ summaries without mutating the complete compiler result.
 - Existing adapter tests retain Unicode/CRLF/order evidence; push/pull suites
   retain stale, result-ID, removal, temporary, response ordering, and oversized
   failure-atomicity evidence under configured upper limits.
-- Focused LSP, diagnostic registry, and governance checks pass. Repository-wide
-  results and the exact implementation commit are recorded during binding.
+- Focused LSP, diagnostic registry, and governance checks pass. The complete
+  repository gate set passed against implementation commit
+  `b70308c1e215fd2f4a4736aa56d7372c368af599` before status binding.
 
 ## Compatibility, determinism, and Unicode impact
 

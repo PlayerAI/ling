@@ -6551,7 +6551,7 @@ notes = [
 [[task]]
 id = "LSP-2204"
 title = "LSP root-cause and error-storm control"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6562,30 +6562,36 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/ERROR-CODES.md",
+  "docs/RFC-0034.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/diagnostic_control.rs",
+  "crates/ling-lsp/tests/diagnostic_control.rs",
+  "docs/RFC-0034.md",
   "docs/status/LSP-2204-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2204-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-diagnostic-control/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit distinguishes accepted compiler root-cause/bounded diagnostics from missing LSP suppression, deduplication, caps, grouping, truncation, and recovery policy.",
-  "The audit covers deterministic error identity/order, per-file/workspace limits, push/pull interaction, stale recovery, related files, localization, and required fixtures.",
-  "No LSP cap, suppression rule, deduplication key, truncation field, diagnostic allocation, Semantic ID change, or placeholder adapter is added while the authority is absent.",
-  "The future implementation must preserve compiler root causes, make any truncation explicit/deterministic, and prove recovery/clear behavior.",
+  "Accepted RFC-0034 defines immutable bounded initialization options, exact root identity, first-wins deduplication, deterministic document/workspace caps, and registered bilingual omission summaries.",
+  "Push and pull apply the same stateless post-adapter transform and preserve byte-identical selected diagnostics, deterministic URI ordering, failure atomicity, stale recovery, and clear behavior.",
+  "Integration tests cover default/custom discovery, bounds and malformed input, exact summaries, workspace ordering, push/pull parity, and recovery; module tests cover independent identities, simultaneous caps, and resource-shaped roots.",
+  "Compiler/parser recovery and production Trait solver integration remain outside this LSP task; upstream resource-limit roots are preserved and deduplicated without manufacturing unsupported compiler diagnostics.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "b70308c1e215fd2f4a4736aa56d7372c368af599"
+completion_commit = "b70308c1e215fd2f4a4736aa56d7372c368af599"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2204 now has its LSP-2202 dependency satisfied but remains BlockedSpec by the missing Accepted root-cause/deduplication/cap/suppression contract; RFC-0032 deliberately performs none of those transformations.",
-  "No editor-specific suppression or error-storm semantics are claimed, and no registered diagnostic code is changed.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit b70308c1e215fd2f4a4736aa56d7372c368af599 adds the shared diagnostic-control layer, RFC-0034 authority, L-LSP-0001, protocol migrations, fixtures, and executable tests.",
+  "The implementation preserves accepted adapter values and ordering, uses checked counters, and keeps normal builds/tests offline after dependencies are locked.",
+  "No Ling syntax/semantics, Typed Core, runtime, bytecode, VM, ABI, Semantic ID, or Unicode 17.0.0 behavior changes.",
 ]
 
 [[task]]
