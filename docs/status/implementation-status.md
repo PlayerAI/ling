@@ -87,6 +87,7 @@
 | `COMPAT-6502` | 1.0 Compiler Compatibility Matrix | `G6` | `L` | `BlockedSpec` | `COMPAT-6501` | `` |
 | `COMPAT-6502-CURRENT` | Current compiler compatibility-boundary evidence | `G6` | `S` | `Done` | `COMPAT-6501-SEED` | `9a56e37933fd78c27fda3c30149f1ec2619855d9` |
 | `COMPAT-6503` | Language Migration Tool | `G6` | `L` | `BlockedSpec` | `COMPAT-6502` | `` |
+| `COMPAT-6503-READINESS` | Migration Tool Readiness Boundary | `G6` | `S` | `Done` | `COMPAT-6502-CURRENT` | `3ccbc058cd6de3ad447712ffb77bfeb1e2e7cb10` |
 | `COMPAT-6504` | Deprecation Policy | `G6` | `L` | `BlockedSpec` | `COMPAT-6503` | `` |
 | `CPU-4201` | Scalar Reference Backend | `G4` | `L` | `BlockedSpec` | `KCHK-4105` | `` |
 | `CPU-4201-OBSERVATION` | Internal CPU scalar-reference boundary evidence | `G4` | `S` | `Done` | `KCHK-4105-OBSERVATION` | `9f723650d65177833a34d623b5b0123e57cb9ecf` |

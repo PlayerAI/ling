@@ -24697,6 +24697,9 @@ spec = [
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md",
+  "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md",
+  "docs/decisions/0232-migration-tool-deferred-until-version-pair.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -24708,6 +24711,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/COMPAT-6503-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6503-READINESS-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6503-READINESS-IMPLEMENTATION-REPORT.md",
+  "docs/governance/migration-readiness.toml",
+  "docs/governance/migration-readiness.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -24724,9 +24731,61 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "COMPAT-6503 is BlockedSpec because no accepted source-version pair, migration transformation, Semantic Transaction/LSP boundary, formatter CLI, command/report contract, or rollback policy exists.",
+  "Accepted DEC-0232 authorizes a completed readiness-evidence child only; it does not authorize the blocked public migration tool.",
   "The execution-plan command label was a stale legacy placeholder; the backlog now uses the neutral Language Migration Tool title, while no public Ling command is introduced and current `ling`/`.ling` naming is preserved.",
   "DEC-0002/DEC-0015/DEC-0023 and RFC-0002 authorize only source spans, Audit/Author Source preservation, and manifest/lock-specific boundaries; open formatter/LSP/semantic-protocol gaps prevent general migration implementation.",
   "The audit changes no source, parser, resolver, evaluator, formatter, identity, diagnostic, schema, package/lock, CLI, editor, dependency, or public API and creates no stale legacy surface.",
+]
+
+[[task]]
+id = "COMPAT-6503-READINESS"
+title = "Migration Tool Readiness Boundary"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["COMPAT-6502-CURRENT"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md",
+  "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md",
+  "docs/decisions/0232-migration-tool-deferred-until-version-pair.md",
+  "docs/status/COMPAT-6503-AUTHORITY-AUDIT.md",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "crates/ling-cli/src/command_catalog.rs",
+  "tools/xtask/src/migration_readiness.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/governance/migration-readiness.toml",
+  "docs/governance/migration-readiness.md",
+  "docs/status/COMPAT-6503-READINESS-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6503-READINESS-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0232 records exactly one released source version, no accepted migration version pair, and an absent public migration command.",
+  "The readiness manifest classifies the plan's exact nine migration requirements as Unavailable with explicit blockers and repository evidence.",
+  "The CLI catalog rejects `migrate` as plan-only and exposes no Migrate command route, so readiness evidence cannot be mistaken for a public feature.",
+  "cargo xtask migration verify validates the authority marker, exact requirement set and order, evidence paths, generated report, and CLI-catalog boundary; the verifier is included in the CI contract.",
+  "Focused migration, compatibility, governance, CI-contract, xtask, CLI, Clippy, formatting, and diff checks pass without changing language or runtime behavior.",
+]
+verified_against_commit = "3ccbc058cd6de3ad447712ffb77bfeb1e2e7cb10"
+completion_commit = "3ccbc058cd6de3ad447712ffb77bfeb1e2e7cb10"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance and verification evidence only under DEC-0232; COMPAT-6503 remains BlockedSpec until an actual version pair and accepted transformation, transaction, diagnostic, CLI/report, and rollback contracts exist.",
+  "No public command spelling is reserved, and no parser rewrite, semantic migration, edit transaction, backup, formatter, machine-report protocol, diagnostic, dependency, schema, Semantic ID, runtime, or Unicode behavior is added.",
 ]
 
 [[task]]
