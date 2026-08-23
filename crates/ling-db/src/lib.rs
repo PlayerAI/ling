@@ -499,6 +499,8 @@ impl SemanticModuleFragment {
 /// Errors raised while materializing a query result.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum QueryError {
+    /// Cooperative analysis cancellation was observed at a query checkpoint.
+    Cancelled,
     UnknownFile {
         file: SourceId,
     },
@@ -564,6 +566,7 @@ pub enum QueryError {
 impl fmt::Display for QueryError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::Cancelled => formatter.write_str("compiler query was cancelled"),
             Self::UnknownFile { file } => write!(formatter, "unknown source file {}", file.get()),
             Self::InvalidSource { file, error } => {
                 write!(formatter, "source file {} is invalid: {error}", file.get())
@@ -662,6 +665,18 @@ impl fmt::Display for QueryError {
 }
 
 impl Error for QueryError {}
+
+fn never_cancelled() -> bool {
+    false
+}
+
+fn check_query_cancellation(cancelled: &dyn Fn() -> bool) -> Result<(), QueryError> {
+    if cancelled() {
+        Err(QueryError::Cancelled)
+    } else {
+        Ok(())
+    }
+}
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 struct QueryKey {
@@ -1015,21 +1030,36 @@ impl CompilerDb {
         &mut self,
         file: SourceId,
     ) -> Result<Arc<SemanticTokenIndex>, QueryError> {
+        self.semantic_token_index_with_cancellation(file, &never_cancelled)
+    }
+
+    /// Generates semantic tokens with cooperative cancellation checkpoints.
+    pub fn semantic_token_index_with_cancellation(
+        &mut self,
+        file: SourceId,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Arc<SemanticTokenIndex>, QueryError> {
+        check_query_cancellation(cancelled)?;
         let (source_key, snapshot, source) = self.source(file)?;
         let lexical = self.token_source_index(file)?;
+        check_query_cancellation(cancelled)?;
 
         let typed_context = (|| {
             let (graph_key, graph) = self.module_graph_query()?;
+            check_query_cancellation(cancelled)?;
             let node = graph
                 .node(file)
                 .cloned()
                 .ok_or(QueryError::UnknownFile { file })?;
             let workspace = self.workspace_resolve_key(&graph_key, &graph, &node.name)?;
+            check_query_cancellation(cancelled)?;
             let key = SemanticTokenQueryKey {
                 source: source_key,
                 workspace,
             };
-            let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+            let checked = self
+                .checked_workspace_with_cancellation(&graph_key, &graph, &node.name, cancelled)?;
+            check_query_cancellation(cancelled)?;
             Ok::<_, QueryError>((key, checked))
         })();
 
@@ -1047,11 +1077,14 @@ impl CompilerDb {
                 )
                 .map(Arc::new)
                 .map_err(|error| QueryError::SemanticTokenIndex { file, error })?;
+                check_query_cancellation(cancelled)?;
                 self.semantic_token_indexes.insert(key, index.clone());
                 self.record(QueryKind::SemanticTokenIndex, &snapshot, QueryOutcome::Miss);
                 Ok(index)
             }
+            Err(QueryError::Cancelled) => Err(QueryError::Cancelled),
             Err(_) => {
+                check_query_cancellation(cancelled)?;
                 let index = SemanticTokenIndex::from_lexical_fallback(
                     &lexical,
                     snapshot.revision(),
@@ -1059,6 +1092,7 @@ impl CompilerDb {
                 )
                 .map(Arc::new)
                 .map_err(|error| QueryError::SemanticTokenIndex { file, error })?;
+                check_query_cancellation(cancelled)?;
                 self.record(QueryKind::SemanticTokenIndex, &snapshot, QueryOutcome::Miss);
                 Ok(index)
             }
@@ -1253,13 +1287,27 @@ impl CompilerDb {
         &mut self,
         file: SourceId,
     ) -> Result<Arc<ResolvedDefinitionIndex>, QueryError> {
+        self.resolved_definition_index_with_cancellation(file, &never_cancelled)
+    }
+
+    /// Builds the resolved definition inventory with cooperative checkpoints.
+    pub fn resolved_definition_index_with_cancellation(
+        &mut self,
+        file: SourceId,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Arc<ResolvedDefinitionIndex>, QueryError> {
+        check_query_cancellation(cancelled)?;
         let (graph_key, graph) = self.module_graph_query()?;
+        check_query_cancellation(cancelled)?;
         let node = graph
             .node(file)
             .cloned()
             .ok_or(QueryError::UnknownFile { file })?;
         let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
-        Ok(Arc::new(ResolvedDefinitionIndex::from_resolved(&resolved)))
+        check_query_cancellation(cancelled)?;
+        let index = Arc::new(ResolvedDefinitionIndex::from_resolved(&resolved));
+        check_query_cancellation(cancelled)?;
+        Ok(index)
     }
 
     /// Builds one bounded module-rooted outline from validated resolved HIR.
@@ -1365,15 +1413,30 @@ impl CompilerDb {
         &mut self,
         file: SourceId,
     ) -> Result<Arc<ReferenceSearchIndex>, QueryError> {
+        self.checked_reference_search_index_with_cancellation(file, &never_cancelled)
+    }
+
+    /// Builds checked reference groups with cooperative checkpoints.
+    pub fn checked_reference_search_index_with_cancellation(
+        &mut self,
+        file: SourceId,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Arc<ReferenceSearchIndex>, QueryError> {
+        check_query_cancellation(cancelled)?;
         let (graph_key, graph) = self.module_graph_query()?;
+        check_query_cancellation(cancelled)?;
         let node = graph
             .node(file)
             .cloned()
             .ok_or(QueryError::UnknownFile { file })?;
-        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
-        ReferenceSearchIndex::from_checked(&checked)
+        let checked =
+            self.checked_workspace_with_cancellation(&graph_key, &graph, &node.name, cancelled)?;
+        check_query_cancellation(cancelled)?;
+        let index = ReferenceSearchIndex::from_checked(&checked)
             .map(Arc::new)
-            .map_err(|error| QueryError::ReferenceSearch { file, error })
+            .map_err(|error| QueryError::ReferenceSearch { file, error })?;
+        check_query_cancellation(cancelled)?;
+        Ok(index)
     }
 
     /// Builds exact checked import-alias declarations and qualified uses.
@@ -1381,15 +1444,30 @@ impl CompilerDb {
         &mut self,
         file: SourceId,
     ) -> Result<Arc<CheckedRenameAliasIndex>, QueryError> {
+        self.checked_rename_alias_index_with_cancellation(file, &never_cancelled)
+    }
+
+    /// Builds checked rename-alias facts with cooperative checkpoints.
+    pub fn checked_rename_alias_index_with_cancellation(
+        &mut self,
+        file: SourceId,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Arc<CheckedRenameAliasIndex>, QueryError> {
+        check_query_cancellation(cancelled)?;
         let (graph_key, graph) = self.module_graph_query()?;
+        check_query_cancellation(cancelled)?;
         let node = graph
             .node(file)
             .cloned()
             .ok_or(QueryError::UnknownFile { file })?;
-        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
-        CheckedRenameAliasIndex::from_checked(&checked)
+        let checked =
+            self.checked_workspace_with_cancellation(&graph_key, &graph, &node.name, cancelled)?;
+        check_query_cancellation(cancelled)?;
+        let index = CheckedRenameAliasIndex::from_checked(&checked)
             .map(Arc::new)
-            .map_err(|error| QueryError::RenameAlias { file, error })
+            .map_err(|error| QueryError::RenameAlias { file, error })?;
+        check_query_cancellation(cancelled)?;
+        Ok(index)
     }
 
     /// Builds an immutable inventory of resolver-backed names for future
@@ -1415,15 +1493,28 @@ impl CompilerDb {
         &mut self,
         file: SourceId,
     ) -> Result<Arc<ResolvedCompletionMetadataIndex>, QueryError> {
+        self.resolved_completion_metadata_index_with_cancellation(file, &never_cancelled)
+    }
+
+    /// Builds completion metadata with cooperative checkpoints.
+    pub fn resolved_completion_metadata_index_with_cancellation(
+        &mut self,
+        file: SourceId,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Arc<ResolvedCompletionMetadataIndex>, QueryError> {
+        check_query_cancellation(cancelled)?;
         let (graph_key, graph) = self.module_graph_query()?;
+        check_query_cancellation(cancelled)?;
         let node = graph
             .node(file)
             .cloned()
             .ok_or(QueryError::UnknownFile { file })?;
-        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
-        Ok(Arc::new(ResolvedCompletionMetadataIndex::from_checked(
-            &checked,
-        )))
+        let checked =
+            self.checked_workspace_with_cancellation(&graph_key, &graph, &node.name, cancelled)?;
+        check_query_cancellation(cancelled)?;
+        let index = Arc::new(ResolvedCompletionMetadataIndex::from_checked(&checked));
+        check_query_cancellation(cancelled)?;
+        Ok(index)
     }
 
     /// Builds the bounded wire-agnostic candidate facts authorized by RFC-0042.
@@ -1431,13 +1522,28 @@ impl CompilerDb {
         &mut self,
         file: SourceId,
     ) -> Result<Arc<CheckedCompletionCatalog>, QueryError> {
+        self.checked_completion_catalog_with_cancellation(file, &never_cancelled)
+    }
+
+    /// Builds completion candidates with cooperative checkpoints.
+    pub fn checked_completion_catalog_with_cancellation(
+        &mut self,
+        file: SourceId,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Arc<CheckedCompletionCatalog>, QueryError> {
+        check_query_cancellation(cancelled)?;
         let (graph_key, graph) = self.module_graph_query()?;
+        check_query_cancellation(cancelled)?;
         let node = graph
             .node(file)
             .cloned()
             .ok_or(QueryError::UnknownFile { file })?;
-        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
-        Ok(Arc::new(CheckedCompletionCatalog::from_checked(&checked)))
+        let checked =
+            self.checked_workspace_with_cancellation(&graph_key, &graph, &node.name, cancelled)?;
+        check_query_cancellation(cancelled)?;
+        let catalog = Arc::new(CheckedCompletionCatalog::from_checked(&checked));
+        check_query_cancellation(cancelled)?;
+        Ok(catalog)
     }
 
     /// Builds an immutable source-order observation of checked user
@@ -1747,27 +1853,45 @@ impl CompilerDb {
         graph: &ModuleGraph,
         entry: &str,
     ) -> Result<Arc<CheckedProgram>, QueryError> {
+        self.checked_workspace_with_cancellation(graph_key, graph, entry, &never_cancelled)
+    }
+
+    fn checked_workspace_with_cancellation(
+        &mut self,
+        graph_key: &ModuleGraphKey,
+        graph: &ModuleGraph,
+        entry: &str,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<Arc<CheckedProgram>, QueryError> {
+        check_query_cancellation(cancelled)?;
         let key = self.workspace_resolve_key(graph_key, graph, entry)?;
         if let Some(cached) = self.checked_programs.get(&key).cloned() {
+            check_query_cancellation(cancelled)?;
             return cached.map_err(type_effect_failure);
         }
         let resolved = self.resolved_workspace(graph_key, graph, entry)?;
-        let typed = match ling_types::check((*resolved).clone()) {
+        check_query_cancellation(cancelled)?;
+        let typed = match ling_types::check_with_cancellation((*resolved).clone(), cancelled) {
             Ok(typed) => typed,
-            Err(errors) => {
+            Err(ling_types::TypeCheckError::Cancelled) => return Err(QueryError::Cancelled),
+            Err(ling_types::TypeCheckError::Errors(errors)) => {
                 let failure = TypeEffectFailure::Type(errors.into_boxed_slice());
+                check_query_cancellation(cancelled)?;
                 self.checked_programs.insert(key, Err(failure.clone()));
                 return Err(type_effect_failure(failure));
             }
         };
+        check_query_cancellation(cancelled)?;
         let checked = match ling_effects::check(typed) {
             Ok(checked) => Arc::new(checked),
             Err(errors) => {
                 let failure = TypeEffectFailure::Effect(errors.into_boxed_slice());
+                check_query_cancellation(cancelled)?;
                 self.checked_programs.insert(key, Err(failure.clone()));
                 return Err(type_effect_failure(failure));
             }
         };
+        check_query_cancellation(cancelled)?;
         self.checked_programs.insert(key, Ok(checked.clone()));
         Ok(checked)
     }
@@ -3016,6 +3140,39 @@ mod tests {
             db.resolved_definition_index(file),
             Err(QueryError::InvalidSource { .. })
         ));
+    }
+
+    #[test]
+    fn cancellable_query_returns_typed_cancelled_without_partial_checked_cache() {
+        use std::cell::Cell;
+
+        let mut db = CompilerDb::new();
+        let file = file(
+            db.set_disk_snapshot(
+                "cancel/Main.ling",
+                b"module Main\n\nlet first = 1\nlet second = first\nlet main () = second\n"
+                    .to_vec(),
+            )
+            .unwrap(),
+        );
+        let observations = Cell::new(0_u32);
+        let cancelled = || {
+            let next = observations.get().saturating_add(1);
+            observations.set(next);
+            next >= 4
+        };
+
+        assert!(matches!(
+            db.checked_completion_catalog_with_cancellation(file, &cancelled),
+            Err(QueryError::Cancelled)
+        ));
+        assert!(observations.get() >= 4);
+        assert!(db.checked_programs.is_empty());
+
+        let catalog = db
+            .checked_completion_catalog(file)
+            .expect("a later uncancelled query completes independently");
+        assert!(!catalog.candidates().is_empty());
     }
 
     #[test]

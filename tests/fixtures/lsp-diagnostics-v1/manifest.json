@@ -13,21 +13,21 @@
       "input": "pull-parity-recovery.input.jsonl",
       "output": "pull-parity-recovery.output.jsonl",
       "exitCode": 0,
-      "protocols": ["ling.lsp.lifecycle/0.1", "ling.lsp.diagnostic/0.2", "ling.lsp.publish-diagnostics/0.2", "ling.lsp.pull-diagnostics/0.2", "ling.lsp.diagnostic-control/0.1", "ling.lsp.document-symbol/0.1", "ling.lsp.hover/0.1", "ling.lsp.navigation/0.1", "ling.lsp.references/0.1", "ling.lsp.prepare-rename/0.1", "ling.lsp.rename/0.1", "ling.lsp.completion/0.1", "ling.lsp.workspace-symbol/0.1"]
+      "protocols": ["ling.lsp.lifecycle/0.1", "ling.lsp.diagnostic/0.2", "ling.lsp.publish-diagnostics/0.2", "ling.lsp.pull-diagnostics/0.2", "ling.lsp.diagnostic-control/0.1", "ling.lsp.document-symbol/0.1", "ling.lsp.hover/0.1", "ling.lsp.navigation/0.1", "ling.lsp.references/0.1", "ling.lsp.prepare-rename/0.1", "ling.lsp.rename/0.1", "ling.lsp.completion/0.1", "ling.lsp.workspace-symbol/0.1", "ling.lsp.request-cancellation/0.1"]
     },
     {
       "id": "push-unicode-recovery",
       "input": "push-unicode-recovery.input.jsonl",
       "output": "push-unicode-recovery.output.jsonl",
       "exitCode": 0,
-      "protocols": ["ling.lsp.lifecycle/0.1", "ling.lsp.overlay/0.2", "ling.lsp.diagnostic/0.2", "ling.lsp.publish-diagnostics/0.2", "ling.lsp.diagnostic-control/0.1", "ling.lsp.document-symbol/0.1", "ling.lsp.hover/0.1", "ling.lsp.navigation/0.1", "ling.lsp.references/0.1", "ling.lsp.prepare-rename/0.1", "ling.lsp.rename/0.1", "ling.lsp.completion/0.1", "ling.lsp.workspace-symbol/0.1"]
+      "protocols": ["ling.lsp.lifecycle/0.1", "ling.lsp.overlay/0.2", "ling.lsp.diagnostic/0.2", "ling.lsp.publish-diagnostics/0.2", "ling.lsp.diagnostic-control/0.1", "ling.lsp.document-symbol/0.1", "ling.lsp.hover/0.1", "ling.lsp.navigation/0.1", "ling.lsp.references/0.1", "ling.lsp.prepare-rename/0.1", "ling.lsp.rename/0.1", "ling.lsp.completion/0.1", "ling.lsp.workspace-symbol/0.1", "ling.lsp.request-cancellation/0.1"]
     },
     {
       "id": "storm-control-recovery",
       "input": "storm-control-recovery.input.jsonl",
       "output": "storm-control-recovery.output.jsonl",
       "exitCode": 0,
-      "protocols": ["ling.lsp.lifecycle/0.1", "ling.lsp.diagnostic/0.2", "ling.lsp.publish-diagnostics/0.2", "ling.lsp.diagnostic-control/0.1", "ling.lsp.document-symbol/0.1", "ling.lsp.hover/0.1", "ling.lsp.navigation/0.1", "ling.lsp.references/0.1", "ling.lsp.prepare-rename/0.1", "ling.lsp.rename/0.1", "ling.lsp.completion/0.1", "ling.lsp.workspace-symbol/0.1"]
+      "protocols": ["ling.lsp.lifecycle/0.1", "ling.lsp.diagnostic/0.2", "ling.lsp.publish-diagnostics/0.2", "ling.lsp.diagnostic-control/0.1", "ling.lsp.document-symbol/0.1", "ling.lsp.hover/0.1", "ling.lsp.navigation/0.1", "ling.lsp.references/0.1", "ling.lsp.prepare-rename/0.1", "ling.lsp.rename/0.1", "ling.lsp.completion/0.1", "ling.lsp.workspace-symbol/0.1", "ling.lsp.request-cancellation/0.1"]
     }
   ]
 }

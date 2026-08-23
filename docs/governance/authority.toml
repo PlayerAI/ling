@@ -1224,6 +1224,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0049"
+title = "Preview LSP Request Cancellation"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0049.md"
+covers = ["ling.lsp.request-cancellation/0.1", "standard stdio $/cancelRequest association for exact live string and number request IDs", "typed cooperative compiler-backed cancellation with atomic response, Workspace Edit, completion-resolve, index-cache, and semantic-token-history publication"]
+depends_on = ["RFC-0048", "RFC-0045", "RFC-0044", "RFC-0043", "RFC-0041", "RFC-0030", "RFC-0029", "RFC-0023", "RFC-0004", "DEC-0019", "DEC-0021", "DEC-0030", "DEC-0031", "DEC-0032", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

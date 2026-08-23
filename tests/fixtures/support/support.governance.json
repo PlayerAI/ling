@@ -580,6 +580,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-REQUEST-CANCELLATION",
+      "visibility": "Public",
+      "version": "ling.lsp.request-cancellation/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-SEMANTIC-TOKENS",
       "visibility": "Public",
       "version": "ling.lsp.semantic-tokens/0.1",

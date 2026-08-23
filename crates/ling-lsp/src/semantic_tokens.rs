@@ -467,7 +467,7 @@ impl super::LspServer {
             .check()
             .map_err(|_| SemanticTokenError::Cancelled)?;
         let index = compiler
-            .semantic_token_index(file)
+            .semantic_token_index_with_cancellation(file, &|| cancellation.is_cancelled())
             .map_err(SemanticTokenError::Compiler)?;
         if index.source() != file || index.source_name() != document.logical_name() {
             return Err(SemanticTokenError::InvalidProjection);
@@ -722,7 +722,8 @@ fn semantic_token_error(id: Value, error: &SemanticTokenError) -> HandleOutcome 
             METHOD_NOT_FOUND,
             "语义 Token 方法不可用 / semantic token method unavailable",
         ),
-        SemanticTokenError::Cancelled => error_or_none(
+        SemanticTokenError::Cancelled
+        | SemanticTokenError::Compiler(ling_db::QueryError::Cancelled) => error_or_none(
             true,
             id,
             REQUEST_CANCELLED,

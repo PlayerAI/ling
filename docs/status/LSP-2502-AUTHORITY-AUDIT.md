@@ -2,77 +2,69 @@
 
 ## Outcome
 
-`LSP-2502` remains correctly recorded as `BlockedSpec` for public LSP and
-compiler cancellation. Accepted DEC-0031 authorizes and child
-`LSP-2502-CANCELLATION` implements only a clone-shared, monotonic in-process
-checkpoint token. The public `$/cancelRequest` method, request-ID lifecycle,
-compiler propagation, and partial-result publication rules remain undefined.
+`LSP-2502` is authorized by Accepted RFC-0049 and may advance from
+`BlockedSpec` to implementation. RFC-0049 closes the bounded Preview surface
+that the earlier audit correctly found missing: standard wire
+`$/cancelRequest`, exact live request-ID association, cooperative compiler
+propagation, RequestCancelled `-32800`, atomic publication, cleanup, privacy,
+and migration rules.
 
-No JSON-RPC cancellation handler, compiler query cancellation API, partial
-result suppression mechanism, diagnostic allocation, protocol schema, or
-placeholder scheduler was added.
+The Accepted contract composes rather than broadens the existing method
+authorities. It does not define general Semantic Transactions, parallel request
+execution, deadlines, quotas, priorities, progress, VM cancellation, or Stable
+editor compatibility.
 
 ## Normative traceability
 
-- The execution package is non-normative; its `$/cancelRequest` and checkpoint
-  bullets do not authorize a JSON-RPC method or compiler-facing API.
-- Accepted DEC-0019 permits an internal cooperative query cancellation point
-  and forbids publishing partial checked results, while explicitly leaving
-  compiler-facing and LSP request cancellation to separate authority.
-- Accepted DEC-0031 defines only the internal `ling-lsp::CancellationToken`
-  and typed checkpoint error; it carries no request ID, document version,
-  deadline, snapshot identity, or wire response.
-- Accepted RFC-0020 defines cancellation for VM host control and the
-  `execution.cancelled` Runtime Fault. It is deliberately not reused for
-  compiler/LSP analysis.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` and
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` still leave public result lifecycle,
-  stale handling, and migration open.
+- RFC-0049 §1 fixes `ling.lsp.request-cancellation/0.1` discovery.
+- RFC-0049 §2–§4 fixes exact string/number ID lifetime, duplicate-live
+  rejection, valid/unknown/duplicate/late behavior, and the single mutable
+  executor with an independently progressing bounded reader.
+- RFC-0049 §5 fixes transport-to-handler propagation, typed
+  `QueryError::Cancelled`, bounded compiler/type/Trait-solver checkpoints, and
+  fail-before-cache behavior.
+- RFC-0049 §6 fixes cancellation precedence and atomic response, Workspace
+  Edit, completion-resolve, workspace-index, semantic-token-history, and
+  diagnostic publication.
+- RFC-0049 §7 fixes session cleanup, privacy, and the separation from
+  RFC-0020 VM/runtime cancellation.
+- DEC-0019 remains the query/cache authority; DEC-0030 owns immutable request
+  snapshots; DEC-0031 owns the monotonic token primitive; RFC-0041, RFC-0043,
+  RFC-0045, and RFC-0048 retain their method-specific publication contracts.
 
-## Current interface evidence
+## Resolved specification questions
 
-- `ling-lsp` now has an internal clone-shared token whose cancellation is
-  monotonic, idempotent, non-blocking, and independent of wall-clock timing.
-- The focused child tests cover pre-cancel success, clone propagation,
-  repeated cancellation, typed checkpoint errors, and independent tokens.
-- No solver/index/rename/completion implementation, Workspace Edit publisher,
-  request scheduler, compiler cancellation result, or public cancellation
-  protocol exists in the repository.
-- No fixture covers public request IDs, snapshot association, stale/limited
-  results, partial edits/diagnostics/tokens, deadlines, fairness, unknown or
-  late cancellation, or cache publication.
+1. **ID domain and lifetime:** exact JSON string and number IDs are associated
+   from accepted frame routing until response selection; null remains accepted
+   by RFC-0004 but is not cancellable.
+2. **Unknown, duplicate, and late cancellation:** each is an idempotent no-op;
+   duplicate live request IDs receive `-32600` and cannot replace the first
+   token; late cancellation cannot cross ID reuse.
+3. **Wire form:** only notification-form `$/cancelRequest` has an effect;
+   malformed notifications remain response-free and request form receives
+   `-32600` without an effect.
+4. **Precedence:** cancellation wins when observed before final publication;
+   a response already selected and cleaned up is complete, so later
+   cancellation is a no-op.
+5. **Compiler/cache behavior:** cancellation is typed and checked before
+   expensive stages, between bounded index/type/Trait-solver stages, and before
+   cache insertion. Completed immutable dependencies may remain cached, but no
+   partial checked result may be inserted.
 
-## Required authority before parent implementation
+## Remaining higher-level gaps
 
-An Accepted RFC or decision must still define:
+`GAP-LSP-TRANSACTION-PROTOCOL-001` stays Open because RFC-0049 closes only
+request cancellation. General scheduling/fairness, resource limits, arbitrary
+Workspace Edit/Semantic Transaction publication, and Stable compatibility
+remain assigned to LSP-2503, LSP-2504, IDE-2309, or later Accepted authority.
+Those broader gaps do not block the exact LSP-2502 contract.
 
-1. the JSON-RPC cancellation method, request-ID type and lifetime,
-   unknown/duplicate/late behavior, and capability negotiation;
-2. propagation from transport to request snapshots, compiler queries,
-   solver/index/rename/completion, and all checkpoints;
-3. publication precedence among cancelled, completed, failed, stale, limited,
-   and superseded requests, including suppression of partial artifacts; and
-4. interaction with document versions, deadlines, resource limits, fairness,
-   deterministic behavior, diagnostics, migration, and executable race tests.
+## Compatibility and determinism
 
-Until those decisions are Accepted, cancellation could suppress the wrong
-revision or expose VM/runtime cancellation details as an LSP contract.
-
-## Evidence and compatibility
-
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0019, DEC-0031, RFC-0020,
-`ling-lsp`, `ling-db`, `ling-vm`, the execution plan, and governance records.
-
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed. The internal token
-is not a wire protocol and is absent from the protocol inventory/support
-matrix.
-
-## Intentionally deferred
-
-The `LSP-2502-CANCELLATION` child is complete under DEC-0031. The parent
-LSP-2502 remains blocked until request snapshots, compiler-facing propagation,
-public JSON-RPC cancellation, result precedence, and LSP/Semantic Transaction
-lifecycle rules are Accepted. Future work must keep VM cancellation separate
-and publish no partial checked result or Workspace Edit.
+The change adds one Preview LSP protocol marker, one standard notification,
+one standard JSON-RPC error code, and typed in-process compiler cancellation.
+It allocates no Ling diagnostic or standalone schema and changes no Ling
+syntax, semantics, Typed Core evaluation, Semantic ID, Definition ID, source
+span, runtime, bytecode, VM, ABI, package, filesystem/network, or Unicode
+17.0.0 behavior. Request scheduling, timing, thread identity, allocation,
+paths, and compiler identities are absent from wire output.

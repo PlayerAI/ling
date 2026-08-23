@@ -12,13 +12,14 @@
 //! deterministic Completion; RFC-0043 governs snapshot-bound Completion
 //! Resolve; RFC-0044 governs bounded transactional Code Actions; RFC-0045
 //! governs snapshot-indexed Workspace Symbols; RFC-0048 governs bounded
-//! semantic-token full and delta transport.
+//! semantic-token full and delta transport; RFC-0049 governs Preview stdio
+//! request cancellation and atomic publication.
 
 use std::collections::BTreeMap;
 use std::fmt;
 use std::io::{self, BufRead, BufReader, BufWriter, Read, Write};
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, mpsc};
 
 pub use ling_source::{FileOrigin, PositionEncoding, Revision, WorkspaceInput};
 use ling_source::{
@@ -90,6 +91,8 @@ pub use semantic_tokens::{
     MAX_SEMANTIC_TOKEN_RESULTS, MAX_SEMANTIC_TOKENS, SEMANTIC_TOKEN_PROTOCOL_VERSION,
     SEMANTIC_TOKEN_TAXONOMY_VERSION,
 };
+mod request_cancellation;
+pub use request_cancellation::REQUEST_CANCELLATION_PROTOCOL_VERSION;
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -130,6 +133,7 @@ const METHOD_NOT_FOUND: i32 = -32_601;
 const INVALID_PARAMS: i32 = -32_602;
 const INTERNAL_ERROR: i32 = -32_603;
 const REQUEST_FAILED: i32 = -32_803;
+const REQUEST_CANCELLED: i32 = -32_800;
 const SERVER_NOT_INITIALIZED: i32 = -32_002;
 const SERVER_SHUTTING_DOWN: i32 = -32_003;
 const DOCUMENT_STALE: i32 = -32_004;
@@ -376,6 +380,10 @@ impl CancellationToken {
             Ok(())
         }
     }
+
+    fn same_signal(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.cancelled, &other.cancelled)
+    }
 }
 
 /// The typed result of an internal LSP cancellation checkpoint.
@@ -550,6 +558,8 @@ pub enum TransportError {
     UnexpectedEof,
     /// Synchronous diagnostic analysis failed before publication.
     DiagnosticAnalysis(DiagnosticAnalysisError),
+    /// The single request executor terminated unexpectedly.
+    ExecutorPanicked,
 }
 
 impl fmt::Display for TransportError {
@@ -570,6 +580,7 @@ impl fmt::Display for TransportError {
             Self::DiagnosticAnalysis(error) => {
                 write!(formatter, "LSP diagnostic analysis failed: {error}")
             }
+            Self::ExecutorPanicked => formatter.write_str("LSP request executor panicked"),
         }
     }
 }
@@ -861,9 +872,11 @@ impl LspServer {
             ),
             "textDocument/references" => self.references(id_present, id, params),
             "textDocument/prepareRename" => self.prepare_rename(id_present, id, params),
-            "textDocument/rename" => self.rename(id_present, id, params),
-            "textDocument/completion" => self.completion(id_present, id, params),
-            "completionItem/resolve" => self.completion_resolve(id_present, id, params),
+            "textDocument/rename" => self.rename(id_present, id, params, cancellation),
+            "textDocument/completion" => self.completion(id_present, id, params, cancellation),
+            "completionItem/resolve" => {
+                self.completion_resolve(id_present, id, params, cancellation)
+            }
             "textDocument/codeAction" => self.code_action(id_present, id, params),
             "workspace/symbol" => self.workspace_symbols(id_present, id, params, cancellation),
             "textDocument/semanticTokens/full" => {
@@ -874,6 +887,7 @@ impl LspServer {
             }
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
+            "$/cancelRequest" => cancel_request(id_present, id),
             _ => self.unknown_method(id_present, id, method),
         }
     }
@@ -1501,21 +1515,61 @@ impl LspServer {
     }
 }
 
-/// Runs the RFC-0004 framed stdio loop.
-pub fn run_stdio<R: Read, W: Write>(input: R, output: W) -> Result<RunResult, TransportError> {
+/// Runs the RFC-0004 framed stdio loop with RFC-0049 cancellation dispatch.
+pub fn run_stdio<R: Read, W: Write + Send>(
+    input: R,
+    output: W,
+) -> Result<RunResult, TransportError> {
     let mut reader = BufReader::new(input);
+    let registry = Arc::new(request_cancellation::RequestRegistry::default());
+    let (sender, receiver) = mpsc::channel();
+
+    std::thread::scope(|scope| {
+        let worker_registry = Arc::clone(&registry);
+        let worker = scope.spawn(move || execute_routed_frames(receiver, output, &worker_registry));
+        let read_result = (|| {
+            while let Some(body) = read_frame(&mut reader)? {
+                let frame = registry.route(body);
+                let exits = frame.exits;
+                if sender.send(frame).is_err() || exits {
+                    break;
+                }
+            }
+            Ok::<(), TransportError>(())
+        })();
+        drop(sender);
+
+        let worker_result = worker
+            .join()
+            .map_err(|_| TransportError::ExecutorPanicked)?;
+        read_result?;
+        worker_result
+    })
+}
+
+fn execute_routed_frames<W: Write>(
+    receiver: mpsc::Receiver<request_cancellation::RoutedFrame>,
+    output: W,
+    registry: &request_cancellation::RequestRegistry,
+) -> Result<RunResult, TransportError> {
     let mut writer = BufWriter::new(output);
     let mut server = LspServer::new();
 
-    loop {
-        let Some(body) = read_frame(&mut reader)? else {
-            writer.flush()?;
-            return Ok(RunResult {
-                exit_code: 0,
-                state: server.state(),
-            });
+    while let Ok(frame) = receiver.recv() {
+        let outcome = if let Some(id) = frame.duplicate_id {
+            HandleOutcome::Response(error_response(
+                Some(id),
+                INVALID_REQUEST,
+                "请求 ID 已在使用 / request id is already live",
+            ))
+        } else {
+            server.handle_json_with_cancellation(&frame.body, &frame.cancellation)
         };
-        match server.handle_json(&body) {
+        if let Some(key) = &frame.request {
+            registry.finish(key, &frame.cancellation);
+        }
+
+        match outcome {
             HandleOutcome::Response(response) => write_frame(&mut writer, &response)?,
             HandleOutcome::NoResponse => {}
             HandleOutcome::Exit { code } => {
@@ -1533,6 +1587,12 @@ pub fn run_stdio<R: Read, W: Write>(input: R, output: W) -> Result<RunResult, Tr
             }
         }
     }
+
+    writer.flush()?;
+    Ok(RunResult {
+        exit_code: 0,
+        state: server.state(),
+    })
 }
 
 struct ParsedInitializeParams {
@@ -2017,6 +2077,19 @@ fn valid_request_id(value: &Value) -> bool {
     matches!(value, Value::Null | Value::String(_) | Value::Number(_))
 }
 
+fn cancel_request(is_request: bool, id: Value) -> HandleOutcome {
+    if is_request {
+        error_or_none(
+            true,
+            id,
+            INVALID_REQUEST,
+            "取消必须作为通知发送 / cancellation must be sent as a notification",
+        )
+    } else {
+        HandleOutcome::NoResponse
+    }
+}
+
 fn parse_content_length(value: &[u8]) -> Result<usize, TransportError> {
     if value.is_empty() || !value.iter().all(u8::is_ascii_digit) {
         return Err(TransportError::InvalidContentLength);
@@ -2232,6 +2305,12 @@ fn initialize_result(parsed: &ParsedInitializeParams) -> Value {
                     "maxSymbols": MAX_WORKSPACE_SYMBOLS,
                     "scope": "tracked-workspace-sources",
                     "version": WORKSPACE_SYMBOL_PROTOCOL_VERSION,
+                },
+                "lingRequestCancellation": {
+                    "method": "$/cancelRequest",
+                    "requestCancelledCode": REQUEST_CANCELLED,
+                    "requestIds": ["number", "string"],
+                    "version": REQUEST_CANCELLATION_PROTOCOL_VERSION,
                 },
                 "lingOverlay": {
                     "changeLimit": MAX_CONTENT_CHANGES,

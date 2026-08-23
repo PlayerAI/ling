@@ -77,6 +77,26 @@ pub(crate) fn solve_obligations(
     obligations: &[Obligation],
     requirements: &BTreeMap<ImplId, Vec<Obligation>>,
 ) -> Result<Vec<SolvedObligation>, Vec<SolverError>> {
+    match solve_obligations_with_cancellation(resolved, index, obligations, requirements, &|| false)
+    {
+        Ok(selections) => Ok(selections),
+        Err(SolveFailure::Errors(errors)) => Err(errors),
+        Err(SolveFailure::Cancelled) => unreachable!("the default probe never cancels"),
+    }
+}
+
+pub(crate) enum SolveFailure {
+    Cancelled,
+    Errors(Vec<SolverError>),
+}
+
+pub(crate) fn solve_obligations_with_cancellation(
+    resolved: &ResolvedProgram,
+    index: &CoherenceIndex,
+    obligations: &[Obligation],
+    requirements: &BTreeMap<ImplId, Vec<Obligation>>,
+    cancelled: &dyn Fn() -> bool,
+) -> Result<Vec<SolvedObligation>, SolveFailure> {
     let mut solver = Solver {
         resolved,
         index,
@@ -84,9 +104,14 @@ pub(crate) fn solve_obligations(
         active: BTreeSet::new(),
         selections: Vec::new(),
         errors: Vec::new(),
+        cancelled,
+        cancellation_observed: false,
     };
     for obligation in obligations {
         solver.solve_one(obligation, 0);
+        if solver.cancellation_observed {
+            return Err(SolveFailure::Cancelled);
+        }
     }
     if solver.errors.is_empty() {
         Ok(solver.selections)
@@ -105,7 +130,7 @@ pub(crate) fn solve_obligations(
                     format!("{:?}", right.kind),
                 ))
         });
-        Err(solver.errors)
+        Err(SolveFailure::Errors(solver.errors))
     }
 }
 
@@ -116,10 +141,16 @@ struct Solver<'a> {
     active: BTreeSet<ActiveObligation>,
     selections: Vec<SolvedObligation>,
     errors: Vec<SolverError>,
+    cancelled: &'a dyn Fn() -> bool,
+    cancellation_observed: bool,
 }
 
 impl Solver<'_> {
     fn solve_one(&mut self, obligation: &Obligation, depth: usize) {
+        if (self.cancelled)() {
+            self.cancellation_observed = true;
+            return;
+        }
         let Some(module) = self.resolved.module(obligation.module) else {
             self.errors.push(SolverError {
                 source_name: obligation.origin.source_name.clone(),
@@ -250,6 +281,9 @@ impl Solver<'_> {
         if let Some(nested) = self.requirements.get(&candidate.id) {
             for requirement in nested {
                 self.solve_one(requirement, depth.saturating_add(1));
+                if self.cancellation_observed {
+                    break;
+                }
             }
         }
         self.active.remove(&active);

@@ -12,9 +12,9 @@ use super::location_projection::{
 };
 use super::publication::{compiler_for_snapshot, compiler_for_snapshot_with_overrides};
 use super::{
-    HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_DOCUMENT_BYTES, MAX_FRAME_BYTES,
-    RequestSnapshot, RequestSnapshotError, error_or_none, parse_text_document_position,
-    success_response,
+    CancellationToken, HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer,
+    MAX_DOCUMENT_BYTES, MAX_FRAME_BYTES, REQUEST_CANCELLED, RequestSnapshot, RequestSnapshotError,
+    error_or_none, parse_text_document_position, success_response,
 };
 
 /// Current Preview checked-rename writer marker.
@@ -37,6 +37,7 @@ enum RenameError {
     SimulationMismatch,
     Stale,
     ResponseTooLarge,
+    Cancelled,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -116,15 +117,24 @@ struct RenamePlan {
 }
 
 impl LspServer {
-    pub(crate) fn rename(&self, is_request: bool, id: Value, params: Value) -> HandleOutcome {
+    pub(crate) fn rename(
+        &self,
+        is_request: bool,
+        id: Value,
+        params: Value,
+        cancellation: &CancellationToken,
+    ) -> HandleOutcome {
         if !is_request {
             return HandleOutcome::NoResponse;
         }
         if self.state != LifecycleState::Ready {
             return self.state_error(id);
         }
-        match self.rename_result(&params) {
+        match self.rename_result(&params, cancellation) {
             Ok(result) => {
+                if cancellation.check().is_err() {
+                    return rename_error(id, &RenameError::Cancelled);
+                }
                 let response = success_response(id.clone(), result);
                 if response.len() > MAX_FRAME_BYTES {
                     return rename_error(id, &RenameError::ResponseTooLarge);
@@ -135,14 +145,20 @@ impl LspServer {
         }
     }
 
-    fn rename_result(&self, params: &Value) -> Result<Value, RenameError> {
+    fn rename_result(
+        &self,
+        params: &Value,
+        cancellation: &CancellationToken,
+    ) -> Result<Value, RenameError> {
         if !self.transactional_rename_supported {
             return Err(RenameError::UnsupportedTransaction);
         }
         let (uri, position, new_name) = parse_rename_params(params)?;
+        check_cancelled(cancellation)?;
         let snapshot = self
             .capture_request_snapshot()
             .map_err(RenameError::Snapshot)?;
+        check_cancelled(cancellation)?;
         let document = snapshot.document(uri).ok_or(RenameError::InvalidParams)?;
         let temporary = document.is_temporary().then_some(document.uri());
         let mut compiler =
@@ -167,9 +183,10 @@ impl LspServer {
             file,
             document.logical_name(),
             offset,
+            cancellation,
         )?
         else {
-            return self.finish_rename(&snapshot, Value::Null);
+            return self.finish_rename(&snapshot, Value::Null, cancellation);
         };
         let candidate =
             observe_rename_identifier(new_name).map_err(|_| RenameError::InvalidNewName)?;
@@ -182,20 +199,29 @@ impl LspServer {
         if target.occurrences().iter().all(|occurrence| {
             occurrence_text(&snapshot, &compiler, occurrence).ok() == Some(new_name)
         }) {
-            return self.finish_rename(&snapshot, Value::Null);
+            return self.finish_rename(&snapshot, Value::Null, cancellation);
         }
 
-        let plan = build_plan(&snapshot, &compiler, &target, new_name)?;
-        simulate_plan(&snapshot, temporary, &target, &plan, candidate.normalized())?;
-        let result = workspace_edit(&snapshot, &compiler, &plan, new_name)?;
-        self.finish_rename(&snapshot, result)
+        let plan = build_plan(&snapshot, &compiler, &target, new_name, cancellation)?;
+        simulate_plan(
+            &snapshot,
+            temporary,
+            &target,
+            &plan,
+            candidate.normalized(),
+            cancellation,
+        )?;
+        let result = workspace_edit(&snapshot, &compiler, &plan, new_name, cancellation)?;
+        self.finish_rename(&snapshot, result, cancellation)
     }
 
     fn finish_rename(
         &self,
         snapshot: &RequestSnapshot,
         result: Value,
+        cancellation: &CancellationToken,
     ) -> Result<Value, RenameError> {
+        check_cancelled(cancellation)?;
         if self
             .capture_request_snapshot()
             .map_err(RenameError::Snapshot)?
@@ -203,6 +229,7 @@ impl LspServer {
         {
             return Err(RenameError::Stale);
         }
+        check_cancelled(cancellation)?;
         Ok(result)
     }
 }
@@ -213,9 +240,11 @@ fn select_target(
     file: ling_source::SourceId,
     source_name: &str,
     offset: ByteOffset,
+    cancellation: &CancellationToken,
 ) -> Result<Option<RenameTarget>, RenameError> {
+    check_cancelled(cancellation)?;
     let references = compiler
-        .checked_reference_search_index(file)
+        .checked_reference_search_index_with_cancellation(file, &|| cancellation.is_cancelled())
         .map_err(RenameError::Compiler)?;
     if let Some(selection) = references.selection_at(source_name, offset) {
         let Some(declaration) = selection.declaration() else {
@@ -240,7 +269,7 @@ fn select_target(
                 declaration: location.is_declaration(),
             })
             .collect::<Vec<_>>();
-        validate_occurrences(snapshot, compiler, &occurrences, &normalized)?;
+        validate_occurrences(snapshot, compiler, &occurrences, &normalized, cancellation)?;
         return Ok(Some(RenameTarget::Symbol {
             key: selection.target().clone(),
             normalized,
@@ -251,8 +280,9 @@ fn select_target(
     }
 
     let aliases = compiler
-        .checked_rename_alias_index(file)
+        .checked_rename_alias_index_with_cancellation(file, &|| cancellation.is_cancelled())
         .map_err(RenameError::Compiler)?;
+    check_cancelled(cancellation)?;
     let Some(selection) = aliases.selection_at(source_name, offset) else {
         return Ok(None);
     };
@@ -266,7 +296,13 @@ fn select_target(
             declaration: location.is_declaration(),
         })
         .collect::<Vec<_>>();
-    validate_occurrences(snapshot, compiler, &occurrences, selection.normalized())?;
+    validate_occurrences(
+        snapshot,
+        compiler,
+        &occurrences,
+        selection.normalized(),
+        cancellation,
+    )?;
     Ok(Some(RenameTarget::Alias {
         module_id: selection.module_id(),
         target_module_id: selection.target_module_id(),
@@ -282,11 +318,13 @@ fn validate_occurrences(
     compiler: &CompilerDb,
     occurrences: &[RenameOccurrence],
     expected_normalized: &str,
+    cancellation: &CancellationToken,
 ) -> Result<(), RenameError> {
     if occurrences.is_empty() {
         return Err(RenameError::InvalidOccurrence);
     }
     for occurrence in occurrences {
+        check_cancelled(cancellation)?;
         let normalized = observe_occurrence(snapshot, compiler, occurrence)?;
         if normalized != expected_normalized {
             return Err(RenameError::InvalidOccurrence);
@@ -330,6 +368,7 @@ fn build_plan(
     compiler: &CompilerDb,
     target: &RenameTarget,
     new_name: &str,
+    cancellation: &CancellationToken,
 ) -> Result<RenamePlan, RenameError> {
     let mut grouped = BTreeMap::<String, Vec<RenameOccurrence>>::new();
     for occurrence in target.occurrences() {
@@ -344,6 +383,7 @@ fn build_plan(
     let mut expected_occurrences = Vec::with_capacity(target.occurrences().len());
     let mut documents = Vec::with_capacity(grouped.len());
     for (source_name, mut occurrences) in grouped {
+        check_cancelled(cancellation)?;
         occurrences.sort_by_key(|occurrence| {
             (
                 occurrence.span.start(),
@@ -368,6 +408,7 @@ fn build_plan(
             .ok_or(RenameError::InvalidOccurrence)?;
         let mut delta = 0_i64;
         for occurrence in &occurrences {
+            check_cancelled(cancellation)?;
             let old_text = identifier_text(document, occurrence.span, file)
                 .map_err(RenameError::Projection)?;
             let start = i64::from(occurrence.span.start().get()) + delta;
@@ -403,6 +444,7 @@ fn build_plan(
 
         let mut bytes = document.bytes().to_vec();
         for occurrence in occurrences.iter().rev() {
+            check_cancelled(cancellation)?;
             let start = usize::try_from(occurrence.span.start().get())
                 .map_err(|_| RenameError::InvalidOccurrence)?;
             let end = usize::try_from(occurrence.span.end().get())
@@ -439,7 +481,9 @@ fn simulate_plan(
     target: &RenameTarget,
     plan: &RenamePlan,
     new_normalized: &str,
+    cancellation: &CancellationToken,
 ) -> Result<(), RenameError> {
+    check_cancelled(cancellation)?;
     let overrides = plan
         .documents
         .iter()
@@ -452,13 +496,16 @@ fn simulate_plan(
         .file_id(&plan.selected_source_name)
         .ok_or(RenameError::SimulationMismatch)?;
     let offset = ByteOffset::new(plan.selected_start);
+    check_cancelled(cancellation)?;
 
     match target {
         RenameTarget::Symbol {
             key, normalized, ..
         } => {
             let index = compiler
-                .checked_reference_search_index(file)
+                .checked_reference_search_index_with_cancellation(file, &|| {
+                    cancellation.is_cancelled()
+                })
                 .map_err(RenameError::Compiler)?;
             let selection = index
                 .selection_at(&plan.selected_source_name, offset)
@@ -477,6 +524,7 @@ fn simulate_plan(
                     declaration: location.is_declaration(),
                 })
                 .collect::<Vec<_>>();
+            check_cancelled(cancellation)?;
             actual.sort();
             if actual != plan.expected_occurrences {
                 return Err(RenameError::SimulationMismatch);
@@ -488,7 +536,7 @@ fn simulate_plan(
             ..
         } => {
             let index = compiler
-                .checked_rename_alias_index(file)
+                .checked_rename_alias_index_with_cancellation(file, &|| cancellation.is_cancelled())
                 .map_err(RenameError::Compiler)?;
             let selection = index
                 .selection_at(&plan.selected_source_name, offset)
@@ -510,6 +558,7 @@ fn simulate_plan(
                     declaration: location.is_declaration(),
                 })
                 .collect::<Vec<_>>();
+            check_cancelled(cancellation)?;
             actual.sort();
             if actual != plan.expected_occurrences {
                 return Err(RenameError::SimulationMismatch);
@@ -555,13 +604,16 @@ fn workspace_edit(
     compiler: &CompilerDb,
     plan: &RenamePlan,
     new_name: &str,
+    cancellation: &CancellationToken,
 ) -> Result<Value, RenameError> {
     let mut document_changes = Vec::with_capacity(plan.documents.len());
     for document in &plan.documents {
+        check_cancelled(cancellation)?;
         let edits = document
             .original_occurrences
             .iter()
             .map(|occurrence| {
+                check_cancelled(cancellation)?;
                 range_value(&document.source_name, occurrence.span, snapshot, compiler)
                     .map(|range| json!({"newText": new_name, "range": range}))
                     .map_err(RenameError::Projection)
@@ -623,6 +675,12 @@ pub(crate) fn parse_workspace_edit_capability(
 
 fn rename_error(id: Value, error: &RenameError) -> HandleOutcome {
     match error {
+        RenameError::Cancelled | RenameError::Compiler(QueryError::Cancelled) => error_or_none(
+            true,
+            id,
+            REQUEST_CANCELLED,
+            "重命名已取消 / rename cancelled",
+        ),
         RenameError::InvalidParams => error_or_none(
             true,
             id,
@@ -647,4 +705,8 @@ fn rename_error(id: Value, error: &RenameError) -> HandleOutcome {
             "重命名不可用 / rename unavailable",
         ),
     }
+}
+
+fn check_cancelled(cancellation: &CancellationToken) -> Result<(), RenameError> {
+    cancellation.check().map_err(|_| RenameError::Cancelled)
 }

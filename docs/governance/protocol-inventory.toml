@@ -332,6 +332,28 @@ authority = ["RFC-0048", "RFC-0047", "RFC-0046", "RFC-0004", "RFC-0023", "RFC-00
 notes = ["The Preview exposes no source text, VFS revision, path, diagnostic, compiler, Semantic or Definition identity, type, Effect, Capability, debug data, range/refresh/dynamic registration, partial/work-done result, wire cancellation, persistent history, Semantic Transaction, or Stable claim. Future language categories remain excluded by RFC-0046."]
 
 [[protocol]]
+id = "PROTO-LSP-REQUEST-CANCELLATION"
+title = "Ling Preview LSP request cancellation"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.request-cancellation/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp cancellation dispatcher"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Associate exact string and number request IDs before execution, accept only notification-form $/cancelRequest with one valid params.id, cancel the currently live exact association, ignore unknown, duplicate, and late cancellation, and reject duplicate live request IDs without executing them."
+writer_policy = "Propagate one monotonic cooperative token through compiler-backed analysis, check at bounded stages and immediately before publication, return standard -32800 when observed, and publish no partial response, Workspace Edit, completion-resolve batch, workspace index, semantic-token history, diagnostic, or compiler cache entry."
+unknown_field_policy = "Ignore ordinary unknown cancellation parameter members; malformed notifications have no effect and no response, while incompatible method, ID, precedence, discovery, checkpoint, cleanup, publication, or error behavior requires a new marker and migration evidence."
+migration_tool = "None; ling.lsp.request-cancellation/0.1 is Preview with no predecessor, and clients discover its exact experimental marker while standard non-cancelling clients remain unchanged."
+fixtures = ["crates/ling-lsp/tests/cancellation.rs", "tests/protocols/lsp-request-cancellation/fixtures/v1.json", "tests/protocols/lsp-request-cancellation/README.md", "docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0049.md", "docs/RFC-0004.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0041.md", "docs/RFC-0043.md", "docs/RFC-0044.md", "docs/RFC-0045.md", "docs/RFC-0048.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0021-deterministic-parallel-scheduling.md", "docs/decisions/0030-lsp-request-snapshot-boundary.md", "docs/decisions/0031-lsp-internal-cancellation-boundary.md", "docs/decisions/0032-lsp-internal-scheduling-boundary.md", "crates/ling-types/src/solver.rs", "crates/ling-types/src/lib.rs", "crates/ling-db/src/lib.rs", "crates/ling-lsp/src/request_cancellation.rs", "crates/ling-lsp/src/rename.rs", "crates/ling-lsp/src/completion.rs", "crates/ling-lsp/src/completion_resolve.rs", "crates/ling-lsp/src/workspace_symbols.rs", "crates/ling-lsp/src/semantic_tokens.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.request-cancellation/0.1", "$/cancelRequest", "lingRequestCancellation", "-32800"]
+authority = ["RFC-0049", "RFC-0048", "RFC-0045", "RFC-0044", "RFC-0043", "RFC-0041", "RFC-0030", "RFC-0029", "RFC-0023", "RFC-0004", "DEC-0019", "DEC-0021", "DEC-0030", "DEC-0031", "DEC-0032"]
+notes = ["The Preview adds no deadline, timeout, progress, quota, server-initiated cancellation, parallel compiler mutation, persistent state, VM/runtime cancellation, Stable editor compatibility, or general Semantic Transaction claim."]
+
+[[protocol]]
 id = "PROTO-LSP-HOVER"
 title = "Ling checked LSP hover"
 category = "LSP"

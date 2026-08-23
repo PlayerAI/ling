@@ -942,7 +942,7 @@ fn execute_init(
 }
 
 fn execute_lsp() -> u8 {
-    match ling_lsp::run_stdio(std::io::stdin().lock(), std::io::stdout().lock()) {
+    match ling_lsp::run_stdio(std::io::stdin().lock(), std::io::stdout()) {
         Ok(result) => result.exit_code(),
         Err(error) => {
             eprintln!("LSP 传输失败：{error}\nLSP transport failed: {error}");

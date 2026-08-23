@@ -7344,3 +7344,31 @@ unresolved_alternatives = [
   "Range tokens, refresh, dynamic registration, partial and work-done results, wire $/cancelRequest, asynchronous scheduling, configurable limits, persistent history, multi-edit optimization, mixed checked and error-region generation, Stable lifecycle, editor presentation, and Semantic Transactions remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0049"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0049.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Cover string and number IDs, independent IDs, reuse after completion, duplicate-live rejection, and exact string/number separation.",
+  "Cover valid, unknown, duplicate, late, malformed, null-ID, and request-form cancellation while preserving notification response-freedom.",
+  "Exercise cancellation before work, during bounded compiler/index loops, and at the final publication boundary for workspace symbols, rename, completion, completion resolve, and semantic tokens.",
+  "Prove a cancelled request returns -32800 and cannot mutate Workspace Edit, completion-resolve, workspace-index, semantic-token-history, diagnostic, or compiler partial-cache state.",
+  "Repeat framed transcripts and cancellation storms without depending on timing; cover EOF, exit, malformed frames, and writer failures without leaked associations or non-protocol stdout.",
+]
+compatibility_impact = [
+  "Adds standard $/cancelRequest, RequestCancelled -32800, duplicate-live-ID rejection, and Preview ling.lsp.request-cancellation/0.1 discovery with no predecessor.",
+  "Adds typed cooperative cancellation to selected compiler-backed queries without changing successful query identity, checked facts, spans, or deterministic cache values.",
+  "Adds no Ling diagnostic, standalone JSON schema, Semantic ID, Definition ID, canonical compiler byte, language, runtime, bytecode, VM, ABI, package, filesystem, network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Parallel request execution, general scheduler fairness and priorities, deadlines, quotas, progress, server-initiated cancellation, async non-stdio transports, Stable editor compatibility, and general Semantic Transactions remain deferred.",
+]
+superseded_by = ""

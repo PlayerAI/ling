@@ -16,9 +16,9 @@ use super::completion_resolve::{
 use super::location_projection::{LocationProjectionError, range_value};
 use super::publication::{compiler_for_snapshot, compiler_for_snapshot_with_overrides};
 use super::{
-    HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES, RequestDocument,
-    RequestSnapshot, RequestSnapshotError, error_or_none, parse_text_document_position,
-    success_response,
+    CancellationToken, HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES,
+    REQUEST_CANCELLED, RequestDocument, RequestSnapshot, RequestSnapshotError, error_or_none,
+    parse_text_document_position, success_response,
 };
 
 /// Current checked completion Preview marker.
@@ -88,6 +88,7 @@ enum CompletionError {
     ResolvePublish(CompletionResolvePublishError),
     Stale,
     ResponseTooLarge,
+    Cancelled,
 }
 
 impl LspServer {
@@ -96,6 +97,7 @@ impl LspServer {
         is_request: bool,
         id: Value,
         params: Value,
+        cancellation: &CancellationToken,
     ) -> HandleOutcome {
         if !is_request {
             return HandleOutcome::NoResponse;
@@ -103,11 +105,17 @@ impl LspServer {
         if self.state != LifecycleState::Ready {
             return self.state_error(id);
         }
-        match self.completion_result(&params) {
+        match self.completion_result(&params, cancellation) {
             Ok(build) => {
+                if cancellation.check().is_err() {
+                    return completion_error(id, &CompletionError::Cancelled);
+                }
                 let response = success_response(id.clone(), build.result);
                 if response.len() > MAX_FRAME_BYTES {
                     return completion_error(id, &CompletionError::ResponseTooLarge);
+                }
+                if cancellation.check().is_err() {
+                    return completion_error(id, &CompletionError::Cancelled);
                 }
                 if let Err(error) = self.completion_resolve.publish(build.records) {
                     return completion_error(id, &CompletionError::ResolvePublish(error));
@@ -118,13 +126,19 @@ impl LspServer {
         }
     }
 
-    fn completion_result(&self, params: &Value) -> Result<CompletionBuild, CompletionError> {
+    fn completion_result(
+        &self,
+        params: &Value,
+        cancellation: &CancellationToken,
+    ) -> Result<CompletionBuild, CompletionError> {
         validate_completion_context(params)?;
         let (uri, position) =
             parse_text_document_position(params).ok_or(CompletionError::InvalidParams)?;
+        check_cancelled(cancellation)?;
         let snapshot = self
             .capture_request_snapshot()
             .map_err(CompletionError::Snapshot)?;
+        check_cancelled(cancellation)?;
         let document = snapshot
             .document(uri)
             .ok_or(CompletionError::InvalidParams)?;
@@ -148,13 +162,14 @@ impl LspServer {
             .token_source_index(file)
             .map_err(CompletionError::Compiler)?;
         let parsed = compiler.parse(file).map_err(CompletionError::Compiler)?;
+        check_cancelled(cancellation)?;
         if !lexical.is_valid() || !parsed.is_valid() {
             return Err(CompletionError::InvalidSource);
         }
         let site = completion_site(&lexical, parsed.tree().root(), offset.get(), document)
             .ok_or(CompletionError::InvalidParams)?;
         let catalog = compiler
-            .checked_completion_catalog(file)
+            .checked_completion_catalog_with_cancellation(file, &|| cancellation.is_cancelled())
             .map_err(CompletionError::Compiler)?;
         if catalog.candidates().len() > MAX_CHECKED_COMPLETION_CANDIDATES {
             return Err(CompletionError::CandidateBound);
@@ -169,7 +184,8 @@ impl LspServer {
             })
             .and_then(CheckedCompletionCandidate::module_id);
         let module_target = member_module_target(&site, &catalog, current_module);
-        let mut ranked = candidate_pool(&site, &catalog, current_module, module_target);
+        let mut ranked =
+            candidate_pool(&site, &catalog, current_module, module_target, cancellation)?;
         ranked.sort_by(|left, right| left.rank.cmp(&right.rank));
 
         let start = usize::try_from(site.replacement.start().get())
@@ -182,6 +198,7 @@ impl LspServer {
         let mut valid = Vec::new();
         let mut labels = BTreeSet::new();
         for candidate in ranked.into_iter().take(MAX_CHECKED_COMPLETION_CANDIDATES) {
+            check_cancelled(cancellation)?;
             if !labels.insert(candidate.label.clone()) {
                 continue;
             }
@@ -193,6 +210,7 @@ impl LspServer {
                 start,
                 end,
                 &candidate.label,
+                cancellation,
             )? {
                 valid.push(candidate);
             }
@@ -217,6 +235,7 @@ impl LspServer {
         let mut items = Vec::with_capacity(valid.len());
         let mut records = Vec::with_capacity(valid.len());
         for (ordinal, candidate) in valid.into_iter().enumerate() {
+            check_cancelled(cancellation)?;
             let mut item = json!({
                 "filterText": candidate.label,
                 "insertTextFormat": 1,
@@ -258,6 +277,7 @@ impl LspServer {
         let result = self.finish_completion(
             &snapshot,
             json!({"isIncomplete": is_incomplete, "items": items}),
+            cancellation,
         )?;
         Ok(CompletionBuild { result, records })
     }
@@ -266,7 +286,9 @@ impl LspServer {
         &self,
         snapshot: &RequestSnapshot,
         result: Value,
+        cancellation: &CancellationToken,
     ) -> Result<Value, CompletionError> {
+        check_cancelled(cancellation)?;
         if self
             .capture_request_snapshot()
             .map_err(CompletionError::Snapshot)?
@@ -274,6 +296,7 @@ impl LspServer {
         {
             return Err(CompletionError::Stale);
         }
+        check_cancelled(cancellation)?;
         Ok(result)
     }
 }
@@ -435,23 +458,26 @@ fn candidate_pool(
     catalog: &CheckedCompletionCatalog,
     current_module: Option<u32>,
     member_target: Option<u32>,
-) -> Vec<RankedCandidate> {
+    cancellation: &CancellationToken,
+) -> Result<Vec<RankedCandidate>, CompletionError> {
     if site.context == CompletionContext::Keyword {
-        return keyword_pool(site);
+        return Ok(keyword_pool(site));
     }
 
-    let mut candidates = catalog
-        .candidates()
-        .iter()
-        .filter(|candidate| candidate.name().starts_with(&site.prefix))
-        .filter(|candidate| candidate_in_context(site, candidate, member_target))
-        .map(|candidate| RankedCandidate {
-            label: candidate.name().to_owned(),
-            kind: candidate.kind(),
-            metadata_identity: candidate.metadata_identity().cloned(),
-            rank: rank_candidate(site, candidate, current_module),
-        })
-        .collect::<Vec<_>>();
+    let mut candidates = Vec::new();
+    for candidate in catalog.candidates() {
+        check_cancelled(cancellation)?;
+        if candidate.name().starts_with(&site.prefix)
+            && candidate_in_context(site, candidate, member_target)
+        {
+            candidates.push(RankedCandidate {
+                label: candidate.name().to_owned(),
+                kind: candidate.kind(),
+                metadata_identity: candidate.metadata_identity().cloned(),
+                rank: rank_candidate(site, candidate, current_module),
+            });
+        }
+    }
     if site.context == CompletionContext::Pattern && "_".starts_with(&site.prefix) {
         candidates.push(RankedCandidate {
             label: "_".to_owned(),
@@ -468,7 +494,7 @@ fn candidate_pool(
             },
         });
     }
-    candidates
+    Ok(candidates)
 }
 
 fn keyword_pool(site: &CompletionSite) -> Vec<RankedCandidate> {
@@ -573,7 +599,9 @@ fn replacement_checks(
     start: usize,
     end: usize,
     replacement: &str,
+    cancellation: &CancellationToken,
 ) -> Result<bool, CompletionError> {
+    check_cancelled(cancellation)?;
     let mut bytes = document.bytes().to_vec();
     bytes.splice(start..end, replacement.bytes());
     let mut overrides = BTreeMap::new();
@@ -585,11 +613,16 @@ fn replacement_checks(
         .file_id(document.logical_name())
         .ok_or(CompletionError::InvalidParams)?;
     debug_assert_eq!(file, original_file);
-    match compiler.checked_completion_catalog(file) {
+    let result = match compiler
+        .checked_completion_catalog_with_cancellation(file, &|| cancellation.is_cancelled())
+    {
         Ok(_) => Ok(true),
         Err(QueryError::UnknownFile { .. }) => Err(CompletionError::InvalidParams),
+        Err(QueryError::Cancelled) => Err(CompletionError::Cancelled),
         Err(_) => Ok(false),
-    }
+    };
+    check_cancelled(cancellation)?;
+    result
 }
 
 const fn completion_item_kind(kind: CheckedCompletionKind) -> u8 {
@@ -633,6 +666,14 @@ const fn is_keyword(kind: TokenKind) -> bool {
 
 fn completion_error(id: Value, error: &CompletionError) -> HandleOutcome {
     match error {
+        CompletionError::Cancelled | CompletionError::Compiler(QueryError::Cancelled) => {
+            error_or_none(
+                true,
+                id,
+                REQUEST_CANCELLED,
+                "补全已取消 / completion cancelled",
+            )
+        }
         CompletionError::InvalidParams => error_or_none(
             true,
             id,
@@ -655,6 +696,10 @@ fn completion_error(id: Value, error: &CompletionError) -> HandleOutcome {
             "补全不可用 / completion unavailable",
         ),
     }
+}
+
+fn check_cancelled(cancellation: &CancellationToken) -> Result<(), CompletionError> {
+    cancellation.check().map_err(|_| CompletionError::Cancelled)
 }
 
 #[cfg(test)]

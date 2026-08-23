@@ -13,8 +13,8 @@ use serde_json::{Map, Value, json};
 
 use super::publication::compiler_for_snapshot;
 use super::{
-    HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES, RequestSnapshot,
-    RequestSnapshotError, error_or_none, success_response,
+    CancellationToken, HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES,
+    REQUEST_CANCELLED, RequestSnapshot, RequestSnapshotError, error_or_none, success_response,
 };
 
 /// Negotiated completion protocol marker when resolve is enabled.
@@ -193,6 +193,7 @@ enum CompletionResolveError {
     DocumentationBound,
     Stale,
     ResponseTooLarge,
+    Cancelled,
 }
 
 impl LspServer {
@@ -201,6 +202,7 @@ impl LspServer {
         is_request: bool,
         id: Value,
         params: Value,
+        cancellation: &CancellationToken,
     ) -> HandleOutcome {
         if !is_request {
             return HandleOutcome::NoResponse;
@@ -211,8 +213,11 @@ impl LspServer {
         if !self.completion_resolve.options().enabled() {
             return completion_resolve_error(id, &CompletionResolveError::Unavailable);
         }
-        match self.completion_resolve_result(&params) {
+        match self.completion_resolve_result(&params, cancellation) {
             Ok(result) => {
+                if cancellation.check().is_err() {
+                    return completion_resolve_error(id, &CompletionResolveError::Cancelled);
+                }
                 let response = success_response(id.clone(), result);
                 if response.len() > MAX_FRAME_BYTES {
                     return completion_resolve_error(id, &CompletionResolveError::ResponseTooLarge);
@@ -223,8 +228,13 @@ impl LspServer {
         }
     }
 
-    fn completion_resolve_result(&self, params: &Value) -> Result<Value, CompletionResolveError> {
+    fn completion_resolve_result(
+        &self,
+        params: &Value,
+        cancellation: &CancellationToken,
+    ) -> Result<Value, CompletionResolveError> {
         let handle = parse_resolve_item(params)?;
+        check_cancelled(cancellation)?;
         let record = self
             .completion_resolve
             .record(handle)
@@ -236,6 +246,7 @@ impl LspServer {
         if current != *record.snapshot {
             return Err(CompletionResolveError::Stale);
         }
+        check_cancelled(cancellation)?;
 
         let mut result = record.item.clone();
         if let Some(identity) = &record.metadata_identity {
@@ -251,8 +262,11 @@ impl LspServer {
                 .file_id(document.logical_name())
                 .ok_or(CompletionResolveError::MetadataMismatch)?;
             let index = compiler
-                .resolved_completion_metadata_index(file)
+                .resolved_completion_metadata_index_with_cancellation(file, &|| {
+                    cancellation.is_cancelled()
+                })
                 .map_err(CompletionResolveError::Compiler)?;
+            check_cancelled(cancellation)?;
             let metadata = index
                 .identity(identity)
                 .filter(|metadata| metadata.name() == record.name)
@@ -260,6 +274,7 @@ impl LspServer {
             if metadata.type_display().is_some() {
                 let author_documentation =
                     attached_author_documentation(&mut compiler, &record.snapshot, metadata)?;
+                check_cancelled(cancellation)?;
                 add_checked_presentation(
                     &mut result,
                     metadata,
@@ -276,6 +291,7 @@ impl LspServer {
         {
             return Err(CompletionResolveError::Stale);
         }
+        check_cancelled(cancellation)?;
         Ok(result)
     }
 }
@@ -738,6 +754,13 @@ const fn metadata_kind(kind: ResolvedCompletionSourceKind) -> &'static str {
 
 fn completion_resolve_error(id: Value, error: &CompletionResolveError) -> HandleOutcome {
     match error {
+        CompletionResolveError::Cancelled
+        | CompletionResolveError::Compiler(QueryError::Cancelled) => error_or_none(
+            true,
+            id,
+            REQUEST_CANCELLED,
+            "补全项解析已取消 / completion-item resolve cancelled",
+        ),
         CompletionResolveError::InvalidParams => error_or_none(
             true,
             id,
@@ -762,6 +785,12 @@ fn completion_resolve_error(id: Value, error: &CompletionResolveError) -> Handle
             "补全项解析不可用 / completion-item resolve unavailable",
         ),
     }
+}
+
+fn check_cancelled(cancellation: &CancellationToken) -> Result<(), CompletionResolveError> {
+    cancellation
+        .check()
+        .map_err(|_| CompletionResolveError::Cancelled)
 }
 
 #[cfg(test)]

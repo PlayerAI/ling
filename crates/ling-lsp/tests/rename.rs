@@ -1,4 +1,4 @@
-use ling_lsp::{HandleOutcome, LspServer, RENAME_PROTOCOL_VERSION};
+use ling_lsp::{CancellationToken, HandleOutcome, LspServer, RENAME_PROTOCOL_VERSION};
 use serde_json::{Value, json};
 
 fn message(id: Option<u64>, method: &str, params: Value) -> Vec<u8> {
@@ -109,6 +109,35 @@ fn rename(
             "textDocument": {"uri": uri},
         }),
     )
+}
+
+#[test]
+fn cancelled_rename_publishes_no_partial_workspace_edit() {
+    let uri = "ling://workspace/src/CancelledRename.ling";
+    let source = "module CancelledRename\n\nlet helper = 1\n\nlet main () = helper\n";
+    let (mut server, _) = initialize(true, "utf-16");
+    open(&mut server, uri, 1, source);
+    let (line, character) = position(source, "helper", 1, "utf-16");
+    let body = message(
+        Some(2),
+        "textDocument/rename",
+        json!({
+            "newName": "utility",
+            "position": {"character": character, "line": line},
+            "textDocument": {"uri": uri},
+        }),
+    );
+    let token = CancellationToken::new();
+    token.cancel();
+    let HandleOutcome::Response(bytes) = server.handle_json_with_cancellation(&body, &token) else {
+        panic!("cancelled rename must respond")
+    };
+    let cancelled: Value = serde_json::from_slice(&bytes).expect("response JSON");
+    assert_eq!(cancelled["error"]["code"], -32_800);
+    assert!(cancelled.get("result").is_none());
+
+    let active = rename(&mut server, 3, uri, line, character, "utility");
+    assert!(active["result"]["documentChanges"].is_array());
 }
 
 #[test]

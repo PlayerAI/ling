@@ -1,5 +1,6 @@
 use ling_lsp::{
-    COMPLETION_PROTOCOL_VERSION, HandleOutcome, JSON_RPC_VERSION, LspServer, MAX_COMPLETION_ITEMS,
+    COMPLETION_PROTOCOL_VERSION, CancellationToken, HandleOutcome, JSON_RPC_VERSION, LspServer,
+    MAX_COMPLETION_ITEMS,
 };
 use serde_json::{Value, json};
 
@@ -86,6 +87,33 @@ fn labels(response: &Value) -> Vec<&str> {
         .iter()
         .map(|item| item["label"].as_str().expect("label"))
         .collect()
+}
+
+#[test]
+fn cancelled_completion_returns_request_cancelled_before_handle_publication() {
+    let uri = "ling://workspace/src/CancelledCompletion.ling";
+    let source = "module CancelledCompletion\n\nlet helper = 1\n\nlet main () = helper\n";
+    let (mut server, _) = ready("utf-16");
+    open(&mut server, uri, 1, source);
+    let token = CancellationToken::new();
+    token.cancel();
+    let body = request(
+        2,
+        "textDocument/completion",
+        json!({
+            "context": {"triggerKind": 1},
+            "position": {"character": 20, "line": 4},
+            "textDocument": {"uri": uri},
+        }),
+    );
+    let HandleOutcome::Response(bytes) = server.handle_json_with_cancellation(&body, &token) else {
+        panic!("cancelled completion must respond")
+    };
+    let cancelled: Value = serde_json::from_slice(&bytes).expect("response JSON");
+    assert_eq!(cancelled["error"]["code"], -32_800);
+
+    let active = completion(&mut server, 3, uri, 4, 20);
+    assert_eq!(labels(&active), vec!["helper"]);
 }
 
 #[test]

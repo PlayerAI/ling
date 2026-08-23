@@ -1,0 +1,56 @@
+{
+  "fixtureFormat": "ling.test.lsp-request-cancellation/1",
+  "protocol": "ling.lsp.request-cancellation/0.1",
+  "discovery": {
+    "method": "$/cancelRequest",
+    "requestCancelledCode": -32800,
+    "requestIds": ["number", "string"],
+    "version": "ling.lsp.request-cancellation/0.1"
+  },
+  "cases": [
+    {
+      "name": "valid-string-id-notification",
+      "message": {
+        "jsonrpc": "2.0",
+        "method": "$/cancelRequest",
+        "params": {"id": "analysis-1"}
+      },
+      "expected": null
+    },
+    {
+      "name": "valid-number-id-notification-with-ignored-member",
+      "message": {
+        "jsonrpc": "2.0",
+        "method": "$/cancelRequest",
+        "params": {"id": 7, "ignored": true}
+      },
+      "expected": null
+    },
+    {
+      "name": "malformed-null-id-notification",
+      "message": {
+        "jsonrpc": "2.0",
+        "method": "$/cancelRequest",
+        "params": {"id": null}
+      },
+      "expected": null
+    },
+    {
+      "name": "request-form-is-invalid-request",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "method": "$/cancelRequest",
+        "params": {"id": "analysis-1"}
+      },
+      "expected": {
+        "error": {
+          "code": -32600,
+          "message": "取消必须作为通知发送 / cancellation must be sent as a notification"
+        },
+        "id": 9,
+        "jsonrpc": "2.0"
+      }
+    }
+  ]
+}

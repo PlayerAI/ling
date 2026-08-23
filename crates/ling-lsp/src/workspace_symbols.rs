@@ -194,7 +194,7 @@ fn build_workspace_symbol_records(
         .file_id(root.logical_name())
         .ok_or(WorkspaceSymbolError::InvalidSpan)?;
     let index = compiler
-        .resolved_definition_index(root_file)
+        .resolved_definition_index_with_cancellation(root_file, &|| cancellation.is_cancelled())
         .map_err(WorkspaceSymbolError::Compiler)?;
 
     let mut sources = BTreeMap::new();
@@ -334,12 +334,14 @@ fn workspace_symbol_error(id: Value, error: &WorkspaceSymbolError) -> HandleOutc
             INVALID_PARAMS,
             "工作区符号参数无效 / invalid workspace symbol parameters",
         ),
-        WorkspaceSymbolError::Cancelled => error_or_none(
-            true,
-            id,
-            REQUEST_CANCELLED,
-            "工作区符号查询已取消 / workspace symbol query cancelled",
-        ),
+        WorkspaceSymbolError::Cancelled | WorkspaceSymbolError::Compiler(QueryError::Cancelled) => {
+            error_or_none(
+                true,
+                id,
+                REQUEST_CANCELLED,
+                "工作区符号查询已取消 / workspace symbol query cancelled",
+            )
+        }
         WorkspaceSymbolError::Snapshot(_)
         | WorkspaceSymbolError::CompilerInput(_)
         | WorkspaceSymbolError::Compiler(_)

@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 46 records: 42 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 26 Preview, 0 Stable.
+- 47 records: 43 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 27 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -32,6 +32,7 @@
 | `PROTO-LSP-PULL-DIAGNOSTICS` | Public | LSP | `ling.lsp.pull-diagnostics/0.2` | `Preview` | no | no | 5 |
 | `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-RENAME` | Public | LSP | `ling.lsp.rename/0.1` | `Preview` | no | no | 4 |
+| `PROTO-LSP-REQUEST-CANCELLATION` | Public | LSP | `ling.lsp.request-cancellation/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-SEMANTIC-TOKENS` | Public | LSP | `ling.lsp.semantic-tokens/0.1` | `Preview` | no | no | 6 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-WORKSPACE-SYMBOL` | Public | LSP | `ling.lsp.workspace-symbol/0.1` | `Preview` | no | no | 3 |
@@ -296,6 +297,19 @@
 - Sources: [`docs/RFC-0041.md`](../RFC-0041.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/RFC-0040.md`](../RFC-0040.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0077-ide-rename-identifier-observation.md`](../decisions/0077-ide-rename-identifier-observation.md), [`docs/decisions/0078-ide-rename-reference-span-observation.md`](../decisions/0078-ide-rename-reference-span-observation.md), [`crates/ling-db/src/rename_alias_index.rs`](../../crates/ling-db/src/rename_alias_index.rs), [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-lsp/src/rename.rs`](../../crates/ling-lsp/src/rename.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
 - Fixtures: [`crates/ling-db/src/rename_alias_index.rs`](../../crates/ling-db/src/rename_alias_index.rs), [`crates/ling-lsp/tests/rename.rs`](../../crates/ling-lsp/tests/rename.rs), [`tests/protocols/lsp-rename/README.md`](../../tests/protocols/lsp-rename/README.md), [`docs/status/IDE-2306-IMPLEMENTATION-REPORT.md`](../status/IDE-2306-IMPLEMENTATION-REPORT.md)
 - Notes: The bounded standard Workspace Edit is proposed to the client and is never applied by the server. General Semantic Transactions, language Alias syntax, localized Author Source, generated or dependency mutation, module/file rename, type-only identities, cancellation, annotations, and Stable lifecycle remain out of scope.
+
+### `PROTO-LSP-REQUEST-CANCELLATION` — Ling Preview LSP request cancellation
+
+- Producer: ling lsp --stdio; ling-lsp cancellation dispatcher
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Associate exact string and number request IDs before execution, accept only notification-form $/cancelRequest with one valid params.id, cancel the currently live exact association, ignore unknown, duplicate, and late cancellation, and reject duplicate live request IDs without executing them.
+- Writer policy: Propagate one monotonic cooperative token through compiler-backed analysis, check at bounded stages and immediately before publication, return standard -32800 when observed, and publish no partial response, Workspace Edit, completion-resolve batch, workspace index, semantic-token history, diagnostic, or compiler cache entry.
+- Unknown-field policy: Ignore ordinary unknown cancellation parameter members; malformed notifications have no effect and no response, while incompatible method, ID, precedence, discovery, checkpoint, cleanup, publication, or error behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.request-cancellation/0.1 is Preview with no predecessor, and clients discover its exact experimental marker while standard non-cancelling clients remain unchanged.
+- Authority: `RFC-0049`, `RFC-0048`, `RFC-0045`, `RFC-0044`, `RFC-0043`, `RFC-0041`, `RFC-0030`, `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0021`, `DEC-0030`, `DEC-0031`, `DEC-0032`
+- Sources: [`docs/RFC-0049.md`](../RFC-0049.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0041.md`](../RFC-0041.md), [`docs/RFC-0043.md`](../RFC-0043.md), [`docs/RFC-0044.md`](../RFC-0044.md), [`docs/RFC-0045.md`](../RFC-0045.md), [`docs/RFC-0048.md`](../RFC-0048.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0021-deterministic-parallel-scheduling.md`](../decisions/0021-deterministic-parallel-scheduling.md), [`docs/decisions/0030-lsp-request-snapshot-boundary.md`](../decisions/0030-lsp-request-snapshot-boundary.md), [`docs/decisions/0031-lsp-internal-cancellation-boundary.md`](../decisions/0031-lsp-internal-cancellation-boundary.md), [`docs/decisions/0032-lsp-internal-scheduling-boundary.md`](../decisions/0032-lsp-internal-scheduling-boundary.md), [`crates/ling-types/src/solver.rs`](../../crates/ling-types/src/solver.rs), [`crates/ling-types/src/lib.rs`](../../crates/ling-types/src/lib.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/request_cancellation.rs`](../../crates/ling-lsp/src/request_cancellation.rs), [`crates/ling-lsp/src/rename.rs`](../../crates/ling-lsp/src/rename.rs), [`crates/ling-lsp/src/completion.rs`](../../crates/ling-lsp/src/completion.rs), [`crates/ling-lsp/src/completion_resolve.rs`](../../crates/ling-lsp/src/completion_resolve.rs), [`crates/ling-lsp/src/workspace_symbols.rs`](../../crates/ling-lsp/src/workspace_symbols.rs), [`crates/ling-lsp/src/semantic_tokens.rs`](../../crates/ling-lsp/src/semantic_tokens.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-lsp/tests/cancellation.rs`](../../crates/ling-lsp/tests/cancellation.rs), [`tests/protocols/lsp-request-cancellation/fixtures/v1.json`](../../tests/protocols/lsp-request-cancellation/fixtures/v1.json), [`tests/protocols/lsp-request-cancellation/README.md`](../../tests/protocols/lsp-request-cancellation/README.md), [`docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md`](../status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md)
+- Notes: The Preview adds no deadline, timeout, progress, quota, server-initiated cancellation, parallel compiler mutation, persistent state, VM/runtime cancellation, Stable editor compatibility, or general Semantic Transaction claim.
 
 ### `PROTO-LSP-SEMANTIC-TOKENS` — Ling bounded LSP semantic tokens
 

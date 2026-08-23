@@ -495,8 +495,49 @@ impl fmt::Display for TypeError {
 
 impl Error for TypeError {}
 
+/// Failure of a cancellable type-checking request.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum TypeCheckError {
+    /// Cooperative cancellation was observed before Typed Core publication.
+    Cancelled,
+    /// Deterministic source diagnostics rejected the program.
+    Errors(Vec<TypeError>),
+}
+
+impl fmt::Display for TypeCheckError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Cancelled => formatter.write_str("type checking was cancelled"),
+            Self::Errors(errors) => {
+                write!(
+                    formatter,
+                    "type checking produced {} error(s)",
+                    errors.len()
+                )
+            }
+        }
+    }
+}
+
+impl Error for TypeCheckError {}
+
 /// Infers all Seed types and validates assignment places.
 pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> {
+    match check_with_cancellation(resolved, &|| false) {
+        Ok(program) => Ok(program),
+        Err(TypeCheckError::Errors(errors)) => Err(errors),
+        Err(TypeCheckError::Cancelled) => unreachable!("the default probe never cancels"),
+    }
+}
+
+/// Infers Seed types with cooperative stage and solver checkpoints.
+pub fn check_with_cancellation(
+    resolved: ResolvedProgram,
+    cancelled: &dyn Fn() -> bool,
+) -> Result<TypedProgram, TypeCheckError> {
+    if cancelled() {
+        return Err(TypeCheckError::Cancelled);
+    }
     // RFC-0021 makes concrete, witness-resolved Trait members executable.  A
     // declaration by itself is therefore no longer an unsupported type
     // construct; unresolved generic obligations remain outside this bounded
@@ -520,6 +561,9 @@ pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> 
             }))
         }
     }
+    if cancelled() {
+        return Err(TypeCheckError::Cancelled);
+    }
     let coherence = match coherence::build_index(&resolved) {
         Ok(index) => Some(index),
         Err(coherence_errors) => {
@@ -534,6 +578,9 @@ pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> 
             None
         }
     };
+    if cancelled() {
+        return Err(TypeCheckError::Cancelled);
+    }
     if !trait_errors.is_empty() {
         trait_errors.sort_by(|left, right| {
             (
@@ -547,13 +594,13 @@ pub fn check(resolved: ResolvedProgram) -> Result<TypedProgram, Vec<TypeError>> 
                     format!("{:?}", right.kind),
                 ))
         });
-        return Err(trait_errors);
+        return Err(TypeCheckError::Errors(trait_errors));
     }
     Inferencer::new(
         resolved,
         coherence.expect("coherence errors returned above"),
     )
-    .run()
+    .run(cancelled)
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -686,32 +733,24 @@ impl Inferencer {
         }
     }
 
-    fn run(mut self) -> Result<TypedProgram, Vec<TypeError>> {
+    fn run(mut self, cancelled: &dyn Fn() -> bool) -> Result<TypedProgram, TypeCheckError> {
+        if cancelled() {
+            return Err(TypeCheckError::Cancelled);
+        }
         self.seed_builtins();
         self.seed_prelude();
         self.index_nominal_types();
         self.predeclare_values();
-        self.infer_definitions();
+        if !self.infer_definitions(cancelled) {
+            return Err(TypeCheckError::Cancelled);
+        }
         self.check_equality_constraints();
         self.reject_bare_trait_members();
 
-        if !self.errors.is_empty() {
-            self.errors.sort_by(|left, right| {
-                (
-                    &left.source_name,
-                    left.span.start(),
-                    format!("{:?}", left.kind),
-                )
-                    .cmp(&(
-                        &right.source_name,
-                        right.span.start(),
-                        format!("{:?}", right.kind),
-                    ))
-            });
-            return Err(self.errors);
+        if cancelled() {
+            return Err(TypeCheckError::Cancelled);
         }
 
-        let (dictionary, trait_member_calls) = self.lower_trait_calls();
         if !self.errors.is_empty() {
             self.errors.sort_by(|left, right| {
                 (
@@ -725,7 +764,28 @@ impl Inferencer {
                         format!("{:?}", right.kind),
                     ))
             });
-            return Err(self.errors);
+            return Err(TypeCheckError::Errors(self.errors));
+        }
+
+        let (dictionary, trait_member_calls) = self.lower_trait_calls(cancelled)?;
+        if !self.errors.is_empty() {
+            self.errors.sort_by(|left, right| {
+                (
+                    &left.source_name,
+                    left.span.start(),
+                    format!("{:?}", left.kind),
+                )
+                    .cmp(&(
+                        &right.source_name,
+                        right.span.start(),
+                        format!("{:?}", right.kind),
+                    ))
+            });
+            return Err(TypeCheckError::Errors(self.errors));
+        }
+
+        if cancelled() {
+            return Err(TypeCheckError::Cancelled);
         }
 
         let mut arena = TypeArena::default();
@@ -838,6 +898,9 @@ impl Inferencer {
             })
             .collect();
 
+        if cancelled() {
+            return Err(TypeCheckError::Cancelled);
+        }
         Ok(TypedProgram {
             resolved: self.resolved,
             arena,
@@ -867,9 +930,12 @@ impl Inferencer {
         }
     }
 
-    fn lower_trait_calls(&mut self) -> (DictionaryTable, BTreeMap<ExpressionKey, TraitMemberCall>) {
+    fn lower_trait_calls(
+        &mut self,
+        cancelled: &dyn Fn() -> bool,
+    ) -> Result<(DictionaryTable, BTreeMap<ExpressionKey, TraitMemberCall>), TypeCheckError> {
         if self.pending_trait_calls.is_empty() {
-            return (DictionaryTable::empty(), BTreeMap::new());
+            return Ok((DictionaryTable::empty(), BTreeMap::new()));
         }
 
         let obligations = self
@@ -911,15 +977,20 @@ impl Inferencer {
                 })
             })
             .collect::<Vec<_>>();
+        if cancelled() {
+            return Err(TypeCheckError::Cancelled);
+        }
 
-        let selections = match solver::solve_obligations(
+        let selections = match solver::solve_obligations_with_cancellation(
             &self.resolved,
             &self.coherence,
             &obligations,
             &BTreeMap::new(),
+            cancelled,
         ) {
             Ok(selections) => selections,
-            Err(errors) => {
+            Err(solver::SolveFailure::Cancelled) => return Err(TypeCheckError::Cancelled),
+            Err(solver::SolveFailure::Errors(errors)) => {
                 self.errors
                     .extend(errors.into_iter().map(|error| TypeError {
                         kind: TypeErrorKind::UnsupportedTypeSyntax,
@@ -927,9 +998,13 @@ impl Inferencer {
                         span: error.span,
                         restriction_reason: None,
                     }));
-                return (DictionaryTable::empty(), BTreeMap::new());
+                return Ok((DictionaryTable::empty(), BTreeMap::new()));
             }
         };
+
+        if cancelled() {
+            return Err(TypeCheckError::Cancelled);
+        }
 
         let dictionary = match checked_core::lower_dictionary_witnesses(
             &selections,
@@ -945,7 +1020,7 @@ impl Inferencer {
                         span: error.span,
                         restriction_reason: None,
                     }));
-                return (DictionaryTable::empty(), BTreeMap::new());
+                return Ok((DictionaryTable::empty(), BTreeMap::new()));
             }
         };
 
@@ -962,6 +1037,9 @@ impl Inferencer {
         let mut calls = BTreeMap::new();
         let pending_calls = self.pending_trait_calls.clone();
         for (order, pending) in pending_calls.iter().enumerate() {
+            if cancelled() {
+                return Err(TypeCheckError::Cancelled);
+            }
             let Some(selection) = selections_by_order.get(&order) else {
                 continue;
             };
@@ -994,7 +1072,7 @@ impl Inferencer {
                 },
             );
         }
-        (dictionary, calls)
+        Ok((dictionary, calls))
     }
 
     fn constraint_type(&self, module: ModuleId, value: &InferType) -> constraints::ConstraintType {
@@ -1582,11 +1660,17 @@ impl Inferencer {
         }
     }
 
-    fn infer_definitions(&mut self) {
+    fn infer_definitions(&mut self, cancelled: &dyn Fn() -> bool) -> bool {
         let modules = self.resolved.modules().to_vec();
         for module in &modules {
+            if cancelled() {
+                return false;
+            }
             self.current_module = module.id;
             for definition in &module.hir.definitions {
+                if cancelled() {
+                    return false;
+                }
                 let Some(id) = self
                     .resolved
                     .definition_id(module.id, &definition.name.normalized)
@@ -1656,8 +1740,14 @@ impl Inferencer {
             }
 
             for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
+                if cancelled() {
+                    return false;
+                }
                 let receiver = self.type_syntax(module.id, &implementation.receiver);
                 for (member_ordinal, definition) in implementation.members.iter().enumerate() {
+                    if cancelled() {
+                        return false;
+                    }
                     let Some(id) = self
                         .resolved
                         .impl_members()
@@ -1708,6 +1798,7 @@ impl Inferencer {
                 }
             }
         }
+        true
     }
 
     fn impl_member_type(
@@ -3939,6 +4030,31 @@ mod tests {
             })
             .collect();
         ling_resolve::resolve(programs, "Main").expect("resolves")
+    }
+
+    #[test]
+    fn cancellable_type_check_stops_between_definitions() {
+        use std::cell::Cell;
+
+        let program = resolved(concat!(
+            "module Main\n\n",
+            "let first = 1\n",
+            "let second = first\n",
+            "let third = second\n",
+            "let main () = third\n",
+        ));
+        let observations = Cell::new(0_u32);
+        let cancelled = || {
+            let next = observations.get().saturating_add(1);
+            observations.set(next);
+            next >= 7
+        };
+
+        assert!(matches!(
+            check_with_cancellation(program, &cancelled),
+            Err(TypeCheckError::Cancelled)
+        ));
+        assert!(observations.get() >= 7);
     }
 
     #[test]
