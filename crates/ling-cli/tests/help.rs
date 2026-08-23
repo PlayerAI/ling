@@ -33,9 +33,12 @@ fn help_aliases_have_the_same_truthful_surface() {
     ] {
         assert!(help.contains(command), "help is missing `{command}`");
     }
-    for stale in ["build", "query", "patch", "zero", ".zero"] {
+    for stale in [
+        "build", "query", "patch", "replay", "explain", "evidence", "version", "support",
+        "features", "zero", ".zero",
+    ] {
         assert!(
-            !help.contains(stale),
+            !help.contains(&format!("  ling {stale}")),
             "help advertises stale command `{stale}`"
         );
     }
@@ -43,13 +46,21 @@ fn help_aliases_have_the_same_truthful_surface() {
 
 #[test]
 fn unknown_future_command_is_rejected_with_usage_on_stderr() {
-    let output = run(&["query"]);
+    for command in [
+        "build", "query", "patch", "replay", "explain", "evidence", "version", "support",
+        "features",
+    ] {
+        let output = run(&[command]);
 
-    assert_eq!(output.status.code(), Some(2));
-    assert!(output.stdout.is_empty());
-    let stderr = String::from_utf8(output.stderr).expect("diagnostic is UTF-8");
-    assert!(stderr.contains("unknown command `query`"));
-    assert!(stderr.contains("Usage:"));
-    assert!(stderr.contains("ling test"));
-    assert!(!stderr.contains("ling query"));
+        assert_eq!(output.status.code(), Some(2), "{command}");
+        assert!(output.stdout.is_empty(), "{command}");
+        let stderr = String::from_utf8(output.stderr).expect("diagnostic is UTF-8");
+        assert!(
+            stderr.contains(&format!("unknown command `{command}`")),
+            "{command}"
+        );
+        assert!(stderr.contains("Usage:"), "{command}");
+        assert!(stderr.contains("ling test"), "{command}");
+        assert!(!stderr.contains(&format!("ling {command}\n")), "{command}");
+    }
 }

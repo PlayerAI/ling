@@ -3328,3 +3328,16 @@ covers = ["STAB-6101 bounded Support-Matrix Item Audit boundary evidence", "test
 depends_on = ["DEC-0215", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0217"
+title = "Internal False-Entry-Point Audit boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0217-false-entry-point-audit-boundary-evidence.md"
+covers = ["STAB-6102 bounded false-entry-point audit boundary evidence", "test-only cleanup classification vocabulary and CLI negative regression", "audit boundaries without deletion or migration authority"]
+depends_on = ["DEC-0216", "DEC-0036", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

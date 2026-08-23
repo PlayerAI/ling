@@ -56,16 +56,19 @@ non-normative checklist alone.
 
 ## Evidence in this repository
 
-Targeted searches found no `todo!()`, `unimplemented!()`, or `unreachable!()`
-constructs under `crates/`, `editors/`, `tests/`, or `schemas`. The scoped CLI,
-editor, schema, and fixture paths contain no stale `zero` command entry. The
-remaining occurrences of “placeholder” are legitimate `Text.format` fault
-semantics, type-inference temporaries, recovery/editor documentation, or
-governance notes describing intentionally Future/Unsupported surfaces. Current
-support fixtures explicitly encode Unavailable/Unsupported/Future states, and
-the existing CLI/help and grammar behavior provide no audited STAB-6102
-deletion set. These observations are evidence for the audit, not permission to
-remove arbitrary source or documentation.
+Targeted searches found no production `todo!()` or `unimplemented!()` construct
+under `crates/`. The CLI contains `unreachable!()` assertions only after modes
+have already been dispatched; those are internal control-flow invariants, not
+advertised success paths. Test-only panic assertions and editor recovery data
+likewise do not claim a public capability. The scoped CLI, editor, schema, and
+fixture paths contain no stale `zero` command entry. The remaining occurrences
+of “placeholder” are legitimate `Text.format` fault semantics, type-inference
+temporaries, recovery/editor documentation, or governance notes describing
+intentionally Future/Unsupported surfaces. Current support fixtures explicitly
+encode Unavailable/Unsupported/Future states, and the existing CLI/help and
+grammar behavior provide no audited STAB-6102 deletion set. These observations
+are evidence for the audit, not permission to remove arbitrary source or
+documentation.
 
 ## Required authority before implementation
 

@@ -5544,3 +5544,29 @@ unresolved_alternatives = [
   "Candidate Stable Feature/Profile/Target inventory; stable identity/version; inclusion, exclusion, promotion, demotion and removal rules; Accepted clauses; parser/checker/Typed-Core and Interpreter/VM/Native/Device evidence; positive/negative/differential conformance; diagnostic, LSP and Zed coverage; bidirectional clause/symbol/test traceability; evidence polarity; known limitations; source/Semantic/canonical/schema/CLI/package/bytecode/replay/ABI/profile/target compatibility and migration; protocol readers/writers and golden corpora; deterministic offline builds; Tier scope, target/toolchain and artifact identity; independent review, security, fuzz/fault/TCB/licensing and release-candidate binding; fail-closed missing/conflicting/stale/unverifiable rows; bilingual stable diagnostics and machine schema; per-row positive, negative, migration, corruption, Unicode 17.0.0, BOM/CRLF, source-span and determinism fixtures; protocol inventory and public support remain open under STAB-6101, STAB-6102, STAB-6103, ROADMAP-1.0, all incomplete G1-G5 exits, open gaps, the draft SUPPORT-MATRIX, and missing G6 stabilization authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0217"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0217-false-entry-point-audit-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty local categories, deterministic rank order, duplicate rejection, and equal opaque bytes for forward/reverse input.",
+  "Verify all nine plan-only CLI roots are absent from help and fail closed with exit code 2, empty stdout, and usage on stderr.",
+  "Run the current support-matrix verifier without changing matrix claims.",
+  "Defer cleanup until Accepted authority identifies the exact public surface and delete/hide/reject/retain/migrate action.",
+]
+compatibility_impact = [
+  "Adds only regression and test-local observation evidence. Accepted Seed behavior, current CLI commands, diagnostics, schemas, Semantic IDs, source spans, editor grammar, runtime, dependencies, support states, and Unicode 17.0.0 remain unchanged.",
+  "No command, API, grammar/completion item, backend/profile, default, diagnostic, protocol, fixture, or support state is deleted, hidden, deprecated, migrated, or added.",
+]
+unresolved_alternatives = [
+  "Complete public-surface ownership; classification of success/no-op/recovery/negative/internal/future/unsupported surfaces; exact cleanup inventory; delete/hide/reject/retain/deprecate/migrate rules; compatibility and release notes; aliases, completion, grammar, profiles, backends, defaults, schemas and protocol consumers; diagnostic allocations; positive, negative, malformed, migration, editor, Unicode, source-span, deterministic/offline and release fixtures remain open under STAB-6102, STAB-6101, STAB-6103, incomplete G1-G5 exits, ROADMAP-1.0, the draft SUPPORT-MATRIX, and registered gaps.",
+]
+superseded_by = ""
