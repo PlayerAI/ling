@@ -4386,6 +4386,54 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6904-CURRENT-EVIDENCE"
+title = "Current RC2 upstream/protocol evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6903-CURRENT-EVIDENCE", "RC-6904-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0055-seed-rc2-final-change-control-inventory-gate.md",
+  "docs/decisions/0247-current-rc3-upstream-evidence.md",
+  "docs/decisions/0248-current-rc2-boundary-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/testing/RC2-FINAL-CHANGE-CONTROL.md",
+  "docs/testing/RC3-INDEPENDENT-VERIFICATION.md",
+  "docs/status/RC-6904-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/rc2_change_control.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "docs/testing/RC2-FINAL-CHANGE-CONTROL.md",
+  "docs/status/RC-6904-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6904-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc2 verify composes the current RC3-to-RC1-to-RC0 inventory chain and retains six exact RC2 states and seven linked audits.",
+  "The affected-protocol row accurately records 27 protocol inventory entries while preserving the absent candidate impact manifest and BlockedSpec state.",
+  "A focused negative test rejects stale upstream/protocol markers with GOV-RC2-CHANGE-CONTROL-0011.",
+  "Focused RC2/RC3/RC1/RC0/protocol checks plus workspace, CI, governance, support, status, traceability, formatting, lint, deterministic, and offline gates pass.",
+  "No blocker approval, source fix, candidate, artifact, Final decision, network request, or system change is created.",
+]
+verified_against_commit = "ced71085cd75b24ffc3d9104ade896b1f0c40463"
+completion_commit = "ced71085cd75b24ffc3d9104ade896b1f0c40463"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "RC-6904 remains BlockedSpec for blocker taxonomy/disposition, candidate baseline, regression/risk/impact records, matrix rerun, immutable candidate/provenance, reviewer approval, regeneration, and Final/Go.",
+  "This child corrects and composes internal evidence only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, Unicode, protocol states, support states, and public APIs are unchanged.",
+]
+
+[[task]]
 id = "RC-6904"
 title = "RC2 / Final Change Control"
 state = "BlockedSpec"
@@ -4393,7 +4441,7 @@ release = "G6"
 size = "L"
 owner = "Codex"
 branch = "main"
-depends_on = ["RC-6903"]
+depends_on = ["RC-6903", "RC-6904-CURRENT-EVIDENCE"]
 spec = [
   "AGENTS.md",
   "docs/ROADMAP-1.0.md",
@@ -4401,16 +4449,19 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/governance/support-matrix.toml",
   "docs/governance/protocol-inventory.toml",
+  "docs/decisions/0248-current-rc2-boundary-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/RC-6901-AUTHORITY-AUDIT.md",
   "docs/status/RC-6902-AUTHORITY-AUDIT.md",
   "docs/status/RC-6903-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6904-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
   "docs/status/REL-6603-AUTHORITY-AUDIT.md",
   "docs/testing/RC2-FINAL-CHANGE-CONTROL.md",
 ]
 artifacts = [
   "docs/status/RC-6904-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6904-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/RC2-FINAL-CHANGE-CONTROL.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
