@@ -5420,7 +5420,7 @@ notes = [
 [[task]]
 id = "CLI-1705"
 title = "Semantic query and patch commands"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -5432,30 +5432,55 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0253-current-cli-command-model.md",
+  "docs/decisions/0254-cli-output-policy.md",
+  "docs/RFC-0027.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-cli/src/command_catalog.rs",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/src/semantic_commands.rs",
+  "crates/ling-cli/tests/help.rs",
+  "crates/ling-cli/tests/semantic_commands.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/RFC-0027.md",
   "docs/status/CLI-1705-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1705-IMPLEMENTATION-REPORT.md",
+  "schemas/semantic-query/0.1",
+  "schemas/semantic-transaction/0.1",
+  "schemas/semantic-transaction-result/0.1",
+  "tests/protocols/semantic-query/README.md",
+  "docs/ERROR-CODES.md",
+  "docs/governance/error-code-lock.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the Experimental Semantic Graph boundary and Future Semantic Transaction inventory and identifies missing query, patch, stale-base, preserve, authorization, and atomicity contracts.",
-  "The audit covers deterministic query projection, transaction lifecycle, project/lock/CLI behavior, and required safety/differential fixtures.",
-  "No query/patch command, mutation API, transaction decoder, capability surface, protocol field, diagnostic allocation, or placeholder semantic authority is added while the contracts are absent.",
-  "The future implementation must keep queries read-only by default, reject stale bases, and commit patches atomically through the approved semantic pipeline.",
+  "Accepted RFC-0027 defines exact one-file query and proposal-only patch commands with three registered Preview JSON protocols and no Graph.Commit or editor-mutation claim.",
+  "Query performs exact Unicode-17.0.0 NFC user-definition lookup in canonical graph order; patch rejects a stale Program ID before candidate compilation and validates one checked in-memory replacement.",
+  "Patch preserves the complete definition set, types, Effects, and Capabilities, restricts changed Body IDs to sorted authorized targets, emits committed false, and never writes source or request bytes.",
+  "Focused CLI/reader/schema/corrupt-input evidence and repository-wide offline tests, Clippy, CI, governance, support, status, RC0, traceability, formatting, and deterministic-diff gates pass.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "d72cdbf3134b960ca07888404d55ea27eadb38ca"
+completion_commit = "d72cdbf3134b960ca07888404d55ea27eadb38ca"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "CLI-1705 is BlockedSpec by GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-PROJECT-CLI-INTERFACE-001, and CLI-1701; PROTO-SEMANTIC-TRANSACTION remains Future.",
-  "The current `ling semantic` and `ling audit` commands remain file-oriented read-only projections; no patch behavior or public query language is claimed.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit: d72cdbf3134b960ca07888404d55ea27eadb38ca (`feat(cli): add semantic query and patch proposals`).",
+  "Verified with exact/NFC query, stale precedence, checked candidate, preserve/authorization, deterministic process, nonmutation, schema/reader/corruption, all workspace targets, Clippy with warnings denied, and CI/governance/support/status/RC0/traceability/formatting/diff gates; the final status-bound full gate is recorded by the following status commit.",
+  "Project/workspace query, imports, references, fuzzy search, pagination, source ranges, partial edits, rename, tests/benchmarks/proofs/contracts, Graph.Commit, atomic disk publication, LSP WorkspaceEdit, migration, and Stable compatibility remain intentionally deferred under the open semantic/LSP transaction gaps.",
 ]
 
 [[task]]
