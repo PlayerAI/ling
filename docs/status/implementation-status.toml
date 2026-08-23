@@ -4657,7 +4657,7 @@ notes = [
 [[task]]
 id = "PRJ-1107"
 title = "Project API and CLI integration"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -4670,6 +4670,7 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/RFC-0002.md",
   "docs/RFC-0024.md",
+  "docs/RFC-0025.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0037-cli-internal-exit-catalog-boundary.md",
@@ -4679,10 +4680,18 @@ spec = [
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-cli/src/project.rs",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/tests/project_commands.rs",
+  "crates/ling-db/src/project_snapshot.rs",
+  "crates/ling-eval/src/lib.rs",
+  "docs/RFC-0025.md",
   "docs/status/PRJ-1107-AUTHORITY-AUDIT.md",
+  "docs/status/PRJ-1107-IMPLEMENTATION-REPORT.md",
   "docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md",
   "docs/status/PRJ-1107-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/PROJECT-CLI-STATUS.md",
+  "tests/protocols/project-command/README.md",
   "tools/xtask/src/project_status.rs",
   "docs/governance/gap-register.toml",
   "docs/governance/gap-register.md",
@@ -4690,18 +4699,20 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "RFC-0024 now defines the bounded locked project graph-check command; project semantic check/run/test/build and workspace selection remain separate parent scope.",
-  "The completed child reuses the RFC-0002 library graph and does not duplicate package resolution or add a placeholder CompilerHost API.",
-  "No stale `zero` command, unregistered protocol, diagnostic allocation, build artifact claim, or project test convention is introduced beyond the accepted graph-check boundary.",
-  "The DEC-0250 current-surface gate composes the three completed children while preserving five BlockedSpec public surfaces and the blocked parent state.",
+  "Accepted RFC-0025 defines exact manifest-selected `ling check`, `ling run`, `ling test`, and `ling build` project forms while RFC-0024 retains the distinct graph-only `ling project check` surface.",
+  "Semantic commands load exactly one explicit RFC-0002 root through the locked, offline project graph, compile all packages to checked Typed Core, and never interpret unresolved AST nodes.",
+  "Project run and the isolated root-entry smoke test execute checked project semantics with captured Console output; compile and runtime failures preserve the accepted exit classes and bilingual registered diagnostics.",
+  "Project build publishes deterministic path-free `ling.project.artifact/0.1` canonical bytes with create-new semantics and a SHA-256 complete-byte identity; it does not claim native code, bytecode, installation, or registry publication.",
+  "Focused integration tests cover deterministic nonmutation, cross-package execution, runtime and semantic failures, canonical artifact identity, overwrite refusal, and incomplete, mixed, unsupported, or duplicate option rejection.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "56790c7c9fc8e58821f9fb829e978c3bf746725b"
+completion_commit = "56790c7c9fc8e58821f9fb829e978c3bf746725b"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "PRJ-1107 remains BlockedSpec for semantic project checking, run/test/build, workspace selection, and artifact policy; RFC-0024 authorizes only the bounded graph-check child.",
-  "The current file-oriented commands and accepted `ling.manifest/1`, `ling.semantic/0.2`, and `ling.lock/1` library protocols remain unchanged outside `ling project check`.",
+  "Implementation commit: 56790c7c9fc8e58821f9fb829e978c3bf746725b (`Implement locked project command workflow`).",
+  "Verified with the focused six-case project command suite, workspace tests, Clippy with warnings denied, governance check-all, support verify, RC0 verify, rustfmt check, and git diff check; the final status-bound full gate is recorded by the following status commit.",
+  "Workspace/member filters, implicit discovery, native/critical profiles, bytecode/native artifacts, multiple project tests, publication, installation, and registry distribution remain intentionally deferred and unclaimed.",
 ]
 
 [[task]]

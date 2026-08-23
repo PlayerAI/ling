@@ -362,7 +362,7 @@
 | `PRJ-1104` | Content-identified local dependency graph | `G1` | `L` | `Done` | `PRJ-1101`, `PRJ-1102` | `66a64c9b57c8bb327599a7463345c9d2fbe77a51` |
 | `PRJ-1105` | Canonical project lockfile protocol | `G1` | `L` | `Done` | `PRJ-1104` | `9ff0fcca0c65b7e9e2fccf3c1df001b4737d3082` |
 | `PRJ-1106` | End-to-end project fixture matrix | `G1` | `M` | `Done` | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105` | `0e9c5800411a6f1acd1441068e6ce2fd58f29816` |
-| `PRJ-1107` | Project API and CLI integration | `G1` | `M` | `BlockedSpec` | `PRJ-1106` | `` |
+| `PRJ-1107` | Project API and CLI integration | `G1` | `M` | `Done` | `PRJ-1106` | `56790c7c9fc8e58821f9fb829e978c3bf746725b` |
 | `PRJ-1107-CHECK` | Locked project graph check Preview | `G1` | `M` | `Done` | `PRJ-1106` | `b37ab47f268e83e8c2c39931f5ddd0a311dbf4aa` |
 | `PRJ-1107-CURRENT-EVIDENCE` | Current project CLI/API boundary evidence | `G1` | `S` | `Done` | `PRJ-1107-CHECK`, `PRJ-1107-LOAD`, `PRJ-1107-SEMANTIC-SNAPSHOT` | `0822280f4a2ea2c9e4205e8fbff104a00b522ef3` |
 | `PRJ-1107-LOAD` | Locked project snapshot boundary | `G1` | `S` | `Done` | `PRJ-1106` | `23f9eb78b1bb3dfb0c90de88be30f4e16b248196` |
