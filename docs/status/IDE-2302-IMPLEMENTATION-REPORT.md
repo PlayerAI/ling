@@ -1,6 +1,7 @@
 # IDE-2302 implementation report
 
-> Status: Implemented; status-ledger binding pending the implementation commit
+> Status: Done
+> Implementation commit: `81116951f9203f8374e59ae4ef6e5cd155e5d5e6`
 > Task: `IDE-2302`
 > Authority: Accepted `RFC-0037`, `RFC-0004`, `RFC-0005`, `RFC-0023`,
 > `RFC-0029`, `RFC-0030`, `RFC-0036`, `DEC-0002`, `DEC-0012`, `DEC-0019`,
@@ -50,8 +51,15 @@ or Markdown for one exact identifier target.
 ## Tests and evidence
 
 - `cargo test -p ling-lsp --test hover --locked --offline` passes.
-- Remaining focused, workspace, governance, and release gates are recorded
-  only after they are executed against the implementation commit.
+- `cargo test --workspace --all-targets --locked --offline --quiet` passes.
+- `cargo clippy --workspace --all-targets --locked --offline -- -D warnings`
+  passes.
+- `cargo xtask ci verify`, `governance check-all`, `lsp verify`, `support
+  verify`, `status verify`, `rc0 verify`, and `traceability verify --release
+  v0.0.1` pass.
+- `cargo fmt --all -- --check` and `git diff --check` pass.
+- The complete gate set passed against implementation commit
+  `81116951f9203f8374e59ae4ef6e5cd155e5d5e6` before status binding.
 
 ## Compatibility, determinism, and Unicode impact
 

@@ -6734,7 +6734,7 @@ acceptance = [
   "Records preserve resolver DefinitionId, module/name spelling, classification, mutability, logical source name, SourceId, and original UTF-8 Span, plus optional exact type display, canonical Effect labels, and checked module capabilities.",
   "Existing TypedProgram, EffectRow, and capability facts are copied without new type, Effect, Capability, namespace, or Semantic ID rules; explicit source/span/name/identity ordering makes repeated observations equal.",
   "Focused cargo fmt, ling-db tests, and Clippy checks pass; Unicode/BOM/CRLF spans, Console.Write effect/capability facts, repeated output, user-only lookup, and invalid UTF-8 failure are covered.",
-  "The public IDE-2302 hover target remains BlockedSpec for target selection, presentation, Markdown/localization, positions, URI/version, cancellation, publication, Trait witnesses, and fixtures.",
+  "The public IDE-2302 hover target is separately complete under Accepted RFC-0037 and consumes this child without broadening its internal observation contract.",
 ]
 verified_against_commit = "d0727d95442309390a68d1af512111a8cd17f919"
 completion_commit = "d0727d95442309390a68d1af512111a8cd17f919"
@@ -6796,7 +6796,7 @@ notes = [
 [[task]]
 id = "IDE-2302"
 title = "IDE hover"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6809,30 +6809,37 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/RFC-0005.md",
+  "docs/RFC-0037.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/checked_hover_index.rs",
+  "crates/ling-lsp/src/hover.rs",
+  "crates/ling-lsp/tests/hover.rs",
+  "docs/RFC-0037.md",
   "docs/status/IDE-2302-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2302-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-hover/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing LSP hover request/response, display, source-span, position/version, localization, Semantic ID, and Trait projection contracts.",
-  "The audit covers inferred/declared types, effects, capabilities, documentation, aliases, unresolved states, stale results, Unicode/CRLF/BOM, deterministic formatting, and required fixtures.",
-  "No hover handler, renderer, capability disclosure, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must use checked data, preserve source-span/ID truth, format deterministically, and label experimental fields.",
+  "Accepted RFC-0037 fixes capability negotiation, exact discovery, immutable snapshot scope, checked target taxonomy and selection, canonical type/Effect/Capability/Trait facts, plaintext/Markdown rendering, 16384-entry and 65536-byte bounds, fixed failures, and Preview migration behavior.",
+  "The compiler query joins exact declaration, binding, parameter, and resolver-filtered reference spans to complete checked facts without exposing resolver/Semantic IDs, implementation ordinals, paths, or debug values.",
+  "Executable tests cover every Seed target kind, canonical polymorphic types, Effects, Capabilities, concrete Trait selection, plaintext/Markdown, UTF-8/16/32, BOM/CRLF/Chinese/emoji/combining text, repeated requests, temporary isolation, malformed inputs, checked failure/recovery, notifications, null, and overflow.",
+  "Locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass against implementation commit 81116951f9203f8374e59ae4ef6e5cd155e5d5e6.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "81116951f9203f8374e59ae4ef6e5cd155e5d5e6"
+completion_commit = "81116951f9203f8374e59ae4ef6e5cd155e5d5e6"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "IDE-2302 remains BlockedSpec by the missing hover schema/lifecycle authority and IDE-2301; RFC-0031 covers diagnostics only, not hover.",
-  "Current type/effect/capability and graph code remains internal and exposes no public hover mapping or editor range protocol.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit 81116951f9203f8374e59ae4ef6e5cd155e5d5e6 adds Accepted RFC-0037, the bounded checked-hover index, LSP provider, exact transcript migration, protocol/governance records, and implementation evidence.",
+  "Documentation, arbitrary expressions, modules/imports, profile/resource facts, unresolved recovery, progress, partial results, dynamic registration, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deliberately deferred.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, Semantic ID/schema, dependency, or Unicode 17.0.0 behavior changes.",
 ]
 
 [[task]]
