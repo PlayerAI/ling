@@ -8,6 +8,8 @@ composes the existing cycle, depth-64, and source-evidence-independence facts
 while preserving five unresolved production surfaces. Parent `TRAIT-1309`
 remains `BlockedSpec`.
 
+Implementation commit: `d4c24920d0dc719a517da2e804b4824dcd792633`.
+
 ## Normative clauses covered
 
 - Accepted RFC-0005 §2.5 and DEC-0026 fix active-cycle rejection and the exact

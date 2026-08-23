@@ -27260,6 +27260,9 @@ spec = [
 ]
 artifacts = [
   "docs/status/TRAIT-1309-AUTHORITY-AUDIT.md",
+  "docs/status/TRAIT-1309-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/testing/TRAIT-PERFORMANCE-STATUS.md",
+  "tools/xtask/src/trait_performance_status.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -27268,6 +27271,7 @@ acceptance = [
   "The audit identifies the absent production HIR obligation graph and defines required deep-chain, diamond, failure, cross-package, deterministic, and differential benchmark evidence.",
   "No solver limit, wall-clock threshold, benchmark schema, public diagnostic, cancellation API, or Trait protocol claim is added while the authority and integration are absent.",
   "The future implementation must preserve RFC-0005 termination semantics and keep host timing out of Ling language semantics.",
+  "The DEC-0252 current-surface gate composes three accepted termination facts while preserving five BlockedSpec production surfaces and the blocked parent state.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -27324,6 +27328,58 @@ integration_state = "committed"
 completed = "2026-08-22"
 notes = [
   "The bounded termination child records source-evidence independence only; the TRAIT-1309 parent remains BlockedSpec for production HIR integration, benchmark metrics, resource budgets, and LSP cancellation.",
+]
+
+[[task]]
+id = "TRAIT-1309-CURRENT-EVIDENCE"
+title = "Current Trait performance and termination evidence"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1309-TERMINATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/decisions/0026-trait-solver-v0-boundary.md",
+  "docs/decisions/0068-trait-termination-corpus.md",
+  "docs/decisions/0252-current-trait-performance-evidence.md",
+  "docs/governance/gap-register.toml",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "tools/xtask/src/trait_performance_status.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/testing/TRAIT-PERFORMANCE-STATUS.md",
+  "docs/decisions/0252-current-trait-performance-evidence.md",
+  "docs/status/TRAIT-1309-AUTHORITY-AUDIT.md",
+  "docs/status/TRAIT-1309-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0252 authorizes only a deterministic, read-only, offline inventory gate over the accepted cycle, depth-64, and source-evidence-independent termination facts; it adds no solver behavior.",
+  "cargo xtask trait-performance verify enforces exactly three Internal termination surfaces, five BlockedSpec production surfaces, seven evidence files, and two parent/child task states.",
+  "Focused tests reject matrix-state drift, parent promotion, missing child status, and missing solver evidence; the gate is present in the always-on governance-authority CI contract.",
+  "Parent TRAIT-1309 remains BlockedSpec for production integration, deterministic work budgets, benchmark corpora/thresholds, environment/variance policy, cancellation, stale results, and public evidence formats.",
+  "No language semantics, public diagnostics, schemas, Semantic IDs, protocol states, dependencies, CLI/LSP/DAP/runtime behavior, bytecode, VM, ABI, Unicode 17.0.0 data, timing promise, network behavior, or public APIs change.",
+]
+verified_against_commit = "d4c24920d0dc719a517da2e804b4824dcd792633"
+completion_commit = "d4c24920d0dc719a517da2e804b4824dcd792633"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child closes only the current-evidence composition authorized by DEC-0252; it does not close or narrow the unresolved TRAIT-1309 parent scope.",
+  "The implementation commit passed focused solver tests plus workspace, Clippy, CI, governance, support, status, traceability, formatting, offline, and diff gates before binding.",
 ]
 
 [[task]]
