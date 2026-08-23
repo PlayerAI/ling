@@ -523,6 +523,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `STD-6302` | G6 | 删除过度便利 API | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:180`, `docs/status/STD-6302-AUTHORITY-AUDIT.md` |
 | `STD-6302-OBSERVATION` | G6 | Internal Convenience API Removal Audit boundary evidence | S | Done | Accepted `DEC-0224`; see `crates/ling-types/tests/convenience_api_removal_audit_evidence.rs`, `crates/ling-resolve/src/lib.rs`, and `docs/status/STD-6302-OBSERVATION-IMPLEMENTATION-REPORT.md`; current removal set is empty and real lifecycle/migration semantics remain BlockedSpec |
 | `STD-6303` | G6 | Unicode 与中文编程稳定性 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:195`, `docs/status/STD-6303-AUTHORITY-AUDIT.md` |
+| `STD-6303-OBSERVATION` | G6 | Internal Unicode and Chinese-programming stability boundary evidence | S | Done | Accepted `DEC-0225`; see `crates/ling-unicode/tests/unicode_chinese_stability.rs`, `crates/ling-types/tests/unicode_chinese_stability_evidence.rs`, and `docs/status/STD-6303-OBSERVATION-IMPLEMENTATION-REPORT.md`; Unicode upgrade/localization/tool protocol semantics remain BlockedSpec |
 | `PKG-6401` | G6 | 包发布协议 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:210`, `docs/status/PKG-6401-AUTHORITY-AUDIT.md` |
 | `PKG-6402` | G6 | Hermetic Build | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:226`, `docs/status/PKG-6402-AUTHORITY-AUDIT.md` |
 | `PKG-6403` | G6 | Registry 最小实现或推迟策略 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:239`, `docs/status/PKG-6403-AUTHORITY-AUDIT.md` |

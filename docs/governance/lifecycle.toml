@@ -5752,3 +5752,30 @@ unresolved_alternatives = [
   "Public/internal ownership; core/Preview packages; exact future removal set; delete/hide/reject/retain/deprecate/migrate rules; replacements; compatibility windows; diagnostics; package/lock effects; migration fixtures; complexity/resource contracts; profiles; and release policy remain open under STD-6302, STD-6303, incomplete G1-G5 exits, and future API-lifecycle authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0225"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0225-unicode-chinese-stability-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert the exact Unicode 17.0.0 version and eleven-file input SHA-256 manifest.",
+  "Assert representative Chinese, XID, NFC, script, confusable, mixed-script, forbidden-property, and original-byte-offset behavior.",
+  "Assert all sixty local boundaries, exact ordering, duplicate rejection, and order-independent opaque bytes.",
+  "Run Unicode generation, conformance, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+  "Defer cross-tool stabilization and any Unicode upgrade until Accepted authority defines those contracts and migration evidence.",
+]
+compatibility_impact = [
+  "Adds only exact-manifest regression and test-local evidence. Unicode data, generated tables, dependency versions, identifier behavior, diagnostics, Semantic IDs, source spans, packages, profiles, tooling, and paths remain unchanged.",
+  "No Unicode upgrade, alias syntax, localized view, formatter/LSP/Zed/CLI feature, Windows-path rule, migration protocol, public API, or Stable support claim is added.",
+]
+unresolved_alternatives = [
+  "Unicode upgrade ownership and migration; localized aliases and display; profile identifier policy; diagnostics; formatter, LSP, Zed, CLI, UTF-16, and Windows-path contracts; package/module migration; and cross-process compatibility remain open under STD-6303, registered gaps, and future Accepted authority.",
+]
+superseded_by = ""

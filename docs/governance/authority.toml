@@ -3432,3 +3432,16 @@ covers = ["STD-6302 bounded Convenience API Removal Audit boundary evidence", "e
 depends_on = ["DEC-0011", "DEC-0014", "DEC-0223", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0225"
+title = "Unicode and Chinese-programming stability boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0225-unicode-chinese-stability-boundary-evidence.md"
+covers = ["STD-6303 bounded Unicode and Chinese-programming stability evidence", "exact Unicode 17.0.0 input manifest and representative accepted identifier behavior", "test-only observation without upgrade, localization, or cross-tool protocol semantics"]
+depends_on = ["SEMANTICS", "DEC-0002", "DEC-0007", "DEC-0012", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
