@@ -1,11 +1,11 @@
 use ling_db::{CheckedHoverEntry, CheckedHoverKind, MAX_CHECKED_HOVER_ENTRIES, QueryError};
-use ling_source::{LspPosition, PositionError, SourceError, SourceFile, Span, VfsError};
+use ling_source::{PositionError, SourceError, SourceFile, Span, VfsError};
 use serde_json::{Map, Value, json};
 
 use super::publication::compiler_for_snapshot;
 use super::{
     HandleOutcome, INVALID_PARAMS, LifecycleState, LspServer, MAX_FRAME_BYTES,
-    RequestSnapshotError, error_or_none, success_response,
+    RequestSnapshotError, error_or_none, parse_text_document_position, success_response,
 };
 
 /// Current Preview checked-hover writer marker.
@@ -69,7 +69,8 @@ impl LspServer {
     }
 
     fn hover_result(&self, params: &Value) -> Result<Value, HoverError> {
-        let (uri, position) = parse_hover_params(params)?;
+        let (uri, position) =
+            parse_text_document_position(params).ok_or(HoverError::InvalidParams)?;
         let snapshot = self
             .capture_request_snapshot()
             .map_err(HoverError::Snapshot)?;
@@ -142,31 +143,6 @@ pub(crate) fn parse_hover_capability(
             _ => None,
         })
         .ok_or(())
-}
-
-fn parse_hover_params(params: &Value) -> Result<(&str, LspPosition), HoverError> {
-    let object = params.as_object().ok_or(HoverError::InvalidParams)?;
-    let uri = object
-        .get("textDocument")
-        .and_then(Value::as_object)
-        .and_then(|document| document.get("uri"))
-        .and_then(Value::as_str)
-        .ok_or(HoverError::InvalidParams)?;
-    let position = object
-        .get("position")
-        .and_then(Value::as_object)
-        .ok_or(HoverError::InvalidParams)?;
-    let line = position
-        .get("line")
-        .and_then(Value::as_u64)
-        .and_then(|value| u32::try_from(value).ok())
-        .ok_or(HoverError::InvalidParams)?;
-    let character = position
-        .get("character")
-        .and_then(Value::as_u64)
-        .and_then(|value| u32::try_from(value).ok())
-        .ok_or(HoverError::InvalidParams)?;
-    Ok((uri, LspPosition::new(line, character)))
 }
 
 fn hover_value(

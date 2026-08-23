@@ -6,7 +6,7 @@
 //! with bounded incremental changes; RFC-0030 governs atomic workspace reload;
 //! RFC-0026 governs the bounded document-formatting response; DEC-0029 remains
 //! the authority for position projection; RFC-0036 governs Document Symbols;
-//! RFC-0037 governs checked Hover.
+//! RFC-0037 governs checked Hover; RFC-0038 governs resolver navigation.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -55,6 +55,8 @@ mod document_symbols;
 pub use document_symbols::{DOCUMENT_SYMBOL_PROTOCOL_VERSION, MAX_DOCUMENT_SYMBOLS};
 mod hover;
 pub use hover::{HOVER_PROTOCOL_VERSION, MAX_HOVER_CONTENT_BYTES, MAX_HOVER_ENTRIES};
+mod navigation;
+pub use navigation::{MAX_NAVIGATION_TARGETS, NAVIGATION_PROTOCOL_VERSION};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -773,6 +775,24 @@ impl LspServer {
             "textDocument/diagnostic" => self.document_diagnostic(id_present, id, params),
             "textDocument/documentSymbol" => self.document_symbols(id_present, id, params),
             "textDocument/hover" => self.hover(id_present, id, params),
+            "textDocument/definition" => self.navigation(
+                id_present,
+                id,
+                params,
+                navigation::NavigationMethod::Definition,
+            ),
+            "textDocument/declaration" => self.navigation(
+                id_present,
+                id,
+                params,
+                navigation::NavigationMethod::Declaration,
+            ),
+            "textDocument/typeDefinition" => self.navigation(
+                id_present,
+                id,
+                params,
+                navigation::NavigationMethod::TypeDefinition,
+            ),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -1416,6 +1436,7 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
                 }
             }
             hover_markup = hover::parse_hover_capability(text_document)?;
+            navigation::parse_navigation_capabilities(text_document)?;
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -1433,6 +1454,25 @@ fn parse_initialize_params(params: &Value) -> Result<ParsedInitializeParams, ()>
         hierarchical_document_symbols,
         hover_markup,
     })
+}
+
+pub(crate) fn parse_text_document_position(params: &Value) -> Option<(&str, LspPosition)> {
+    let object = params.as_object()?;
+    let uri = object
+        .get("textDocument")?
+        .as_object()?
+        .get("uri")?
+        .as_str()?;
+    let position = object.get("position")?.as_object()?;
+    let line = position
+        .get("line")?
+        .as_u64()
+        .and_then(|value| u32::try_from(value).ok())?;
+    let character = position
+        .get("character")?
+        .as_u64()
+        .and_then(|value| u32::try_from(value).ok())?;
+    Some((uri, LspPosition::new(line, character)))
 }
 
 fn parse_open_params(params: &Value) -> Result<(String, i64, String), OverlayError> {
@@ -1947,16 +1987,23 @@ fn initialize_result(
 ) -> Value {
     let mut result = json!({
         "capabilities": {
+            "declarationProvider": true,
+            "definitionProvider": true,
             "positionEncoding": encoding.wire_name(),
             "documentFormattingProvider": true,
             "documentSymbolProvider": true,
             "hoverProvider": true,
+            "typeDefinitionProvider": true,
             "experimental": {
                 "lingHover": {
                     "maxContentBytes": MAX_HOVER_CONTENT_BYTES,
                     "maxEntries": MAX_HOVER_ENTRIES,
                     "markup": hover_markup.wire_name(),
                     "version": HOVER_PROTOCOL_VERSION,
+                },
+                "lingNavigation": {
+                    "maxTargets": MAX_NAVIGATION_TARGETS,
+                    "version": NAVIGATION_PROTOCOL_VERSION,
                 },
                 "lingDocumentSymbols": {
                     "maxSymbols": MAX_DOCUMENT_SYMBOLS,

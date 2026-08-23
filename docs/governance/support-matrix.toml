@@ -357,6 +357,13 @@ stability = "Preview"
 implemented = true
 
 [[protocol]]
+id = "PROTO-LSP-NAVIGATION"
+visibility = "Public"
+version = "ling.lsp.navigation/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 visibility = "Public"
 version = "ling.lsp.formatting/0.1"

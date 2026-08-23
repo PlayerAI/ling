@@ -517,6 +517,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-NAVIGATION",
+      "visibility": "Public",
+      "version": "ling.lsp.navigation/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-OVERLAY",
       "visibility": "Public",
       "version": "ling.lsp.overlay/0.2",

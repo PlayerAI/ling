@@ -32,6 +32,8 @@ mod checked_token_source_index;
 mod completion_metadata_index;
 mod completion_source_index;
 mod definition_index;
+mod definition_projection;
+mod navigation_index;
 mod project_snapshot;
 mod reference_index;
 mod reference_span_index;
@@ -52,6 +54,10 @@ pub use completion_source_index::{
 };
 pub use definition_index::{
     ResolvedDefinitionIndex, ResolvedDefinitionKind, ResolvedDefinitionSymbol,
+};
+pub use navigation_index::{
+    MAX_NAVIGATION_ENTRIES, NavigationEntry, NavigationIndex, NavigationIndexError,
+    NavigationLocation,
 };
 pub use project_snapshot::ProjectSnapshotError;
 pub use reference_index::{
@@ -514,6 +520,10 @@ pub enum QueryError {
         file: SourceId,
         error: CheckedHoverIndexError,
     },
+    Navigation {
+        file: SourceId,
+        error: NavigationIndexError,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -583,6 +593,13 @@ impl fmt::Display for QueryError {
                 write!(
                     formatter,
                     "checked hover index for source file {} failed: {error}",
+                    file.get()
+                )
+            }
+            Self::Navigation { file, error } => {
+                write!(
+                    formatter,
+                    "navigation index for source file {} failed: {error}",
                     file.get()
                 )
             }
@@ -1188,6 +1205,38 @@ impl CompilerDb {
         Ok(Arc::new(ResolvedReferenceSpanIndex::from_resolved(
             &resolved,
         )))
+    }
+
+    /// Builds exact definition/declaration navigation from complete resolution.
+    pub fn resolved_navigation_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<NavigationIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
+        NavigationIndex::from_resolved(&resolved)
+            .map(Arc::new)
+            .map_err(|error| QueryError::Navigation { file, error })
+    }
+
+    /// Builds exact type-definition navigation from one complete checked workspace.
+    pub fn checked_navigation_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<NavigationIndex>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+        NavigationIndex::from_checked(&checked)
+            .map(Arc::new)
+            .map_err(|error| QueryError::Navigation { file, error })
     }
 
     /// Builds an immutable inventory of resolver-backed names for future

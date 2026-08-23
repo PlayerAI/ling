@@ -7031,3 +7031,31 @@ unresolved_alternatives = [
   "Documentation, arbitrary expression hover, imports/modules, profile and resource facts, unresolved recovery, dynamic registration, progress, partial results, asynchronous cancellation, caching promises, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0038"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0038.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact standard provider and Experimental discovery, capability validation, lifecycle, notification silence, params, unknown URI, invalid positions, null, and fixed failures.",
+  "Cover same-file and cross-workspace definition/declaration, local and parameter bindings, records, variants, constructors, Trait members, read-only dependency targets, and absent Prelude/builtin targets.",
+  "Cover direct nominal type definitions for values, locals, constructors, and function results plus null primitive/list/tuple/generic cases.",
+  "Cover UTF-8/16/32, Chinese, emoji, combining marks, BOM, CRLF, exact member spans, temporary isolation, repeated output, insertion-order invariance, bounds, checked failure/recovery, freshness, and absence of IDs, ordinals, paths, arrays, and LocationLink fields.",
+  "Migrate exact initialize transcripts and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.navigation/0.1 for three standard LSP navigation methods with no predecessor.",
+  "Adds bounded immutable resolved and checked compiler navigation indexes while keeping resolver/Semantic identities internal.",
+  "Adds no diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, package format, dependency, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Generated/primitive virtual documents, alias hops, multiple targets, LocationLink, declaration-source selection, nested composite type search, implementation witnesses, dynamic registration, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

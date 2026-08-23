@@ -11,6 +11,7 @@ use ling_resolve::{
 };
 use ling_source::{ByteOffset, Span};
 
+use crate::definition_projection::{DefinitionProjectionError, definition_projection};
 use crate::reference_span_index::ResolvedReferenceSpanIndex;
 
 /// Maximum declarations, bindings, and references in one checked hover index.
@@ -310,54 +311,28 @@ fn definition_entry(
     let definition = resolved
         .definition(&id)
         .ok_or(CheckedHoverIndexError::MissingDefinition)?;
-    let (kind, name, span) = if let Some(member) = resolved.trait_member(&id) {
-        let span = if declaration {
-            resolved
-                .module(member.module)
-                .and_then(|module| {
-                    module
-                        .hir
-                        .traits
-                        .iter()
-                        .find(|declaration| declaration.name.normalized == member.trait_name)
-                })
-                .and_then(|declaration| declaration.members.get(member.ordinal))
-                .filter(|declaration| declaration.name.normalized == member.member_name)
-                .map(|declaration| declaration.name.span)
-                .ok_or(CheckedHoverIndexError::InvalidDefinitionSpan)?
-        } else {
-            span
-        };
-        (
-            CheckedHoverKind::TraitMember,
-            format!("{}.{}", member.trait_name, member.member_name),
-            span,
-        )
-    } else if let Some(member) = resolved.impl_member(&id) {
-        let span = if declaration {
-            resolved
-                .module(member.module)
-                .and_then(|module| module.hir.impls.get(member.impl_ordinal))
-                .and_then(|implementation| implementation.members.get(member.member_ordinal))
-                .filter(|definition| definition.name.normalized == member.member_name)
-                .map(|definition| definition.name.span)
-                .ok_or(CheckedHoverIndexError::InvalidDefinitionSpan)?
-        } else {
-            span
-        };
-        (
-            CheckedHoverKind::ImplementationMember,
-            member.member_name.clone(),
-            span,
-        )
+    let projection = definition_projection(resolved, &id).map_err(|error| match error {
+        DefinitionProjectionError::MissingDefinition => CheckedHoverIndexError::MissingDefinition,
+        DefinitionProjectionError::InvalidMember => CheckedHoverIndexError::InvalidDefinitionSpan,
+    })?;
+    let kind = if resolved.trait_member(&id).is_some() {
+        CheckedHoverKind::TraitMember
+    } else if resolved.impl_member(&id).is_some() {
+        CheckedHoverKind::ImplementationMember
     } else {
-        let kind = match definition.kind {
+        match definition.kind {
             DefinitionKind::Value => CheckedHoverKind::Value,
             DefinitionKind::Type => CheckedHoverKind::Type,
             DefinitionKind::Constructor => CheckedHoverKind::Constructor,
             DefinitionKind::Builtin => CheckedHoverKind::Builtin,
-        };
-        (kind, definition.name.clone(), span)
+        }
+    };
+    let span = if declaration {
+        projection
+            .name_span
+            .ok_or(CheckedHoverIndexError::InvalidDefinitionSpan)?
+    } else {
+        span
     };
     let module = match definition.origin {
         DefinitionOrigin::User { module } => Some(module),
@@ -366,7 +341,7 @@ fn definition_entry(
     Ok(CheckedHoverEntry {
         source_name: source_name.to_owned(),
         span,
-        name,
+        name: projection.name,
         kind,
         mutable: definition.mutable,
         type_display: checked

@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 38 records: 34 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 18 Preview, 0 Stable.
+- 39 records: 35 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 19 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -23,6 +23,7 @@
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-HOVER` | Public | LSP | `ling.lsp.hover/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
+| `PROTO-LSP-NAVIGATION` | Public | LSP | `ling.lsp.navigation/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | Public | LSP | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | no | no | 4 |
 | `PROTO-LSP-PULL-DIAGNOSTICS` | Public | LSP | `ling.lsp.pull-diagnostics/0.2` | `Preview` | no | no | 5 |
@@ -171,6 +172,19 @@
 - Sources: [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0257-current-lsp-lifecycle-skeleton.md`](../decisions/0257-current-lsp-lifecycle-skeleton.md), [`docs/decisions/0258-current-lsp-position-encoding-boundary.md`](../decisions/0258-current-lsp-position-encoding-boundary.md), [`crates/ling-source/src/position.rs`](../../crates/ling-source/src/position.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
 - Fixtures: [`crates/ling-source/src/position.rs`](../../crates/ling-source/src/position.rs), [`crates/ling-lsp/tests/lifecycle.rs`](../../crates/ling-lsp/tests/lifecycle.rs), [`crates/ling-lsp/tests/position_encoding.rs`](../../crates/ling-lsp/tests/position_encoding.rs), [`crates/ling-cli/tests/lsp.rs`](../../crates/ling-cli/tests/lsp.rs), [`tests/protocols/lsp-lifecycle/README.md`](../../tests/protocols/lsp-lifecycle/README.md), [`docs/status/LSP-2101-IMPLEMENTATION-REPORT.md`](../status/LSP-2101-IMPLEMENTATION-REPORT.md), [`docs/status/LSP-2102-IMPLEMENTATION-REPORT.md`](../status/LSP-2102-IMPLEMENTATION-REPORT.md)
 - Notes: DEC-0257 accepts the RFC-0004 lifecycle implementation as bounded LSP-2101; DEC-0258 accepts DEC-0029 source projection plus RFC-0004 initialize negotiation as bounded LSP-2102. RFC-0029 extends the initialize capability object with explicit textDocumentSync incremental support and the current overlay marker without changing lifecycle transitions. Snapshots, cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
+
+### `PROTO-LSP-NAVIGATION` — Ling resolver-backed LSP navigation
+
+- Producer: ling lsp --stdio; ling-lsp navigation provider
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Validate optional object-valued definition, declaration, and typeDefinition capabilities plus optional boolean dynamicRegistration; accept only Ready-state requests naming an exact current Ling URI and exact negotiated position, while notifications perform no work.
+- Writer policy: Capture and revalidate one immutable snapshot, select one exact resolver reference, and return either one URI/range Location for the user definition/binding or direct checked nominal type definition, or null for absent/unsupported targets; never synthesize paths, URIs, virtual documents, arrays, or LocationLinks.
+- Unknown-field policy: Ignore ordinary unknown request and capability fields while rejecting malformed known members; incompatible method mapping, target policy, span, type peeling, field/cardinality, bound, snapshot, URI, failure, or null behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.navigation/0.1 is Preview with no predecessor and clients gate on the three standard provider booleans plus the exact lingNavigation discovery object.
+- Authority: `RFC-0038`, `RFC-0004`, `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `RFC-0037`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0075`
+- Sources: [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0037.md`](../RFC-0037.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`crates/ling-db/src/definition_projection.rs`](../../crates/ling-db/src/definition_projection.rs), [`crates/ling-db/src/navigation_index.rs`](../../crates/ling-db/src/navigation_index.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/navigation.rs`](../../crates/ling-lsp/src/navigation.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-db/src/navigation_index.rs`](../../crates/ling-db/src/navigation_index.rs), [`crates/ling-lsp/tests/navigation.rs`](../../crates/ling-lsp/tests/navigation.rs), [`tests/protocols/lsp-navigation/README.md`](../../tests/protocols/lsp-navigation/README.md), [`docs/status/IDE-2303-IMPLEMENTATION-REPORT.md`](../status/IDE-2303-IMPLEMENTATION-REPORT.md)
+- Notes: Navigation is a source presentation of unique resolver identity. Builtins/Prelude without source, generated/primitive virtual documents, multiple targets, and public identity/provenance remain explicit null or deferred behavior rather than fabricated locations.
 
 ### `PROTO-LSP-OVERLAY` — Ling LSP Preview document overlay
 

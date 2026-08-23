@@ -310,6 +310,28 @@ authority = ["RFC-0037", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-00
 notes = ["Hover is a presentation projection of complete checked compiler facts. It deliberately omits documentation and profile/resource claims for which no accepted compiler observation exists, and never publishes resolver/Semantic IDs, implementation ordinals, paths, or debug output."]
 
 [[protocol]]
+id = "PROTO-LSP-NAVIGATION"
+title = "Ling resolver-backed LSP navigation"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.navigation/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp navigation provider"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Validate optional object-valued definition, declaration, and typeDefinition capabilities plus optional boolean dynamicRegistration; accept only Ready-state requests naming an exact current Ling URI and exact negotiated position, while notifications perform no work."
+writer_policy = "Capture and revalidate one immutable snapshot, select one exact resolver reference, and return either one URI/range Location for the user definition/binding or direct checked nominal type definition, or null for absent/unsupported targets; never synthesize paths, URIs, virtual documents, arrays, or LocationLinks."
+unknown_field_policy = "Ignore ordinary unknown request and capability fields while rejecting malformed known members; incompatible method mapping, target policy, span, type peeling, field/cardinality, bound, snapshot, URI, failure, or null behavior requires a new marker and migration evidence."
+migration_tool = "None; ling.lsp.navigation/0.1 is Preview with no predecessor and clients gate on the three standard provider booleans plus the exact lingNavigation discovery object."
+fixtures = ["crates/ling-db/src/navigation_index.rs", "crates/ling-lsp/tests/navigation.rs", "tests/protocols/lsp-navigation/README.md", "docs/status/IDE-2303-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0038.md", "docs/RFC-0004.md", "docs/RFC-0005.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0037.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0075-ide-resolved-reference-index.md", "crates/ling-db/src/definition_projection.rs", "crates/ling-db/src/navigation_index.rs", "crates/ling-db/src/lib.rs", "crates/ling-lsp/src/navigation.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.navigation/0.1", "textDocument/definition", "textDocument/declaration", "textDocument/typeDefinition", "definitionProvider", "declarationProvider", "typeDefinitionProvider", "lingNavigation"]
+authority = ["RFC-0038", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0037", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0075"]
+notes = ["Navigation is a source presentation of unique resolver identity. Builtins/Prelude without source, generated/primitive virtual documents, multiple targets, and public identity/provenance remain explicit null or deferred behavior rather than fabricated locations."]
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 title = "Ling LSP bounded document formatting"
 category = "LSP"

@@ -1081,6 +1081,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0038"
+title = "Resolver-backed LSP Navigation Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0038.md"
+covers = ["ling.lsp.navigation/0.1", "bounded textDocument definition/declaration/typeDefinition over exact resolver references", "workspace/dependency URI and checked direct-nominal type-location projection"]
+depends_on = ["RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0037", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0075", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"
