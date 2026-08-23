@@ -2,106 +2,76 @@
 
 ## Outcome
 
-`LSP-2401` is correctly recorded as `BlockedSpec`. The execution plan proposes
-standard LSP token types, Ling-specific types such as `effect`, `capability`,
-`resource`, `actor`, `node`, `kernel`, and `semanticId`, and modifiers such as
-`declaration`, `mutable`, `borrowed`, and `generated`. No accepted repository
-decision defines this taxonomy, client negotiation, semantic mapping, or
-fallback behavior.
+`LSP-2401` is authorized and complete under Accepted RFC-0046. The RFC defines
+the Seed taxonomy, modifier semantics, checked-to-lexical evidence precedence,
+conservative recovery, deterministic client-supported legend projection,
+original-span/line-splitting rules, and explicit privacy and future-category
+exclusions as `ling.semantic-token-taxonomy/0.1`.
 
-No token taxonomy RFC, protocol registry entry, token generator, custom token
-kind, modifier, diagnostic allocation, or placeholder LSP surface was added.
-Accepted DEC-0084 and the bounded `LSP-2401-LEXICAL-SOURCE` child now add only
-an internal source-order inventory of existing lexer kinds, original spans, and
-source spelling; the public taxonomy remains blocked.
+This task is the taxonomy RFC/decision milestone. It intentionally does not
+advertise `semanticTokensProvider` or implement a request: typed generation and
+full/delta transport remain LSP-2402 and LSP-2403. The protocol inventory now
+records that planned public surface accurately as `Future` and unimplemented.
 
 ## Normative traceability
 
-- The execution package is non-normative; the listed standard/custom token
-  names and modifiers are design inputs only.
-- `docs/SEMANTICS.md` defines language concepts such as Effect, Capability,
-  Ownership, and Semantic IDs, but it does not authorize their presentation as
-  LSP token types or modifiers.
-- DEC-0002 makes original UTF-8 `SourceId + Span` authoritative and requires an
-  explicit SourceMap projection for LSP UTF-16 positions. It does not define
-  token ranges, overlap, ordering, or client encoding negotiation.
-- DEC-0012 fixes Semantic IDs/canonical bytes. The registered
-  `PROTO-SEMANTIC-GRAPH-JSON` projections are Experimental and do not define a
-  semantic-token taxonomy or `semanticId` token disclosure.
-- Accepted DEC-0084 authorizes only `CompilerDb::token_source_index`: it
-  preserves existing lexer `TokenKind`, original UTF-8 `Span`, source spelling,
-  source order, and lexical-error visibility. It explicitly does not define a
-  semantic-token category, legend, modifier, position projection, negotiation,
-  or transport.
-- `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves graph/transaction field
-  stability, compatibility, stale handling, and migration open;
-  `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves editor position/version and
-  protocol fields open. RFC-0005/DEC-0027 explicitly provide no public Trait or
-  witness projection.
+- RFC-0046 is the sole Accepted taxonomy authority. It selects 18 standard LSP
+  token types, six standard modifiers, optional custom `mutable`, exact role
+  mapping, modifier exclusivity, evidence precedence, fallback, projection,
+  span, freshness, privacy, and migration requirements.
+- RFC-0004/RFC-0029 and DEC-0029 govern capability validation and negotiated
+  positions. RFC-0023/RFC-0030/DEC-0071 govern immutable document/workspace
+  snapshots. DEC-0002 keeps original UTF-8 spans authoritative.
+- DEC-0012 prohibits Definition/Semantic identity leakage. DEC-0073/DEC-0075
+  provide resolver-owned definitions/references. DEC-0084 through DEC-0087
+  provide the lexical, checked-identity, revision, and fixture observations on
+  which later generation may rely.
+- The lower-authority plan's `effect`, `capability`, `resource`, `actor`,
+  `node`, `kernel`, `semanticId`, `borrowed`, `unsafeBoundary`, and `generated`
+  proposals are not copied into the taxonomy without exact implemented source
+  roles and privacy/migration authority.
 
 ## Current interface evidence
 
-- `ling-semantic` produces checked/Experimental graph definitions, nodes, and
-  references, but no token categories, modifiers, source-origin policy, or LSP
-  writer.
-- Compiler syntax/highlight fixtures and Tree-sitter captures are not a typed
-  Semantic Token protocol and cannot authorize semantic categories.
-- `ling-source` preserves byte spans and scalar columns, but no negotiated
-  UTF-16 mapping, same-version requirement, non-overlap validation, or client
-  fallback behavior exists.
-- No token taxonomy registry, capability negotiation, profile/redaction policy,
-  or fixture covers standard/custom mappings, unknown custom kinds, effect/
-  capability disclosure, Semantic IDs, generated/error-recovery regions,
-  Unicode/CRLF/BOM, ordering, or migration.
-- The new lexical-source index is an internal compiler observation only; it is
-  not an LSP range list and does not reinterpret layout, trivia, error, or EOF
-  tokens as semantic categories.
+- The exact canonical type/modifier orders and role mappings now have Accepted
+  authority, including module/type/variant/Trait/record/type-parameter/
+  parameter/value/field/constructor/function/member and lexical roles.
+- Checked identity wins over structural evidence, which wins over the limited
+  lexical fallback. Unresolved identifiers, errors, layout, punctuation, EOF,
+  and synthetic zero-width tokens emit nothing.
+- Client support is projected through a fixed fallback table; unsupported
+  modifiers are omitted without changing analysis, and an empty selected type
+  legend cannot advertise a provider.
+- Multiline spans split into nonempty line-local segments; original spans,
+  UTF-8/16/32 projection, non-overlap, snapshot freshness, and open-document
+  version freshness are fixed before transport implementation.
+- Inferred type/Effect/Capability facts, Semantic IDs, DefinitionIds, host
+  paths, and future language concepts are excluded from token data.
 
-## Required authority before implementation
+## Acceptance boundary
 
-An Accepted RFC or decision must define, at minimum:
-
-1. standard-token mapping and the necessity, names, versioning, and client
-   capability negotiation of every Ling-specific type/modifier;
-2. source categories and precedence for syntax, resolved HIR/Checked Core,
-   Effect/Capability, ownership/mutability, declarations, generated/dependency,
-   and error-recovery fallback, including redaction and profile policy;
-3. token span truth, UTF-8/UTF-16 SourceMap projection, same-document-version
-   binding, non-overlap/position ordering, duplicate/conflict resolution, and
-   Semantic ID/provenance treatment;
-4. full/delta protocol fields, unknown-token fallback, cancellation/limits,
-   protocol inventory, Stable versus Experimental lifecycle, localization, and
-   migration; and
-5. executable positive/negative fixtures for standard/custom mappings,
-   modifiers, unknown-client fallback, Chinese columns/emoji, CRLF/BOM,
-   nested/shadowed symbols, mutable fields, effects/capabilities, generated and
-   syntax-error regions, deterministic ordering, version mismatch, and
-   migration.
-
-Until these decisions are Accepted, token kinds could expose unapproved
-capability/effect information, bind semantic output to non-authoritative spans,
-or become an irreversible client compatibility surface.
+RFC-0046 and its lifecycle record are the executable-design authority required
+by this task. `PROTO-LSP-SEMANTIC-TOKENS` remains `Planned public`, `Future`, and
+`implemented = false`; therefore the registry, support matrix, initialize
+response, and existing diagnostic transcripts make no false provider claim.
+LSP-2402 must implement typed classification and fixtures against this mapping;
+LSP-2403 must separately accept and implement the wire transport.
 
 ## Evidence and compatibility
 
-This audit was checked against `docs/SEMANTICS.md`, `docs/LANGUAGE.md`,
-`docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, RFC-0005,
-DEC-0084,
-`docs/decisions/0027-trait-checked-core-dictionary-witness.md`,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the `ling-semantic`, `ling-source`, `ling-syntax`, and editor fixture
-directories.
+Evidence is `docs/RFC-0046.md`, its Accepted authority/lifecycle records, the
+Future protocol/support records, DEC-0084 through DEC-0087, and
+`docs/status/LSP-2401-IMPLEMENTATION-REPORT.md`.
 
-Only the internal `ling-db` lexical-source observation changed; no compiler
-language semantics, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-public source-span projection, runtime, or Unicode 17.0.0 behavior changed.
+Only governance and taxonomy authority changes. No provider, request, token
+generator, diagnostic, schema, Semantic ID, public data, compiler language
+semantics, interpreter, VM, bytecode, ABI, runtime, package, filesystem/network,
+or Unicode 17.0.0 behavior changes.
 
 ## Intentionally deferred
 
-The bounded lexical-source child is complete under DEC-0084. Public
-`LSP-2401` can begin only after the token taxonomy, position/version, Semantic
-Graph lifecycle, and client negotiation decisions are Accepted. The future
-implementation must derive tokens from checked data, preserve source-span and
-identity truth, redact capabilities explicitly, provide deterministic fallback,
-and label experimental categories.
+Typed token generation, reference classification implementation, provider
+advertisement, full/delta/result IDs, request/document scope, temporary and
+dependency policy, caching, limits, cancellation, stale error codes, fixture
+schema, Zed presentation, Stable lifecycle, and Semantic Transactions remain
+LSP-2402 through LSP-2404 and LSP-2501/LSP-2502 work.

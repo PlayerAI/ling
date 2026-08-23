@@ -7815,7 +7815,7 @@ notes = [
 [[task]]
 id = "LSP-2401"
 title = "Semantic token taxonomy RFC/decision"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -7830,30 +7830,52 @@ spec = [
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/RFC-0005.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0029.md",
+  "docs/RFC-0030.md",
+  "docs/RFC-0036.md",
+  "docs/RFC-0046.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
+  "docs/decisions/0073-ide-resolved-definition-index.md",
+  "docs/decisions/0075-ide-resolved-reference-index.md",
+  "docs/decisions/0084-lsp-lexical-token-source-index.md",
+  "docs/decisions/0085-lsp-checked-token-identity-observation.md",
+  "docs/decisions/0086-lsp-checked-token-snapshot-identity.md",
+  "docs/decisions/0087-lsp-checked-token-source-fixtures.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "docs/RFC-0046.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
   "docs/status/LSP-2401-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2401-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing standard/custom token taxonomy, modifiers, source mapping, client negotiation, position/version, Semantic ID/provenance, redaction, and protocol lifecycle contracts.",
-  "The audit covers Effect/Capability/resource/custom categories, declarations/mutability/generated modifiers, checked-core versus syntax-error fallback, unknown-client behavior, Unicode/CRLF/BOM, overlap/order, version mismatch, deterministic output, and required fixtures.",
-  "No token taxonomy RFC, protocol registry entry, token generator, custom kind, modifier, diagnostic allocation, Semantic ID change, or placeholder LSP API is added while the authority is absent.",
-  "The future implementation must derive tokens from checked data, preserve source-span/ID truth, redact capabilities explicitly, provide deterministic fallback, and label experimental categories.",
+  "Accepted RFC-0046 fixes ling.semantic-token-taxonomy/0.1 with 18 standard token types, six standard modifiers, optional custom mutable, exact Seed role mappings, and modifier exclusivity.",
+  "Checked identity, compiler structural roles, and limited lexer fallback have a strict precedence; unresolved identifiers, errors, layout, punctuation, EOF, and zero-width synthetic tokens emit nothing rather than fabricating semantic success.",
+  "Deterministic client-supported projection, fallback, deduplication, original UTF-8 span truth, multiline line splitting, UTF-8/16/32 projection, non-overlap, snapshot/version freshness, identity redaction, and migration are normative.",
+  "Effect, Capability, resource, actor, node, kernel, Semantic ID, ownership, borrow, unsafe, and generated categories are explicitly excluded until exact implemented source-role, privacy, fallback, negotiation, and migration authority exists.",
+  "The protocol and support registries accurately record semantic tokens as Planned public, Future, and unimplemented; no provider, request, current protocol version, schema, or fixture is falsely claimed before LSP-2402/LSP-2403.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "cdc70731f75e27fc508402304e628dcc334c20fb"
+completion_commit = "cdc70731f75e27fc508402304e628dcc334c20fb"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "LSP-2401 is BlockedSpec by the missing semantic-token taxonomy/negotiation decision, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, LSP-2101/LSP-2102, and the absence of a semantic-token protocol inventory entry.",
-  "Current semantic and syntax fixtures provide graph/highlight inputs but no accepted typed-token mapping, custom-token stability, client fallback, modifier, or capability redaction contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "LSP-2401 is the taxonomy RFC/decision milestone; typed classification remains LSP-2402 and full/delta wire transport remains LSP-2403, so no semanticTokensProvider is advertised by this completion.",
+  "RFC-0046 uses existing DEC-0084 through DEC-0087 compiler observations and treats Tree-sitter captures only as separate lexical editor fallback, never semantic truth.",
+  "No diagnostic allocation, schema, Semantic ID/canonical-byte, compiler language semantics, Typed Core evaluation, interpreter/VM/bytecode/ABI/package, filesystem/network, source-span truth, or Unicode 17.0.0 table changes.",
 ]
 
 [[task]]
