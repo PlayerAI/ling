@@ -7228,3 +7228,32 @@ unresolved_alternatives = [
   "Missing-import, confusable-rename, mutability, match-case, stale-syntax, diagnostic quick-fix, multi-document, resolve, command, annotation, generated/dependency mutation, cancellation, general Semantic Transaction, and Stable lifecycle behavior remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0045"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0045.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact provider and discovery, lifecycle, notification silence, params, query byte and NUL bounds, empty query, fixed failures, and response bounds.",
+  "Cover exact and prefix matching, no case, normalization, fuzzy, or module matching, kind mapping, module containers, workspace URIs, dependency and temporary exclusion, and compiler failure.",
+  "Cover Unicode, Chinese, decomposed and NFC distinctions, emoji and combining prefixes, BOM, CRLF, UTF-8/16/32 positions, duplicate names, insertion order, exact-before-prefix ordering, deterministic 256-result truncation, and repeat equality.",
+  "Verify equal-snapshot cache reuse, document, revision, position and input invalidation, failed-build isolation, freshness, and absence of persistence semantics.",
+  "Verify cooperative pre-cancel and in-flight cancellation return -32800 without partial publication or cache mutation while retaining the explicit absence of a stdio $/cancelRequest claim.",
+  "Add exact protocol fixtures and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, diff, and execution-plan checksum gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.workspace-symbol/0.1 with no predecessor and one standard workspaceSymbolProvider capability.",
+  "Consumes the existing resolved-definition inventory and DEC-0031 cancellation token through one disposable complete-snapshot presentation cache without changing compiler identity or semantics.",
+  "Adds no diagnostic code, JSON schema, Semantic ID, DefinitionId, Ling syntax or semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, package, filesystem/network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Dependency, generated, builtin and Prelude search, explicit package fields, top-level-only filtering, fuzzy, case-folded, normalized and module search, scores, configurable limits, resolve, partial results, work-done progress, stdio $/cancelRequest, concurrent scheduling, persistence, filesystem discovery, Stable lifecycle, and general Semantic Transactions remain deferred.",
+]
+superseded_by = ""

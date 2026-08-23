@@ -1172,6 +1172,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0045"
+title = "Snapshot-indexed LSP Workspace Symbols Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0045.md"
+covers = ["ling.lsp.workspace-symbol/0.1", "resolver-backed exact and prefix workspace symbol search with module and workspace URI context", "complete-snapshot cache reuse, deterministic truncation, negotiated positions, freshness, cooperative cancellation, and bounded atomic publication"]
+depends_on = ["RFC-0004", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0036", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0031", "DEC-0071", "DEC-0073", "DEC-0082", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"
