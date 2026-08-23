@@ -257,6 +257,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0224` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0224](../decisions/0224-convenience-api-removal-audit-boundary-evidence.md) |
 | `DEC-0225` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0225](../decisions/0225-unicode-chinese-stability-boundary-evidence.md) |
 | `DEC-0226` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0226](../decisions/0226-local-package-publication-boundary-evidence.md) |
+| `DEC-0227` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0227](../decisions/0227-hermetic-build-exclusion-boundary-evidence.md) |
 
 ## Migration boundary
 

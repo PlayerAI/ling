@@ -5806,3 +5806,30 @@ unresolved_alternatives = [
   "Publisher/source coordinates; namespace ownership and transfer; archive and artifact formats; checksums, signatures, provenance, SBOM, licenses, trust roots, and transparency; registry and installation operations; yanking/deprecation; mirrors and offline caches; version selection; CLI and diagnostics; compatibility, migration, and security fixtures remain open under PKG-6401, later package tasks, and future Accepted authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0227"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0227-hermetic-build-exclusion-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert manifest and local-dependency rejection of representative build and host-authority fields.",
+  "Assert absence of build executor, script, shell, subprocess, and network routes from the local project implementation.",
+  "Assert all sixty local boundaries, exact ordering, duplicate rejection, and order-independent opaque bytes.",
+  "Run project, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+  "Defer every build execution, sandbox, artifact, and replay behavior until dedicated Accepted authority defines the public contracts and executable security and reproducibility evidence.",
+]
+compatibility_impact = [
+  "Adds only negative manifest and test-local evidence. Manifest, lock, package identity, dependency resolution, compiler/query/cache behavior, diagnostics, CLI, profiles, targets, artifacts, Semantic IDs, source spans, dependencies, Unicode 17.0.0, and support claims remain unchanged.",
+  "No build graph, node, executor, script/plugin, generator, sandbox, Capability, manifest field, artifact, cache/replay, command, diagnostic, public API, or support claim is added.",
+]
+unresolved_alternatives = [
+  "Typed build nodes and graphs; inputs/outputs and Capabilities; sandbox and resource policies; plugins/generators; environment/network/filesystem/process authority; build-plan and artifact identities; cache/replay/corruption; profiles/targets/toolchains; CLI and diagnostics; compatibility, migration, cross-process, cross-platform, and security fixtures remain open under PKG-6402, later package tasks, and future Accepted authority.",
+]
+superseded_by = ""

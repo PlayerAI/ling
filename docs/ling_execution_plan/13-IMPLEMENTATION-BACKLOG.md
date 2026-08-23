@@ -527,6 +527,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PKG-6401` | G6 | 包发布协议 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:210`, `docs/status/PKG-6401-AUTHORITY-AUDIT.md` |
 | `PKG-6401-OBSERVATION` | G6 | Local package and publication-exclusion boundary evidence | S | Done | Accepted `DEC-0226`; see `crates/ling-project/tests/package_publication_boundary.rs`, `crates/ling-types/tests/package_publication_boundary_evidence.rs`, and `docs/status/PKG-6401-OBSERVATION-IMPLEMENTATION-REPORT.md`; publication/registry/supply-chain semantics remain BlockedSpec |
 | `PKG-6402` | G6 | Hermetic Build | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:226`, `docs/status/PKG-6402-AUTHORITY-AUDIT.md` |
+| `PKG-6402-OBSERVATION` | G6 | Hermetic-build exclusion boundary evidence | S | Done | Accepted `DEC-0227`; see `crates/ling-project/tests/hermetic_build_boundary.rs`, `crates/ling-types/tests/hermetic_build_boundary_evidence.rs`, and `docs/status/PKG-6402-OBSERVATION-IMPLEMENTATION-REPORT.md`; build graph/executor/sandbox/artifact semantics remain BlockedSpec |
 | `PKG-6403` | G6 | Registry 最小实现或推迟策略 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:239`, `docs/status/PKG-6403-AUTHORITY-AUDIT.md` |
 | `PKG-6404` | G6 | 供应链攻击测试 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:248`, `docs/status/PKG-6404-AUTHORITY-AUDIT.md` |
 | `COMPAT-6501` | G6 | 历史 Corpus | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:265`, `docs/status/COMPAT-6501-AUTHORITY-AUDIT.md` |

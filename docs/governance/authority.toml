@@ -3458,3 +3458,16 @@ covers = ["PKG-6401 bounded local package and publication-exclusion evidence", "
 depends_on = ["RFC-0002", "DEC-0007", "DEC-0012", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0227"
+title = "Hermetic-build exclusion boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0227-hermetic-build-exclusion-boundary-evidence.md"
+covers = ["PKG-6402 bounded hermetic-build exclusion evidence", "RFC-0002 manifest and local-dependency rejection of build execution and host authority", "test-only observation without build graph, executor, sandbox, artifact, cache, or replay semantics"]
+depends_on = ["RFC-0002", "DEC-0010", "DEC-0019", "DEC-0022", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
