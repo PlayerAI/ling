@@ -119,7 +119,7 @@ const REQUIRED_LSP_MARKERS: &[(&str, &[&str])] = &[
             "id = \"PROTO-LSP-LIFECYCLE\"",
             "current_version = \"ling.lsp.lifecycle/0.1\"",
             "id = \"PROTO-LSP-OVERLAY\"",
-            "current_version = \"ling.lsp.overlay/0.1\"",
+            "current_version = \"ling.lsp.overlay/0.2\"",
             "ling lsp --stdio",
         ],
     ),

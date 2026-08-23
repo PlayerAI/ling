@@ -42,7 +42,7 @@ fn open_params(uri: &str, version: i64, text: &str) -> Value {
 
 #[test]
 fn workspace_overlay_is_full_sync_and_disk_changes_are_revealed_on_close() {
-    assert_eq!(OVERLAY_PROTOCOL_VERSION, "ling.lsp.overlay/0.1");
+    assert_eq!(OVERLAY_PROTOCOL_VERSION, "ling.lsp.overlay/0.2");
     let mut server = ready_server();
     let uri = "ling://workspace/src/Main.ling";
     let opened = server.handle_json(&request(

@@ -964,6 +964,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0029"
+title = "LSP incremental document changes"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0029.md"
+covers = ["ling.lsp.overlay/0.2", "ordered negotiated-position incremental didChange batches", "failure-atomic VFS publication and full-replacement equivalence"]
+depends_on = ["RFC-0004", "RFC-0023", "DEC-0002", "DEC-0019", "DEC-0029", "DEC-0069", "DEC-0070", "DEC-0258", "DEC-0259", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

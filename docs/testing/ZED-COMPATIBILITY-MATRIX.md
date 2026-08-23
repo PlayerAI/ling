@@ -29,7 +29,7 @@ instead of inferred from a development tool.
 | --- | --- | --- |
 | Zed minimum/tested version | No Zed extension package or Zed CI job exists in this repository | Not established; no support claim |
 | Ling compiler | CLI is `ling`, source extension is `.ling`, language version is `0.0.1-dev`; compiler conformance runs on the locked Rust workspace | Seed compiler evidence only; no Zed integration |
-| LSP executable/version | `ling lsp --stdio`; `ling.lsp.lifecycle/0.1` Preview and `ling.lsp.overlay/0.1` Experimental fixtures; no released Zed language-server artifact | Preview lifecycle/overlay only; no Zed compatibility range |
+| LSP executable/version | `ling lsp --stdio`; `ling.lsp.lifecycle/0.1` Preview and `ling.lsp.overlay/0.2` Experimental fixtures; no released Zed language-server artifact | Preview lifecycle/overlay only; no Zed compatibility range |
 | Tree-sitter grammar | `editors/tree-sitter-ling`, package `0.0.1-dev`, grammar metadata `source.ling`, `.ling` file type | Editor-only implementation; no Stable node compatibility |
 | Grammar revision | Current tracked grammar snapshot; generated parser and Unicode ranges were regenerated without worktree drift before the local suite | Pinned for this evidence snapshot, not a public Zed release tag |
 | Tree-sitter CLI / Node | `tree-sitter-cli@0.26.12` in `package-lock.json`; Node `>=20` in `package.json` | Locked development toolchain; no consumer guarantee |

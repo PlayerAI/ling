@@ -128,32 +128,32 @@ writer_policy = "Emit only framed compact UTF-8 JSON-RPC responses for initializ
 unknown_field_policy = "Unknown JSON-RPC object fields and ASCII transport headers are ignored for this Preview; unknown methods are rejected only when they are requests, and future incompatible fields require a new protocol version."
 migration_tool = "None; `ling.lsp.lifecycle/0.1` is current-writer-only and a future Stable/editor contract requires an accepted migration specification."
 fixtures = ["crates/ling-source/src/position.rs", "crates/ling-lsp/tests/lifecycle.rs", "crates/ling-lsp/tests/position_encoding.rs", "crates/ling-cli/tests/lsp.rs", "tests/protocols/lsp-lifecycle/README.md", "docs/status/LSP-2101-IMPLEMENTATION-REPORT.md", "docs/status/LSP-2102-IMPLEMENTATION-REPORT.md"]
-sources = ["docs/RFC-0004.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0257-current-lsp-lifecycle-skeleton.md", "docs/decisions/0258-current-lsp-position-encoding-boundary.md", "crates/ling-source/src/position.rs", "crates/ling-lsp/src/lib.rs", "crates/ling-cli/src/main.rs"]
+sources = ["docs/RFC-0004.md", "docs/RFC-0029.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0257-current-lsp-lifecycle-skeleton.md", "docs/decisions/0258-current-lsp-position-encoding-boundary.md", "crates/ling-source/src/position.rs", "crates/ling-lsp/src/lib.rs", "crates/ling-cli/src/main.rs"]
 version_markers = ["ling.lsp.lifecycle/0.1", "ling lsp --stdio"]
-authority = ["RFC-0004", "DEC-0029", "DEC-0257", "DEC-0258"]
-notes = ["DEC-0257 accepts the RFC-0004 lifecycle implementation as bounded LSP-2101; DEC-0258 accepts DEC-0029 source projection plus RFC-0004 initialize negotiation as bounded LSP-2102. The Preview lifecycle covers initialize/initialized/shutdown/exit, explicit UTF-8/16/32 selection, shared strict SourceMap conversion, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity; later methods retain independent authorities, while snapshots, cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred."]
+authority = ["RFC-0004", "DEC-0029", "DEC-0257", "DEC-0258", "RFC-0029"]
+notes = ["DEC-0257 accepts the RFC-0004 lifecycle implementation as bounded LSP-2101; DEC-0258 accepts DEC-0029 source projection plus RFC-0004 initialize negotiation as bounded LSP-2102. RFC-0029 extends the initialize capability object with explicit textDocumentSync incremental support and the current overlay marker without changing lifecycle transitions. Snapshots, cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred."]
 
 [[protocol]]
 id = "PROTO-LSP-OVERLAY"
 title = "Ling LSP Preview document overlay"
 category = "LSP"
 visibility = "Public"
-current_version = "ling.lsp.overlay/0.1"
+current_version = "ling.lsp.overlay/0.2"
 stability = "Experimental"
 implemented = true
 public_schema = false
 canonical = false
 producer = ["ling lsp --stdio", "ling-lsp overlay adapter"]
 consumer = ["Preview LSP clients", "editor and integration test harnesses"]
-reader_policy = "Accept only the restricted ling://workspace, ling://dependency, and untitled://ling URI forms; require non-negative monotonic document versions and exactly one full-text change; reject invalid, stale, closed, ranged, oversized, or read-only edits without VFS mutation."
-writer_policy = "Retain exact UTF-8 text in the session-local VFS, preserve overlay precedence over disk, reveal the latest disk layer on close, remove temporary untitled files, and expose no SourceId or host path on the wire."
-unknown_field_policy = "Unknown JSON-RPC fields are ignored by the current Preview parser except range/rangeLength on full-sync changes, which are rejected; incompatible URI, version, or edit evolution requires a new protocol version."
-migration_tool = "None; ling.lsp.overlay/0.1 is current-writer-only and remains Experimental."
-fixtures = ["crates/ling-lsp/tests/overlay.rs", "tests/protocols/lsp-overlay/README.md", "docs/status/LSP-2103-IMPLEMENTATION-REPORT.md"]
-sources = ["docs/RFC-0023.md", "docs/decisions/0259-current-lsp-open-document-overlay.md", "crates/ling-lsp/src/lib.rs", "crates/ling-source/src/vfs.rs"]
-version_markers = ["ling.lsp.overlay/0.1", "textDocument/didOpen", "textDocument/didChange", "textDocument/didClose"]
-authority = ["RFC-0023", "RFC-0004", "DEC-0019", "DEC-0259"]
-notes = ["DEC-0259 accepts the RFC-0023 implementation as the complete bounded LSP-2103 parent: path-free URI/file state, exact full-text overlays, monotonic client versions, disk reveal or temporary removal on close, and dependency read-only rejection. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, Semantic Transactions, and Stable compatibility remain deferred."]
+reader_policy = "Accept only restricted ling://workspace, ling://dependency, and untitled://ling URI forms; require an open writable document, a strictly newer non-negative version, and 1-64 ordered full or negotiated-position range changes; reject invalid, stale, closed, malformed, boundary-invalid, oversized, or read-only batches without VFS or version mutation."
+writer_policy = "Apply every change in protocol order to immutable local SourceFile snapshots, rebuild SourceMap/line indexes after each entry, publish the final exact UTF-8 bytes once, preserve overlay precedence, reveal disk or remove temporary files on close, and expose no SourceId, revision, or host path on the wire."
+unknown_field_policy = "Unknown ordinary JSON-RPC fields are ignored by the Experimental parser; rangeLength is rejected, range/start/end/line/character shapes are validated exactly by type and bounds, and incompatible URI/version/edit evolution requires a new protocol version."
+migration_tool = "None; the 0.2 server accepts every valid 0.1 single-full-change message, and clients discover the new marker and incremental capability during initialize."
+fixtures = ["crates/ling-lsp/tests/overlay.rs", "crates/ling-lsp/tests/incremental_changes.rs", "tests/protocols/lsp-overlay/README.md", "docs/status/LSP-2103-IMPLEMENTATION-REPORT.md", "docs/status/LSP-2104-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0023.md", "docs/RFC-0029.md", "docs/decisions/0069-lsp-utf8-edit-primitive.md", "docs/decisions/0070-lsp-position-edit-projection.md", "docs/decisions/0259-current-lsp-open-document-overlay.md", "crates/ling-lsp/src/lib.rs", "crates/ling-source/src/lib.rs", "crates/ling-source/src/position.rs", "crates/ling-source/src/vfs.rs"]
+version_markers = ["ling.lsp.overlay/0.2", "textDocument/didOpen", "textDocument/didChange", "textDocument/didClose"]
+authority = ["RFC-0023", "RFC-0029", "RFC-0004", "DEC-0019", "DEC-0029", "DEC-0069", "DEC-0070", "DEC-0259"]
+notes = ["DEC-0259 accepts RFC-0023 full-text overlays as bounded LSP-2103. RFC-0029 implements LSP-2104 by advancing the Experimental marker to 0.2, advertising incremental sync, and adding bounded ordered UTF-8/16/32 range batches with failure-atomic publication and full-replacement equivalence. Compiler queries, snapshots, stale analysis, diagnostics, Workspace Edits, cancellation, Semantic Transactions, and Stable compatibility remain deferred."]
 
 [[protocol]]
 id = "PROTO-LSP-FORMATTING"

@@ -2,9 +2,9 @@
 //! `ling lsp --stdio`.
 //!
 //! RFC-0004 is the authority for lifecycle and transport; RFC-0023 is the
-//! authority for the full-text document overlay boundary; RFC-0026 governs the
-//! bounded document-formatting response; DEC-0029 remains the authority for
-//! position projection.
+//! authority for the full-text document overlay boundary; RFC-0029 extends it
+//! with bounded incremental changes; RFC-0026 governs the bounded document-
+//! formatting response; DEC-0029 remains the authority for position projection.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -14,8 +14,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 pub use ling_source::{FileOrigin, PositionEncoding, Revision};
 use ling_source::{
-    SourceFile, SourceId, VfsError, VirtualFileSystem, negotiate_position_encoding,
-    validate_logical_name,
+    LspPosition, LspPositionEdit, SourceFile, SourceId, VfsError, VirtualFileSystem,
+    negotiate_position_encoding, validate_logical_name,
 };
 use serde_json::{Map, Value, json};
 
@@ -38,8 +38,8 @@ mod diagnostic_batch;
 
 /// Version marker for the current Preview lifecycle protocol.
 pub const PROTOCOL_VERSION: &str = "ling.lsp.lifecycle/0.1";
-/// Version marker for the full-text document overlay Preview extension.
-pub const OVERLAY_PROTOCOL_VERSION: &str = "ling.lsp.overlay/0.1";
+/// Version marker for the incremental document overlay Experimental extension.
+pub const OVERLAY_PROTOCOL_VERSION: &str = "ling.lsp.overlay/0.2";
 /// Version marker for the bounded document-formatting Experimental extension.
 pub const FORMATTING_PROTOCOL_VERSION: &str = "ling.lsp.formatting/0.1";
 /// JSON-RPC protocol version accepted by this server.
@@ -56,6 +56,8 @@ pub const MAX_WORKSPACE_URI_BYTES: usize = 4_096;
 pub const MAX_WORKSPACE_NAME_BYTES: usize = 256;
 /// Maximum UTF-8 byte length of one open-document text value.
 pub const MAX_DOCUMENT_BYTES: usize = MAX_FRAME_BYTES;
+/// Maximum number of ordered entries accepted in one incremental change batch.
+pub const MAX_CONTENT_CHANGES: usize = 64;
 
 const PARSE_ERROR: i32 = -32_700;
 const INVALID_REQUEST: i32 = -32_600;
@@ -348,10 +350,17 @@ struct DocumentIdentity {
     temporary: bool,
 }
 
-/// Errors raised while publishing or applying an RFC-0023 document overlay.
+#[derive(Clone, Debug, Eq, PartialEq)]
+enum DocumentChange {
+    Full(String),
+    Range(LspPositionEdit),
+}
+
+/// Errors raised while publishing or applying an RFC-0023/RFC-0029 document overlay.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum OverlayError {
     InvalidParams,
+    InvalidRange,
     InvalidUri,
     UnknownDocument,
     AlreadyOpen,
@@ -741,7 +750,7 @@ impl LspServer {
             return self.state_error_for(is_request, id);
         }
         let result = parse_change_params(&params)
-            .and_then(|(uri, version, text)| self.change_document(&uri, version, text));
+            .and_then(|(uri, version, changes)| self.change_document(&uri, version, changes));
         self.overlay_outcome(is_request, id, result)
     }
 
@@ -884,7 +893,7 @@ impl LspServer {
         &mut self,
         uri: &str,
         version: i64,
-        text: String,
+        changes: Vec<DocumentChange>,
     ) -> Result<(), OverlayError> {
         document_identity(uri)?;
         let record = self
@@ -904,8 +913,30 @@ impl LspServer {
                 requested: version,
             });
         }
+        let snapshot = self
+            .vfs
+            .snapshot(record.file)
+            .ok_or(OverlayError::UnknownDocument)?;
+        let mut bytes = snapshot.bytes().to_vec();
+        for change in changes {
+            bytes = match change {
+                // RFC-0023 accepts the exact UTF-8 JSON string as an overlay,
+                // including text that is not yet a valid Ling source file.
+                DocumentChange::Full(text) => text.into_bytes(),
+                DocumentChange::Range(edit) => {
+                    SourceFile::from_bytes(record.file, record.logical_name.clone(), bytes)
+                        .map_err(|_| OverlayError::InvalidRange)?
+                        .apply_lsp_position_edit(self.position_encoding, &edit)
+                        .map_err(|_| OverlayError::InvalidRange)?
+                        .into_original_bytes()
+                }
+            };
+            if bytes.len() > MAX_DOCUMENT_BYTES {
+                return Err(OverlayError::TextTooLarge);
+            }
+        }
         self.vfs
-            .open_overlay(record.file, text.into_bytes())
+            .open_overlay(record.file, bytes)
             .map_err(OverlayError::Vfs)?;
         let current = self
             .documents
@@ -1118,7 +1149,7 @@ fn parse_open_params(params: &Value) -> Result<(String, i64, String), OverlayErr
     Ok((uri, version, text))
 }
 
-fn parse_change_params(params: &Value) -> Result<(String, i64, String), OverlayError> {
+fn parse_change_params(params: &Value) -> Result<(String, i64, Vec<DocumentChange>), OverlayError> {
     let object = params.as_object().ok_or(OverlayError::InvalidParams)?;
     let text_document = object
         .get("textDocument")
@@ -1134,15 +1165,53 @@ fn parse_change_params(params: &Value) -> Result<(String, i64, String), OverlayE
         .get("contentChanges")
         .and_then(Value::as_array)
         .ok_or(OverlayError::InvalidParams)?;
-    if changes.len() != 1 {
+    if changes.is_empty() || changes.len() > MAX_CONTENT_CHANGES {
         return Err(OverlayError::InvalidParams);
     }
-    let change = changes[0].as_object().ok_or(OverlayError::InvalidParams)?;
-    if change.contains_key("range") || change.contains_key("rangeLength") {
-        return Err(OverlayError::InvalidParams);
+    let mut parsed = Vec::with_capacity(changes.len());
+    for change in changes {
+        let change = change.as_object().ok_or(OverlayError::InvalidParams)?;
+        if change.contains_key("rangeLength") {
+            return Err(OverlayError::InvalidParams);
+        }
+        let text = parse_text(change.get("text"))?;
+        if let Some(range) = change.get("range") {
+            let (start, end) = parse_range(range)?;
+            parsed.push(DocumentChange::Range(LspPositionEdit::new(
+                start,
+                end,
+                text.into_bytes(),
+            )));
+        } else {
+            parsed.push(DocumentChange::Full(text));
+        }
     }
-    let text = parse_text(change.get("text"))?;
-    Ok((uri, version, text))
+    Ok((uri, version, parsed))
+}
+
+fn parse_range(value: &Value) -> Result<(LspPosition, LspPosition), OverlayError> {
+    let range = value.as_object().ok_or(OverlayError::InvalidParams)?;
+    Ok((
+        parse_position(range.get("start"))?,
+        parse_position(range.get("end"))?,
+    ))
+}
+
+fn parse_position(value: Option<&Value>) -> Result<LspPosition, OverlayError> {
+    let position = value
+        .and_then(Value::as_object)
+        .ok_or(OverlayError::InvalidParams)?;
+    let line = position
+        .get("line")
+        .and_then(Value::as_u64)
+        .and_then(|value| u32::try_from(value).ok())
+        .ok_or(OverlayError::InvalidParams)?;
+    let character = position
+        .get("character")
+        .and_then(Value::as_u64)
+        .and_then(|value| u32::try_from(value).ok())
+        .ok_or(OverlayError::InvalidParams)?;
+    Ok(LspPosition::new(line, character))
 }
 
 fn parse_close_params(params: &Value) -> Result<String, OverlayError> {
@@ -1268,6 +1337,10 @@ fn overlay_error_details(error: &OverlayError) -> (i32, &'static str) {
             (INVALID_PARAMS, "文档状态无效 / invalid document state")
         }
         OverlayError::AlreadyOpen => (INVALID_PARAMS, "文档已经打开 / document is already open"),
+        OverlayError::InvalidRange => (
+            INVALID_PARAMS,
+            "文档编辑范围无效 / invalid document edit range",
+        ),
         OverlayError::InvalidParams | OverlayError::Vfs(_) => {
             (INVALID_PARAMS, "文档参数无效 / invalid document parameters")
         }
@@ -1465,6 +1538,16 @@ fn initialize_result(encoding: PositionEncoding) -> Value {
         "capabilities": {
             "positionEncoding": encoding.wire_name(),
             "documentFormattingProvider": true,
+            "experimental": {
+                "lingOverlay": {
+                    "changeLimit": MAX_CONTENT_CHANGES,
+                    "version": OVERLAY_PROTOCOL_VERSION,
+                },
+            },
+            "textDocumentSync": {
+                "change": 2,
+                "openClose": true,
+            },
             "workspace": {
                 "workspaceFolders": {
                     "changeNotifications": false,

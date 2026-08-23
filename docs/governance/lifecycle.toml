@@ -6780,3 +6780,30 @@ unresolved_alternatives = [
   "Dynamic path/package/module/symbol completion, installation, descriptions, localization, plugins, future command discovery, and Stable compatibility remain separately governed.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0029"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0029.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Cover ordered multi-range and mixed full/range batches across UTF-8/16/32, Chinese text, emoji, combining marks, BOM, CRLF, newlines, and rebuilt line indexes.",
+  "Compare incremental batches with exact full replacements and repeated runs across a table-driven corpus.",
+  "Reject malformed, empty, over-limit, stale, read-only, ranged-boundary, invalid-result, and oversized batches while proving bytes, version, VFS revision, and history remain unchanged.",
+  "Verify exact incremental-sync capability fields and retain RFC-0023 single-full-change compatibility.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, locked/offline, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Advances the Experimental overlay marker to ling.lsp.overlay/0.2, advertises incremental synchronization, and accepts bounded ordered range batches while retaining every valid 0.1 single-full-change message.",
+  "Adds no Ling diagnostic, language semantics, schema, Semantic ID, source-span, runtime, bytecode, VM, ABI, package, filesystem/network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Concurrent changes, version vectors, rangeLength, save semantics, host-file resolution, project reload, compiler snapshots, diagnostics, cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.",
+]
+superseded_by = ""

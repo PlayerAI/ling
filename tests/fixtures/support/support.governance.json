@@ -491,7 +491,7 @@
     {
       "id": "PROTO-LSP-OVERLAY",
       "visibility": "Public",
-      "version": "ling.lsp.overlay/0.1",
+      "version": "ling.lsp.overlay/0.2",
       "stability": "Experimental",
       "implemented": true
     },

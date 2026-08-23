@@ -2,12 +2,11 @@
 
 ## Outcome
 
-`LSP-2104-UTF8-EDITS` is a bounded child of the blocked `LSP-2104` target,
-authorized by Accepted `DEC-0069`. It covers only immutable, in-process
-application of original UTF-8 byte ranges. The parent remains `BlockedSpec`
-because the public range schema, negotiated position adapter, document-version
-policy, VFS publication transaction, and stale-result behavior are not
-accepted.
+`LSP-2104-UTF8-EDITS` is a bounded source child authorized by Accepted
+`DEC-0069`. It covers only immutable, in-process application of original UTF-8
+byte ranges. Accepted `RFC-0029` now supplies the separate public range schema,
+negotiated-position adapter, document-version policy, and failure-atomic VFS
+publication needed to compose the completed `LSP-2104` parent.
 
 ## Normative traceability
 
@@ -16,9 +15,8 @@ accepted.
   revisions from any editor protocol state.
 - Accepted `DEC-0029` defines explicit position projection, but this child
   consumes original byte offsets and does not infer an editor position.
-- Accepted `RFC-0023` defines only full-text Preview overlays and explicitly
-  defers incremental range edits until their encoding, bounds, and transaction
-  semantics are accepted.
+- Accepted `RFC-0023` defines full-text overlays; Accepted `RFC-0029` provides
+  the later incremental encoding, bounds, ordering, and publication semantics.
 - Accepted `DEC-0069` authorizes the source-only range/batch primitive and
   explicitly excludes public LSP behavior.
 
@@ -40,8 +38,7 @@ changed.
 
 ## Intentionally deferred
 
-LSP JSON fields, negotiated position conversion, URI/version validation,
-overlay/VFS publication, stale-result rejection, cancellation, Workspace
-Edits, and Semantic Transactions remain in the `LSP-2104` parent and its open
-governance gaps.
-
+Compiler request identity, stale analysis publication, cancellation,
+diagnostics, Workspace Edits, Semantic Transactions, and Stable compatibility
+remain in later tasks and open governance gaps. RFC-0029 composes this child
+without changing its source-only contract.

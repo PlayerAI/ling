@@ -2,95 +2,72 @@
 
 ## Outcome
 
-`LSP-2104` is correctly recorded as `BlockedSpec`. The execution plan allows a
-Full-sync baseline and later asks for Incremental sync with negotiated-position
-range conversion, ordered batch application, LineIndex updates, version and
-boundary rejection, and equivalence with full replacement. The repository has
-no accepted LSP change schema or adapter contract for those operations.
+`LSP-2104` is implementation-ready and complete under Accepted `RFC-0029`.
+The RFC composes the existing `DEC-0069` UTF-8 edit and `DEC-0070` negotiated-
+position edit primitives with the Done LSP-2102 negotiation and LSP-2103
+overlay boundaries.
 
-Accepted `DEC-0069` now authorizes the bounded `LSP-2104-UTF8-EDITS` child. That
-child implements only immutable source-layer byte-range application and its
-tests; it does not close the parent public LSP, position, version, VFS, or
-transaction boundary.
-
-Accepted `DEC-0070` also authorizes the bounded
-`LSP-2104-POSITION-EDITS` child. It composes the explicit DEC-0029
-position-to-byte projection with the DEC-0069 primitive, while keeping the
-same public-protocol boundary.
-
-No incremental-change parser, range application API, LSP version validator,
-partial-edit transaction, or placeholder server was added. Existing VFS full
-snapshot and compiler incremental-query behavior remains unchanged.
+The server now accepts bounded ordered incremental `didChange` batches,
+rebuilds source mapping after every entry, and publishes one final VFS snapshot
+only after the entire batch succeeds. The valid RFC-0023 single full-
+replacement form remains accepted.
 
 ## Normative traceability
 
-- Accepted DEC-0019 defines immutable source snapshots, revisions, query
-  invalidation, and clean/incremental equivalence at the compiler boundary. It
-  does not define LSP `didChange` ranges, batch ordering, or document-version
-  messages.
-- Accepted DEC-0002 makes UTF-8 byte spans authoritative and requires any
-  future UTF-16 position projection to be explicit; it does not define range
-  conversion failure or edit normalization.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves position/snapshot/version and
-  Workspace Edit behavior open. LSP-2101 through LSP-2103 remain blocked on
-  lifecycle, position, and overlay contracts.
+- Accepted `DEC-0002` preserves original UTF-8 byte spans.
+- Accepted `DEC-0019` owns immutable VFS snapshots and deterministic revisions.
+- Accepted `DEC-0029` defines strict UTF-8/16/32 position projection without
+  clamping.
+- Accepted `RFC-0023` defines URI identity, open state, monotonic client
+  versions, writability, overlay precedence, and full-sync compatibility.
+- Accepted `DEC-0069` defines ordered immutable original-byte edits and source-
+  map rebuilding; `DEC-0070` composes explicit positions with that primitive.
+- Accepted `RFC-0029` defines `ling.lsp.overlay/0.2`, capability advertisement,
+  the 1–64 entry schema, protocol-order application, size/boundary failures,
+  and one-shot VFS/version publication.
+- `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md` requires exactly those
+  range conversion, ordering, line-index, failure-atomicity, and full-
+  replacement-equivalence properties.
 
-## Current interface evidence
+## Current implementation evidence
 
-The current repository confirms the missing boundary:
+- Initialize advertises `textDocumentSync` with `openClose: true` and
+  incremental `change: 2`, plus the exact overlay version and batch limit.
+- `parse_change_params` accepts one through 64 full or ranged changes, rejects
+  `rangeLength`, and validates position integers as non-negative `u32` values.
+- `change_document` validates URI/open/writable/version state first, transforms
+  immutable `SourceFile` snapshots in array order using the negotiated
+  encoding, enforces the 1 MiB limit after every entry, and calls the VFS once.
+- Projection failures, malformed ranges, invalid BOM/source results, stale
+  versions, read-only documents, and oversized intermediates leave visible
+  bytes, client version, last-version history, and VFS revision unchanged.
+- Tests cover UTF-8/16/32 equivalence, ordered and mixed batches, rebuilt line
+  indexes, Chinese text, emoji, combining marks, BOM, CRLF, malformed shapes,
+  limits, later-entry failure atomicity, and 0.1 full-sync compatibility.
 
-- `ling-source::Vfs` accepts complete byte snapshots and provides deterministic
-  revisions/overlays; it has no LSP range decoder or client-version type.
-- `ling-db` proves clean versus incremental query results equivalent after
-  source replacement, but its compiler query input is already a validated
-  snapshot rather than a JSON-RPC edit batch.
-- `ling-source` now provides `Utf8Edit` and ordered immutable application under
-  `DEC-0069`; the primitive rejects scalar/CRLF interior boundaries and
-  revalidates every resulting snapshot without publishing it to the VFS.
-- `ling-source` also provides `LspPositionEdit` and ordered projection under
-  `DEC-0070`; each explicit UTF-8/16/32 position is converted through the
-  SourceMap before the byte primitive is called.
-- No public adapter defines range interpretation across UTF-8/UTF-16, client
-  change ordering, stale-version response, or the required LSP fixtures.
+## Specification gaps retained
 
-## Required authority before implementation
+`RFC-0029` closes only document synchronization. It does not close
+`GAP-LSP-TRANSACTION-PROTOCOL-001` for compiler request snapshots, stale
+analysis publication, diagnostics, cancellation, Workspace Edits, or Semantic
+Transactions. Those surfaces remain assigned to later tasks and cannot be
+inferred from VFS publication.
 
-An implementation-ready decision or RFC must define, at minimum:
+## Compatibility and determinism
 
-1. Full versus Incremental sync capabilities, change message schema, range
-   encoding, end-position/newline rules, and batch ordering;
-2. document-version monotonicity, duplicate/stale policy, atomic application,
-   failure response, overlay/revision publication, and query cancellation;
-3. conversion behavior for UTF-8/UTF-16, CRLF/BOM/Unicode boundaries, invalid
-   ranges, limits, and source-span preservation;
-4. interaction with LSP lifecycle, workspace/dependency read-only policy,
-   snapshots, diagnostics, and Stable versus Experimental fields; and
-5. positive, negative, multi-edit, full-equivalence, stale/duplicate version,
-   invalid-boundary, Unicode/CRLF/BOM, deterministic, and migration fixtures.
+The Experimental overlay advances from 0.1 to 0.2 and advertises the new
+capability. Every valid 0.1 single-full-change message remains valid, so no
+migration tool is required. No Ling diagnostic, syntax, Checked Core,
+Semantic ID, compiler span, runtime, bytecode, VM, ABI, package, filesystem,
+network, or Unicode 17.0.0 behavior changes.
 
-Until the remaining public decisions and fixtures are Accepted, adapting the
-source primitive to LSP ranges would risk partial VFS mutation, stale semantic
-results, or a position unit that conflicts with DEC-0002. The bounded child is
-therefore evidence only, not completion of the parent.
-
-## Evidence and compatibility
-
-This audit was checked against `docs/decisions/0019-incremental-query-boundary.md`,
-`docs/decisions/0002-source-position-units.md`, `docs/SEMANTICS.md`,
-`docs/ROADMAP-1.0.md`, `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-source/src/vfs.rs`, `crates/ling-source/src/lib.rs`, and
-`crates/ling-db/src/lib.rs`.
-The bounded child adds no public protocol behavior; no diagnostic allocation,
-schema, Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0
-claim is made. See `docs/status/LSP-2104-UTF8-EDITS-AUTHORITY-AUDIT.md` and
-`docs/status/LSP-2104-UTF8-EDITS-IMPLEMENTATION-REPORT.md` for its evidence.
+Batch order is explicit protocol input. Source projection and line-index
+rebuilding depend only on immutable bytes and the negotiated encoding; VFS
+publication occurs once and exposes no host path, allocation, or hash order.
 
 ## Intentionally deferred
 
-The full `LSP-2104` target can begin after the LSP position/overlay/version
-contract is Accepted. The public implementation must apply each change batch
-atomically, preserve full-replacement equivalence, reject stale/invalid ranges
-before publication, and keep compiler byte spans authoritative. The
-`LSP-2104-UTF8-EDITS` and `LSP-2104-POSITION-EDITS` source-only children are
-complete under `DEC-0069` and `DEC-0070`; the parent remains deferred.
+Save semantics, host-file resolution, project reload, compiler snapshots,
+stale analysis, diagnostics publication, navigation, cancellation, Workspace
+Edits, Semantic Transactions, and Stable editor compatibility remain governed
+by later execution-plan tasks.

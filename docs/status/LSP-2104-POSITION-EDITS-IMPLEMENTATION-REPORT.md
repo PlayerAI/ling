@@ -5,8 +5,8 @@
 The source layer now composes explicit UTF-8/UTF-16/UTF-32 lexical positions
 with immutable original-byte edits. Single edits and ordered batches return
 new validated `SourceFile` values; invalid positions or replacements return
-typed errors without changing the input. This completes the bounded child,
-not the public `LSP-2104` parent.
+typed errors without changing the input. Accepted `RFC-0029` now consumes this
+bounded child in the completed public `LSP-2104` incremental-change adapter.
 
 ## Implementation
 
@@ -34,8 +34,7 @@ ordered edit values; host paths and allocation/hash order are not observable.
 
 ## Intentionally deferred
 
-Negotiation/capability advertisement, URI/document versions, JSON-RPC
-`didChange`, VFS transactions, stale compiler results, cancellation,
-diagnostics, Workspace Edits, and public compatibility remain deferred to the
-blocked parent.
-
+Compiler request snapshots, stale analysis results, cancellation, diagnostics,
+Workspace Edits, Semantic Transactions, and Stable compatibility remain
+deferred to later tasks. RFC-0029 owns negotiation/capability, URI/version,
+JSON-RPC `didChange`, and failure-atomic VFS composition.

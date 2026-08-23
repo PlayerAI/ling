@@ -4,9 +4,9 @@
 
 The source layer now provides a deterministic in-process UTF-8 edit primitive.
 One edit or an ordered batch produces a new validated `SourceFile`; malformed
-ranges or replacements return typed errors without mutating the input. This
-is evidence for the bounded child only. The public `LSP-2104` target remains
-`BlockedSpec`.
+ranges or replacements return typed errors without mutating the input. Accepted
+`RFC-0029` now consumes this bounded child in the completed public `LSP-2104`
+incremental-change adapter.
 
 ## Implementation
 
@@ -36,7 +36,7 @@ not observable.
 
 ## Intentionally deferred
 
-Negotiated LSP positions, URI/document versions, JSON-RPC `didChange`, VFS
-transactions, stale compiler results, cancellation, diagnostics, Workspace
-Edits, and public compatibility remain deferred to the blocked parent.
-
+Compiler request snapshots, stale analysis results, cancellation, diagnostics,
+Workspace Edits, Semantic Transactions, and Stable compatibility remain
+deferred to later tasks. RFC-0029 owns the negotiated public `didChange`
+composition without changing this source primitive.
