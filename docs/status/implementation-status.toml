@@ -22975,6 +22975,70 @@ notes = [
 ]
 
 [[task]]
+id = "STAB-6101-OBSERVATION"
+title = "Internal Support-Matrix Item Audit boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CBK-5903-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0215-critical-runtime-target-package-boundary-evidence.md",
+  "docs/decisions/0216-support-matrix-item-audit-boundary-evidence.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/support_matrix_item_audit_evidence.rs",
+  "docs/decisions/0216-support-matrix-item-audit-boundary-evidence.md",
+  "docs/status/STAB-6101-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/STAB-6101-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0216 authorizes only test-local Support-Matrix Item Audit boundary evidence; no Stable candidate/row, promotion/demotion, compatibility promise, release binding, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty item identity, authority, compiler/execution, conformance/editor, compatibility/evidence, traceability, support-state, failure, and fixture boundaries.",
+  "Forward/reverse inputs emit the same opaque bytes and duplicates are rejected; candidate, authority, Experimental/Preview/Unavailable/Unsupported/Stable, missing-field, fail-closed, and protocol categories remain distinct; the tag has no Stable-promotion authority.",
+  "cargo test -p ling-types --test support_matrix_item_audit_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+  "cargo xtask support verify passes against the unchanged 1.0-draft matrix.",
+]
+verified_against_commit = "b6694aab307365446387551651545f2698846ad0"
+completion_commit = "b6694aab307365446387551651545f2698846ad0"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0216; STAB-6101 remains BlockedSpec for candidate Stable inventory, per-row authority/evidence, promotion/demotion, compatibility/migration, release binding, diagnostics, protocols, and support semantics.",
+  "No Stable row, support-matrix state, candidate registry, compatibility promise, release artifact, CLI/LSP/Zed route, diagnostic, public protocol, placeholder API, dependency, or Unicode behavior was added.",
+]
+
+[[task]]
 id = "STAB-6102"
 title = "Remove False Entry Points"
 state = "BlockedSpec"
