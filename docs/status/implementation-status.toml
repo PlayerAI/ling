@@ -8162,7 +8162,7 @@ notes = [
 [[task]]
 id = "LSP-2404"
 title = "Semantic-token fixture corpus"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -8173,6 +8173,9 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
+  "docs/RFC-0046.md",
+  "docs/RFC-0047.md",
+  "docs/RFC-0048.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/decisions/0019-incremental-query-boundary.md",
@@ -8182,25 +8185,30 @@ spec = [
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/tests/semantic_tokens.rs",
+  "docs/governance/protocol-inventory.toml",
   "docs/status/LSP-2404-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2404-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
+  "tests/protocols/lsp-semantic-tokens/README.md",
+  "tests/protocols/lsp-semantic-tokens/fixtures/v1.json",
 ]
 acceptance = [
-  "The audit records the missing versioned fixture/schema model, token legend/modifiers, typed/fallback origin, source provenance, and expected-output representation.",
-  "The audit covers UTF-8/UTF-16 positions, Chinese columns, emoji prefixes, CRLF/BOM, snapshot/version binding, scope shadowing, mutable fields, variant constructors, Effect/Capability, generated/dependency data, and redaction.",
-  "The audit covers error recovery, incomplete input, unchecked-AST rejection, full/delta equivalence, ordering/non-overlap, deterministic serialization, cancellation, limits, stale results, result-ID/base handling, and migration fixtures.",
-  "No semantic-token fixture corpus, expected token output, protocol schema, diagnostic allocation, Semantic ID change, or placeholder LSP API is added while the authority is absent.",
-  "The future fixtures must be independent, deterministic, versioned, position-unit explicit, and sourced only from checked Typed Core/Resolved HIR or explicitly marked parsed fallback.",
+  "Accepted RFC-0046/RFC-0047/RFC-0048 authorize the exact taxonomy, generation, position, transport, identity, fallback, privacy, and compatibility values frozen by the corpus.",
+  "The test-only ling.test.lsp-semantic-tokens/1 corpus fixes canonical legends, explicit position encoding, exact URI/version/source inputs, complete full results, one canonical delta, and the equivalent current full result.",
+  "Executable cases cover UTF-16 BOM/CRLF/emoji/combining/Chinese positions, same spelling across scopes, mutable fields and writes, variant constructors and patterns, Effect/Capability exclusion, and whole-source error recovery.",
+  "The independent reader executes fresh sessions, compares exact JSON-RPC values and deterministic result IDs, validates order/non-overlap and case invariants, and reapplies the delta to its exact base.",
+  "No public schema, diagnostic allocation, Semantic ID/canonical-byte change, language/runtime behavior, dependency, host path, private compiler identity, or Unicode 17.0.0 data change is introduced.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "9105ff5be4aad29b471d5997594156a923f5cb56"
+completion_commit = "9105ff5be4aad29b471d5997594156a923f5cb56"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "LSP-2404 is BlockedSpec by LSP-2401/LSP-2402/LSP-2403, LSP-2501/LSP-2502, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no semantic-token fixture or transport inventory entry exists.",
-  "Existing syntax, semantic graph, source, type/effect, diagnostics, and project fixtures do not define token legends, origin markers, position units, document versions, or full/delta compatibility.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "Implementation commit 9105ff5be4aad29b471d5997594156a923f5cb56 adds four exact fixtures and their executable reader under the existing Preview protocol.",
+  "The fixture-format marker is test-only and is not registered as a public schema or compatibility surface.",
+  "General LSP snapshot, wire cancellation, editor presentation, mixed recovery, and Stable lifecycle work remain intentionally outside LSP-2404.",
 ]
 
 [[task]]
@@ -8255,8 +8263,8 @@ completion_commit = "cee068af008cbd1e0327799a418078be850db754"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This bounded child is complete under DEC-0087; public LSP-2404 remains BlockedSpec for versioned semantic-token schema, taxonomy, fallback provenance, position units, full/delta equivalence, and protocol migration.",
-  "The fixture corpus is compiler-owned evidence only and must not be read as semantic-token or LSP conformance output.",
+  "This bounded child is complete under DEC-0087 and is consumed by completed LSP-2404 under Accepted RFC-0046/RFC-0047/RFC-0048.",
+  "Its source-boundary evidence remains compiler-owned; the separate LSP-2404 corpus owns client-visible conformance output.",
 ]
 
 [[task]]

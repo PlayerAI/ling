@@ -21,9 +21,11 @@ semantic-token or transport behavior.
   2 checked-token-source fixture tests passed.
 - `cargo clippy -p ling-db --all-targets --locked --offline -- -D warnings`
 
-## Boundaries
+## Boundaries and subsequent integration
 
 This child is not semantic-token generation, a versioned fixture schema,
 position projection, fallback classification, full/delta equivalence,
 result-ID/base handling, cancellation, stale handling, or an LSP/JSON-RPC
-response. Public `LSP-2404` remains `BlockedSpec`.
+response. Accepted RFC-0046/RFC-0047/RFC-0048 subsequently authorized the
+separate public conformance corpus completed by `LSP-2404`; this child remains
+only compiler-owned source-boundary evidence.
