@@ -14,6 +14,10 @@ These children do not promote the parent task to `Done` because public
 semantic project checking, run/test/build behavior, workspace selection, and
 artifact policy still lack accepted contracts.
 
+Accepted DEC-0250 adds `cargo xtask project verify` as a read-only current-
+surface evidence gate. It composes the three completed children and enforces
+the unresolved parent boundary; it adds no project behavior.
+
 The children reuse the accepted RFC-0002 `ling-project` manifest, module
 discovery, lockfile, and package-graph APIs. They do not duplicate package
 resolution or add a placeholder `CompilerHost` API. Existing file-oriented
@@ -81,6 +85,12 @@ changed. The JSON report is current-writer-only and intentionally not
 canonical. The internal semantic adapter adds no protocol or diagnostic
 allocation. The implementation is local/offline and does not claim network,
 workspace, artifact, or performance behavior.
+
+`docs/testing/PROJECT-CLI-STATUS.md` and
+`docs/status/PRJ-1107-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md` record the
+composed current boundary. The verifier requires one Experimental, two
+Internal, and five `BlockedSpec` surface rows and checks the implementation,
+test, report, and task-state evidence directly.
 
 ## Intentionally deferred
 

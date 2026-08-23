@@ -3757,3 +3757,16 @@ covers = ["RC-6905 bounded current predecessor, LSP, and protocol evidence", "co
 depends_on = ["DEC-0056", "DEC-0242", "DEC-0248", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0250"
+title = "Current project-surface evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0250-current-project-surface-evidence.md"
+covers = ["PRJ-1107 bounded current project-surface evidence", "composed graph-check, locked-project, and semantic-snapshot implementation evidence", "internal gate without public semantic check, run/test/build, workspace, artifact, or parent-completion claims"]
+depends_on = ["RFC-0024", "DEC-0058", "DEC-0083", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

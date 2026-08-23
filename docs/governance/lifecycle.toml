@@ -6416,3 +6416,29 @@ unresolved_alternatives = [
   "Every v1 candidate, artifact, signing/SBOM/provenance, standard-library package, Zed/LSP distribution, documentation/migration, final support, Stable protocol corpus, Tier1 conformance, security policy, evidence bundle, and publication remains deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0250"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0250-current-project-surface-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask project verify and require eight surfaces, twelve evidence files, and four parent/child status assertions.",
+  "Replace an implemented state, parent state, matrix state, and source marker in focused tests and require fail-closed internal governance errors.",
+  "Run the focused ling-cli project-check, ling-project, and ling-db suites independently.",
+  "Run workspace, CI, governance, support, status, traceability, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds internal evidence and documentation only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, bytecode, VM, ABI, Unicode 17.0.0, protocol states, support states, and public APIs remain unchanged.",
+  "Adds no public semantic project check, compiler host, run/test/build, workspace selection, implicit discovery, artifact, network behavior, or parent-completion claim.",
+]
+unresolved_alternatives = [
+  "Public semantic project checking, compiler-host lifecycle, project run/test/build, entry and capability policy, workspace/member selection, implicit discovery, artifacts, result schemas, and Stable project compatibility remain deferred.",
+]
+superseded_by = ""
