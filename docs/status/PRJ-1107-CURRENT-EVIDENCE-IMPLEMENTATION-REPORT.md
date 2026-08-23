@@ -7,6 +7,8 @@ Accepted DEC-0250. `cargo xtask project verify` now proves the current
 three-slice implementation boundary and fails closed if the blocked public
 surface is silently promoted. The parent `PRJ-1107` remains `BlockedSpec`.
 
+Implementation commit: `0822280f4a2ea2c9e4205e8fbff104a00b522ef3`.
+
 ## Normative clauses covered
 
 - Accepted RFC-0024 §§1–9 authorize only the explicit locked graph-check CLI
