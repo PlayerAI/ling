@@ -13,6 +13,11 @@ No benchmark command, public timing schema, wall-clock guarantee, LSP budget,
 or placeholder cancellation API was added. The existing Seed and internal
 solver behavior remains unchanged.
 
+Accepted DEC-0252 adds `cargo xtask trait-performance verify` as a read-only
+current-surface evidence gate. It composes the three accepted termination facts
+and enforces the five unresolved production surfaces; it changes no solver or
+performance behavior.
+
 ## Normative traceability
 
 - Accepted RFC-0005 §2.5 requires recursive obligations to terminate on the
@@ -86,6 +91,11 @@ This audit was checked against `docs/RFC-0005.md`,
 The bounded child changes only internal test evidence; no public protocol,
 diagnostic allocation, schema, Semantic ID, source-span, runtime, bytecode,
 VM, or Unicode 17.0.0 claim is made.
+
+`docs/testing/TRAIT-PERFORMANCE-STATUS.md` and
+`docs/status/TRAIT-1309-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md` record the
+composed boundary. The verifier checks three Internal and five `BlockedSpec`
+rows against the solver, authority, audits, report, and task states.
 
 ## Intentionally deferred
 

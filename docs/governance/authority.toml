@@ -3783,3 +3783,16 @@ covers = ["TRAIT-1308 bounded current Trait IDE surface evidence", "composed Exp
 depends_on = ["RFC-0022", "DEC-0059", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0252"
+title = "Current Trait performance evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0252-current-trait-performance-evidence.md"
+covers = ["TRAIT-1309 bounded current termination evidence", "composed cycle, depth-64, and source-evidence-independence facts", "internal gate without production integration, resource budget, benchmark, cancellation, public format, or parent-completion claims"]
+depends_on = ["RFC-0005", "DEC-0026", "DEC-0068", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

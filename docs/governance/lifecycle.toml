@@ -6468,3 +6468,29 @@ unresolved_alternatives = [
   "Trait hover, definition/implementation navigation, completion, rename, diagnostics, safe repairs, URI/position/snapshot/version/cancellation, Workspace Edits, Semantic Transactions, cross-package editor fixtures, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0252"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0252-current-trait-performance-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask trait-performance verify and require eight surfaces, seven evidence files, and two parent/child status assertions.",
+  "Mutate a matrix state, parent state, child presence, and solver marker in focused tests and require fail-closed internal governance errors.",
+  "Run the ling-types cycle, depth, and source-independence solver tests.",
+  "Run workspace, CI, governance, support, status, traceability, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds internal evidence and documentation only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, bytecode, VM, ABI, Unicode 17.0.0, protocol states, support states, and public APIs remain unchanged.",
+  "Adds no production solver integration, deterministic resource budget, benchmark threshold, cancellation behavior, public evidence format, network behavior, or parent-completion claim.",
+]
+unresolved_alternatives = [
+  "Production obligation integration, deterministic work units and exhaustion, benchmark corpora and thresholds, environment/variance policy, LSP cancellation/version/stale-result behavior, public evidence schemas, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""
