@@ -3464,7 +3464,7 @@ notes = [
 [[task]]
 id = "FMT-1507"
 title = "Formatter CLI/LSP integration"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -3475,34 +3475,56 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0026.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0015-audit-source-format.md",
   "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/decisions/0028-formatter-cli-contract.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0057-formatter-in-process-edit-projection.md",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/formatting.rs",
+  "docs/RFC-0026.md",
   "docs/status/FMT-1507-AUTHORITY-AUDIT.md",
+  "docs/status/FMT-1507-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-formatting/README.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
   "docs/governance/gap-register.toml",
   "docs/governance/gap-register.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "An accepted formatter CLI decision defines the current `ling` command, stdin and logical-filename behavior, check-mode output and exit status, and the JSON report schema.",
-  "Accepted LSP and Semantic Transaction decisions define position encoding, document-version preconditions, Workspace Edit fields, and Stable versus Experimental compatibility before any public adapter is implemented.",
-  "The implementation adds no stale `zero` command, placeholder public API, unregistered protocol, diagnostic allocation, or Audit/semantic mutation while these decisions are absent.",
+  "Accepted DEC-0028 defines the Preview `ling fmt` file/stdin/check/JSON surface, while RFC-0026 defines only synchronous `textDocument/formatting` over the RFC-0023 open-document overlay.",
+  "The LSP adapter accepts exact fixed Ling options, formats only current open writable workspace or untitled overlays through the compiler parser and Format IR, and never reads a closed file or writes source, disk, VFS, version, Semantic Graph, or Audit state.",
+  "Changed valid source returns exactly one whole-document TextEdit; unchanged or invalid source returns no edits; the original end is projected under negotiated UTF-8/UTF-16/UTF-32 with explicit BOM and CRLF behavior.",
+  "Missing, closed, dependency, invalid-URI, malformed-option, notification, and impossible internal cases fail closed with the accepted JSON-RPC behavior and no Ling diagnostic allocation.",
+  "Focused LSP/formatter tests and repository-wide offline tests, Clippy, governance, support, status, RC0, traceability, rustfmt, and deterministic-diff gates pass without introducing stale `zero`/`.zero` names.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = "2026-08-22"
+verified_against_commit = "0421925f3a8e20f6bc951eff546b00523c3f36ff"
+completion_commit = "0421925f3a8e20f6bc951eff546b00523c3f36ff"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "FMT-1507 is blocked by GAP-FORMATTER-AUTHOR-SOURCE-001, GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no public formatter surface is authorized yet.",
-  "The lower-authority execution-plan `zero fmt` spelling is stale; current accepted CLI and source names remain `ling` and `.ling`.",
-  "FMT-1508 now proves canonical Audit Source byte equality after formatting; it does not alter the public CLI/LSP blocker set.",
+  "Implementation commit: 0421925f3a8e20f6bc951eff546b00523c3f36ff (`feat(lsp): add bounded document formatting`).",
+  "Verified with focused formatter/LSP suites, workspace tests, Clippy with warnings denied, CI/governance/support/LSP/Zed/status/RC0/traceability verifiers, rustfmt check, and git diff check; the final status-bound full gate is recorded by the following status commit.",
+  "Range/on-type formatting, configurable style, minimal diffs, format-on-save, closed-file formatting, Workspace Edit, Semantic Transaction, cancellation, asynchronous publication, and Stable compatibility remain intentionally deferred and unclaimed.",
 ]
 
 [[task]]

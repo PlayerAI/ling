@@ -179,7 +179,7 @@
 | `FMT-1504` | Comment attachment | `G1` | `M` | `Done` | `FMT-1503` | `4348bfe548d0f62c25efdd5bb5c704e0a46958f9` |
 | `FMT-1505` | Incomplete-source recovery | `G1` | `M` | `Done` | `FMT-1504` | `da412442bde5c7624946909996fa40772d14ce77` |
 | `FMT-1506` | Formatter property and semantic-equivalence evidence | `G1` | `M` | `Done` | `FMT-1505` | `18e14f0a4f19d668b1b854fb1584ec52f91afec1` |
-| `FMT-1507` | Formatter CLI/LSP integration | `G1` | `M` | `BlockedSpec` | `FMT-1506` | `` |
+| `FMT-1507` | Formatter CLI/LSP integration | `G1` | `M` | `Done` | `FMT-1506` | `0421925f3a8e20f6bc951eff546b00523c3f36ff` |
 | `FMT-1507-CLI` | Formatter CLI Preview slice | `G1` | `M` | `Done` | `FMT-1506` | `13737c71281f12b266423d855d856fb5f77e2096` |
 | `FMT-1507-EDIT` | Deterministic formatter whole-document edit projection | `G1` | `S` | `Done` | `FMT-1506` | `e33f8496de369b8fc6364007a59a0a1fb4ca9e9f` |
 | `FMT-1508` | Audit Source separation | `G1` | `S` | `Done` | `FMT-1506` | `f247dfed98f104ea5227532965e8b579938a213e` |
