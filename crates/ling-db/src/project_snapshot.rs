@@ -332,7 +332,7 @@ fn source_error_diagnostic(logical_name: &str, error: &SourceError) -> Diagnosti
     }
 }
 
-fn hir_error_diagnostic(logical_name: &str, error: &HirLowerError) -> Diagnostic {
+pub(crate) fn hir_error_diagnostic(logical_name: &str, error: &HirLowerError) -> Diagnostic {
     let code = match error.kind {
         ling_hir::LowerErrorKind::InvalidAssignmentPlace => codes::INVALID_ASSIGNMENT,
         _ => codes::INVALID_MODULE,

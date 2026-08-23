@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 use super::document_identity;
 
 /// Version marker placed in every Experimental diagnostic `data` object.
-pub const DIAGNOSTIC_PROTOCOL_VERSION: &str = "ling.lsp.diagnostic/0.1";
+pub const DIAGNOSTIC_PROTOCOL_VERSION: &str = "ling.lsp.diagnostic/0.2";
 
 /// One exact logical source and its public path-free editor URI.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -196,11 +196,6 @@ pub fn adapt_diagnostics(
                 uri: source.uri().to_owned(),
             }
         })?;
-        if identity.temporary {
-            return Err(DiagnosticAdapterError::InvalidSourceUri {
-                uri: source.uri().to_owned(),
-            });
-        }
         if identity.logical_name != source.source().name() {
             return Err(DiagnosticAdapterError::SourceIdentityMismatch {
                 uri: source.uri().to_owned(),

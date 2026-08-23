@@ -317,7 +317,14 @@ implemented = true
 [[protocol]]
 id = "PROTO-LSP-DIAGNOSTIC"
 visibility = "Public"
-version = "ling.lsp.diagnostic/0.1"
+version = "ling.lsp.diagnostic/0.2"
+stability = "Experimental"
+implemented = true
+
+[[protocol]]
+id = "PROTO-LSP-PUBLISH-DIAGNOSTICS"
+visibility = "Public"
+version = "ling.lsp.publish-diagnostics/0.1"
 stability = "Experimental"
 implemented = true
 
@@ -570,10 +577,10 @@ sources = ["docs/governance/gap-register.toml"]
 id = "UNSUP-LSP-EDITOR"
 area = "Tooling"
 capability = "LSP document features, Zed extension, or semantic mutation"
-reason = "RFC-0004, RFC-0023, and RFC-0026 implement the bounded lifecycle, full-text overlay, and whole-document formatting response. Diagnostics, navigation, range/on-type formatting, Zed integration, semantic mutation, and transaction boundaries remain unresolved."
+reason = "RFC-0004, RFC-0023, RFC-0026, and RFC-0032 implement the bounded lifecycle, document overlay, whole-document formatting response, and deterministic push diagnostics. Pull diagnostics, navigation, remaining document features, range/on-type formatting, Zed integration, semantic mutation, and general transaction boundaries remain unresolved."
 blockers = [
   "GAP-LSP-TRANSACTION-PROTOCOL-001",
   "GAP-FORMATTER-AUTHOR-SOURCE-001",
   "GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001",
 ]
-sources = ["docs/governance/gap-register.toml"]
+sources = ["docs/governance/gap-register.toml", "docs/RFC-0032.md"]

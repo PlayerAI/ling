@@ -3,9 +3,10 @@
 Status: Done (bounded internal child only)
 
 This report records the implementation authorized by Accepted DEC-0035. The
-parent `LSP-2202` task remains `BlockedSpec`: no `publishDiagnostics` handler,
-trigger, snapshot/version association, clearing, replacement, or public LSP
-diagnostic schema is implemented.
+child remains a bounded internal collection and was completed before the
+parent publication contract existed. Accepted RFC-0032 now separately
+authorizes and implements parent `LSP-2202`; it does not retroactively broaden
+this child's API or authority.
 
 ## Normative scope
 
@@ -47,7 +48,8 @@ was allocated and no partial result can be published by this child.
 
 ## Deferred work
 
-Public diagnostic triggers, push/pull selection, snapshot/version association,
-URI/range projection, severity/tags, clear/replace, suppression, caps,
-truncation, cancellation/stale precedence, localization, and protocol lifecycle
-remain deferred to parent `LSP-2202`, `LSP-2203`, and `LSP-2204`.
+RFC-0032 now owns parent push triggers, snapshot/version association, strict
+URI/range projection, clear/replace, and stale precedence. Pull selection and
+parity remain LSP-2203; suppression, root-cause grouping, and caps remain
+LSP-2204; cancellation requests, tags, localization policy, and Stable
+protocol lifecycle remain deferred.

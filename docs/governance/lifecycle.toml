@@ -6863,3 +6863,31 @@ unresolved_alternatives = [
   "Push and pull publication, document versions, stale results, cancellation, root-cause grouping, caps, omission reporting, codeDescription, tags, fix application, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0032"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0032.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact capability and notification shapes, response ordering, version inclusion, URI ordering, and adapter 0.2 compatibility.",
+  "Cover every mutation trigger, coalescing, replacement, empty/removed/temporary clearance, syntax precedence, complete workspace checking, and temporary isolation.",
+  "Reject stale or failed completion after every captured identity dimension while proving no partial output, ledger mutation, or newer-work loss.",
+  "Cover registered compiler errors, multiple sources, all negotiated encodings, Chinese, emoji, combining marks, BOM, CRLF, repeated runs, and insertion-order independence.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds Experimental current-writer-only ling.lsp.publish-diagnostics/0.1 and advances the diagnostic adapter compatibly from 0.1 to 0.2 for validated temporary sources.",
+  "Leaves registered diagnostic identity and ling.diagnostic/0.1 unchanged; adapter 0.1 non-temporary inputs retain identical output.",
+  "Adds no Ling syntax, semantics, Typed Core, runtime, bytecode, VM, ABI, filesystem/network, cache, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Pull parity, wall-clock scheduling, worker fairness, cancellation requests, partial results, progress, root-cause grouping, deduplication, caps, suppression, tags, codeDescription, repair application, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

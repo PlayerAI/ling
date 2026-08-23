@@ -2,73 +2,70 @@
 
 ## Outcome
 
-`LSP-2202` remains `BlockedSpec`, but its foundational dependencies are now
-implemented: RFC-0004/RFC-0023/RFC-0029/RFC-0030 govern lifecycle, overlays,
-incremental edits, and workspace snapshots, while Accepted RFC-0031 defines
-the compiler diagnostic adapter. The remaining blocker is narrower and
-substantive: no Accepted authority defines push publication, trigger/debounce,
-document-version association, stale-result rejection, replacement, or clear
-semantics.
+`LSP-2202` is implementation-ready under Accepted RFC-0032. The RFC closes
+the previously recorded publication/scheduling portion of
+`GAP-LSP-TRANSACTION-PROTOCOL-001` for this bounded Experimental writer without
+claiming a general Semantic Transaction or asynchronous scheduling contract.
 
-Accepted DEC-0035 closes only the bounded `LSP-2202-BATCH` child: an immutable
-internal batch over opaque diagnostic IDs and DEC-0034 order keys. It is not a
-publication contract and cannot be inferred into one.
+RFC-0004/RFC-0023/RFC-0029/RFC-0030 govern lifecycle, overlays, incremental
+edits, and workspace snapshots. RFC-0031 defines the diagnostic value adapter;
+RFC-0032 compatibly advances it to 0.2 for temporary sources and defines the
+separate `ling.lsp.publish-diagnostics/0.1` lifecycle.
 
 ## Normative traceability
 
-- `docs/SEMANTICS.md`, `docs/ERROR-CODES.md`, and RFC-0031 define deterministic
-  bilingual compiler diagnostics and their exact LSP value projection.
+- RFC-0032 §§1–3 define exact state-change triggers, deterministic logical
+  debounce, immutable complete-state tickets, full-identity freshness, syntax
+  precedence, checked-workspace analysis, and internal-failure atomicity.
+- RFC-0032 §§4–6 define the adapter 0.2 source-set extension, exact
+  `publishDiagnostics` params, version/clearance/ledger behavior, URI order,
+  failure atomicity, and initialize capability marker.
 - RFC-0004 defines lifecycle/transport and negotiated position encoding;
   RFC-0023/RFC-0029 define versioned open-document changes; RFC-0030 defines
-  atomic workspace input snapshots.
+  atomic workspace reload and project-input observation.
 - DEC-0019 and DEC-0071 define revision-aware invalidation and immutable
-  observation, but not asynchronous publication ownership.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` still leaves event scheduling,
-  snapshot/client-version association, stale completion, and publication
-  replacement behavior open.
-- `PROTO-DIAGNOSTIC-JSON` is a separate Preview compiler writer;
-  `PROTO-LSP-DIAGNOSTIC` is a pure adapter, not `publishDiagnostics`.
+  snapshots; DEC-0034/DEC-0035 define deterministic diagnostic collection;
+  DEC-0072 defines strict source-span projection.
+- `PROTO-LSP-DIAGNOSTIC` and `PROTO-LSP-PUBLISH-DIAGNOSTICS` remain separate:
+  the first maps immutable compiler values, while the second owns scheduling,
+  freshness, replacement, clearance, and JSON-RPC delivery.
 
-## Current interface evidence
+## Implemented boundary
 
-- `ling-lsp::adapt_diagnostics` can build exact ordered LSP diagnostic values
-  from immutable source inputs, but it accepts no request snapshot or client
-  version and sends no JSON-RPC notification.
-- `LspServer` tracks lifecycle, overlays, versions, and workspace revisions,
-  but has no compile scheduler, debounce state, published-result identity, or
-  replacement/clear ledger.
-- `ling-db` exposes revisioned queries and cancellation primitives internally;
-  no Accepted rule chooses syntax-only versus workspace analysis timing or
-  defines which completed result may still be published.
-- The DEC-0035 batch remains disconnected from transport and cannot establish
-  document-version, stale-result, or empty-clear behavior.
+- `ling-db::CompilerDb::workspace_diagnostics` executes deterministic
+  lexical/parse precedence and complete workspace HIR, resolution, type, and
+  Effect diagnostics without interpreting unchecked AST nodes.
+- `ling-lsp::DiagnosticAnalysisTicket` owns exact request bytes and compiler
+  inputs. Completion compares the full current snapshot and rejects stale
+  results without losing pending work.
+- `LspServer` marks only successful state changes pending, coalesces at an
+  explicit flush boundary, publishes URI-sorted changed entries, associates
+  open client versions, clears removed entries, and commits its ledger only
+  after every notification is valid and within the transport bound.
+- The stdio host writes a request response before any notification caused by
+  that message and performs no timer-, path-, environment-, or network-based
+  scheduling.
 
-## Required authority before implementation
+## Specification gaps encountered
 
-An implementation-ready RFC must define, at minimum:
-
-1. exact `didOpen`/`didChange`/workspace-reload triggers, deterministic debounce
-   and cancellation checkpoints, and bounded work/resource policy;
-2. immutable request/workspace snapshot identity, optional LSP document
-   version mapping, and stale completion rejection;
-3. `publishDiagnostics` URI/version/diagnostics shape, ordering, related-file
-   scope, replacement and empty-clear semantics, and failure atomicity;
-4. syntax-fast-path versus workspace semantic result precedence without
-   allowing older/narrower results to overwrite newer/complete results; and
-5. positive, negative, edit-burst, cancellation, stale, clear/replace,
-   multi-file, Unicode/CRLF, deterministic, and migration fixtures.
+The earlier audit correctly found that no Accepted authority defined push
+publication. RFC-0032 supplies that missing bounded authority. The broader gap
+remains open for pull diagnostics, cancellation requests, general background
+scheduling, Workspace Edits, Semantic Transactions, and other editor
+transactions; none is inferred into this implementation.
 
 ## Compatibility and determinism
 
-The future publisher must reuse RFC-0031 values unchanged, expose no host
-paths or scheduler timing as Ling semantics, and prevent cancelled or stale
-work from clearing a newer result. Any public extension field requires an
-explicit Experimental version marker and migration evidence. No diagnostic
-code or core diagnostic schema should be allocated for transport bookkeeping.
+Adapter 0.2 accepts every valid adapter 0.1 input with unchanged output and
+only adds validated temporary identities. No compiler diagnostic code, core
+diagnostic schema, Ling syntax or semantics, Typed Core, runtime, bytecode,
+VM, ABI, or Unicode 17.0.0 table changes. Host paths, clocks, thread order,
+allocation order, and debug output cannot affect published values.
 
 ## Intentionally deferred
 
-Until the publication RFC is Accepted, no `publishDiagnostics` handler,
-background compiler job, timer/debounce mechanism, version tag, result ledger,
-or placeholder public API may be added. Root-cause/error-storm caps and
-suppression remain LSP-2204; pull diagnostics remain LSP-2203.
+Pull diagnostics and push/pull parity remain LSP-2203. Root-cause grouping,
+deduplication, caps, and suppression remain LSP-2204. Cancellation requests,
+partial results, progress, tags, code-description URLs, repair application,
+Workspace Edits, Semantic Transactions, wall-clock debounce, worker pools, and
+Stable compatibility require later Accepted authority.

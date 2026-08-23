@@ -14,6 +14,7 @@ use std::thread;
 
 use ling_ast::{LowerError, Program, lower};
 use ling_cache::{CacheKey, CacheStore};
+use ling_diagnostics::Diagnostic;
 use ling_effects::{self, CheckedProgram, EffectError};
 use ling_hir::{self, LowerError as HirLowerError};
 use ling_project::PackageGraphId;
@@ -905,6 +906,80 @@ impl CompilerDb {
         self.parses.insert(key, parsed.clone());
         self.record(QueryKind::Parse, &snapshot, QueryOutcome::Miss);
         Ok(parsed)
+    }
+
+    /// Computes the complete registered compiler diagnostic set for the
+    /// current visible workspace without filesystem or environment access.
+    ///
+    /// Lexical errors take precedence over parse errors within one source. If
+    /// any source has a syntax error, semantic checking is skipped for the
+    /// complete workspace so unchecked syntax cannot create cascades.
+    pub fn workspace_diagnostics(&mut self) -> Result<Box<[Diagnostic]>, QueryError> {
+        let snapshots = self.vfs.snapshots();
+        let mut diagnostics = Vec::new();
+        for snapshot in &snapshots {
+            let parsed = self.parse(snapshot.id())?;
+            if parsed.lexical_errors().is_empty() {
+                diagnostics.extend(
+                    parsed
+                        .parse_errors()
+                        .iter()
+                        .map(|error| error.to_diagnostic(snapshot.logical_name())),
+                );
+            } else {
+                diagnostics.extend(
+                    parsed
+                        .lexical_errors()
+                        .iter()
+                        .map(|error| error.to_diagnostic(snapshot.logical_name())),
+                );
+            }
+        }
+        if !diagnostics.is_empty() || snapshots.is_empty() {
+            return Ok(diagnostics.into_boxed_slice());
+        }
+
+        let (graph_key, graph) = match self.module_graph_query() {
+            Ok(graph) => graph,
+            Err(QueryError::HirLowering { file, error }) => {
+                let source_name = snapshots
+                    .iter()
+                    .find(|snapshot| snapshot.id() == file)
+                    .map_or("<unknown>", FileSnapshot::logical_name);
+                return Ok(
+                    vec![project_snapshot::hir_error_diagnostic(source_name, &error)]
+                        .into_boxed_slice(),
+                );
+            }
+            Err(error) => return Err(error),
+        };
+        let entry = graph
+            .nodes()
+            .first()
+            .ok_or(QueryError::ResolvedModuleMissing {
+                file: snapshots[0].id(),
+            })?
+            .name()
+            .to_owned();
+        match self.checked_workspace(&graph_key, &graph, &entry) {
+            Ok(_) => Ok(Box::new([])),
+            Err(QueryError::Resolution { errors }) => Ok(errors
+                .iter()
+                .map(ResolveError::to_diagnostic)
+                .collect::<Vec<_>>()
+                .into_boxed_slice()),
+            Err(QueryError::TypeChecking { errors }) => Ok(errors
+                .iter()
+                .map(TypeError::to_diagnostic)
+                .collect::<Vec<_>>()
+                .into_boxed_slice()),
+            Err(QueryError::EffectChecking { errors }) => Ok(errors
+                .iter()
+                .map(EffectError::to_diagnostic)
+                .collect::<Vec<_>>()
+                .into_boxed_slice()),
+            Err(error) => Err(error),
+        }
     }
 
     /// Returns the AST lowered from a valid parse result.

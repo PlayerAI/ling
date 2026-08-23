@@ -69,7 +69,7 @@ fn maps_the_complete_public_shape_and_related_sources_exactly() {
                     {"changes_semantics": false, "kind": "add_annotation"}
                 ],
                 "semanticId": "sid:type:7",
-                "version": "ling.lsp.diagnostic/0.1"
+                "version": "ling.lsp.diagnostic/0.2"
             },
             "message": "中文消息 / English message",
             "range": {
@@ -227,12 +227,7 @@ fn rejects_invalid_source_sets_and_missing_or_unknown_primary_spans() {
     assert!(matches!(
         adapt_diagnostics(
             PositionEncoding::Utf8,
-            &[source(
-                1,
-                "untitled://ling/src/Main.ling",
-                "untitled/src/Main.ling",
-                "abc"
-            )],
+            &[source(1, "file:///src/Main.ling", MAIN_NAME, "abc")],
             &[]
         ),
         Err(DiagnosticAdapterError::InvalidSourceUri { .. })
@@ -302,6 +297,30 @@ fn rejects_invalid_source_sets_and_missing_or_unknown_primary_spans() {
         adapt_diagnostics(PositionEncoding::Utf8, &[main], &[unknown]),
         Err(DiagnosticAdapterError::UnknownSource { .. })
     ));
+}
+
+#[test]
+fn adapter_v02_accepts_exact_temporary_source_identity() {
+    let sources = [source(
+        1,
+        "untitled://ling/scratch/Main.ling",
+        "untitled/scratch/Main.ling",
+        "凌",
+    )];
+    let input = DiagnosticAdapterInput::new(diagnostic(
+        codes::INVALID_NUMBER,
+        Severity::Error,
+        "untitled/scratch/Main.ling",
+        0,
+        3,
+    ));
+    let adapted = adapt_diagnostics(PositionEncoding::Utf16, &sources, &[input])
+        .expect("validated temporary identity adapts in 0.2");
+    assert_eq!(adapted[0].uri(), "untitled://ling/scratch/Main.ling");
+    assert_eq!(
+        adapted[0].value()["data"]["version"],
+        "ling.lsp.diagnostic/0.2"
+    );
 }
 
 #[test]

@@ -33,8 +33,9 @@ apply repairs.
 - The adapter validates the whole source/input set before returning output,
   projects through the caller-selected encoding, preserves structured fields,
   and sorts by the Accepted DEC-0034 key.
-- `PROTO-LSP-DIAGNOSTIC` registers Experimental
-  `ling.lsp.diagnostic/0.1` in the protocol inventory and support matrix.
+- `PROTO-LSP-DIAGNOSTIC` originally registered Experimental
+  `ling.lsp.diagnostic/0.1`; Accepted RFC-0032 later advanced it compatibly to
+  0.2 solely to admit validated temporary `untitled://ling/...` identities.
 
 ## Tests and evidence
 
@@ -47,8 +48,9 @@ input atomicity.
 
 ## Compatibility and determinism
 
-- Adds current-writer-only Experimental `ling.lsp.diagnostic/0.1`; no previous
-  adapter version or migration exists.
+- This milestone added current-writer-only Experimental
+  `ling.lsp.diagnostic/0.1`. RFC-0032's current 0.2 writer preserves every
+  valid 0.1 non-temporary output and adds only temporary-source acceptance.
 - No diagnostic code, severity, message, repair, core diagnostic JSON schema,
   Ling syntax/semantics, Typed Core, runtime, bytecode, VM, ABI, or Unicode
   17.0.0 table changes.
@@ -63,8 +65,9 @@ bound in `docs/status/implementation-status.toml`.
 
 ## Intentionally deferred
 
-`publishDiagnostics`, pull diagnostics, document/snapshot versions, debounce,
-cancellation, stale-result handling, replacement/clearance, deduplication,
-root-cause/error-storm caps, suppression, tags, immutable code-description
-URLs, Workspace Edits, Semantic Transactions, and Stable compatibility remain
-owned by LSP-2202 through LSP-2205 and future Accepted authorities.
+RFC-0032/LSP-2202 now owns `publishDiagnostics`, snapshot/document versions,
+logical debounce, stale-result handling, and replacement/clearance. Pull
+diagnostics remain LSP-2203; deduplication, root-cause/error-storm caps, and
+suppression remain LSP-2204. Cancellation requests, tags, immutable
+code-description URLs, Workspace Edits, Semantic Transactions, and Stable
+compatibility remain deferred.

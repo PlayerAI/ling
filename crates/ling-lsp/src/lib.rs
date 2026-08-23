@@ -36,8 +36,13 @@ pub use diagnostics::{
     AdaptedDiagnostic, DIAGNOSTIC_PROTOCOL_VERSION, DiagnosticAdapterError, DiagnosticAdapterInput,
     DiagnosticProjectionError, DiagnosticSource, RelatedDiagnosticLabel, adapt_diagnostics,
 };
-// DEC-0035 is an internal immutable collection child; public diagnostics
-// publication remains deferred to the parent LSP contracts.
+mod publication;
+pub use publication::{
+    DiagnosticAnalysisError, DiagnosticAnalysisResult, DiagnosticAnalysisTicket,
+    PUBLISH_DIAGNOSTICS_PROTOCOL_VERSION,
+};
+// DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
+// separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
 mod diagnostic_batch;
 
@@ -137,6 +142,7 @@ pub struct RequestDocument {
     revision: Revision,
     origin: FileOrigin,
     open: bool,
+    temporary: bool,
     client_version: Option<i64>,
     bytes: Box<[u8]>,
 }
@@ -170,6 +176,12 @@ impl RequestDocument {
     #[must_use]
     pub const fn is_open(&self) -> bool {
         self.open
+    }
+
+    /// Returns whether this is an untitled editor-only document.
+    #[must_use]
+    pub const fn is_temporary(&self) -> bool {
+        self.temporary
     }
 
     /// Returns the client version for an open document, or `None` for a
@@ -479,6 +491,8 @@ pub enum TransportError {
     FrameTooLarge { length: usize },
     /// The input ended in the middle of a header or body.
     UnexpectedEof,
+    /// Synchronous diagnostic analysis failed before publication.
+    DiagnosticAnalysis(DiagnosticAnalysisError),
 }
 
 impl fmt::Display for TransportError {
@@ -496,6 +510,9 @@ impl fmt::Display for TransportError {
                 MAX_FRAME_BYTES
             ),
             Self::UnexpectedEof => formatter.write_str("truncated LSP frame"),
+            Self::DiagnosticAnalysis(error) => {
+                write!(formatter, "LSP diagnostic analysis failed: {error}")
+            }
         }
     }
 }
@@ -504,6 +521,7 @@ impl std::error::Error for TransportError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(error) => Some(error),
+            Self::DiagnosticAnalysis(error) => Some(error),
             _ => None,
         }
     }
@@ -512,6 +530,12 @@ impl std::error::Error for TransportError {
 impl From<io::Error> for TransportError {
     fn from(error: io::Error) -> Self {
         Self::Io(error)
+    }
+}
+
+impl From<DiagnosticAnalysisError> for TransportError {
+    fn from(error: DiagnosticAnalysisError) -> Self {
+        Self::DiagnosticAnalysis(error)
     }
 }
 
@@ -524,6 +548,9 @@ pub struct LspServer {
     vfs: VirtualFileSystem,
     documents: BTreeMap<String, DocumentRecord>,
     last_versions: BTreeMap<String, i64>,
+    diagnostics_pending: bool,
+    published_diagnostics: BTreeMap<String, Value>,
+    outbound_notifications: Vec<Vec<u8>>,
 }
 
 impl Default for LspServer {
@@ -543,6 +570,9 @@ impl LspServer {
             vfs: VirtualFileSystem::new(),
             documents: BTreeMap::new(),
             last_versions: BTreeMap::new(),
+            diagnostics_pending: false,
+            published_diagnostics: BTreeMap::new(),
+            outbound_notifications: Vec::new(),
         }
     }
 
@@ -607,6 +637,7 @@ impl LspServer {
                 revision: snapshot.revision(),
                 origin: snapshot.origin(),
                 open: record.open,
+                temporary: record.temporary,
                 client_version: record.open.then_some(record.version),
                 bytes: snapshot.bytes().into(),
             });
@@ -624,6 +655,7 @@ impl LspServer {
     ///
     /// An open overlay continues to hide this snapshot until `didClose`.
     pub fn publish_disk_snapshot(&mut self, uri: &str, text: &str) -> Result<(), OverlayError> {
+        let previous_revision = self.vfs.revision();
         let identity = document_identity(uri)?;
         if identity.temporary || text.len() > MAX_DOCUMENT_BYTES {
             return Err(if identity.temporary {
@@ -648,6 +680,9 @@ impl LspServer {
                     temporary: identity.temporary,
                 },
             );
+        }
+        if self.vfs.revision() != previous_revision {
+            self.mark_diagnostics_pending();
         }
         Ok(())
     }
@@ -802,6 +837,9 @@ impl LspServer {
         }
         let result = parse_open_params(&params)
             .and_then(|(uri, version, text)| self.open_document(uri, version, text));
+        if result.is_ok() {
+            self.mark_diagnostics_pending();
+        }
         self.overlay_outcome(is_request, id, result)
     }
 
@@ -811,6 +849,9 @@ impl LspServer {
         }
         let result = parse_change_params(&params)
             .and_then(|(uri, version, changes)| self.change_document(&uri, version, changes));
+        if result.is_ok() {
+            self.mark_diagnostics_pending();
+        }
         self.overlay_outcome(is_request, id, result)
     }
 
@@ -819,6 +860,9 @@ impl LspServer {
             return self.state_error_for(is_request, id);
         }
         let result = parse_close_params(&params).and_then(|uri| self.close_document(&uri));
+        if result.is_ok() {
+            self.mark_diagnostics_pending();
+        }
         self.overlay_outcome(is_request, id, result)
     }
 
@@ -837,13 +881,18 @@ impl LspServer {
         let result =
             parse_workspace_reload(&params).and_then(|reload| self.reload_workspace(reload));
         match result {
-            Ok(result) => HandleOutcome::Response(success_response(
-                id,
-                json!({
-                    "changed": result.changed,
-                    "revision": result.revision.get().to_string(),
-                }),
-            )),
+            Ok(result) => {
+                if result.changed {
+                    self.mark_diagnostics_pending();
+                }
+                HandleOutcome::Response(success_response(
+                    id,
+                    json!({
+                        "changed": result.changed,
+                        "revision": result.revision.get().to_string(),
+                    }),
+                ))
+            }
             Err(WorkspaceReloadError::Stale { .. }) => error_or_none(
                 true,
                 id,
@@ -1254,6 +1303,12 @@ pub fn run_stdio<R: Read, W: Write>(input: R, output: W) -> Result<RunResult, Tr
                     exit_code: code,
                     state: server.state(),
                 });
+            }
+        }
+        if server.state() == LifecycleState::Ready {
+            server.flush_pending_diagnostics()?;
+            for notification in server.take_notifications() {
+                write_frame(&mut writer, &notification)?;
             }
         }
     }
@@ -1813,6 +1868,11 @@ fn initialize_result(encoding: PositionEncoding) -> Value {
                     "sourceLimit": MAX_RELOAD_SOURCES,
                     "totalByteLimit": MAX_RELOAD_TEXT_BYTES,
                     "version": WORKSPACE_PROTOCOL_VERSION,
+                },
+                "lingPublishDiagnostics": {
+                    "adapterVersion": DIAGNOSTIC_PROTOCOL_VERSION,
+                    "debounce": "message-boundary",
+                    "version": PUBLISH_DIAGNOSTICS_PROTOCOL_VERSION,
                 },
             },
             "textDocumentSync": {

@@ -1003,6 +1003,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0032"
+title = "LSP push diagnostics v0"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0032.md"
+covers = ["ling.lsp.publish-diagnostics/0.1", "ling.lsp.diagnostic/0.2 temporary-source extension", "snapshot-fresh versioned publishDiagnostics replacement and clearance"]
+depends_on = ["RFC-0004", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0031", "DEC-0019", "DEC-0034", "DEC-0035", "DEC-0071", "DEC-0072", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"
