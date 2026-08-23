@@ -25,6 +25,12 @@ two-layer requirement rows and seven Seed feature-traceability rows. It does
 not run examples or promote the current Experimental/Preview evidence to a
 Stable 1.0 support claim.
 
+Accepted `DEC-0239` additionally closes only the bounded
+`DOC-6702-EXECUTION-MANIFEST` child. It makes the six checked-in example paths,
+roles, expected outputs, and Semantic witnesses a single strict source shared
+by the governance verifier and CLI process test. It does not promote the
+examples, schema, or features to Stable.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:406-415` is a non-normative checklist. It does
@@ -55,7 +61,9 @@ The missing release evidence is a future Stable support matrix, feature-specific
 profile/target policy, complete cross-platform output fixtures, and examples
 for capabilities whose Accepted semantics and implementation do not yet
 exist. Those are G1-G5 dependencies, not gaps to fill with guessed syntax.
-The matrix verifier checks only the inventory and anti-placeholder policy text.
+The matrix verifier checks the inventory, anti-placeholder policy text, and
+strict six-case execution manifest. The CLI workspace test executes every
+manifest case; this remains current Seed evidence rather than G6 completion.
 
 ## Compatibility and deferred work
 

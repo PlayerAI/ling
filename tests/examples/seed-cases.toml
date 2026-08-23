@@ -1,0 +1,49 @@
+schema = "ling.seed-example-cases/0"
+
+[[case]]
+id = "adt-match"
+path = "examples/adt-match.ling"
+role = "core-realistic"
+expected_stdout = "受伤 30\n"
+semantic_name = "生存状态"
+identifier_style = "chinese"
+
+[[case]]
+id = "hello"
+path = "examples/hello.ling"
+role = "core-minimal"
+expected_stdout = "你好，零\n"
+semantic_name = "main"
+identifier_style = "ascii"
+
+[[case]]
+id = "person"
+path = "examples/人物.ling"
+role = "core-realistic"
+expected_stdout = "存活\n"
+semantic_name = "受到伤害"
+identifier_style = "chinese"
+
+[[case]]
+id = "pipeline"
+path = "examples/pipeline.ling"
+role = "core-realistic"
+expected_stdout = "9\n"
+semantic_name = "加一"
+identifier_style = "chinese"
+
+[[case]]
+id = "tutorial-en"
+path = "examples/tutorial-en.ling"
+role = "tutorial"
+expected_stdout = "alive\n"
+semantic_name = "takeDamage"
+identifier_style = "ascii"
+
+[[case]]
+id = "tutorial-zh"
+path = "examples/tutorial-zh.ling"
+role = "tutorial"
+expected_stdout = "存活\n"
+semantic_name = "受到伤害"
+identifier_style = "chinese"

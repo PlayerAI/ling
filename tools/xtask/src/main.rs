@@ -469,8 +469,8 @@ fn main() -> ExitCode {
             match examples_matrix::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "example matrix OK: {} two-layer requirements, {} feature traceability rows",
-                        summary.requirement_count, summary.feature_count
+                        "example matrix OK: {} two-layer requirements, {} feature traceability rows, {} executable cases",
+                        summary.requirement_count, summary.feature_count, summary.case_count
                     );
                     ExitCode::SUCCESS
                 }

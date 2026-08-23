@@ -6127,3 +6127,30 @@ unresolved_alternatives = [
   "Content completeness; Markdown anchors; external links; recursive directory manifests; generated references; bilingual parity; future manual authority; publication; and G6 sign-off remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0239"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0239-seed-example-execution-manifest.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify the strict six-case manifest and exact role/path classifications.",
+  "Reject traversal or missing source paths and malformed expected stdout in an isolated test.",
+  "Execute all six cases through check, run, and semantic from the shared manifest and validate exact observable results.",
+  "Retain negative conformance and deterministic Audit tests.",
+  "Run examples, CLI, xtask, governance, status, workspace, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Consolidates existing internal example-test metadata and adds hello to the shared process loop; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/runtime behavior, Unicode, protocols, and support states remain unchanged.",
+  "Adds no public manifest protocol, Stable support claim, future syntax, profile, ownership rule, or G6 completion claim.",
+]
+unresolved_alternatives = [
+  "Stable 1.0 example policy; future feature examples; public manifest schema; profile/target matrices; ownership, package, backend, concurrency, and editor examples; cross-host release fixtures; and G6 sign-off remain deferred.",
+]
+superseded_by = ""

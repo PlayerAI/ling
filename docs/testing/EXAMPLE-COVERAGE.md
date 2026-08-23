@@ -32,12 +32,13 @@ authorize syntax, protocols, profiles, ownership rules, or runtime behavior.
 | Semantic Graph and Audit Source | `examples/hello.ling` | `examples/人物.ling`, `examples/adt-match.ling`, and `examples/pipeline.ling` | `ling.semantic/0.1` and `ling.audit/0.1` remain Experimental/Preview protocols |
 | Deterministic tooling | README command matrix and `seed reproduce` | conformance runner, independent-process Semantic/Audit tests, and CI | Offline/locked commands are evidence only; no Stable 1.x promise is made |
 
-The existing process-level test
-`seed_examples_check_run_and_emit_semantic_graphs` covers the three realistic
-Seed examples (`人物`, ADT/match, and pipeline) for check, run, and Semantic
-schema/name evidence. The independent `hello` Semantic and Audit tests cover
-the minimal example and canonical output. The conformance runner executes both
-positive and negative fixtures, including the correct-error layer.
+The strict execution manifest `tests/examples/seed-cases.toml` records one
+minimal example, three realistic examples, and the Chinese/English tutorial
+pair. The process-level test `seed_examples_check_run_and_emit_semantic_graphs`
+reads that same manifest and covers all six sources for check, run, exact
+stdout, and Semantic schema/name evidence. The independent Audit test covers
+deterministic round-trip output. The conformance runner executes both positive
+and negative fixtures, including the correct-error layer.
 
 ## Capability-to-example traceability
 
@@ -91,6 +92,8 @@ unaccepted ownership semantics, an unsupported backend, a migration promise,
 or a stale legacy command/source name.
 
 The internal `cargo xtask examples verify` command validates the exact
-two-layer requirement and Seed feature-traceability rows above. It protects
-inventory drift only; it does not run the examples, create a Stable support
-claim, or replace the conformance and process-level evidence listed here.
+two-layer requirement and Seed feature-traceability rows above plus the strict
+six-case execution manifest. The command itself does not run examples; the
+workspace's CLI process test consumes the same manifest. Neither check creates
+a Stable support claim or replaces the registered negative conformance and
+Audit evidence listed here.

@@ -29,6 +29,24 @@ struct Expectation {
     diagnostic_codes: Vec<String>,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExampleCases {
+    schema: String,
+    case: Vec<ExampleCase>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ExampleCase {
+    id: String,
+    path: String,
+    role: String,
+    expected_stdout: String,
+    semantic_name: String,
+    identifier_style: String,
+}
+
 #[test]
 fn conformance_fixtures() {
     let fixture_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/conformance");
@@ -429,15 +447,31 @@ fn loads_an_explicit_import_from_the_entry_module_root() {
 
 #[test]
 fn seed_examples_check_run_and_emit_semantic_graphs() {
-    let examples = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples");
-    for (file, expected_stdout, required_name) in [
-        ("人物.ling", "存活\n", "受到伤害"),
-        ("adt-match.ling", "受伤 30\n", "生存状态"),
-        ("pipeline.ling", "9\n", "加一"),
-        ("tutorial-zh.ling", "存活\n", "受到伤害"),
-        ("tutorial-en.ling", "alive\n", "takeDamage"),
-    ] {
-        let path = examples.join(file);
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let manifest_path = root.join("tests/examples/seed-cases.toml");
+    let manifest_source = fs::read_to_string(&manifest_path)
+        .unwrap_or_else(|error| panic!("failed to read {}: {error}", manifest_path.display()));
+    let manifest: ExampleCases = toml::from_str(&manifest_source)
+        .unwrap_or_else(|error| panic!("failed to parse {}: {error}", manifest_path.display()));
+    assert_eq!(manifest.schema, "ling.seed-example-cases/0");
+    assert_eq!(manifest.case.len(), 6);
+
+    let mut ids = BTreeSet::new();
+    for case in manifest.case {
+        assert!(
+            ids.insert(case.id.clone()),
+            "duplicate example id {}",
+            case.id
+        );
+        assert!(matches!(
+            case.role.as_str(),
+            "core-minimal" | "core-realistic" | "tutorial"
+        ));
+        assert!(matches!(
+            case.identifier_style.as_str(),
+            "ascii" | "chinese"
+        ));
+        let path = root.join(&case.path);
         let checked = Command::new(env!("CARGO_BIN_EXE_ling"))
             .args(["check", "--format", "json"])
             .arg(&path)
@@ -460,7 +494,7 @@ fn seed_examples_check_run_and_emit_semantic_graphs() {
         assert!(executed.status.success(), "{}", path.display());
         assert_eq!(
             String::from_utf8(executed.stdout).expect("example stdout is UTF-8"),
-            expected_stdout
+            case.expected_stdout
         );
         assert!(executed.stderr.is_empty());
 
@@ -482,7 +516,7 @@ fn seed_examples_check_run_and_emit_semantic_graphs() {
         assert!(graph["definitions"].as_array().is_some_and(|definitions| {
             definitions
                 .iter()
-                .any(|definition| definition["name"] == required_name)
+                .any(|definition| definition["name"] == case.semantic_name)
         }));
     }
 }

@@ -3614,3 +3614,16 @@ covers = ["DOC-6701 bounded formal-inventory evidence-path integrity", "twelve r
 depends_on = ["DEC-0045", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0239"
+title = "Seed example execution manifest"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0239-seed-example-execution-manifest.md"
+covers = ["DOC-6702 bounded Seed example execution-manifest integrity", "six exact checked-in sources shared by governance validation and real CLI check/run/semantic process evidence", "internal manifest without Stable-support, public-schema, future-feature, cross-host, or G6 completion claims"]
+depends_on = ["DEC-0046", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
