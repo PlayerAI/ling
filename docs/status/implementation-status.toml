@@ -3689,17 +3689,21 @@ spec = [
   "docs/status/ZED-6803-AUTHORITY-AUDIT.md",
   "docs/testing/DAP-STATUS.md",
   "docs/decisions/0051-seed-dap-status-inventory-gate.md",
+  "docs/decisions/0244-current-dap-boundary-evidence.md",
 ]
 artifacts = [
   "docs/status/ZED-6804-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6804-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6804-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/DAP-STATUS.md",
+  "tools/xtask/src/dap_status.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The status explicitly keeps DAP unavailable/non-blocking for language and basic editor 1.0 support and does not present an incomplete debugger as Preview or Stable.",
   "The matrix maps adapter, Zed registration, launch/attach, breakpoint/step, stack/variables, Fault/stop, Task/Actor, protocol, and security/platform rows to actual evidence and required Preview authority.",
-  "The audit links DAP-3601 through DAP-3603, VM/source-map limits, support/protocol registries, and the G1-G5 dependency without inventing protocol or runtime behavior.",
+  "The audit links DAP-3601 through DAP-3603, their three completed 60-boundary observation children, VM/source-map limits, support/protocol registries, and the G1-G5 dependency without inventing protocol or runtime behavior.",
   "The repository gates validate the negative boundary; no DAP process, network request, extension registration, debugger control, or system configuration is exercised.",
   "No placeholder command, API, protocol, schema, backend, migration promise, or stale legacy name is added.",
 ]
@@ -3708,7 +3712,8 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "ZED-6804 is BlockedSpec because DAP-3601 through DAP-3603 have no accepted adapter, registration, protocol, runtime debug metadata, or executable evidence.",
+  "ZED-6804 is BlockedSpec because DAP-3601 through DAP-3603 have no accepted adapter, registration, protocol, runtime debug metadata, or executable debugger behavior; their observation children are test-only vocabulary evidence.",
+  "Accepted DEC-0244 closes only current test-only observation evidence and does not authorize any DAP behavior or support promotion.",
   "The release policy is recorded as non-blocking: unsupported DAP must not block language checking, running, grammar-only editing, or other independently supported capabilities, and must not expose misleading debugger controls.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, or public API and performs no external network/system mutation.",
 ]
@@ -3759,7 +3764,7 @@ artifacts = [
 ]
 acceptance = [
   "cargo xtask dap verify deterministically validates nine DAP surfaces: four Unavailable, three Future, one Partial foundation, and one Unsupported state with non-empty evidence/authority cells.",
-  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, missing non-blocking/no-control markers, missing DAP-3601/3602/3603 audit markers, and stale legacy names.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, missing non-blocking/no-control markers, missing DAP-3601/3602/3603 audit or observation markers, and stale legacy names.",
   "The command is included in the governance-authority CI gate and does not run a debugger, register DAP, read settings, contact a registry, allocate public diagnostics, define wire fields, or change runtime behavior.",
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0051 closes only this internal Seed DAP-status child; the parent ZED-6804 gate remains BlockedSpec for DAP protocol, adapter, registration, and release evidence.",
@@ -3769,8 +3774,59 @@ completion_commit = "cf49269ecee39eeb8f3033a5520127f2837f4755"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "The verifier protects the non-blocking DAP boundary only; VM/Fault/source-map evidence remains experimental foundation, not debugger protocol behavior.",
+  "The original Seed verifier protects the non-blocking DAP boundary and three authority audits; accepted DEC-0244 adds six current observation test/report files without changing any surface state.",
   "No adapter, debugger command, extension registration, launch/attach API, network request, system configuration, or placeholder public API is added.",
+]
+
+[[task]]
+id = "ZED-6804-CURRENT-EVIDENCE"
+title = "Current DAP observation evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DAP-3601-OBSERVATION", "DAP-3602-OBSERVATION", "DAP-3603-OBSERVATION", "ZED-6803-CURRENT-EVIDENCE", "ZED-6804-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0051-seed-dap-status-inventory-gate.md",
+  "docs/decisions/0144-dap-debugger-boundary-evidence.md",
+  "docs/decisions/0145-zed-debugger-registration-boundary-evidence.md",
+  "docs/decisions/0146-staged-debugger-capability-boundary-evidence.md",
+  "docs/decisions/0244-current-dap-boundary-evidence.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/testing/DAP-STATUS.md",
+  "docs/status/ZED-6804-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "crates/ling-types/tests/dap_debugger_boundary_evidence.rs",
+  "crates/ling-types/tests/zed_debugger_registration_evidence.rs",
+  "crates/ling-types/tests/staged_debugger_capability_evidence.rs",
+  "docs/status/DAP-3601-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/status/DAP-3602-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/status/DAP-3603-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "tools/xtask/src/dap_status.rs",
+  "tools/xtask/src/main.rs",
+  "docs/status/ZED-6804-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6804-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The nine-surface matrix retains four Unavailable, three Future, one Partial foundation, and one Unsupported state while referencing current observation evidence.",
+  "Three ling-types integrations pass nine tests across 180 exact provisional adapter, Zed-registration, and staged-capability boundaries with local ordering, duplicate rejection, deterministic forward/reverse bytes, and explicit no-authority checks.",
+  "cargo xtask dap verify validates three authority audits plus six current observation test/report files and rejects missing counts, tags, test names, report scopes, or parent BlockedSpec handoffs.",
+  "The matrix and verifier distinguish test-only completeness vocabulary from DAP messages, runtime behavior, Zed registration, public protocols, and support claims.",
+  "Focused DAP/observation checks plus workspace, CI, governance, support, status, formatting, lint, deterministic, traceability, and offline gates pass.",
+]
+verified_against_commit = "e6987c928437d5c5d80b92051b6df8f5c0fafbcf"
+completion_commit = "e6987c928437d5c5d80b92051b6df8f5c0fafbcf"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "ZED-6804 remains BlockedSpec for DAP wire/lifecycle, launch/attach/session, breakpoints/step, value/Fault/Task/Actor mappings, runtime/source-map and binary identity, security/resources, Zed registration, acquisition, platform fixtures, migration, and release support.",
+  "This child integrates test-only evidence; no Ling semantic, diagnostic, schema, Semantic ID, package, dependency, CLI/LSP/DAP/editor behavior, runtime, Unicode, protocol, support, network, or public API changes.",
 ]
 
 [[task]]

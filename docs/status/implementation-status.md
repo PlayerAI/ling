@@ -515,6 +515,7 @@
 | `ZED-6803-CURRENT-EVIDENCE` | Current grammar, LSP, and position acceptance evidence | `G6` | `S` | `Done` | `ZED-6801-CURRENT-EVIDENCE`, `ZED-6802-CURRENT-EVIDENCE`, `ZED-6803-SEED` | `75ac1729356af7ac4af5b0d7b6304d7e6f3adf5b` |
 | `ZED-6803-SEED` | Seed Zed extension acceptance inventory drift gate | `G6` | `S` | `Done` | `ZED-6802-SEED` | `75b6dd213dc1b07717f8cf2718dbe939176b76ae` |
 | `ZED-6804` | DAP Status | `G6` | `M` | `BlockedSpec` | `ZED-6803` | `` |
+| `ZED-6804-CURRENT-EVIDENCE` | Current DAP observation evidence | `G6` | `S` | `Done` | `DAP-3601-OBSERVATION`, `DAP-3602-OBSERVATION`, `DAP-3603-OBSERVATION`, `ZED-6803-CURRENT-EVIDENCE`, `ZED-6804-SEED` | `e6987c928437d5c5d80b92051b6df8f5c0fafbcf` |
 | `ZED-6804-SEED` | Seed DAP status inventory drift gate | `G6` | `S` | `Done` | `ZED-6803-SEED` | `cf49269ecee39eeb8f3033a5520127f2837f4755` |
 | `ZQ-3201` | Syntax highlighting queries | `G1` | `S` | `Done` | `TS-3108` | `77aab24ff8160e1535ea15b67d5302c1a4bb3fc8` |
 | `ZQ-3202` | Bracket matching queries | `G1` | `S` | `Done` | `ZQ-3201` | `1106b323685ed4910e6580a4347dce47df466208` |
