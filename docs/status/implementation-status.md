@@ -433,6 +433,7 @@
 | `STD-6301` | Stable Standard Library Audit | `G6` | `L` | `BlockedSpec` | `PROTO-6204` | `` |
 | `STD-6301-OBSERVATION` | Internal Stable Standard Library Audit boundary evidence | `G6` | `S` | `Done` | `PROTO-6204-OBSERVATION` | `5c2f2ae0bbb34aad83ad5f7deb53cbc6d8cd5623` |
 | `STD-6302` | Remove Convenience APIs | `G6` | `L` | `BlockedSpec` | `STD-6301` | `` |
+| `STD-6302-OBSERVATION` | Internal Convenience API Removal Audit boundary evidence | `G6` | `S` | `Done` | `STD-6301-OBSERVATION` | `74eff3886fd9305f1c4bdc3c78025a7289200a81` |
 | `STD-6303` | Unicode and Chinese-Programming Stability | `G6` | `L` | `BlockedSpec` | `STD-6302` | `` |
 | `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `SUP-2401-OBSERVATION` | Internal Supervisor observation | `G2` | `S` | `Done` | `ACT-2306-PROPERTY-OBSERVATION` | `c29d95c7bc7b926c92757b2c32fccf960500e421` |

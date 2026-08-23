@@ -23883,6 +23883,54 @@ notes = [
 ]
 
 [[task]]
+id = "STD-6302-OBSERVATION"
+title = "Internal Convenience API Removal Audit boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["STD-6301-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/LANGUAGE.md",
+  "docs/SEMANTICS.md",
+  "docs/decisions/0011-seed-builtins.md",
+  "docs/decisions/0014-seed-prelude-option-result.md",
+  "docs/decisions/0223-stable-standard-library-audit-boundary-evidence.md",
+  "docs/decisions/0224-convenience-api-removal-audit-boundary-evidence.md",
+  "docs/status/STD-6302-AUTHORITY-AUDIT.md",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-resolve/src/lib.rs",
+  "crates/ling-types/tests/convenience_api_removal_audit_evidence.rs",
+  "docs/status/STD-6302-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/STD-6302-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0224 authorizes only bounded convenience-API removal audit evidence; the current delete/hide/deprecate/migrate set is explicitly empty.",
+  "All twelve Accepted injected Seed symbols remain present and unchanged; representative plan-only Clock, Random, Network/retry, global-runtime, reflection, FFI, and unbounded-collection names remain absent.",
+  "The test-local inventory covers sixty lifecycle, risk, symbol, semantic, package, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "No core/Preview package split, replacement, diagnostic, compatibility window, package/lock transition, or migration behavior is inferred.",
+  "cargo test -p ling-resolve --locked --offline passes.",
+  "cargo test -p ling-types --test convenience_api_removal_audit_evidence --locked --offline passes.",
+  "cargo clippy -p ling-resolve -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "support, governance, formatting, and diff checks pass without changing public API behavior or lifecycle claims.",
+]
+verified_against_commit = "74eff3886fd9305f1c4bdc3c78025a7289200a81"
+completion_commit = "74eff3886fd9305f1c4bdc3c78025a7289200a81"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0224; STD-6302 remains BlockedSpec for any real removal, deprecation, replacement, package transition, migration, diagnostics, compatibility, or release evidence.",
+  "The opaque ling.convenience-api-removal-audit-observation/0 bytes are test evidence only and are not a removal manifest, API version, deprecation protocol, Semantic ID input, or migration record.",
+  "No API, symbol, type, Effect, Capability, Fault, package, profile, diagnostic, Semantic ID, source span, or Unicode behavior changed.",
+]
+
+[[task]]
 id = "STD-6303"
 title = "Unicode and Chinese-Programming Stability"
 state = "BlockedSpec"
