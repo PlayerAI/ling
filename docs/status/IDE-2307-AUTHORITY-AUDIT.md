@@ -1,8 +1,13 @@
 # IDE-2307 Authority Audit: Completion v0
 
+> Historical blocker audit. RFC-0042 was Accepted on 2026-08-23 and supplies
+> the bounded authority this audit required. See
+> `docs/status/IDE-2307-IMPLEMENTATION-REPORT.md` for current evidence.
+
 ## Outcome
 
-`IDE-2307` is correctly recorded as `BlockedSpec`. The execution plan names six
+At the time of this audit, `IDE-2307` was correctly recorded as `BlockedSpec`.
+The execution plan names six
 completion contexts (expression start, member access, type position,
 pattern/variant, import/module, and keyword) and requires ordering by scope
 proximity, type fit, explicit imports, and stable dictionary order, with no AI

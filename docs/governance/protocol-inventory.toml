@@ -398,6 +398,28 @@ authority = ["RFC-0041", "RFC-0040", "RFC-0039", "RFC-0038", "RFC-0004", "RFC-00
 notes = ["The bounded standard Workspace Edit is proposed to the client and is never applied by the server. General Semantic Transactions, language Alias syntax, localized Author Source, generated or dependency mutation, module/file rename, type-only identities, cancellation, annotations, and Stable lifecycle remain out of scope."]
 
 [[protocol]]
+id = "PROTO-LSP-COMPLETION"
+title = "Ling checked deterministic LSP completion"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.completion/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling-lsp textDocument/completion"]
+consumer = ["LSP clients with standard completion support"]
+reader_policy = "Clients gate on exact ling.lsp.completion/0.1 discovery; completionItem/resolve is unsupported and items intentionally omit metadata and internal identities."
+writer_policy = "Emit a bounded deterministic Completion List from one completely checked immutable snapshot; validate each replacement through a fresh compiler, publish only exact PlainText text edits, and never use AI or unchecked fallback."
+unknown_field_policy = "Ignore ordinary unknown request fields while rejecting malformed known members; request, context, candidate, validation, ranking, field, kind, edit, bound, snapshot, or failure changes require a new marker and migration evidence."
+migration_tool = "None; ling.lsp.completion/0.1 is Preview with no predecessor and clients gate on the exact completionProvider plus lingCompletion discovery object."
+fixtures = ["crates/ling-db/src/checked_completion_catalog.rs", "crates/ling-lsp/tests/completion.rs", "tests/protocols/lsp-completion/README.md", "docs/status/IDE-2307-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0042.md", "docs/RFC-0004.md", "docs/RFC-0005.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/RFC-0037.md", "docs/RFC-0038.md", "docs/RFC-0039.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0075-ide-resolved-reference-index.md", "docs/decisions/0079-ide-completion-source-inventory.md", "docs/decisions/0080-ide-completion-checked-metadata.md", "crates/ling-db/src/checked_completion_catalog.rs", "crates/ling-lsp/src/completion.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.completion/0.1", "textDocument/completion", "completionProvider", "lingCompletion"]
+authority = ["RFC-0042", "RFC-0039", "RFC-0038", "RFC-0037", "RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0075", "DEC-0079", "DEC-0080"]
+notes = ["The Preview requires a fully checked baseline and existing-token replacement; incomplete-source recovery, zero-width insertion, auto-imports, snippets, resolve metadata, AI ranking, and Stable lifecycle remain out of scope."]
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 title = "Ling LSP bounded document formatting"
 category = "LSP"

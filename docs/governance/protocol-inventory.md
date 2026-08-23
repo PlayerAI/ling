@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 42 records: 38 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 22 Preview, 0 Stable.
+- 43 records: 39 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 23 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -17,6 +17,7 @@
 | `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 10 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 4 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
+| `PROTO-LSP-COMPLETION` | Public | LSP | `ling.lsp.completion/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-DIAGNOSTIC` | Public | LSP | `ling.lsp.diagnostic/0.2` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-DIAGNOSTIC-CONTROL` | Public | LSP | `ling.lsp.diagnostic-control/0.1` | `Preview` | no | no | 5 |
 | `PROTO-LSP-DOCUMENT-SYMBOL` | Public | LSP | `ling.lsp.document-symbol/0.1` | `Preview` | no | no | 3 |
@@ -97,6 +98,19 @@
 - Sources: [`docs/RFC-0024.md`](../RFC-0024.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-project/src/lib.rs`](../../crates/ling-project/src/lib.rs)
 - Fixtures: [`crates/ling-cli/tests/project_check.rs`](../../crates/ling-cli/tests/project_check.rs), [`tests/protocols/project-check/README.md`](../../tests/protocols/project-check/README.md)
 - Notes: Graph validation only: semantic compilation, run/test/build, workspace search, registry/network behavior, and lock update mode remain deferred.
+
+### `PROTO-LSP-COMPLETION` — Ling checked deterministic LSP completion
+
+- Producer: ling-lsp textDocument/completion
+- Consumer: LSP clients with standard completion support
+- Reader policy: Clients gate on exact ling.lsp.completion/0.1 discovery; completionItem/resolve is unsupported and items intentionally omit metadata and internal identities.
+- Writer policy: Emit a bounded deterministic Completion List from one completely checked immutable snapshot; validate each replacement through a fresh compiler, publish only exact PlainText text edits, and never use AI or unchecked fallback.
+- Unknown-field policy: Ignore ordinary unknown request fields while rejecting malformed known members; request, context, candidate, validation, ranking, field, kind, edit, bound, snapshot, or failure changes require a new marker and migration evidence.
+- Migration tool: None; ling.lsp.completion/0.1 is Preview with no predecessor and clients gate on the exact completionProvider plus lingCompletion discovery object.
+- Authority: `RFC-0042`, `RFC-0039`, `RFC-0038`, `RFC-0037`, `RFC-0004`, `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0075`, `DEC-0079`, `DEC-0080`
+- Sources: [`docs/RFC-0042.md`](../RFC-0042.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0037.md`](../RFC-0037.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0079-ide-completion-source-inventory.md`](../decisions/0079-ide-completion-source-inventory.md), [`docs/decisions/0080-ide-completion-checked-metadata.md`](../decisions/0080-ide-completion-checked-metadata.md), [`crates/ling-db/src/checked_completion_catalog.rs`](../../crates/ling-db/src/checked_completion_catalog.rs), [`crates/ling-lsp/src/completion.rs`](../../crates/ling-lsp/src/completion.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-db/src/checked_completion_catalog.rs`](../../crates/ling-db/src/checked_completion_catalog.rs), [`crates/ling-lsp/tests/completion.rs`](../../crates/ling-lsp/tests/completion.rs), [`tests/protocols/lsp-completion/README.md`](../../tests/protocols/lsp-completion/README.md), [`docs/status/IDE-2307-IMPLEMENTATION-REPORT.md`](../status/IDE-2307-IMPLEMENTATION-REPORT.md)
+- Notes: The Preview requires a fully checked baseline and existing-token replacement; incomplete-source recovery, zero-width insertion, auto-imports, snippets, resolve metadata, AI ranking, and Stable lifecycle remain out of scope.
 
 ### `PROTO-LSP-DIAGNOSTIC` — Ling LSP compiler diagnostic adapter
 

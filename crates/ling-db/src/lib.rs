@@ -27,6 +27,7 @@ use ling_source::{
 use ling_syntax::{LexedSource, ParsedSource, lex, parse};
 use ling_types::{self, TypeError};
 
+mod checked_completion_catalog;
 mod checked_hover_index;
 mod checked_token_source_index;
 mod completion_metadata_index;
@@ -44,6 +45,10 @@ mod resolved_outline;
 mod token_source_index;
 mod typed_definition_index;
 
+pub use checked_completion_catalog::{
+    CheckedCompletionCandidate, CheckedCompletionCatalog, CheckedCompletionKind,
+    MAX_CHECKED_COMPLETION_CANDIDATES,
+};
 pub use checked_hover_index::{
     CheckedHoverEntry, CheckedHoverIndex, CheckedHoverIndexError, CheckedHoverKind,
     CheckedHoverTraitSelection, MAX_CHECKED_HOVER_ENTRIES,
@@ -1336,6 +1341,20 @@ impl CompilerDb {
         Ok(Arc::new(ResolvedCompletionMetadataIndex::from_checked(
             &checked,
         )))
+    }
+
+    /// Builds the bounded wire-agnostic candidate facts authorized by RFC-0042.
+    pub fn checked_completion_catalog(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<CheckedCompletionCatalog>, QueryError> {
+        let (graph_key, graph) = self.module_graph_query()?;
+        let node = graph
+            .node(file)
+            .cloned()
+            .ok_or(QueryError::UnknownFile { file })?;
+        let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+        Ok(Arc::new(CheckedCompletionCatalog::from_checked(&checked)))
     }
 
     /// Builds an immutable source-order observation of checked user

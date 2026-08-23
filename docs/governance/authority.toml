@@ -1133,6 +1133,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0042"
+title = "Checked Deterministic LSP Completion Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0042.md"
+covers = ["ling.lsp.completion/0.1", "checked deterministic textDocument/completion over six bounded compiler contexts", "fresh checked replacement probes, explicit ranking, exact text edits, bounds, freshness, and no-AI behavior"]
+depends_on = ["RFC-0004", "RFC-0005", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0037", "RFC-0038", "RFC-0039", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0075", "DEC-0079", "DEC-0080", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

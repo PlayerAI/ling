@@ -8,7 +8,8 @@
 //! the authority for position projection; RFC-0036 governs Document Symbols;
 //! RFC-0037 governs checked Hover; RFC-0038 governs resolver navigation;
 //! RFC-0039 governs checked References; RFC-0040 governs Prepare Rename;
-//! RFC-0041 governs checked transactional Rename.
+//! RFC-0041 governs checked transactional Rename; RFC-0042 governs checked
+//! deterministic Completion.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -66,6 +67,8 @@ mod prepare_rename;
 pub use prepare_rename::PREPARE_RENAME_PROTOCOL_VERSION;
 mod rename;
 pub use rename::RENAME_PROTOCOL_VERSION;
+mod completion;
+pub use completion::{COMPLETION_PROTOCOL_VERSION, MAX_COMPLETION_ITEMS};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -815,6 +818,7 @@ impl LspServer {
             "textDocument/references" => self.references(id_present, id, params),
             "textDocument/prepareRename" => self.prepare_rename(id_present, id, params),
             "textDocument/rename" => self.rename(id_present, id, params),
+            "textDocument/completion" => self.completion(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -2024,6 +2028,10 @@ fn initialize_result(
             "documentSymbolProvider": true,
             "hoverProvider": true,
             "referencesProvider": true,
+            "completionProvider": {
+                "resolveProvider": false,
+                "triggerCharacters": ["."],
+            },
             "renameProvider": {
                 "prepareProvider": true,
                 "workDoneProgress": false,
@@ -2055,6 +2063,12 @@ fn initialize_result(
                     "result": "versionedDocumentChanges",
                     "transactional": true,
                     "version": RENAME_PROTOCOL_VERSION,
+                },
+                "lingCompletion": {
+                    "contexts": ["expression", "member", "type", "pattern", "module", "keyword"],
+                    "maxItems": MAX_COMPLETION_ITEMS,
+                    "source": "checked",
+                    "version": COMPLETION_PROTOCOL_VERSION,
                 },
                 "lingDocumentSymbols": {
                     "maxSymbols": MAX_DOCUMENT_SYMBOLS,

@@ -7143,3 +7143,31 @@ unresolved_alternatives = [
   "General Semantic Transactions, Stable edit lifecycle, localized Author Source equivalence, language Alias declarations, generated or virtual mutation, module and file renames, type-only identities, cancellation, and change annotations remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0042"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0042.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact provider and discovery shapes, lifecycle, notification silence, params and context validation, URI and position rejection, empty lists, fixed failures, response bounds, and absence of resolve.",
+  "Cover expression, module-member, record-member, type, variant-pattern, import-module, and keyword contexts; locals and parameters, shadowing, same/imported/Prelude/builtin sources, duplicate collapse, and visibility.",
+  "Cover checked type, Effect, and Capability filtering, invalid replacement probes, deterministic rank ties, prefix filtering, item cap and incomplete behavior, repeated requests, and insertion-order independence without AI.",
+  "Cover UTF-8, UTF-16, and UTF-32 positions, Chinese identifiers, combining marks, emoji prefixes, BOM, CRLF, exact single-line replacement ranges, temporary isolation, stale snapshots, and absence of internal metadata.",
+  "Migrate exact initialize transcripts and run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.completion/0.1 for standard textDocument/completion with no predecessor and no completionItem/resolve support.",
+  "Adds one bounded immutable checked compiler completion catalog while keeping resolver and Semantic identities internal and DEC-0079/DEC-0080 observations unchanged.",
+  "Adds no diagnostic allocation, Ling syntax or semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, package, filesystem/network behavior, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Incomplete-source recovery, zero-width sites, auto-imports, snippets, lazy metadata, documentation and signature rendering, AI ranking, generated sources, cancellation, dynamic registration, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""
