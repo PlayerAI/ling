@@ -22041,6 +22041,68 @@ notes = [
 ]
 
 [[task]]
+id = "TIM-5703-OBSERVATION"
+title = "Internal Deadline Check boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TIM-5702-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0207-timing-analysis-separation-boundary-evidence.md",
+  "docs/decisions/0208-deadline-check-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/deadline_check_evidence.rs",
+  "docs/decisions/0208-deadline-check-boundary-evidence.md",
+  "docs/status/TIM-5703-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/TIM-5703-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0208 authorizes only test-local Deadline Check boundary evidence; no Node/deadline semantics, checker, schedulability result, WCET certificate, overrun Fault, schema, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty Node timing, comparison, identity, overrun, failure, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; comparison inputs and target/profile/build identity remain distinct; tag has no checker, result, WCET, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test deadline_check_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "ac1e7c226350c6694dd2b9997daa0d3cd149e2e4"
+completion_commit = "ac1e7c226350c6694dd2b9997daa0d3cd149e2e4"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0208; TIM-5703 remains BlockedSpec for Node/clock/overrun, comparison/schedulability/WCET, target identity, diagnostic, protocol, and support semantics.",
+  "No Node syntax/Core/runtime, logical clock, deadline comparison, schedulability result, WCET certificate, overrun Fault, schema, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
+]
+
+[[task]]
 id = "EVD-5801"
 title = "Evidence Bundle Schema"
 state = "BlockedSpec"

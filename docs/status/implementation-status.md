@@ -442,6 +442,7 @@
 | `TIM-5702` | Measurement and Static-Analysis Separation | `G5` | `M` | `BlockedSpec` | `TIM-5701` | `` |
 | `TIM-5702-OBSERVATION` | Internal timing-analysis separation boundary evidence | `G5` | `S` | `Done` | `TIM-5701-OBSERVATION` | `002769f816455efca2932eecf5674f62a4cdf415` |
 | `TIM-5703` | Deadline Check | `G5` | `M` | `BlockedSpec` | `TIM-5702` | `` |
+| `TIM-5703-OBSERVATION` | Internal Deadline Check boundary evidence | `G5` | `S` | `Done` | `TIM-5702-OBSERVATION` | `ac1e7c226350c6694dd2b9997daa0d3cd149e2e4` |
 | `TRAIT-1301` | Trait RFC closure | `G1` | `M` | `Done` | — | `ccab6ea91e05ed477457cc1ed870d76faaa46e3c` |
 | `TRAIT-1302` | Trait AST/HIR representation | `G1` | `M` | `Done` | `TRAIT-1301` | `693b841000c98ca8aae119e3797a737fe0cebc7f` |
 | `TRAIT-1303` | Trait constraint collection | `G1` | `M` | `Done` | `TRAIT-1302` | `1dfc52ee4439c43f284fbf384869436a408344d3` |
