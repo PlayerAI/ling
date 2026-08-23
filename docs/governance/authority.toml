@@ -3263,3 +3263,16 @@ covers = ["EVD-5803 bounded Reproducible Build Binding boundary evidence", "test
 depends_on = ["DEC-0210", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0212"
+title = "Internal AI Provenance boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0212-ai-provenance-boundary-evidence.md"
+covers = ["EVD-5804 bounded AI Provenance boundary evidence", "test-only provenance/privacy/non-proof vocabulary", "provenance boundaries without schema/privacy/approval semantics"]
+depends_on = ["DEC-0211", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

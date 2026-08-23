@@ -497,6 +497,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EVD-5803` | G5 | 可重复构建绑定 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:557`, `docs/status/EVD-5803-AUTHORITY-AUDIT.md` |
 | `EVD-5803-OBSERVATION` | G5 | Internal Reproducible Build Binding boundary evidence | S | Done | Accepted `DEC-0211`; see `crates/ling-types/tests/reproducible_build_binding_evidence.rs` and `docs/status/EVD-5803-OBSERVATION-IMPLEMENTATION-REPORT.md`; manifest/artifact/equivalence semantics remain BlockedSpec |
 | `EVD-5804` | G5 | AI Provenance | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:566`, `docs/status/EVD-5804-AUTHORITY-AUDIT.md` |
+| `EVD-5804-OBSERVATION` | G5 | Internal AI Provenance boundary evidence | S | Done | Accepted `DEC-0212`; see `crates/ling-types/tests/ai_provenance_evidence.rs` and `docs/status/EVD-5804-OBSERVATION-IMPLEMENTATION-REPORT.md`; provenance/privacy/approval semantics remain BlockedSpec |
 | `CBK-5901` | G5 | 可信编译路线决策 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:585`, `docs/status/CBK-5901-AUTHORITY-AUDIT.md` |
 | `CBK-5902` | G5 | Lowering Validator | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:599`, `docs/status/CBK-5902-AUTHORITY-AUDIT.md` |
 | `CBK-5903` | G5 | Critical Runtime/Target Package | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:611`, `docs/status/CBK-5903-AUTHORITY-AUDIT.md` |
