@@ -167,7 +167,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2201-ORDERING` | G1/Editor | Internal canonical diagnostic ordering | S | Done | Accepted DEC-0034; consumed by Accepted `RFC-0031`; see `docs/status/LSP-2201-ORDERING-IMPLEMENTATION-REPORT.md` |
 | `LSP-2202` | G1/Editor | Push diagnostics v0 | — | Done | Accepted RFC-0032; implementation `4914d2346f5647f2cdfad85ef4f1335bd44b9f12`; see `docs/status/LSP-2202-IMPLEMENTATION-REPORT.md` |
 | `LSP-2202-BATCH` | G1/Editor | Internal immutable diagnostic batch | S | Done | Accepted DEC-0035; see `crates/ling-lsp/src/diagnostic_batch.rs` and `docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md`; RFC-0032 separately implements the parent without broadening this child |
-| `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:215`, `docs/status/LSP-2203-AUTHORITY-AUDIT.md` |
+| `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | Done | `04-LSP-IMPLEMENTATION.md:215`, `docs/RFC-0033.md`, `docs/status/LSP-2203-IMPLEMENTATION-REPORT.md` |
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:219`, `docs/status/LSP-2204-AUTHORITY-AUDIT.md` |
 | `LSP-2205` | G1/Editor | Diagnostic fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:227`, `docs/status/LSP-2205-AUTHORITY-AUDIT.md` |
 | `IDE-2301` | G1/Editor | Document symbols | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:244`, `docs/status/IDE-2301-AUTHORITY-AUDIT.md` |

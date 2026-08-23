@@ -6497,7 +6497,7 @@ notes = [
 [[task]]
 id = "LSP-2203"
 title = "LSP pull diagnostics Preview"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6505,6 +6505,9 @@ branch = "main"
 depends_on = ["LSP-2101", "LSP-2201"]
 spec = [
   "AGENTS.md",
+  "docs/RFC-0033.md",
+  "docs/RFC-0032.md",
+  "docs/RFC-0031.md",
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/ERROR-CODES.md",
@@ -6514,24 +6517,35 @@ spec = [
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/src/publication.rs",
+  "crates/ling-lsp/src/pull_diagnostics.rs",
+  "crates/ling-lsp/tests/pull_diagnostics.rs",
+  "docs/RFC-0033.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
   "docs/status/LSP-2203-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2203-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-pull-diagnostics/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing pull request/result, result-id, unchanged, workspace, partial-result, snapshot, cancellation, and push/pull interaction contracts.",
-  "The audit covers diagnostic adapter dependencies, cache invalidation, limits, deterministic ordering, stale revisions, and required Preview/migration fixtures.",
-  "No pull endpoint, result-id cache, workspace report, protocol field, diagnostic allocation, Semantic ID change, or placeholder handler is added while the authority is absent.",
-  "The future implementation must pin results to immutable revisions and keep Preview fields out of Stable contracts.",
+  "Accepted RFC-0033 defines capability-gated LSP 3.17 document/workspace pull diagnostics, stateless result IDs, push parity, bounds, lifecycle, and failure behavior.",
+  "Supporting clients receive the exact Preview provider and full/unchanged reports; non-supporting clients receive no provider and MethodNotFound for requests, while notifications perform no work.",
+  "Pull reuses one freshness-checked immutable RFC-0032 ticket and exact adapter arrays without consuming pending push work or mutating its ledger.",
+  "Workspace results are URI-sorted and cover open/closed versions, empty workspaces, mixed unchanged/full results, and previous-only removed-URI clearance.",
+  "Focused tests cover negotiation, validation, parity, deterministic result identity, temporary syntax isolation, the 1024-entry bound, and oversized-response failure atomicity.",
+  "The complete locked-offline workspace, Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass.",
+  "No diagnostic allocation, core schema, Semantic ID, language/runtime/VM/ABI, or Unicode 17.0.0 behavior changes.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "da69abff0c74765283d3e52e182a7c0ae2f8dc3a"
+completion_commit = "da69abff0c74765283d3e52e182a7c0ae2f8dc3a"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2203 remains BlockedSpec by the missing Accepted pull-diagnostic lifecycle, result-ID, unchanged-result, workspace-report, and push/pull parity contract; RFC-0032 supplies only the completed push side.",
-  "The current diagnostic and query services remain internal/CLI-facing and make no pull result-id or workspace report claim.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "RFC-0033 resolves the former BlockedSpec boundary with a synchronous stateless subset; dynamic registration, cancellation, progress, partial results, refresh, related documents, and Stable lifecycle remain deferred.",
+  "The implementation commit is da69abff0c74765283d3e52e182a7c0ae2f8dc3a; this status binding contains no compiler or protocol behavior change.",
 ]
 
 [[task]]

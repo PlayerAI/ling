@@ -1,6 +1,6 @@
 # LSP-2203 implementation report
 
-> Status: implementation complete; status binding pending
+> Status: Done / completed
 > Task: `LSP-2203`
 > Authority: Accepted `RFC-0033`, `RFC-0032`, `RFC-0031`, `RFC-0030`,
 > `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0034`, `DEC-0071`, and
@@ -54,9 +54,10 @@ identity, and leaves push scheduling and publication state untouched.
 - `crates/ling-lsp/tests/diagnostic_adapter.rs` continues to prove strict
   original-byte projection under UTF-8, UTF-16, and UTF-32 for the exact values
   reused by pull responses.
-- Focused `ling-lsp` tests and strict Clippy pass offline. Repository-wide gate
-  results and the exact implementation commit are recorded during status
-  binding.
+- Focused `ling-lsp` tests and strict Clippy pass offline. The complete locked-
+  offline workspace, Clippy, CI, governance, LSP, support, status, RC0,
+  traceability, formatting, and diff gates pass. The exact implementation
+  commit is `da69abff0c74765283d3e52e182a7c0ae2f8dc3a`.
 
 ## Compatibility, determinism, and Unicode impact
 
