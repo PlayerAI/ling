@@ -26359,9 +26359,9 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "cargo xtask zed-extension verify deterministically validates thirteen acceptance areas, four covered, four partial, five unsupported, two future classifications, and nine evidence files with non-empty evidence/boundary cells.",
-  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, missing authority/no-promotion markers, missing package/query/TS/ZQ evidence markers, and stale legacy names.",
-  "The command is included in the governance-authority CI gate and does not run npm, generate a parser, contact a registry, create an extension manifest, start an LSP process, allocate public diagnostics, or claim marketplace support.",
+  "The retained thirteen-area Seed boundary remains exact; accepted DEC-0243 updates the current classification to four covered, five partial, five unsupported, and two future entries.",
+  "The verifier fails closed on duplicate/missing/unexpected rows, state drift, missing authority/no-promotion markers, missing historical/current/query/position evidence markers, and stale legacy names.",
+  "The command is included in the governance-authority CI gate, composes two read-only upstream gates, and does not run npm, generate a parser, contact a registry, create an extension manifest, start an LSP process, allocate public diagnostics, or claim marketplace support.",
   "Focused xtask, CI-contract, workspace, governance, traceability, and status checks pass offline without changing language, runtime, diagnostics, schemas, protocols, Semantic IDs, or Unicode behavior.",
   "Accepted DEC-0050 closes only this internal Seed editor-inventory child; the parent ZED-6803 gate remains BlockedSpec for full Zed/LSP acceptance and release evidence.",
 ]
@@ -26370,8 +26370,60 @@ completion_commit = "75b6dd213dc1b07717f8cf2718dbe939176b76ae"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "The verifier protects editor acceptance inventory only; the existing grammar/query package and TS/ZQ reports remain editor evidence, not language or Stable Zed authority.",
-  "No extension manifest, LSP feature, formatter, task/runnable, Replay/Evidence UI, install path, marketplace package, network request, system configuration, or placeholder public API is added.",
+  "The original Seed verifier protected editor inventory and nine historical evidence files; accepted DEC-0243 adds current grammar/LSP/position facts, one current report, two composed gates, and three position files.",
+  "No extension manifest, public LSP document feature, editor formatter transaction, task/runnable, Replay/Evidence UI, install path, marketplace package, network request, system configuration, or placeholder public API is added.",
+]
+
+[[task]]
+id = "ZED-6803-CURRENT-EVIDENCE"
+title = "Current grammar, LSP, and position acceptance evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ZED-6801-CURRENT-EVIDENCE", "ZED-6802-CURRENT-EVIDENCE", "ZED-6803-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/decisions/0050-seed-zed-extension-acceptance-inventory-gate.md",
+  "docs/decisions/0241-current-zed-matrix-evidence.md",
+  "docs/decisions/0242-current-lsp-discovery-boundary.md",
+  "docs/decisions/0243-current-zed-acceptance-evidence.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
+  "docs/testing/LSP-DISCOVERY-ACQUISITION.md",
+  "docs/testing/ZED-EXTENSION-ACCEPTANCE.md",
+  "docs/status/ZED-6803-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "crates/ling-source/src/position.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/position_encoding.rs",
+  "docs/status/ZED-6801-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "tools/xtask/src/zed_extension.rs",
+  "tools/xtask/src/main.rs",
+  "docs/status/ZED-6803-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6803-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The thirteen-area matrix records four covered, five partial, five unsupported, and two future classifications while keeping every listed public document feature unsupported.",
+  "The locked npm run verify --offline suite passes on Windows with exact grammar/differential/recovery/query/example totals and zero tracked regeneration drift; Linux/macOS and Zed remain unexecuted.",
+  "cargo xtask zed-extension verify composes the current Zed-matrix and LSP-discovery gates, validates ten historical/current evidence files, and checks three position files for negotiation, Unicode, surrogate, BOM/CRLF, overlay, malformed-metadata, and response evidence.",
+  "Focused negative evidence rejects missing position markers, and source-position plus ling-lsp lifecycle/overlay/position suites pass.",
+  "Focused Zed/LSP checks plus workspace, CI, governance, status, formatting, lint, deterministic, and offline gates pass.",
+]
+verified_against_commit = "75ac1729356af7ac4af5b0d7b6304d7e6f3adf5b"
+completion_commit = "75ac1729356af7ac4af5b0d7b6304d7e6f3adf5b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "ZED-6803 remains BlockedSpec for a Zed manifest/version policy, public LSP document-feature/edit protocols, tasks/runnables, Replay/Evidence UI, restart behavior, workspace limits, installation/marketplace provenance, cross-host/Zed fixtures, migration, and G6 sign-off.",
+  "This child corrects evidence and composes internal validation only; no Ling semantic, diagnostic, public schema, Semantic ID, package, dependency, CLI/LSP/editor behavior, runtime, Unicode, protocol, support, network, or public API changes.",
 ]
 
 [[task]]
@@ -26408,18 +26460,22 @@ spec = [
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
   "docs/testing/ZED-EXTENSION-ACCEPTANCE.md",
   "docs/decisions/0050-seed-zed-extension-acceptance-inventory-gate.md",
+  "docs/decisions/0243-current-zed-acceptance-evidence.md",
 ]
 artifacts = [
   "docs/status/ZED-6803-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6803-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6803-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/ZED-EXTENSION-ACCEPTANCE.md",
+  "tools/xtask/src/zed_extension.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The matrix covers .ling recognition, Tree-sitter highlights/brackets/indentation/outline/textobjects/runnables, all planned LSP features, task/run/test/Audit/Replay/Evidence, Unicode and position cases, crash/restart, large workspace, metadata/license, development install, and marketplace packaging.",
   "Each row is classified Covered, Partial, Unsupported, or Future against actual repository evidence; grammar/query behavior is not promoted to language semantics or Stable Zed compatibility.",
-  "The matrix links existing TS/ZQ fixtures and records the local npm cache-lock failure without claiming a test or platform pass that was not executed.",
-  "The audit preserves the editor-only Tree-sitter boundary, `ling`/`.ling`, Unicode 17.0.0, original UTF-8 spans, deterministic/offline behavior, and explicit LSP/Zed/formatter/replay/evidence limitations.",
+  "The matrix links existing TS/ZQ fixtures, records the passing locked Windows grammar suite and tested Preview LSP/position prerequisites, and does not claim Linux/macOS or Zed execution.",
+  "The audit preserves the editor-only Tree-sitter boundary, `ling`/`.ling`, Unicode 17.0.0, original UTF-8 spans, deterministic/offline behavior, and explicit public LSP/Zed/editor-formatter/replay/evidence limitations.",
   "No placeholder command, protocol, backend, schema, extension package, migration promise, or stale legacy name is added.",
 ]
 verified_against_commit = ""
@@ -26427,8 +26483,8 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "ZED-6803 is BlockedSpec because only a local grammar/query package exists; LSP, formatter, tasks/runnables, replay/evidence, crash/restart, extension packaging, and marketplace contracts are absent.",
-  "The matrix reuses TS-3108 and ZQ-3201 through ZQ-3203 evidence and keeps their editor-only status explicit; local npm verification was blocked by a Windows cache-lock permission error.",
+  "ZED-6803 is BlockedSpec because no Zed package or public document-feature/editor-transaction/task/replay/restart/marketplace contracts exist; the Preview lifecycle/overlay, source positions, formatter CLI, and grammar remain narrower prerequisites.",
+  "Accepted DEC-0243 closes only current grammar/LSP/position acceptance evidence; the passing Windows grammar suite and composed internal gates do not establish Zed or cross-host support.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor protocol, dependencies, or public API.",
 ]
 
