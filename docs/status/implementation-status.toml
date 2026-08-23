@@ -7873,7 +7873,7 @@ completion_commit = "cdc70731f75e27fc508402304e628dcc334c20fb"
 integration_state = "committed"
 completed = "2026-08-24"
 notes = [
-  "LSP-2401 is the taxonomy RFC/decision milestone; typed classification was subsequently completed by LSP-2402, while full/delta wire transport remains LSP-2403, so no semanticTokensProvider is advertised by this completion.",
+  "LSP-2401 is the taxonomy milestone and advertised no provider itself; typed generation was subsequently completed by LSP-2402 and full/delta transport by LSP-2403 under RFC-0048.",
   "RFC-0046 uses existing DEC-0084 through DEC-0087 compiler observations and treats Tree-sitter captures only as separate lexical editor fallback, never semantic truth.",
   "No diagnostic allocation, schema, Semantic ID/canonical-byte, compiler language semantics, Typed Core evaluation, interpreter/VM/bytecode/ABI/package, filesystem/network, source-span truth, or Unicode 17.0.0 table changes.",
 ]
@@ -7983,7 +7983,7 @@ completion_commit = "899d00f56d444f43a5128da844e517ef3a85e186"
 integration_state = "committed"
 completed = "2026-08-24"
 notes = [
-  "This task implements only the abstract compiler-owned generator. PROTO-LSP-SEMANTIC-TOKENS remains Future and unimplemented until LSP-2403 defines provider and full/delta transport.",
+  "This task implements only the abstract compiler-owned generator; PROTO-LSP-SEMANTIC-TOKENS was subsequently implemented by LSP-2403 under RFC-0048 without broadening this compiler query.",
   "Whole-source lexical fallback replaces the lower-authority plan's parsed-error-region proposal because no Accepted partial checked-AST boundary exists.",
   "No diagnostic allocation, public schema, Semantic ID/canonical-byte, language semantics, interpreter/runtime/VM/bytecode/ABI/package, filesystem/network, dependency, source-position, or Unicode 17.0.0 table change is introduced.",
 ]
@@ -8046,7 +8046,7 @@ notes = [
 [[task]]
 id = "LSP-2403"
 title = "Semantic token full and delta transport"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -8056,32 +8056,52 @@ spec = [
   "AGENTS.md",
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0029.md",
+  "docs/RFC-0030.md",
+  "docs/RFC-0046.md",
+  "docs/RFC-0047.md",
+  "docs/RFC-0048.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0031-lsp-internal-cancellation-boundary.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/semantic_tokens.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/semantic_tokens.rs",
+  "docs/RFC-0048.md",
   "docs/status/LSP-2403-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2403-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-semantic-tokens/README.md",
+  "docs/governance/protocol-inventory.toml",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing full/delta response, token legend/encoding, result-ID/base validation, same-document-version, stale/cancellation/limit, position, taxonomy, and protocol lifecycle contracts.",
-  "The audit covers insertion/deletion/reorder deltas, invalid-base full fallback, result-ID eviction, full/delta equivalence, non-overlap/order, Unicode/emoji/CRLF/BOM, stale versions, cancellation, deterministic bytes, and migration fixtures.",
-  "No full-token writer, delta encoder, result-ID store, protocol field, diagnostic allocation, Semantic ID change, or placeholder LSP API is added while the authority is absent.",
-  "The future implementation must publish only same-version, non-overlapping deterministic tokens, recover to full on invalid bases, and label experimental fields.",
+  "Accepted RFC-0046 through RFC-0048 authorize ling.lsp.semantic-tokens/0.1 with canonical client-selected legends, snapshot-bound checked/fallback generation, negotiated relative positions, deterministic result IDs, bounded retention, full responses, canonical deltas, invalid-base recovery, freshness, cancellation, limits, privacy, and migration.",
+  "Initialize validates known standard capabilities, ignores ordinary unknown members, advertises a provider only for full plus relative plus a nonempty type legend, and independently negotiates delta without range, refresh, dynamic registration, partial results, or wire cancellation claims.",
+  "The handler consumes one exact immutable RequestSnapshot and RFC-0047 token index, projects original line-local spans through UTF-8/16/32, validates order/non-overlap, and emits standard five-integer relative groups without unchecked-AST interpretation or compiler identity leakage.",
+  "A 32-entry FIFO history stores only URI, projection identity, result ID, and integer data; valid bases yield one canonical equivalent edit, while invalid, expired, or foreign-document bases recover to a deterministic full response.",
+  "Seven integration tests and two unit tests cover all/partial/empty/malformed negotiation, typed/fallback roles, modifiers, Unicode/emoji/combining text, BOM, CRLF, temporary/closed documents, insertion/deletion/reorder/equal deltas, equivalence, invalid/foreign/expired bases, eviction, cancellation, lifecycle, and limits.",
+  "Full locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, diff, and execution-package checksum gates pass.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "75c2bd0b7d0dcd6e37cdb16e0ec854529f56f97f"
+completion_commit = "75c2bd0b7d0dcd6e37cdb16e0ec854529f56f97f"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "LSP-2403 is BlockedSpec by LSP-2401/LSP-2402, LSP-2501/LSP-2502, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; no semantic-token transport inventory entry exists.",
-  "Current semantic graph and source revisions provide no full/delta token writer, result-ID lifecycle, base mismatch handling, or same-version publication boundary.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "PROTO-LSP-SEMANTIC-TOKENS is implemented Preview, not Stable; RFC-0048 closes only this bounded transport and does not claim the broad LSP/Semantic Transaction gaps are globally resolved.",
+  "Result IDs hash only length-delimited client-visible protocol inputs and token data; no source text, VFS revision, compiler key, Definition ID, Semantic ID, path, diagnostic, type, Effect, Capability, allocation, timing, or debug value enters wire or retained state.",
+  "No diagnostic allocation, standalone public schema, Semantic ID/canonical-byte, language semantics, checked compiler fact, runtime/VM/bytecode/ABI/package, filesystem/network, or Unicode 17.0.0 table change is introduced.",
 ]
 
 [[task]]
@@ -8135,7 +8155,7 @@ completion_commit = "74b3135ef51558a151af2d4a064f907281e4a32e"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This bounded child is complete under DEC-0086; public LSP-2403 remains BlockedSpec for full/delta encoding, result IDs, document versions, stale/base handling, and transport lifecycle.",
+  "This bounded child is complete under DEC-0086 and is consumed by completed LSP-2403 under RFC-0048.",
   "SourceId and Revision are session-local compiler observations only; they are not a cross-process protocol identity or semantic ID.",
 ]
 

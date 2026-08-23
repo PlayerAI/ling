@@ -2,94 +2,73 @@
 
 ## Outcome
 
-`LSP-2403` is correctly recorded as `BlockedSpec`. The execution plan suggests
-full token responses first and delta responses after performance evidence, with
-tokens sorted by position, non-overlapping, and generated against one document
-version. The repository has no accepted full/delta wire schema, token legend,
-result-ID lifecycle, base-result validation, or stale-version behavior.
+The former `BlockedSpec` condition is closed. Accepted RFC-0046 fixes the
+taxonomy and client projection, RFC-0047 fixes snapshot-bound typed generation,
+and RFC-0048 now fixes the bounded public full/delta transport as
+`ling.lsp.semantic-tokens/0.1`. LSP-2403 may be and has been implemented.
 
-No full-token writer, delta encoder, result-ID store, protocol field, diagnostic
-allocation, or placeholder LSP surface was added. Accepted DEC-0086 and the
-bounded `LSP-2403-SNAPSHOT-IDENTITY` child add only existing `SourceId` and VFS
-`Revision` observations to the internal checked-token source; public transport
-remains blocked.
+RFC-0048 does not claim that the two broad registered LSP/Semantic Transaction
+gaps are globally closed. It resolves only the semantic-token request,
+snapshot, position, result-ID, base, retention, cancellation, limit, failure,
+privacy, and migration questions needed by this task.
 
 ## Normative traceability
 
-- The execution package is non-normative; its full/delta ordering and performance
-  sequencing do not authorize a public transport protocol.
-- LSP-2401 token taxonomy and LSP-2402 typed generation are both
-  `BlockedSpec`, so a transport cannot freeze their categories or source-origin
-  semantics.
-- DEC-0002 makes original UTF-8 `SourceId + Span` authoritative and requires an
-  explicit SourceMap projection for LSP UTF-16 positions. It does not define
-  token integer encoding, result IDs, delta edits, or version preconditions.
-- DEC-0012 fixes Semantic IDs/canonical bytes; the Semantic Graph projections
-  are Experimental and are not a token-result cache or delta base.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves snapshot/version and editor fields
-  open; `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves protocol stability,
-  reader/writer compatibility, stale rejection, and migration open. LSP-2501
-  and LSP-2502 separately remain unaccepted snapshot/cancellation contracts.
-- Accepted DEC-0086 authorizes only retention of the existing source identity
-  and session-local VFS revision on `CheckedTokenSourceIndex`; neither value is
-  an LSP document version or result ID.
+- RFC-0046 §1–7 owns the canonical 17 token types, seven possible modifiers,
+  fallback projection, checked/lexical evidence precedence, original-span
+  truth, line splitting, selected legend, and privacy exclusions.
+- RFC-0047 §1–7 owns the complete checked-workspace generator, whole-source
+  lexical fallback, immutable source/revision binding, role/modifier mapping,
+  deterministic non-overlap, and identity redaction.
+- RFC-0048 §1–2 owns capability validation, static discovery, full/delta
+  methods, parameter bounds, lifecycle, and disabled-method behavior.
+- RFC-0048 §3–4 owns exact immutable request snapshots, same-version freshness,
+  source-map position projection, legend mapping, relative integer encoding,
+  order, and overlap rejection.
+- RFC-0048 §5–8 owns client-visible deterministic result IDs, 32-entry FIFO
+  retention, base validation, canonical deltas, full fallback, cancellation,
+  limits, fixed failures, atomic publication, privacy, and migration.
+- RFC-0004, RFC-0023, RFC-0029, RFC-0030, DEC-0029, DEC-0031, and DEC-0071
+  remain the inherited lifecycle, overlay, position, workspace, cancellation,
+  and snapshot authorities.
 
-## Current interface evidence
+## Former gaps and decisions
 
-- No crate writes a semantic-token legend, full response, delta response,
-  `resultId`, `previousResultId`, or delta edit list.
-- `ling-semantic` produces deterministic graph data, but its Experimental JSON
-  identity and ordering are not a token transport or cache compatibility rule.
-- `ling-source` has byte/source maps and revisions, but no same-version token
-  requirement, stale-result rejection, cancellation publication rule, or
-  non-overlap validator.
-- No fixture proves full/delta equivalence, base-result mismatch recovery,
-  changed token ranges, document version transitions, limits, cancellation,
-  Unicode/CRLF/BOM positions, or deterministic encoding.
-- The snapshot-identity child records source/revision binding and cache
-  invalidation but has no token encoding, delta state, URI/version, or transport
-  field.
+The original audit correctly stopped implementation because taxonomy,
+generation, legend, result identity, full/delta encoding, base validation,
+freshness, cancellation, limits, and lifecycle were missing. Those specific
+questions are now resolved by RFC-0046 through RFC-0048.
 
-## Required authority before implementation
+The implementation deliberately does not reuse VFS revisions, compiler query
+keys, source hashes, Semantic IDs, or Definition IDs as public result IDs.
+RFC-0048 instead hashes only client-visible protocol inputs. Invalid, expired,
+or foreign-document bases recover to a full standard response rather than an
+error or guessed edit.
 
-An Accepted RFC or decision must define, at minimum:
+## Acceptance evidence
 
-1. full response schema, token legend, integer/relative encoding, result ID
-   generation and retention, document URI/version/snapshot binding, and
-   cancellation/limit behavior;
-2. delta request base-result semantics, edit operation/index rules, mismatch or
-   expired-base fallback to full, result-ID migration, memory/eviction policy,
-   and failure responses;
-3. token ordering/non-overlap/duplicate rules, UTF-8/UTF-16 SourceMap
-   projection, taxonomy/modifier stability, source-origin and Semantic ID
-   provenance, and generated/dependency/error fallback policy;
-4. protocol inventory, Stable versus Experimental fields, client capability
-   negotiation, diagnostics, and migration; and
-5. executable fixtures for full output, deltas with insertion/deletion/reorder,
-   base mismatch, stale versions, cancellation, limits, full/delta semantic
-   equivalence, Chinese/emoji/CRLF/BOM positions, deterministic bytes, and
-   migration.
+- `crates/ling-db/src/semantic_token_index.rs` supplies only RFC-0047 abstract
+  tokens over original UTF-8 spans.
+- `crates/ling-lsp/src/semantic_tokens.rs` owns negotiation, source-map
+  projection, relative encoding, bounded history, result identity, canonical
+  delta construction, freshness, cancellation, and atomic publication.
+- `crates/ling-lsp/tests/semantic_tokens.rs` covers full-only and delta
+  negotiation, malformed and empty legends, UTF-8/16/32, Chinese, emoji,
+  combining text, BOM, CRLF, multiline spans, insertion/deletion/reordering,
+  equality, invalid/foreign/expired bases, FIFO eviction, temporary/closed
+  documents, conservative fallback, cancellation, lifecycle, and limits.
+- `tests/protocols/lsp-semantic-tokens/README.md` records the executable public
+  protocol fixture boundary.
+- `PROTO-LSP-SEMANTIC-TOKENS` is registered as implemented Preview, not Stable.
 
-Until these decisions are Accepted, delta state could be applied to the wrong
-document, produce overlapping/out-of-order tokens, or turn an internal cache
-identifier into an external compatibility promise.
+## Compatibility and deferred work
 
-## Evidence and compatibility
+No Ling syntax, semantics, Typed Core evaluation, diagnostic code, standalone
+schema, Semantic ID, canonical byte, runtime, bytecode, VM, ABI, package,
+filesystem/network, or Unicode 17.0.0 behavior changes.
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the `ling-semantic`, `ling-source`, and schema/fixture directories.
-
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
-
-## Intentionally deferred
-
-The bounded snapshot-identity child is complete under DEC-0086. Public
-`LSP-2403` can begin after LSP-2401 taxonomy, LSP-2402 generation,
-LSP-2501/LSP-2502 snapshot/cancellation, and Semantic Graph lifecycle decisions
-are Accepted. The future implementation must publish only same-version,
-non-overlapping deterministic tokens, recover to full on invalid bases, and
-label experimental fields.
+Range requests, refresh, dynamic registration, partial/work-done results, wire
+`$/cancelRequest`, asynchronous scheduling, configurable limits, persistent
+history, multi-edit optimization, mixed checked/error-region output, editor
+presentation, Stable lifecycle, and general Semantic Transactions remain
+intentionally deferred.

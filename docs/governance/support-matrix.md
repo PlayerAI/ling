@@ -100,7 +100,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-LSP-PULL-DIAGNOSTICS` | `Public` | `ling.lsp.pull-diagnostics/0.2` | `Preview` | yes |
 | `PROTO-LSP-REFERENCES` | `Public` | `ling.lsp.references/0.1` | `Preview` | yes |
 | `PROTO-LSP-RENAME` | `Public` | `ling.lsp.rename/0.1` | `Preview` | yes |
-| `PROTO-LSP-SEMANTIC-TOKENS` | `Planned public` | — | `Future` | no |
+| `PROTO-LSP-SEMANTIC-TOKENS` | `Public` | `ling.lsp.semantic-tokens/0.1` | `Preview` | yes |
 | `PROTO-LSP-WORKSPACE` | `Public` | `ling.lsp.workspace/0.1` | `Experimental` | yes |
 | `PROTO-LSP-WORKSPACE-SYMBOL` | `Public` | `ling.lsp.workspace-symbol/0.1` | `Preview` | yes |
 | `PROTO-PACKAGE-IDENTITY` | `Public` | `v1 domain encodings` | `Experimental` | yes |

@@ -358,10 +358,10 @@ implemented = true
 
 [[protocol]]
 id = "PROTO-LSP-SEMANTIC-TOKENS"
-visibility = "Planned public"
-version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+version = "ling.lsp.semantic-tokens/0.1"
+stability = "Preview"
+implemented = true
 
 [[protocol]]
 id = "PROTO-LSP-HOVER"

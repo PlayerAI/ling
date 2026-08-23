@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 46 records: 41 current public, 1 internal, 4 Future.
-- Current public stability: 16 Experimental, 25 Preview, 0 Stable.
+- 46 records: 42 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 26 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -32,6 +32,7 @@
 | `PROTO-LSP-PULL-DIAGNOSTICS` | Public | LSP | `ling.lsp.pull-diagnostics/0.2` | `Preview` | no | no | 5 |
 | `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-RENAME` | Public | LSP | `ling.lsp.rename/0.1` | `Preview` | no | no | 4 |
+| `PROTO-LSP-SEMANTIC-TOKENS` | Public | LSP | `ling.lsp.semantic-tokens/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-WORKSPACE-SYMBOL` | Public | LSP | `ling.lsp.workspace-symbol/0.1` | `Preview` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
@@ -56,7 +57,6 @@
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.2` | `Experimental` | no | no | 7 |
 | `PROTO-VM-CONTROL` | Public | Runtime control | `ling.vm.control/0.1` | `Experimental` | no | no | 4 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
-| `PROTO-LSP-SEMANTIC-TOKENS` | Planned public | LSP | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
 | `PROTO-ABI` | Planned public | ABI | — | `Future` | no | no | 0 |
 | `PROTO-EVIDENCE` | Planned public | Evidence | — | `Future` | no | no | 0 |
@@ -296,6 +296,19 @@
 - Sources: [`docs/RFC-0041.md`](../RFC-0041.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0038.md`](../RFC-0038.md), [`docs/RFC-0039.md`](../RFC-0039.md), [`docs/RFC-0040.md`](../RFC-0040.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0075-ide-resolved-reference-index.md`](../decisions/0075-ide-resolved-reference-index.md), [`docs/decisions/0077-ide-rename-identifier-observation.md`](../decisions/0077-ide-rename-identifier-observation.md), [`docs/decisions/0078-ide-rename-reference-span-observation.md`](../decisions/0078-ide-rename-reference-span-observation.md), [`crates/ling-db/src/rename_alias_index.rs`](../../crates/ling-db/src/rename_alias_index.rs), [`crates/ling-db/src/reference_search_index.rs`](../../crates/ling-db/src/reference_search_index.rs), [`crates/ling-lsp/src/rename.rs`](../../crates/ling-lsp/src/rename.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
 - Fixtures: [`crates/ling-db/src/rename_alias_index.rs`](../../crates/ling-db/src/rename_alias_index.rs), [`crates/ling-lsp/tests/rename.rs`](../../crates/ling-lsp/tests/rename.rs), [`tests/protocols/lsp-rename/README.md`](../../tests/protocols/lsp-rename/README.md), [`docs/status/IDE-2306-IMPLEMENTATION-REPORT.md`](../status/IDE-2306-IMPLEMENTATION-REPORT.md)
 - Notes: The bounded standard Workspace Edit is proposed to the client and is never applied by the server. General Semantic Transactions, language Alias syntax, localized Author Source, generated or dependency mutation, module/file rename, type-only identities, cancellation, annotations, and Stable lifecycle remain out of scope.
+
+### `PROTO-LSP-SEMANTIC-TOKENS` — Ling bounded LSP semantic tokens
+
+- Producer: ling lsp --stdio; ling-lsp semantic-token provider
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Validate the standard textDocument.semanticTokens capability, require full plus relative encoding and a nonempty RFC-0046 selected type legend, advertise delta only when requested, accept Ready-state full and negotiated delta requests for one exact tracked URI, and recover an invalid or expired delta base to full.
+- Writer policy: Capture and revalidate one immutable snapshot, consume only RFC-0047 abstract tokens, project through the selected legend and negotiated UTF-8, UTF-16 or UTF-32 encoding, emit standard relative groups, retain at most 32 opaque results, and publish deterministic full or canonical one-edit delta responses atomically within fixed limits.
+- Unknown-field policy: Ignore ordinary unknown capability and request members while rejecting malformed known members; incompatible taxonomy, provider, legend, position, result-ID, retention, delta, limit, privacy, freshness, cancellation, or failure behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.semantic-tokens/0.1 is Preview with no predecessor and clients gate on semanticTokensProvider plus the exact lingSemanticTokens discovery object.
+- Authority: `RFC-0048`, `RFC-0047`, `RFC-0046`, `RFC-0004`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0031`, `DEC-0071`, `DEC-0084`, `DEC-0085`, `DEC-0086`, `DEC-0087`
+- Sources: [`docs/RFC-0048.md`](../RFC-0048.md), [`docs/RFC-0047.md`](../RFC-0047.md), [`docs/RFC-0046.md`](../RFC-0046.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0031-lsp-internal-cancellation-boundary.md`](../decisions/0031-lsp-internal-cancellation-boundary.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0084-lsp-lexical-token-source-index.md`](../decisions/0084-lsp-lexical-token-source-index.md), [`docs/decisions/0085-lsp-checked-token-identity-observation.md`](../decisions/0085-lsp-checked-token-identity-observation.md), [`docs/decisions/0086-lsp-checked-token-snapshot-identity.md`](../decisions/0086-lsp-checked-token-snapshot-identity.md), [`docs/decisions/0087-lsp-checked-token-source-fixtures.md`](../decisions/0087-lsp-checked-token-source-fixtures.md), [`crates/ling-db/src/semantic_token_index.rs`](../../crates/ling-db/src/semantic_token_index.rs), [`crates/ling-lsp/src/semantic_tokens.rs`](../../crates/ling-lsp/src/semantic_tokens.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-db/tests/semantic_tokens.rs`](../../crates/ling-db/tests/semantic_tokens.rs), [`crates/ling-lsp/tests/semantic_tokens.rs`](../../crates/ling-lsp/tests/semantic_tokens.rs), [`tests/protocols/lsp-semantic-tokens/README.md`](../../tests/protocols/lsp-semantic-tokens/README.md), [`docs/status/LSP-2403-IMPLEMENTATION-REPORT.md`](../status/LSP-2403-IMPLEMENTATION-REPORT.md)
+- Notes: The Preview exposes no source text, VFS revision, path, diagnostic, compiler, Semantic or Definition identity, type, Effect, Capability, debug data, range/refresh/dynamic registration, partial/work-done result, wire cancellation, persistent history, Semantic Transaction, or Stable claim. Future language categories remain excluded by RFC-0046.
 
 ### `PROTO-LSP-WORKSPACE` — Ling LSP atomic workspace reload
 
@@ -608,19 +621,6 @@
 - Sources: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Fixtures: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Notes: This record prevents a versioned implementation artifact from being mistaken for a public 1.x commitment; it is not the Future evidence-bundle protocol.
-
-### `PROTO-LSP-SEMANTIC-TOKENS` — Ling LSP semantic tokens
-
-- Producer: Future ling-lsp typed semantic-token provider
-- Consumer: Future LSP 3.17 clients and editor hosts
-- Reader policy: Accepted RFC-0046 defines taxonomy and legend projection; Accepted RFC-0047 defines an in-process snapshot-bound generator only. Request, document, full/delta, result-ID, stale, cancellation, and limit semantics remain undefined.
-- Writer policy: The RFC-0047 compiler-owned generator exists, but no LSP writer exists. A future writer must consume that abstract result and obtain Accepted LSP-2403 transport authority before advertising a provider.
-- Unknown-field policy: Not yet defined for the future request protocol; RFC-0046 requires ordinary unknown initialize capability members to be ignored and malformed known semantic-token capability members to fail initialization.
-- Migration tool: Not defined; ling.semantic-token-taxonomy/0.1 is an Accepted taxonomy basis, not a current public wire version.
-- Authority: `RFC-0047`, `RFC-0046`, `RFC-0004`, `DEC-0002`, `DEC-0012`, `DEC-0029`, `DEC-0084`, `DEC-0085`, `DEC-0086`, `DEC-0087`
-- Sources: [`docs/RFC-0046.md`](../RFC-0046.md), [`docs/RFC-0047.md`](../RFC-0047.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0084-lsp-lexical-token-source-index.md`](../decisions/0084-lsp-lexical-token-source-index.md), [`docs/decisions/0085-lsp-checked-token-identity-observation.md`](../decisions/0085-lsp-checked-token-identity-observation.md), [`docs/decisions/0086-lsp-checked-token-snapshot-identity.md`](../decisions/0086-lsp-checked-token-snapshot-identity.md), [`docs/decisions/0087-lsp-checked-token-source-fixtures.md`](../decisions/0087-lsp-checked-token-source-fixtures.md), [`crates/ling-db/src/semantic_token_index.rs`](../../crates/ling-db/src/semantic_token_index.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-db/tests/semantic_tokens.rs`](../../crates/ling-db/tests/semantic_tokens.rs), [`docs/status/LSP-2402-IMPLEMENTATION-REPORT.md`](../status/LSP-2402-IMPLEMENTATION-REPORT.md)
-- Fixtures: —
-- Notes: The in-process ling.semantic-token-generation/0.1 index is implemented under RFC-0047. No semanticTokensProvider, request method, client legend, result, public protocol marker, custom token type, or LSP compatibility claim is implemented. Effect, Capability, resource, actor, node, kernel, Semantic ID, ownership, borrow, unsafe, and generated categories remain excluded.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

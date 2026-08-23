@@ -276,7 +276,7 @@
 | `LSP-2401-LEXICAL-SOURCE` | Internal lexical token source index | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP` | `135bfb07bb8f824f1ab119b5e0f765c674d6f294` |
 | `LSP-2402` | Typed semantic-token generation | `G1` | `L` | `Done` | `LSP-2101`, `LSP-2102`, `LSP-2401` | `899d00f56d444f43a5128da844e517ef3a85e186` |
 | `LSP-2402-CHECKED-IDENTITY` | Internal checked-token identity observation | `G1` | `S` | `Done` | `LSP-2401-LEXICAL-SOURCE` | `bbb0786453b8fefee974b4137b47587ff636c60c` |
-| `LSP-2403` | Semantic token full and delta transport | `G1` | `L` | `BlockedSpec` | `LSP-2401`, `LSP-2402` | `` |
+| `LSP-2403` | Semantic token full and delta transport | `G1` | `L` | `Done` | `LSP-2401`, `LSP-2402` | `75c2bd0b7d0dcd6e37cdb16e0ec854529f56f97f` |
 | `LSP-2403-SNAPSHOT-IDENTITY` | Internal checked-token snapshot identity | `G1` | `S` | `Done` | `LSP-2402-CHECKED-IDENTITY` | `74b3135ef51558a151af2d4a064f907281e4a32e` |
 | `LSP-2404` | Semantic-token fixture corpus | `G1` | `M` | `BlockedSpec` | `LSP-2401`, `LSP-2402`, `LSP-2403` | `` |
 | `LSP-2404-CHECKED-SOURCE-FIXTURES` | Internal checked-token source fixture corpus | `G1` | `S` | `Done` | `LSP-2403-SNAPSHOT-IDENTITY` | `cee068af008cbd1e0327799a418078be850db754` |
