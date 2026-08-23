@@ -4228,6 +4228,54 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6903-CURRENT-EVIDENCE"
+title = "Current RC3 upstream-boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6902-CURRENT-EVIDENCE", "RC-6903-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0054-seed-rc3-independent-verification-inventory-gate.md",
+  "docs/decisions/0246-current-rc1-boundary-evidence.md",
+  "docs/decisions/0247-current-rc3-upstream-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/testing/RC0-INTERNAL-FREEZE.md",
+  "docs/testing/RC1-PUBLIC-VALIDATION.md",
+  "docs/testing/RC3-INDEPENDENT-VERIFICATION.md",
+  "docs/status/RC-6903-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/rc3_verification.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "docs/testing/RC3-INDEPENDENT-VERIFICATION.md",
+  "docs/status/RC-6903-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6903-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc3 verify composes the current RC1-to-RC0 inventory chain and retains seven exact RC3 states and seven linked audits.",
+  "The readiness document explicitly states that bounded upstream gates pass, both release parents remain BlockedSpec, and repository self-validation is not independent verification.",
+  "A focused negative test rejects missing upstream-pass/parent-blocked/non-independent markers with GOV-RC3-VERIFICATION-0011.",
+  "Focused RC3/RC1/RC0 checks plus workspace, CI, governance, support, status, traceability, formatting, lint, deterministic, and offline gates pass.",
+  "No candidate, reviewer, artifact verification, reproduction, evidence bundle, sign-off, network request, or system change is created.",
+]
+verified_against_commit = "723ac8bfd3c5360be474ab3049c60749fa12c748"
+completion_commit = "723ac8bfd3c5360be474ab3049c60749fa12c748"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "RC-6903 remains BlockedSpec for immutable candidate identity, independent reviewer/conflict policy, clean build, artifact/security verification, complete reproduction, retention/rerun rules, signed comparison, and Go/No-Go.",
+  "This child composes internal inventory evidence only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, Unicode, protocol states, support states, and public APIs are unchanged.",
+]
+
+[[task]]
 id = "RC-6903"
 title = "Independent Verification"
 state = "BlockedSpec"
@@ -4235,7 +4283,7 @@ release = "G6"
 size = "L"
 owner = "Codex"
 branch = "main"
-depends_on = ["RC-6902"]
+depends_on = ["RC-6902", "RC-6903-CURRENT-EVIDENCE"]
 spec = [
   "AGENTS.md",
   "docs/ROADMAP-1.0.md",
@@ -4243,10 +4291,12 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/governance/support-matrix.toml",
   "docs/governance/protocol-inventory.toml",
+  "docs/decisions/0247-current-rc3-upstream-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/RC-6901-AUTHORITY-AUDIT.md",
   "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6903-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
   "docs/status/REL-6603-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6804-AUTHORITY-AUDIT.md",
   "docs/SEED-RELEASE-REPORT.md",
@@ -4255,6 +4305,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/RC-6903-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6903-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/RC3-INDEPENDENT-VERIFICATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",

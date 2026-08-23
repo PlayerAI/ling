@@ -395,7 +395,8 @@
 | `RC-6902` | RC1 Public Validation | `G6` | `L` | `BlockedSpec` | `RC-6901`, `RC-6902-CURRENT-EVIDENCE` | `` |
 | `RC-6902-CURRENT-EVIDENCE` | Current RC1 RC0/Zed boundary evidence | `G6` | `S` | `Done` | `RC-6901-CURRENT-EVIDENCE`, `RC-6902-SEED`, `ZED-6803-CURRENT-EVIDENCE` | `554005ef1eea6ab738a5b62657fdb9a5c3599ace` |
 | `RC-6902-SEED` | Seed RC1 public-validation inventory drift gate | `G6` | `S` | `Done` | `RC-6901-SEED` | `056c6afb17fd1e8656b825e2c2a4f70b4173f2d8` |
-| `RC-6903` | Independent Verification | `G6` | `L` | `BlockedSpec` | `RC-6902` | `` |
+| `RC-6903` | Independent Verification | `G6` | `L` | `BlockedSpec` | `RC-6902`, `RC-6903-CURRENT-EVIDENCE` | `` |
+| `RC-6903-CURRENT-EVIDENCE` | Current RC3 upstream-boundary evidence | `G6` | `S` | `Done` | `RC-6902-CURRENT-EVIDENCE`, `RC-6903-SEED` | `723ac8bfd3c5360be474ab3049c60749fa12c748` |
 | `RC-6903-SEED` | Seed RC3 independent-verification inventory drift gate | `G6` | `S` | `Done` | `RC-6902-SEED` | `c782b771b0c72c8cf7cbdcbfa3ab64a6cd001774` |
 | `RC-6904` | RC2 / Final Change Control | `G6` | `L` | `BlockedSpec` | `RC-6903` | `` |
 | `RC-6904-SEED` | Seed RC2/final change-control inventory drift gate | `G6` | `S` | `Done` | `RC-6903-SEED` | `b8660b524e103b615f9df332b55b4da8b3638c8b` |
