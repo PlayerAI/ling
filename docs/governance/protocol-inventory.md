@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 36 records: 32 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 16 Preview, 0 Stable.
+- 37 records: 33 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 17 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -19,6 +19,7 @@
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-DIAGNOSTIC` | Public | LSP | `ling.lsp.diagnostic/0.2` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-DIAGNOSTIC-CONTROL` | Public | LSP | `ling.lsp.diagnostic-control/0.1` | `Preview` | no | no | 5 |
+| `PROTO-LSP-DOCUMENT-SYMBOL` | Public | LSP | `ling.lsp.document-symbol/0.1` | `Preview` | no | no | 3 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
@@ -117,6 +118,19 @@
 - Sources: [`docs/RFC-0034.md`](../RFC-0034.md), [`docs/SEMANTICS.md`](../SEMANTICS.md), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`docs/RFC-0033.md`](../RFC-0033.md), [`docs/RFC-0032.md`](../RFC-0032.md), [`docs/RFC-0031.md`](../RFC-0031.md), [`docs/decisions/0001-error-code-policy.md`](../decisions/0001-error-code-policy.md), [`docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md`](../decisions/0034-lsp-internal-diagnostic-ordering-boundary.md), [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-lsp/src/diagnostic_control.rs`](../../crates/ling-lsp/src/diagnostic_control.rs), [`crates/ling-lsp/src/publication.rs`](../../crates/ling-lsp/src/publication.rs), [`crates/ling-lsp/src/pull_diagnostics.rs`](../../crates/ling-lsp/src/pull_diagnostics.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
 - Fixtures: [`crates/ling-lsp/tests/diagnostic_control.rs`](../../crates/ling-lsp/tests/diagnostic_control.rs), [`crates/ling-lsp/tests/push_diagnostics.rs`](../../crates/ling-lsp/tests/push_diagnostics.rs), [`crates/ling-lsp/tests/pull_diagnostics.rs`](../../crates/ling-lsp/tests/pull_diagnostics.rs), [`tests/protocols/lsp-diagnostic-control/README.md`](../../tests/protocols/lsp-diagnostic-control/README.md), [`docs/status/LSP-2204-IMPLEMENTATION-REPORT.md`](../status/LSP-2204-IMPLEMENTATION-REPORT.md)
 - Notes: Control is a stateless post-adapter LSP projection. It does not change parser recovery or compiler diagnostics and does not expose the crate-private Trait solver; a future production solver resource diagnostic remains subject to the same exact-root rule once separately authorized.
+
+### `PROTO-LSP-DOCUMENT-SYMBOL` — Ling LSP Document Symbols
+
+- Producer: ling lsp --stdio; ling-lsp document-symbol provider
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Negotiate an optional object-valued textDocument.documentSymbol capability and optional boolean hierarchicalDocumentSymbolSupport; accept only Ready-state textDocument/documentSymbol requests naming an exact current Ling URI, while notifications perform no work.
+- Writer policy: Capture one immutable snapshot, resolve exact visible bytes, build at most 4096 compiler structural nodes, and return either one module-rooted DocumentSymbol tree with separate original-byte-projected full/selection ranges or the same tree's URI-bound SymbolInformation pre-order fallback.
+- Unknown-field policy: Ignore ordinary unknown request and capability fields while rejecting malformed known members; incompatible kind mapping, hierarchy, field, order, limit, snapshot, temporary-isolation, projection, or failure behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.document-symbol/0.1 is Preview with no predecessor and clients gate on documentSymbolProvider plus the exact lingDocumentSymbols discovery object.
+- Authority: `RFC-0036`, `RFC-0004`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0073`
+- Sources: [`docs/RFC-0036.md`](../RFC-0036.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0073-ide-resolved-definition-index.md`](../decisions/0073-ide-resolved-definition-index.md), [`crates/ling-db/src/resolved_outline.rs`](../../crates/ling-db/src/resolved_outline.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/document_symbols.rs`](../../crates/ling-lsp/src/document_symbols.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-lsp/tests/document_symbols.rs`](../../crates/ling-lsp/tests/document_symbols.rs), [`tests/protocols/lsp-document-symbol/README.md`](../../tests/protocols/lsp-document-symbol/README.md), [`docs/status/IDE-2301-IMPLEMENTATION-REPORT.md`](../status/IDE-2301-IMPLEMENTATION-REPORT.md)
+- Notes: Document symbols are presentation derived from resolved source structure, not Semantic ID publication. Local bindings, inferred details, dynamic registration, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
 
 ### `PROTO-LSP-FORMATTING` — Ling LSP bounded document formatting
 

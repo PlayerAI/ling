@@ -266,6 +266,28 @@ authority = ["RFC-0034", "RFC-0033", "RFC-0032", "RFC-0031", "DEC-0001", "DEC-00
 notes = ["Control is a stateless post-adapter LSP projection. It does not change parser recovery or compiler diagnostics and does not expose the crate-private Trait solver; a future production solver resource diagnostic remains subject to the same exact-root rule once separately authorized."]
 
 [[protocol]]
+id = "PROTO-LSP-DOCUMENT-SYMBOL"
+title = "Ling LSP Document Symbols"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.document-symbol/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp document-symbol provider"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Negotiate an optional object-valued textDocument.documentSymbol capability and optional boolean hierarchicalDocumentSymbolSupport; accept only Ready-state textDocument/documentSymbol requests naming an exact current Ling URI, while notifications perform no work."
+writer_policy = "Capture one immutable snapshot, resolve exact visible bytes, build at most 4096 compiler structural nodes, and return either one module-rooted DocumentSymbol tree with separate original-byte-projected full/selection ranges or the same tree's URI-bound SymbolInformation pre-order fallback."
+unknown_field_policy = "Ignore ordinary unknown request and capability fields while rejecting malformed known members; incompatible kind mapping, hierarchy, field, order, limit, snapshot, temporary-isolation, projection, or failure behavior requires a new marker and migration evidence."
+migration_tool = "None; ling.lsp.document-symbol/0.1 is Preview with no predecessor and clients gate on documentSymbolProvider plus the exact lingDocumentSymbols discovery object."
+fixtures = ["crates/ling-lsp/tests/document_symbols.rs", "tests/protocols/lsp-document-symbol/README.md", "docs/status/IDE-2301-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0036.md", "docs/RFC-0004.md", "docs/RFC-0023.md", "docs/RFC-0029.md", "docs/RFC-0030.md", "docs/decisions/0002-source-position-units.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0071-lsp-workspace-state-snapshot.md", "docs/decisions/0073-ide-resolved-definition-index.md", "crates/ling-db/src/resolved_outline.rs", "crates/ling-db/src/lib.rs", "crates/ling-lsp/src/document_symbols.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.document-symbol/0.1", "textDocument/documentSymbol", "documentSymbolProvider", "lingDocumentSymbols"]
+authority = ["RFC-0036", "RFC-0004", "RFC-0023", "RFC-0029", "RFC-0030", "DEC-0002", "DEC-0012", "DEC-0019", "DEC-0029", "DEC-0071", "DEC-0073"]
+notes = ["Document symbols are presentation derived from resolved source structure, not Semantic ID publication. Local bindings, inferred details, dynamic registration, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred."]
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 title = "Ling LSP bounded document formatting"
 category = "LSP"

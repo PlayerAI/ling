@@ -5,7 +5,7 @@
 //! authority for the full-text document overlay boundary; RFC-0029 extends it
 //! with bounded incremental changes; RFC-0030 governs atomic workspace reload;
 //! RFC-0026 governs the bounded document-formatting response; DEC-0029 remains
-//! the authority for position projection.
+//! the authority for position projection; RFC-0036 governs Document Symbols.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -50,6 +50,8 @@ pub use publication::{
 };
 mod pull_diagnostics;
 pub use pull_diagnostics::{MAX_PULL_PREVIOUS_RESULTS, PULL_DIAGNOSTICS_PROTOCOL_VERSION};
+mod document_symbols;
+pub use document_symbols::{DOCUMENT_SYMBOL_PROTOCOL_VERSION, MAX_DOCUMENT_SYMBOLS};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -562,6 +564,7 @@ pub struct LspServer {
     outbound_notifications: Vec<Vec<u8>>,
     pull_diagnostics_supported: bool,
     diagnostic_limits: DiagnosticLimits,
+    hierarchical_document_symbols: bool,
 }
 
 impl Default for LspServer {
@@ -586,6 +589,7 @@ impl LspServer {
             outbound_notifications: Vec::new(),
             pull_diagnostics_supported: false,
             diagnostic_limits: DiagnosticLimits::DEFAULT,
+            hierarchical_document_symbols: false,
         }
     }
 
@@ -762,6 +766,7 @@ impl LspServer {
             "textDocument/didClose" => self.did_close(id_present, id, params),
             "textDocument/formatting" => self.document_formatting(id_present, id, params),
             "textDocument/diagnostic" => self.document_diagnostic(id_present, id, params),
+            "textDocument/documentSymbol" => self.document_symbols(id_present, id, params),
             "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
@@ -781,26 +786,37 @@ impl LspServer {
             );
         }
 
-        let (encoding, folders, pull_diagnostics_supported, diagnostic_limits) =
-            match parse_initialize_params(&params) {
-                Ok(value) => value,
-                Err(()) => {
-                    return error_or_none(
-                        true,
-                        id,
-                        INVALID_PARAMS,
-                        "初始化参数无效 / invalid initialize parameters",
-                    );
-                }
-            };
+        let (
+            encoding,
+            folders,
+            pull_diagnostics_supported,
+            diagnostic_limits,
+            hierarchical_document_symbols,
+        ) = match parse_initialize_params(&params) {
+            Ok(value) => value,
+            Err(()) => {
+                return error_or_none(
+                    true,
+                    id,
+                    INVALID_PARAMS,
+                    "初始化参数无效 / invalid initialize parameters",
+                );
+            }
+        };
         self.position_encoding = encoding;
         self.workspace_folders = folders;
         self.pull_diagnostics_supported = pull_diagnostics_supported;
         self.diagnostic_limits = diagnostic_limits;
+        self.hierarchical_document_symbols = hierarchical_document_symbols;
         self.state = LifecycleState::AwaitingInitialized;
         HandleOutcome::Response(success_response(
             id,
-            initialize_result(encoding, pull_diagnostics_supported, diagnostic_limits),
+            initialize_result(
+                encoding,
+                pull_diagnostics_supported,
+                diagnostic_limits,
+                hierarchical_document_symbols,
+            ),
         ))
     }
 
@@ -1343,6 +1359,7 @@ fn parse_initialize_params(
         Vec<WorkspaceFolder>,
         bool,
         DiagnosticLimits,
+        bool,
     ),
     (),
 > {
@@ -1352,6 +1369,7 @@ fn parse_initialize_params(
 
     let mut labels = Vec::new();
     let mut pull_diagnostics_supported = false;
+    let mut hierarchical_document_symbols = false;
     if let Some(capabilities) = object.get("capabilities") {
         let Some(capabilities) = capabilities.as_object() else {
             return Err(());
@@ -1382,6 +1400,13 @@ fn parse_initialize_params(
                 }
                 pull_diagnostics_supported = true;
             }
+            if let Some(document_symbol) = text_document.get("documentSymbol") {
+                let document_symbol = document_symbol.as_object().ok_or(())?;
+                if let Some(hierarchical) = document_symbol.get("hierarchicalDocumentSymbolSupport")
+                {
+                    hierarchical_document_symbols = hierarchical.as_bool().ok_or(())?;
+                }
+            }
         }
     }
     let encoding = negotiate_position_encoding(&labels);
@@ -1396,6 +1421,7 @@ fn parse_initialize_params(
         folders,
         pull_diagnostics_supported,
         diagnostic_limits,
+        hierarchical_document_symbols,
     ))
 }
 
@@ -1906,12 +1932,19 @@ fn initialize_result(
     encoding: PositionEncoding,
     pull_diagnostics_supported: bool,
     diagnostic_limits: DiagnosticLimits,
+    hierarchical_document_symbols: bool,
 ) -> Value {
     let mut result = json!({
         "capabilities": {
             "positionEncoding": encoding.wire_name(),
             "documentFormattingProvider": true,
+            "documentSymbolProvider": true,
             "experimental": {
+                "lingDocumentSymbols": {
+                    "maxSymbols": MAX_DOCUMENT_SYMBOLS,
+                    "mode": if hierarchical_document_symbols { "hierarchical" } else { "flat" },
+                    "version": DOCUMENT_SYMBOL_PROTOCOL_VERSION,
+                },
                 "lingOverlay": {
                     "changeLimit": MAX_CONTENT_CHANGES,
                     "version": OVERLAY_PROTOCOL_VERSION,

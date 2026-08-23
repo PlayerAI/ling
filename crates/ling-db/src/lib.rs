@@ -35,6 +35,7 @@ mod project_snapshot;
 mod reference_index;
 mod reference_span_index;
 mod rename_identifier;
+mod resolved_outline;
 mod token_source_index;
 mod typed_definition_index;
 
@@ -57,6 +58,10 @@ pub use reference_index::{
 pub use reference_span_index::{ResolvedReferenceSpan, ResolvedReferenceSpanIndex};
 pub use rename_identifier::{
     RenameIdentifierObservation, RenameIdentifierStatus, observe_rename_identifier,
+};
+pub use resolved_outline::{
+    MAX_RESOLVED_OUTLINE_NODES, ResolvedOutline, ResolvedOutlineError, ResolvedOutlineKind,
+    ResolvedOutlineNode,
 };
 pub use token_source_index::{TokenSource, TokenSourceIndex, TokenSourceIndexError};
 pub use typed_definition_index::{TypedDefinitionIndex, TypedDefinitionSymbol};
@@ -496,6 +501,10 @@ pub enum QueryError {
     TokenSourceIndex {
         message: String,
     },
+    ResolvedOutline {
+        file: SourceId,
+        error: ResolvedOutlineError,
+    },
 }
 
 impl fmt::Display for QueryError {
@@ -553,6 +562,13 @@ impl fmt::Display for QueryError {
             Self::ProjectSnapshot { error } => error.fmt(formatter),
             Self::TokenSourceIndex { message } => {
                 write!(formatter, "token source index failed: {message}")
+            }
+            Self::ResolvedOutline { file, error } => {
+                write!(
+                    formatter,
+                    "resolved outline for source file {} failed: {error}",
+                    file.get()
+                )
             }
         }
     }
@@ -1090,6 +1106,23 @@ impl CompilerDb {
             .ok_or(QueryError::UnknownFile { file })?;
         let resolved = self.resolved_workspace(&graph_key, &graph, &node.name)?;
         Ok(Arc::new(ResolvedDefinitionIndex::from_resolved(&resolved)))
+    }
+
+    /// Builds one bounded module-rooted outline from validated resolved HIR.
+    ///
+    /// The result owns only compiler structural kinds and original byte spans;
+    /// it contains no editor position, URI, lifecycle, or wire representation.
+    pub fn resolved_outline(&mut self, file: SourceId) -> Result<Arc<ResolvedOutline>, QueryError> {
+        let snapshot = self.source_bytes(file)?;
+        let original =
+            std::str::from_utf8(snapshot.bytes()).map_err(|_| QueryError::ResolvedOutline {
+                file,
+                error: ResolvedOutlineError::InvalidSpan,
+            })?;
+        let module = self.resolve_module(file)?;
+        ResolvedOutline::from_module(&module, original)
+            .map(Arc::new)
+            .map_err(|error| QueryError::ResolvedOutline { file, error })
     }
 
     /// Builds an immutable source/module-order inventory of resolved

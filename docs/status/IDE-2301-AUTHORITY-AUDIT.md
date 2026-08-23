@@ -1,79 +1,67 @@
-# IDE-2301 Authority Audit: Document symbols
+# IDE-2301 authority audit: Document symbols
 
 ## Outcome
 
-`IDE-2301` remains correctly recorded as `BlockedSpec` for its public editor
-surface. Accepted DEC-0073 closes only the bounded `IDE-2301-INDEX` child: an
-in-process deterministic inventory of resolver-owned user definitions and
-original spans. The decision does not fix an LSP document-symbol schema, node
-kinds, hierarchy, ranges, URI/version association, or field lifecycle.
+`IDE-2301` is authorized by Accepted RFC-0036. The RFC closes the previously
+recorded public-protocol gap for the bounded Preview
+`textDocument/documentSymbol` surface while retaining Accepted DEC-0073 as the
+narrower internal resolved-definition-index authority.
 
-No document-symbol handler, symbol-kind mapping, hierarchy projection,
-location conversion, or placeholder editor API was added.
+The implementation may expose only RFC-0036's fixed hierarchical
+`DocumentSymbol` or flat `SymbolInformation` projections. It must not infer
+local bindings, publish Semantic IDs, invent unaccepted symbol kinds, or imply
+support for edits, transactions, progress, partial results, or Stable
+compatibility.
 
 ## Normative traceability
 
-- Accepted DEC-0012 defines path-free Semantic IDs and canonical bytes, not an
-  LSP symbol request/response or presentation-range projection.
-- Accepted DEC-0073 authorizes only the internal resolved-definition index;
-  existing resolver IDs and spans are copied without creating presentation
-  ranges or a new identity rule.
-- `docs/LANGUAGE.md` and `docs/SEMANTICS.md` describe Semantic Graph nodes,
-  stable identity, and source relationships, but do not freeze LSP symbol
-  kinds, nesting, selection, or document lifecycle fields.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` and
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leave URI/snapshot/version and public
-  Semantic Graph protocol lifecycle open.
-- No LSP protocol inventory entry authorizes document symbols; the Experimental
-  Semantic Graph JSON protocol is not an LSP response schema.
+- RFC-0036 §§1–2 fixes capability negotiation, discovery, Ready-state request
+  behavior, immutable request snapshots, exact URI identity, temporary-source
+  isolation, freshness, and failure atomicity.
+- RFC-0036 §§3–4 fixes the compiler outline taxonomy, original UTF-8 spans,
+  hierarchy, 4096-node bound, display names, and deterministic source order.
+- RFC-0036 §§5–7 fixes hierarchical and flat wire fields, UTF-8/16/32 range
+  projection, failure codes/messages, compatibility, and migration policy.
+- Accepted RFC-0004, RFC-0023, RFC-0029, and RFC-0030 remain authoritative for
+  JSON-RPC lifecycle, overlays, position encoding, and LSP framing.
+- Accepted DEC-0012 keeps Semantic IDs path-free and separate from
+  presentation; DEC-0019, DEC-0071, and DEC-0073 provide the compiler query,
+  immutable snapshot, and resolved-definition boundaries composed here.
 
-## Current interface evidence
+## Scope resolution
 
-The current repository confirms the missing boundary:
+The earlier audit identified missing decisions for kinds, hierarchy, ranges,
+URI/snapshot binding, limits, errors, and lifecycle. RFC-0036 now fixes those
+items narrowly:
 
-- `ling-semantic` emits canonical graph fragments/JSON and internal IDs, while
-  `ling-db` now exposes the bounded resolver-owned definition inventory for
-  compiler queries; neither exposes LSP symbol kinds, hierarchical
-  `DocumentSymbol` nodes, or URI locations.
-- `ling-source` preserves byte spans, but no accepted position adapter maps
-  them to editor ranges or document versions.
-- No fixture covers symbol nesting, duplicate display names, Unicode names,
-  generated/virtual files, stale snapshots, or deterministic ordering.
+1. module/type/member/value/Trait/implementation structures have exact
+   compiler and LSP kind mappings;
+2. hierarchy, flat fallback, full versus selection ranges, display names, and
+   ordering are explicit;
+3. requests use one exact current snapshot and negotiated source projection,
+   with isolated temporary documents and stale-result rejection;
+4. malformed params use InvalidParams, while compiler/projection/limit/stale
+   failures use one fixed bilingual RequestFailed result; and
+5. the Preview marker, discovery object, protocol inventory, migration rule,
+   and executable conformance boundaries are registered.
 
-## Required authority before implementation
-
-An implementation-ready decision or RFC must define, at minimum:
-
-1. symbol kinds, tags, names/detail/display policy, hierarchy/flat fallback,
-   selection ranges versus full ranges, and source-span identity;
-2. URI/document version and package/workspace scope, generated/dependency file
-   policy, position encoding, and stale-result behavior;
-3. Semantic ID and rename/reference identity mapping, localization, field
-   stability, limits, cancellation, and deterministic ordering;
-4. LSP lifecycle/capability negotiation, protocol inventory/version migration,
-   and interaction with diagnostics/semantic snapshots; and
-5. positive, negative, nested, Unicode/CRLF/BOM, cross-module/package,
-   generated-file, stale-version, deterministic, and migration fixtures.
-
-Until those decisions and fixtures are Accepted, an LSP symbol projection could
-leak unstable graph details, map an incorrect range, or freeze identity rules
-that conflict with DEC-0012.
+Generated/dependency-only symbols, local bindings, inferred presentation,
+documentation, tags, cancellation channels, dynamic registration, background
+work, edits, transactions, and Stable lifecycle remain deliberately outside
+the authorized surface.
 
 ## Evidence and compatibility
 
-This audit was checked against `docs/decisions/0012-semantic-identity-and-canonical-bytes.md`,
-`docs/SEMANTICS.md`, `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-semantic`, `crates/ling-db`, and `crates/ling-source`.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+The implementation evidence is recorded in
+`docs/status/IDE-2301-IMPLEMENTATION-REPORT.md`, the protocol fixture README,
+the compiler/LSP tests, and the exact diagnostic transcript migration. No
+compiler diagnostic code, language semantics, Typed Core, Semantic ID schema,
+runtime, bytecode, VM, ABI, or Unicode 17.0.0 data changes are authorized or
+introduced by this decision.
 
-## Intentionally deferred
+## Historical note
 
-The bounded `IDE-2301-INDEX` child is complete under DEC-0073. The public
-`IDE-2301` implementation can begin only after LSP lifecycle/position and
-Semantic Graph projection decisions are Accepted. It must derive locations
-from approved source maps, preserve Semantic IDs, and keep compiler graph
-identity separate from presentation details.
+Before RFC-0036 was Accepted, this audit correctly held the public task at
+`BlockedSpec` and allowed only `IDE-2301-INDEX` under DEC-0073. That historical
+block no longer applies to the exact RFC-0036 Preview surface; it continues to
+protect all deferred editor behavior from accidental implementation.

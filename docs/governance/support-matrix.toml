@@ -343,6 +343,13 @@ stability = "Preview"
 implemented = true
 
 [[protocol]]
+id = "PROTO-LSP-DOCUMENT-SYMBOL"
+visibility = "Public"
+version = "ling.lsp.document-symbol/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 visibility = "Public"
 version = "ling.lsp.formatting/0.1"

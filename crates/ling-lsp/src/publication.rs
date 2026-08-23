@@ -180,25 +180,31 @@ impl From<DiagnosticAdapterError> for DiagnosticAnalysisError {
 fn compile_checked_workspace(
     snapshot: &RequestSnapshot,
 ) -> Result<Vec<Diagnostic>, DiagnosticAnalysisError> {
-    let mut compiler = CompilerDb::new();
-    for input in snapshot.inputs() {
-        compiler
-            .set_workspace_input(input.kind(), input.bytes().to_vec())
-            .map_err(DiagnosticAnalysisError::CompilerInput)?;
-    }
-    for document in snapshot
-        .documents()
-        .iter()
-        .filter(|document| !document.is_temporary())
-    {
-        compiler
-            .set_disk_snapshot(document.logical_name(), document.bytes().to_vec())
-            .map_err(DiagnosticAnalysisError::CompilerInput)?;
-    }
+    let mut compiler =
+        compiler_for_snapshot(snapshot, None).map_err(DiagnosticAnalysisError::CompilerInput)?;
     compiler
         .workspace_diagnostics()
         .map(Vec::from)
         .map_err(DiagnosticAnalysisError::Compiler)
+}
+
+pub(crate) fn compiler_for_snapshot(
+    snapshot: &RequestSnapshot,
+    requested_temporary_uri: Option<&str>,
+) -> Result<CompilerDb, VfsError> {
+    let mut compiler = CompilerDb::new();
+    for input in snapshot.inputs() {
+        compiler.set_workspace_input(input.kind(), input.bytes().to_vec())?;
+    }
+    for document in snapshot.documents().iter().filter(|document| {
+        requested_temporary_uri.map_or_else(
+            || !document.is_temporary(),
+            |uri| document.is_temporary() && document.uri() == uri,
+        )
+    }) {
+        compiler.set_disk_snapshot(document.logical_name(), document.bytes().to_vec())?;
+    }
+    Ok(compiler)
 }
 
 impl LspServer {

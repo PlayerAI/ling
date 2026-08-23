@@ -6975,3 +6975,31 @@ unresolved_alternatives = [
   "Golden transport headers, editor-driven snapshots, automatic fixture update mode, fabricated stale/cancellation races, Workspace Edits, Semantic Transactions, and Stable lifecycle remain excluded or deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0036"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0036.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact capability validation, hierarchical/flat discovery, Ready-state method behavior, notification silence, params, unknown URI, and fixed errors.",
+  "Cover module, record/field, variant/case, alias, function, constant, Trait/member, and implementation/member kinds with exact hierarchy and source order.",
+  "Cover negotiated UTF-8/16/32 projection, Chinese, emoji, combining marks, BOM, CRLF, full/selection ranges, temporary isolation, dependencies, repeated requests, and flat pre-order containers.",
+  "Reject syntax/HIR/resolution, malformed outline spans, stale snapshots, node overflow, and oversized bodies atomically without diagnostic or document mutation.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.document-symbol/0.1 with hierarchical and standard flat fallback and no predecessor.",
+  "Adds a bounded compiler-owned resolved structural outline while leaving DEC-0073 flat definition-index behavior and Semantic IDs unchanged.",
+  "Adds no diagnostic allocation, Ling syntax/semantics, Typed Core, runtime, bytecode, VM, ABI, filesystem/network/cache behavior, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Local bindings, inferred details, documentation, tags, dynamic registration, progress, partial results, observable cancellation, caching promises, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""
