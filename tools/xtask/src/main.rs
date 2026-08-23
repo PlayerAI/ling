@@ -586,11 +586,12 @@ fn main() -> ExitCode {
             match rc3_verification::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "RC3 inventory OK: {} checks ({} BlockedSpec, {} partial), {} audit files",
+                        "RC3 inventory OK: {} checks ({} BlockedSpec, {} partial), {} audit files, {} upstream gate",
                         summary.check_count,
                         summary.blocked_count,
                         summary.partial_count,
-                        summary.audit_file_count
+                        summary.audit_file_count,
+                        summary.upstream_gate_count
                     );
                     ExitCode::SUCCESS
                 }

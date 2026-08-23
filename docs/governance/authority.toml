@@ -3718,3 +3718,16 @@ covers = ["RC-6902 bounded current RC0/Zed boundary evidence", "corrected source
 depends_on = ["DEC-0053", "DEC-0243", "DEC-0245", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0247"
+title = "Current RC3 upstream evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0247-current-rc3-upstream-evidence.md"
+covers = ["RC-6903 bounded current RC1-to-RC0 upstream evidence", "composed bounded release-readiness inventories with explicit parent-blocked and non-independent markers", "internal evidence without reviewer, candidate, artifact verification, reproduction, sign-off, or G6 completion claims"]
+depends_on = ["DEC-0054", "DEC-0246", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

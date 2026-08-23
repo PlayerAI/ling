@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+use crate::rc1_validation;
+
 const MATRIX_PATH: &str = "docs/testing/RC3-INDEPENDENT-VERIFICATION.md";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -94,6 +96,7 @@ pub struct CheckSummary {
     pub blocked_count: usize,
     pub partial_count: usize,
     pub audit_file_count: usize,
+    pub upstream_gate_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -104,6 +107,10 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_audits(root));
+    if let Err(upstream_errors) = rc1_validation::check_repository(root) {
+        errors.extend(upstream_errors);
+    }
+    errors.extend(validate_current_evidence(&matrix));
     finish(errors).map(|()| CheckSummary {
         check_count: CHECKS.len(),
         blocked_count: count_state("BlockedSpec"),
@@ -112,7 +119,26 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
             .filter(|check| check.state.starts_with("Partial"))
             .count(),
         audit_file_count: REQUIRED_AUDIT_MARKERS.len(),
+        upstream_gate_count: 1,
     })
+}
+
+fn validate_current_evidence(matrix: &str) -> Vec<String> {
+    const REQUIRED: &[&str] = &[
+        "The bounded current RC0 and RC1 inventory gates pass",
+        "both parent release gates remain `BlockedSpec`",
+        "does not constitute independent verification",
+    ];
+    let normalized = normalize(matrix);
+    REQUIRED
+        .iter()
+        .filter(|marker| !normalized.contains(&normalize(marker)))
+        .map(|marker| {
+            format!(
+                "GOV-RC3-VERIFICATION-0011: {MATRIX_PATH} is missing current evidence marker {marker:?}"
+            )
+        })
+        .collect()
 }
 
 fn validate_matrix(matrix: &str) -> Vec<String> {
@@ -258,6 +284,7 @@ mod tests {
         assert_eq!(summary.blocked_count, 3);
         assert_eq!(summary.partial_count, 4);
         assert_eq!(summary.audit_file_count, 7);
+        assert_eq!(summary.upstream_gate_count, 1);
     }
 
     #[test]
@@ -279,6 +306,17 @@ mod tests {
             errors
                 .iter()
                 .any(|error| error.contains("missing audit marker"))
+        );
+    }
+
+    #[test]
+    fn rejects_missing_current_upstream_boundary() {
+        let errors = validate_current_evidence("self-validation is enough");
+        assert_eq!(errors.len(), 3);
+        assert!(
+            errors
+                .iter()
+                .all(|error| error.contains("GOV-RC3-VERIFICATION-0011"))
         );
     }
 

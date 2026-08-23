@@ -6338,3 +6338,29 @@ unresolved_alternatives = [
   "RC0 completion; public artifacts/acquisition; checksums, SBOM, provenance and signing; clean install; Zed packaging; samples; migration; issue intake; schema-reset change control; independent validation; and RC1 approval remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0247"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0247-current-rc3-upstream-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc3 verify and require seven checks, seven audit files, and one composed upstream gate.",
+  "Run the current RC1 and RC0 verifiers independently.",
+  "Remove upstream-pass, parent-blocked, and non-independent markers in a focused test and require fail-closed errors.",
+  "Run workspace, CI, governance, support, status, traceability, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Composes internal evidence gates and clarifies documentation only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP behavior, runtime, Unicode, protocol states, support states, and public APIs remain unchanged.",
+  "Adds no reviewer, candidate, artifact verification, reproduction, evidence bundle, Go/No-Go, network behavior, or G6 completion claim.",
+]
+unresolved_alternatives = [
+  "Immutable candidate; reviewer independence/conflict policy; clean environment/toolchain capture; artifact/security verification; complete reproduction; retention/rerun rules; signed comparison; and Go/No-Go remain deferred.",
+]
+superseded_by = ""

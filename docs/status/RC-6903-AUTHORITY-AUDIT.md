@@ -55,6 +55,12 @@ no-independent-sign-off boundary, and seven linked audit-marker files. It
 validates inventory drift only and does not create any independent evidence or
 Go/No-Go decision.
 
+Accepted `DEC-0247` additionally authorizes the bounded
+`RC-6903-CURRENT-EVIDENCE` child. The RC3 verifier composes the current RC1
+gate, which already composes RC0, and requires an explicit statement that both
+parent release gates remain blocked. This validates upstream inventory only;
+it is not reviewer independence, reproduction, or sign-off.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

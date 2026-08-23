@@ -1,6 +1,6 @@
 # RC-6903 Independent Verification
 
-Status: `BlockedSpec` (2026-08-22). This matrix defines readiness for an
+Status: `BlockedSpec` (2026-08-23). This matrix defines readiness for an
 independent release-candidate review; it is not an independent sign-off and
 does not create a tag, artifact, reviewer identity, or Go decision.
 
@@ -13,6 +13,10 @@ and compare tag/hash/release-manifest identities. The current workspace has
 no accepted candidate package, independent reviewer record, evidence-bundle
 protocol, or sign-off schema. A run by the implementing agent is repository
 validation, not RC3 independence.
+
+The bounded current RC0 and RC1 inventory gates pass, and both parent release
+gates remain `BlockedSpec`. This composed repository result does not constitute
+independent verification.
 
 ## Verification matrix
 
@@ -50,7 +54,8 @@ cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 
 `cargo xtask rc3 verify` deterministically checks the exact seven checks,
 their `BlockedSpec` or partial Seed states, the no-independent-sign-off
-boundary, and seven linked audit-marker files. It is a readiness inventory
+boundary, seven linked audit-marker files, and the current upstream RC1 gate
+(which composes RC0). It is a readiness inventory
 only; it does not build a tag, verify artifacts, contact a reviewer, or make a
 Go/No-Go decision.
 
