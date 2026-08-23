@@ -271,7 +271,7 @@
 | `LSP-2202-BATCH` | Internal immutable diagnostic batch | `G1` | `S` | `Done` | `LSP-2201-ORDERING`, `LSP-2501-SNAPSHOT` | `15f8461582281ae1f9e99250ca6288a8b2d5f3b4` |
 | `LSP-2203` | LSP pull diagnostics Preview | `G1` | `M` | `Done` | `LSP-2101`, `LSP-2201` | `da69abff0c74765283d3e52e182a7c0ae2f8dc3a` |
 | `LSP-2204` | LSP root-cause and error-storm control | `G1` | `M` | `Done` | `LSP-2201`, `LSP-2202` | `b70308c1e215fd2f4a4736aa56d7372c368af599` |
-| `LSP-2205` | LSP diagnostic fixtures | `G1` | `M` | `BlockedSpec` | `LSP-2201`, `LSP-2202`, `LSP-2203`, `LSP-2204` | `` |
+| `LSP-2205` | LSP diagnostic fixtures | `G1` | `M` | `Done` | `LSP-2201`, `LSP-2202`, `LSP-2203`, `LSP-2204` | `93a58e9090ce5a3be17bcfb8569d7246ce7d71ec` |
 | `LSP-2401` | Semantic token taxonomy RFC/decision | `G1` | `M` | `BlockedSpec` | `IDE-2311`, `LSP-2101`, `LSP-2102` | `` |
 | `LSP-2401-LEXICAL-SOURCE` | Internal lexical token source index | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP` | `135bfb07bb8f824f1ab119b5e0f765c674d6f294` |
 | `LSP-2402` | Typed semantic-token generation | `G1` | `L` | `BlockedSpec` | `LSP-2101`, `LSP-2102`, `LSP-2401` | `` |

@@ -6597,7 +6597,7 @@ notes = [
 [[task]]
 id = "LSP-2205"
 title = "LSP diagnostic fixtures"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6608,30 +6608,35 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/ERROR-CODES.md",
+  "docs/RFC-0035.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/tests/diagnostic_transcripts.rs",
+  "docs/RFC-0035.md",
   "docs/status/LSP-2205-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2205-IMPLEMENTATION-REPORT.md",
+  "tests/fixtures/lsp-diagnostics-v1/manifest.json",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit distinguishes existing compiler/CLI diagnostic fixtures from the missing LSP schema, position, version, publication, pull/push, and error-storm fixture contract.",
-  "The audit covers fixture metadata, stable/experimental fields, stale/cancelled results, related files, Unicode/CRLF/BOM, deterministic ordering, and migration evidence.",
-  "No LSP fixture corpus, expected JSON-RPC bytes, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor contract is added while the authority is absent.",
-  "The future fixture suite must be generated from accepted LSP contracts and remain separate from compiler diagnostic authority.",
+  "Accepted RFC-0035 defines the internal manifest, compact UTF-8/LF JSON-RPC payload grammar, strict RFC-0004 framing boundary, exact response-body comparison, and repeated fresh-server execution.",
+  "Four executable cases cover UTF-16 Chinese/emoji/BOM/CRLF incremental recovery, exact push/pull array parity and result IDs, storm-control omission and clearance, and invalid known-limit initialization atomicity.",
+  "The harness validates sorted unique safe paths, active protocol markers, canonical object bytes, exit state, frame order/count, exact output bytes, and semantic cross-frame invariants without an update/bless mode.",
+  "Stale-ticket, sequential cancellation, related-file, alternate-encoding, oversized, and internal failure-injection boundaries remain truthfully covered by focused integration tests rather than fabricated transcript messages.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "93a58e9090ce5a3be17bcfb8569d7246ce7d71ec"
+completion_commit = "93a58e9090ce5a3be17bcfb8569d7246ce7d71ec"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2205 now has its LSP-2202 push-fixture dependency satisfied but remains BlockedSpec downstream of LSP-2203/LSP-2204 and their missing pull/error-storm authorities.",
-  "Current compiler/CLI diagnostic fixtures remain valid evidence for their own protocols and are not relabeled as editor fixtures.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit 93a58e9090ce5a3be17bcfb8569d7246ce7d71ec adds Accepted RFC-0035, the exact transcript corpus, LF checkout policy, conformance harness, governance records, and implementation evidence.",
+  "The internal Preview fixture marker creates no public method or compiler diagnostic authority; all expected wire values derive from Accepted RFC-0004 and RFC-0031 through RFC-0034.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core, runtime, bytecode, VM, ABI, Semantic ID, result-ID algorithm, or Unicode 17.0.0 behavior changes.",
 ]
 
 [[task]]

@@ -1,6 +1,6 @@
 # LSP-2205 implementation report
 
-> Status: implementation complete; status binding pending
+> Status: Done
 > Task: `LSP-2205`
 > Authority: Accepted `RFC-0035`, `RFC-0034`, `RFC-0033`, `RFC-0032`,
 > `RFC-0031`, `RFC-0004`, `DEC-0001`, `DEC-0002`, `DEC-0029`, `DEC-0034`,
@@ -47,8 +47,8 @@ server independently of Zed and does not add or modify a public method.
 - Existing LSP adapter, push, pull, diagnostic-control, position, overlay,
   cancellation, lifecycle, and oversized-response tests retain the focused
   evidence referenced by RFC-0035 §5.
-- Repository-wide results and the exact implementation commit are recorded
-  during status binding.
+- The complete repository gate set passed against implementation commit
+  `93a58e9090ce5a3be17bcfb8569d7246ce7d71ec` before status binding.
 
 ## Compatibility, determinism, and Unicode impact
 

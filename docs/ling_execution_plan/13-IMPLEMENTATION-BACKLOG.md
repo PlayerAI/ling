@@ -169,7 +169,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2202-BATCH` | G1/Editor | Internal immutable diagnostic batch | S | Done | Accepted DEC-0035; see `crates/ling-lsp/src/diagnostic_batch.rs` and `docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md`; RFC-0032 separately implements the parent without broadening this child |
 | `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | Done | `04-LSP-IMPLEMENTATION.md:215`, `docs/RFC-0033.md`, `docs/status/LSP-2203-IMPLEMENTATION-REPORT.md` |
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | Done | `RFC-0034`, `docs/status/LSP-2204-IMPLEMENTATION-REPORT.md`, `b70308c1e215fd2f4a4736aa56d7372c368af599` |
-| `LSP-2205` | G1/Editor | Diagnostic fixtures | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:227`, `docs/status/LSP-2205-AUTHORITY-AUDIT.md` |
+| `LSP-2205` | G1/Editor | Diagnostic fixtures | — | Done | `RFC-0035`, `docs/status/LSP-2205-IMPLEMENTATION-REPORT.md`, `93a58e9090ce5a3be17bcfb8569d7246ce7d71ec` |
 | `IDE-2301` | G1/Editor | Document symbols | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:244`, `docs/status/IDE-2301-AUTHORITY-AUDIT.md` |
 | `IDE-2301-INDEX` | G1/Editor | Internal resolved-definition source-order index | S | Done | Accepted `DEC-0073`; see `crates/ling-db/src/definition_index.rs` and `docs/status/IDE-2301-INDEX-IMPLEMENTATION-REPORT.md`; public DocumentSymbol behavior remains BlockedSpec in `IDE-2301` |
 | `IDE-2302` | G1/Editor | Hover | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:248`, `docs/status/IDE-2302-AUTHORITY-AUDIT.md` |
