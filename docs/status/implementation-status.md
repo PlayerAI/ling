@@ -254,7 +254,7 @@
 | `KCHK-4105-OBSERVATION` | Internal Kernel Core/verifier boundary evidence | `G4` | `S` | `Done` | `KCHK-4104-OBSERVATION` | `b362af10cd5bf5bc872cb46625aa05aa90c09b03` |
 | `LSP-2101` | LSP lifecycle skeleton | `G1` | `S` | `Done` | `CLI-1701` | `eb71c9db15263a38b070962efde9efb04144bcee` |
 | `LSP-2101-LIFECYCLE` | LSP lifecycle Preview slice | `G1` | `S` | `Done` | — | `38d95fb7b91c2035bd2b1b4ebf864c1693050925` |
-| `LSP-2102` | LSP position-encoding negotiation | `G1` | `S` | `BlockedSpec` | `LSP-2101` | `` |
+| `LSP-2102` | LSP position-encoding negotiation | `G1` | `S` | `Done` | `LSP-2101` | `15cdfe7963ecd272447ff9ac00d1b71df0a63800` |
 | `LSP-2102-NEGOTIATION` | LSP initialize position-encoding negotiation | `G1` | `S` | `Done` | `LSP-2101-LIFECYCLE`, `LSP-2102-SOURCE-MAP` | `39755afad13db66b429967fe61f20f66a4aea699` |
 | `LSP-2102-SOURCE-MAP` | LSP SourceMap position projection | `G1` | `S` | `Done` | — | `9e917250bff5bb3ebba1ef02a5f2f6b66ab700de` |
 | `LSP-2103` | LSP open-document overlay | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |

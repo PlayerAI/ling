@@ -47,10 +47,11 @@ shared strict source conversion API. It adds no executable behavior.
 
 ## Verification
 
-The milestone is accepted only after focused package tests and the full locked,
-offline workspace, CI, governance, support, status, RC0, traceability, Clippy,
-formatting, and deterministic-diff gates pass. The exact acceptance commit is
-recorded in `docs/status/implementation-status.toml` after it exists.
+Focused package tests and the full locked, offline workspace, CI, governance,
+support, status, RC0, traceability, Clippy, formatting, and deterministic-diff
+gates passed before acceptance commit
+`15cdfe7963ecd272447ff9ac00d1b71df0a63800`. The task registry binds that
+exact immutable commit.
 
 ## Intentionally deferred
 

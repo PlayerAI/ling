@@ -5710,7 +5710,7 @@ notes = [
 [[task]]
 id = "LSP-2102"
 title = "LSP position-encoding negotiation"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "S"
 owner = "Codex"
@@ -5723,31 +5723,41 @@ spec = [
   "docs/decisions/0002-source-position-units.md",
   "docs/RFC-0004.md",
   "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0258-current-lsp-position-encoding-boundary.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-source/src/position.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/src/diagnostics.rs",
+  "crates/ling-lsp/tests/position_encoding.rs",
   "docs/status/LSP-2102-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2102-SOURCE-MAP-IMPLEMENTATION-REPORT.md",
   "docs/status/LSP-2102-NEGOTIATION-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2102-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the DEC-0002 byte-span/scalar-column authority and the bounded RFC-0004/DEC-0029 negotiation and SourceMap slices.",
-  "The completed children cover supported encodings, first-supported selection, UTF-16 fallback, invalid metadata, strict boundaries, CRLF/BOM/Unicode, and deterministic fixtures.",
-  "The parent remains blocked for document versions, snapshots, stale results, handler-wide diagnostics/Workspace Edit conversion, cancellation, and Stable field lifecycle.",
-  "All position-bearing behavior derives from SourceMap and keeps compiler byte spans authoritative.",
+  "Accepted DEC-0258 composes the implemented DEC-0029 strict SourceMap projection and RFC-0004 initialize negotiation as the complete bounded LSP-2102 contract.",
+  "Supported encodings, first-supported selection, unknown-label filtering, UTF-16 fallback, invalid metadata, strict boundaries, CRLF/BOM/Unicode, and deterministic fixtures are covered.",
+  "Every currently implemented position-bearing path consumes the shared ling-source conversion API; original UTF-8 compiler spans remain authoritative and no ad hoc handler counting is introduced.",
+  "Document/snapshot versions, stale results, diagnostics publication, incremental edits, Workspace Edits, cancellation, future methods, and Stable compatibility remain independently governed downstream.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "15cdfe7963ecd272447ff9ac00d1b71df0a63800"
+completion_commit = "15cdfe7963ecd272447ff9ac00d1b71df0a63800"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2102 remains BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001 for the complete editor transaction surface; RFC-0004 and DEC-0029 authorize only the bounded children.",
-  "LSP-2102-SOURCE-MAP and LSP-2102-NEGOTIATION are independently complete and do not expose host paths, revisions, or document identity.",
-  "The parent audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "The former blocker over-scoped this size-S negotiation task with later editor transaction requirements; DEC-0258 records the exact plan boundary without closing GAP-LSP-TRANSACTION-PROTOCOL-001.",
+  "LSP-2102-SOURCE-MAP and LSP-2102-NEGOTIATION supply the complete implementation evidence and expose no host paths, revisions, filesystem/network behavior, or document transaction promise.",
+  "Verified and committed as 15cdfe7963ecd272447ff9ac00d1b71df0a63800 after focused source/LSP tests and the full locked offline workspace, Clippy, CI, governance, support, status, RC0, traceability, formatting, and diff gates passed.",
 ]
 
 [[task]]
