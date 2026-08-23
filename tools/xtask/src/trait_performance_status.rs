@@ -60,7 +60,7 @@ const REQUIRED_EVIDENCE: &[(&str, &[&str])] = &[
     (
         "crates/ling-types/src/solver.rs",
         &[
-            "const MAX_NESTED_OBLIGATIONS: usize = 64;",
+            "pub const MAX_NESTED_TRAIT_OBLIGATIONS: usize = 64;",
             "active: BTreeSet::new()",
             "SolverErrorKind::Cycle",
             "SolverErrorKind::DepthLimit",
@@ -369,8 +369,11 @@ mod tests {
     fn rejects_missing_solver_marker() {
         let errors = validate_markers(
             "solver.rs",
-            "const MAX_NESTED_OBLIGATIONS: usize = 64;",
-            &["MAX_NESTED_OBLIGATIONS", "bounded_termination_projection"],
+            "pub const MAX_NESTED_TRAIT_OBLIGATIONS: usize = 64;",
+            &[
+                "MAX_NESTED_TRAIT_OBLIGATIONS",
+                "bounded_termination_projection",
+            ],
         );
         assert_eq!(errors.len(), 1);
         assert!(errors[0].contains("bounded_termination_projection"));

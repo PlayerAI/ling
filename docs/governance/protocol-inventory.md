@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 48 records: 44 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 28 Preview, 0 Stable.
+- 49 records: 45 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 29 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -33,6 +33,7 @@
 | `PROTO-LSP-REFERENCES` | Public | LSP | `ling.lsp.references/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-RENAME` | Public | LSP | `ling.lsp.rename/0.1` | `Preview` | no | no | 4 |
 | `PROTO-LSP-REQUEST-CANCELLATION` | Public | LSP | `ling.lsp.request-cancellation/0.1` | `Preview` | no | no | 4 |
+| `PROTO-LSP-RESOURCE-LIMITS` | Public | LSP | `ling.lsp.resource-limits/0.1` | `Preview` | no | no | 5 |
 | `PROTO-LSP-SCHEDULING` | Public | LSP | `ling.lsp.scheduling/0.1` | `Preview` | no | no | 5 |
 | `PROTO-LSP-SEMANTIC-TOKENS` | Public | LSP | `ling.lsp.semantic-tokens/0.1` | `Preview` | no | no | 6 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
@@ -311,6 +312,19 @@
 - Sources: [`docs/RFC-0049.md`](../RFC-0049.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0041.md`](../RFC-0041.md), [`docs/RFC-0043.md`](../RFC-0043.md), [`docs/RFC-0044.md`](../RFC-0044.md), [`docs/RFC-0045.md`](../RFC-0045.md), [`docs/RFC-0048.md`](../RFC-0048.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0021-deterministic-parallel-scheduling.md`](../decisions/0021-deterministic-parallel-scheduling.md), [`docs/decisions/0030-lsp-request-snapshot-boundary.md`](../decisions/0030-lsp-request-snapshot-boundary.md), [`docs/decisions/0031-lsp-internal-cancellation-boundary.md`](../decisions/0031-lsp-internal-cancellation-boundary.md), [`docs/decisions/0032-lsp-internal-scheduling-boundary.md`](../decisions/0032-lsp-internal-scheduling-boundary.md), [`crates/ling-types/src/solver.rs`](../../crates/ling-types/src/solver.rs), [`crates/ling-types/src/lib.rs`](../../crates/ling-types/src/lib.rs), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/request_cancellation.rs`](../../crates/ling-lsp/src/request_cancellation.rs), [`crates/ling-lsp/src/rename.rs`](../../crates/ling-lsp/src/rename.rs), [`crates/ling-lsp/src/completion.rs`](../../crates/ling-lsp/src/completion.rs), [`crates/ling-lsp/src/completion_resolve.rs`](../../crates/ling-lsp/src/completion_resolve.rs), [`crates/ling-lsp/src/workspace_symbols.rs`](../../crates/ling-lsp/src/workspace_symbols.rs), [`crates/ling-lsp/src/semantic_tokens.rs`](../../crates/ling-lsp/src/semantic_tokens.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
 - Fixtures: [`crates/ling-lsp/tests/cancellation.rs`](../../crates/ling-lsp/tests/cancellation.rs), [`tests/protocols/lsp-request-cancellation/fixtures/v1.json`](../../tests/protocols/lsp-request-cancellation/fixtures/v1.json), [`tests/protocols/lsp-request-cancellation/README.md`](../../tests/protocols/lsp-request-cancellation/README.md), [`docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md`](../status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md)
 - Notes: The Preview adds no deadline, timeout, progress, quota, server-initiated cancellation, parallel compiler mutation, persistent state, VM/runtime cancellation, Stable editor compatibility, or general Semantic Transaction claim.
+
+### `PROTO-LSP-RESOURCE-LIMITS` — Ling bounded Preview LSP resources
+
+- Producer: ling lsp --stdio; ling-lsp resource accounting and request admission
+- Consumer: LSP 3.17 clients; editor hosts; integration test harnesses
+- Reader policy: Count exact decoded UTF-8 overlay bytes and live string/number request-ID associations using the fixed session and per-operation scopes; retain existing transport, completion, diagnostic, and Trait solver bounds.
+- Writer policy: Advertise the exact Preview marker and return -32803 with registered bilingual L-LSP-0002 data for request-form LSP-owned hard-limit failures, while notifications remain response-free and every failure is publication-atomic.
+- Unknown-field policy: The marker and resource error data have exact fixed shapes; clients may ignore Experimental discovery, while incompatible units, scopes, limits, precedence, facts, cleanup, retry, or privacy behavior requires a new marker and migration evidence.
+- Migration tool: None; ling.lsp.resource-limits/0.1 is Preview with no predecessor and adds no JSON-RPC method or client-selected non-diagnostic configuration.
+- Authority: `RFC-0051`, `RFC-0050`, `RFC-0049`, `RFC-0042`, `RFC-0032`, `RFC-0029`, `RFC-0023`, `RFC-0005`, `RFC-0004`, `DEC-0019`, `DEC-0033`
+- Sources: [`docs/RFC-0051.md`](../RFC-0051.md), [`docs/RFC-0050.md`](../RFC-0050.md), [`docs/RFC-0049.md`](../RFC-0049.md), [`docs/RFC-0042.md`](../RFC-0042.md), [`docs/RFC-0032.md`](../RFC-0032.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0005.md`](../RFC-0005.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0033-lsp-internal-byte-accounting-boundary.md`](../decisions/0033-lsp-internal-byte-accounting-boundary.md), [`docs/ERROR-CODES.md`](../ERROR-CODES.md), [`crates/ling-lsp/src/resource.rs`](../../crates/ling-lsp/src/resource.rs), [`crates/ling-lsp/src/request_cancellation.rs`](../../crates/ling-lsp/src/request_cancellation.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs)
+- Fixtures: [`crates/ling-lsp/src/resource.rs`](../../crates/ling-lsp/src/resource.rs), [`crates/ling-lsp/tests/resource_limits.rs`](../../crates/ling-lsp/tests/resource_limits.rs), [`tests/protocols/lsp-resource-limits/fixtures/v1.json`](../../tests/protocols/lsp-resource-limits/fixtures/v1.json), [`tests/protocols/lsp-resource-limits/README.md`](../../tests/protocols/lsp-resource-limits/README.md), [`docs/status/LSP-2504-IMPLEMENTATION-REPORT.md`](../status/LSP-2504-IMPLEMENTATION-REPORT.md)
+- Notes: The Preview counts explicit UTF-8 bytes and logical associations only; it adds no allocator/RSS promise, OOM recovery, adaptive quota, eviction, partial result, deadline, total compiler fuel, Stable lifecycle, or Semantic Transaction claim.
 
 ### `PROTO-LSP-SCHEDULING` — Ling deterministic Preview LSP scheduling
 

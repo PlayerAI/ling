@@ -14,7 +14,8 @@
 //! governs snapshot-indexed Workspace Symbols; RFC-0048 governs bounded
 //! semantic-token full and delta transport; RFC-0049 governs Preview stdio
 //! request cancellation and atomic publication; RFC-0050 governs logical
-//! debounce, priority classes, bounded fairness, and analysis supersession.
+//! debounce, priority classes, bounded fairness, and analysis supersession;
+//! RFC-0051 governs bounded Preview resource accounting and admission.
 
 use std::collections::BTreeMap;
 use std::fmt;
@@ -22,6 +23,8 @@ use std::io::{self, BufRead, BufReader, BufWriter, Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, mpsc};
 
+pub use ling_db::MAX_NESTED_TRAIT_OBLIGATIONS;
+use ling_diagnostics::codes;
 pub use ling_source::{FileOrigin, PositionEncoding, Revision, WorkspaceInput};
 use ling_source::{
     LspPosition, LspPositionEdit, SourceFile, SourceId, VfsError, VirtualFileSystem,
@@ -32,10 +35,12 @@ use serde_json::{Map, Value, json};
 #[allow(dead_code)]
 mod scheduler;
 pub use scheduler::{MAX_INTERACTIVE_BURST, MAX_NON_BACKGROUND_BURST, SCHEDULING_PROTOCOL_VERSION};
-// DEC-0033 is an internal arithmetic child; public quota and diagnostic
-// behavior remains deferred to the parent LSP-2504 contract.
-#[allow(dead_code)]
 mod resource;
+use resource::ByteBudget;
+pub use resource::{
+    MAX_LIVE_REQUESTS, MAX_OPEN_DOCUMENT_BYTES, RESOURCE_LIMITS_PROTOCOL_VERSION,
+    ResourceLimitExceeded,
+};
 // RFC-0031 owns the public compiler-diagnostic adapter. Publication remains a
 // separate LSP-2202 concern.
 #[allow(dead_code)]
@@ -509,7 +514,8 @@ pub enum OverlayError {
     NotOpen,
     StaleVersion { current: i64, requested: i64 },
     ReadOnly,
-    TextTooLarge,
+    ResourceLimit(ResourceLimitExceeded),
+    ResourceAccounting,
     Vfs(VfsError),
 }
 
@@ -637,6 +643,7 @@ pub struct LspServer {
     code_action: code_action::CodeActionOptions,
     workspace_symbol_state: workspace_symbols::WorkspaceSymbolState,
     semantic_token_state: semantic_tokens::SemanticTokenState,
+    open_document_bytes: ByteBudget,
 }
 
 impl Default for LspServer {
@@ -669,6 +676,7 @@ impl LspServer {
             code_action: code_action::CodeActionOptions::disabled(),
             workspace_symbol_state: workspace_symbols::WorkspaceSymbolState::new(),
             semantic_token_state: semantic_tokens::SemanticTokenState::new(),
+            open_document_bytes: ByteBudget::new(MAX_OPEN_DOCUMENT_BYTES),
         }
     }
 
@@ -758,7 +766,12 @@ impl LspServer {
             return Err(if identity.temporary {
                 OverlayError::InvalidUri
             } else {
-                OverlayError::TextTooLarge
+                OverlayError::ResourceLimit(ResourceLimitExceeded::new(
+                    "document_bytes",
+                    "document",
+                    text.len(),
+                    MAX_DOCUMENT_BYTES,
+                ))
             });
         }
         let file = self.ensure_file(uri, &identity, text.as_bytes())?;
@@ -1263,10 +1276,19 @@ impl LspServer {
         {
             return Err(OverlayError::AlreadyOpen);
         }
-        let file = self.ensure_file(&uri, &identity, text.as_bytes())?;
-        self.vfs
-            .open_overlay(file, text.into_bytes())
-            .map_err(OverlayError::Vfs)?;
+        let text_len = text.len();
+        self.reserve_open_document_bytes(text_len)?;
+        let file = match self.ensure_file(&uri, &identity, text.as_bytes()) {
+            Ok(file) => file,
+            Err(error) => {
+                self.release_open_document_bytes(text_len)?;
+                return Err(error);
+            }
+        };
+        if let Err(error) = self.vfs.open_overlay(file, text.into_bytes()) {
+            self.release_open_document_bytes(text_len)?;
+            return Err(OverlayError::Vfs(error));
+        }
         self.documents.insert(
             uri.clone(),
             DocumentRecord {
@@ -1310,6 +1332,7 @@ impl LspServer {
             .vfs
             .snapshot(record.file)
             .ok_or(OverlayError::UnknownDocument)?;
+        let previous_len = snapshot.bytes().len();
         let mut bytes = snapshot.bytes().to_vec();
         for change in changes {
             bytes = match change {
@@ -1325,12 +1348,28 @@ impl LspServer {
                 }
             };
             if bytes.len() > MAX_DOCUMENT_BYTES {
-                return Err(OverlayError::TextTooLarge);
+                return Err(OverlayError::ResourceLimit(ResourceLimitExceeded::new(
+                    "document_bytes",
+                    "document",
+                    bytes.len(),
+                    MAX_DOCUMENT_BYTES,
+                )));
             }
         }
-        self.vfs
-            .open_overlay(record.file, bytes)
-            .map_err(OverlayError::Vfs)?;
+        let next_len = bytes.len();
+        let growth = next_len.saturating_sub(previous_len);
+        if growth > 0 {
+            self.reserve_open_document_bytes(growth)?;
+        }
+        if let Err(error) = self.vfs.open_overlay(record.file, bytes) {
+            if growth > 0 {
+                self.release_open_document_bytes(growth)?;
+            }
+            return Err(OverlayError::Vfs(error));
+        }
+        if previous_len > next_len {
+            self.release_open_document_bytes(previous_len - next_len)?;
+        }
         let current = self
             .documents
             .get_mut(uri)
@@ -1413,9 +1452,16 @@ impl LspServer {
         if !record.open {
             return Err(OverlayError::NotOpen);
         }
+        let overlay_len = self
+            .vfs
+            .snapshot(record.file)
+            .ok_or(OverlayError::UnknownDocument)?
+            .bytes()
+            .len();
         self.vfs
             .close_overlay(record.file)
             .map_err(OverlayError::Vfs)?;
+        self.release_open_document_bytes(overlay_len)?;
         if record.temporary {
             self.vfs
                 .remove_file(record.file)
@@ -1425,6 +1471,25 @@ impl LspServer {
             current.open = false;
         }
         Ok(())
+    }
+
+    fn reserve_open_document_bytes(&mut self, amount: usize) -> Result<(), OverlayError> {
+        let maximum = self.open_document_bytes.limit();
+        let actual = self.open_document_bytes.used().saturating_add(amount);
+        self.open_document_bytes.try_reserve(amount).map_err(|_| {
+            OverlayError::ResourceLimit(ResourceLimitExceeded::new(
+                "open_document_bytes",
+                "session",
+                actual,
+                maximum,
+            ))
+        })
+    }
+
+    fn release_open_document_bytes(&mut self, amount: usize) -> Result<(), OverlayError> {
+        self.open_document_bytes
+            .release(amount)
+            .map_err(|_| OverlayError::ResourceAccounting)
     }
 
     fn ensure_file(
@@ -1463,8 +1528,12 @@ impl LspServer {
             Ok(()) if is_request => HandleOutcome::Response(success_response(id, Value::Null)),
             Ok(()) => HandleOutcome::NoResponse,
             Err(error) if is_request => {
-                let (code, message) = overlay_error_details(&error);
-                error_or_none(true, id, code, message)
+                if let OverlayError::ResourceLimit(limit) = error {
+                    resource_limit_outcome(id, limit)
+                } else {
+                    let (code, message) = overlay_error_details(&error);
+                    error_or_none(true, id, code, message)
+                }
             }
             Err(_) => HandleOutcome::NoResponse,
         }
@@ -1577,6 +1646,8 @@ fn execute_routed_frames<W: Write>(
                 INVALID_REQUEST,
                 "请求 ID 已在使用 / request id is already live",
             ))
+        } else if let Some((id, limit)) = frame.resource_limit {
+            HandleOutcome::Response(resource_limit_response(Some(id), limit))
         } else {
             server.handle_json_with_cancellation(&frame.body, &frame.cancellation)
         };
@@ -1975,7 +2046,12 @@ fn parse_text(value: Option<&Value>) -> Result<String, OverlayError> {
         .and_then(Value::as_str)
         .ok_or(OverlayError::InvalidParams)?;
     if text.len() > MAX_DOCUMENT_BYTES {
-        return Err(OverlayError::TextTooLarge);
+        return Err(OverlayError::ResourceLimit(ResourceLimitExceeded::new(
+            "document_bytes",
+            "document",
+            text.len(),
+            MAX_DOCUMENT_BYTES,
+        )));
     }
     Ok(text.to_owned())
 }
@@ -2034,10 +2110,12 @@ fn overlay_error_details(error: &OverlayError) -> (i32, &'static str) {
             DOCUMENT_URI,
             "文档 URI 无效 / invalid or unsupported document URI",
         ),
-        OverlayError::TextTooLarge => (
-            INVALID_PARAMS,
-            "文档文本过大 / document text exceeds the size limit",
-        ),
+        OverlayError::ResourceLimit(_) => {
+            (REQUEST_FAILED, "资源上限已超出 / resource limit exceeded")
+        }
+        OverlayError::ResourceAccounting => {
+            (INTERNAL_ERROR, "资源计数失败 / resource accounting failed")
+        }
         OverlayError::UnknownDocument | OverlayError::NotOpen => {
             (INVALID_PARAMS, "文档状态无效 / invalid document state")
         }
@@ -2242,6 +2320,31 @@ fn error_response(id: Option<Value>, code: i32, message: &str) -> Vec<u8> {
     }))
 }
 
+fn resource_limit_outcome(id: Value, limit: ResourceLimitExceeded) -> HandleOutcome {
+    HandleOutcome::Response(resource_limit_response(Some(id), limit))
+}
+
+fn resource_limit_response(id: Option<Value>, limit: ResourceLimitExceeded) -> Vec<u8> {
+    encode(&json!({
+        "jsonrpc": JSON_RPC_VERSION,
+        "id": id.unwrap_or(Value::Null),
+        "error": {
+            "code": REQUEST_FAILED,
+            "message": "资源上限已超出 / resource limit exceeded",
+            "data": {
+                "code": codes::LSP_RESOURCE_LIMIT_EXCEEDED.as_str(),
+                "facts": {
+                    "actual": limit.actual(),
+                    "maximum": limit.maximum(),
+                    "resource": limit.resource(),
+                    "scope": limit.scope(),
+                },
+                "version": RESOURCE_LIMITS_PROTOCOL_VERSION,
+            },
+        },
+    }))
+}
+
 fn formatting_internal_error(id: Value) -> HandleOutcome {
     error_or_none(
         true,
@@ -2343,6 +2446,21 @@ fn initialize_result(parsed: &ParsedInitializeParams) -> Value {
                     "requestOrder": "wire-order",
                     "supersession": "cancel-stale-analysis",
                     "version": SCHEDULING_PROTOCOL_VERSION,
+                },
+                "lingResourceLimits": {
+                    "completionItemsPerRequest": MAX_COMPLETION_ITEMS,
+                    "diagnosticDefaultPerDocument": DEFAULT_MAX_DIAGNOSTICS_PER_DOCUMENT,
+                    "diagnosticDefaultPerWorkspace": DEFAULT_MAX_DIAGNOSTICS_PER_WORKSPACE,
+                    "diagnosticHardMaxPerDocument": MAX_DIAGNOSTICS_PER_DOCUMENT,
+                    "diagnosticHardMaxPerWorkspace": MAX_DIAGNOSTICS_PER_WORKSPACE,
+                    "documentBytes": MAX_DOCUMENT_BYTES,
+                    "errorCode": codes::LSP_RESOURCE_LIMIT_EXCEEDED.as_str(),
+                    "liveRequests": MAX_LIVE_REQUESTS,
+                    "openDocumentBytes": MAX_OPEN_DOCUMENT_BYTES,
+                    "solverNestedObligations": MAX_NESTED_TRAIT_OBLIGATIONS,
+                    "transportFrameBytes": MAX_FRAME_BYTES,
+                    "unit": "utf8-bytes-and-counts",
+                    "version": RESOURCE_LIMITS_PROTOCOL_VERSION,
                 },
                 "lingOverlay": {
                     "changeLimit": MAX_CONTENT_CHANGES,

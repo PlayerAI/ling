@@ -63,6 +63,7 @@ pub use completion_source_index::{
 pub use definition_index::{
     ResolvedDefinitionIndex, ResolvedDefinitionKind, ResolvedDefinitionSymbol,
 };
+pub use ling_types::MAX_NESTED_TRAIT_OBLIGATIONS;
 pub use navigation_index::{
     MAX_NAVIGATION_ENTRIES, NavigationEntry, NavigationIndex, NavigationIndexError,
     NavigationLocation,

@@ -18,6 +18,7 @@ mod constraints;
 // Solver evidence remains crate-private until dictionary lowering integrates it.
 #[allow(dead_code)]
 mod solver;
+pub use solver::MAX_NESTED_TRAIT_OBLIGATIONS;
 // Checked Core dictionary witnesses remain crate-private until a runtime and
 // semantic-projection contract integrates them.
 #[allow(dead_code)]

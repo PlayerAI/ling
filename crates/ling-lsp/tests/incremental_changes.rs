@@ -222,7 +222,17 @@ fn change_limits_and_invalid_position_shapes_are_failure_atomic() {
             ranged(0, 0, 0, "y"),
         ]),
     );
-    assert_eq!(oversized["error"]["code"], -32_602);
+    assert_eq!(oversized["error"]["code"], -32_803);
+    assert_eq!(oversized["error"]["data"]["code"], "L-LSP-0002");
+    assert_eq!(
+        oversized["error"]["data"]["facts"],
+        json!({
+            "actual": MAX_DOCUMENT_BYTES + 1,
+            "maximum": MAX_DOCUMENT_BYTES,
+            "resource": "document_bytes",
+            "scope": "document",
+        })
+    );
     assert_eq!(server.document(uri).unwrap().text(), "a");
     assert_eq!(server.document(uri).unwrap().version(), 1);
 }

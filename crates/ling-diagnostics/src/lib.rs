@@ -102,6 +102,7 @@ pub mod codes {
     pub const INVALID_PROJECT_LOCK: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0018");
     pub const PROJECT_LOCK_MISMATCH: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0019");
     pub const LSP_DIAGNOSTICS_OMITTED: DiagnosticCode = DiagnosticCode::new("L-LSP-0001");
+    pub const LSP_RESOURCE_LIMIT_EXCEEDED: DiagnosticCode = DiagnosticCode::new("L-LSP-0002");
     pub const INVALID_SEMANTIC_QUERY: DiagnosticCode = DiagnosticCode::new("L-QUERY-0001");
     pub const TEST_NO_CASES: DiagnosticCode = DiagnosticCode::new("L-TEST-0001");
     pub const INVALID_SEMANTIC_TRANSACTION: DiagnosticCode =

@@ -2,16 +2,17 @@
 
 ## Outcome
 
-`LSP-2504` is correctly recorded as `BlockedSpec`. The execution plan names
-limits for open-document bytes, pending requests, completion results,
-diagnostic count, and solver work, and requires a stable tool diagnostic
-instead of OOM. No accepted LSP contract defines resource units, accounting
-scope, limit precedence, failure response, retry behavior, or compatibility.
+The original audit correctly recorded `LSP-2504` as `BlockedSpec`: the
+execution plan named limits but no accepted LSP contract defined their units,
+scope, precedence, response, cleanup, retry, or compatibility. Accepted
+RFC-0051 now closes that authority gap for a bounded Preview slice.
 
-Accepted DEC-0033 closes only the bounded `LSP-2504-BYTE-ACCOUNTING` child: an
-internal UTF-8-byte budget with checked reserve/release arithmetic. No public
-LSP limit constant, quota manager, tool diagnostic, request rejection response,
-protocol schema, diagnostic allocation, or placeholder server was added.
+DEC-0033 remains the checked UTF-8 arithmetic child. RFC-0051 composes it with
+the already accepted frame, document, completion, diagnostic, and RFC-0005
+Trait-solver bounds, and authorizes fixed aggregate open-overlay bytes, fixed
+live-request admission, `L-LSP-0002`, exact discovery, and failure-atomic
+cleanup. Implementation evidence is recorded in
+`docs/status/LSP-2504-IMPLEMENTATION-REPORT.md`.
 
 ## Normative traceability
 
@@ -29,62 +30,49 @@ protocol schema, diagnostic allocation, or placeholder server was added.
 - `PROTO-DIAGNOSTIC-JSON` is a Preview compiler/CLI diagnostic writer, not an
   LSP resource-limit response. The single diagnostic registry permits only
   registered `L-<DOMAIN>-<NUMBER>` meanings.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` and
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leave request, result, lifecycle,
-  stability, and migration fields open. LSP-2501 through LSP-2503 remain
-  `BlockedSpec`, so quota enforcement cannot safely classify or publish their
-  outcomes.
+- Accepted RFC-0049 and RFC-0050 close cancellation, association, scheduling,
+  fairness, and supersession dependencies. RFC-0051 deliberately leaves
+  general mutation, configurable resource operations, Stable lifecycle, and
+  Semantic Transactions in their existing gaps.
 
 ## Current interface evidence
 
-- `ling-project`, `ling-bytecode`, and parser boundaries have explicit local
-  limits and registered diagnostics for their own inputs; none governs open
-  editor bytes, pending LSP work, completion lists, diagnostic reports, or
-  solver steps.
-- No LSP transport, request scheduler, snapshot association, queue accounting,
-  result-size policy, or process-memory guard exists. Host allocation failure,
-  cancellation, stale revision, and semantic errors have no LSP precedence.
-- No tool diagnostic code, bilingual message/facts schema, capability flag,
-  configuration version, retry/backoff rule, or client-visible limit response
-  is inventoried for LSP.
-- The byte-accounting child is deliberately disconnected from `LspServer` and
-  therefore cannot claim open-document, pending-request, result, diagnostic,
-  solver, workspace, or process-memory enforcement.
-- No fixture covers exact-boundary/over-limit cases, aggregate versus
-  per-request accounting, concurrent requests, nested dependencies, partial
-  result suppression, Unicode/CRLF/BOM bytes, cancellation races, or
-  deterministic behavior without OOM.
+- `ling-project`, `ling-bytecode`, and parser boundaries retain explicit local
+  limits for their own inputs and are not reused as LSP policy. RFC-0051 now
+  governs only the documented LSP-owned resources and composes existing result
+  and solver bounds without changing their original domains.
+- `LspServer` now owns an 8 MiB checked aggregate open-overlay byte budget;
+  open/change/close reserve or release exact decoded UTF-8 bytes without
+  publishing a resource-rejected overlay or version.
+- The stdio registry admits at most 128 queued or executing distinct live IDs,
+  applies duplicate-first precedence, creates no association for the 129th,
+  and reuses the identity-safe completion cleanup path.
+- Exact discovery inventories existing 1 MiB frame/document, 256 completion,
+  diagnostic default/hard maxima, and RFC-0005 64-level Trait nesting without
+  inventing allocator/process-memory or editor-only compiler semantics.
+- `L-LSP-0002` and its exact `-32803` data are registered, versioned, bilingual,
+  path/source/request-ID free, and covered by deterministic fixtures.
 
-## Required authority before implementation
+## Accepted closure
 
-An Accepted RFC or decision must define, at minimum:
+RFC-0051 defines the previously required contracts:
 
-1. each resource's unit and accounting scope: bytes versus scalar/code units,
-   per document/request/workspace/process, pending work versus retained
-   results, solver steps, and dependency/generated-file inclusion;
-2. default, minimum, maximum, configuration, capability negotiation, and
-   versioning rules, including whether limits are hard, soft, or adaptive and
-   how changes affect existing snapshots and queues;
-3. failure precedence and response schemas for limit exceeded, cancellation,
-   stale, invalid, internal, and host-memory failures, including bilingual
-   stable tool diagnostics, facts, spans/URI, retry/backoff, and the guarantee
-   that no partial checked result, token, diagnostic, completion list, cache, or
-   Workspace Edit is published;
-4. interaction with immutable snapshots, scheduling priorities, cancellation,
-   fairness, dependency isolation, cleanup, process safety, and deterministic
-   behavior independent of host allocator, CPU, or memory size; and
-5. protocol inventory, Stable versus Experimental fields, migration rules, and
-   executable positive/negative/boundary/concurrency/Unicode/CRLF/BOM,
-   cancellation, stale, deterministic, and no-OOM fixtures.
-
-Until these decisions are Accepted, a quota could measure the wrong unit,
-reject a newer request instead of an older one, leak partial results, or turn
-host memory behavior into an accidental LSP compatibility contract.
+1. exact UTF-8-byte and logical-count units plus document/session scopes and
+   explicit inclusion/exclusion rules;
+2. fixed hard values, diagnostic-only lower configuration, exact Preview
+   discovery, and new-marker migration requirements;
+3. duplicate/cancellation/validation/resource/stale precedence, structured
+   bilingual failure data, response-free notifications, retry, and atomicity;
+4. snapshot, scheduling, cancellation, cleanup, privacy, and deterministic
+   independence from allocator, CPU, load, path, and wall time; and
+5. executable boundary, aggregate, concurrency, Unicode, BOM, CRLF,
+   cancellation, retry, deterministic, and no-partial-publication evidence.
 
 ## Evidence and compatibility
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/ERROR-CODES.md`, `docs/ROADMAP-1.0.md`, RFC-0002, RFC-0020, DEC-0019,
+This closure was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+`docs/ERROR-CODES.md`, `docs/ROADMAP-1.0.md`, RFC-0002, RFC-0005, RFC-0020,
+RFC-0049, RFC-0050, RFC-0051, DEC-0019,
 `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 `crates/ling-project`, `crates/ling-bytecode`, `crates/ling-diagnostics`, and
@@ -95,10 +83,8 @@ source-span, runtime, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-The parent `LSP-2504` can begin after LSP snapshot/version, cancellation,
-scheduling, diagnostics, and Semantic Transaction lifecycle decisions are
-Accepted. The future implementation must use explicit versioned units and
-quotas, fail before partial publication, return registered bilingual tool
-diagnostics, and remain bounded and deterministic under adversarial input. The
-`LSP-2504-BYTE-ACCOUNTING` child is complete only for DEC-0033's internal
-arithmetic boundary.
+Allocator/RSS guarantees, OOM recovery, configurable non-diagnostic quotas,
+eviction, partial results, progress, deadlines, total compiler fuel, general
+workspace/dependency memory accounting, persistence, Stable lifecycle, and
+Semantic Transactions remain deferred. They are not required by RFC-0051's
+complete Preview slice and need separate Accepted authority.

@@ -587,6 +587,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-RESOURCE-LIMITS",
+      "visibility": "Public",
+      "version": "ling.lsp.resource-limits/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-SCHEDULING",
       "visibility": "Public",
       "version": "ling.lsp.scheduling/0.1",

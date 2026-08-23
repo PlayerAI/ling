@@ -101,6 +101,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-LSP-REFERENCES` | `Public` | `ling.lsp.references/0.1` | `Preview` | yes |
 | `PROTO-LSP-RENAME` | `Public` | `ling.lsp.rename/0.1` | `Preview` | yes |
 | `PROTO-LSP-REQUEST-CANCELLATION` | `Public` | `ling.lsp.request-cancellation/0.1` | `Preview` | yes |
+| `PROTO-LSP-RESOURCE-LIMITS` | `Public` | `ling.lsp.resource-limits/0.1` | `Preview` | yes |
 | `PROTO-LSP-SCHEDULING` | `Public` | `ling.lsp.scheduling/0.1` | `Preview` | yes |
 | `PROTO-LSP-SEMANTIC-TOKENS` | `Public` | `ling.lsp.semantic-tokens/0.1` | `Preview` | yes |
 | `PROTO-LSP-WORKSPACE` | `Public` | `ling.lsp.workspace/0.1` | `Experimental` | yes |

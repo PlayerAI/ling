@@ -15,7 +15,7 @@ remains exactly 64. Host wall-clock time is not Ling language semantics.
 | Trait performance surface | Current evidence | State | Authority / blocker |
 | --- | --- | --- | --- |
 | Active-obligation cycle rejection | Ordered active-key tracking and exact `Cycle { depth: 1 }` negative test | Internal | Accepted RFC-0005 §2.5 and DEC-0026 |
-| Nested-obligation depth limit | `MAX_NESTED_OBLIGATIONS = 64` and exact `DepthLimit { depth: 64 }` test | Internal | Accepted RFC-0005 §2.5 and DEC-0026 |
+| Nested-obligation depth limit | `MAX_NESTED_TRAIT_OBLIGATIONS = 64` and exact `DepthLimit { depth: 64 }` test | Internal | Accepted RFC-0005 §2.5 and DEC-0026 |
 | Source-evidence-independent selection | Equivalent logical source names produce the same selected Trait/impl/member projection | Internal | Accepted DEC-0068 |
 | Production HIR and Typed Core integration | The bounded solver seam is not a production incremental/LSP host | BlockedSpec | `GAP-TRAIT-COHERENCE-001` |
 | Deterministic solver work budget | No accepted work unit, precedence, exhaustion result, or diagnostic contract | BlockedSpec | Missing performance/resource decision |

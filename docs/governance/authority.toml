@@ -1250,6 +1250,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0051"
+title = "Bounded Preview LSP Resources"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0051.md"
+covers = ["ling.lsp.resource-limits/0.1", "fixed per-document and aggregate open-overlay UTF-8 byte accounting plus bounded live request admission", "composition of existing transport, completion, diagnostic, and Trait solver bounds with stable L-LSP-0002 failure data"]
+depends_on = ["RFC-0050", "RFC-0049", "RFC-0042", "RFC-0032", "RFC-0029", "RFC-0023", "RFC-0005", "RFC-0004", "DEC-0019", "DEC-0033", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

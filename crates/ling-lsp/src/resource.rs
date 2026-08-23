@@ -1,9 +1,62 @@
 use std::fmt;
 
+/// Preview marker for deterministic LSP resource accounting and admission.
+pub const RESOURCE_LIMITS_PROTOCOL_VERSION: &str = "ling.lsp.resource-limits/0.1";
+/// Maximum aggregate UTF-8 bytes retained by all open document overlays.
+pub const MAX_OPEN_DOCUMENT_BYTES: usize = 8 * 1_048_576;
+/// Maximum number of queued or executing requests with live IDs.
+pub const MAX_LIVE_REQUESTS: usize = 128;
+
+/// Stable facts for one RFC-0051 LSP-owned hard-limit failure.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ResourceLimitExceeded {
+    resource: &'static str,
+    scope: &'static str,
+    actual: usize,
+    maximum: usize,
+}
+
+impl ResourceLimitExceeded {
+    #[must_use]
+    pub const fn new(
+        resource: &'static str,
+        scope: &'static str,
+        actual: usize,
+        maximum: usize,
+    ) -> Self {
+        Self {
+            resource,
+            scope,
+            actual,
+            maximum,
+        }
+    }
+
+    #[must_use]
+    pub const fn resource(self) -> &'static str {
+        self.resource
+    }
+
+    #[must_use]
+    pub const fn scope(self) -> &'static str {
+        self.scope
+    }
+
+    #[must_use]
+    pub const fn actual(self) -> usize {
+        self.actual
+    }
+
+    #[must_use]
+    pub const fn maximum(self) -> usize {
+        self.maximum
+    }
+}
+
 /// A deterministic in-process UTF-8 byte budget for the LSP resource child.
 ///
 /// This value accounts arithmetic units only. It does not observe allocator
-/// or process memory and is not connected to a public protocol response.
+/// or process memory.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) struct ByteBudget {
     limit: usize,

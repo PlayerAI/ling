@@ -12,7 +12,8 @@ use ling_source::Span;
 use crate::coherence::{self, CoherenceIndex, ImplId, TraitId};
 use crate::constraints::{ConstraintType, Obligation, ObligationOrigin};
 
-const MAX_NESTED_OBLIGATIONS: usize = 64;
+/// Accepted RFC-0005 maximum nested Trait-obligation depth.
+pub const MAX_NESTED_TRAIT_OBLIGATIONS: usize = 64;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(crate) struct SolvedObligation {
@@ -210,7 +211,7 @@ impl Solver<'_> {
             return;
         }
 
-        if depth >= MAX_NESTED_OBLIGATIONS {
+        if depth >= MAX_NESTED_TRAIT_OBLIGATIONS {
             self.errors.push(SolverError {
                 source_name: obligation.origin.source_name.clone(),
                 span: obligation.origin.span,

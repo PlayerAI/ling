@@ -7400,3 +7400,31 @@ unresolved_alternatives = [
   "Wall-clock timers, configurable debounce, deadlines, dynamic priority, host-load adaptation, worker pools, parallel mutable requests, response reordering, progress, partial results, quotas, persistence, Stable lifecycle, and Semantic Transactions remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0051"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0051.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact resource discovery and stable -32803/L-LSP-0002 response data.",
+  "Cover exact and one-over individual and aggregate UTF-8 byte boundaries plus failure-atomic open, change, close, reopen, cleanup, and retry.",
+  "Cover 128 accepted live IDs, distinct 129th rejection, duplicate precedence, cancellation/completion cleanup, and deterministic framed execution without timing assertions.",
+  "Retain completion, diagnostic, frame, and RFC-0005 solver-bound evidence without introducing an LSP-only semantic result.",
+  "Repeat Unicode, BOM, CRLF, malformed, cancellation, stale, writer-failure, and no-partial-publication evidence under locked offline gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.resource-limits/0.1 discovery and one structured JSON-RPC resource failure with no new method.",
+  "Allocates bilingual L-LSP-0002 and adds fixed aggregate open-overlay and live-request limits while composing existing bounded results and solver nesting.",
+  "Adds no successful compiler fact, source span, standalone schema, Semantic ID, Definition ID, canonical byte, language, runtime, bytecode, VM, ABI, package, filesystem, network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Allocator/RSS limits, configurable non-diagnostic quotas, eviction, partial results, progress, deadlines, total compiler fuel, general dependency/workspace memory accounting, persistence, Stable lifecycle, and Semantic Transactions remain deferred.",
+]
+superseded_by = ""

@@ -376,6 +376,28 @@ authority = ["RFC-0050", "RFC-0049", "RFC-0045", "RFC-0034", "RFC-0033", "RFC-00
 notes = ["The Preview adds no wall-clock duration, latency SLA, deadline, dynamic priority, host-load adaptation, worker pool, parallel mutable request, response reordering, progress, partial result, quota, persistent queue, Stable lifecycle, or Semantic Transaction claim."]
 
 [[protocol]]
+id = "PROTO-LSP-RESOURCE-LIMITS"
+title = "Ling bounded Preview LSP resources"
+category = "LSP"
+visibility = "Public"
+current_version = "ling.lsp.resource-limits/0.1"
+stability = "Preview"
+implemented = true
+public_schema = false
+canonical = false
+producer = ["ling lsp --stdio", "ling-lsp resource accounting and request admission"]
+consumer = ["LSP 3.17 clients", "editor hosts", "integration test harnesses"]
+reader_policy = "Count exact decoded UTF-8 overlay bytes and live string/number request-ID associations using the fixed session and per-operation scopes; retain existing transport, completion, diagnostic, and Trait solver bounds."
+writer_policy = "Advertise the exact Preview marker and return -32803 with registered bilingual L-LSP-0002 data for request-form LSP-owned hard-limit failures, while notifications remain response-free and every failure is publication-atomic."
+unknown_field_policy = "The marker and resource error data have exact fixed shapes; clients may ignore Experimental discovery, while incompatible units, scopes, limits, precedence, facts, cleanup, retry, or privacy behavior requires a new marker and migration evidence."
+migration_tool = "None; ling.lsp.resource-limits/0.1 is Preview with no predecessor and adds no JSON-RPC method or client-selected non-diagnostic configuration."
+fixtures = ["crates/ling-lsp/src/resource.rs", "crates/ling-lsp/tests/resource_limits.rs", "tests/protocols/lsp-resource-limits/fixtures/v1.json", "tests/protocols/lsp-resource-limits/README.md", "docs/status/LSP-2504-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0051.md", "docs/RFC-0050.md", "docs/RFC-0049.md", "docs/RFC-0042.md", "docs/RFC-0032.md", "docs/RFC-0029.md", "docs/RFC-0023.md", "docs/RFC-0005.md", "docs/RFC-0004.md", "docs/decisions/0019-incremental-query-boundary.md", "docs/decisions/0033-lsp-internal-byte-accounting-boundary.md", "docs/ERROR-CODES.md", "crates/ling-lsp/src/resource.rs", "crates/ling-lsp/src/request_cancellation.rs", "crates/ling-lsp/src/lib.rs"]
+version_markers = ["ling.lsp.resource-limits/0.1", "lingResourceLimits", "L-LSP-0002", "live_requests", "open_document_bytes"]
+authority = ["RFC-0051", "RFC-0050", "RFC-0049", "RFC-0042", "RFC-0032", "RFC-0029", "RFC-0023", "RFC-0005", "RFC-0004", "DEC-0019", "DEC-0033"]
+notes = ["The Preview counts explicit UTF-8 bytes and logical associations only; it adds no allocator/RSS promise, OOM recovery, adaptive quota, eviction, partial result, deadline, total compiler fuel, Stable lifecycle, or Semantic Transaction claim."]
+
+[[protocol]]
 id = "PROTO-LSP-HOVER"
 title = "Ling checked LSP hover"
 category = "LSP"

@@ -1,0 +1,33 @@
+{
+  "schema": "ling.test.lsp-resource-limits/1",
+  "protocol": "ling.lsp.resource-limits/0.1",
+  "discovery": {
+    "completionItemsPerRequest": 256,
+    "diagnosticDefaultPerDocument": 100,
+    "diagnosticDefaultPerWorkspace": 1000,
+    "diagnosticHardMaxPerDocument": 4096,
+    "diagnosticHardMaxPerWorkspace": 65536,
+    "documentBytes": 1048576,
+    "errorCode": "L-LSP-0002",
+    "liveRequests": 128,
+    "openDocumentBytes": 8388608,
+    "solverNestedObligations": 64,
+    "transportFrameBytes": 1048576,
+    "unit": "utf8-bytes-and-counts",
+    "version": "ling.lsp.resource-limits/0.1"
+  },
+  "resourceError": {
+    "code": -32803,
+    "message": "资源上限已超出 / resource limit exceeded",
+    "data": {
+      "code": "L-LSP-0002",
+      "facts": {
+        "actual": 129,
+        "maximum": 128,
+        "resource": "live_requests",
+        "scope": "session"
+      },
+      "version": "ling.lsp.resource-limits/0.1"
+    }
+  }
+}
