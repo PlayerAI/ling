@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::io::Write as _;
 use std::path::Path;
@@ -45,6 +45,18 @@ struct ExampleCase {
     expected_stdout: String,
     semantic_name: String,
     identifier_style: String,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct TutorialSemanticShape {
+    schema: String,
+    language_version: String,
+    unicode_version: String,
+    entry_module: String,
+    module_requirements: Vec<Vec<String>>,
+    definitions: Vec<(String, String, Vec<String>, Vec<String>)>,
+    nodes: Vec<(String, String, Vec<String>, Vec<String>)>,
+    references: Vec<(String, String)>,
 }
 
 #[test]
@@ -457,6 +469,7 @@ fn seed_examples_check_run_and_emit_semantic_graphs() {
     assert_eq!(manifest.case.len(), 6);
 
     let mut ids = BTreeSet::new();
+    let mut tutorial_shapes = BTreeMap::new();
     for case in manifest.case {
         assert!(
             ids.insert(case.id.clone()),
@@ -471,6 +484,8 @@ fn seed_examples_check_run_and_emit_semantic_graphs() {
             case.identifier_style.as_str(),
             "ascii" | "chinese"
         ));
+        let is_tutorial = case.role == "tutorial";
+        let identifier_style = case.identifier_style.clone();
         let path = root.join(&case.path);
         let checked = Command::new(env!("CARGO_BIN_EXE_ling"))
             .args(["check", "--format", "json"])
@@ -518,7 +533,120 @@ fn seed_examples_check_run_and_emit_semantic_graphs() {
                 .iter()
                 .any(|definition| definition["name"] == case.semantic_name)
         }));
+        if is_tutorial {
+            assert!(
+                tutorial_shapes
+                    .insert(identifier_style, tutorial_semantic_shape(&graph))
+                    .is_none(),
+                "duplicate tutorial identifier style"
+            );
+        }
     }
+    assert_eq!(tutorial_shapes.len(), 2);
+    assert_eq!(tutorial_shapes["ascii"], tutorial_shapes["chinese"]);
+}
+
+fn tutorial_semantic_shape(graph: &serde_json::Value) -> TutorialSemanticShape {
+    let definitions = graph["definitions"]
+        .as_array()
+        .expect("Semantic definitions are an array");
+    let nominal_type = definitions
+        .iter()
+        .find(|definition| definition["origin"] == "user" && definition["kind"] == "type")
+        .and_then(|definition| definition["name"].as_str())
+        .expect("tutorial has one user nominal type");
+
+    let mut module_requirements = graph["modules"]
+        .as_array()
+        .expect("Semantic modules are an array")
+        .iter()
+        .map(|module| string_array(&module["requires"]))
+        .collect::<Vec<_>>();
+    module_requirements.sort();
+
+    let mut definition_shapes = definitions
+        .iter()
+        .filter(|definition| definition["origin"] == "user")
+        .map(|definition| {
+            (
+                json_string(&definition["kind"]),
+                normalize_nominal(&json_string(&definition["type"]), nominal_type),
+                normalize_nominals(string_array(&definition["effects"]), nominal_type),
+                string_array(&definition["capabilities"]),
+            )
+        })
+        .collect::<Vec<_>>();
+    definition_shapes.sort();
+
+    let mut node_shapes = graph["nodes"]
+        .as_array()
+        .expect("Semantic nodes are an array")
+        .iter()
+        .map(|node| {
+            (
+                json_string(&node["kind"]),
+                normalize_nominal(&json_optional_string(&node["type"]), nominal_type),
+                normalize_nominals(string_array(&node["effects"]), nominal_type),
+                string_array(&node["capabilities"]),
+            )
+        })
+        .collect::<Vec<_>>();
+    node_shapes.sort();
+
+    let mut reference_shapes = graph["references"]
+        .as_array()
+        .expect("Semantic references are an array")
+        .iter()
+        .map(|reference| {
+            (
+                json_string(&reference["source_kind"]),
+                json_string(&reference["target_kind"]),
+            )
+        })
+        .collect::<Vec<_>>();
+    reference_shapes.sort();
+
+    TutorialSemanticShape {
+        schema: json_string(&graph["schema"]),
+        language_version: json_string(&graph["language_version"]),
+        unicode_version: json_string(&graph["unicode_version"]),
+        entry_module: json_string(&graph["entry_module"]),
+        module_requirements,
+        definitions: definition_shapes,
+        nodes: node_shapes,
+        references: reference_shapes,
+    }
+}
+
+fn json_string(value: &serde_json::Value) -> String {
+    value
+        .as_str()
+        .expect("Semantic field is a string")
+        .to_owned()
+}
+
+fn json_optional_string(value: &serde_json::Value) -> String {
+    value.as_str().unwrap_or("<none>").to_owned()
+}
+
+fn string_array(value: &serde_json::Value) -> Vec<String> {
+    value
+        .as_array()
+        .expect("Semantic field is an array")
+        .iter()
+        .map(json_string)
+        .collect()
+}
+
+fn normalize_nominal(value: &str, nominal_type: &str) -> String {
+    value.replace(nominal_type, "$DomainType")
+}
+
+fn normalize_nominals(values: Vec<String>, nominal_type: &str) -> Vec<String> {
+    values
+        .into_iter()
+        .map(|value| normalize_nominal(&value, nominal_type))
+        .collect()
 }
 
 fn run_fixture(directory: &Path) -> String {

@@ -14,8 +14,8 @@ accepted.
 
 | Source | Language | Expected output | Process evidence | Boundary |
 | --- | --- | --- | --- | --- |
-| `examples/tutorial-en.ling` | English | alive | `seed_examples_check_run_and_emit_semantic_graphs`; check/run/semantic | Seed; Experimental/Preview |
-| `examples/tutorial-zh.ling` | Chinese-first | 存活 | `seed_examples_check_run_and_emit_semantic_graphs`; check/run/semantic/audit | Seed; Experimental/Preview |
+| `examples/tutorial-en.ling` | English | alive | shared six-case process test; check/run/semantic and bilingual Semantic-shape comparison | Seed; Experimental/Preview |
+| `examples/tutorial-zh.ling` | Chinese-first | 存活 | shared six-case process test; check/run/semantic and bilingual Semantic-shape comparison; separate audit test | Seed; Experimental/Preview |
 
 ## Requirement matrix
 
@@ -41,8 +41,10 @@ cargo xtask tutorial verify
 The command checks this exact source/requirement inventory, the bilingual
 tutorial markers, and the source markers. It does not execute programs,
 generate syntax, allocate public diagnostics, define protocols, or change
-support state. Existing process-level and conformance tests remain the
-authoritative evidence for observed output and registered diagnostics.
+support state. The shared process-level test executes both sources and compares
+their checked Semantic shapes after excluding localized names/text and
+experimental identities. Conformance tests remain the authoritative evidence
+for observed output and registered diagnostics.
 
 The parent DOC-6703 remains BlockedSpec; a future 1.0 tutorial gate requires
 Accepted localization/alias policy, Stable support entries, cross-platform

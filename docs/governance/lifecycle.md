@@ -270,6 +270,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0237` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0237](../decisions/0237-performance-baseline-artifact-gate.md) |
 | `DEC-0238` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0238](../decisions/0238-documentation-evidence-path-gate.md) |
 | `DEC-0239` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0239](../decisions/0239-seed-example-execution-manifest.md) |
+| `DEC-0240` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0240](../decisions/0240-bilingual-tutorial-semantic-equivalence.md) |
 
 ## Migration boundary
 

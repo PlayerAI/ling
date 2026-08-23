@@ -24,6 +24,12 @@ internal `cargo xtask tutorial verify` command protects the two-source,
 eight-requirement Seed inventory and its bilingual/source boundary markers.
 It does not execute programs or promote the G6 tutorial gate to Stable.
 
+Accepted `DEC-0240` additionally closes only the bounded
+`DOC-6703-SEMANTIC-EQUIVALENCE` child. The shared process test compares actual
+emitted tutorial Semantic Graphs by checked structure after excluding localized
+spelling/text and experimental identity evidence. It does not define aliases,
+localization policy, or Stable equivalence.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:417-426` is a non-normative tutorial checklist;
@@ -52,8 +58,9 @@ It does not execute programs or promote the G6 tutorial gate to Stable.
   eight-requirement inventory; `cargo xtask tutorial verify` checks its drift
   together with the tutorial and source markers.
 - `crates/ling-cli/tests/conformance.rs` includes both tutorial files in the
-  process-level check/run/Semantic matrix; the existing Audit determinism test
-  and Seed traceability registry provide protocol evidence.
+  process-level check/run/Semantic matrix and requires their checked Semantic
+  shape projections to match; the existing Audit determinism test and Seed
+  traceability registry provide protocol evidence.
 
 ## Compatibility and deferred work
 

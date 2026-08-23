@@ -119,7 +119,11 @@ let statusText person =
 
 The declaration structure and checked semantics are equivalent to the Chinese
 tutorial, while names and user-facing text fit an English domain vocabulary.
-It prints `alive` followed by a line feed:
+The process test proves this by comparing their version/entry facts, module
+requirements, definition and node kind/type/effect/capability shapes, and
+reference topology after normalizing only the user nominal type spelling. It
+does not compare localized names, text, spans, source evidence, or Experimental
+IDs. The English source prints `alive` followed by a line feed:
 
 ```text
 cargo run --locked --offline -- check examples/tutorial-en.ling
@@ -182,9 +186,10 @@ cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 cargo xtask tutorial verify
 ```
 
-These commands validate the runnable example matrix, canonical Audit output,
-the complete Seed traceability registry, and tutorial inventory drift. They do
-not promote any feature to Stable or authorize future syntax.
+These commands validate the runnable example matrix, bilingual tutorial
+Semantic-shape equivalence, canonical Audit output, the complete Seed
+traceability registry, and tutorial inventory drift. They do not promote any
+feature to Stable or authorize future syntax.
 
 这些命令验证可运行示例矩阵、规范 Audit 输出和完整 Seed 追踪注册表，但不会把
 教程清单漂移误报为实现完成；它们不会把任何能力提升为 Stable，也不会授权未来

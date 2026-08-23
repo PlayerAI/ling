@@ -3627,3 +3627,16 @@ covers = ["DOC-6702 bounded Seed example execution-manifest integrity", "six exa
 depends_on = ["DEC-0046", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0240"
+title = "Bilingual tutorial semantic equivalence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0240-bilingual-tutorial-semantic-equivalence.md"
+covers = ["DOC-6703 bounded bilingual tutorial checked-shape equivalence", "actual Chinese and English ling.semantic/0.1 process projections with nominal-spelling-only normalization", "private test evidence without localized aliases, public equivalence schema, Stable support, future tutorials, or G6 completion claims"]
+depends_on = ["DEC-0047", "DEC-0239", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

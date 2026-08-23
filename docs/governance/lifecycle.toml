@@ -6154,3 +6154,30 @@ unresolved_alternatives = [
   "Stable 1.0 example policy; future feature examples; public manifest schema; profile/target matrices; ownership, package, backend, concurrency, and editor examples; cross-host release fixtures; and G6 sign-off remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0240"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0240-bilingual-tutorial-semantic-equivalence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Check, run, and emit Semantic Graphs for all six manifest cases.",
+  "Derive one ASCII and one Chinese tutorial projection and require exact shape equality after only nominal-type spelling normalization.",
+  "Retain exact localized runtime output and named-definition witnesses.",
+  "Retain correct-error conformance and deterministic Audit evidence.",
+  "Run tutorial, examples, CLI, governance, status, workspace, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds a private test-only Semantic comparison; Ling semantics, sources, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/runtime behavior, Unicode, protocols, and support states remain unchanged.",
+  "Adds no localized keyword/alias behavior, public equivalence schema, Stable support claim, future tutorial, or G6 completion claim.",
+]
+unresolved_alternatives = [
+  "Stable localization policy; translated keyword or alias behavior; prose-level translation validation; public equivalence schema; future tutorials; profile/target and ownership guidance; cross-host release samples; and G6 sign-off remain deferred.",
+]
+superseded_by = ""
