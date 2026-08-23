@@ -22858,6 +22858,67 @@ notes = [
 ]
 
 [[task]]
+id = "CBK-5903-OBSERVATION"
+title = "Internal Critical Runtime/Target Package boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["CBK-5902-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0019.md",
+  "docs/decisions/0214-lowering-validator-boundary-evidence.md",
+  "docs/decisions/0215-critical-runtime-target-package-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/critical_runtime_target_package_evidence.rs",
+  "docs/decisions/0215-critical-runtime-target-package-boundary-evidence.md",
+  "docs/status/CBK-5903-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/CBK-5903-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0215 authorizes only test-local Critical Runtime/Target Package boundary evidence; no scheduler/runtime, resource bound, lifecycle/watchdog, target/primitive/ABI, evidence, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty profile/Core, scheduling/time, memory/resource, lifecycle/Fault/watchdog, Target Package/primitive, identity, evidence/trust, and fixture boundaries.",
+  "Forward/reverse inputs emit the same opaque bytes and duplicates are rejected; scheduler, heap/stack, startup, watchdog/safe-state, target primitive, host-service, evidence, and protocol categories remain distinct; the tag has no Critical runtime or target authority.",
+  "cargo test -p ling-types --test critical_runtime_target_package_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "728edd4a58646c146e792d39ec346648db850971"
+completion_commit = "728edd4a58646c146e792d39ec346648db850971"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0215; CBK-5903 remains BlockedSpec for Critical profile/runtime, scheduling/time, memory/resource, lifecycle/Fault/watchdog, Target Package/ABI/primitive, evidence/trust/TCB, diagnostics, protocols, and support semantics.",
+  "No Critical runtime/scheduler, resource checker, lifecycle/watchdog state machine, Target Package/primitive registry, host service, ABI/FFI dependency, evidence verifier, CLI route, diagnostic, public protocol, placeholder API, support-matrix change, or Unicode behavior was added.",
+]
+
+[[task]]
 id = "STAB-6101"
 title = "Support-Matrix Item Audit"
 state = "BlockedSpec"
