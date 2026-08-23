@@ -5399,3 +5399,27 @@ unresolved_alternatives = [
   "Versioned bundle/verifier input and canonical bytes; required fields, size limits, hash domains, unknown/missing fields and migration; artifact/source/Semantic/build/target/Profile/toolchain/dependency/test/proof/model/replay/timing/memory/FFI/TCB/assumption/provenance identities and recomputed links; evidence polarity and non-claims; certificate/signature formats, trust roots, keys, revocation, verifier identity/version and TCB; resource/network/offline isolation and prohibition of bundle code/plugins/commands/FFI/hooks; valid/invalid/unknown/unsupported, hash/link mismatch, invalid certificate, unavailable/stale/trust/resource/malformed/corrupt/unsupported-version and fail-closed behavior; diagnostics/exits, positive/negative/tampered-link/invalid-certificate/no-code-execution/Unicode/determinism fixtures, protocol inventory, and public support remain open under EVD-5802, EVD-5801, EVD-5803, EVD-5804, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, and missing verifier authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0211"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0211-reproducible-build-binding-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty reproducible-build-binding categories and local order; compare forward/reverse opaque bytes; reject duplicates; retain source and Semantic IDs, object and binary hashes, hermetic-build and accepted-nondeterminism boundaries together.",
+  "Defer controlled rebuilds, artifact equivalence, nondeterminism policy, diagnostics, protocols, and public support until Accepted authority and offline fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-local boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, and Unicode 17.0.0 remain unchanged; existing identity, bytecode round-trip, cache, scheduler, and build evidence is not reinterpreted as reproducible-build proof.",
+  "No build runner, manifest/schema, controlled environment, artifact producer or hash protocol, equivalence or nondeterminism rule, diagnostic allocation, CLI/LSP route, dependency, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Versioned hermetic manifests and canonical bytes; complete source/dependency/toolchain/target/profile/environment/TCB input closure; object/binary/archive/debug/symbol identity and hash domains; byte identity versus semantic equivalence; path, timestamp, archive-order, metadata, and generated-input normalization; accepted nondeterminism registry, reason, scope, and comparison; generated source/proof provenance; repeated clean/warm-cache and cross-process/host builds; offline/network isolation; stale/missing/hash/identity/nondeterminism/malformed/corrupt/version/migration failures; bilingual stable diagnostics and exits; positive, negative, repeated-build, cross-host, corruption, Unicode 17.0.0, BOM/CRLF, and provenance fixtures; protocol inventory and public support remain open under EVD-5803, EVD-5801, EVD-5802, EVD-5804, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, PROTO-BUILD-METADATA, and missing reproducible-build authority.",
+]
+superseded_by = ""

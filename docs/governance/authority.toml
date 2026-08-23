@@ -3250,3 +3250,16 @@ covers = ["EVD-5802 bounded Independent Verifier boundary evidence", "test-only 
 depends_on = ["DEC-0209", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0211"
+title = "Internal Reproducible Build Binding boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0211-reproducible-build-binding-boundary-evidence.md"
+covers = ["EVD-5803 bounded Reproducible Build Binding boundary evidence", "test-only reproducible-build vocabulary", "build-binding boundaries without manifest/artifact/equivalence semantics"]
+depends_on = ["DEC-0210", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
