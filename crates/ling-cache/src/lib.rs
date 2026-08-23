@@ -302,6 +302,43 @@ mod tests {
     }
 
     #[test]
+    fn hostile_envelopes_are_bounded_safe_misses() {
+        let cache_key = key(b"source");
+        let key_bytes = cache_key.canonical_bytes();
+        let valid = encode(&key_bytes, b"payload");
+
+        let mut corrupt_checksum = valid.clone();
+        let last = corrupt_checksum.len() - 1;
+        corrupt_checksum[last] ^= 0xff;
+
+        let mut incompatible_version = valid.clone();
+        incompatible_version[MAGIC.len()] ^= 0xff;
+
+        let header_len = MAGIC.len() + 2 + 4 + 8;
+        let mut excessive_key = valid.clone();
+        excessive_key[MAGIC.len() + 2..MAGIC.len() + 6].copy_from_slice(&u32::MAX.to_le_bytes());
+
+        let payload_offset = MAGIC.len() + 2 + 4;
+        let mut excessive_payload = valid.clone();
+        excessive_payload[payload_offset..header_len].copy_from_slice(&u64::MAX.to_le_bytes());
+
+        for hostile in [
+            Vec::new(),
+            b"not-a-cache".to_vec(),
+            valid[..header_len].to_vec(),
+            corrupt_checksum,
+            incompatible_version,
+            excessive_key,
+            excessive_payload,
+        ] {
+            assert_eq!(decode(&hostile, &cache_key), None);
+        }
+
+        let foreign_key = key(b"different source");
+        assert_eq!(decode(&valid, &foreign_key), None);
+    }
+
+    #[test]
     fn keys_include_all_version_and_profile_dimensions() {
         let base = key(b"source");
         let mut language = base.clone();

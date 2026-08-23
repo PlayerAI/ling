@@ -3484,3 +3484,16 @@ covers = ["PKG-6403 registry-deferred product strategy", "publication, installat
 depends_on = ["RFC-0002", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0229"
+title = "Local supply-chain attack-boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0229-local-supply-chain-attack-boundary-evidence.md"
+covers = ["PKG-6404 bounded local supply-chain attack evidence", "exact classification of all ten planned attacks as an executable RFC-0002 local subset or unavailable protocol", "test-only observation without registry, archive, signing, package-cache, build-sandbox, or complete security semantics"]
+depends_on = ["RFC-0002", "DEC-0022", "DEC-0228", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

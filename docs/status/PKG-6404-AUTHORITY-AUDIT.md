@@ -7,7 +7,7 @@
 
 ## Decision
 
-`PKG-6404` is `BlockedSpec`. The G6 checklist names dependency confusion,
+`PKG-6404` remains `BlockedSpec`. The G6 checklist names dependency confusion,
 namespace spoofing, Unicode-confusable packages, malicious manifests, archive
 traversal, decompression bombs, signature/key mismatch, yanked packages,
 compromised caches, and build-capability escalation. Several of those attacks
@@ -21,8 +21,10 @@ path and symlink escape rejection, graph-local name collision checks, Unicode
 17.0.0 identifier/display-name validation, cycle and visibility checks,
 canonical content/graph identities, lock corruption rejection, no ambient
 network or code execution, and failure-atomic resolution. Those existing
-fixtures must remain intact, but they do not authorize inventing attack tests
-for absent public package or build protocols.
+fixtures must remain intact. Accepted `DEC-0229` now authorizes a bounded child
+that executes representative local-subset attacks and classifies each absent
+surface explicitly; it does not authorize inventing public package or build
+protocols.
 
 ## Normative traceability
 
@@ -42,8 +44,9 @@ for absent public package or build protocols.
   unknown manifest/lock fields, malformed/corrupt locks, network requests,
   ambient environment lookup, and dependency code execution. These are local
   conformance boundaries, not a global supply-chain security protocol.
-- `UNSUP-PACKAGES` explicitly keeps publication, package installation, and
-  registry distribution out of scope. `PROTO-PACKAGE-MANIFEST`,
+- Accepted `DEC-0228` and `UNSUP-PACKAGES` explicitly keep publication,
+  package installation, and registry distribution out of scope.
+  `PROTO-PACKAGE-MANIFEST`,
   `PROTO-PACKAGE-IDENTITY`, and `PROTO-LOCKFILE` remain Experimental local
   protocols; `PROTO-BUILD-METADATA` is Future. There is no accepted archive,
   signature, provenance, yanking, registry-cache, or build-capability protocol.
@@ -90,7 +93,7 @@ They do not establish:
 Adding fixtures for these absent surfaces would either test an invented
 protocol or encode implementation details as security promises.
 
-## Required authority before implementation
+## Required authority for the blocked remainder
 
 An accepted package-security and test strategy must define, at minimum:
 
@@ -111,22 +114,24 @@ An accepted package-security and test strategy must define, at minimum:
    cross-process determinism evidence, Unicode 17.0.0, platform/path cases,
    and generated protocol/support/traceability/status drift checks.
 
-Until those authorities exist, tests may extend only the already accepted
-local manifest/graph/lock and Unicode boundaries without naming them as full
-1.0 supply-chain coverage.
+Accepted `DEC-0229` permits tests to extend only the already accepted local
+manifest/graph/lock, internal disposable-cache, and Unicode boundaries. They
+must not be named as full 1.0 supply-chain coverage. The remaining authority
+above is still required before the parent task can become `Done`.
 
 ## Compatibility and deferred work
 
-This audit changes no manifest, resolver, package graph, identity, lockfile,
-Unicode policy, cache, build, diagnostic, schema, CLI, dependency, or public
-API behavior. It preserves RFC-0002's local/offline guarantees, existing
-bounded rejection and failure-atomicity evidence, Unicode 17.0.0, original
-UTF-8 spans, checked Typed Core boundaries, and explicit
+The bounded `PKG-6404-LOCAL` child changes no manifest, resolver, package
+graph, identity, lockfile, Unicode policy, cache, build, diagnostic, schema,
+CLI, dependency, or public API behavior. It preserves RFC-0002's local/offline
+guarantees, existing bounded rejection and failure-atomicity evidence, Unicode
+17.0.0, original UTF-8 spans, checked Typed Core boundaries, and explicit
 Experimental/Preview/Future/Unsupported states.
 
-It deliberately adds no registry/archive parser, decompression layer,
-signature verifier, publisher trust store, yanking state, package cache,
-hermetic-build sandbox, security diagnostic, dependency, public protocol,
-security claim, or placeholder. Future attack coverage remains deferred until
-the governing package, registry, artifact, cache, and build authorities are
-Accepted and executable fixtures can state an unambiguous oracle.
+Accepted `DEC-0229` deliberately adds no registry/archive parser,
+decompression layer, signature verifier, publisher trust store, yanking state,
+package cache, hermetic-build sandbox, security diagnostic, dependency, public
+protocol, security claim, or placeholder. Future attack coverage remains
+deferred until the governing package, registry, artifact, cache, and build
+authorities are Accepted and executable fixtures can state an unambiguous
+oracle.

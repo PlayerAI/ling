@@ -5859,3 +5859,30 @@ unresolved_alternatives = [
   "A Preview or Stable registry; authenticated publisher/source coordinates; ownership/key lifecycle; archive/artifact/signature/provenance; registry and installation operations; mirrors/caches; availability; CLI, diagnostics, schemas, migration, and security fixtures require a future Accepted RFC.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0229"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0229-local-supply-chain-attack-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Execute representative technical-name, Unicode spoofing, hostile manifest, external locator, and unavailable execution-route tests in ling-project.",
+  "Preserve existing graph collision, path/symlink escape, lock corruption, deterministic, bounded-resource, Unicode, offline, and failure-atomic tests.",
+  "Exercise hostile internal query-cache envelopes as safe misses without claiming package-cache coverage.",
+  "Assert the exact ten-item attack inventory, local/unavailable classification, deterministic ordering, and duplicate rejection.",
+  "Run project, cache, governance, status, workspace, lint, formatting, and offline gates.",
+]
+compatibility_impact = [
+  "Adds tests and governance evidence only; manifest, lock, package identity, resolver, compiler, cache format, diagnostics, CLI, Semantic IDs, source spans, dependencies, Unicode 17.0.0, and public protocols remain unchanged.",
+  "Adds no registry, archive reader, decompressor, signature verifier, yanking state, shared package cache, build executor, sandbox, security API, or Stable support claim.",
+]
+unresolved_alternatives = [
+  "Authenticated publisher namespaces; registry and installer threat models; archive/artifact formats; signing and trust; yanking and rollback; package-cache repair; hermetic build capabilities; stable diagnostics; migration; and complete 1.0 supply-chain claims require future Accepted authority.",
+]
+superseded_by = ""
