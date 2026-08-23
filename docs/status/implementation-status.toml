@@ -23449,6 +23449,66 @@ notes = [
 ]
 
 [[task]]
+id = "PROTO-6202-OBSERVATION"
+title = "Internal Reader/Writer Compatibility boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROTO-6201-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0219-protocol-registry-boundary-evidence.md",
+  "docs/decisions/0220-reader-writer-compatibility-boundary-evidence.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/SCHEMA-LIFECYCLE.md",
+  "schemas/registry.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/reader_writer_compatibility_evidence.rs",
+  "tools/xtask/src/schema.rs",
+  "docs/decisions/0220-reader-writer-compatibility-boundary-evidence.md",
+  "docs/status/PROTO-6202-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PROTO-6202-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0220 authorizes only bounded Reader/Writer Compatibility evidence; no N-1 edge, migration, new reader/writer, limit, diagnostic, schema, or protocol is defined.",
+  "The test-local inventory covers sixty schema, reader/writer, field-policy, corruption, canonical, limit, failure, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "The schema registry remains exactly eight CurrentOnly writers, three CurrentOnly readers, five reader=None schemas, eight NoPreviousVersion records, and zero migration adapters.",
+  "The existing corpus remains 12 valid fixtures, 25 invalid fixtures, 3 canonical byte fixtures, and 66 deterministic corrupt-input mutations, with zero verified N-1 edges.",
+  "cargo test -p ling-types --test reader_writer_compatibility_evidence --locked --offline passes.",
+  "cargo test -p xtask schema::tests --locked --offline passes.",
+  "cargo clippy -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "schema validate-all, schema compatibility, schema corrupt-inputs, governance check-protocols, support verify, and status verify pass without changing public claims.",
+]
+verified_against_commit = "64076eaade1f6858718e70e33f131f835b5c71b1"
+completion_commit = "64076eaade1f6858718e70e33f131f835b5c71b1"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0220; PROTO-6202 remains BlockedSpec for per-protocol N-1/migration, future-version behavior, size/depth/resource/security limits, diagnostics, unavailable schemas, and release evidence.",
+  "No compatibility edge, reader, writer, migration, schema/version, protocol, diagnostic, CLI/LSP route, dependency, Semantic ID, source-span, or Unicode behavior changed.",
+]
+
+[[task]]
 id = "PROTO-6203"
 title = "Semantic Hash Upgrade Rehearsal"
 state = "BlockedSpec"
