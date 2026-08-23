@@ -6442,3 +6442,29 @@ unresolved_alternatives = [
   "Public semantic project checking, compiler-host lifecycle, project run/test/build, entry and capability policy, workspace/member selection, implicit discovery, artifacts, result schemas, and Stable project compatibility remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0251"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0251-current-trait-ide-surface-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask trait-ide verify and require eight surfaces, seven evidence files, and three parent/child status assertions.",
+  "Mutate a matrix state, parent state, child presence, and evidence marker in focused tests and require fail-closed internal governance errors.",
+  "Run the ling-semantic Trait projection and lookup tests independently.",
+  "Run workspace, CI, governance, protocol, support, status, traceability, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds internal evidence and documentation only; Ling semantics, public diagnostics, core schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, bytecode, VM, ABI, Unicode 17.0.0, protocol states, support states, and public APIs remain unchanged.",
+  "Adds no hover, navigation request, completion, rename, diagnostic, repair, document transaction/version, network behavior, or parent-completion claim.",
+]
+unresolved_alternatives = [
+  "Trait hover, definition/implementation navigation, completion, rename, diagnostics, safe repairs, URI/position/snapshot/version/cancellation, Workspace Edits, Semantic Transactions, cross-package editor fixtures, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

@@ -3770,3 +3770,16 @@ covers = ["PRJ-1107 bounded current project-surface evidence", "composed graph-c
 depends_on = ["RFC-0024", "DEC-0058", "DEC-0083", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0251"
+title = "Current Trait IDE surface evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0251-current-trait-ide-surface-evidence.md"
+covers = ["TRAIT-1308 bounded current Trait IDE surface evidence", "composed Experimental projection and Internal lookup evidence", "internal gate without hover, navigation, completion, rename, diagnostic, repair, transaction, or parent-completion claims"]
+depends_on = ["RFC-0022", "DEC-0059", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

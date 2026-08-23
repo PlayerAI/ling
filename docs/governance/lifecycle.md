@@ -281,6 +281,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0248` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0248](../decisions/0248-current-rc2-boundary-evidence.md) |
 | `DEC-0249` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0249](../decisions/0249-current-v1-artifact-boundary-evidence.md) |
 | `DEC-0250` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0250](../decisions/0250-current-project-surface-evidence.md) |
+| `DEC-0251` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0251](../decisions/0251-current-trait-ide-surface-evidence.md) |
 
 ## Migration boundary
 

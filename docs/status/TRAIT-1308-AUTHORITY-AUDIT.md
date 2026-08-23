@@ -15,6 +15,10 @@ No IDE adapter, LSP request/response method, public Trait diagnostic,
 placeholder repair, or Stable 1.0 editor claim was added. Existing v0.0.1 Seed
 language and editor behavior remains unchanged.
 
+Accepted DEC-0251 adds `cargo xtask trait-ide verify` as a read-only current-
+surface evidence gate. It composes the two completed children and enforces the
+six unresolved public editor surfaces; it adds no Trait or editor behavior.
+
 ## Normative traceability
 
 - Accepted RFC-0005 §4.1–§4.2 requires a selected immutable witness and its
@@ -100,6 +104,12 @@ This audit was checked against `docs/RFC-0005.md`,
 The bounded projection changed the optional Semantic Graph extension only; no
 diagnostic allocation, LSP wire method, bytecode, VM, or Unicode 17.0.0
 contract changed.
+
+`docs/testing/TRAIT-IDE-STATUS.md` and
+`docs/status/TRAIT-1308-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md` record the
+composed boundary. The verifier checks one Experimental, one Internal, and six
+`BlockedSpec` surface rows against the source, tests, authority, reports,
+protocol registration, and task states.
 
 ## Intentionally deferred
 
