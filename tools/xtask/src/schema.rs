@@ -1716,6 +1716,41 @@ mod tests {
     }
 
     #[test]
+    fn repository_reader_writer_scope_is_exact_and_current_only() {
+        let registry = load_registry(repository_root()).expect("registry parses");
+        assert_eq!(registry.schema.len(), 8);
+        assert!(
+            registry
+                .schema
+                .iter()
+                .all(|record| record.writer == "CurrentOnly")
+        );
+        assert_eq!(
+            registry
+                .schema
+                .iter()
+                .filter(|record| record.reader == "CurrentOnly")
+                .count(),
+            3
+        );
+        assert_eq!(
+            registry
+                .schema
+                .iter()
+                .filter(|record| record.reader == "None")
+                .count(),
+            5
+        );
+        assert!(registry.schema.iter().all(|record| {
+            record.compatibility == "NoPreviousVersion"
+                && record.previous_version.is_empty()
+                && record.previous_marker.is_empty()
+                && record.compatibility_dir.is_empty()
+                && record.migration_adapter == "None"
+        }));
+    }
+
+    #[test]
     fn deterministic_corruptions_have_the_declared_outcomes() {
         let summary =
             corrupt_inputs(repository_root()).expect("corruptions are rejected correctly");

@@ -513,6 +513,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PROTO-6201` | G6 | 协议注册表 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:86`, `docs/status/PROTO-6201-AUTHORITY-AUDIT.md` |
 | `PROTO-6201-OBSERVATION` | G6 | Internal Protocol Registry boundary evidence | S | Done | Accepted `DEC-0219`; see `crates/ling-types/tests/protocol_registry_evidence.rs`, `tools/xtask/src/protocols.rs`, and `docs/status/PROTO-6201-OBSERVATION-IMPLEMENTATION-REPORT.md`; Stable lifecycle/owner/universal compatibility semantics remain BlockedSpec |
 | `PROTO-6202` | G6 | Reader/Writer 兼容测试 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:109`, `docs/status/PROTO-6202-AUTHORITY-AUDIT.md` |
+| `PROTO-6202-OBSERVATION` | G6 | Internal Reader/Writer Compatibility boundary evidence | S | Done | Accepted `DEC-0220`; see `crates/ling-types/tests/reader_writer_compatibility_evidence.rs`, `tools/xtask/src/schema.rs`, and `docs/status/PROTO-6202-OBSERVATION-IMPLEMENTATION-REPORT.md`; N-1/migration/limit semantics remain BlockedSpec |
 | `PROTO-6203` | G6 | Semantic Hash 升级演练 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:123`, `docs/status/PROTO-6203-AUTHORITY-AUDIT.md` |
 | `PROTO-6204` | G6 | CLI 与退出码冻结 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:136`, `docs/status/PROTO-6204-AUTHORITY-AUDIT.md` |
 | `STD-6301` | G6 | 稳定标准库审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:164`, `docs/status/STD-6301-AUTHORITY-AUDIT.md` |

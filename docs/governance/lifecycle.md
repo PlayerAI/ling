@@ -250,6 +250,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0217` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0217](../decisions/0217-false-entry-point-audit-boundary-evidence.md) |
 | `DEC-0218` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0218](../decisions/0218-feature-state-metadata-boundary-evidence.md) |
 | `DEC-0219` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0219](../decisions/0219-protocol-registry-boundary-evidence.md) |
+| `DEC-0220` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0220](../decisions/0220-reader-writer-compatibility-boundary-evidence.md) |
 
 ## Migration boundary
 

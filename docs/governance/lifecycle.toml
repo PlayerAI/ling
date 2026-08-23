@@ -5622,3 +5622,29 @@ unresolved_alternatives = [
   "Registry owner identity and responsibility; stable registry identity/version; public versus internal/planned lifecycle transitions; supersession; missing and unknown fields; reader/writer/N-1/migration rules; canonical registry encoding; size/depth/security limits; per-protocol Accepted authority, compatibility, golden/corrupt corpus, diagnostics, release artifacts and independent review remain open under PROTO-6201, PROTO-6202 through PROTO-6204, incomplete G1-G5 exits, ROADMAP-1.0, Draft schema policy, and registered gaps.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0220"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0220-reader-writer-compatibility-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty local boundaries, explicit order, duplicate rejection, and order-independent opaque bytes.",
+  "Assert exactly eight current-only writers, three current readers, five writer-only schemas, eight NoPreviousVersion records, and zero migrations.",
+  "Run schema validation, compatibility, corrupt-input, protocol, support, status, and governance gates without adding compatibility edges.",
+  "Defer protocol-specific N-1, migration, future-version, limit, and diagnostic semantics until Accepted authority and executable adapters exist.",
+]
+compatibility_impact = [
+  "Adds only exact-scope and test-local evidence. Existing schemas, readers, writers, fixtures, protocol versions, canonical bytes, diagnostics, language/runtime behavior, CLI/LSP, dependencies, Semantic IDs, source spans, and Unicode 17.0.0 remain unchanged.",
+  "No reader, writer, N-1 edge, migration tool, canonical re-encoder, limit, schema version, public protocol, or diagnostic is added.",
+]
+unresolved_alternatives = [
+  "Per-protocol version graphs and ownership; N-1 readers; migration adapters; unknown/missing/default/future-version behavior beyond current schemas; canonical re-encoding and identity upgrades; size/depth/resource/security limits; ABI/replay/evidence/device/LSP/package schemas; bilingual diagnostics; cross-process, repeated-build, Unicode, BOM/CRLF, golden/corrupt/migration and release fixtures remain open under PROTO-6202 through PROTO-6204, incomplete G1-G5 exits, ROADMAP-1.0, Draft schema policy, and registered gaps.",
+]
+superseded_by = ""

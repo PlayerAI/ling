@@ -3367,3 +3367,16 @@ covers = ["PROTO-6201 bounded Protocol Registry boundary evidence", "single prot
 depends_on = ["DEC-0218", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0220"
+title = "Internal Reader/Writer Compatibility boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0220-reader-writer-compatibility-boundary-evidence.md"
+covers = ["PROTO-6202 bounded Reader/Writer Compatibility boundary evidence", "exact current-only writer/reader and no-previous-version scope", "compatibility boundaries without N-1 or migration semantics"]
+depends_on = ["DEC-0219", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
