@@ -3926,3 +3926,16 @@ covers = ["LSP-2102 current position-encoding boundary", "DEC-0029 source projec
 depends_on = ["DEC-0002", "DEC-0029", "RFC-0004", "DEC-0257", "RFC-0023", "RFC-0026", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0259"
+title = "Current LSP open-document overlay"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0259-current-lsp-open-document-overlay.md"
+covers = ["LSP-2103 current full-text open-document overlay", "RFC-0023 URI/version/VFS parent composition", "separation from incremental edits and compiler transactions"]
+depends_on = ["DEC-0002", "DEC-0019", "RFC-0004", "RFC-0023", "DEC-0257", "DEC-0258", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

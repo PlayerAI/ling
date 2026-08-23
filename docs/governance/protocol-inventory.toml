@@ -149,11 +149,11 @@ reader_policy = "Accept only the restricted ling://workspace, ling://dependency,
 writer_policy = "Retain exact UTF-8 text in the session-local VFS, preserve overlay precedence over disk, reveal the latest disk layer on close, remove temporary untitled files, and expose no SourceId or host path on the wire."
 unknown_field_policy = "Unknown JSON-RPC fields are ignored by the current Preview parser except range/rangeLength on full-sync changes, which are rejected; incompatible URI, version, or edit evolution requires a new protocol version."
 migration_tool = "None; ling.lsp.overlay/0.1 is current-writer-only and remains Experimental."
-fixtures = ["crates/ling-lsp/tests/overlay.rs", "tests/protocols/lsp-overlay/README.md"]
-sources = ["docs/RFC-0023.md", "crates/ling-lsp/src/lib.rs", "crates/ling-source/src/vfs.rs"]
+fixtures = ["crates/ling-lsp/tests/overlay.rs", "tests/protocols/lsp-overlay/README.md", "docs/status/LSP-2103-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0023.md", "docs/decisions/0259-current-lsp-open-document-overlay.md", "crates/ling-lsp/src/lib.rs", "crates/ling-source/src/vfs.rs"]
 version_markers = ["ling.lsp.overlay/0.1", "textDocument/didOpen", "textDocument/didChange", "textDocument/didClose"]
-authority = ["RFC-0023", "RFC-0004", "DEC-0019"]
-notes = ["Full-text Preview synchronization only. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, and Semantic Transactions remain deferred."]
+authority = ["RFC-0023", "RFC-0004", "DEC-0019", "DEC-0259"]
+notes = ["DEC-0259 accepts the RFC-0023 implementation as the complete bounded LSP-2103 parent: path-free URI/file state, exact full-text overlays, monotonic client versions, disk reveal or temporary removal on close, and dependency read-only rejection. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, Semantic Transactions, and Stable compatibility remain deferred."]
 
 [[protocol]]
 id = "PROTO-LSP-FORMATTING"

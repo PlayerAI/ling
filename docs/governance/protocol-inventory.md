@@ -19,7 +19,7 @@
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
-| `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
+| `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-CLI-TEST` | Public | JSON | `ling.test/0.1` | `Preview` | yes | no | 5 |
@@ -121,10 +121,10 @@
 - Writer policy: Retain exact UTF-8 text in the session-local VFS, preserve overlay precedence over disk, reveal the latest disk layer on close, remove temporary untitled files, and expose no SourceId or host path on the wire.
 - Unknown-field policy: Unknown JSON-RPC fields are ignored by the current Preview parser except range/rangeLength on full-sync changes, which are rejected; incompatible URI, version, or edit evolution requires a new protocol version.
 - Migration tool: None; ling.lsp.overlay/0.1 is current-writer-only and remains Experimental.
-- Authority: `RFC-0023`, `RFC-0004`, `DEC-0019`
-- Sources: [`docs/RFC-0023.md`](../RFC-0023.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-source/src/vfs.rs`](../../crates/ling-source/src/vfs.rs)
-- Fixtures: [`crates/ling-lsp/tests/overlay.rs`](../../crates/ling-lsp/tests/overlay.rs), [`tests/protocols/lsp-overlay/README.md`](../../tests/protocols/lsp-overlay/README.md)
-- Notes: Full-text Preview synchronization only. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, and Semantic Transactions remain deferred.
+- Authority: `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0259`
+- Sources: [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/decisions/0259-current-lsp-open-document-overlay.md`](../decisions/0259-current-lsp-open-document-overlay.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-source/src/vfs.rs`](../../crates/ling-source/src/vfs.rs)
+- Fixtures: [`crates/ling-lsp/tests/overlay.rs`](../../crates/ling-lsp/tests/overlay.rs), [`tests/protocols/lsp-overlay/README.md`](../../tests/protocols/lsp-overlay/README.md), [`docs/status/LSP-2103-IMPLEMENTATION-REPORT.md`](../status/LSP-2103-IMPLEMENTATION-REPORT.md)
+- Notes: DEC-0259 accepts the RFC-0023 implementation as the complete bounded LSP-2103 parent: path-free URI/file state, exact full-text overlays, monotonic client versions, disk reveal or temporary removal on close, and dependency read-only rejection. Incremental ranges, diagnostics, compiler queries, snapshots, Workspace Edits, cancellation, Semantic Transactions, and Stable compatibility remain deferred.
 
 ### `PROTO-HUMAN-OUTPUT` — Human-readable CLI and diagnostic output
 

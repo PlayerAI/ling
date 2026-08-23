@@ -6704,6 +6704,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0259"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0259-current-lsp-open-document-overlay.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Retain workspace, dependency, and untitled open/change/close fixtures for overlay precedence, hidden disk changes, disk reveal, temporary removal, and deterministic document ordering.",
+  "Retain failure-atomic rejection fixtures for invalid URIs and parameters, duplicate opens, stale versions, closed documents, dependency edits, ranged changes, and oversized text.",
+  "Retain request/notification response rules, lifecycle gates, framed transport, exact IDs, bilingual errors, and repeated-run determinism.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, offline, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Accepts the existing RFC-0023 implementation as the complete bounded LSP-2103 parent without changing any command, method, capability, field, error, frame, output byte, protocol marker, or stability level.",
+  "Changes no Ling semantics, diagnostics, schemas, Semantic IDs, spans, runtime, bytecode, VM, ABI, filesystem/network behavior, or Unicode 17.0.0 data.",
+]
+unresolved_alternatives = [
+  "Host file resolution, project discovery, generated files, incremental synchronization, compiler snapshots, stale results, diagnostics, navigation, cancellation, Workspace Edits, Semantic Transactions, and Stable editor compatibility remain separately governed.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0027"
 kind = "RFC"
 status = "Accepted"

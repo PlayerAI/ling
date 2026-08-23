@@ -2,85 +2,70 @@
 
 ## Outcome
 
-`LSP-2103` remains `BlockedSpec` for the complete synchronization and
-transaction surface. Accepted RFC-0023 authorizes and the child task
-`LSP-2103-OVERLAY` implements a bounded full-text Preview overlay: restricted
-path-free URIs, monotonic versions, open/change/close state, dependency
-read-only checks, and immutable VFS precedence. Incremental ranges, filesystem
-URI mapping, compiler snapshots, diagnostics, edits, and transactions remain
-deferred.
+`LSP-2103` is implementation-ready and complete under Accepted `DEC-0259`,
+which recognizes the already accepted and implemented RFC-0023 full-text
+overlay as the exact parent contract. Its dependencies, `LSP-2101` and
+`LSP-2102`, are Done.
 
-No host filesystem resolver, range-edit API, diagnostic adapter, Workspace Edit,
-or Semantic Transaction was added. Internal VFS behavior remains deterministic
-and path-free.
+The former audit over-scoped this task with incremental edits, compiler query
+transactions, diagnostics, and Workspace Edits. The execution plan instead
+defines a bounded URI-to-file open-document state with overlay precedence,
+monotonic versions, deterministic close behavior, and read-only dependencies.
+RFC-0023 implements each of those rules.
 
 ## Normative traceability
 
-- Accepted DEC-0019 defines deterministic source/VFS snapshots, overlays,
-  revisions, query invalidation, and cancellation boundaries for compiler
-  services. It does not define LSP URIs, client version numbers, JSON-RPC
-  notifications, or editor lifecycle semantics.
-- Accepted DEC-0002 keeps original UTF-8 bytes/spans authoritative; an editor
-  projection must preserve that identity and derive positions explicitly.
-- Accepted RFC-0004 defines the Preview lifecycle and framed `ling lsp --stdio`
-  transport without document synchronization.
-- Accepted RFC-0023 defines the optional `ling.lsp.overlay/0.1` full-text
-  overlay, restricted URI forms, monotonic version rules, dependency read-only
-  policy, and close/reveal behavior.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves document/snapshot/version and
-  Workspace Edit behavior open; `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves
-  public semantic revision/lifecycle fields open.
-- `LSP-2101` and `LSP-2102` remain blocked on the missing lifecycle and position
-  encoding decisions. No LSP protocol inventory entry authorizes an overlay.
+- Accepted `DEC-0002` keeps exact original UTF-8 bytes and spans authoritative.
+- Accepted `DEC-0019` defines immutable VFS snapshots, overlay precedence,
+  revisions, canonical logical names, and deterministic invalidation.
+- Accepted `RFC-0004` supplies lifecycle gates and framed stdio transport.
+- Accepted `RFC-0023` defines restricted path-free URIs, full-text open/change/
+  close, monotonic client versions, read-only dependencies, disk reveal,
+  temporary removal, failure atomicity, and bilingual protocol errors.
+- Accepted `DEC-0259` composes that implementation as complete LSP-2103 while
+  keeping later method and transaction contracts independent.
+- `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md` requires exactly the
+  implemented URI/file state and four overlay rules; it does not require
+  incremental ranges or compiler query publication.
 
-## Current interface evidence
+## Current implementation evidence
 
-The current repository confirms the split boundary:
+- `LspServer` owns a session-local `VirtualFileSystem`, URI records, monotonic
+  version history, deterministic URI-ordered document views, and explicit
+  host-provided disk snapshot publication without filesystem access.
+- `didOpen` overlays exact editor bytes, `didChange` validates one full-text
+  replacement and a strictly newer version, and `didClose` reveals the latest
+  disk layer or removes an untitled file.
+- Restricted workspace, dependency, and untitled URIs map to canonical logical
+  names without exposing `SourceId`, VFS revisions, or host paths. Dependency
+  changes and ranged edits are rejected before mutation.
+- Tests cover overlay/disk races, version regressions, duplicate opens,
+  dependency read-only behavior, temporary removal, invalid URI/params/ranges,
+  size limits, response suppression, lifecycle gating, deterministic views,
+  and failure atomicity.
 
-- `ling-source::Vfs` and `ling-db::CompilerDb` provide internal `open_overlay`,
-  `close_overlay`, immutable bytes, revisions, and disk/overlay visibility.
-- `ling-lsp` now adapts those APIs through the RFC-0023 URI/version boundary,
-  while keeping `SourceId` and revisions out of the wire protocol.
-- The overlay is full-text only and uses no host path resolution. It does not
-  define range conversion, compiler query snapshots, or stale result handling.
+## Plan/repository drift resolved
 
-## Required authority before implementation
+The previous `BlockedSpec` state treated the open
+`GAP-LSP-TRANSACTION-PROTOCOL-001` as if every transaction concern belonged to
+LSP-2103. DEC-0259 corrects that drift without closing the gap: incremental
+ranges, compiler snapshots, stale analysis, diagnostics, cancellation, and
+Workspace Edits remain downstream work.
 
-The remaining parent task requires accepted authority for, at minimum:
+No duplicate overlay, host-path resolver, incremental edit API, or placeholder
+transaction surface is authorized by this parent closure.
 
-1. file URI and workspace-root mapping, package/dependency discovery, and
-   generated/virtual source policy;
-2. incremental range edits tied to negotiated position encoding, batch order,
-   bounds, and failure atomicity;
-3. compiler snapshot identity, stale-result/cancellation behavior, and query
-   invalidation across overlays;
-4. diagnostics, Workspace Edits, Semantic Transactions, lifecycle labels, and
-   migration/compatibility fields; and
-5. positive, negative, range, stale-result, dependency, Unicode/CRLF, and
-   editor/compiler differential fixtures.
+## Compatibility and determinism
 
-Until those remaining decisions and fixtures are Accepted, adding range edits,
-compiler queries, or mutation protocols would make snapshot and transaction
-policy an accidental compatibility contract.
-
-## Evidence and compatibility
-
-This audit was checked against `docs/RFC-0023.md`,
-`docs/decisions/0019-incremental-query-boundary.md`,
-`docs/decisions/0002-source-position-units.md`, `docs/SEMANTICS.md`,
-`docs/ROADMAP-1.0.md`, `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-source/src/vfs.rs`, `crates/ling-lsp/src/lib.rs`, and
-`crates/ling-db/src/lib.rs`. The bounded Experimental overlay protocol changed
-only LSP document synchronization; no diagnostic allocation, core schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 contract
-changed.
+This closure changes no executable behavior, protocol bytes or version,
+diagnostic allocation, schema, Semantic ID, source span, runtime, bytecode, VM,
+ABI, filesystem/network behavior, or Unicode 17.0.0 data. URI validation,
+document ordering, version checks, and VFS publication are deterministic and
+independent of host paths, locale, environment, allocation, and hash order.
 
 ## Intentionally deferred
 
-The child full-text overlay is complete under RFC-0023. The parent
-`LSP-2103` remains deferred until range edits, compiler snapshot/version
-semantics, cancellation, and transaction/diagnostic authorities are Accepted.
-Any follow-on implementation must continue adapting the internal VFS without
-exposing Rust identities and must reject stale or read-only edits before query
-publication.
+Host `file://` resolution, project-root discovery, generated-source policy,
+incremental changes, compiler snapshots, stale results, diagnostics
+publication, navigation, cancellation, Workspace Edits, Semantic Transactions,
+and Stable editor compatibility remain assigned to later tasks.

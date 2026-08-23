@@ -5,9 +5,9 @@
 **Status: Done (bounded full-text Preview slice).**
 
 This child task implements the document-overlay boundary authorized by Accepted
-RFC-0023. The parent `LSP-2103` remains `BlockedSpec` for incremental ranges,
-compiler query snapshots, diagnostics, Workspace Edits, and Semantic
-Transactions.
+RFC-0023. Accepted `DEC-0259` composes it as the complete bounded `LSP-2103`
+parent; incremental ranges, compiler query snapshots, diagnostics, Workspace
+Edits, and Semantic Transactions remain independent downstream work.
 
 ## Normative clauses covered
 
@@ -62,4 +62,4 @@ Semantic IDs, bytecode, VM, CLI command set, package identity, or Unicode
 17.0.0 data changed. `ling.lsp.overlay/0.1` is Experimental and current-writer
 only. Incremental range edits, file URI/root mapping, compiler snapshots,
 stale-result handling, diagnostics, Workspace Edits, cancellation, and
-Semantic Transactions remain parent-task work.
+Semantic Transactions remain assigned to later tasks.
