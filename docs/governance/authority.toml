@@ -3341,3 +3341,16 @@ covers = ["STAB-6102 bounded false-entry-point audit boundary evidence", "test-o
 depends_on = ["DEC-0216", "DEC-0036", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0218"
+title = "Internal Feature-State Metadata boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0218-feature-state-metadata-boundary-evidence.md"
+covers = ["STAB-6103 bounded Feature-State Metadata boundary evidence", "test-only state/stability and consumer vocabulary", "internal metadata boundaries without public schema or lifecycle semantics"]
+depends_on = ["DEC-0217", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

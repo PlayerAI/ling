@@ -248,6 +248,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0215` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0215](../decisions/0215-critical-runtime-target-package-boundary-evidence.md) |
 | `DEC-0216` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0216](../decisions/0216-support-matrix-item-audit-boundary-evidence.md) |
 | `DEC-0217` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0217](../decisions/0217-false-entry-point-audit-boundary-evidence.md) |
+| `DEC-0218` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0218](../decisions/0218-feature-state-metadata-boundary-evidence.md) |
 
 ## Migration boundary
 

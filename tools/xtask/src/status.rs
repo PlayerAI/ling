@@ -992,6 +992,31 @@ mod tests {
     }
 
     #[test]
+    fn feature_state_and_stability_vocabularies_are_closed_and_distinct() {
+        assert_eq!(FEATURE_STATES, ["Unavailable", "Partial", "Implemented"]);
+        assert_eq!(
+            FEATURE_STABILITIES,
+            ["Experimental", "Preview", "Stable", "Deprecated", "Removed"]
+        );
+
+        let root = repository_root();
+        let (mut registry, trace, support, gaps) = inputs(&root);
+        registry.features[0].current_state = "Stable".to_owned();
+        registry.features[1].stability = "Implemented".to_owned();
+        let errors = validate(&root, &registry, &trace, &support, &gaps);
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.contains("unknown current_state \"Stable\""))
+        );
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.contains("unknown stability \"Implemented\""))
+        );
+    }
+
+    #[test]
     fn cli_fixture_is_internal_and_unimplemented() {
         let root = repository_root();
         let (registry, trace, _, _) = inputs(&root);
