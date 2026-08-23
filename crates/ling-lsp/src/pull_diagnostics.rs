@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use blake3::Hasher;
 use serde_json::{Value, json};
 
-use super::publication::grouped_diagnostics;
+use super::diagnostic_control::controlled_diagnostics;
 use super::{
     DIAGNOSTIC_PROTOCOL_VERSION, HandleOutcome, INTERNAL_ERROR, INVALID_PARAMS, LifecycleState,
     LspServer, MAX_FRAME_BYTES, METHOD_NOT_FOUND, RequestDocument, document_identity,
@@ -11,7 +11,7 @@ use super::{
 };
 
 /// Version marker for the capability-gated Preview pull-diagnostics protocol.
-pub const PULL_DIAGNOSTICS_PROTOCOL_VERSION: &str = "ling.lsp.pull-diagnostics/0.1";
+pub const PULL_DIAGNOSTICS_PROTOCOL_VERSION: &str = "ling.lsp.pull-diagnostics/0.2";
 /// Maximum previous-result entries accepted by one workspace request.
 pub const MAX_PULL_PREVIOUS_RESULTS: usize = 1_024;
 
@@ -62,7 +62,7 @@ impl LspServer {
         let Ok(analysis) = self.analyze_current_diagnostics() else {
             return internal_error(id);
         };
-        let Ok(grouped) = grouped_diagnostics(&analysis) else {
+        let Ok(grouped) = controlled_diagnostics(&analysis, self.diagnostic_limits) else {
             return internal_error(id);
         };
         let Some(items) = grouped.get(&params.uri) else {
@@ -114,7 +114,7 @@ impl LspServer {
         let Ok(analysis) = self.analyze_current_diagnostics() else {
             return internal_error(id);
         };
-        let Ok(mut grouped) = grouped_diagnostics(&analysis) else {
+        let Ok(mut grouped) = controlled_diagnostics(&analysis, self.diagnostic_limits) else {
             return internal_error(id);
         };
         for uri in params.previous_result_ids.keys() {

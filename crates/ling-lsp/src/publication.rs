@@ -6,13 +6,14 @@ use ling_source::{SourceError, SourceFile, SourceId, VfsError};
 use serde_json::{Map, Value, json};
 
 use super::{
-    AdaptedDiagnostic, DiagnosticAdapterError, DiagnosticAdapterInput, DiagnosticSource,
-    JSON_RPC_VERSION, LifecycleState, LspServer, MAX_FRAME_BYTES, RequestSnapshot,
-    RequestSnapshotError, adapt_diagnostics, encode,
+    AdaptedDiagnostic, DiagnosticAdapterError, DiagnosticAdapterInput, DiagnosticControlError,
+    DiagnosticSource, JSON_RPC_VERSION, LifecycleState, LspServer, MAX_FRAME_BYTES,
+    RequestSnapshot, RequestSnapshotError, adapt_diagnostics, encode,
 };
+use crate::diagnostic_control::{DiagnosticLimits, controlled_diagnostics};
 
 /// Version marker for deterministic push-diagnostic publication.
-pub const PUBLISH_DIAGNOSTICS_PROTOCOL_VERSION: &str = "ling.lsp.publish-diagnostics/0.1";
+pub const PUBLISH_DIAGNOSTICS_PROTOCOL_VERSION: &str = "ling.lsp.publish-diagnostics/0.2";
 
 /// Immutable RFC-0032 analysis input captured from one complete server state.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -115,6 +116,7 @@ pub enum DiagnosticAnalysisError {
     Adapter(DiagnosticAdapterError),
     Stale,
     UnknownResultUri { uri: String },
+    Control(DiagnosticControlError),
     NotificationTooLarge { length: usize },
 }
 
@@ -136,6 +138,7 @@ impl std::fmt::Display for DiagnosticAnalysisError {
             Self::UnknownResultUri { uri } => {
                 write!(formatter, "diagnostic result names unknown URI {uri:?}")
             }
+            Self::Control(error) => error.fmt(formatter),
             Self::NotificationTooLarge { length } => write!(
                 formatter,
                 "diagnostic notification length {length} exceeds {MAX_FRAME_BYTES} bytes"
@@ -152,6 +155,7 @@ impl std::error::Error for DiagnosticAnalysisError {
             Self::CompilerInput(error) => Some(error),
             Self::Compiler(error) => Some(error),
             Self::Adapter(error) => Some(error),
+            Self::Control(error) => Some(error),
             Self::NotReady
             | Self::TooManySources
             | Self::Stale
@@ -249,7 +253,7 @@ impl LspServer {
             return Err(DiagnosticAnalysisError::Stale);
         }
 
-        let candidate = publication_params(&result)?;
+        let candidate = publication_params(&result, self.diagnostic_limits)?;
         let mut changed = BTreeMap::new();
         for (uri, params) in &candidate {
             if self.published_diagnostics.get(uri) != Some(params) {
@@ -307,8 +311,9 @@ impl LspServer {
 
 fn publication_params(
     result: &DiagnosticAnalysisResult,
+    limits: DiagnosticLimits,
 ) -> Result<BTreeMap<String, Value>, DiagnosticAnalysisError> {
-    let grouped = grouped_diagnostics(result)?;
+    let grouped = controlled_diagnostics(result, limits)?;
     Ok(grouped
         .into_iter()
         .map(|(uri, diagnostics)| {

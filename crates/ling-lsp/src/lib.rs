@@ -36,6 +36,13 @@ pub use diagnostics::{
     AdaptedDiagnostic, DIAGNOSTIC_PROTOCOL_VERSION, DiagnosticAdapterError, DiagnosticAdapterInput,
     DiagnosticProjectionError, DiagnosticSource, RelatedDiagnosticLabel, adapt_diagnostics,
 };
+mod diagnostic_control;
+pub use diagnostic_control::{
+    DEFAULT_MAX_DIAGNOSTICS_PER_DOCUMENT, DEFAULT_MAX_DIAGNOSTICS_PER_WORKSPACE,
+    DIAGNOSTIC_CONTROL_PROTOCOL_VERSION, DiagnosticControlError, MAX_DIAGNOSTICS_PER_DOCUMENT,
+    MAX_DIAGNOSTICS_PER_WORKSPACE,
+};
+use diagnostic_control::{DiagnosticLimits, parse_diagnostic_limits};
 mod publication;
 pub use publication::{
     DiagnosticAnalysisError, DiagnosticAnalysisResult, DiagnosticAnalysisTicket,
@@ -554,6 +561,7 @@ pub struct LspServer {
     published_diagnostics: BTreeMap<String, Value>,
     outbound_notifications: Vec<Vec<u8>>,
     pull_diagnostics_supported: bool,
+    diagnostic_limits: DiagnosticLimits,
 }
 
 impl Default for LspServer {
@@ -577,6 +585,7 @@ impl LspServer {
             published_diagnostics: BTreeMap::new(),
             outbound_notifications: Vec::new(),
             pull_diagnostics_supported: false,
+            diagnostic_limits: DiagnosticLimits::DEFAULT,
         }
     }
 
@@ -772,25 +781,26 @@ impl LspServer {
             );
         }
 
-        let (encoding, folders, pull_diagnostics_supported) = match parse_initialize_params(&params)
-        {
-            Ok(value) => value,
-            Err(()) => {
-                return error_or_none(
-                    true,
-                    id,
-                    INVALID_PARAMS,
-                    "初始化参数无效 / invalid initialize parameters",
-                );
-            }
-        };
+        let (encoding, folders, pull_diagnostics_supported, diagnostic_limits) =
+            match parse_initialize_params(&params) {
+                Ok(value) => value,
+                Err(()) => {
+                    return error_or_none(
+                        true,
+                        id,
+                        INVALID_PARAMS,
+                        "初始化参数无效 / invalid initialize parameters",
+                    );
+                }
+            };
         self.position_encoding = encoding;
         self.workspace_folders = folders;
         self.pull_diagnostics_supported = pull_diagnostics_supported;
+        self.diagnostic_limits = diagnostic_limits;
         self.state = LifecycleState::AwaitingInitialized;
         HandleOutcome::Response(success_response(
             id,
-            initialize_result(encoding, pull_diagnostics_supported),
+            initialize_result(encoding, pull_diagnostics_supported, diagnostic_limits),
         ))
     }
 
@@ -1327,7 +1337,15 @@ pub fn run_stdio<R: Read, W: Write>(input: R, output: W) -> Result<RunResult, Tr
 
 fn parse_initialize_params(
     params: &Value,
-) -> Result<(PositionEncoding, Vec<WorkspaceFolder>, bool), ()> {
+) -> Result<
+    (
+        PositionEncoding,
+        Vec<WorkspaceFolder>,
+        bool,
+        DiagnosticLimits,
+    ),
+    (),
+> {
     let Some(object) = params.as_object() else {
         return Err(());
     };
@@ -1367,12 +1385,18 @@ fn parse_initialize_params(
         }
     }
     let encoding = negotiate_position_encoding(&labels);
+    let diagnostic_limits = parse_diagnostic_limits(object)?;
 
     let folders = match object.get("workspaceFolders") {
         None | Some(Value::Null) => Vec::new(),
         Some(value) => parse_workspace_folders(value)?,
     };
-    Ok((encoding, folders, pull_diagnostics_supported))
+    Ok((
+        encoding,
+        folders,
+        pull_diagnostics_supported,
+        diagnostic_limits,
+    ))
 }
 
 fn parse_open_params(params: &Value) -> Result<(String, i64, String), OverlayError> {
@@ -1878,7 +1902,11 @@ fn formatting_internal_error(id: Value) -> HandleOutcome {
     )
 }
 
-fn initialize_result(encoding: PositionEncoding, pull_diagnostics_supported: bool) -> Value {
+fn initialize_result(
+    encoding: PositionEncoding,
+    pull_diagnostics_supported: bool,
+    diagnostic_limits: DiagnosticLimits,
+) -> Value {
     let mut result = json!({
         "capabilities": {
             "positionEncoding": encoding.wire_name(),
@@ -1898,6 +1926,11 @@ fn initialize_result(encoding: PositionEncoding, pull_diagnostics_supported: boo
                     "adapterVersion": DIAGNOSTIC_PROTOCOL_VERSION,
                     "debounce": "message-boundary",
                     "version": PUBLISH_DIAGNOSTICS_PROTOCOL_VERSION,
+                },
+                "lingDiagnosticControl": {
+                    "maxPerDocument": diagnostic_limits.per_document(),
+                    "maxPerWorkspace": diagnostic_limits.per_workspace(),
+                    "version": DIAGNOSTIC_CONTROL_PROTOCOL_VERSION,
                 },
             },
             "textDocumentSync": {

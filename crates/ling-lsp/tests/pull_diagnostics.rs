@@ -26,6 +26,10 @@ fn response(outcome: HandleOutcome) -> Value {
 }
 
 fn ready(pull: bool) -> (LspServer, Value) {
+    ready_with_options(pull, json!({}))
+}
+
+fn ready_with_options(pull: bool, initialization_options: Value) -> (LspServer, Value) {
     let mut server = LspServer::new();
     let capabilities = if pull {
         json!({"textDocument": {"diagnostic": {}}})
@@ -35,7 +39,10 @@ fn ready(pull: bool) -> (LspServer, Value) {
     let initialized = response(server.handle_json(&message(
         Some(1),
         "initialize",
-        json!({"capabilities": capabilities}),
+        json!({
+            "capabilities": capabilities,
+            "initializationOptions": initialization_options,
+        }),
     )));
     assert_eq!(
         server.handle_json(&message(None, "initialized", json!({}))),
@@ -366,7 +373,13 @@ fn temporary_document_pull_is_syntax_only_and_uses_its_exact_uri() {
 
 #[test]
 fn oversized_success_becomes_bounded_request_failed() {
-    let (mut server, _) = ready(true);
+    let (mut server, _) = ready_with_options(
+        true,
+        json!({"lingDiagnosticControl": {
+            "maxPerDocument": 4_096,
+            "maxPerWorkspace": 65_536,
+        }}),
+    );
     let text = "@".repeat(20_000);
     assert!(text.len() < MAX_FRAME_BYTES);
     open(&mut server, URI, 1, &text);

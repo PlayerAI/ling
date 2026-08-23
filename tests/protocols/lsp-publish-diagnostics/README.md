@@ -1,4 +1,4 @@
-# `ling.lsp.publish-diagnostics/0.1` Experimental fixture
+# `ling.lsp.publish-diagnostics/0.2` Experimental fixture
 
 This fixture records the Accepted RFC-0032 deterministic push-diagnostic
 writer:
@@ -16,6 +16,9 @@ writer:
 - exact unchanged entries are suppressed, changed entries are URI-sorted, and
   a stale, failed, unknown-URI, or oversized result leaves the ledger and
   pending work unchanged;
+- RFC-0034 root control applies the discovered immutable caps, preserves every
+  retained `ling.lsp.diagnostic/0.2` value byte-for-byte, and reports omissions
+  with registered `L-LSP-0001` summaries;
 - output uses the separately registered `ling.lsp.diagnostic/0.2` values and
   performs no filesystem, environment, registry, network, shell, or host-path
   access.

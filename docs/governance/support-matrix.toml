@@ -324,14 +324,21 @@ implemented = true
 [[protocol]]
 id = "PROTO-LSP-PUBLISH-DIAGNOSTICS"
 visibility = "Public"
-version = "ling.lsp.publish-diagnostics/0.1"
+version = "ling.lsp.publish-diagnostics/0.2"
 stability = "Experimental"
 implemented = true
 
 [[protocol]]
 id = "PROTO-LSP-PULL-DIAGNOSTICS"
 visibility = "Public"
-version = "ling.lsp.pull-diagnostics/0.1"
+version = "ling.lsp.pull-diagnostics/0.2"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-LSP-DIAGNOSTIC-CONTROL"
+visibility = "Public"
+version = "ling.lsp.diagnostic-control/0.1"
 stability = "Preview"
 implemented = true
 

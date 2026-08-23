@@ -2,74 +2,58 @@
 
 ## Outcome
 
-`LSP-2204` is correctly recorded as `BlockedSpec`. The execution plan requests
-root-cause prioritization and error-storm control for editor diagnostics. Ling
-already defines root-cause-first ordering and bounded structured diagnostics at
-the compiler boundary, but no accepted LSP policy defines suppression,
-deduplication, per-snapshot caps, related-file grouping, or recovery.
-
-No LSP diagnostic cap, suppression rule, deduplication key, truncation marker,
-grouping field, or placeholder adapter was added. Existing compiler/CLI
-diagnostics remain complete and unchanged.
+`LSP-2204` is implementation-authorized by Accepted RFC-0034. It defines the
+previously missing root identity, configurable bounds, explicit omission
+representation, push/pull interaction, recovery, failure, and migration rules
+for a stateless LSP projection. Compiler diagnostics remain complete and
+unchanged before that projection.
 
 ## Normative traceability
 
-- `docs/SEMANTICS.md` §26 requires root-cause-first diagnostics, stable codes,
-  original spans, bounded Facts/repairs, and bilingual rendering; it does not
-  define editor error-storm policy or lossy suppression.
-- `docs/ERROR-CODES.md` defines the single registered code source and stable
-  meanings; it does not authorize LSP-specific truncation or deduplication.
-- `PROTO-DIAGNOSTIC-JSON` is a Preview diagnostic writer, not an LSP publication
-  policy.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` and
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leave snapshot/result lifecycle,
-  versioning, and public editor fields open. LSP-2201 through LSP-2203 remain
-  blocked on adapter and publication contracts.
+- `SEMANTICS.md` §26 requires root-cause-first diagnostics and suppression of
+  obvious cascades while retaining multiple independent errors.
+- RFC-0031 and DEC-0034 define exact adapter fields and the accepted logical
+  path/original-byte/code/end/tie order.
+- RFC-0032 and RFC-0033 define immutable current analysis, push replacement,
+  pull full/unchanged reports, result identity, versions, and clearance.
+- RFC-0034 §§1–7 add exact-root first-wins suppression, immutable initialization
+  limits, document/workspace caps, `L-LSP-0001` summaries, shared push/pull
+  control, recovery, and the 0.2 migration.
 
-## Current interface evidence
+## Accepted boundary
 
-The current repository confirms the missing boundary:
+Root identity is exact URI plus code, projected range, Semantic ID, and Facts.
+The first accepted-order value wins; independent ranges, identities, or Facts
+remain visible. Document caps run before the URI-ordered workspace cap.
+Summaries are additional registered warnings and do not consume either cap.
 
-- Compiler diagnostics are sorted and bounded by root cause/source order, but
-  no LSP-specific maximum, aggregation, or suppression metadata exists.
-- No code defines whether duplicate diagnostics are equal by code/span/facts,
-  whether related-file errors are grouped, or how a later successful snapshot
-  clears a suppressed error.
-- No fixture covers pathological syntax/error cascades, caps, truncation,
-  resumption, or deterministic suppression across process/hash seeds.
+The LSP layer does not alter parser recovery or manufacture compiler failures.
+An upstream registered resource-limit diagnostic remains a root and exact
+duplicates collapse to one. The crate-private Trait solver is not production-
+integrated, so no Trait diagnostic or public support claim is created here.
 
-## Required authority before implementation
+## Required evidence
 
-An implementation-ready decision or RFC must define, at minimum:
+- default/custom discovery and complete limit validation;
+- root identity, first-wins values, independent errors, resource roots, accepted
+  order, per-document/workspace caps, and exact summary counts/ranges;
+- push/pull parity, protocol markers, result IDs, pending/ledger isolation,
+  recovery, clearance, stale results, and oversized failure atomicity;
+- temporary sources, Unicode encodings, CRLF, repeatability, URI-order
+  invariance, malformed internal shapes, and generated governance locks;
+- full locked-offline repository quality and governance gates.
 
-1. root-cause and dependent-diagnostic ordering, deduplication identity, and
-   grouping/related-file rules;
-2. per-file/workspace/snapshot limits, truncation representation, severity
-   policy, and whether suppressed facts remain queryable;
-3. recovery and resumption when the source becomes valid, stale result and
-   cancellation behavior, and interaction with push/pull diagnostics;
-4. deterministic ordering, localization, negotiated positions, protocol field
-   lifecycle, and compatibility/migration policy; and
-5. positive, negative, cascade, cap/truncation, recovery, cross-file,
-   Unicode/CRLF, deterministic, and migration fixtures.
+## Compatibility impact
 
-Until those decisions and fixtures are Accepted, suppressing or reshaping
-diagnostics in an LSP adapter could hide root causes, produce unstable editor
-behavior, or diverge from the registered compiler diagnostic contract.
-
-## Evidence and compatibility
-
-This audit was checked against `docs/SEMANTICS.md`, `docs/ERROR-CODES.md`,
-`docs/ROADMAP-1.0.md`, `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-diagnostics`, and the LSP-2201/2202/2203 audit boundaries.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+Adds Preview `ling.lsp.diagnostic-control/0.1` and registered warning
+`L-LSP-0001`; advances push/pull diagnostic-set markers to 0.2. The compiler
+adapter and pull-result algorithm markers are unchanged. No existing diagnostic
+meaning, Semantic ID, language/runtime/VM/ABI, or Unicode 17.0.0 behavior
+changes.
 
 ## Intentionally deferred
 
-`LSP-2204` can begin after the LSP diagnostic adapter/publication contracts and
-error-storm decision are Accepted. The implementation must preserve compiler
-root causes, make any truncation explicit and deterministic, and prove
-recovery/clear behavior with fixtures.
+Parser recovery changes, production Trait solver integration, dynamic settings,
+severity/code filtering, merge policies, telemetry, persistence, cancellation,
+progress, fixes, Workspace Edits, Semantic Transactions, and Stable lifecycle
+remain outside LSP-2204.

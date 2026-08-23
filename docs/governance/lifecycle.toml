@@ -6919,3 +6919,31 @@ unresolved_alternatives = [
   "Dynamic registration, related-document maps, observable cancellation, progress, partial results, refresh, notebooks, root-cause control, fixes, Workspace Edits, Semantic Transactions, general scheduling, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0034"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0034.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify default and custom document/workspace bounds, option validation, exact discovery, immutability, and unknown-field tolerance.",
+  "Cover exact root identity, first-wins duplicate suppression, independent roots, accepted order, resource-limit roots, per-document/workspace caps, and exact omission summaries.",
+  "Prove push/pull parity, protocol 0.2 migration, result identity, recovery/clearance, temporary sources, all position encodings, CRLF, repeatability, and URI-order invariance.",
+  "Reject malformed internal values atomically and preserve pending push work, publication ledger, documents, and complete compiler results.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.diagnostic-control/0.1 and registered L-LSP-0001 omission summaries.",
+  "Advances push and pull diagnostic-set protocols from 0.1 to 0.2 while leaving ling.lsp.diagnostic/0.2 and ling.lsp.pull-result/0.1:blake3: unchanged.",
+  "Changes no existing diagnostic meaning, language semantics, Typed Core, runtime, bytecode, VM, ABI, Semantic ID, filesystem/network/cache behavior, or Unicode 17.0.0 data.",
+]
+unresolved_alternatives = [
+  "Dynamic settings, severity and user-code filters, repair/related-information merging, parser recovery changes, production Trait solver integration, telemetry, persistence, cancellation, progress, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

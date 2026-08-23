@@ -24,12 +24,19 @@ fn request(id: u64, method: &str, params: Value) -> Vec<u8> {
 }
 
 fn ready() -> LspServer {
+    ready_with_options(json!({}))
+}
+
+fn ready_with_options(initialization_options: Value) -> LspServer {
     let mut server = LspServer::new();
     assert!(matches!(
         server.handle_json(&request(
             1,
             "initialize",
-            json!({"capabilities": {"general": {"positionEncodings": ["utf-16"]}}}),
+            json!({
+                "capabilities": {"general": {"positionEncodings": ["utf-16"]}},
+                "initializationOptions": initialization_options,
+            }),
         )),
         HandleOutcome::Response(_)
     ));
@@ -413,7 +420,10 @@ fn stdio_writes_request_response_before_caused_publication() {
 #[test]
 fn oversized_notification_is_rejected_without_mutating_publication_state() {
     let uri = "ling://workspace/src/Main.ling";
-    let mut server = ready();
+    let mut server = ready_with_options(json!({"lingDiagnosticControl": {
+        "maxPerDocument": 4_096,
+        "maxPerWorkspace": 65_536,
+    }}));
     let text = format!("module Main\n\nlet value = {}\n", "@".repeat(20_000));
     open(&mut server, uri, 1, &text);
 

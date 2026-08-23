@@ -1029,6 +1029,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0034"
+title = "LSP diagnostic storm control"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0034.md"
+covers = ["ling.lsp.diagnostic-control/0.1", "deterministic root-identity suppression and explicit omission summaries", "configurable document/workspace diagnostic caps and push/pull 0.2 migration"]
+depends_on = ["RFC-0004", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0031", "RFC-0032", "RFC-0033", "DEC-0001", "DEC-0019", "DEC-0034", "DEC-0071", "DEC-0072", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

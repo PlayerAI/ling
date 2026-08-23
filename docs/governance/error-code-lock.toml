@@ -14,6 +14,7 @@ IMPL = 1
 INTERNAL = 1
 IO = 5
 LEX = 12
+LSP = 1
 MUT = 1
 NAME = 9
 PROJECT = 19
@@ -258,6 +259,12 @@ id = "L-LEX-0012"
 core_sha256 = "sha256:98b8c9cd292bdee4c29273113dff78850800eed8e4239a97b96f2621cdc7f490"
 retired = false
 facts = []
+
+[[code]]
+id = "L-LSP-0001"
+core_sha256 = "sha256:e4159225387ea1baf19a5cf5eb35132eb494b89366add6c4170681bcb874fc95"
+retired = false
+facts = ["capped:integer:required", "deduplicated:integer:required", "maximum:integer:required", "omitted:integer:required", "scope:string:required"]
 
 [[code]]
 id = "L-MUT-0001"

@@ -86,11 +86,12 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-INTERNAL-INCIDENT` | `Internal` | `ling.internal-incident/0.1` | `Internal` | yes |
 | `PROTO-LOCKFILE` | `Public` | `ling.lock/1` | `Experimental` | yes |
 | `PROTO-LSP-DIAGNOSTIC` | `Public` | `ling.lsp.diagnostic/0.2` | `Experimental` | yes |
+| `PROTO-LSP-DIAGNOSTIC-CONTROL` | `Public` | `ling.lsp.diagnostic-control/0.1` | `Preview` | yes |
 | `PROTO-LSP-FORMATTING` | `Public` | `ling.lsp.formatting/0.1` | `Experimental` | yes |
 | `PROTO-LSP-LIFECYCLE` | `Public` | `ling.lsp.lifecycle/0.1` | `Preview` | yes |
 | `PROTO-LSP-OVERLAY` | `Public` | `ling.lsp.overlay/0.2` | `Experimental` | yes |
-| `PROTO-LSP-PUBLISH-DIAGNOSTICS` | `Public` | `ling.lsp.publish-diagnostics/0.1` | `Experimental` | yes |
-| `PROTO-LSP-PULL-DIAGNOSTICS` | `Public` | `ling.lsp.pull-diagnostics/0.1` | `Preview` | yes |
+| `PROTO-LSP-PUBLISH-DIAGNOSTICS` | `Public` | `ling.lsp.publish-diagnostics/0.2` | `Experimental` | yes |
+| `PROTO-LSP-PULL-DIAGNOSTICS` | `Public` | `ling.lsp.pull-diagnostics/0.2` | `Preview` | yes |
 | `PROTO-LSP-WORKSPACE` | `Public` | `ling.lsp.workspace/0.1` | `Experimental` | yes |
 | `PROTO-PACKAGE-IDENTITY` | `Public` | `v1 domain encodings` | `Experimental` | yes |
 | `PROTO-PACKAGE-MANIFEST` | `Public` | `ling.manifest/1` | `Experimental` | yes |
