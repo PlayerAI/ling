@@ -7316,3 +7316,31 @@ unresolved_alternatives = [
   "Mixed checked and error-region output, parsed fallback, and custom future categories remain excluded until Accepted authority proves their partial-analysis and source-role boundaries.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0048"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0048.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact full-only and delta provider negotiation across all, partial and empty legends, malformed known capability fields, ignored unknown fields, standard modifier projection, and custom mutable selection.",
+  "Cover deterministic full relative encoding in UTF-8, UTF-16 and UTF-32 across Chinese, emoji, combining prefixes, BOM, LF, CRLF, multiline spans, omitted categories, ordering and non-overlap.",
+  "Cover canonical insertion, deletion, replacement and reorder deltas, equal arrays, invalid, expired and foreign-URI bases, FIFO eviction, full fallback, full/delta equivalence, and deterministic result IDs and bytes.",
+  "Verify immutable overlay, closed and temporary document snapshots, repeated requests, edits, stale recapture, cooperative cancellation, compiler failures, token, data and frame limits, and atomic history publication.",
+  "Prove source bytes, VFS revisions, paths, diagnostics, compiler, Semantic and Definition identities, type, Effect, Capability and debug facts never enter the result ID, response, or retained history.",
+]
+compatibility_impact = [
+  "Adds Preview ling.lsp.semantic-tokens/0.1 with one statically negotiated provider, standard LSP 3.17 full and delta methods, and a bounded disposable session result history.",
+  "Consumes the existing ling.semantic-token-generation/0.1 index without changing compiler queries, checked facts, source spans, fallback, or language semantics.",
+  "Adds no Ling diagnostic, standalone JSON schema, Semantic ID, Definition ID, canonical byte, runtime, bytecode, VM, ABI, package, filesystem, network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Range tokens, refresh, dynamic registration, partial and work-done results, wire $/cancelRequest, asynchronous scheduling, configurable limits, persistent history, multi-edit optimization, mixed checked and error-region generation, Stable lifecycle, editor presentation, and Semantic Transactions remain deferred.",
+]
+superseded_by = ""
