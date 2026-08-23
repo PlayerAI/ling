@@ -1,6 +1,8 @@
 # IDE-2304 implementation report
 
-> Status: Implemented; status-ledger binding pending the implementation commit
+> Status: **Done**
+> Completed: 2026-08-23
+> Final verified implementation commit: `a109de62480d70c2d0d0a48b1604c8a5e04d7307`
 > Task: `IDE-2304`
 > Authority: Accepted `RFC-0039`, `RFC-0038`, `RFC-0004`, `RFC-0005`,
 > `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`, `DEC-0012`, `DEC-0019`,
@@ -53,8 +55,11 @@ optional declaration inclusion.
 - `cargo test -p ling-lsp --test references --locked --offline` passes.
 - `cargo test -p ling-lsp --locked --offline` passes.
 - Focused strict Clippy for `ling-db` and `ling-lsp` passes.
-- Remaining workspace, governance, and release gates are recorded only after
-  execution against the implementation commit.
+- `cargo test --workspace --all-targets --locked --offline --quiet` passes.
+- `cargo clippy --workspace --all-targets --locked --offline -- -D warnings`
+  passes.
+- CI, governance, LSP, support, status, RC0, v0.0.1 traceability, formatting,
+  and diff verification gates pass against the implementation commit.
 
 ## Compatibility, determinism, and Unicode impact
 

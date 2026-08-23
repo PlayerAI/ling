@@ -217,7 +217,7 @@
 | `IDE-2302-TYPED-INDEX` | Internal typed-definition observation | `G1` | `S` | `Done` | `EFF-2102`, `IDE-2301-INDEX`, `INC-1405` | `d0727d95442309390a68d1af512111a8cd17f919` |
 | `IDE-2303` | IDE definition navigation | `G1` | `M` | `Done` | `IDE-2301`, `IDE-2302`, `LSP-2101`, `LSP-2102` | `5abd8034dfeac3ca4b3a7b25cb18c22bfb885ec6` |
 | `IDE-2303-REFERENCE-INDEX` | Internal resolved-reference target index | `G1` | `S` | `Done` | `IDE-2301-INDEX`, `INC-1404` | `1f1b10653f2a38f477cf359ac318be8b662e1503` |
-| `IDE-2304` | IDE references | `G1` | `M` | `BlockedSpec` | `IDE-2303`, `LSP-2101`, `LSP-2102` | `` |
+| `IDE-2304` | IDE references | `G1` | `M` | `Done` | `IDE-2303`, `LSP-2101`, `LSP-2102` | `a109de62480d70c2d0d0a48b1604c8a5e04d7307` |
 | `IDE-2304-REVERSE-INDEX` | Internal resolved-reference reverse index | `G1` | `S` | `Done` | `IDE-2303-REFERENCE-INDEX` | `29854ae695f58c611518190b5fcc58263458c6b0` |
 | `IDE-2305` | IDE prepare rename | `G1` | `M` | `BlockedSpec` | `IDE-2304`, `LSP-2102` | `` |
 | `IDE-2305-IDENTIFIER-OBSERVATION` | Internal rename-identifier Unicode observation | `G1` | `S` | `Done` | `IDE-2304-REVERSE-INDEX` | `e2681b0fe08ec95805e6a1346b3e8693ba83a3af` |

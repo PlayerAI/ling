@@ -6989,7 +6989,7 @@ acceptance = [
   "Groups preserve DefinitionId or binding module/local identity and source logical name, module identity, and resolver reference ID with explicit deterministic ordering.",
   "The reverse view is derived from the validated resolver observation without revision cache, dependency invalidation, persistence, corruption recovery, or Semantic ID generation.",
   "Focused cargo fmt, ling-db tests, and Clippy checks pass; repeated grouping, forward-to-reverse identity, source reference IDs, and invalid UTF-8 failure are covered.",
-  "The public IDE-2304 references target remains BlockedSpec for relation categories, source ranges, incremental lifecycle, URI/version, cancellation, publication, and fixtures.",
+  "IDE-2304 later consumes this grouping under Accepted RFC-0039 while retaining its own checked relation, exact range, snapshot, URI, publication, and fixture contracts.",
 ]
 verified_against_commit = "29854ae695f58c611518190b5fcc58263458c6b0"
 completion_commit = "29854ae695f58c611518190b5fcc58263458c6b0"
@@ -7003,7 +7003,7 @@ notes = [
 [[task]]
 id = "IDE-2304"
 title = "IDE references"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -7018,30 +7018,39 @@ spec = [
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/RFC-0005.md",
+  "docs/RFC-0039.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/reference_search_index.rs",
+  "crates/ling-db/src/reference_span_index.rs",
+  "crates/ling-lsp/src/location_projection.rs",
+  "crates/ling-lsp/src/references.rs",
+  "crates/ling-lsp/tests/references.rs",
+  "docs/RFC-0039.md",
   "docs/status/IDE-2304-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2304-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-references/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing references request/response, relation taxonomy, source-range, URI/position/version, index/invalidation, Semantic ID, and protocol lifecycle contracts.",
-  "The audit covers read/write/call/type/implementation relations, unresolved/builtin/prelude/generated/primitive/dependency targets, cross-package behavior, incremental edits, Unicode/CRLF/BOM, stale results, deterministic ordering, and required fixtures.",
-  "No reference handler, reverse index, relation schema, incremental cache API, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must derive results from checked references, preserve source-span/ID truth, update indexes deterministically, and label experimental fields.",
+  "Accepted RFC-0039 fixes capability negotiation, exact Preview discovery, immutable checked snapshots, declaration/reference selection, includeDeclaration behavior, the complete five-kind relation vocabulary, exact read/write/call emission, explicit type/implementation non-emission, canonical Location arrays, bounds, failures, and migration behavior.",
+  "The compiler index atomically joins exact resolver expression spans and target identities to source-backed definition/member/binding declarations, classifies mutually exclusive read/write/call relations, rejects duplicate/partial/oversized observations, and exposes no resolver or Semantic identity.",
+  "Executable tests cover declaration and reference selection, inclusion control, reads/writes/calls, source-less builtins, workspace/dependency/temporary isolation, insertion-order invariance, UTF-8/16/32, BOM/CRLF/Chinese/emoji/combining text, empty selection, malformed input, notifications, checked failure, bounds, and navigation regression.",
+  "Locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass against implementation commit a109de62480d70c2d0d0a48b1604c8a5e04d7307.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "a109de62480d70c2d0d0a48b1604c8a5e04d7307"
+completion_commit = "a109de62480d70c2d0d0a48b1604c8a5e04d7307"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "IDE-2304 is BlockedSpec by GAP-INCREMENTAL-CACHE-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2101/LSP-2102, and IDE-2303; the Experimental Semantic Graph JSON is not a references schema.",
-  "Current resolver and semantic graph expose internal forward references and identity metadata but no approved reverse index, relation taxonomy, editor range mapping, or invalidation contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, incremental cache behavior, or Unicode 17.0.0 behavior.",
+  "Implementation commit a109de62480d70c2d0d0a48b1604c8a5e04d7307 adds Accepted RFC-0039, checked target grouping, exact expression relations, the LSP references provider, shared location projection, transcript migration, protocol/governance records, and implementation evidence.",
+  "Resolver-owned type/implementation occurrences, generated/virtual documents, custom relation results, persistent indexes, progress, partial results, asynchronous cancellation, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deliberately deferred.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, Semantic ID/schema, persistent cache, package format, or Unicode 17.0.0 behavior changes.",
 ]
 
 [[task]]
