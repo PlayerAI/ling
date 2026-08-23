@@ -292,6 +292,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0255` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0255](../decisions/0255-current-project-initialization-command.md) |
 | `DEC-0256` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0256](../decisions/0256-current-test-command.md) |
 | `DEC-0257` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0257](../decisions/0257-current-lsp-lifecycle-skeleton.md) |
+| `DEC-0258` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0258](../decisions/0258-current-lsp-position-encoding-boundary.md) |
 
 ## Migration boundary
 

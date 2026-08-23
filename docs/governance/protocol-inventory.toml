@@ -127,11 +127,11 @@ reader_policy = "Accept one JSON-RPC 2.0 object per CRLF Content-Length frame; r
 writer_policy = "Emit only framed compact UTF-8 JSON-RPC responses for initialize and shutdown; preserve request IDs, flush each response, and write no unframed protocol bytes or human text to stdout."
 unknown_field_policy = "Unknown JSON-RPC object fields and ASCII transport headers are ignored for this Preview; unknown methods are rejected only when they are requests, and future incompatible fields require a new protocol version."
 migration_tool = "None; `ling.lsp.lifecycle/0.1` is current-writer-only and a future Stable/editor contract requires an accepted migration specification."
-fixtures = ["crates/ling-lsp/tests/lifecycle.rs", "crates/ling-cli/tests/lsp.rs", "tests/protocols/lsp-lifecycle/README.md", "docs/status/LSP-2101-IMPLEMENTATION-REPORT.md"]
-sources = ["docs/RFC-0004.md", "docs/decisions/0257-current-lsp-lifecycle-skeleton.md", "crates/ling-lsp/src/lib.rs", "crates/ling-cli/src/main.rs"]
+fixtures = ["crates/ling-source/src/position.rs", "crates/ling-lsp/tests/lifecycle.rs", "crates/ling-lsp/tests/position_encoding.rs", "crates/ling-cli/tests/lsp.rs", "tests/protocols/lsp-lifecycle/README.md", "docs/status/LSP-2101-IMPLEMENTATION-REPORT.md", "docs/status/LSP-2102-IMPLEMENTATION-REPORT.md"]
+sources = ["docs/RFC-0004.md", "docs/decisions/0029-lsp-position-encoding-projection.md", "docs/decisions/0257-current-lsp-lifecycle-skeleton.md", "docs/decisions/0258-current-lsp-position-encoding-boundary.md", "crates/ling-source/src/position.rs", "crates/ling-lsp/src/lib.rs", "crates/ling-cli/src/main.rs"]
 version_markers = ["ling.lsp.lifecycle/0.1", "ling lsp --stdio"]
-authority = ["RFC-0004", "DEC-0029", "DEC-0257"]
-notes = ["DEC-0257 accepts this RFC-0004 implementation as the complete bounded LSP-2101 parent. The Preview lifecycle covers initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity; later methods retain independent authorities, while snapshots, cancellation, Workspace Edits, and Semantic Transactions remain deferred."]
+authority = ["RFC-0004", "DEC-0029", "DEC-0257", "DEC-0258"]
+notes = ["DEC-0257 accepts the RFC-0004 lifecycle implementation as bounded LSP-2101; DEC-0258 accepts DEC-0029 source projection plus RFC-0004 initialize negotiation as bounded LSP-2102. The Preview lifecycle covers initialize/initialized/shutdown/exit, explicit UTF-8/16/32 selection, shared strict SourceMap conversion, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity; later methods retain independent authorities, while snapshots, cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred."]
 
 [[protocol]]
 id = "PROTO-LSP-OVERLAY"

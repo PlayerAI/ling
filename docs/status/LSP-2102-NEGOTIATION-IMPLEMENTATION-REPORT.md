@@ -12,9 +12,10 @@ label supported by Ling (`utf-8`, `utf-16`, or `utf-32`), falls back to
 `utf-16` for an absent or empty list, and returns the selected wire label in
 `capabilities.positionEncoding`.
 
-The parent `LSP-2102` remains `BlockedSpec` for document/snapshot versions,
-stale results, diagnostics and Workspace Edit projection, cancellation, and
-Stable versus Experimental transaction compatibility.
+Accepted `DEC-0258` composes this slice with the shared source projection to
+close the bounded `LSP-2102` parent. Document/snapshot versions, stale results,
+diagnostics publication, Workspace Edits, cancellation, and Stable editor
+compatibility remain independently governed downstream.
 
 ## Normative clauses covered
 
@@ -62,6 +63,6 @@ commit `39755afad13db66b429967fe61f20f66a4aea699`:
 ## Deferred work
 
 Incremental/range edits, document URI mapping, version and snapshot
-preconditions, stale-result and cancellation policy, diagnostics, Workspace
-Edits, and Semantic Transactions remain governed by the parent LSP/semantic
-protocol gaps. No Stable 1.0 editor claim is made.
+preconditions, stale-result and cancellation policy, diagnostics publication,
+Workspace Edits, and Semantic Transactions remain governed by later tasks and
+the LSP/semantic protocol gaps. No Stable 1.0 editor claim is made.

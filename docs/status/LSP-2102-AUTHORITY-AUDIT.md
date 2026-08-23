@@ -2,86 +2,72 @@
 
 ## Outcome
 
-`LSP-2102` remains `BlockedSpec` for the complete editor position surface, but
-the dependency-complete negotiation and source-projection slices are now
-implemented under Accepted `RFC-0004` and `DEC-0029`:
+`LSP-2102` is implementation-ready and complete under Accepted `DEC-0258`,
+which composes the already accepted and implemented `DEC-0029` source
+projection with `RFC-0004` initialize-time negotiation. Its only plan
+dependency, `LSP-2101`, is Done.
 
-- `LSP-2102-SOURCE-MAP` owns strict byte/position projection in `ling-source`.
-- `LSP-2102-NEGOTIATION` owns the Preview initialize capability and selected
-  `utf-8`/`utf-16`/`utf-32` encoding state in `ling-lsp`.
-
-The parent remains blocked for document-version/snapshot preconditions,
-handler-wide conversion for diagnostics and edits, stale-result behavior,
-and Stable versus Experimental transaction compatibility. Compiler spans and
-diagnostic positions remain unchanged.
+The earlier audit incorrectly treated the complete future editor transaction
+surface as part of this size-S task. The execution plan requires only recording
+the common client/server encoding and routing position-bearing handlers through
+one conversion API. Document versions, snapshots, stale results, incremental
+edits, diagnostics publication, Workspace Edits, and cancellation are assigned
+to later tasks and remain independently governed.
 
 ## Normative traceability
 
-- Accepted DEC-0002 makes JSON diagnostic byte offsets the protocol truth and
-  human columns Unicode scalar counts; it explicitly requires a future LSP
-  UTF-16 projection to be derived from SourceMap and labeled with its encoding,
-  without changing Span identity.
-- Accepted `RFC-0004` defines the Preview `ling lsp --stdio` initialize result
-  and lifecycle boundary; it does not authorize document edits or diagnostics.
-- Accepted `DEC-0029` fixes the supported wire labels, first-supported
-  negotiation with UTF-16 fallback, deterministic advertisement order, and
-  strict SourceMap boundary conversion.
-- `docs/SEMANTICS.md` requires original UTF-8 spans, deterministic source
-  mapping, and stable diagnostics; it does not define an LSP position encoding
-  negotiation or conversion error protocol.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves LSP positions, snapshots, and
-  Workspace Edit fields open, while `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001`
-  leaves the public semantic protocol lifecycle open.
-- `PROTO-LSP-LIFECYCLE` inventories the current Preview lifecycle and records
-  `RFC-0004`/`DEC-0029` as its authority; the overlay remains a separate
-  Experimental protocol.
+- Accepted `DEC-0002` keeps original UTF-8 byte offsets authoritative and
+  requires editor projection to derive from `SourceMap` without changing span
+  identity.
+- Accepted `DEC-0029` fixes the `utf-8`, `utf-16`, and `utf-32` labels,
+  first-supported selection, UTF-16 fallback, zero-based lexical positions,
+  strict boundary failures, and source-layer conversion ownership.
+- Accepted `RFC-0004` defines initialize parsing, selected-encoding process
+  state, capability output, invalid-parameter behavior, and Preview lifecycle.
+- Accepted `DEC-0258` composes those bounded authorities as the complete
+  parent contract while preserving later transaction work as separate tasks.
+- `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md` states only that the
+  common encoding is recorded and all handlers use the conversion API.
 
-## Current interface evidence
+## Current implementation evidence
 
-The current repository now contains the bounded negotiation boundary while
-confirming the remaining parent gap:
+- `ling-source` owns `PositionEncoding`, `LspPosition`, typed
+  `PositionError`, deterministic negotiation, and strict `SourceFile`/
+  `SourceMap` byte-position round trips.
+- `ling-lsp` parses `capabilities.general.positionEncodings`, stores the
+  selected encoding, returns `capabilities.positionEncoding`, and rejects
+  malformed metadata before changing lifecycle state.
+- The currently implemented position-bearing formatting path derives its end
+  position through `SourceFile::lsp_position`; internal diagnostic and edit
+  adapters also consume the shared typed projection boundary. Full-text
+  synchronization contains no position range.
+- Source and LSP tests cover client order, unknown labels, fallback, malformed
+  metadata, Chinese text, emoji, combining marks, BOM, CRLF, empty/final lines,
+  invalid UTF-8 boundaries, and UTF-16 surrogate interiors.
 
-- `ling-source` exposes `PositionEncoding`, `LspPosition`, strict
-  `PositionError`, negotiation, and SourceMap round trips without changing
-  original byte spans.
-- `ling-lsp` parses `capabilities.general.positionEncodings`, selects the first
-  supported label with UTF-16 fallback, and returns the selected
-  `capabilities.positionEncoding` during initialize.
-- LSP unit/integration and source-map fixtures cover unknown labels, fallback,
-  malformed metadata, Chinese text, emoji, combining marks, CRLF, BOM, and
-  invalid UTF-8/UTF-16 boundaries.
-- No URI/document-version association, stale-result policy, diagnostics
-  projection, or Workspace Edit conversion is implied by these slices.
+## Plan/repository drift resolved
 
-## Required authority for the remaining parent task
+The former `BlockedSpec` text conflated LSP-2102 with the open
+`GAP-LSP-TRANSACTION-PROTOCOL-001` surface. DEC-0258 resolves that planning
+drift without closing the gap: the gap still governs the downstream public
+transaction fields and failure semantics, but it does not override the
+execution plan's bounded negotiation task.
 
-An implementation-ready decision or RFC must still define, at minimum:
+No second negotiation implementation, alternate position representation, or
+ad hoc handler conversion is permitted. Later position-bearing handlers must
+obtain their own Accepted method/transaction authority and reuse this boundary.
 
-1. document versions, snapshot identity, stale-result handling, and atomic
-   preconditions for every position-bearing request;
-2. handler-wide conversion ownership and error mapping for diagnostics,
-   Workspace Edits, rename, completion, and code actions;
-3. invalidation/cancellation behavior and Stable versus Experimental field
-   lifecycle; and
-4. positive, negative, cross-encoding, malformed-boundary, stale-version,
-   deterministic, and migration fixtures for the complete editor surface.
+## Compatibility and determinism
 
-## Evidence and compatibility
-
-This audit was checked against `docs/RFC-0004.md`,
-`docs/decisions/0002-source-position-units.md`,
-`docs/decisions/0029-lsp-position-encoding-projection.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-source`, and `crates/ling-db`.
-The bounded slices add no diagnostic allocation, schema, Semantic ID,
-source-span, runtime, bytecode, VM, or Unicode 17.0.0 behavior.
+This closure changes no executable behavior, protocol bytes or version,
+diagnostic allocation, schema, Semantic ID, source span, runtime, bytecode, VM,
+ABI, filesystem/network behavior, or Unicode 17.0.0 data. Negotiation depends
+only on ordered client labels; conversion depends only on immutable source
+bytes, normalized lexical mapping, and the explicit selected encoding.
 
 ## Intentionally deferred
 
-The negotiation and source-map slices are complete. The parent `LSP-2102`
-remains deferred until the remaining transaction authority and fixtures exist;
-future work must continue deriving editor positions from the approved
-SourceMap, keep compiler byte spans authoritative, and avoid exposing
-document/snapshot state as Ling semantics.
+Incremental changes, document/snapshot identity, stale-result handling,
+diagnostic publication, navigation, completion, rename, code actions, semantic
+tokens, cancellation, Workspace Edits, Semantic Transactions, and Stable
+editor compatibility remain assigned to later execution-plan tasks.

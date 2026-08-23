@@ -6678,6 +6678,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0258"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0258-current-lsp-position-encoding-boundary.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Retain strict UTF-8/16/32 SourceMap round trips and failures across BOM, CRLF, Chinese text, emoji, combining marks, empty/final lines, invalid scalar boundaries, and UTF-16 surrogate interiors.",
+  "Retain initialize fixtures for ordered selection, unknown-label filtering, UTF-16 fallback, malformed metadata rejection before lifecycle transition, and exact selected-capability output.",
+  "Retain formatting, diagnostic projection, and position-edit tests proving every implemented position-bearing path consumes the shared typed conversion API.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, offline, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Accepts the existing DEC-0029/RFC-0004 implementation as the complete bounded LSP-2102 parent without changing any command, method, capability, field, error, frame, output byte, protocol marker, or stability level.",
+  "Changes no Ling semantics, diagnostics, schemas, Semantic IDs, spans, runtime, bytecode, VM, ABI, filesystem/network behavior, or Unicode 17.0.0 data.",
+]
+unresolved_alternatives = [
+  "Incremental synchronization, document/snapshot identity, stale results, diagnostic publication, navigation, completion, rename, code actions, semantic tokens, cancellation, Workspace Edits, Semantic Transactions, and Stable editor compatibility remain separately governed.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0027"
 kind = "RFC"
 status = "Accepted"

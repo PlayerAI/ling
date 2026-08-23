@@ -18,7 +18,7 @@
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 4 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
-| `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 4 |
+| `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
@@ -108,10 +108,10 @@
 - Writer policy: Emit only framed compact UTF-8 JSON-RPC responses for initialize and shutdown; preserve request IDs, flush each response, and write no unframed protocol bytes or human text to stdout.
 - Unknown-field policy: Unknown JSON-RPC object fields and ASCII transport headers are ignored for this Preview; unknown methods are rejected only when they are requests, and future incompatible fields require a new protocol version.
 - Migration tool: None; `ling.lsp.lifecycle/0.1` is current-writer-only and a future Stable/editor contract requires an accepted migration specification.
-- Authority: `RFC-0004`, `DEC-0029`, `DEC-0257`
-- Sources: [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0257-current-lsp-lifecycle-skeleton.md`](../decisions/0257-current-lsp-lifecycle-skeleton.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
-- Fixtures: [`crates/ling-lsp/tests/lifecycle.rs`](../../crates/ling-lsp/tests/lifecycle.rs), [`crates/ling-cli/tests/lsp.rs`](../../crates/ling-cli/tests/lsp.rs), [`tests/protocols/lsp-lifecycle/README.md`](../../tests/protocols/lsp-lifecycle/README.md), [`docs/status/LSP-2101-IMPLEMENTATION-REPORT.md`](../status/LSP-2101-IMPLEMENTATION-REPORT.md)
-- Notes: DEC-0257 accepts this RFC-0004 implementation as the complete bounded LSP-2101 parent. The Preview lifecycle covers initialize/initialized/shutdown/exit, position-encoding negotiation, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity; later methods retain independent authorities, while snapshots, cancellation, Workspace Edits, and Semantic Transactions remain deferred.
+- Authority: `RFC-0004`, `DEC-0029`, `DEC-0257`, `DEC-0258`
+- Sources: [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0257-current-lsp-lifecycle-skeleton.md`](../decisions/0257-current-lsp-lifecycle-skeleton.md), [`docs/decisions/0258-current-lsp-position-encoding-boundary.md`](../decisions/0258-current-lsp-position-encoding-boundary.md), [`crates/ling-source/src/position.rs`](../../crates/ling-source/src/position.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
+- Fixtures: [`crates/ling-source/src/position.rs`](../../crates/ling-source/src/position.rs), [`crates/ling-lsp/tests/lifecycle.rs`](../../crates/ling-lsp/tests/lifecycle.rs), [`crates/ling-lsp/tests/position_encoding.rs`](../../crates/ling-lsp/tests/position_encoding.rs), [`crates/ling-cli/tests/lsp.rs`](../../crates/ling-cli/tests/lsp.rs), [`tests/protocols/lsp-lifecycle/README.md`](../../tests/protocols/lsp-lifecycle/README.md), [`docs/status/LSP-2101-IMPLEMENTATION-REPORT.md`](../status/LSP-2101-IMPLEMENTATION-REPORT.md), [`docs/status/LSP-2102-IMPLEMENTATION-REPORT.md`](../status/LSP-2102-IMPLEMENTATION-REPORT.md)
+- Notes: DEC-0257 accepts the RFC-0004 lifecycle implementation as bounded LSP-2101; DEC-0258 accepts DEC-0029 source projection plus RFC-0004 initialize negotiation as bounded LSP-2102. The Preview lifecycle covers initialize/initialized/shutdown/exit, explicit UTF-8/16/32 selection, shared strict SourceMap conversion, bounded opaque workspace folders, deterministic bilingual JSON-RPC errors, and stdio purity; later methods retain independent authorities, while snapshots, cancellation, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
 
 ### `PROTO-LSP-OVERLAY` — Ling LSP Preview document overlay
 
