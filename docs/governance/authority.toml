@@ -3510,3 +3510,16 @@ covers = ["COMPAT-6501 bounded v0.0.1 Seed corpus freeze evidence", "canonical c
 depends_on = ["CONFORMANCE", "DEC-0001", "DEC-0002", "DEC-0012", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0231"
+title = "Current compiler compatibility-boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md"
+covers = ["COMPAT-6502 bounded current compiler compatibility evidence", "v0.0.1 AcceptUnchanged bound to the frozen Seed corpus and v0.1-v0.5 NoReleasedVersion non-claims", "internal drift gate without 1.0, warning, migration, rejection, N-1, or public matrix semantics"]
+depends_on = ["CONFORMANCE", "DEC-0001", "DEC-0002", "DEC-0012", "DEC-0230", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

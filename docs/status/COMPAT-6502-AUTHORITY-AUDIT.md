@@ -20,7 +20,10 @@ independently versioned Experimental protocols. It does not have an accepted
 1.0 compiler compatibility promise, a v0.1–v0.5 release corpus, a general
 migration transaction, or an N-1 reader policy. Implementing a matrix now
 would convert planning labels and Draft RFC material into compatibility
-commitments.
+commitments. Accepted `DEC-0231` now authorizes a bounded current-compiler
+matrix: v0.0.1 is accepted unchanged against the frozen Seed corpus, while
+v0.1-v0.5 are explicitly recorded as nonexistent releases rather than assigned
+invented compatibility outcomes.
 
 ## Normative traceability
 
@@ -82,7 +85,7 @@ It does not provide:
 Generated status or schema snapshots are not a compiler compatibility matrix;
 they must not be promoted by copying or relabeling them.
 
-## Required authority before implementation
+## Required authority for the blocked remainder
 
 An accepted 1.0 compatibility decision must define, at minimum:
 
@@ -118,5 +121,7 @@ Experimental/Preview/Future/Unsupported states.
 It deliberately adds no compatibility matrix, historical version claim,
 warning/rejection diagnostic, migration transaction, reader range, report
 schema, deprecation API, dependency, public protocol, or placeholder. Future
-implementation remains deferred until release authorities, outcome semantics,
-migration rules, and executable cross-version evidence are Accepted.
+The bounded `COMPAT-6502-CURRENT` child records only the current development
+compiler boundary. A 1.0 matrix remains deferred until release authorities,
+outcome semantics, migration rules, and executable cross-version evidence are
+Accepted.

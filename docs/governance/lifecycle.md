@@ -261,6 +261,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0228` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0228](../decisions/0228-registry-deferred-through-v1.md) |
 | `DEC-0229` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0229](../decisions/0229-local-supply-chain-attack-boundary-evidence.md) |
 | `DEC-0230` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0230](../decisions/0230-seed-historical-corpus-freeze-evidence.md) |
+| `DEC-0231` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0231](../decisions/0231-current-compiler-compatibility-boundary-evidence.md) |
 
 ## Migration boundary
 

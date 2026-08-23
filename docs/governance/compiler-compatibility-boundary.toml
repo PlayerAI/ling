@@ -1,0 +1,50 @@
+schema_version = 1
+authority = "DEC-0231"
+compiler_version = "0.0.1-dev"
+compiler_state = "Development"
+unicode_version = "17.0.0"
+report = "docs/governance/compiler-compatibility-boundary.md"
+seed_corpus_sha256 = "caafb863d530bddd7b22a2de4aa0a8db374bd46f407e602fa78276a126442cd8"
+verified_n_minus_one_edges = 0
+
+[[release]]
+id = "v0.0.1"
+outcome = "AcceptUnchanged"
+authority = "CONFORMANCE"
+reason = "The active Seed authority and frozen corpus provide executable unchanged-input evidence."
+evidence = ["tests/conformance", "docs/governance/seed-corpus-freeze.toml", "docs/SEED-TRACEABILITY.md"]
+
+[[release]]
+id = "v0.1"
+outcome = "NoReleasedVersion"
+authority = "DEC-0231"
+reason = "No Accepted v0.1 language release specification or historical corpus exists."
+evidence = ["docs/status/COMPAT-6502-AUTHORITY-AUDIT.md", "docs/governance/seed-corpus-freeze.toml"]
+
+[[release]]
+id = "v0.2"
+outcome = "NoReleasedVersion"
+authority = "DEC-0231"
+reason = "No Accepted v0.2 language release specification or historical corpus exists."
+evidence = ["docs/status/COMPAT-6502-AUTHORITY-AUDIT.md", "docs/governance/seed-corpus-freeze.toml"]
+
+[[release]]
+id = "v0.3"
+outcome = "NoReleasedVersion"
+authority = "DEC-0231"
+reason = "No Accepted v0.3 language release specification or historical corpus exists."
+evidence = ["docs/status/COMPAT-6502-AUTHORITY-AUDIT.md", "docs/governance/seed-corpus-freeze.toml"]
+
+[[release]]
+id = "v0.4"
+outcome = "NoReleasedVersion"
+authority = "DEC-0231"
+reason = "No Accepted v0.4 language release specification or historical corpus exists."
+evidence = ["docs/status/COMPAT-6502-AUTHORITY-AUDIT.md", "docs/governance/seed-corpus-freeze.toml"]
+
+[[release]]
+id = "v0.5"
+outcome = "NoReleasedVersion"
+authority = "DEC-0231"
+reason = "No Accepted v0.5 language release specification or historical corpus exists."
+evidence = ["docs/status/COMPAT-6502-AUTHORITY-AUDIT.md", "docs/governance/seed-corpus-freeze.toml"]

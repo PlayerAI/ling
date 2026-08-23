@@ -5913,3 +5913,30 @@ unresolved_alternatives = [
   "Accepted v0.1-v0.5 release inventories and artifacts; complete per-surface historical corpora; compatibility outcomes, readers, migrations, deprecations, provenance, rollback, and unavailable protocol fixtures remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0231"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify the current compiler/version state and Unicode version exactly.",
+  "Bind v0.0.1 AcceptUnchanged to the frozen Seed digest and CONFORMANCE authority.",
+  "Verify v0.1-v0.5 remain NoReleasedVersion in canonical order and cannot be relabeled as warning, migration, or rejection outcomes.",
+  "Require cargo xtask compatibility verify in the always-on CI contract.",
+  "Run corpus, traceability, schema compatibility, Seed reproduction, governance, status, workspace, lint, formatting, and offline gates.",
+]
+compatibility_impact = [
+  "Adds internal evidence and an explicit non-claim only; source, compiler, parser, resolver, evaluator, diagnostics, Semantic IDs, schemas, bytecode, package/lock, editors, CLI, dependencies, Unicode 17.0.0, and runtime behavior remain unchanged.",
+  "Adds no warning, migration, rejection, reader, N-1, 1.0, or public compatibility protocol.",
+]
+unresolved_alternatives = [
+  "An actual 1.0 compiler subject; released v0.1-v0.5 inputs; per-surface compatibility units; warning and suppression; semantic migration; actionable rejection diagnostics; rollback; N-1 readers; cross-platform evidence; and 1.x compatibility remain deferred.",
+]
+superseded_by = ""

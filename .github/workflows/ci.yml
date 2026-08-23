@@ -48,6 +48,7 @@ jobs:
             command: |
               cargo xtask traceability verify --release v0.0.1
               cargo xtask corpus verify
+              cargo xtask compatibility verify
           - name: support-matrix
             command: |
               cargo xtask support verify
