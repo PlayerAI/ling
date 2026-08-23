@@ -26,6 +26,13 @@ document's nine-row matrix and its explicit release-evidence guardrails. It
 does not promote `REL-6603`, the current controls, or any Covered row to a G6
 security sign-off.
 
+Accepted `DEC-0236` additionally closes only the bounded
+`REL-6603-UNSAFE-POLICY` child. The security verifier now parses the root and
+all declared member manifests, requires the exact workspace unsafe deny policy,
+and requires every current member to inherit it. This prevents workspace-member
+policy drift; it does not audit dependencies, generated macros, uncompiled
+targets, native code, or vulnerabilities and does not promote the parent.
+
 ## Normative traceability
 
 - `10-G6-V1.0-STABILIZATION.md:354-366` is a non-normative checklist. It does
@@ -52,9 +59,10 @@ controls, state, and release evidence. The executable Seed evidence includes
 workspace unsafe denial, bounded readers, symlink/path defenses, lock
 canonicality/transaction tests, capability enforcement, VM resource limits,
 locked offline metadata, and a passing workspace Clippy `-D warnings` gate.
-`cargo xtask security verify` checks only the deterministic row/state inventory
-and the policy phrases that keep missing threat-model and release evidence
-explicit.
+`cargo xtask security verify` checks the deterministic row/state inventory,
+the policy phrases that keep missing threat-model and release evidence
+explicit, and the bounded manifest-level unsafe-policy invariant authorized by
+DEC-0236.
 
 No `unsafe` Rust source, FFI implementation, remote transport, replay/evidence
 decoder, device runtime, or Zed binary updater is present. `cargo-audit` and

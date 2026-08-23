@@ -548,6 +548,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REL-6602-LOCK-PERSISTENCE` | G6 | Lock-persistence fault injection | S | Done | Accepted `DEC-0235`; see private `LockPersistence`, `cargo xtask fault verify`, and `docs/status/REL-6602-LOCK-PERSISTENCE-IMPLEMENTATION-REPORT.md`; OS crash durability and eight future/process scenarios remain BlockedSpec |
 | `REL-6603` | G6 | 安全审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:354`, `docs/status/REL-6603-AUTHORITY-AUDIT.md`, `docs/testing/SECURITY-AUDIT.md` |
 | `REL-6603-SEED` | G6 | Seed security-audit matrix drift gate | S | Done | Accepted DEC-0043; see `cargo xtask security verify` and `docs/status/REL-6603-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `REL-6603-UNSAFE-POLICY` | G6 | Workspace unsafe-policy drift gate | S | Done | Accepted `DEC-0236`; see `cargo xtask security verify` and `docs/status/REL-6603-UNSAFE-POLICY-IMPLEMENTATION-REPORT.md`; dependency/generated-code/cross-target audits and the parent gate remain BlockedSpec |
 | `REL-6604` | G6 | 性能基线 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:368`, `docs/status/REL-6604-AUTHORITY-AUDIT.md`, `docs/testing/PERFORMANCE-BASELINE.md` |
 | `REL-6604-SEED` | G6 | Seed performance-matrix drift gate | S | Done | Accepted DEC-0044; see `cargo xtask performance verify` and `docs/status/REL-6604-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `DOC-6701` | G6 | 正式文档集 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:391`, `docs/status/DOC-6701-AUTHORITY-AUDIT.md`, `docs/testing/DOCUMENTATION-INVENTORY.md` |

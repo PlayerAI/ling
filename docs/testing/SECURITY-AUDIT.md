@@ -10,7 +10,7 @@ claim, a third-party penetration test, or a release security sign-off.
 
 | Required audit surface | Current control / evidence | State | Deferred work |
 | --- | --- | --- | --- |
-| Rust `unsafe` | Workspace lint sets `unsafe_code = "deny"`; repository source has no Rust `unsafe` block. | Covered for current crates | Re-audit every new dependency and target-specific crate. |
+| Rust `unsafe` | Workspace lint sets `unsafe_code = "deny"`; every declared member inherits workspace lints, and `cargo xtask security verify` rejects policy, membership, path, manifest, or inheritance drift. | Covered for current crates | Re-audit dependencies, generated code, macros, and target-specific configurations; this is not a transitive-dependency or cross-target audit. |
 | FFI / Target Primitive TCB | No FFI or Target Primitive API is in the Seed workspace. | Deferred | Accepted FFI/TCB contract, isolation, ownership, ABI, and cross-target evidence. |
 | Deserializers | Source/manifest/lock/Audit/semantic/bytecode readers have size, depth, schema/version, unknown-field, canonical-byte, and bounded-diagnostic checks. | Covered for implemented schemas | Add every future reader only with an Accepted schema, malformed corpus, and resource limits. |
 | Package extraction / build sandbox | Project discovery rejects traversal, host-path forms, symlink escape/cycle/alias, and lock symlinks; package resolution is local and does not execute a build script. | Partial | Archive extraction policy, sandbox/capability model, quota, and hostile archive corpus. |
@@ -58,9 +58,14 @@ cargo xtask security verify
 ```
 
 The check validates the exact nine audit-surface rows, their current
-Covered/Partial/Deferred states, and the release-evidence guardrails. It only
-protects the audit inventory from documentation drift; it does not run an
-advisory scanner, inspect a remote service, or make a vulnerability-free claim.
+Covered/Partial/Deferred states, and the release-evidence guardrails. It also
+parses the root and all declared member manifests, requires the workspace
+`unsafe_code = "deny"` policy, rejects unsafe or wildcard member paths, and
+requires every member to inherit workspace lints. Compilation remains the Rust
+compiler's enforcement evidence; the manifest check prevents a new member from
+silently opting out. It does not audit dependencies or generated macro output,
+run an advisory scanner, inspect a remote service, cover uncompiled targets, or
+make a vulnerability-free claim.
 The required release evidence remains a threat model and trust-boundary
 inventory, accepted security decisions, deterministic hostile-input fixtures,
 reproducible advisory, license, SBOM, checksum, and provenance reports, and an

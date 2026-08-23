@@ -22,6 +22,32 @@ unresolved_alternatives = []
 superseded_by = ""
 
 [[record]]
+id = "DEC-0236"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0236-workspace-unsafe-policy-gate.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify the root workspace unsafe lint is exactly deny.",
+  "Verify every explicit workspace member path is safe and unique and every member manifest inherits workspace lints.",
+  "Reject representative empty, absolute, parent-traversing, wildcard, and normalized-parent paths.",
+  "Run security, xtask, governance, status, workspace, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds only an internal repository-policy drift check; Ling source/runtime semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI, editor integration, artifact formats, and Unicode 17.0.0 remain unchanged.",
+  "The existing nine-row security matrix and state counts remain unchanged; no security feature or release claim is added.",
+]
+unresolved_alternatives = [
+  "Dependency and license review; proc-macro/generated-source audit; cross-target compilation; native/FFI TCB policy; advisory/SBOM/provenance reports; independent review; threat modeling; and disclosure/response remain deferred.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0049"
 kind = "Decision"
 status = "Accepted"

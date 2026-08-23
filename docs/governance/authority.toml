@@ -28,6 +28,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "DEC-0236"
+title = "Workspace unsafe-policy gate"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0236-workspace-unsafe-policy-gate.md"
+covers = ["REL-6603 bounded workspace unsafe-policy drift evidence", "root unsafe_code=deny and declared-member lint-inheritance validation", "internal manifest gate without dependency, generated-code, cross-target, native, vulnerability, or G6 security claims"]
+depends_on = ["DEC-0043", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "DEC-0049"
 title = "Seed language-server discovery inventory gate"
 kind = "Decision"

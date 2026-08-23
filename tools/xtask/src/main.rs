@@ -870,11 +870,12 @@ fn main() -> ExitCode {
             match security::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "security matrix OK: {} surfaces ({} Covered, {} Partial, {} Deferred)",
+                        "security matrix OK: {} surfaces ({} Covered, {} Partial, {} Deferred); {} workspace members inherit unsafe_code=deny",
                         summary.surface_count,
                         summary.covered_count,
                         summary.partial_count,
-                        summary.deferred_count
+                        summary.deferred_count,
+                        summary.workspace_member_count
                     );
                     ExitCode::SUCCESS
                 }
