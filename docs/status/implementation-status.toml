@@ -24469,6 +24469,7 @@ spec = [
   "docs/decisions/0001-error-code-policy.md",
   "docs/decisions/0015-audit-source-format.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -24480,6 +24481,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/COMPAT-6501-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6501-SEED-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6501-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/governance/seed-corpus-freeze.toml",
+  "docs/governance/seed-corpus-freeze.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -24496,9 +24501,60 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "COMPAT-6501 is BlockedSpec because no accepted Seed-to-v0.5 version inventory, historical corpus manifest, compatibility matrix, or migration protocol exists; the plan's list includes Future/Unsupported surfaces.",
-  "The active conformance authority covers v0.0.1 only. RFC-0002 and the bytecode RFCs define their own versioned protocols but do not create a general release N-1 promise; RFC-0001 remains Draft.",
+  "Accepted DEC-0230 and child COMPAT-6501-SEED freeze the actual v0.0.1 conformance bytes only; they do not create v0.1-v0.5 history or a general release N-1 promise.",
   "SCHEMA-LIFECYCLE is Draft and existing schemas report NoPreviousVersion unless an explicit compatibility edge is registered; no historical corpus may be inferred from generated snapshots or editor evidence.",
-  "The audit changes no source, parser, resolver, evaluator, Semantic ID, diagnostic, schema, bytecode, package/lock, replay, evidence, editor, CLI, dependency, or public API and creates no stale zero surface.",
+  "The bounded child adds an internal content drift gate only; it changes no source, parser, resolver, evaluator, Semantic ID, diagnostic, schema, bytecode, package/lock, replay, evidence, editor, CLI, dependency, or public API and creates no stale zero surface.",
+]
+
+[[task]]
+id = "COMPAT-6501-SEED"
+title = "Seed historical-corpus freeze evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PKG-6404-LOCAL"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEED-TRACEABILITY.md",
+  "docs/decisions/0230-seed-historical-corpus-freeze-evidence.md",
+  "docs/status/COMPAT-6501-AUTHORITY-AUDIT.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "tools/xtask/src/historical_corpus.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/governance/seed-corpus-freeze.toml",
+  "docs/governance/seed-corpus-freeze.md",
+  "docs/status/COMPAT-6501-SEED-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6501-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0230 freezes exactly the active v0.0.1 tests/conformance corpus without manufacturing v0.1-v0.5 release history or compatibility semantics.",
+  "The manifest records 42 cases and 84 files plus a domain-separated SHA-256 over sorted canonical relative paths, path and content lengths, and original bytes; physical host paths and enumeration order do not affect the identity.",
+  "The verifier rejects non-directory/symlink cases, non-file/symlink entries, missing or extra case files, marker/count/digest/surface/evidence/report drift, and unreadable inputs.",
+  "All ten COMPAT-6501 surfaces have exact states: two SeedFrozen, one NotFrozen, four SeparateProtocol, and three Unavailable; separate protocols are not copied or reinterpreted as Seed history.",
+  "cargo xtask corpus verify is present in the always-on CI contract and its generated report matches the machine-readable manifest.",
+  "cargo test -p xtask --bin xtask --locked --offline passes with 144 tests.",
+  "cargo xtask traceability verify --release v0.0.1 passes with 42 fixtures and cargo xtask seed reproduce passes across eight independent processes.",
+  "workspace tests, clippy, CI, governance, status, formatting, and diff checks pass without adding a public protocol, schema, CLI, migration, diagnostic, or support claim.",
+]
+verified_against_commit = "80ea137740a23bd924fcf40234a5f9c95b21b940"
+completion_commit = "80ea137740a23bd924fcf40234a5f9c95b21b940"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Internal evidence under DEC-0230; parent COMPAT-6501 remains BlockedSpec until Accepted v0.1-v0.5 release inventories, original artifacts, and compatibility/migration oracles exist.",
+  "The canonical ling.seed-corpus-freeze/0 hash domain is test/governance evidence, not a public corpus protocol, Semantic ID, or compatibility identity.",
+  "SeparateProtocol rows retain their own RFC, schema, fixture, lifecycle, and support boundaries; NotFrozen and Unavailable are explicit non-claims.",
+  "No source, compiler, diagnostic, protocol, package, editor, CLI, dependency, Unicode, schema, or runtime behavior changed.",
 ]
 
 [[task]]

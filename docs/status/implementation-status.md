@@ -83,6 +83,7 @@
 | `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `CLI-1702` | `` |
 | `CLI-1706-HELP` | Truthful implemented-command help fixture | `G1` | `S` | `Done` | `CLI-1701-CATALOG`, `CLI-1702-EXIT` | `27c5f1d58a3add59abc87b0cf4dc29128d7be226` |
 | `COMPAT-6501` | Historical Corpus | `G6` | `L` | `BlockedSpec` | `PKG-6404` | `` |
+| `COMPAT-6501-SEED` | Seed historical-corpus freeze evidence | `G6` | `S` | `Done` | `PKG-6404-LOCAL` | `80ea137740a23bd924fcf40234a5f9c95b21b940` |
 | `COMPAT-6502` | 1.0 Compiler Compatibility Matrix | `G6` | `L` | `BlockedSpec` | `COMPAT-6501` | `` |
 | `COMPAT-6503` | Language Migration Tool | `G6` | `L` | `BlockedSpec` | `COMPAT-6502` | `` |
 | `COMPAT-6504` | Deprecation Policy | `G6` | `L` | `BlockedSpec` | `COMPAT-6503` | `` |
