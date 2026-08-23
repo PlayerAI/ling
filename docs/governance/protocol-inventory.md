@@ -53,10 +53,10 @@
 - Writer policy: Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines; non-LSP output follows DEC-0254 without changing machine schemas or exit classes; and lsp --stdio rejects output-policy flags and retains protocol-only framed output.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
-- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0028`, `DEC-0037`, `DEC-0038`, `DEC-0039`, `DEC-0253`, `DEC-0254`, `RFC-0004`, `RFC-0024`, `RFC-0025`
+- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0028`, `DEC-0037`, `DEC-0038`, `DEC-0039`, `DEC-0253`, `DEC-0254`, `DEC-0255`, `DEC-0256`, `RFC-0004`, `RFC-0024`, `RFC-0025`
 - Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0253-current-cli-command-model.md`](../decisions/0253-current-cli-command-model.md), [`docs/decisions/0254-cli-output-policy.md`](../decisions/0254-cli-output-policy.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/output_policy.rs`](../../crates/ling-cli/src/output_policy.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs)
 - Fixtures: [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/output_policy.rs`](../../crates/ling-cli/tests/output_policy.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/cli-output-policy/README.md`](../../tests/protocols/cli-output-policy/README.md), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
-- Notes: The compiler package version remains the broad CLI version. DEC-0253 accepts the current command model; DEC-0254 adds one non-LSP output policy while preserving command-specific schemas and exit classes.
+- Notes: The compiler package version remains the broad CLI version. DEC-0253 accepts the command model, DEC-0254 the output policy, DEC-0255 the initializer, and DEC-0256 the standalone/project test-mode composition while preserving command-specific schemas and exits.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 
@@ -157,10 +157,10 @@
 - Writer policy: On discovery success, emit exactly one report with the requested root operand, sorted logical .ling test names, captured stdout, and total/passed/failed counts; compilation and runtime diagnostics remain Diagnostic JSON on stderr.
 - Unknown-field policy: Reject unknown core fields; project-test, source-declaration, or report extensions require a new accepted decision and protocol version.
 - Migration tool: None; ling.test/0.1 is current-writer-only.
-- Authority: `DEC-0039`, `DEC-0003`, `DEC-0013`
-- Sources: [`docs/decisions/0039-cli-test-file-runner.md`](../decisions/0039-cli-test-file-runner.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/test_runner.rs`](../../crates/ling-cli/src/test_runner.rs)
+- Authority: `DEC-0039`, `DEC-0254`, `DEC-0256`, `DEC-0003`, `DEC-0013`
+- Sources: [`docs/decisions/0039-cli-test-file-runner.md`](../decisions/0039-cli-test-file-runner.md), [`docs/decisions/0256-current-test-command.md`](../decisions/0256-current-test-command.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/test_runner.rs`](../../crates/ling-cli/src/test_runner.rs)
 - Fixtures: [`crates/ling-cli/tests/test.rs`](../../crates/ling-cli/tests/test.rs), [`schemas/test/0.1/schema.json`](../../schemas/test/0.1/schema.json), [`schemas/test/0.1/valid`](../../schemas/test/0.1/valid), [`schemas/test/0.1/invalid`](../../schemas/test/0.1/invalid), [`tests/protocols/test/README.md`](../../tests/protocols/test/README.md)
-- Notes: This is an explicit standalone-file runner. It does not define test syntax, manifest targets, workspace selection, filtering, assertions, snapshots, property tests, parallelism, or cancellation.
+- Notes: This remains the explicit standalone report; DEC-0256 composes it with RFC-0025 project smoke-test behavior without merging schemas or defining test syntax, manifest targets, workspaces, filters, assertions, snapshots, property tests, parallelism, or cancellation.
 
 ### `PROTO-DIAGNOSTIC-JSON` — Structured bilingual Diagnostic JSON
 

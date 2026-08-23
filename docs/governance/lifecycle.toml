@@ -6624,3 +6624,29 @@ unresolved_alternatives = [
   "Force/reuse modes, selectable templates, custom versions, workspaces, dependencies, editor files, ambient discovery, and Stable scaffold compatibility remain separately governed.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0256"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0256-current-test-command.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Retain sorted standalone selection, checked execution, capture, aggregation, empty-selection, failure-precedence, and schema fixtures.",
+  "Retain locked/offline project selection, single root-entry identity, capture, failure, path-free output, and nonmutation fixtures.",
+  "Verify mixed/incomplete modes fail with exit 2 and output policy changes no selection, machine report, or exit.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Accepts the current standalone and project smoke-test modes without changing commands, schemas, report fields, diagnostics, exits, or selection.",
+  "Changes no source syntax, type, Effect, Checked Core, Semantic ID, span, runtime, bytecode, VM, ABI, offline determinism, or Unicode 17.0.0 behavior.",
+]
+unresolved_alternatives = [
+  "Test declarations, manifest targets, workspaces, filters, assertions, snapshots, property tests, parallelism, cancellation, coverage, benchmarks, and Stable compatibility remain separately governed.",
+]
+superseded_by = ""

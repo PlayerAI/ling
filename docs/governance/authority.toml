@@ -3861,3 +3861,16 @@ covers = ["CLI-1703 current offline project initializer closure", "RFC-0002 mani
 depends_on = ["RFC-0002", "DEC-0038", "DEC-0253", "DEC-0254", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0256"
+title = "Current test command"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0256-current-test-command.md"
+covers = ["CLI-1704 standalone and explicit project test-mode composition", "deterministic checked program and root-entry smoke-test conventions", "absence of inferred source test syntax and hidden project/workspace selection"]
+depends_on = ["DEC-0039", "RFC-0025", "DEC-0253", "DEC-0254", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

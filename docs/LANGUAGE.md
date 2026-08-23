@@ -1334,6 +1334,12 @@ offline and failure-atomically. Template version remains `ling.init/0.1` report
 metadata rather than an unregistered manifest-v1 field; editor task files are
 not generated without their own Accepted schema.
 
+Accepted DEC-0256 fixes the current `ling test` boundary. A positional `.ling`
+file or directory selects deterministic standalone-program tests; an explicit
+`--manifest-path ... --locked --offline` selects one isolated root-project
+entry smoke test. No source test declaration, annotation, hidden convention,
+workspace selection, or dependency test execution is implied.
+
 Accepted RFC-0026 adds bounded editor formatting to `ling lsp --stdio`:
 `textDocument/formatting` consumes the current open writable overlay and returns
 zero or one whole-document `TextEdit` using the negotiated position encoding.
