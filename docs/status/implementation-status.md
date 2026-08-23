@@ -489,6 +489,7 @@
 | `TRAIT-1306` | Trait Checked Core dictionary witnesses | `G1` | `M` | `Done` | `TRAIT-1305` | `bfd00305473363c03286c2e0dbd060d7d136a95d` |
 | `TRAIT-1307` | Trait interpreter and VM dictionary lowering | `G1` | `L` | `Done` | `TRAIT-1306` | `0dfb8d5c2d862143b9f91f0f88f2f47635a8cda5` |
 | `TRAIT-1308` | Trait IDE support | `G1` | `L` | `BlockedSpec` | `TRAIT-1307` | `` |
+| `TRAIT-1308-CURRENT-EVIDENCE` | Current Trait IDE boundary evidence | `G1` | `S` | `Done` | `TRAIT-1308-PROJECTION`, `TRAIT-1308-QUERY` | `bd1a88ced6dddb69e4708f0bc567cdee32963228` |
 | `TRAIT-1308-PROJECTION` | Trait Semantic Graph projection | `G1` | `M` | `Done` | `TRAIT-1307` | `61ea00d8c19c6c5caa51461d4cffb8d2993e59d0` |
 | `TRAIT-1308-QUERY` | Trait projection read-only lookups | `G1` | `S` | `Done` | `TRAIT-1308-PROJECTION` | `feb2be24fc78abc73010f283e830d3844f49b303` |
 | `TRAIT-1309` | Trait solver performance and termination | `G1` | `M` | `BlockedSpec` | `TRAIT-1308` | `` |

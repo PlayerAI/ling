@@ -7,6 +7,8 @@ Accepted DEC-0251. `cargo xtask trait-ide verify` composes the RFC-0022
 projection and DEC-0059 lookup evidence while enforcing the six unresolved
 public editor surfaces. Parent `TRAIT-1308` remains `BlockedSpec`.
 
+Implementation commit: `bd1a88ced6dddb69e4708f0bc567cdee32963228`.
+
 ## Normative clauses covered
 
 - Accepted RFC-0022 §§1–8 govern the optional Experimental

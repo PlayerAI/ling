@@ -27064,6 +27064,9 @@ spec = [
 artifacts = [
   "docs/status/TRAIT-1308-AUTHORITY-AUDIT.md",
   "docs/status/TRAIT-1308-PROJECTION-IMPLEMENTATION-REPORT.md",
+  "docs/status/TRAIT-1308-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/testing/TRAIT-IDE-STATUS.md",
+  "tools/xtask/src/trait_ide_status.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -27072,6 +27075,7 @@ acceptance = [
   "The audit covers hover, go-to implementation/trait, completion, identity-preserving rename, safe constraint repairs, position/version/transaction behavior, and required deterministic editor fixtures.",
   "No IDE adapter, LSP request/response method, diagnostic allocation, placeholder repair, or Stable 1.0 editor claim is added while the remaining authorities and fixtures are absent.",
   "The completed child projection consumes the approved immutable witness and does not re-run Trait selection; the parent remains blocked for the full editor surface.",
+  "The DEC-0251 current-surface gate composes the projection and lookup children while preserving six BlockedSpec public editor surfaces and the blocked parent state.",
 ]
 verified_against_commit = ""
 completion_commit = ""
@@ -27179,6 +27183,59 @@ completed = "2026-08-22"
 notes = [
   "The lookup boundary consumes the immutable x-ling-trait-ide records and does not rerun Trait selection.",
   "Methods are in-process only; protocol, transaction, diagnostic, rename, repair, and Stable 1.0 editor behavior remain deferred to TRAIT-1308.",
+]
+
+[[task]]
+id = "TRAIT-1308-CURRENT-EVIDENCE"
+title = "Current Trait IDE boundary evidence"
+state = "Done"
+release = "G1"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["TRAIT-1308-PROJECTION", "TRAIT-1308-QUERY"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/RFC-0005.md",
+  "docs/RFC-0022.md",
+  "docs/decisions/0059-trait-ide-projection-lookups.md",
+  "docs/decisions/0251-current-trait-ide-surface-evidence.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "tools/xtask/src/trait_ide_status.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/testing/TRAIT-IDE-STATUS.md",
+  "docs/decisions/0251-current-trait-ide-surface-evidence.md",
+  "docs/status/TRAIT-1308-AUTHORITY-AUDIT.md",
+  "docs/status/TRAIT-1308-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0251 authorizes only a deterministic, read-only, offline inventory gate over the completed TRAIT-1308 projection and lookup children; it adds no Trait or editor behavior.",
+  "cargo xtask trait-ide verify enforces exactly one Experimental projection, one Internal lookup boundary, six BlockedSpec public editor surfaces, seven evidence files, and three parent/child task states.",
+  "Focused tests reject matrix-state drift, parent promotion, missing child status, and missing evidence; the gate is present in the always-on governance-authority CI contract.",
+  "Parent TRAIT-1308 remains BlockedSpec for hover, navigation requests, completion, rename, diagnostics, repairs, document positions/versions, Workspace Edits, Semantic Transactions, and Stable compatibility.",
+  "No language semantics, public diagnostics, core schemas, Semantic IDs, protocol states, dependencies, CLI/LSP/DAP/runtime behavior, bytecode, VM, ABI, Unicode 17.0.0 data, network behavior, or public APIs change.",
+]
+verified_against_commit = "bd1a88ced6dddb69e4708f0bc567cdee32963228"
+completion_commit = "bd1a88ced6dddb69e4708f0bc567cdee32963228"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "This child closes only the current-evidence composition authorized by DEC-0251; it does not close or narrow the unresolved TRAIT-1308 parent scope.",
+  "The implementation commit passed focused semantic projection tests plus workspace, Clippy, CI, governance, support, status, traceability, formatting, offline, and diff gates before binding.",
 ]
 
 [[task]]
