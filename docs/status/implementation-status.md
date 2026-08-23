@@ -425,6 +425,7 @@
 | `STAB-6102` | Remove False Entry Points | `G6` | `L` | `BlockedSpec` | `STAB-6101` | `` |
 | `STAB-6102-OBSERVATION` | Internal False-Entry-Point Audit boundary evidence | `G6` | `S` | `Done` | `STAB-6101-OBSERVATION` | `5e3e93586768b10ad2e11805538a17c5cfcb0e7b` |
 | `STAB-6103` | Feature State Metadata | `G6` | `L` | `BlockedSpec` | `STAB-6102` | `` |
+| `STAB-6103-OBSERVATION` | Internal Feature-State Metadata boundary evidence | `G6` | `S` | `Done` | `STAB-6102-OBSERVATION` | `ff9d77c8c6deba2b5e524e473d3fc1360c6d3c44` |
 | `STD-6301` | Stable Standard Library Audit | `G6` | `L` | `BlockedSpec` | `PROTO-6204` | `` |
 | `STD-6302` | Remove Convenience APIs | `G6` | `L` | `BlockedSpec` | `STD-6301` | `` |
 | `STD-6303` | Unicode and Chinese-Programming Stability | `G6` | `L` | `BlockedSpec` | `STD-6302` | `` |

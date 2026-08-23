@@ -23211,6 +23211,67 @@ notes = [
 ]
 
 [[task]]
+id = "STAB-6103-OBSERVATION"
+title = "Internal Feature-State Metadata boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["STAB-6102-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/IMPLEMENTATION.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0217-false-entry-point-audit-boundary-evidence.md",
+  "docs/decisions/0218-feature-state-metadata-boundary-evidence.md",
+  "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/status/implementation-status.toml",
+  "tests/fixtures/status/feature-state.governance.json",
+]
+artifacts = [
+  "crates/ling-types/tests/feature_state_metadata_evidence.rs",
+  "tools/xtask/src/status.rs",
+  "docs/decisions/0218-feature-state-metadata-boundary-evidence.md",
+  "docs/status/STAB-6103-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/STAB-6103-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0218 authorizes only internal/test Feature-State Metadata boundary evidence; no public schema, lifecycle, command, consumer, diagnostic, compatibility promise, or support transition is defined.",
+  "The test-local inventory covers sixty identity, state, lifecycle, consumer, compatibility, and evidence boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "The status validator keeps Unavailable/Partial/Implemented separate from Experimental/Preview/Stable/Deprecated/Removed and rejects cross-domain values.",
+  "The generated ling.governance.feature-state-fixture/1 remains implemented=false and public_contract=false; ling support --format json remains proposed and unimplemented.",
+  "cargo test -p ling-types --test feature_state_metadata_evidence --locked --offline passes.",
+  "cargo test -p xtask status::tests --locked --offline passes.",
+  "cargo clippy -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "cargo xtask support verify and cargo xtask status verify pass without changing public claims.",
+]
+verified_against_commit = "ff9d77c8c6deba2b5e524e473d3fc1360c6d3c44"
+completion_commit = "ff9d77c8c6deba2b5e524e473d3fc1360c6d3c44"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Internal/test-only under DEC-0218; STAB-6103 remains BlockedSpec for public identities, lifecycle transitions, schema/version, consumer contracts, diagnostics, compatibility/migration, and release evidence.",
+  "No language semantics, feature state, support claim, CLI/build/package/LSP/Zed surface, diagnostic, protocol, schema, dependency, Semantic ID, source-span, or Unicode behavior changed.",
+]
+
+[[task]]
 id = "PROTO-6201"
 title = "Protocol Registry"
 state = "BlockedSpec"
