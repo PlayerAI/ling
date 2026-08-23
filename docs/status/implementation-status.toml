@@ -4057,6 +4057,55 @@ notes = [
 ]
 
 [[task]]
+id = "RC-6902-CURRENT-EVIDENCE"
+title = "Current RC1 RC0/Zed boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["RC-6901-CURRENT-EVIDENCE", "RC-6902-SEED", "ZED-6803-CURRENT-EVIDENCE"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0053-seed-rc1-public-validation-inventory-gate.md",
+  "docs/decisions/0243-current-zed-acceptance-evidence.md",
+  "docs/decisions/0245-current-rc0-registry-evidence.md",
+  "docs/decisions/0246-current-rc1-boundary-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/testing/RC0-INTERNAL-FREEZE.md",
+  "docs/testing/RC1-PUBLIC-VALIDATION.md",
+  "docs/testing/ZED-EXTENSION-ACCEPTANCE.md",
+  "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "tools/xtask/src/rc1_validation.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/g0.rs",
+  "tools/xtask/src/governance.rs",
+  "tools/xtask/src/lifecycle.rs",
+  "docs/testing/RC1-PUBLIC-VALIDATION.md",
+  "docs/status/RC-6902-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask rc1 verify composes the current RC0 and Zed acceptance verifiers and retains nine exact RC1 states and eight linked audits.",
+  "The Zed row accurately records the source-built ling lsp --stdio Preview server and current grammar/LSP/position prerequisites while keeping the absent Zed extension Unsupported.",
+  "A focused negative test rejects missing current LSP/Zed/RC0 markers with GOV-RC1-VALIDATION-0011.",
+  "Focused RC1/RC0/Zed checks plus workspace, CI, governance, support, status, traceability, formatting, lint, deterministic, and offline gates pass.",
+  "No public validation, Zed extension, acquisition, artifact, support promotion, migration, issue mutation, network request, or system change is created.",
+]
+verified_against_commit = "554005ef1eea6ab738a5b62657fdb9a5c3599ace"
+completion_commit = "554005ef1eea6ab738a5b62657fdb9a5c3599ace"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "RC-6902 remains BlockedSpec for RC0/G1-G5 exits, artifacts/acquisition, security attestations, clean install, Zed packaging, release samples, migration, issue intake, schema-reset change control, independent verification, and public approval.",
+  "This child corrects and composes internal evidence only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP/runtime behavior, Unicode, protocol states, support states, and public APIs are unchanged.",
+]
+
+[[task]]
 id = "RC-6902"
 title = "RC1 Public Validation"
 state = "BlockedSpec"
@@ -4064,7 +4113,7 @@ release = "G6"
 size = "L"
 owner = "Codex"
 branch = "main"
-depends_on = ["RC-6901"]
+depends_on = ["RC-6901", "RC-6902-CURRENT-EVIDENCE"]
 spec = [
   "AGENTS.md",
   "docs/ROADMAP-1.0.md",
@@ -4073,6 +4122,7 @@ spec = [
   "docs/governance/support-matrix.toml",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
+  "docs/decisions/0246-current-rc1-boundary-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/COMPAT-6502-AUTHORITY-AUDIT.md",
@@ -4083,6 +4133,7 @@ spec = [
   "docs/status/PKG-6403-AUTHORITY-AUDIT.md",
   "docs/status/PKG-6404-AUTHORITY-AUDIT.md",
   "docs/status/RC-6901-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6801-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6802-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6803-AUTHORITY-AUDIT.md",
@@ -4094,6 +4145,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/RC-6902-AUTHORITY-AUDIT.md",
+  "docs/status/RC-6902-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
   "docs/testing/RC1-PUBLIC-VALIDATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
@@ -4111,7 +4163,7 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "RC-6902 is BlockedSpec because RC0/G1-G5 exits, candidate-bound artifacts, acquisition and installation authority, public Zed packaging, general migration policy, issue templates, and schema-reset workflow are absent.",
-  "The current repository has 21 non-Stable protocol records, a 1.0-draft support matrix, Tier2 CI host evidence without release artifacts, and v0.0.1 Seed examples/build reports; none constitute RC1 public validation.",
+  "The current repository has 27 non-Stable protocol records, a source-built Preview LSP server but no Zed extension, a 1.0-draft support matrix, Tier2 CI host evidence without release artifacts, and v0.0.1 Seed examples/build reports; none constitute RC1 public validation.",
   "The authority audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, release tag, or public API and performs no external network/system mutation.",
 ]
 
