@@ -150,6 +150,7 @@
 | `EVD-5802` | Independent Verifier | `G5` | `L` | `BlockedSpec` | `EVD-5801` | `` |
 | `EVD-5802-OBSERVATION` | Internal Independent Evidence Verifier boundary evidence | `G5` | `S` | `Done` | `EVD-5801-OBSERVATION` | `4da432f6e872d3a66f387108d8e672e826ecf10b` |
 | `EVD-5803` | Reproducible Build Binding | `G5` | `M` | `BlockedSpec` | `EVD-5802` | `` |
+| `EVD-5803-OBSERVATION` | Internal Reproducible Build Binding boundary evidence | `G5` | `S` | `Done` | `EVD-5802-OBSERVATION` | `cb4ff8a861327d616aef6cd3b210e41da347800e` |
 | `EVD-5804` | AI Provenance | `G5` | `M` | `BlockedSpec` | `EVD-5803` | `` |
 | `FFI-3601` | FFI declaration model | `G3` | `M` | `BlockedSpec` | `BACK-3505` | `` |
 | `FFI-3601-OBSERVATION` | Internal FFI declaration boundary evidence | `G3` | `S` | `Done` | `BACK-3505-OBSERVATION` | `d254184a0f8a3e123e746c1c2f34973756ff6ba0` |
