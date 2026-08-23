@@ -3848,3 +3848,16 @@ covers = ["CLI-1702 unified non-LSP output policy", "bilingual human language or
 depends_on = ["DEC-0003", "DEC-0013", "DEC-0037", "DEC-0253", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0255"
+title = "Current project initialization command"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0255-current-project-initialization-command.md"
+covers = ["CLI-1703 current offline project initializer closure", "RFC-0002 manifest and lock composition with failure-atomic publication", "rejection of stale manifest-template and unregistered optional editor-file assumptions"]
+depends_on = ["RFC-0002", "DEC-0038", "DEC-0253", "DEC-0254", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

@@ -1328,6 +1328,12 @@ parser/dispatcher and reuse the accepted checked service boundaries. Draft
 commands such as `explain`, `query`, and `patch` remain unimplemented and are
 not advertised.
 
+Accepted DEC-0255 fixes the current `ling init` boundary: it creates a missing
+destination with `.gitignore`, `ling.toml`, `src/Main.ling`, and `ling.lock`
+offline and failure-atomically. Template version remains `ling.init/0.1` report
+metadata rather than an unregistered manifest-v1 field; editor task files are
+not generated without their own Accepted schema.
+
 Accepted RFC-0026 adds bounded editor formatting to `ling lsp --stdio`:
 `textDocument/formatting` consumes the current open writable overlay and returns
 zero or one whole-document `TextEdit` using the negotiated position encoding.

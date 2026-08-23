@@ -144,10 +144,10 @@
 - Writer policy: On success, emit exactly one report with the requested directory operand, fixed template version 1, package coordinates, and the sorted four-file scaffold list; failures remain Diagnostic JSON on stderr.
 - Unknown-field policy: Reject unknown core fields; incompatible template or output changes require a new protocol version and accepted decision.
 - Migration tool: None; ling.init/0.1 is current-writer-only.
-- Authority: `DEC-0038`, `RFC-0002`, `DEC-0003`, `DEC-0013`
-- Sources: [`docs/decisions/0038-cli-init-command.md`](../decisions/0038-cli-init-command.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/init.rs`](../../crates/ling-cli/src/init.rs)
+- Authority: `DEC-0038`, `DEC-0254`, `DEC-0255`, `RFC-0002`, `DEC-0003`, `DEC-0013`
+- Sources: [`docs/decisions/0038-cli-init-command.md`](../decisions/0038-cli-init-command.md), [`docs/decisions/0255-current-project-initialization-command.md`](../decisions/0255-current-project-initialization-command.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/init.rs`](../../crates/ling-cli/src/init.rs)
 - Fixtures: [`crates/ling-cli/tests/init.rs`](../../crates/ling-cli/tests/init.rs), [`tests/protocols/init/README.md`](../../tests/protocols/init/README.md), [`schemas/init/0.1/schema.json`](../../schemas/init/0.1/schema.json), [`schemas/init/0.1/valid`](../../schemas/init/0.1/valid), [`schemas/init/0.1/invalid`](../../schemas/init/0.1/invalid)
-- Notes: The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated.
+- Notes: DEC-0255 accepts the existing four-file offline scaffold as complete CLI-1703. The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated.
 
 ### `PROTO-CLI-TEST` — Ling explicit test-file runner report
 

@@ -18,10 +18,10 @@ writer_policy = "On success, emit exactly one report with the requested director
 unknown_field_policy = "Reject unknown core fields; incompatible template or output changes require a new protocol version and accepted decision."
 migration_tool = "None; ling.init/0.1 is current-writer-only."
 fixtures = ["crates/ling-cli/tests/init.rs", "tests/protocols/init/README.md", "schemas/init/0.1/schema.json", "schemas/init/0.1/valid", "schemas/init/0.1/invalid"]
-sources = ["docs/decisions/0038-cli-init-command.md", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/init.rs"]
+sources = ["docs/decisions/0038-cli-init-command.md", "docs/decisions/0255-current-project-initialization-command.md", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/init.rs"]
 version_markers = ["ling.init/0.1", "ling init"]
-authority = ["DEC-0038", "RFC-0002", "DEC-0003", "DEC-0013"]
-notes = ["The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated."]
+authority = ["DEC-0038", "DEC-0254", "DEC-0255", "RFC-0002", "DEC-0003", "DEC-0013"]
+notes = ["DEC-0255 accepts the existing four-file offline scaffold as complete CLI-1703. The report template version is metadata and does not add an unregistered field to RFC-0002's ling.toml manifest-v1 shape; no .zed or overwrite mode is generated."]
 
 [[protocol]]
 id = "PROTO-CLI-TEST"
