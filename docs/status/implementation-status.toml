@@ -5068,7 +5068,7 @@ notes = [
 [[task]]
 id = "CLI-1702"
 title = "CLI output and exit behavior"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -5082,32 +5082,48 @@ spec = [
   "docs/ERROR-CODES.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0037-cli-internal-exit-catalog-boundary.md",
+  "docs/decisions/0253-current-cli-command-model.md",
+  "docs/decisions/0254-cli-output-policy.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/src/output_policy.rs",
+  "crates/ling-cli/tests/output_policy.rs",
+  "crates/ling-diagnostics/src/lib.rs",
+  "docs/decisions/0254-cli-output-policy.md",
   "docs/status/CLI-1702-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1702-IMPLEMENTATION-REPORT.md",
   "docs/status/CLI-1702-EXIT-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/cli-output-policy/README.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the accepted human/JSON and exit-code subset and distinguishes it from unaccepted language, color, quiet/verbose, and future-command output extensions.",
-  "The missing localization, TTY/color, event-level, stdout/stderr, per-command failure, schema, and fixture contracts are identified with direct authority references.",
-  "Accepted DEC-0037 closes only the internal exit-code catalog child; the parent remains blocked for public output/failure behavior.",
-  "No flag, exit class, diagnostic allocation, output schema, ANSI policy, or localization behavior is added while the command contracts and fixtures are absent.",
-  "The future implementation must preserve stable diagnostic identity, source spans, Semantic IDs, and program Fault semantics while adding only registered options.",
+  "Accepted DEC-0254 defines one immutable output policy for every current non-LSP command with exact format, language, color, and verbosity defaults and values.",
+  "Human diagnostics retain both languages in selectable order; ANSI is confined to human diagnostic stderr, and JSON remains byte-independent of language and ANSI-free.",
+  "Quiet suppresses only auxiliary successful human summaries, while verbose emits exactly one deterministic bilingual path-free policy event before dispatch; program output and every failure remain visible.",
+  "The LSP stdio launcher rejects every output-policy option, and all rendering choices preserve the DEC-0013/DEC-0037 exit classes including reserved exit 3.",
+  "Focused unit/process tests and repository-wide offline tests, Clippy, CI, governance, support, status, RC0, traceability, formatting, and deterministic-diff gates pass without a schema, diagnostic-code, Semantic-ID, span, runtime, or Unicode change.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "f0e45f3c880a85492be351f4f6d2f53b48f0f05d"
+completion_commit = "f0e45f3c880a85492be351f4f6d2f53b48f0f05d"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "CLI-1702 is BlockedSpec downstream of CLI-1701 and the project/formatter CLI gates; DEC-0037 is internal only and the current PROTO-CLI-EXIT/DEC-0013 behavior remains unchanged.",
-  "The current Seed subset already supports human/JSON rendering and stable exit classes; the catalog is not wired as a future command contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit: f0e45f3c880a85492be351f4f6d2f53b48f0f05d (`feat(cli): unify output policy`).",
+  "Verified with exact parser/renderer tests, process-level output-policy tests, all workspace targets, Clippy with warnings denied, and CI/governance/support/status/RC0/traceability/formatting/diff gates; the final status-bound full gate is recorded by the following status commit.",
+  "Localized help grammar, locale inference, themes, progress/tracing, future command output, shell completion, and Stable byte compatibility remain intentionally deferred.",
 ]
 
 [[task]]
