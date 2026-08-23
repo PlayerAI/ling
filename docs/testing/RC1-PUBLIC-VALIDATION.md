@@ -1,6 +1,6 @@
 # RC-6902 RC1 Public Validation
 
-Status: `BlockedSpec` (2026-08-22). This is a public-validation readiness
+Status: `BlockedSpec` (2026-08-23). This is a public-validation readiness
 matrix, not a public release, download page, installation protocol, or
 compatibility promise.
 
@@ -21,7 +21,7 @@ it is not promoted to RC1 or Stable 1.0 support.
 | Checksums, SBOM, provenance | The security audit records no completed advisory/license scan, SBOM, provenance format, or signing root. | BlockedSpec | Versioned checksum/signature, SBOM, license, provenance, and verification fixtures. |
 | Clean install | `UNSUP-PACKAGES` keeps publication, registry installation, and CLI project installation outside the supported surface; no installer or package archive exists. | Unsupported | Accepted acquisition/install contract, clean-root fixture, rollback, and failure diagnostics. |
 | Offline locked build | The v0.0.1 Seed report and current locked offline gates provide compiler evidence; they do not build a public RC1 artifact from a candidate manifest. | Partial Seed evidence | Candidate-tag locked build, dependency/cache policy, artifact verification, and repeatable clean environment. |
-| Zed extension | ZED-6801 through ZED-6804 document grammar-only/editor evidence and no LSP executable, extension package, or debugger integration. | Unsupported | Accepted editor protocol, extension artifact, package metadata, install test, and compatibility suite. |
+| Zed extension | A source-built `ling lsp --stdio` Preview server exists and current grammar/LSP/position prerequisites pass, but no Zed extension manifest, package, acquisition flow, or debugger integration exists. | Unsupported | Accepted editor protocol, extension artifact, package metadata, install test, and compatibility suite. |
 | Sample projects | Existing examples and project fixtures exercise the Seed subset, including bilingual tutorials; no 1.0 profile/support matrix admits them as release samples. | Partial Seed evidence | Versioned sample manifest, expected outputs/diagnostics, supported-host matrix, and clean/offline runs. |
 | Migration test | COMPAT-6502 through COMPAT-6504 remain blocked; RFC-0002 covers only bounded manifest/lock evolution, not a general 1.0 source/protocol migration. | BlockedSpec | Accepted source/schema versions, migration tool/report, rollback, diagnostics, and positive/negative fixtures. |
 | Issue templates | `.github/pull_request_template.md` exists, but no repository issue-template set or RC1 support/security/migration intake contract exists. | Partial repository hygiene | Versioned issue forms/templates, required reproduction/security fields, ownership, and disclosure routing. |
@@ -42,7 +42,8 @@ cargo run -p xtask --locked --offline -- traceability verify --release v0.0.1
 
 `cargo xtask rc1 verify` deterministically checks the exact nine criteria,
 their `BlockedSpec`, `Unsupported`, and partial Seed/repository states, the
-no-publication boundary, and eight linked audit-marker files. It is an
+no-publication boundary, eight linked audit-marker files, the current Zed
+acceptance gate, and the current RC0 gate. RC0 remains `BlockedSpec`. It is an
 inventory check only; it does not publish, download, install, sign, migrate,
 or otherwise establish public RC1 support.
 

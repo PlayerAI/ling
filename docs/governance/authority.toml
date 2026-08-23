@@ -3705,3 +3705,16 @@ covers = ["RC-6901 bounded current status/protocol registry evidence", "composed
 depends_on = ["DEC-0052", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0246"
+title = "Current RC1 boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0246-current-rc1-boundary-evidence.md"
+covers = ["RC-6902 bounded current RC0/Zed boundary evidence", "corrected source-built Preview LSP fact and composed current upstream gates", "internal evidence without Zed extension, public validation, artifact/acquisition, support promotion, or G6 completion claims"]
+depends_on = ["DEC-0053", "DEC-0243", "DEC-0245", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

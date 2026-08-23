@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+use crate::{rc0_freeze, zed_extension};
+
 const MATRIX_PATH: &str = "docs/testing/RC1-PUBLIC-VALIDATION.md";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -107,6 +109,7 @@ pub struct CheckSummary {
     pub unsupported_count: usize,
     pub partial_count: usize,
     pub audit_file_count: usize,
+    pub current_evidence_gate_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -117,6 +120,13 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_audits(root));
+    if let Err(upstream_errors) = rc0_freeze::check_repository(root) {
+        errors.extend(upstream_errors);
+    }
+    if let Err(upstream_errors) = zed_extension::check_repository(root) {
+        errors.extend(upstream_errors);
+    }
+    errors.extend(validate_current_evidence(&matrix));
     finish(errors).map(|()| CheckSummary {
         criterion_count: CRITERIA.len(),
         blocked_count: count_state("BlockedSpec"),
@@ -126,7 +136,26 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
             .filter(|criterion| criterion.state.starts_with("Partial"))
             .count(),
         audit_file_count: REQUIRED_AUDIT_MARKERS.len(),
+        current_evidence_gate_count: 2,
     })
+}
+
+fn validate_current_evidence(matrix: &str) -> Vec<String> {
+    const REQUIRED: &[&str] = &[
+        "A source-built `ling lsp --stdio` Preview server exists",
+        "no Zed extension manifest, package, acquisition flow, or debugger integration exists",
+        "RC0 remains `BlockedSpec`",
+    ];
+    let normalized = normalize(matrix);
+    REQUIRED
+        .iter()
+        .filter(|marker| !normalized.contains(&normalize(marker)))
+        .map(|marker| {
+            format!(
+                "GOV-RC1-VALIDATION-0011: {MATRIX_PATH} is missing current evidence marker {marker:?}"
+            )
+        })
+        .collect()
 }
 
 fn validate_matrix(matrix: &str) -> Vec<String> {
@@ -279,6 +308,7 @@ mod tests {
         assert_eq!(summary.unsupported_count, 2);
         assert_eq!(summary.partial_count, 3);
         assert_eq!(summary.audit_file_count, 8);
+        assert_eq!(summary.current_evidence_gate_count, 2);
     }
 
     #[test]
@@ -300,6 +330,17 @@ mod tests {
             errors
                 .iter()
                 .any(|error| error.contains("missing audit marker"))
+        );
+    }
+
+    #[test]
+    fn rejects_stale_current_evidence() {
+        let errors = validate_current_evidence("no LSP executable exists");
+        assert_eq!(errors.len(), 3);
+        assert!(
+            errors
+                .iter()
+                .all(|error| error.contains("GOV-RC1-VALIDATION-0011"))
         );
     }
 

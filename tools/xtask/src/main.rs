@@ -544,12 +544,13 @@ fn main() -> ExitCode {
             match rc1_validation::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "RC1 inventory OK: {} criteria ({} BlockedSpec, {} Unsupported, {} partial), {} audit files",
+                        "RC1 inventory OK: {} criteria ({} BlockedSpec, {} Unsupported, {} partial), {} audit files, {} current evidence gates",
                         summary.criterion_count,
                         summary.blocked_count,
                         summary.unsupported_count,
                         summary.partial_count,
-                        summary.audit_file_count
+                        summary.audit_file_count,
+                        summary.current_evidence_gate_count
                     );
                     ExitCode::SUCCESS
                 }

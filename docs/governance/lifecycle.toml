@@ -6312,3 +6312,29 @@ unresolved_alternatives = [
   "Candidate identity/change control; accepted 1.0 scope; Stable protocols; Tier1 artifacts; P0/P1 disposition; historical corpus; security sign-off; artifact rehearsal; complete bilingual documentation; independent review; and the RC0 freeze remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0246"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0246-current-rc1-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc1 verify and require nine criteria, eight audit files, and two current-evidence gates.",
+  "Compose the current RC0 and Zed-extension acceptance verifiers and run them independently.",
+  "Remove current LSP/Zed/RC0 markers in a focused test and require a fail-closed internal governance error.",
+  "Run workspace, CI, governance, support, status, traceability, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Corrects documentation and composes internal evidence gates only; Ling semantics, diagnostics, public schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP behavior, runtime, Unicode, protocol states, support states, and public APIs remain unchanged.",
+  "Adds no Zed extension, public artifact/acquisition, release exit, support promotion, migration, issue workflow, network behavior, or G6 completion claim.",
+]
+unresolved_alternatives = [
+  "RC0 completion; public artifacts/acquisition; checksums, SBOM, provenance and signing; clean install; Zed packaging; samples; migration; issue intake; schema-reset change control; independent validation; and RC1 approval remain deferred.",
+]
+superseded_by = ""

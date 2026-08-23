@@ -54,6 +54,12 @@ no-publication boundary, and eight linked audit-marker files. It validates
 inventory drift only and does not create any of the missing public-release
 evidence.
 
+Accepted `DEC-0246` additionally authorizes the bounded
+`RC-6902-CURRENT-EVIDENCE` child. The RC1 verifier now composes the current RC0
+and Zed acceptance gates and corrects the stale claim that no LSP executable
+exists. The source-built Preview server remains only a prerequisite; no Zed
+extension, acquisition surface, debugger integration, or RC1 exit is created.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,
