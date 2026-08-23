@@ -8499,7 +8499,7 @@ notes = [
 [[task]]
 id = "LSP-2503"
 title = "LSP debounce and priority scheduling"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -8513,33 +8513,47 @@ spec = [
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
   "docs/decisions/0032-lsp-internal-scheduling-boundary.md",
+  "docs/RFC-0032.md",
+  "docs/RFC-0045.md",
+  "docs/RFC-0049.md",
+  "docs/RFC-0050.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/src/publication.rs",
+  "crates/ling-lsp/src/scheduler.rs",
+  "crates/ling-lsp/tests/diagnostic_transcripts.rs",
+  "crates/ling-lsp/tests/push_diagnostics.rs",
+  "crates/ling-lsp/tests/scheduling.rs",
+  "docs/RFC-0050.md",
   "docs/status/LSP-2503-AUTHORITY-AUDIT.md",
   "docs/status/LSP-2503-SCHEDULER-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
+  "tests/protocols/lsp-scheduling/README.md",
+  "tests/protocols/lsp-scheduling/fixtures/v1.json",
 ]
 acceptance = [
-  "The audit records the missing event triggers, debounce/coalescing, logical versus wall-clock timing, priority/fairness, budgets, revision supersession, cancellation, publication, diagnostics, and protocol lifecycle contracts.",
-  "The audit distinguishes DEC-0019/DEC-0021 internal deterministic query scheduling from the missing LSP event, queue, freshness, and result-publication protocol.",
-  "Accepted DEC-0032 closes only the internal deterministic ordering child; the parent remains blocked for public scheduling behavior.",
-  "The audit covers edit bursts, timer coalescing, priority inversion/starvation, new-revision cancellation, stale results, concurrent requests, workspace/index throttling, diagnostics clear/replace, Unicode/CRLF/BOM, deterministic scheduling, and migration fixtures.",
-  "No debounce timer, priority queue, scheduler policy, stale-result publisher, cancellation integration, diagnostic allocation, protocol schema, or placeholder LSP service is added while the authority is absent.",
-  "The future implementation must coalesce revisions explicitly, prioritize interactive work without starvation, cancel superseded analysis, publish only current snapshot results, and keep scheduling timing out of Ling semantics.",
+  "Accepted RFC-0050 defines exact ling.lsp.scheduling/0.1 discovery, Interactive/Analysis/Background class mapping, wire-order request and state barriers, message-boundary debounce, diagnostic supersession, and non-public scheduling state.",
+  "The deterministic fair queue retains FIFO within class, admits Analysis after at most 8 Interactive selections, and admits Background after at most 16 non-Background selections without observing clocks, CPU/load, allocation, paths, or source text.",
+  "The stdio executor preserves response wire order, services complete pending diagnostics before Background work, and never makes interactive requests wait for speculative workspace indexing.",
+  "Successful mutations cancel older diagnostic tickets; compiler-aware checkpoints return no partial collection or checked cache, stale completion cannot mutate the publication ledger, and current replacement/clearance remains atomic.",
+  "Exact fixtures and tests cover discovery, class mapping, priority/FIFO, fairness bounds, multi-change coalescing, supersession, staleness, Unicode/CRLF/BOM projection, repeat-byte determinism, and later successful recovery.",
+  "Locked offline workspace tests, strict Clippy, governance, LSP, support, status, RC0, traceability, formatting, diff, and execution-plan checksum gates pass without changing Ling semantics, diagnostics, Semantic IDs, runtime behavior, or Unicode 17.0.0.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "5d7ebb6fb41eea4e4a224d42fac20224e78708a2"
+completion_commit = "5d7ebb6fb41eea4e4a224d42fac20224e78708a2"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "LSP-2503 now has LSP-2202, LSP-2501, and LSP-2502 implemented prerequisites but remains BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and the missing general LSP event/fairness/cancellation scheduling contract.",
-  "RFC-0032 provides only deterministic push-diagnostic message-boundary debounce and stale replacement; it does not authorize the general priority, fairness, cancellation, backpressure, or multi-service scheduling surface owned here.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "Implementation commit 5d7ebb6fb41eea4e4a224d42fac20224e78708a2 closes LSP-2503 under Accepted RFC-0050 and registers ling.lsp.scheduling/0.1 as an implemented Preview protocol.",
+  "Wire order remains authoritative; logical priorities govern ready derived work and do not authorize request response reordering or future-snapshot observation.",
+  "Wall-clock/configurable debounce, deadlines, dynamic priority, host-load adaptation, worker pools, parallel mutable requests, progress, partial results, quotas, persistence, Stable lifecycle, and Semantic Transactions remain intentionally deferred.",
 ]
 
 [[task]]

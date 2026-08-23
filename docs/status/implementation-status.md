@@ -284,7 +284,7 @@
 | `LSP-2501-SNAPSHOT` | Internal immutable LSP request snapshot capture | `G1` | `S` | `Done` | `INC-1402`, `LSP-2102-NEGOTIATION`, `LSP-2103-OVERLAY` | `64eb8e858f87bc4f5896bbb8ac00f53afc48c97d` |
 | `LSP-2502` | LSP request cancellation | `G1` | `L` | `Done` | `INC-1401`, `LSP-2501` | `9d6edd7b2a6fbf751afffaae46b249f0ee6e52e4` |
 | `LSP-2502-CANCELLATION` | Internal cooperative LSP cancellation token | `G1` | `S` | `Done` | `INC-1401`, `LSP-2501-SNAPSHOT` | `132fcc9073bebf2a5e49716bc61048248cc4305a` |
-| `LSP-2503` | LSP debounce and priority scheduling | `G1` | `L` | `BlockedSpec` | `LSP-2103`, `LSP-2104`, `LSP-2202`, `LSP-2501`, `LSP-2502` | `` |
+| `LSP-2503` | LSP debounce and priority scheduling | `G1` | `L` | `Done` | `LSP-2103`, `LSP-2104`, `LSP-2202`, `LSP-2501`, `LSP-2502` | `5d7ebb6fb41eea4e4a224d42fac20224e78708a2` |
 | `LSP-2503-SCHEDULER` | Internal deterministic LSP work ordering | `G1` | `S` | `Done` | `LSP-2501-SNAPSHOT`, `LSP-2502-CANCELLATION` | `bca5b93faeaf582c00cdd0d39b52fb2f741c9ccd` |
 | `LSP-2504` | LSP memory and resource limits | `G1` | `L` | `BlockedSpec` | `LSP-2201`, `LSP-2501`, `LSP-2502`, `LSP-2503` | `` |
 | `LSP-2504-BYTE-ACCOUNTING` | Internal deterministic LSP UTF-8 byte accounting | `G1` | `S` | `Done` | `LSP-2501-SNAPSHOT`, `LSP-2502-CANCELLATION`, `LSP-2503-SCHEDULER` | `2bf9ea77d87716138920201116c8849f4625c2e3` |
