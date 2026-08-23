@@ -3224,3 +3224,16 @@ covers = ["TIM-5703 bounded Deadline Check boundary evidence", "test-only deadli
 depends_on = ["DEC-0207", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0209"
+title = "Internal Evidence Bundle Schema boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0209-evidence-bundle-schema-boundary-evidence.md"
+covers = ["EVD-5801 bounded Evidence Bundle Schema boundary evidence", "test-only evidence-bundle vocabulary", "bundle boundaries without schema/verifier/trust semantics"]
+depends_on = ["DEC-0208", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
