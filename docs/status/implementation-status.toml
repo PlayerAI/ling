@@ -4952,7 +4952,7 @@ notes = [
 [[task]]
 id = "CLI-1701"
 title = "Unified CLI command model"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -4966,35 +4966,59 @@ spec = [
   "docs/RFC-0002.md",
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0028-formatter-cli-contract.md",
   "docs/decisions/0036-cli-internal-command-catalog-boundary.md",
+  "docs/decisions/0038-cli-init-command.md",
+  "docs/decisions/0039-cli-test-file-runner.md",
+  "docs/decisions/0253-current-cli-command-model.md",
   "docs/decisions/0015-audit-source-format.md",
   "docs/decisions/0023-author-source-formatter-preservation.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0024.md",
+  "docs/RFC-0025.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-cli/src/command_catalog.rs",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/tests/conformance.rs",
+  "crates/ling-cli/tests/help.rs",
+  "crates/ling-cli/tests/init.rs",
+  "crates/ling-cli/tests/lsp.rs",
+  "crates/ling-cli/tests/project_check.rs",
+  "crates/ling-cli/tests/project_commands.rs",
+  "crates/ling-cli/tests/test.rs",
+  "docs/decisions/0253-current-cli-command-model.md",
   "docs/status/CLI-1701-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1701-IMPLEMENTATION-REPORT.md",
   "docs/status/CLI-1701-CATALOG-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the accepted current parser and Seed command/exit boundary and distinguishes it from the unaccepted init/test/fmt/query/patch/build/lsp extensions.",
-  "The missing command registry, shared service boundary, project/formatter/query contracts, protocol lifecycle, and deterministic fixtures are identified with direct authority references.",
-  "Accepted DEC-0036 closes only the internal current-command catalog; the parent remains blocked for public command-model behavior.",
-  "No command, alias, CompilerHost API, placeholder help entry, diagnostic allocation, protocol field, or stale zero spelling is added while the contracts are absent.",
-  "The future implementation must reuse the checked services and update protocol inventory and fixtures atomically without advertising unimplemented commands.",
+  "Accepted DEC-0253 defines one exact selection path from arguments through the current Command catalog and Options parser to the sole execute dispatcher.",
+  "The current catalog contains each implemented root exactly once, preserves hierarchical project check, and rejects planned commands, aliases, prefixes, plugins, environment selection, zero, and .zero.",
+  "Each dispatch branch reuses the accepted checked file/project, test, formatter, initializer, graph-check, REPL, or LSP boundary without a duplicate compiler, unchecked AST evaluator, resolver, formatter, or transport.",
+  "Command-specific authorities retain input, output, exit, schema, stability, and migration ownership; CLI-1701 adds no command, option, output field, exit code, or placeholder CompilerHost API.",
+  "Focused CLI suites and repository-wide offline tests, Clippy, CI, governance, support, status, RC0, traceability, rustfmt, and deterministic-diff gates pass.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "160979a422cb521d2987cc0e276161f0536a71fe"
+completion_commit = "160979a422cb521d2987cc0e276161f0536a71fe"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "CLI-1701 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001, GAP-FORMATTER-CLI-PROTOCOL-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001; DEC-0003 and DEC-0036 authorize only the current Preview command surface/catalog.",
-  "PRJ-1107 and FMT-1507 remain separate authority gates; the DEC-0036 catalog is internal and this audit does not broaden either contract or create a public command model.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit: 160979a422cb521d2987cc0e276161f0536a71fe (`docs(cli): accept current command model`).",
+  "Verified with the exact catalog/help unit tests, all ling-cli integration suites, workspace tests, Clippy with warnings denied, and CI/governance/support/status/RC0/traceability/formatting/diff gates; the final status-bound full gate is recorded by the following status commit.",
+  "CLI-1702 output policy, CLI-1705 query/patch, CLI-1706 completion/help fixtures, future commands, plugins/daemons, and Stable compatibility remain intentionally deferred and unclaimed.",
 ]
 
 [[task]]

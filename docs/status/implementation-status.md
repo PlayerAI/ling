@@ -71,7 +71,7 @@
 | `CBK-5902-OBSERVATION` | Internal Lowering Validator boundary evidence | `G5` | `S` | `Done` | `CBK-5901-OBSERVATION` | `85bd46dca8c6e7c059816ed9b47b100c4840f816` |
 | `CBK-5903` | Critical Runtime/Target Package | `G5` | `L` | `BlockedSpec` | `CBK-5902` | `` |
 | `CBK-5903-OBSERVATION` | Internal Critical Runtime/Target Package boundary evidence | `G5` | `S` | `Done` | `CBK-5902-OBSERVATION` | `728edd4a58646c146e792d39ec346648db850971` |
-| `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
+| `CLI-1701` | Unified CLI command model | `G1` | `L` | `Done` | `FMT-1507`, `PRJ-1107` | `160979a422cb521d2987cc0e276161f0536a71fe` |
 | `CLI-1701-CATALOG` | Internal current CLI command catalog | `G1` | `S` | `Done` | `FMT-1507-CLI`, `PRJ-1107-CHECK` | `8410aaa4b4ae7508b84a6736015d80ea73444706` |
 | `CLI-1702` | CLI output and exit behavior | `G1` | `M` | `BlockedSpec` | `CLI-1701` | `` |
 | `CLI-1702-EXIT` | Internal CLI exit-code catalog | `G1` | `S` | `Done` | `CLI-1701-CATALOG` | `b55db2ca22e597da4266f1af3deb664f610cd1ea` |
