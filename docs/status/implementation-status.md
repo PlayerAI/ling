@@ -68,6 +68,7 @@
 | `CBK-5901` | Trusted Compiler Route Decision | `G5` | `L` | `BlockedSpec` | `EVD-5804` | `` |
 | `CBK-5901-OBSERVATION` | Internal Trusted Compiler Route boundary evidence | `G5` | `S` | `Done` | `EVD-5804-OBSERVATION` | `9caebb42d8022fc8fdb6f1f7a06f128cd64d1a39` |
 | `CBK-5902` | Lowering Validator | `G5` | `L` | `BlockedSpec` | `CBK-5901` | `` |
+| `CBK-5902-OBSERVATION` | Internal Lowering Validator boundary evidence | `G5` | `S` | `Done` | `CBK-5901-OBSERVATION` | `85bd46dca8c6e7c059816ed9b47b100c4840f816` |
 | `CBK-5903` | Critical Runtime/Target Package | `G5` | `L` | `BlockedSpec` | `CBK-5902` | `` |
 | `CLI-1701` | Unified CLI command model | `G1` | `L` | `BlockedSpec` | `FMT-1507`, `PRJ-1107` | `` |
 | `CLI-1701-CATALOG` | Internal current CLI command catalog | `G1` | `S` | `Done` | `FMT-1507-CLI`, `PRJ-1107-CHECK` | `8410aaa4b4ae7508b84a6736015d80ea73444706` |
