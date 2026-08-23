@@ -257,7 +257,7 @@
 | `LSP-2102` | LSP position-encoding negotiation | `G1` | `S` | `Done` | `LSP-2101` | `15cdfe7963ecd272447ff9ac00d1b71df0a63800` |
 | `LSP-2102-NEGOTIATION` | LSP initialize position-encoding negotiation | `G1` | `S` | `Done` | `LSP-2101-LIFECYCLE`, `LSP-2102-SOURCE-MAP` | `39755afad13db66b429967fe61f20f66a4aea699` |
 | `LSP-2102-SOURCE-MAP` | LSP SourceMap position projection | `G1` | `S` | `Done` | — | `9e917250bff5bb3ebba1ef02a5f2f6b66ab700de` |
-| `LSP-2103` | LSP open-document overlay | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
+| `LSP-2103` | LSP open-document overlay | `G1` | `M` | `Done` | `LSP-2101`, `LSP-2102` | `5f64ab8bf4de8f562d63dca1bcd627808f955dbc` |
 | `LSP-2103-OVERLAY` | LSP full-text overlay Preview slice | `G1` | `M` | `Done` | `LSP-2101-LIFECYCLE`, `LSP-2102-SOURCE-MAP` | `6cedec3e09f8112b28cde1c12dca514dae4191e4` |
 | `LSP-2104` | LSP incremental text changes | `G1` | `M` | `BlockedSpec` | `LSP-2102`, `LSP-2103` | `` |
 | `LSP-2104-POSITION-EDITS` | Bounded internal position-edit projection | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2104-UTF8-EDITS` | `94a990418730a768a7974f3f40629f1d32a5c05e` |

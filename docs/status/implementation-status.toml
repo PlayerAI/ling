@@ -5798,7 +5798,7 @@ acceptance = [
   "DEC-0029 authorizes deterministic utf-8, utf-16, and utf-32 negotiation and SourceMap byte/position projection without defining an LSP server or edit lifecycle.",
   "The source API preserves original UTF-8 byte authority, removes no source data, and rejects offsets or positions inside UTF-8 scalars, normalized CRLF, or UTF-16 surrogate pairs without clamping.",
   "Focused source tests cover BOM, CRLF, Chinese, emoji, combining marks, empty/final lines, all valid boundary round trips, negotiation order, fallback, and typed failures.",
-  "No diagnostic allocation, schema, Semantic ID, CLI, bytecode, runtime, public LSP protocol, or Unicode table behavior changes; parent LSP-2102 remains blocked for lifecycle and version semantics.",
+  "No diagnostic allocation, schema, Semantic ID, CLI, bytecode, runtime, public LSP protocol, or Unicode table behavior changes; DEC-0258 composes this source slice into the bounded completed LSP-2102 parent.",
 ]
 verified_against_commit = "9e917250bff5bb3ebba1ef02a5f2f6b66ab700de"
 completion_commit = "9e917250bff5bb3ebba1ef02a5f2f6b66ab700de"
@@ -5852,14 +5852,14 @@ completion_commit = "39755afad13db66b429967fe61f20f66a4aea699"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This is the dependency-complete initialize negotiation slice of LSP-2102; the parent remains BlockedSpec for document/snapshot and transaction semantics.",
+  "This is the dependency-complete initialize negotiation slice of LSP-2102; DEC-0258 composes it with the source projection to close the bounded parent while downstream transactions remain separate.",
   "Existing lifecycle code from RFC-0004 stores the selected encoding; this milestone adds focused conformance evidence and updates the authority traceability.",
 ]
 
 [[task]]
 id = "LSP-2103"
 title = "LSP open-document overlay"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -5873,31 +5873,40 @@ spec = [
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/RFC-0004.md",
   "docs/RFC-0023.md",
+  "docs/decisions/0259-current-lsp-open-document-overlay.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/overlay.rs",
+  "crates/ling-source/src/vfs.rs",
+  "tests/protocols/lsp-overlay/README.md",
   "docs/status/LSP-2103-AUTHORITY-AUDIT.md",
   "docs/status/LSP-2103-OVERLAY-IMPLEMENTATION-REPORT.md",
+  "docs/status/LSP-2103-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit distinguishes the accepted RFC-0023 full-text overlay slice from the remaining URI-root, incremental-edit, snapshot, diagnostic, and transaction contracts.",
-  "The audit covers URI identity, virtual/dependency files, overlay precedence, disk races, stale/duplicate versions, snapshots, cancellation, and required deterministic fixtures.",
-  "No host filesystem resolver, range-edit API, diagnostic allocation, Semantic ID change, Workspace Edit, or placeholder transaction is added while the remaining authority is absent.",
-  "The completed child adapts internal VFS without exposing Rust identities and rejects stale/read-only edits before VFS mutation; follow-on query work remains deferred.",
+  "Accepted DEC-0259 composes the implemented RFC-0023 full-text overlay as the exact LSP-2103 URI/file-state and open/change/close contract.",
+  "Workspace, dependency, and untitled documents preserve exact UTF-8 overlay precedence, monotonic versions, disk reveal or temporary removal on close, and deterministic URI ordering.",
+  "Invalid URIs/parameters/ranges, duplicate opens, stale versions, closed documents, oversized text, and dependency edits are rejected before VFS mutation.",
+  "No host filesystem resolver, incremental range API, compiler transaction, diagnostic allocation, Semantic ID change, Workspace Edit, or Stable editor claim is introduced.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "5f64ab8bf4de8f562d63dca1bcd627808f955dbc"
+completion_commit = "5f64ab8bf4de8f562d63dca1bcd627808f955dbc"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2103 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and LSP-2101/LSP-2102; DEC-0019's VFS overlay is an internal compiler boundary only.",
-  "RFC-0023 and LSP-2103-OVERLAY define only the Experimental full-text overlay; range edits, compiler snapshots, diagnostics, Workspace Edits, and transactions remain unresolved.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, core schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "The former blocker over-scoped LSP-2103 with later incremental, query, diagnostic, and transaction work; DEC-0259 records the exact execution-plan boundary without closing the open transaction gaps.",
+  "RFC-0023 and LSP-2103-OVERLAY supply the complete implementation evidence while exposing no host path, SourceId, revision, filesystem/network behavior, or broader editor promise.",
+  "Verified and committed as 5f64ab8bf4de8f562d63dca1bcd627808f955dbc after focused LSP tests and the full locked offline workspace, Clippy, CI, governance, support, status, RC0, traceability, formatting, and diff gates passed.",
 ]
 
 [[task]]
@@ -5947,7 +5956,7 @@ completion_commit = "6cedec3e09f8112b28cde1c12dca514dae4191e4"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "Bounded full-text overlay slice completed under RFC-0023; parent LSP-2103 remains BlockedSpec for incremental synchronization and transaction/query semantics.",
+  "Bounded full-text overlay slice completed under RFC-0023; DEC-0259 composes it as the complete LSP-2103 parent while incremental synchronization and transaction/query semantics remain downstream.",
   "ling-source exposes the validated logical-name boundary and removes temporary VFS files without reusing SourceIds.",
   "No public diagnostic allocation or host filesystem behavior is claimed.",
 ]

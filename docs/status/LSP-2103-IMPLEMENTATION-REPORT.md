@@ -47,10 +47,11 @@ behavior.
 
 ## Verification
 
-The milestone is accepted only after focused LSP tests and the full locked,
-offline workspace, CI, governance, support, status, RC0, traceability, Clippy,
-formatting, and deterministic-diff gates pass. The exact acceptance commit is
-recorded in `docs/status/implementation-status.toml` after it exists.
+Focused LSP tests and the full locked, offline workspace, CI, governance,
+support, status, RC0, traceability, Clippy, formatting, and deterministic-diff
+gates passed before acceptance commit
+`5f64ab8bf4de8f562d63dca1bcd627808f955dbc`. The task registry binds that
+exact immutable commit.
 
 ## Intentionally deferred
 
