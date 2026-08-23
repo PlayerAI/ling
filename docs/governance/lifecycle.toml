@@ -5779,3 +5779,30 @@ unresolved_alternatives = [
   "Unicode upgrade ownership and migration; localized aliases and display; profile identifier policy; diagnostics; formatter, LSP, Zed, CLI, UTF-16, and Windows-path contracts; package/module migration; and cross-process compatibility remain open under STD-6303, registered gaps, and future Accepted authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0226"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0226-local-package-publication-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert exact local manifest and lock markers plus representative valid local metadata.",
+  "Assert version-1 rejection of publication fields and external dependency locators plus absence of registry, network, process, and signing routes.",
+  "Assert all sixty local boundaries, exact ordering, duplicate rejection, and order-independent opaque bytes.",
+  "Run project, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+  "Defer every publication and supply-chain behavior until dedicated Accepted authority defines authenticated coordinates, formats, trust, lifecycle, and executable compatibility and security evidence.",
+]
+compatibility_impact = [
+  "Adds only local-protocol regression and test-local evidence. Manifest, lock, package and graph identities, dependency resolution, diagnostics, CLI, Semantic IDs, source spans, dependencies, Unicode 17.0.0, and support claims remain unchanged.",
+  "No publisher coordinate, registry, archive, artifact, checksum/signature, provenance, SBOM, mirror/cache, yanking, installation, migration, public API, or support claim is added.",
+]
+unresolved_alternatives = [
+  "Publisher/source coordinates; namespace ownership and transfer; archive and artifact formats; checksums, signatures, provenance, SBOM, licenses, trust roots, and transparency; registry and installation operations; yanking/deprecation; mirrors and offline caches; version selection; CLI and diagnostics; compatibility, migration, and security fixtures remain open under PKG-6401, later package tasks, and future Accepted authority.",
+]
+superseded_by = ""

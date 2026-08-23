@@ -3445,3 +3445,16 @@ covers = ["STD-6303 bounded Unicode and Chinese-programming stability evidence",
 depends_on = ["SEMANTICS", "DEC-0002", "DEC-0007", "DEC-0012", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0226"
+title = "Local package and publication-exclusion boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0226-local-package-publication-boundary-evidence.md"
+covers = ["PKG-6401 bounded local package and publication-exclusion evidence", "exact RFC-0002 local manifest, identity, dependency, and lock boundary", "test-only observation without publication, registry, installation, or supply-chain protocol semantics"]
+depends_on = ["RFC-0002", "DEC-0007", "DEC-0012", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

@@ -525,6 +525,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `STD-6303` | G6 | Unicode 与中文编程稳定性 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:195`, `docs/status/STD-6303-AUTHORITY-AUDIT.md` |
 | `STD-6303-OBSERVATION` | G6 | Internal Unicode and Chinese-programming stability boundary evidence | S | Done | Accepted `DEC-0225`; see `crates/ling-unicode/tests/unicode_chinese_stability.rs`, `crates/ling-types/tests/unicode_chinese_stability_evidence.rs`, and `docs/status/STD-6303-OBSERVATION-IMPLEMENTATION-REPORT.md`; Unicode upgrade/localization/tool protocol semantics remain BlockedSpec |
 | `PKG-6401` | G6 | 包发布协议 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:210`, `docs/status/PKG-6401-AUTHORITY-AUDIT.md` |
+| `PKG-6401-OBSERVATION` | G6 | Local package and publication-exclusion boundary evidence | S | Done | Accepted `DEC-0226`; see `crates/ling-project/tests/package_publication_boundary.rs`, `crates/ling-types/tests/package_publication_boundary_evidence.rs`, and `docs/status/PKG-6401-OBSERVATION-IMPLEMENTATION-REPORT.md`; publication/registry/supply-chain semantics remain BlockedSpec |
 | `PKG-6402` | G6 | Hermetic Build | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:226`, `docs/status/PKG-6402-AUTHORITY-AUDIT.md` |
 | `PKG-6403` | G6 | Registry 最小实现或推迟策略 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:239`, `docs/status/PKG-6403-AUTHORITY-AUDIT.md` |
 | `PKG-6404` | G6 | 供应链攻击测试 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:248`, `docs/status/PKG-6404-AUTHORITY-AUDIT.md` |
