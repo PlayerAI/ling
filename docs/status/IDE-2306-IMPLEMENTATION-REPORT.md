@@ -1,8 +1,8 @@
 # IDE-2306 implementation report
 
-> Status: Implemented; status-ledger binding pending implementation commit
+> Status: Done (2026-08-23)
 > Task: `IDE-2306`
-> Implementation commit: pending
+> Implementation commit: `ecb6545fec5fa1f457ee9abf69c7354306ea1bb0`
 > Authority: Accepted `RFC-0041`, `RFC-0040`, `RFC-0039`, `RFC-0038`,
 > `RFC-0004`, `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`,
 > `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0075`, `DEC-0077`,
@@ -37,9 +37,9 @@ localized Author Source remain outside this implementation.
 - `cargo test -p ling-db rename_alias_index --locked --offline` passes.
 - `cargo test -p ling-lsp --test rename --locked --offline` passes.
 - All-target `ling-db` and `ling-lsp` tests and strict Clippy pass.
-- Full locked offline workspace, CI, governance, LSP, support, status, RC0,
-  v0.0.1 traceability, formatting, and diff gates are pending the implementation
-  commit and status binding.
+- Full locked offline workspace tests, strict Clippy, CI, governance, LSP,
+  support, status, RC0, v0.0.1 traceability, formatting, and diff gates pass
+  against implementation commit `ecb6545fec5fa1f457ee9abf69c7354306ea1bb0`.
 
 ## Compatibility, determinism, and Unicode impact
 

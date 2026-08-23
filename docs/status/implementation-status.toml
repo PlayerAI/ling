@@ -7202,21 +7202,21 @@ acceptance = [
   "Name, projection-field, and mutable-place-root spans preserve the HIR SourceId + Span; orphan HIR IDs are omitted and no editor position is synthesized.",
   "Deterministic source/module/reference/span ordering and source-scoped lookup make repeated equal resolver/HIR inputs equal without protocol/cache state.",
   "Focused cargo fmt and ling-db tests pass; Unicode/BOM/CRLF exact spans, repeated construction, source lookup, and resolver filtering are covered.",
-  "The public IDE-2306 rename target remains BlockedSpec for target/alias policy, edits, snapshots, identity migration, versions, stale behavior, and protocol semantics.",
+  "The source-span observation is consumed by completed IDE-2306 under Accepted RFC-0041 without becoming a separate public protocol.",
 ]
 verified_against_commit = "70e0aeb833013a65c73e71b48d195c2d69454bfd"
 completion_commit = "70e0aeb833013a65c73e71b48d195c2d69454bfd"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "The index is source-span evidence for future rename analysis, not an editor range, Workspace Edit, target selector, or Semantic ID migration.",
+  "The index remains internal source-span evidence consumed by IDE-2306; RFC-0041 owns editor ranges, Workspace Edit policy, target selection, and explicit DefinitionId migration.",
   "No protocol-inventory entry, diagnostic allocation, language-semantic change, runtime/VM change, or Unicode table change is introduced.",
 ]
 
 [[task]]
 id = "IDE-2306"
 title = "IDE rename"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -7229,32 +7229,60 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
   "docs/RFC-0005.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0029.md",
+  "docs/RFC-0030.md",
+  "docs/RFC-0038.md",
+  "docs/RFC-0039.md",
+  "docs/RFC-0040.md",
+  "docs/RFC-0041.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
+  "docs/decisions/0075-ide-resolved-reference-index.md",
+  "docs/decisions/0077-ide-rename-identifier-observation.md",
+  "docs/decisions/0078-ide-rename-reference-span-observation.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/rename_alias_index.rs",
+  "crates/ling-lsp/src/rename.rs",
+  "crates/ling-lsp/tests/rename.rs",
+  "docs/RFC-0041.md",
   "docs/status/IDE-2306-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2306-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
+  "tests/protocols/lsp-rename/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing rename identity/target, reference/alias collection, Unicode/name, temporary-snapshot, behavior/identity, Workspace Edit, position/version, and protocol lifecycle contracts.",
-  "The audit covers definitions/references/import aliases, generated/dependency/builtin/primitive targets, Unicode 17.0.0/XID/NFC/confusables, CRLF/BOM, visibility/coherence, atomic multi-file edits, stale versions, rollback, deterministic output, and required fixtures.",
-  "No rename handler, Workspace Edit schema, temporary-snapshot API, validator, protocol field, diagnostic allocation, Semantic ID migration, or mutation surface is added while the authority is absent.",
-  "The future implementation must use checked resolution and references, preserve source-span truth, apply edits atomically against explicit versions, make DefinitionId changes visible, and label experimental fields.",
+  "Accepted RFC-0041 authorizes Preview ling.lsp.rename/0.1 with exact transactional capability discovery and no unversioned Workspace Edit fallback.",
+  "Checked definition, binding, reference, and explicit import-alias occurrences are collected structurally, remain writable and source-backed, and preserve original UTF-8 span truth without textual inference.",
+  "Unicode 17.0.0 XID/NFC/security validation plus a fresh resolution/type/Effect simulation rejects lexical, normalized, confusable, visibility, coherence, identity, or relation-topology changes atomically.",
+  "Successful results are deterministic URI-ordered versioned documentChanges; definition migration is explicit, binding/import identity is preserved, stale completion fails, and the server applies no edits.",
+  "Focused and locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, v0.0.1 traceability, formatting, and diff gates pass against the implementation commit.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "ecb6545fec5fa1f457ee9abf69c7354306ea1bb0"
+completion_commit = "ecb6545fec5fa1f457ee9abf69c7354306ea1bb0"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "IDE-2306 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, GAP-UNICODE-ALIAS-SYNTAX-001, GAP-AUTHOR-SOURCE-LOCALIZATION-001, LSP-2102/LSP-2104, and IDE-2305; DEC-0012 makes rename-induced DefinitionId changes explicit.",
-  "Current VFS, resolver, semantic, and project code has no public atomic edit, identity migration, alias/localization, dependency/generated mutability, or stale-version contract.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "RFC-0041 removes IDE-2306 from broader open gap blocker lists only for the bounded standard Workspace Edit response; general Semantic Transactions, language Alias syntax, localization, generated/dependency mutation, module/file rename, and Stable lifecycle remain open.",
+  "Definition renames deliberately change DefinitionId under DEC-0012; no Semantic ID schema or serialized identity migration is introduced.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime/VM/bytecode/ABI/package behavior, filesystem/network mutation, or Unicode 17.0.0 table change is introduced.",
 ]
 
 [[task]]
