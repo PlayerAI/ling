@@ -60,7 +60,8 @@ final VFS and version publication after complete validation.
 The milestone is accepted only after focused LSP/source tests and the full
 locked, offline workspace, CI, governance, support, status, RC0, traceability,
 Clippy, formatting, and deterministic-diff gates pass. The exact implementation
-commit is bound in `docs/status/implementation-status.toml` after it exists.
+commit is `492754b066da11e4ae2fe58774e5c7096e3703a5`, bound in
+`docs/status/implementation-status.toml`.
 
 ## Intentionally deferred
 
