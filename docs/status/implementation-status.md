@@ -431,6 +431,7 @@
 | `STAB-6103` | Feature State Metadata | `G6` | `L` | `BlockedSpec` | `STAB-6102` | `` |
 | `STAB-6103-OBSERVATION` | Internal Feature-State Metadata boundary evidence | `G6` | `S` | `Done` | `STAB-6102-OBSERVATION` | `ff9d77c8c6deba2b5e524e473d3fc1360c6d3c44` |
 | `STD-6301` | Stable Standard Library Audit | `G6` | `L` | `BlockedSpec` | `PROTO-6204` | `` |
+| `STD-6301-OBSERVATION` | Internal Stable Standard Library Audit boundary evidence | `G6` | `S` | `Done` | `PROTO-6204-OBSERVATION` | `5c2f2ae0bbb34aad83ad5f7deb53cbc6d8cd5623` |
 | `STD-6302` | Remove Convenience APIs | `G6` | `L` | `BlockedSpec` | `STD-6301` | `` |
 | `STD-6303` | Unicode and Chinese-Programming Stability | `G6` | `L` | `BlockedSpec` | `STD-6302` | `` |
 | `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |

@@ -23778,6 +23778,56 @@ notes = [
 ]
 
 [[task]]
+id = "STD-6301-OBSERVATION"
+title = "Internal Stable Standard Library Audit boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PROTO-6204-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0011-seed-builtins.md",
+  "docs/decisions/0014-seed-prelude-option-result.md",
+  "docs/decisions/0223-stable-standard-library-audit-boundary-evidence.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/status/STD-6301-AUTHORITY-AUDIT.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/authority.toml",
+]
+artifacts = [
+  "crates/ling-resolve/src/lib.rs",
+  "crates/ling-types/tests/stable_standard_library_audit_evidence.rs",
+  "tools/xtask/src/support.rs",
+  "docs/status/STD-6301-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/STD-6301-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0223 authorizes only bounded Stable Standard Library audit evidence; no packaged, profiled, or Stable library surface is defined.",
+  "The resolver inventory remains exactly six function-like built-ins: Console.write, Text.format, max, min, map, and sum, each with builtin origin and no source file or span.",
+  "The logical Ling.Prelude inventory remains exactly Option, Some, None, Result, Ok, and Error with correct type/constructor kinds, Prelude origin, and no source file or span.",
+  "The support matrix retains exactly one standard-package record: STD-LING-PRELUDE 0.0.1-dev, BuiltinOnly, Preview, implemented, un-packaged, unprofiled, with three explicit unsupported boundaries.",
+  "The test-local inventory covers sixty symbol, semantic, package, profile, lifecycle, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "cargo test -p ling-resolve --locked --offline passes.",
+  "cargo test -p ling-types --test stable_standard_library_audit_evidence --locked --offline passes.",
+  "cargo test -p xtask support::tests --locked --offline passes.",
+  "cargo clippy -p ling-resolve -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "support, governance, formatting, and diff checks pass without changing public library behavior or lifecycle claims.",
+]
+verified_against_commit = "5c2f2ae0bbb34aad83ad5f7deb53cbc6d8cd5623"
+completion_commit = "5c2f2ae0bbb34aad83ad5f7deb53cbc6d8cd5623"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0223; STD-6301 remains BlockedSpec for a complete public symbol table, package/version distribution, profiles/targets, complexity/resource/locale contracts, migration, diagnostics, and release evidence.",
+  "The opaque ling.stable-standard-library-audit-observation/0 bytes are test evidence only and are not a package manifest, symbol ABI, Semantic ID input, support protocol, or stability marker.",
+  "No symbol, type, Effect, Capability, Fault, package, profile, support lifecycle, diagnostic, Semantic ID, source-span rule, or Unicode behavior changed.",
+]
+
+[[task]]
 id = "STD-6302"
 title = "Remove Convenience APIs"
 state = "BlockedSpec"
