@@ -100,7 +100,7 @@ mod tests {
         );
         for planned_only in [
             "project", "build", "query", "patch", "replay", "explain", "evidence", "version",
-            "support",
+            "support", "migrate",
         ] {
             assert_eq!(
                 Command::parse(planned_only),

@@ -7,12 +7,15 @@
 
 ## Decision
 
-`COMPAT-6503` is `BlockedSpec`. The G6 checklist requires migration based on
+`COMPAT-6503` remains `BlockedSpec`. The G6 checklist requires migration based on
 the parser and a semantic transaction rather than regular expressions, a dry
 run, semantic diff, stale-edit checks, backup/transactional writes, formatter
 integration, post-check/test, machine-readable reporting, and human choice
 when automation is ambiguous. These requirements are not an accepted command,
-transaction, migration-schema, or source-version contract.
+transaction, migration-schema, or source-version contract. Accepted
+`DEC-0232` now authorizes a bounded readiness child: the public command remains
+absent and all nine prerequisites are tracked as unavailable until a real
+version pair is accepted.
 
 The plan's original command label is a stale legacy placeholder. The current
 authority fixes the public CLI as `ling` and the source extension as `.ling`;
@@ -78,7 +81,7 @@ Adding a migration binary, regex rewrite, edit schema, command alias, or
 placeholder report would create irreversible compatibility behavior without an
 accepted source version or transaction oracle.
 
-## Required authority before implementation
+## Required authority for the blocked remainder
 
 An accepted migration and semantic-edit RFC/decision must define, at minimum:
 
@@ -108,7 +111,8 @@ names, checked Typed Core boundary, original UTF-8 spans, Unicode 17.0.0,
 deterministic/offline requirements, and explicit
 Experimental/Preview/Future/Unsupported states.
 
-It deliberately adds no migration executable, command alias, regex rewrite,
+The bounded `COMPAT-6503-READINESS` child deliberately adds no migration
+executable, command alias, regex rewrite,
 semantic transaction, LSP edit, formatter CLI, report schema, warning or
 rejection diagnostic, backup/rollback protocol, dependency, public API, or
 placeholder. Future migration remains deferred until source-version authority,

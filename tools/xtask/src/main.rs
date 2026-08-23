@@ -12,6 +12,7 @@ mod governance;
 mod historical_corpus;
 mod lifecycle;
 mod lsp_discovery;
+mod migration_readiness;
 mod performance;
 mod performance_matrix;
 mod protocols;
@@ -382,6 +383,39 @@ fn main() -> ExitCode {
         }
         [area, command] if area == "compatibility" && command == "render" => {
             match compiler_compatibility::render_repository(&root) {
+                Ok(output) => {
+                    print!("{output}");
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "migration" && command == "verify" => {
+            match migration_readiness::check_repository(&root) {
+                Ok(summary) => {
+                    println!(
+                        "migration readiness OK: {} requirements ({} unavailable), {} released source version",
+                        summary.requirement_count,
+                        summary.unavailable_count,
+                        summary.released_source_versions
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(errors) => {
+                    for error in errors {
+                        eprintln!("{error}");
+                    }
+                    ExitCode::from(EXIT_VALIDATION_FAILED)
+                }
+            }
+        }
+        [area, command] if area == "migration" && command == "render" => {
+            match migration_readiness::render_repository(&root) {
                 Ok(output) => {
                     print!("{output}");
                     ExitCode::SUCCESS
@@ -881,7 +915,7 @@ fn main() -> ExitCode {
         }
         _ => {
             eprintln!(
-                "Usage:\n  cargo xtask ci verify\n  cargo xtask dap verify\n  cargo xtask governance check-all\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask corpus verify\n  cargo xtask corpus render\n  cargo xtask compatibility verify\n  cargo xtask compatibility render\n  cargo xtask docs verify\n  cargo xtask examples verify\n  cargo xtask tutorial verify\n  cargo xtask lsp verify\n  cargo xtask rc0 verify\n  cargo xtask rc1 verify\n  cargo xtask rc2 verify\n  cargo xtask rc3 verify\n  cargo xtask v1 verify\n  cargo xtask zed verify\n  cargo xtask zed-extension verify\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask schema validate-all\n  cargo xtask schema compatibility --from N-1 --to N\n  cargo xtask schema corrupt-inputs\n  cargo xtask seed reproduce\n  cargo xtask performance baseline\n  cargo xtask performance verify\n  cargo xtask fuzz verify\n  cargo xtask fault verify\n  cargo xtask security verify\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
+                "Usage:\n  cargo xtask ci verify\n  cargo xtask dap verify\n  cargo xtask governance check-all\n  cargo xtask governance check-authority\n  cargo xtask governance render-authority\n  cargo xtask governance check-gaps\n  cargo xtask governance render-gaps\n  cargo xtask governance check-lifecycle\n  cargo xtask governance render-lifecycle\n  cargo xtask governance check-protocols\n  cargo xtask governance render-protocols\n  cargo xtask governance check-error-codes\n  cargo xtask governance render-error-code-lock\n  cargo xtask traceability verify --release <release>\n  cargo xtask traceability render --release <release>\n  cargo xtask corpus verify\n  cargo xtask corpus render\n  cargo xtask compatibility verify\n  cargo xtask compatibility render\n  cargo xtask migration verify\n  cargo xtask migration render\n  cargo xtask docs verify\n  cargo xtask examples verify\n  cargo xtask tutorial verify\n  cargo xtask lsp verify\n  cargo xtask rc0 verify\n  cargo xtask rc1 verify\n  cargo xtask rc2 verify\n  cargo xtask rc3 verify\n  cargo xtask v1 verify\n  cargo xtask zed verify\n  cargo xtask zed-extension verify\n  cargo xtask support verify\n  cargo xtask support render\n  cargo xtask support render-version-fixture\n  cargo xtask support render-support-fixture\n  cargo xtask schema validate-all\n  cargo xtask schema compatibility --from N-1 --to N\n  cargo xtask schema corrupt-inputs\n  cargo xtask seed reproduce\n  cargo xtask performance baseline\n  cargo xtask performance verify\n  cargo xtask fuzz verify\n  cargo xtask fault verify\n  cargo xtask security verify\n  cargo xtask status verify\n  cargo xtask status render\n  cargo xtask status render-release-notes\n  cargo xtask status render-cli-fixture"
             );
             ExitCode::from(EXIT_INVALID_USAGE)
         }

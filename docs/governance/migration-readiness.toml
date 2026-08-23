@@ -1,0 +1,60 @@
+schema_version = 1
+authority = "DEC-0232"
+released_source_versions = 1
+accepted_version_pair = false
+public_command = "Absent"
+report = "docs/governance/migration-readiness.md"
+
+[[requirement]]
+id = "parser-semantic-transaction"
+state = "Unavailable"
+blocker = "No Accepted source-version pair or semantic transformation contract exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md", "docs/governance/compiler-compatibility-boundary.toml"]
+
+[[requirement]]
+id = "dry-run"
+state = "Unavailable"
+blocker = "No migration operation or observable edit plan is authorized."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md"]
+
+[[requirement]]
+id = "semantic-diff"
+state = "Unavailable"
+blocker = "No cross-version Semantic ID or equivalence contract exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md"]
+
+[[requirement]]
+id = "stale-edit-check"
+state = "Unavailable"
+blocker = "No migration transaction or source revision protocol exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md"]
+
+[[requirement]]
+id = "backup-transaction"
+state = "Unavailable"
+blocker = "No write, rollback, or failure-atomic migration policy exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md"]
+
+[[requirement]]
+id = "formatter"
+state = "Unavailable"
+blocker = "Author Source formatting is accepted, but no post-migration formatting contract exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md", "docs/decisions/0023-author-source-formatter-preservation.md"]
+
+[[requirement]]
+id = "post-check-test"
+state = "Unavailable"
+blocker = "No target-version compiler outcome or migration success oracle exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md", "docs/governance/compiler-compatibility-boundary.toml"]
+
+[[requirement]]
+id = "machine-readable-report"
+state = "Unavailable"
+blocker = "No public migration report schema or CLI contract exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md", "docs/governance/protocol-inventory.toml"]
+
+[[requirement]]
+id = "human-choice-stop"
+state = "Unavailable"
+blocker = "No ambiguity taxonomy, prompt protocol, or resumable transaction exists."
+evidence = ["docs/status/COMPAT-6503-AUTHORITY-AUDIT.md"]

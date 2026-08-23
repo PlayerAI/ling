@@ -537,6 +537,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `COMPAT-6502` | G6 | 1.0 Compiler 兼容矩阵 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:280`, `docs/status/COMPAT-6502-AUTHORITY-AUDIT.md` |
 | `COMPAT-6502-CURRENT` | G6 | Current compiler compatibility-boundary evidence | S | Done | Accepted `DEC-0231`; see `cargo xtask compatibility verify`, `docs/governance/compiler-compatibility-boundary.toml`, and `docs/status/COMPAT-6502-CURRENT-IMPLEMENTATION-REPORT.md`; actual 1.0, v0.1-v0.5, warning, migration, rejection, and N-1 semantics remain BlockedSpec |
 | `COMPAT-6503` | G6 | Language Migration Tool | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:293`, `docs/status/COMPAT-6503-AUTHORITY-AUDIT.md` |
+| `COMPAT-6503-READINESS` | G6 | Migration-tool readiness and absence evidence | S | Done | Accepted `DEC-0232`; see `cargo xtask migration verify`, `crates/ling-cli/src/command_catalog.rs`, and `docs/status/COMPAT-6503-READINESS-IMPLEMENTATION-REPORT.md`; version-pair, transformation, transaction, report, diagnostic, and CLI semantics remain BlockedSpec |
 | `COMPAT-6504` | G6 | 弃用政策 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:307`, `docs/status/COMPAT-6504-AUTHORITY-AUDIT.md` |
 | `REL-6601` | G6 | Fuzz 总覆盖盘点 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:321`, `docs/status/REL-6601-AUTHORITY-AUDIT.md`, `docs/testing/FUZZ-COVERAGE.md` |
 | `REL-6601-SEED` | G6 | Seed fuzz inventory and corpus drift gate | S | Done | Accepted DEC-0041; see `cargo xtask fuzz verify`, `fuzz/README.md`, and `docs/status/REL-6601-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |

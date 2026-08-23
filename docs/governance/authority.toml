@@ -3523,3 +3523,16 @@ covers = ["COMPAT-6502 bounded current compiler compatibility evidence", "v0.0.1
 depends_on = ["CONFORMANCE", "DEC-0001", "DEC-0002", "DEC-0012", "DEC-0230", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0232"
+title = "Migration tool deferred until an accepted version pair"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0232-migration-tool-deferred-until-version-pair.md"
+covers = ["COMPAT-6503 bounded migration-readiness evidence", "public migration command absent while only one released source version and no accepted version pair exist", "exact nine-requirement unavailable inventory without transformation, transaction, report, diagnostic, or CLI semantics"]
+depends_on = ["DEC-0002", "DEC-0012", "DEC-0015", "DEC-0023", "DEC-0230", "DEC-0231", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

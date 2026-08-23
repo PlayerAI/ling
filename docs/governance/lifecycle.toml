@@ -5940,3 +5940,30 @@ unresolved_alternatives = [
   "An actual 1.0 compiler subject; released v0.1-v0.5 inputs; per-surface compatibility units; warning and suppression; semantic migration; actionable rejection diagnostics; rollback; N-1 readers; cross-platform evidence; and 1.x compatibility remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0232"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0232-migration-tool-deferred-until-version-pair.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert migrate remains rejected by the implemented command catalog and no Migrate command variant or parser route exists.",
+  "Verify one released source version, no accepted pair, an absent public command, and all nine requirements in canonical order as Unavailable.",
+  "Validate every blocker/evidence path and generated report drift.",
+  "Require cargo xtask migration verify in the always-on CI contract.",
+  "Run CLI, corpus, compatibility, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds an explicit non-claim and internal drift evidence only; commands, source, parser, resolver, formatter, LSP, diagnostics, Semantic IDs, schemas, packages, dependencies, Unicode 17.0.0, and runtime behavior remain unchanged.",
+  "No command spelling is reserved and no transformation, transaction, report, diagnostic, or public protocol is added.",
+]
+unresolved_alternatives = [
+  "Concrete source-version pairs; parser/checked-semantic transformations; equivalence and semantic diff; stale edits; atomic writes; backup/rollback; formatter/post-check/test orchestration; public CLI/report schema; diagnostics; ambiguity handling; and resumable human decisions remain deferred.",
+]
+superseded_by = ""
