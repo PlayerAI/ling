@@ -26019,11 +26019,15 @@ spec = [
   "docs/status/ZQ-3203-IMPLEMENTATION-REPORT.md",
   "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
   "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md",
+  "docs/decisions/0241-current-zed-matrix-evidence.md",
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
 ]
 artifacts = [
   "docs/status/ZED-6801-AUTHORITY-AUDIT.md",
   "docs/status/ZED-6801-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/ZED-6801-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6801-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "tools/xtask/src/zed_matrix.rs",
   "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md",
   "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -26032,8 +26036,8 @@ artifacts = [
 acceptance = [
   "The matrix records Zed version, compiler/LSP range, grammar revision, protocol/schema, OS, binary acquisition, and limitations as established, not established, or unsupported based on repository evidence.",
   "The local Tree-sitter package, locked CLI version, Node requirement, generated Unicode/query corpus, and editor-only authority boundary are linked without claiming a Zed extension or Stable CST compatibility.",
-  "The audit records the Windows cache-lock failure for the attempted offline npm verification and does not convert an unexecuted or blocked command into a pass or platform claim.",
-  "The matrix preserves the `ling`/`.ling` names, Unicode 17.0.0, original UTF-8 spans, deterministic generated artifacts, and explicit unsupported LSP/Zed/binary/protocol boundaries.",
+  "The locked offline npm verification passes on Windows after authorized cache-lock access, with exact grammar/differential/query totals and zero tracked regeneration drift; Linux/macOS and Zed remain unexecuted.",
+  "The matrix preserves the `ling`/`.ling` names, Unicode 17.0.0, original UTF-8 spans, deterministic generated artifacts, the Preview lifecycle/Experimental overlay boundary, and explicit unsupported Zed/document-feature/acquisition boundaries.",
   "No placeholder command, download, protocol, backend, schema, extension package, migration promise, or stale legacy name is added.",
 ]
 verified_against_commit = ""
@@ -26041,8 +26045,9 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "ZED-6801 is BlockedSpec because no Zed extension, LSP executable, public editor schema, tested Zed version, or binary acquisition contract exists; G6 depends on G1-G5 exits.",
-  "The matrix reuses existing Tree-sitter grammar/query and differential evidence as editor-only implementation evidence and records the local Windows cache-lock limitation honestly.",
+  "ZED-6801 is BlockedSpec because no Zed extension, released standalone language-server/extension artifact, Stable editor schema, tested Zed version, or binary acquisition contract exists; G6 depends on G1-G5 exits.",
+  "Accepted DEC-0241 closes only current repository/package/LSP facts and the local Windows grammar evidence; it does not establish Zed or cross-host support.",
+  "The matrix reuses existing Tree-sitter grammar/query and differential evidence as editor-only implementation evidence while distinguishing the implemented Preview lifecycle/Experimental overlay from unavailable document features.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor protocol, dependencies, or public API.",
 ]
 
@@ -26094,8 +26099,57 @@ completion_commit = "3ed4af01362d2a0e906acd40cff863237e355303"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "The verifier protects compatibility inventory and package markers only; Tree-sitter execution and the documented Windows cache-lock limitation remain existing evidence.",
-  "No Zed extension, LSP executable, binary acquisition, protocol, schema, migration promise, or placeholder public surface is added.",
+  "The original Seed verifier protects compatibility inventory and package markers; accepted DEC-0241 adds structured package/LSP evidence and separately executed Windows grammar evidence.",
+  "No Zed extension, LSP document feature, standalone binary acquisition, Stable protocol/schema, migration promise, or placeholder public surface is added.",
+]
+
+[[task]]
+id = "ZED-6801-CURRENT-EVIDENCE"
+title = "Current LSP, grammar, and package compatibility evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["ZED-6801-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/decisions/0048-seed-zed-compatibility-matrix-gate.md",
+  "docs/decisions/0241-current-zed-matrix-evidence.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/testing/ZED-COMPATIBILITY-MATRIX.md",
+  "docs/status/ZED-6801-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "Cargo.toml",
+  "crates/ling-lsp/Cargo.toml",
+  "editors/tree-sitter-ling/package.json",
+  "editors/tree-sitter-ling/package-lock.json",
+  "editors/tree-sitter-ling/tree-sitter.json",
+  "tools/xtask/src/zed_matrix.rs",
+  "tools/xtask/src/main.rs",
+  "docs/status/ZED-6801-CURRENT-EVIDENCE-AUTHORITY-AUDIT.md",
+  "docs/status/ZED-6801-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The ten-surface matrix records the implemented Preview ling lsp --stdio lifecycle and Experimental overlay while keeping Zed integration, document features, compatibility ranges, and standalone acquisition unavailable.",
+  "cargo xtask zed verify structurally parses package.json, package-lock.json, and tree-sitter.json and validates fifteen exact identity, version, private-state, dependency, engine, script, lockfile, grammar, query, and metadata fields.",
+  "The corrected LSP claims are bound to three current evidence files covering the workspace member, ling-lsp crate, and registered lifecycle/overlay protocol versions.",
+  "npm run verify --offline passes on Windows with the locked CLI and exact grammar/differential/recovery/query totals; regeneration leaves no tracked changes, while Linux/macOS and Zed remain unexecuted.",
+  "Focused Zed and LSP checks plus workspace, CI, governance, status, formatting, lint, deterministic, and offline gates pass.",
+]
+verified_against_commit = "892bcb4287d7c2538495cafa6b34c78c28283a6b"
+completion_commit = "892bcb4287d7c2538495cafa6b34c78c28283a6b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "ZED-6801 remains BlockedSpec for an actual extension, Zed version/support decision, document-feature protocols, standalone acquisition, cross-host/Zed execution, signed release artifacts, marketplace evidence, migration policy, and G6 sign-off.",
+  "This child corrects evidence and strengthens internal validation only; no Ling semantic, diagnostic, public schema, Semantic ID, package, dependency, CLI/LSP/editor behavior, runtime, Unicode, protocol, support, or public API changes.",
 ]
 
 [[task]]
