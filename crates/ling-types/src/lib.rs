@@ -7,8 +7,8 @@ use std::fmt;
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_hir as hir;
 use ling_resolve::{
-    BindingKey, Builtin, DefinitionId, DefinitionKind, ExpressionKey, ModuleId, PreludeDefinition,
-    ReferenceTarget, ResolvedProgram,
+    BindingKey, Builtin, DefinitionId, DefinitionKind, ExpressionKey, HandlerValueType, ModuleId,
+    PreludeDefinition, ReferenceTarget, ResolvedProgram, resolve_handler_operation,
 };
 use ling_source::Span;
 use num_bigint::BigInt;
@@ -2059,14 +2059,31 @@ impl Inferencer {
                 }
                 base_type
             }
-            hir::ExpressionKind::Handle { .. } => {
-                self.push_error(
-                    module,
-                    expression.span,
-                    TypeErrorKind::UnsupportedHandler,
-                    None,
-                );
-                InferType::Error
+            hir::ExpressionKind::Handle { body, clauses } => {
+                let result = self.infer_expression(module, body);
+                for clause in clauses {
+                    let operation = resolve_handler_operation(&clause.operation.normalized())
+                        .expect("resolved handler operation is registered");
+                    for (parameter, input) in clause.parameters.iter().zip(operation.inputs()) {
+                        self.bind_pattern(module, parameter, handler_value_type(*input));
+                    }
+                    if let Some(resume) = &clause.resume {
+                        let key = BindingKey::new(module, resume.id);
+                        let resume_type =
+                            function(vec![handler_value_type(operation.output())], result.clone());
+                        self.bindings.insert(key, Scheme::mono(resume_type.clone()));
+                        self.inferred_bindings.insert(key, resume_type);
+                    }
+                    let clause_result = self.infer_expression(module, &clause.body);
+                    self.unify(
+                        result.clone(),
+                        clause_result,
+                        module,
+                        clause.body.span,
+                        None,
+                    );
+                }
+                result
             }
         };
         if matches!(value, InferType::TraitMember(_)) {
@@ -3690,6 +3707,14 @@ impl Inferencer {
             span,
             restriction_reason,
         });
+    }
+}
+
+const fn handler_value_type(value: HandlerValueType) -> InferType {
+    match value {
+        HandlerValueType::Unit => InferType::Unit,
+        HandlerValueType::Int => InferType::Int,
+        HandlerValueType::Text => InferType::Text,
     }
 }
 

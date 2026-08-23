@@ -357,7 +357,7 @@ writer_evidence = ["crates/ling-cli/src/semantic_commands.rs", "crates/ling-cli/
 protocol_id = "PROTO-AUDIT-SOURCE"
 format = "CanonicalText"
 reason = "Audit Source is an accepted canonical text grammar with an isolated parser; it is not representable as a JSON schema package."
-evidence = ["docs/decisions/0015-audit-source-format.md", "crates/ling-format/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
+evidence = ["docs/decisions/0015-audit-source-format.md", "docs/decisions/0260-checked-handler-lowering.md", "crates/ling-format/src/lib.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/handler_boundary.rs"]
 
 [[non_json_boundary]]
 protocol_id = "PROTO-CLI-COMPLETION"

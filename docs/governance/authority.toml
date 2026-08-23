@@ -4238,3 +4238,16 @@ covers = ["LSP-2103 current full-text open-document overlay", "RFC-0023 URI/vers
 depends_on = ["DEC-0002", "DEC-0019", "RFC-0004", "RFC-0023", "DEC-0257", "DEC-0258", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0260"
+title = "Checked handler lowering"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0260-checked-handler-lowering.md"
+covers = ["EFF-2103 source-to-checked Handler Core lowering", "lexical handler binding, type, resume, and residual-row checking", "Semantic Graph identity and Audit Source 0.2 projection", "checked-only execution boundary"]
+depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "DEC-0010", "DEC-0012", "DEC-0015", "DEC-0062", "DEC-0063", "DEC-0064", "DEC-0065", "DEC-0066", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = true

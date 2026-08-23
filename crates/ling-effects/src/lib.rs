@@ -7,7 +7,9 @@ use std::fmt;
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_hir as hir;
 use ling_resolve::{
-    BindingKey, Builtin, DefinitionId, DefinitionOrigin, ExpressionKey, ModuleId, ReferenceTarget,
+    BindingKey, Builtin, DefinitionId, DefinitionOrigin, ExpressionKey, HandlerResumeMode,
+    HandlerValueType, ModuleId, ReferenceTarget, ResolvedHandlerOperation,
+    resolve_handler_operation,
 };
 use ling_source::Span;
 use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
@@ -56,6 +58,14 @@ impl Effect {
     }
 }
 
+fn handler_effect(operation: &str) -> Option<Effect> {
+    match resolve_handler_operation(operation)?.label() {
+        "Console.Write" => Some(Effect::ConsoleWrite),
+        "Clock" | "Random" => None,
+        _ => None,
+    }
+}
+
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct EffectRow(BTreeSet<Effect>);
 
@@ -90,6 +100,10 @@ impl EffectRow {
 
     fn extend(&mut self, other: &Self) {
         self.0.extend(other.0.iter().cloned());
+    }
+
+    fn without(&self, handled: &BTreeSet<Effect>) -> Self {
+        Self(self.0.difference(handled).cloned().collect())
     }
 
     /// Projects the current Seed closed row into canonical, path-free names.
@@ -145,6 +159,7 @@ pub struct CheckedProgram {
     typed: TypedProgram,
     definition_effects: BTreeMap<DefinitionId, EffectRow>,
     binding_effects: BTreeMap<BindingKey, EffectRow>,
+    handler_cores: BTreeMap<ExpressionKey, HandlerCore>,
     module_capabilities: BTreeMap<ModuleId, BTreeSet<Capability>>,
     warnings: Vec<Diagnostic>,
 }
@@ -218,6 +233,16 @@ impl CheckedProgram {
     }
 
     #[must_use]
+    pub fn handler_core(&self, expression: ExpressionKey) -> Option<&HandlerCore> {
+        self.handler_cores.get(&expression)
+    }
+
+    #[must_use]
+    pub fn handler_cores(&self) -> &BTreeMap<ExpressionKey, HandlerCore> {
+        &self.handler_cores
+    }
+
+    #[must_use]
     pub fn definition_function_type(
         &self,
         definition: &DefinitionId,
@@ -271,6 +296,7 @@ pub struct EffectError {
 pub enum EffectErrorKind {
     MissingCapability { capability: &'static str },
     UnknownCapability { capability: String },
+    InvalidHandlerContract { operation: String, reason: String },
 }
 
 impl EffectError {
@@ -287,9 +313,21 @@ impl EffectError {
                 format!("Seed 不支持 Capability“{capability}”"),
                 format!("Ling Seed does not support capability `{capability}`"),
             ),
+            EffectErrorKind::InvalidHandlerContract { reason, .. } => (
+                codes::INVALID_HANDLER_CONTRACT,
+                format!("Handler clause contract 无效：{reason}"),
+                format!("handler clause contract is invalid: {reason}"),
+            ),
         };
-        Diagnostic::new(code, Severity::Error, zh, en)
-            .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span))
+        let diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
+            .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span));
+        match &self.kind {
+            EffectErrorKind::InvalidHandlerContract { operation, reason } => diagnostic
+                .with_fact("operation", operation.clone())
+                .with_fact("reason", reason.clone()),
+            EffectErrorKind::MissingCapability { .. }
+            | EffectErrorKind::UnknownCapability { .. } => diagnostic,
+        }
     }
 }
 
@@ -432,10 +470,16 @@ enum Callable {
     Binding(BindingKey),
 }
 
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct CallEdge {
+    callee: Callable,
+    handled: BTreeSet<Effect>,
+}
+
 struct Checker {
     typed: TypedProgram,
     direct_effects: BTreeMap<Callable, EffectRow>,
-    calls: BTreeMap<Callable, BTreeSet<Callable>>,
+    calls: BTreeMap<Callable, BTreeSet<CallEdge>>,
     returns: BTreeMap<Callable, BTreeSet<Callable>>,
     callable_parameters: BTreeMap<Callable, Vec<Option<BindingKey>>>,
     errors: Vec<EffectError>,
@@ -458,7 +502,8 @@ impl Checker {
 
     fn run(mut self) -> Result<CheckedProgram, Vec<EffectError>> {
         self.collect_direct_effects();
-        let callable_effects = self.propagate_effects();
+        let callable_effects = self.propagate_effects(true);
+        let capability_effects = self.propagate_effects(false);
         let definition_effects = callable_effects
             .iter()
             .filter_map(|(callable, effects)| match callable {
@@ -467,18 +512,27 @@ impl Checker {
             })
             .collect();
         let binding_effects = callable_effects
-            .into_iter()
+            .iter()
             .filter_map(|(callable, effects)| match callable {
-                Callable::Binding(binding) => Some((binding, effects)),
+                Callable::Binding(binding) => Some((*binding, effects.clone())),
                 Callable::Definition(_) => None,
             })
             .collect();
-        let module_capabilities = self.check_capabilities(&definition_effects);
+        let handler_cores = self.build_handler_cores(&callable_effects);
+        let capability_definition_effects = capability_effects
+            .iter()
+            .filter_map(|(callable, effects)| match callable {
+                Callable::Definition(definition) => Some((definition.clone(), effects.clone())),
+                Callable::Binding(_) => None,
+            })
+            .collect();
+        let module_capabilities = self.check_capabilities(&capability_definition_effects);
         if self.errors.is_empty() {
             Ok(CheckedProgram {
                 typed: self.typed,
                 definition_effects,
                 binding_effects,
+                handler_cores,
                 module_capabilities,
                 warnings: self.warnings,
             })
@@ -582,7 +636,13 @@ impl Checker {
     ) {
         let mut effects = EffectRow::default();
         let mut calls = BTreeSet::new();
-        self.visit_expression(module, expression, &mut effects, &mut calls);
+        self.visit_expression(
+            module,
+            expression,
+            &BTreeSet::new(),
+            &mut effects,
+            &mut calls,
+        );
         self.direct_effects.insert(callable.clone(), effects);
         self.calls
             .entry(callable.clone())
@@ -611,7 +671,10 @@ impl Checker {
 
     fn connect_alias(&mut self, alias: Callable, module: ModuleId, expression: &hir::Expression) {
         if let Some(target) = self.value_callable(module, expression) {
-            self.calls.entry(alias).or_default().insert(target);
+            self.calls.entry(alias).or_default().insert(CallEdge {
+                callee: target,
+                handled: BTreeSet::new(),
+            });
         }
     }
 
@@ -619,8 +682,9 @@ impl Checker {
         &mut self,
         module: ModuleId,
         expression: &hir::Expression,
+        handled: &BTreeSet<Effect>,
         effects: &mut EffectRow,
-        calls: &mut BTreeSet<Callable>,
+        calls: &mut BTreeSet<CallEdge>,
     ) {
         match &expression.kind {
             hir::ExpressionKind::Sequence(elements) => {
@@ -630,7 +694,13 @@ impl Checker {
                             let binding_callable =
                                 Callable::Binding(BindingKey::new(module, binding.id));
                             if binding.parameters.is_empty() {
-                                self.visit_expression(module, &binding.value, effects, calls);
+                                self.visit_expression(
+                                    module,
+                                    &binding.value,
+                                    handled,
+                                    effects,
+                                    calls,
+                                );
                                 self.connect_alias(binding_callable, module, &binding.value);
                             } else {
                                 self.register_parameters(
@@ -646,7 +716,7 @@ impl Checker {
                             }
                         }
                         hir::SequenceElement::Expression(expression) => {
-                            self.visit_expression(module, expression, effects, calls);
+                            self.visit_expression(module, expression, handled, effects, calls);
                         }
                     }
                 }
@@ -656,17 +726,17 @@ impl Checker {
                 then_branch,
                 else_branch,
             } => {
-                self.visit_expression(module, condition, effects, calls);
-                self.visit_expression(module, then_branch, effects, calls);
-                self.visit_expression(module, else_branch, effects, calls);
+                self.visit_expression(module, condition, handled, effects, calls);
+                self.visit_expression(module, then_branch, handled, effects, calls);
+                self.visit_expression(module, else_branch, handled, effects, calls);
             }
             hir::ExpressionKind::Match { scrutinee, cases } => {
-                self.visit_expression(module, scrutinee, effects, calls);
+                self.visit_expression(module, scrutinee, handled, effects, calls);
                 for case in cases {
                     if let Some(guard) = &case.guard {
-                        self.visit_expression(module, guard, effects, calls);
+                        self.visit_expression(module, guard, handled, effects, calls);
                     }
-                    self.visit_expression(module, &case.body, effects, calls);
+                    self.visit_expression(module, &case.body, handled, effects, calls);
                 }
             }
             hir::ExpressionKind::Assignment { value, .. } => {
@@ -679,19 +749,24 @@ impl Checker {
                         identity: self.typed.arena().display(type_id),
                     })
                     .expect("checked assignment has a root place type");
-                effects.insert(state_type);
-                self.visit_expression(module, value, effects, calls);
+                if !handled.contains(&state_type) {
+                    effects.insert(state_type);
+                }
+                self.visit_expression(module, value, handled, effects, calls);
             }
             hir::ExpressionKind::Application {
                 function,
                 arguments,
             } => {
-                self.visit_expression(module, function, effects, calls);
+                self.visit_expression(module, function, handled, effects, calls);
                 if let Some(call) = self
                     .typed
                     .trait_member_call(ExpressionKey::new(module, expression.id))
                 {
-                    calls.insert(Callable::Definition(call.implementation().clone()));
+                    calls.insert(CallEdge {
+                        callee: Callable::Definition(call.implementation().clone()),
+                        handled: handled.clone(),
+                    });
                 }
                 if let Some((callee, applied)) = self.expression_callable_state(module, function) {
                     let target = if applied > 0 {
@@ -710,53 +785,465 @@ impl Checker {
                             Callable::Definition(definition)
                                 if definition == self.typed.resolved().builtin_id(Builtin::Map)
                         );
-                        calls.insert(target.clone());
+                        calls.insert(CallEdge {
+                            callee: target.clone(),
+                            handled: handled.clone(),
+                        });
                         self.connect_arguments(&target, module, arguments);
                         if is_map {
                             if let Some(callback) = arguments
                                 .first()
                                 .and_then(|argument| self.expression_callable(module, argument))
                             {
-                                calls.insert(callback);
+                                calls.insert(CallEdge {
+                                    callee: callback,
+                                    handled: handled.clone(),
+                                });
                             }
                         }
                     }
                 }
                 for argument in arguments {
-                    self.visit_expression(module, argument, effects, calls);
+                    self.visit_expression(module, argument, handled, effects, calls);
                 }
             }
             hir::ExpressionKind::Projection { target, .. } => {
                 if self.expression_callable(module, expression).is_none() {
-                    self.visit_expression(module, target, effects, calls);
+                    self.visit_expression(module, target, handled, effects, calls);
                 }
             }
             hir::ExpressionKind::Binary { left, right, .. } => {
-                self.visit_expression(module, left, effects, calls);
-                self.visit_expression(module, right, effects, calls);
+                self.visit_expression(module, left, handled, effects, calls);
+                self.visit_expression(module, right, handled, effects, calls);
             }
             hir::ExpressionKind::Unary { operand, .. } => {
-                self.visit_expression(module, operand, effects, calls);
+                self.visit_expression(module, operand, handled, effects, calls);
             }
             hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => {
                 for element in elements {
-                    self.visit_expression(module, element, effects, calls);
+                    self.visit_expression(module, element, handled, effects, calls);
                 }
             }
             hir::ExpressionKind::Record(fields) => {
                 for field in fields {
-                    self.visit_expression(module, &field.value, effects, calls);
+                    self.visit_expression(module, &field.value, handled, effects, calls);
                 }
             }
             hir::ExpressionKind::RecordUpdate { base, fields } => {
-                self.visit_expression(module, base, effects, calls);
+                self.visit_expression(module, base, handled, effects, calls);
                 for field in fields {
-                    self.visit_expression(module, &field.value, effects, calls);
+                    self.visit_expression(module, &field.value, handled, effects, calls);
                 }
             }
-            // The resolver rejects unresolved handlers before Effect checking;
-            // this branch intentionally does not infer handler semantics.
-            hir::ExpressionKind::Handle { .. } => {}
+            hir::ExpressionKind::Handle { body, clauses } => {
+                let mut inner = handled.clone();
+                for clause in clauses {
+                    if let Some(effect) = handler_effect(&clause.operation.normalized()) {
+                        inner.insert(effect);
+                    }
+                }
+                self.visit_expression(module, body, &inner, effects, calls);
+                for clause in clauses {
+                    self.visit_expression(module, &clause.body, handled, effects, calls);
+                }
+            }
+            hir::ExpressionKind::Name { .. }
+            | hir::ExpressionKind::Literal(_)
+            | hir::ExpressionKind::Unit => {}
+        }
+    }
+
+    fn expression_effects(
+        &self,
+        module: ModuleId,
+        expression: &hir::Expression,
+        callable_effects: &BTreeMap<Callable, EffectRow>,
+    ) -> EffectRow {
+        let mut output = EffectRow::default();
+        match &expression.kind {
+            hir::ExpressionKind::Sequence(elements) => {
+                for element in elements {
+                    match element {
+                        hir::SequenceElement::Let(binding) if binding.parameters.is_empty() => {
+                            output.extend(&self.expression_effects(
+                                module,
+                                &binding.value,
+                                callable_effects,
+                            ));
+                        }
+                        hir::SequenceElement::Expression(value) => {
+                            output.extend(&self.expression_effects(module, value, callable_effects))
+                        }
+                        hir::SequenceElement::Let(_) => {}
+                    }
+                }
+            }
+            hir::ExpressionKind::Handle { body, clauses } => {
+                let input = self.expression_effects(module, body, callable_effects);
+                let handled = clauses
+                    .iter()
+                    .filter_map(|clause| handler_effect(&clause.operation.normalized()))
+                    .collect();
+                output.extend(&input.without(&handled));
+                for clause in clauses {
+                    output.extend(&self.expression_effects(module, &clause.body, callable_effects));
+                }
+            }
+            hir::ExpressionKind::If {
+                condition,
+                then_branch,
+                else_branch,
+            } => {
+                for value in [
+                    condition.as_ref(),
+                    then_branch.as_ref(),
+                    else_branch.as_ref(),
+                ] {
+                    output.extend(&self.expression_effects(module, value, callable_effects));
+                }
+            }
+            hir::ExpressionKind::Match { scrutinee, cases } => {
+                output.extend(&self.expression_effects(module, scrutinee, callable_effects));
+                for case in cases {
+                    if let Some(guard) = &case.guard {
+                        output.extend(&self.expression_effects(module, guard, callable_effects));
+                    }
+                    output.extend(&self.expression_effects(module, &case.body, callable_effects));
+                }
+            }
+            hir::ExpressionKind::Assignment { value, .. } => {
+                let key = ExpressionKey::new(module, expression.id);
+                if let Some(type_id) = self.typed.place_root_type(key) {
+                    output.insert(Effect::State {
+                        display: self.typed.display_type(type_id),
+                        identity: self.typed.arena().display(type_id),
+                    });
+                }
+                output.extend(&self.expression_effects(module, value, callable_effects));
+            }
+            hir::ExpressionKind::Application {
+                function,
+                arguments,
+            } => {
+                output.extend(&self.expression_effects(module, function, callable_effects));
+                for argument in arguments {
+                    output.extend(&self.expression_effects(module, argument, callable_effects));
+                }
+                if let Some(call) = self
+                    .typed
+                    .trait_member_call(ExpressionKey::new(module, expression.id))
+                    .and_then(|call| {
+                        callable_effects.get(&Callable::Definition(call.implementation().clone()))
+                    })
+                {
+                    output.extend(call);
+                }
+                if let Some((callee, applied)) = self.expression_callable_state(module, function) {
+                    let target = if applied > 0 {
+                        self.value_callable(module, function)
+                            .unwrap_or_else(|| callee.clone())
+                    } else {
+                        callee.clone()
+                    };
+                    let target_applied = if target == callee { applied } else { 0 };
+                    let complete = self.callable_arity(&target).is_none_or(|arity| {
+                        target_applied.saturating_add(arguments.len()) >= arity
+                    });
+                    if complete {
+                        if let Some(effects) = callable_effects.get(&target) {
+                            output.extend(effects);
+                        }
+                        if matches!(
+                            &target,
+                            Callable::Definition(definition)
+                                if definition == self.typed.resolved().builtin_id(Builtin::Map)
+                        ) {
+                            if let Some(callback) = arguments
+                                .first()
+                                .and_then(|argument| self.expression_callable(module, argument))
+                                .and_then(|callback| callable_effects.get(&callback))
+                            {
+                                output.extend(callback);
+                            }
+                        }
+                    }
+                }
+            }
+            hir::ExpressionKind::Projection { target, .. } => {
+                if self.expression_callable(module, expression).is_none() {
+                    output.extend(&self.expression_effects(module, target, callable_effects));
+                }
+            }
+            hir::ExpressionKind::Binary { left, right, .. } => {
+                output.extend(&self.expression_effects(module, left, callable_effects));
+                output.extend(&self.expression_effects(module, right, callable_effects));
+            }
+            hir::ExpressionKind::Unary { operand, .. } => {
+                output.extend(&self.expression_effects(module, operand, callable_effects));
+            }
+            hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => {
+                for element in elements {
+                    output.extend(&self.expression_effects(module, element, callable_effects));
+                }
+            }
+            hir::ExpressionKind::Record(fields) => {
+                for field in fields {
+                    output.extend(&self.expression_effects(module, &field.value, callable_effects));
+                }
+            }
+            hir::ExpressionKind::RecordUpdate { base, fields } => {
+                output.extend(&self.expression_effects(module, base, callable_effects));
+                for field in fields {
+                    output.extend(&self.expression_effects(module, &field.value, callable_effects));
+                }
+            }
+            hir::ExpressionKind::Name { .. }
+            | hir::ExpressionKind::Literal(_)
+            | hir::ExpressionKind::Unit => {}
+        }
+        output
+    }
+
+    fn build_handler_cores(
+        &mut self,
+        callable_effects: &BTreeMap<Callable, EffectRow>,
+    ) -> BTreeMap<ExpressionKey, HandlerCore> {
+        let modules = self.typed.resolved().modules().to_vec();
+        let mut output = BTreeMap::new();
+        for module in modules {
+            for definition in &module.hir.definitions {
+                self.collect_handler_cores(
+                    module.id,
+                    &module.hir.source_name,
+                    &definition.value,
+                    callable_effects,
+                    &mut output,
+                );
+            }
+            for implementation in &module.hir.impls {
+                for definition in &implementation.members {
+                    self.collect_handler_cores(
+                        module.id,
+                        &module.hir.source_name,
+                        &definition.value,
+                        callable_effects,
+                        &mut output,
+                    );
+                }
+            }
+        }
+        output
+    }
+
+    fn collect_handler_cores(
+        &mut self,
+        module: ModuleId,
+        source_name: &str,
+        expression: &hir::Expression,
+        callable_effects: &BTreeMap<Callable, EffectRow>,
+        output: &mut BTreeMap<ExpressionKey, HandlerCore>,
+    ) {
+        match &expression.kind {
+            hir::ExpressionKind::Sequence(elements) => {
+                for element in elements {
+                    let value = match element {
+                        hir::SequenceElement::Let(binding) => &binding.value,
+                        hir::SequenceElement::Expression(value) => value,
+                    };
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        value,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
+            hir::ExpressionKind::Handle { body, clauses } => {
+                self.collect_handler_cores(module, source_name, body, callable_effects, output);
+                for clause in clauses {
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        &clause.body,
+                        callable_effects,
+                        output,
+                    );
+                }
+                let built = (|| {
+                    let input =
+                        effect_row_model(&self.expression_effects(module, body, callable_effects))?;
+                    let mut core_clauses = Vec::with_capacity(clauses.len());
+                    for clause in clauses {
+                        let operation_name = clause.operation.normalized();
+                        let operation = resolve_handler_operation(&operation_name)
+                            .ok_or_else(|| format!("unknown operation `{operation_name}`"))?;
+                        let clause_contract = handler_clause(operation)?;
+                        let uses = clause.resume.as_ref().map_or(0, |resume| {
+                            self.typed
+                                .resolved()
+                                .handler_resume_uses(BindingKey::new(module, resume.id))
+                                .unwrap_or(0)
+                        });
+                        let resume_use = match uses {
+                            0 => ResumeUse::Never,
+                            1 => ResumeUse::Once,
+                            _ => ResumeUse::Many,
+                        };
+                        core_clauses.push(HandlerCoreClause::new(
+                            clause_contract,
+                            handler_node_id(clause.body.id),
+                            resume_use,
+                        ));
+                    }
+                    let key = ExpressionKey::new(module, expression.id);
+                    let return_type = self
+                        .typed
+                        .expression_type(key)
+                        .ok_or_else(|| "missing checked handler result type".to_owned())?;
+                    HandlerCore::new(
+                        input,
+                        handler_node_id(body.id),
+                        canonical_type_ref(&self.typed.display_type(return_type))?,
+                        core_clauses,
+                        Some(EffectSourceSpan::new(
+                            source_name,
+                            u64::from(expression.span.start().get()),
+                            u64::from(expression.span.end().get()),
+                        )),
+                    )
+                    .map_err(|error| error.to_string())
+                    .map(|core| (key, core))
+                })();
+                match built {
+                    Ok((key, core)) => {
+                        output.insert(key, core);
+                    }
+                    Err(reason) => self.errors.push(EffectError {
+                        kind: EffectErrorKind::InvalidHandlerContract {
+                            operation: clauses
+                                .first()
+                                .map_or_else(String::new, |clause| clause.operation.normalized()),
+                            reason,
+                        },
+                        source_name: source_name.to_owned(),
+                        span: expression.span,
+                    }),
+                }
+            }
+            hir::ExpressionKind::If {
+                condition,
+                then_branch,
+                else_branch,
+            } => {
+                for value in [
+                    condition.as_ref(),
+                    then_branch.as_ref(),
+                    else_branch.as_ref(),
+                ] {
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        value,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
+            hir::ExpressionKind::Match { scrutinee, cases } => {
+                self.collect_handler_cores(
+                    module,
+                    source_name,
+                    scrutinee,
+                    callable_effects,
+                    output,
+                );
+                for case in cases {
+                    if let Some(guard) = &case.guard {
+                        self.collect_handler_cores(
+                            module,
+                            source_name,
+                            guard,
+                            callable_effects,
+                            output,
+                        );
+                    }
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        &case.body,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
+            hir::ExpressionKind::Assignment { value, .. } => {
+                self.collect_handler_cores(module, source_name, value, callable_effects, output)
+            }
+            hir::ExpressionKind::Application {
+                function,
+                arguments,
+            } => {
+                self.collect_handler_cores(module, source_name, function, callable_effects, output);
+                for argument in arguments {
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        argument,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
+            hir::ExpressionKind::Projection { target, .. }
+            | hir::ExpressionKind::Unary {
+                operand: target, ..
+            } => self.collect_handler_cores(module, source_name, target, callable_effects, output),
+            hir::ExpressionKind::Binary { left, right, .. } => {
+                for value in [left.as_ref(), right.as_ref()] {
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        value,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
+            hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => {
+                for element in elements {
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        element,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
+            hir::ExpressionKind::Record(fields) => {
+                for field in fields {
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        &field.value,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
+            hir::ExpressionKind::RecordUpdate { base, fields } => {
+                self.collect_handler_cores(module, source_name, base, callable_effects, output);
+                for field in fields {
+                    self.collect_handler_cores(
+                        module,
+                        source_name,
+                        &field.value,
+                        callable_effects,
+                        output,
+                    );
+                }
+            }
             hir::ExpressionKind::Name { .. }
             | hir::ExpressionKind::Literal(_)
             | hir::ExpressionKind::Unit => {}
@@ -787,7 +1274,10 @@ impl Checker {
             self.calls
                 .entry(Callable::Binding(parameter))
                 .or_default()
-                .insert(argument);
+                .insert(CallEdge {
+                    callee: argument,
+                    handled: BTreeSet::new(),
+                });
         }
     }
 
@@ -865,16 +1355,20 @@ impl Checker {
         }
     }
 
-    fn propagate_effects(&self) -> BTreeMap<Callable, EffectRow> {
+    fn propagate_effects(&self, apply_handlers: bool) -> BTreeMap<Callable, EffectRow> {
         let mut effects = self.direct_effects.clone();
         let mut changed = true;
         while changed {
             changed = false;
             for (caller, callees) in &self.calls {
                 let mut next = effects.get(caller).cloned().unwrap_or_default();
-                for callee in callees {
-                    if let Some(callee_effects) = effects.get(callee) {
-                        next.extend(callee_effects);
+                for edge in callees {
+                    if let Some(callee_effects) = effects.get(&edge.callee) {
+                        if apply_handlers {
+                            next.extend(&callee_effects.without(&edge.handled));
+                        } else {
+                            next.extend(callee_effects);
+                        }
                     }
                 }
                 if effects.get(caller) != Some(&next) {
@@ -948,6 +1442,62 @@ impl Checker {
         }
         output
     }
+}
+
+fn handler_node_id(expression: hir::ExpressionId) -> HandlerCoreNodeId {
+    HandlerCoreNodeId::new(expression.get().saturating_add(1))
+}
+
+fn handler_clause(operation: ResolvedHandlerOperation) -> Result<HandlerClause, String> {
+    let owner = EffectId::new(operation.owner()).map_err(|error| error.to_string())?;
+    let label = EffectLabel::new(owner.clone(), []);
+    let inputs = operation
+        .inputs()
+        .iter()
+        .copied()
+        .map(handler_type_ref)
+        .collect::<Result<Vec<_>, _>>()?;
+    let operation = EffectOperation::new(
+        owner,
+        operation.operation(),
+        inputs,
+        handler_type_ref(operation.output())?,
+        match operation.resume_mode() {
+            HandlerResumeMode::Never => ResumeMode::Never,
+            HandlerResumeMode::Once => ResumeMode::Once,
+            HandlerResumeMode::Many => ResumeMode::Many,
+        },
+    )
+    .map_err(|error| error.to_string())?;
+    HandlerClause::new(label, operation).map_err(|error| error.to_string())
+}
+
+fn handler_type_ref(value: HandlerValueType) -> Result<EffectTypeRef, String> {
+    EffectTypeRef::new(match value {
+        HandlerValueType::Unit => "Unit",
+        HandlerValueType::Int => "Int",
+        HandlerValueType::Text => "Text",
+    })
+    .map_err(|error| error.to_string())
+}
+
+fn canonical_type_ref(display: &str) -> Result<EffectTypeRef, String> {
+    let canonical = display
+        .chars()
+        .filter(|character| !character.is_whitespace())
+        .collect::<String>();
+    EffectTypeRef::new(&canonical).map_err(|error| error.to_string())
+}
+
+fn effect_row_model(row: &EffectRow) -> Result<EffectRowModel, String> {
+    let labels = row
+        .effects()
+        .map(|effect| match effect {
+            Effect::ConsoleWrite => Ok(EffectLabel::console_write()),
+            Effect::State { identity, .. } => canonical_type_ref(identity).map(EffectLabel::state),
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+    Ok(EffectRowModel::closed(labels))
 }
 
 #[cfg(test)]

@@ -53,7 +53,7 @@
 | `PROTO-CANONICAL-BYTES` | Public | Canonical identity | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | no | yes | 2 |
 | `PROTO-PACKAGE-IDENTITY` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 9 |
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 4 |
-| `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.1` | `Preview` | yes | yes | 2 |
+| `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.2` | `Preview` | yes | yes | 3 |
 | `PROTO-CLI-COMPLETION` | Public | Text protocol | `ling.cli-completion/0.1` | `Preview` | yes | yes | 5 |
 | `PROTO-BUILD-METADATA` | Public | Package metadata | `ling.project.artifact/0.1` | `Experimental` | no | yes | 3 |
 | `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 26 |
@@ -467,7 +467,7 @@
 - Authority: `RFC-0002`, `DEC-0012`
 - Sources: [`crates/ling-resolve/src/lib.rs`](../../crates/ling-resolve/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/RFC-0002.md`](../RFC-0002.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.2/schema.json`](../../schemas/semantic/0.2/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
 - Fixtures: [`crates/ling-semantic/tests/project_snapshot.rs`](../../crates/ling-semantic/tests/project_snapshot.rs), [`tests/projects/resolution-v1/valid-cross-package`](../../tests/projects/resolution-v1/valid-cross-package), [`schemas/semantic/0.2/schema.json`](../../schemas/semantic/0.2/schema.json), [`schemas/semantic/0.2/valid`](../../schemas/semantic/0.2/valid), [`schemas/semantic/0.2/invalid`](../../schemas/semantic/0.2/invalid), [`schemas/semantic/0.2/canonical`](../../schemas/semantic/0.2/canonical)
-- Notes: File-oriented Seed commands remain on ling.semantic/0.1; PRJ-1107 must explicitly select project mode before any CLI can emit this protocol.; No package-aware Audit Source is claimed because accepted ling.audit/0.1 has no package coordinate model.
+- Notes: File-oriented Seed commands remain on ling.semantic/0.1; PRJ-1107 must explicitly select project mode before any CLI can emit this protocol.; No package-aware Audit Source is claimed because accepted ling.audit/0.1 and ling.audit/0.2 have no package coordinate model.
 
 ### `PROTO-REPL-JSON` — REPL submission event JSON
 
@@ -577,14 +577,14 @@
 
 - Producer: ling-format Audit renderer; ling audit
 - Consumer: ling-format isolated Audit parser; independent audit tooling
-- Reader policy: Require the exact Audit version; parse into an isolated AuditModel, validate semantic/reference invariants, and never convert the result to CheckedProgram or evaluator input.
-- Writer policy: Emit one BOM-free UTF-8/LF/two-space canonical document with fixed ordering, JSON string escaping, implemented Seed fields only, and exactly one final LF.
+- Reader policy: Accept exact ling.audit/0.1 and ling.audit/0.2 headers; 0.1 rejects Handler fields, while 0.2 validates Handler expression identity, byte span, Core body/type, input/eliminated/residual rows, operation labels, and resume mode/use. Parse only into an isolated AuditModel and never convert it to CheckedProgram or evaluator input.
+- Writer policy: Emit one BOM-free UTF-8/LF/two-space canonical document with fixed ordering, JSON string escaping, and exactly one final LF. Models without handlers retain ling.audit/0.1 bytes; models with checked handlers emit ling.audit/0.2 Handler blocks.
 - Unknown-field policy: Accept and discard x-* extension fields, accept input field reordering, and reject unknown core fields.
-- Migration tool: None; incompatible grammar/model changes upgrade ling.audit/* and must document compatibility with the referenced Semantic Schema.
-- Authority: `DEC-0015`
-- Sources: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`docs/decisions/0015-audit-source-format.md`](../decisions/0015-audit-source-format.md)
-- Fixtures: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
-- Notes: The accepted 0.1 format is Preview rather than 1.0 Stable and embeds Experimental semantic identities.
+- Migration tool: None; 0.1 remains accepted for handler-free models, 0.2 is selected only when checked Handler evidence is present, and future incompatible changes must upgrade ling.audit/*.
+- Authority: `DEC-0015`, `DEC-0260`
+- Sources: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0015-audit-source-format.md`](../decisions/0015-audit-source-format.md), [`docs/decisions/0260-checked-handler-lowering.md`](../decisions/0260-checked-handler-lowering.md)
+- Fixtures: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/handler_boundary.rs`](../../crates/ling-cli/tests/handler_boundary.rs)
+- Notes: Both accepted revisions are Preview and embed Experimental semantic identities; 0.2 is a bounded Handler projection, not executable Core or a package-aware Audit protocol.
 
 ### `PROTO-CLI-COMPLETION` — Ling canonical shell completion scripts
 

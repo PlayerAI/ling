@@ -24,7 +24,7 @@ accepted.
 | Chinese-first runnable source | `examples/tutorial-zh.ling`; Chinese domain identifiers | `DOC-6703-AUTHORITY-AUDIT`; process-level conformance | Seed evidence |
 | Idiomatic English equivalent | `examples/tutorial-en.ling`; domain names are not mechanically translated | `DOC-6703-AUTHORITY-AUDIT`; process-level conformance | Seed evidence |
 | Checked offline commands | locked `check` and `run` commands for both sources | `docs/TUTORIAL.md` Verification | Seed evidence |
-| Semantic and Audit output | `semantic` for both; `audit` for the Chinese source | `ling.semantic/0.1`; `ling.audit/0.1` | Experimental/Preview |
+| Semantic and Audit output | `semantic` for both; `audit` for the Chinese source | `ling.semantic/0.1`; handler-free `ling.audit/0.1`, Handler `ling.audit/0.2` | Experimental/Preview |
 | Correct missing-Capability error | `p7-missing-capability` registered negative fixture | `ERROR-CODES.md`; conformance expectation | Seed evidence |
 | Bilingual terminology | Chinese-first and English explanations use natural domain vocabulary | `docs/TUTORIAL.md` sections 2–4 | Seed evidence |
 | Unicode 17 and original UTF-8 spans | Chinese identifiers and explicit span guidance | `LANGUAGE.md`; `SEMANTICS.md`; `AGENTS.md` | Seed evidence |

@@ -319,7 +319,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
             hir::ExpressionKind::Handle { .. } => Err(self.fault(
                 module,
                 expression.span,
-                "unresolved handler reached evaluator",
+                "checked handler execution requires accepted EFF-2104 authority",
             )),
             hir::ExpressionKind::If {
                 condition,
@@ -1267,6 +1267,28 @@ mod tests {
             }
         ));
         assert_eq!(fault.to_diagnostic().code(), codes::RUNTIME_FAULT);
+    }
+
+    #[test]
+    fn checked_handler_execution_remains_a_structured_eff_2104_boundary() {
+        let snapshot = snapshot(concat!(
+            "module Main\n\n",
+            "let main () =\n",
+            "    handle () with\n",
+            "        operation Clock.now() -> ()\n",
+        ));
+        let main = locate_main(snapshot.checked()).expect("valid main");
+        let mut console = MemoryConsole::default();
+        let fault = execute_main(&snapshot, &main, &mut console)
+            .expect_err("EFF-2103 does not authorize Handler execution");
+        assert!(matches!(
+            fault.kind,
+            RuntimeFaultKind::InvalidCheckedCore {
+                invariant: "checked handler execution requires accepted EFF-2104 authority"
+            }
+        ));
+        assert_eq!(fault.to_diagnostic().code(), codes::RUNTIME_FAULT);
+        assert!(fault.span.start() < fault.span.end());
     }
 
     #[test]

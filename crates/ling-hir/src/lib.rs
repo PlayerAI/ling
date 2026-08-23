@@ -248,8 +248,15 @@ pub struct HandlerClause {
     pub span: Span,
     pub operation: QualifiedName,
     pub parameters: Vec<Pattern>,
-    pub resume: Option<Name>,
+    pub resume: Option<HandlerResume>,
     pub body: Expression,
+}
+
+/// A lexical resume binding allocated during AST-to-HIR lowering.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct HandlerResume {
+    pub id: BindingId,
+    pub name: Name,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -903,7 +910,10 @@ impl Lowerer {
                                 .iter()
                                 .map(|parameter| self.pattern(parameter))
                                 .collect::<Result<Vec<_>, _>>()?,
-                            resume: clause.resume.as_ref().map(name),
+                            resume: clause.resume.as_ref().map(|resume| HandlerResume {
+                                id: self.binding_id(),
+                                name: name(resume),
+                            }),
                             body: self.expression(&clause.body)?,
                         })
                     })

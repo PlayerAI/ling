@@ -68,6 +68,7 @@ This file is the single source of truth for stable diagnostic-code allocation. A
 | `L-EFFECT-0002` | `EFFECT` | `Preview` | `Error` | Effect Row occurs check 发现无限 Row | Effect row occurs check found an infinite row | Effect Row 推导产生无限 Row | effect row inference produced an infinite row | `conflict_set:string[], row:string, variable:string` | — | `0.0.1-dev` |
 | `L-EFFECT-0003` | `EFFECT` | `Preview` | `Error` | Handler 残留 Effect 未处理 | Handler residual Effect is unhandled | Handler 作用域仍有未处理 Effect：{residual_row} | handler scope leaves an unhandled residual Effect: `{residual_row}` | `boundary:string, residual_row:string` | — | `0.0.1-dev` |
 | `L-EFFECT-0004` | `EFFECT` | `Preview` | `Error` | Handler 尚未具备已检查语义 | Handler does not yet have checked semantics | Handler 尚未具备已检查语义 | handler does not yet have checked semantics | — | — | `0.0.1-dev` |
+| `L-EFFECT-0005` | `EFFECT` | `Preview` | `Error` | Handler clause contract 无效 | Handler clause contract is invalid | Handler clause contract 无效：{reason} | handler clause contract is invalid: {reason} | `actual?:string, expected?:string, operation:string, reason:string` | — | `0.0.1-dev` |
 | `L-ENTRY-0001` | `ENTRY` | `Preview` | `Error` | run 入口 module 不是 Main | Run entry module is not Main | run 入口模块必须是 Main | the run entry module must be `Main` | — | — | `0.0.1-dev` |
 | `L-ENTRY-0002` | `ENTRY` | `Preview` | `Error` | Main 缺少 main | Main has no main | Main 模块缺少 main 定义 | module `Main` does not define `main` | — | — | `0.0.1-dev` |
 | `L-ENTRY-0003` | `ENTRY` | `Preview` | `Error` | main 签名或参数 pattern 非法 | Invalid main signature or parameter pattern | main 必须具有 Unit -> Unit 和 Unit pattern | `main` must have Unit -> Unit and a Unit pattern | — | — | `0.0.1-dev` |
@@ -119,6 +120,7 @@ Retired entries preserve their code, root-cause meaning, severity, and payload t
 
 | Code | Phase | Stability | Severity | 中文标题 | English title | 中文模板 | English template | Payload schema | Repair schema | Since |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `L-EFFECT-0006` | `EFFECT` | `Deprecated` | `Error` | 已检查 Handler 尚不能进入后续阶段 | Checked handler is unavailable at a downstream stage | 已检查 Handler 尚不能进入 {stage} 阶段 | checked handler is not yet available at the `{stage}` stage | `stage:string` | — | `0.0.1-dev` |
 | `L-IMPL-0001` | `IMPL` | `Deprecated` | `Error` | 所请求路径依赖尚未实现的编译阶段（已废弃/保留） | Requested path requires an unimplemented compiler stage (deprecated/reserved) | `{command}` 命令所需的编译阶段尚未实现 | the compiler stage required by `{command}` is not implemented yet | `command:string, completed_stage:string, had_bom?:boolean, source_name?:string, token_count?:integer, unicode_version?:string` | — | `0.0.1-dev` |
 
 ## 兼容性边界 / Compatibility boundary

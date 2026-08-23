@@ -202,6 +202,34 @@ fn unsupported_checked_features_fail_atomically_with_original_span() {
 }
 
 #[test]
+fn every_bytecode_revision_rejects_checked_handlers_atomically() {
+    let text = concat!(
+        "module Main\n\n",
+        "let main () =\n",
+        "    handle () with\n",
+        "        operation Clock.now() -> ()\n",
+    );
+    let (source, snapshot) = checked_source("handler.ling", text);
+    let sources = [LoweringSource::new(&source, "src/Main.ling")];
+    let errors = [
+        lower_v1(&snapshot, &sources).expect_err("bytecode 1.0 rejects Handler"),
+        lower_v1_1(&snapshot, &sources).expect_err("bytecode 1.1 rejects Handler"),
+        lower_v1_2(&snapshot, &sources).expect_err("bytecode 1.2 rejects Handler"),
+    ];
+    let start = u32::try_from(text.find("handle").expect("Handler token")).expect("span fits");
+    for error in errors {
+        assert_eq!(error.source_name(), Some("handler.ling"));
+        assert_eq!(error.span().map(|span| span.start().get()), Some(start));
+        assert_eq!(
+            error.kind(),
+            &LoweringErrorKind::UnsupportedFeature {
+                feature: "handler".to_owned()
+            }
+        );
+    }
+}
+
+#[test]
 fn physical_or_ambiguous_logical_source_names_are_rejected() {
     let (source, snapshot) = checked_source("display-only.ling", HELLO);
     let error = lower_v1(

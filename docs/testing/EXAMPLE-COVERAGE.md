@@ -29,7 +29,7 @@ authorize syntax, protocols, profiles, ownership rules, or runtime behavior.
 | Unicode 17 and Chinese names | `examples/hello.ling` and `examples/人物.ling` | ADT/person fixtures with Chinese definitions and fields; mixed-script negative fixture | Original UTF-8 spans and Unicode 17.0.0 are tested; Seed evidence covered |
 | Types, patterns, and Place | `examples/adt-match.ling` | `examples/人物.ling`, record/pattern and exhaustiveness fixtures | Semantic graphs are emitted for process examples; Seed evidence covered |
 | Effect and Capability | `requires Console.Write` in the executable examples | missing-capability and higher-order-capability negatives | Audit records `Console.Write`; there is no selectable Profile; ownership is outside Seed |
-| Semantic Graph and Audit Source | `examples/hello.ling` | `examples/人物.ling`, `examples/adt-match.ling`, and `examples/pipeline.ling` | `ling.semantic/0.1` and `ling.audit/0.1` remain Experimental/Preview protocols |
+| Semantic Graph and Audit Source | `examples/hello.ling` | `examples/人物.ling`, `examples/adt-match.ling`, and `examples/pipeline.ling` | `ling.semantic/0.1` and `ling.audit/0.1`/`0.2` remain Experimental/Preview protocols |
 | Deterministic tooling | README command matrix and `seed reproduce` | conformance runner, independent-process Semantic/Audit tests, and CI | Offline/locked commands are evidence only; no Stable 1.x promise is made |
 
 The strict execution manifest `tests/examples/seed-cases.toml` records one
@@ -73,7 +73,7 @@ cargo xtask examples verify
 Expected observable boundaries are: successful checks have empty stdout and
 stderr; the runnable examples produce `你好，零`, `存活`, `受伤 30`, and `9`
 respectively; Semantic output identifies `ling.semantic/0.1`; Audit output
-identifies `ling.audit/0.1` and Unicode `17.0.0`; and negative fixtures return
+identifies handler-free `ling.audit/0.1` and Unicode `17.0.0`; and negative fixtures return
 their registered `L-<DOMAIN>-<NUMBER>` diagnostics. Exact semantic IDs are
 experimental and must not be copied into prose as stable values.
 

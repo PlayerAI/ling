@@ -703,7 +703,7 @@ fixtures = ["crates/ling-semantic/tests/project_snapshot.rs", "tests/projects/re
 sources = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "docs/RFC-0002.md", "docs/decisions/0012-semantic-identity-and-canonical-bytes.md", "schemas/registry.toml", "schemas/semantic/0.2/schema.json", "tools/xtask/src/schema.rs"]
 version_markers = ["ling.semantic/0.2"]
 authority = ["RFC-0002", "DEC-0012"]
-notes = ["File-oriented Seed commands remain on ling.semantic/0.1; PRJ-1107 must explicitly select project mode before any CLI can emit this protocol.", "No package-aware Audit Source is claimed because accepted ling.audit/0.1 has no package coordinate model."]
+notes = ["File-oriented Seed commands remain on ling.semantic/0.1; PRJ-1107 must explicitly select project mode before any CLI can emit this protocol.", "No package-aware Audit Source is claimed because accepted ling.audit/0.1 and ling.audit/0.2 have no package coordinate model."]
 
 [[protocol]]
 id = "PROTO-CANONICAL-BYTES"
@@ -754,22 +754,22 @@ id = "PROTO-AUDIT-SOURCE"
 title = "Canonical Audit Source"
 category = "Text protocol"
 visibility = "Public"
-current_version = "ling.audit/0.1"
+current_version = "ling.audit/0.2"
 stability = "Preview"
 implemented = true
 public_schema = true
 canonical = true
 producer = ["ling-format Audit renderer", "ling audit"]
 consumer = ["ling-format isolated Audit parser", "independent audit tooling"]
-reader_policy = "Require the exact Audit version; parse into an isolated AuditModel, validate semantic/reference invariants, and never convert the result to CheckedProgram or evaluator input."
-writer_policy = "Emit one BOM-free UTF-8/LF/two-space canonical document with fixed ordering, JSON string escaping, implemented Seed fields only, and exactly one final LF."
+reader_policy = "Accept exact ling.audit/0.1 and ling.audit/0.2 headers; 0.1 rejects Handler fields, while 0.2 validates Handler expression identity, byte span, Core body/type, input/eliminated/residual rows, operation labels, and resume mode/use. Parse only into an isolated AuditModel and never convert it to CheckedProgram or evaluator input."
+writer_policy = "Emit one BOM-free UTF-8/LF/two-space canonical document with fixed ordering, JSON string escaping, and exactly one final LF. Models without handlers retain ling.audit/0.1 bytes; models with checked handlers emit ling.audit/0.2 Handler blocks."
 unknown_field_policy = "Accept and discard x-* extension fields, accept input field reordering, and reject unknown core fields."
-migration_tool = "None; incompatible grammar/model changes upgrade ling.audit/* and must document compatibility with the referenced Semantic Schema."
-fixtures = ["crates/ling-format/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
-sources = ["crates/ling-format/src/lib.rs", "docs/decisions/0015-audit-source-format.md"]
-version_markers = ["ling.audit/0.1"]
-authority = ["DEC-0015"]
-notes = ["The accepted 0.1 format is Preview rather than 1.0 Stable and embeds Experimental semantic identities."]
+migration_tool = "None; 0.1 remains accepted for handler-free models, 0.2 is selected only when checked Handler evidence is present, and future incompatible changes must upgrade ling.audit/*."
+fixtures = ["crates/ling-format/src/lib.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/handler_boundary.rs"]
+sources = ["crates/ling-format/src/lib.rs", "crates/ling-semantic/src/lib.rs", "docs/decisions/0015-audit-source-format.md", "docs/decisions/0260-checked-handler-lowering.md"]
+version_markers = ["ling.audit/0.1", "ling.audit/0.2"]
+authority = ["DEC-0015", "DEC-0260"]
+notes = ["Both accepted revisions are Preview and embed Experimental semantic identities; 0.2 is a bounded Handler projection, not executable Core or a package-aware Audit protocol."]
 
 [[protocol]]
 id = "PROTO-REPL-JSON"

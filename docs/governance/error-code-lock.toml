@@ -8,7 +8,7 @@ registry_schema = "ling.diagnostic-registry/0.1"
 AUDIT = 4
 BYTECODE = 6
 CAP = 3
-EFFECT = 4
+EFFECT = 6
 ENTRY = 3
 IMPL = 1
 INTERNAL = 1
@@ -127,6 +127,18 @@ id = "L-EFFECT-0004"
 core_sha256 = "sha256:3361cbfaeb4b3f6086ec8f89ff053c4aec60ab728cb23755969a852272aa2caa"
 retired = false
 facts = []
+
+[[code]]
+id = "L-EFFECT-0005"
+core_sha256 = "sha256:f6199efec247bf17e800ab2d45cd1d5515b860ab45ad7c3bfed4f4982981d903"
+retired = false
+facts = ["actual:string:optional", "expected:string:optional", "operation:string:required", "reason:string:required"]
+
+[[code]]
+id = "L-EFFECT-0006"
+core_sha256 = "sha256:4bdc9b6b83b35b04b6163009f8f5b2dc3e5905b30d12caf7b51266083d794c51"
+retired = true
+facts = ["stage:string:required"]
 
 [[code]]
 id = "L-ENTRY-0001"

@@ -246,6 +246,109 @@ impl Builtin {
     }
 }
 
+/// Primitive types used by the fixed Experimental handler-operation registry.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum HandlerValueType {
+    Unit,
+    Int,
+    Text,
+}
+
+/// Static continuation cardinality for a checked handler operation.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum HandlerResumeMode {
+    Never,
+    Once,
+    Many,
+}
+
+/// One compiler-owned operation signature accepted by DEC-0260.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct ResolvedHandlerOperation {
+    source_name: &'static str,
+    label: &'static str,
+    owner: &'static str,
+    operation: &'static str,
+    inputs: &'static [HandlerValueType],
+    output: HandlerValueType,
+    resume_mode: HandlerResumeMode,
+}
+
+impl ResolvedHandlerOperation {
+    #[must_use]
+    pub const fn source_name(self) -> &'static str {
+        self.source_name
+    }
+
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        self.label
+    }
+
+    #[must_use]
+    pub const fn owner(self) -> &'static str {
+        self.owner
+    }
+
+    #[must_use]
+    pub const fn operation(self) -> &'static str {
+        self.operation
+    }
+
+    #[must_use]
+    pub const fn inputs(self) -> &'static [HandlerValueType] {
+        self.inputs
+    }
+
+    #[must_use]
+    pub const fn output(self) -> HandlerValueType {
+        self.output
+    }
+
+    #[must_use]
+    pub const fn resume_mode(self) -> HandlerResumeMode {
+        self.resume_mode
+    }
+}
+
+const TEXT_INPUT: &[HandlerValueType] = &[HandlerValueType::Text];
+const INT_INPUT: &[HandlerValueType] = &[HandlerValueType::Int];
+
+/// Resolves a DEC-0260 operation without adding it to the value namespace.
+#[must_use]
+pub fn resolve_handler_operation(name: &str) -> Option<ResolvedHandlerOperation> {
+    match name {
+        "Console.Write.write" => Some(ResolvedHandlerOperation {
+            source_name: "Console.Write.write",
+            label: "Console.Write",
+            owner: "Console.Write",
+            operation: "write",
+            inputs: TEXT_INPUT,
+            output: HandlerValueType::Unit,
+            resume_mode: HandlerResumeMode::Once,
+        }),
+        "Clock.now" => Some(ResolvedHandlerOperation {
+            source_name: "Clock.now",
+            label: "Clock",
+            owner: "Clock",
+            operation: "now",
+            inputs: &[],
+            output: HandlerValueType::Int,
+            resume_mode: HandlerResumeMode::Once,
+        }),
+        "Random.next" => Some(ResolvedHandlerOperation {
+            source_name: "Random.next",
+            label: "Random",
+            owner: "Random",
+            operation: "next",
+            inputs: INT_INPUT,
+            output: HandlerValueType::Int,
+            resume_mode: HandlerResumeMode::Many,
+        }),
+        _ => None,
+    }
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DefinitionKind {
     Value,
@@ -462,6 +565,7 @@ pub struct ResolvedProgram {
     definitions: BTreeMap<DefinitionId, DefinitionInfo>,
     references: BTreeMap<ReferenceKey, ReferenceTarget>,
     bindings: BTreeMap<BindingKey, BindingInfo>,
+    handler_resume_uses: BTreeMap<BindingKey, usize>,
     pattern_constructors: BTreeMap<PatternKey, DefinitionId>,
     builtins: BTreeMap<Builtin, DefinitionId>,
     prelude: BTreeMap<PreludeDefinition, DefinitionId>,
@@ -538,6 +642,11 @@ impl ResolvedProgram {
     }
 
     #[must_use]
+    pub fn handler_resume_uses(&self, binding: BindingKey) -> Option<usize> {
+        self.handler_resume_uses.get(&binding).copied()
+    }
+
+    #[must_use]
     pub fn pattern_constructor(
         &self,
         module: ModuleId,
@@ -602,18 +711,48 @@ pub struct ResolveError {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ResolveErrorKind {
-    UndefinedName { name: String },
-    DuplicateDefinition { name: String },
-    DuplicateModule { module: String },
-    DuplicateImportAlias { alias: String },
-    MissingModule { module: String },
-    ImportedModuleMustBeExplicit { module: String },
-    ImportCycle { modules: Vec<String> },
-    ConfusableCollision { first: String, second: String },
-    SuspiciousMixedScript { name: String, scripts: Vec<String> },
-    ReservedName { name: String },
-    MutableTopLevel { name: String },
+    UndefinedName {
+        name: String,
+    },
+    DuplicateDefinition {
+        name: String,
+    },
+    DuplicateModule {
+        module: String,
+    },
+    DuplicateImportAlias {
+        alias: String,
+    },
+    MissingModule {
+        module: String,
+    },
+    ImportedModuleMustBeExplicit {
+        module: String,
+    },
+    ImportCycle {
+        modules: Vec<String>,
+    },
+    ConfusableCollision {
+        first: String,
+        second: String,
+    },
+    SuspiciousMixedScript {
+        name: String,
+        scripts: Vec<String>,
+    },
+    ReservedName {
+        name: String,
+    },
+    MutableTopLevel {
+        name: String,
+    },
     UnsupportedHandler,
+    InvalidHandlerContract {
+        operation: String,
+        reason: &'static str,
+        expected: Option<String>,
+        actual: Option<String>,
+    },
 }
 
 impl ResolveError {
@@ -686,6 +825,11 @@ impl ResolveError {
                 "Handler 尚未具备已检查语义".to_owned(),
                 "handler does not yet have checked semantics".to_owned(),
             ),
+            ResolveErrorKind::InvalidHandlerContract { reason, .. } => (
+                codes::INVALID_HANDLER_CONTRACT,
+                format!("Handler clause contract 无效：{reason}"),
+                format!("handler clause contract is invalid: {reason}"),
+            ),
         };
         let diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
             .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span));
@@ -693,6 +837,23 @@ impl ResolveError {
             ResolveErrorKind::SuspiciousMixedScript { name, scripts } => diagnostic
                 .with_fact("name", name.clone())
                 .with_fact("scripts", scripts.clone()),
+            ResolveErrorKind::InvalidHandlerContract {
+                operation,
+                reason,
+                expected,
+                actual,
+            } => {
+                let mut diagnostic = diagnostic
+                    .with_fact("operation", operation.clone())
+                    .with_fact("reason", (*reason).to_owned());
+                if let Some(expected) = expected {
+                    diagnostic = diagnostic.with_fact("expected", expected.clone());
+                }
+                if let Some(actual) = actual {
+                    diagnostic = diagnostic.with_fact("actual", actual.clone());
+                }
+                diagnostic
+            }
             _ => diagnostic,
         }
     }
@@ -865,6 +1026,7 @@ struct Resolver {
     module_definitions: BTreeMap<ModuleId, BTreeMap<String, DefinitionId>>,
     references: BTreeMap<ReferenceKey, ReferenceTarget>,
     bindings: BTreeMap<BindingKey, BindingInfo>,
+    handler_resume_uses: BTreeMap<BindingKey, usize>,
     pattern_constructors: BTreeMap<PatternKey, DefinitionId>,
     builtins: BTreeMap<Builtin, DefinitionId>,
     prelude: BTreeMap<PreludeDefinition, DefinitionId>,
@@ -943,6 +1105,7 @@ impl Resolver {
             module_definitions: BTreeMap::new(),
             references: BTreeMap::new(),
             bindings: BTreeMap::new(),
+            handler_resume_uses: BTreeMap::new(),
             pattern_constructors: BTreeMap::new(),
             builtins: BTreeMap::new(),
             prelude: BTreeMap::new(),
@@ -983,6 +1146,7 @@ impl Resolver {
                 definitions: self.definitions,
                 references: self.references,
                 bindings: self.bindings,
+                handler_resume_uses: self.handler_resume_uses,
                 pattern_constructors: self.pattern_constructors,
                 builtins: self.builtins,
                 prelude: self.prelude,
@@ -1606,14 +1770,203 @@ impl Resolver {
                     self.resolve_expression(module, &field.value, scopes);
                 }
             }
-            hir::ExpressionKind::Handle { .. } => {
-                self.errors.push(ResolveError {
-                    kind: ResolveErrorKind::UnsupportedHandler,
-                    source_name: self.modules[module.0 as usize].hir.source_name.clone(),
-                    span: expression.span,
-                });
+            hir::ExpressionKind::Handle { body, clauses } => {
+                self.resolve_expression(module, body, scopes);
+                let mut handled_labels = BTreeSet::new();
+                for clause in clauses {
+                    let operation_name = clause.operation.normalized();
+                    let operation = resolve_handler_operation(&operation_name);
+                    if let Some(operation) = operation {
+                        if !handled_labels.insert(operation.label()) {
+                            self.invalid_handler_contract(
+                                module,
+                                clause.operation.span,
+                                &operation_name,
+                                "duplicate_handled_label",
+                                None,
+                                Some(operation.label().to_owned()),
+                            );
+                        }
+                        if clause.parameters.len() != operation.inputs().len() {
+                            self.invalid_handler_contract(
+                                module,
+                                clause.span,
+                                &operation_name,
+                                "parameter_arity",
+                                Some(operation.inputs().len().to_string()),
+                                Some(clause.parameters.len().to_string()),
+                            );
+                        }
+                    } else {
+                        self.invalid_handler_contract(
+                            module,
+                            clause.operation.span,
+                            &operation_name,
+                            "unknown_operation",
+                            None,
+                            None,
+                        );
+                    }
+
+                    scopes.push(Scope::default());
+                    for parameter in &clause.parameters {
+                        self.bind_pattern(module, parameter, true, scopes);
+                    }
+                    if let Some(resume) = &clause.resume {
+                        self.bind_name(module, resume.id, &resume.name, false, true, scopes);
+                    }
+                    self.resolve_expression(module, &clause.body, scopes);
+                    scopes.pop();
+
+                    if let (Some(operation), Some(resume)) = (operation, &clause.resume) {
+                        let uses = self.count_binding_references(
+                            module,
+                            &clause.body,
+                            BindingKey::new(module, resume.id),
+                        );
+                        self.handler_resume_uses
+                            .insert(BindingKey::new(module, resume.id), uses);
+                        match operation.resume_mode() {
+                            HandlerResumeMode::Never => self.invalid_handler_contract(
+                                module,
+                                resume.name.span,
+                                &operation_name,
+                                "resume_forbidden",
+                                Some("0".to_owned()),
+                                Some(uses.to_string()),
+                            ),
+                            HandlerResumeMode::Once if uses > 1 => self.invalid_handler_contract(
+                                module,
+                                resume.name.span,
+                                &operation_name,
+                                "resume_uses",
+                                Some("at-most-one".to_owned()),
+                                Some(uses.to_string()),
+                            ),
+                            HandlerResumeMode::Once | HandlerResumeMode::Many => {}
+                        }
+                    }
+                }
             }
             hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
+        }
+    }
+
+    fn invalid_handler_contract(
+        &mut self,
+        module: ModuleId,
+        span: Span,
+        operation: &str,
+        reason: &'static str,
+        expected: Option<String>,
+        actual: Option<String>,
+    ) {
+        self.errors.push(ResolveError {
+            kind: ResolveErrorKind::InvalidHandlerContract {
+                operation: operation.to_owned(),
+                reason,
+                expected,
+                actual,
+            },
+            source_name: self.modules[module.0 as usize].hir.source_name.clone(),
+            span,
+        });
+    }
+
+    fn count_binding_references(
+        &self,
+        module: ModuleId,
+        expression: &hir::Expression,
+        binding: BindingKey,
+    ) -> usize {
+        let reference_count = |reference: ReferenceId| {
+            usize::from(matches!(
+                self.references.get(&ReferenceKey::new(module, reference)),
+                Some(ReferenceTarget::Binding(target)) if *target == binding
+            ))
+        };
+        match &expression.kind {
+            hir::ExpressionKind::Sequence(elements) => elements
+                .iter()
+                .map(|element| match element {
+                    hir::SequenceElement::Let(local) => {
+                        self.count_binding_references(module, &local.value, binding)
+                    }
+                    hir::SequenceElement::Expression(value) => {
+                        self.count_binding_references(module, value, binding)
+                    }
+                })
+                .fold(0usize, usize::saturating_add),
+            hir::ExpressionKind::Handle { body, clauses } => clauses
+                .iter()
+                .map(|clause| self.count_binding_references(module, &clause.body, binding))
+                .fold(
+                    self.count_binding_references(module, body, binding),
+                    usize::saturating_add,
+                ),
+            hir::ExpressionKind::If {
+                condition,
+                then_branch,
+                else_branch,
+            } => self
+                .count_binding_references(module, condition, binding)
+                .saturating_add(self.count_binding_references(module, then_branch, binding))
+                .saturating_add(self.count_binding_references(module, else_branch, binding)),
+            hir::ExpressionKind::Match { scrutinee, cases } => cases
+                .iter()
+                .map(|case| {
+                    case.guard
+                        .as_ref()
+                        .map_or(0, |guard| {
+                            self.count_binding_references(module, guard, binding)
+                        })
+                        .saturating_add(self.count_binding_references(module, &case.body, binding))
+                })
+                .fold(
+                    self.count_binding_references(module, scrutinee, binding),
+                    usize::saturating_add,
+                ),
+            hir::ExpressionKind::Assignment { place, value } => {
+                reference_count(place.root_reference)
+                    .saturating_add(self.count_binding_references(module, value, binding))
+            }
+            hir::ExpressionKind::Application {
+                function,
+                arguments,
+            } => arguments
+                .iter()
+                .map(|argument| self.count_binding_references(module, argument, binding))
+                .fold(
+                    self.count_binding_references(module, function, binding),
+                    usize::saturating_add,
+                ),
+            hir::ExpressionKind::Projection {
+                reference, target, ..
+            } => reference_count(*reference)
+                .saturating_add(self.count_binding_references(module, target, binding)),
+            hir::ExpressionKind::Name { reference, .. } => reference_count(*reference),
+            hir::ExpressionKind::Binary { left, right, .. } => self
+                .count_binding_references(module, left, binding)
+                .saturating_add(self.count_binding_references(module, right, binding)),
+            hir::ExpressionKind::Unary { operand, .. } => {
+                self.count_binding_references(module, operand, binding)
+            }
+            hir::ExpressionKind::Tuple(elements) | hir::ExpressionKind::List(elements) => elements
+                .iter()
+                .map(|element| self.count_binding_references(module, element, binding))
+                .fold(0usize, usize::saturating_add),
+            hir::ExpressionKind::Record(fields) => fields
+                .iter()
+                .map(|field| self.count_binding_references(module, &field.value, binding))
+                .fold(0usize, usize::saturating_add),
+            hir::ExpressionKind::RecordUpdate { base, fields } => fields
+                .iter()
+                .map(|field| self.count_binding_references(module, &field.value, binding))
+                .fold(
+                    self.count_binding_references(module, base, binding),
+                    usize::saturating_add,
+                ),
+            hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => 0,
         }
     }
 
@@ -2322,29 +2675,62 @@ mod tests {
     }
 
     #[test]
-    fn rejects_unresolved_handler_hir_before_publication() {
+    fn resolves_checked_handler_scopes_and_rejects_unknown_operations() {
         let program = hir_program(
             0,
             "Main.ling",
             concat!(
                 "module Main\n\n",
+                "let input = 1\n",
                 "let value =\n",
-                "    handle value with\n",
-                "        operation Clock.now() -> 1\n",
+                "    handle input with\n",
+                "        operation Random.next(seed, resume) -> resume seed\n",
             ),
         );
-        let errors = resolve(vec![program], "Main").expect_err("handler needs checked semantics");
+        let resolved = resolve(vec![program], "Main").expect("handler scope resolves");
+        let module = resolved.entry_module();
+        let hir::ExpressionKind::Handle { clauses, .. } = &module.hir.definitions[1].value.kind
+        else {
+            panic!("expected handler");
+        };
+        let resume = clauses[0].resume.as_ref().expect("resume binding");
+        let key = BindingKey::new(module.id, resume.id);
+        assert_eq!(resolved.handler_resume_uses(key), Some(1));
+        assert!(resolved.bindings().contains_key(&key));
+
+        let unknown = hir_program(
+            0,
+            "Main.ling",
+            concat!(
+                "module Main\n\n",
+                "let value =\n",
+                "    handle 1 with\n",
+                "        operation Missing.run() -> 1\n",
+            ),
+        );
+        let errors = resolve(vec![unknown], "Main").expect_err("unknown operation is rejected");
         let error = errors
             .iter()
-            .find(|error| matches!(error.kind, ResolveErrorKind::UnsupportedHandler))
-            .expect("handler rejection");
-        assert_eq!(error.to_diagnostic().code(), codes::UNSUPPORTED_HANDLER);
+            .find(|error| {
+                matches!(
+                    error.kind,
+                    ResolveErrorKind::InvalidHandlerContract {
+                        reason: "unknown_operation",
+                        ..
+                    }
+                )
+            })
+            .expect("unknown-operation rejection");
+        assert_eq!(
+            error.to_diagnostic().code(),
+            codes::INVALID_HANDLER_CONTRACT
+        );
         assert!(
             error
                 .to_diagnostic()
                 .render_json()
                 .expect("diagnostic JSON")
-                .contains("handler does not yet have checked semantics")
+                .contains("Missing.run")
         );
         assert!(error.span.start() < error.span.end());
     }

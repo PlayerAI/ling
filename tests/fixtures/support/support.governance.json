@@ -372,7 +372,7 @@
     {
       "id": "PROTO-AUDIT-SOURCE",
       "visibility": "Public",
-      "version": "ling.audit/0.1",
+      "version": "ling.audit/0.2",
       "stability": "Preview",
       "implemented": true
     },

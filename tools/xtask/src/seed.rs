@@ -203,8 +203,10 @@ fn validate_pair(
 }
 
 fn validate_audit_bytes(bytes: &[u8], errors: &mut Vec<String>) {
+    let supported_header = bytes.starts_with(b"audit ling.audit/0.1 {\n")
+        || bytes.starts_with(b"audit ling.audit/0.2 {\n");
     if bytes.starts_with(&[0xEF, 0xBB, 0xBF])
-        || !bytes.starts_with(b"audit ling.audit/0.1 {\n")
+        || !supported_header
         || bytes.last() != Some(&b'\n')
         || bytes.ends_with(b"\n\n")
         || bytes.contains(&b'\r')
@@ -240,6 +242,8 @@ mod tests {
     fn audit_boundary_accepts_only_one_lf_and_no_bom_or_cr() {
         let mut errors = Vec::new();
         validate_audit_bytes(b"audit ling.audit/0.1 {\n}\n", &mut errors);
+        assert!(errors.is_empty());
+        validate_audit_bytes(b"audit ling.audit/0.2 {\n}\n", &mut errors);
         assert!(errors.is_empty());
 
         for invalid in [

@@ -18,11 +18,12 @@ use std::fmt;
 
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_semantic::{
-    AuditDefinition, AuditModel, AuditModule, AuditNode, AuditReference, SemanticImport,
-    validate_audit_model,
+    AuditDefinition, AuditHandler, AuditHandlerClause, AuditModel, AuditModule, AuditNode,
+    AuditReference, SemanticImport, validate_audit_model,
 };
 
 pub const AUDIT_SCHEMA: &str = "ling.audit/0.1";
+pub const HANDLER_AUDIT_SCHEMA: &str = "ling.audit/0.2";
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct AuditFormatError {
@@ -116,7 +117,7 @@ impl AuditFormatError {
             start,
             start.saturating_add(1),
         ))
-        .with_fact("audit_schema", AUDIT_SCHEMA)
+        .with_fact("audit_schema", HANDLER_AUDIT_SCHEMA)
     }
 }
 
@@ -131,8 +132,17 @@ pub fn render_audit(model: &AuditModel) -> Result<String, AuditFormatError> {
         byte_offset: 0,
     })?;
 
+    let schema = if model
+        .modules
+        .iter()
+        .any(|module| !module.handlers.is_empty())
+    {
+        HANDLER_AUDIT_SCHEMA
+    } else {
+        AUDIT_SCHEMA
+    };
     let mut output = String::new();
-    push_line(&mut output, 0, &format!("audit {AUDIT_SCHEMA} {{"));
+    push_line(&mut output, 0, &format!("audit {schema} {{"));
     push_assignment(&mut output, 1, "language", &model.language_version)?;
     push_assignment(&mut output, 1, "semantic", &model.semantic_schema)?;
     push_assignment(&mut output, 1, "unicode", &model.unicode_version)?;
@@ -168,10 +178,47 @@ pub fn render_audit(model: &AuditModel) -> Result<String, AuditFormatError> {
         for reference in &module.references {
             render_reference(&mut output, reference)?;
         }
+        for handler in &module.handlers {
+            render_handler(&mut output, handler)?;
+        }
         push_line(&mut output, 1, "}");
     }
     push_line(&mut output, 0, "}");
     Ok(output)
+}
+
+fn render_handler(output: &mut String, handler: &AuditHandler) -> Result<(), AuditFormatError> {
+    push_line(
+        output,
+        2,
+        &format!("handler {} {{", quote(&handler.handler_id)?),
+    );
+    push_line(output, 3, &format!("expression = {}", handler.expression));
+    push_line(
+        output,
+        3,
+        &format!("source_start = {}", handler.source_start),
+    );
+    push_line(output, 3, &format!("source_end = {}", handler.source_end));
+    push_line(output, 3, &format!("body = {}", handler.body));
+    push_assignment(output, 3, "type", &handler.return_type)?;
+    push_assignment(output, 3, "input", &handler.input_row)?;
+    push_string_list(output, 3, "eliminated", &handler.eliminated_effects)?;
+    push_assignment(output, 3, "residual", &handler.residual_row)?;
+    for clause in &handler.clauses {
+        push_line(
+            output,
+            3,
+            &format!("clause {} {{", quote(&clause.operation)?),
+        );
+        push_assignment(output, 4, "label", &clause.label)?;
+        push_line(output, 4, &format!("body = {}", clause.body));
+        push_assignment(output, 4, "resume_mode", &clause.resume_mode)?;
+        push_assignment(output, 4, "resume_use", &clause.resume_use)?;
+        push_line(output, 3, "}");
+    }
+    push_line(output, 2, "}");
+    Ok(())
 }
 
 fn render_node(output: &mut String, node: &AuditNode) -> Result<(), AuditFormatError> {
@@ -367,6 +414,16 @@ fn canonicalize(model: &mut AuditModel) {
                     &right.target,
                 ))
         });
+        module
+            .handlers
+            .sort_by(|left, right| left.handler_id.cmp(&right.handler_id));
+        for handler in &mut module.handlers {
+            handler.eliminated_effects.sort();
+            handler.eliminated_effects.dedup();
+            handler
+                .clauses
+                .sort_by(|left, right| left.label.cmp(&right.label));
+        }
     }
 }
 
@@ -538,12 +595,13 @@ impl<'input> Parser<'input> {
     fn parse(mut self) -> Result<AuditModel, AuditFormatError> {
         self.expect_word("audit")?;
         let (schema, offset) = self.take_word()?;
-        if schema != AUDIT_SCHEMA {
+        if schema != AUDIT_SCHEMA && schema != HANDLER_AUDIT_SCHEMA {
             return Err(AuditFormatError {
                 kind: AuditFormatErrorKind::UnsupportedVersion { actual: schema },
                 byte_offset: offset,
             });
         }
+        let handlers_enabled = schema == HANDLER_AUDIT_SCHEMA;
         self.expect(TokenKind::LeftBrace, "`{`")?;
         let mut language_version = None;
         let mut semantic_schema = None;
@@ -574,7 +632,7 @@ impl<'input> Parser<'input> {
                     let value = self.assignment_string()?;
                     set_once(&mut entry_module, value, "entry", offset)?;
                 }
-                "module" => modules.push(self.module()?),
+                "module" => modules.push(self.module(handlers_enabled)?),
                 extension if extension.starts_with("x-") => self.extension()?,
                 field => return Err(unknown(field, offset)),
             }
@@ -599,7 +657,7 @@ impl<'input> Parser<'input> {
         Ok(model)
     }
 
-    fn module(&mut self) -> Result<AuditModule, AuditFormatError> {
+    fn module(&mut self, handlers_enabled: bool) -> Result<AuditModule, AuditFormatError> {
         let name = self.take_string()?;
         self.expect(TokenKind::LeftBrace, "`{`")?;
         let mut explicit = None;
@@ -608,6 +666,7 @@ impl<'input> Parser<'input> {
         let mut definitions = Vec::new();
         let mut nodes = Vec::new();
         let mut references = Vec::new();
+        let mut handlers = Vec::new();
         while self.current.kind != TokenKind::RightBrace {
             let (field, offset) = self.take_word()?;
             match field.as_str() {
@@ -631,6 +690,7 @@ impl<'input> Parser<'input> {
                 "definition" => definitions.push(self.definition()?),
                 "node" => nodes.push(self.node()?),
                 "reference" => references.push(self.reference()?),
+                "handler" if handlers_enabled => handlers.push(self.handler()?),
                 extension if extension.starts_with("x-") => self.extension()?,
                 field => return Err(unknown(field, offset)),
             }
@@ -644,6 +704,113 @@ impl<'input> Parser<'input> {
             definitions,
             nodes,
             references,
+            handlers,
+        })
+    }
+
+    fn handler(&mut self) -> Result<AuditHandler, AuditFormatError> {
+        let handler_id = self.take_string()?;
+        self.expect(TokenKind::LeftBrace, "`{`")?;
+        let mut expression = None;
+        let mut source_start = None;
+        let mut source_end = None;
+        let mut body = None;
+        let mut return_type = None;
+        let mut input_row = None;
+        let mut eliminated_effects = None;
+        let mut residual_row = None;
+        let mut clauses = Vec::new();
+        while self.current.kind != TokenKind::RightBrace {
+            let (field, offset) = self.take_word()?;
+            match field.as_str() {
+                "expression" => set_once(
+                    &mut expression,
+                    self.assignment_number()?,
+                    "expression",
+                    offset,
+                )?,
+                "source_start" => set_once(
+                    &mut source_start,
+                    self.assignment_number()?,
+                    "source_start",
+                    offset,
+                )?,
+                "source_end" => set_once(
+                    &mut source_end,
+                    self.assignment_number()?,
+                    "source_end",
+                    offset,
+                )?,
+                "body" => set_once(&mut body, self.assignment_number()?, "body", offset)?,
+                "type" => set_once(&mut return_type, self.assignment_string()?, "type", offset)?,
+                "input" => set_once(&mut input_row, self.assignment_string()?, "input", offset)?,
+                "eliminated" => set_once(
+                    &mut eliminated_effects,
+                    self.assignment_string_list()?,
+                    "eliminated",
+                    offset,
+                )?,
+                "residual" => set_once(
+                    &mut residual_row,
+                    self.assignment_string()?,
+                    "residual",
+                    offset,
+                )?,
+                "clause" => clauses.push(self.handler_clause()?),
+                extension if extension.starts_with("x-") => self.extension()?,
+                field => return Err(unknown(field, offset)),
+            }
+        }
+        self.advance()?;
+        Ok(AuditHandler {
+            handler_id,
+            expression: required(expression, "expression")?,
+            source_start: required(source_start, "source_start")?,
+            source_end: required(source_end, "source_end")?,
+            body: required(body, "body")?,
+            return_type: required(return_type, "type")?,
+            input_row: required(input_row, "input")?,
+            eliminated_effects: required(eliminated_effects, "eliminated")?,
+            residual_row: required(residual_row, "residual")?,
+            clauses,
+        })
+    }
+
+    fn handler_clause(&mut self) -> Result<AuditHandlerClause, AuditFormatError> {
+        let operation = self.take_string()?;
+        self.expect(TokenKind::LeftBrace, "`{`")?;
+        let mut label = None;
+        let mut body = None;
+        let mut resume_mode = None;
+        let mut resume_use = None;
+        while self.current.kind != TokenKind::RightBrace {
+            let (field, offset) = self.take_word()?;
+            match field.as_str() {
+                "label" => set_once(&mut label, self.assignment_string()?, "label", offset)?,
+                "body" => set_once(&mut body, self.assignment_number()?, "body", offset)?,
+                "resume_mode" => set_once(
+                    &mut resume_mode,
+                    self.assignment_string()?,
+                    "resume_mode",
+                    offset,
+                )?,
+                "resume_use" => set_once(
+                    &mut resume_use,
+                    self.assignment_string()?,
+                    "resume_use",
+                    offset,
+                )?,
+                extension if extension.starts_with("x-") => self.extension()?,
+                field => return Err(unknown(field, offset)),
+            }
+        }
+        self.advance()?;
+        Ok(AuditHandlerClause {
+            operation,
+            label: required(label, "label")?,
+            body: required(body, "body")?,
+            resume_mode: required(resume_mode, "resume_mode")?,
+            resume_use: required(resume_use, "resume_use")?,
         })
     }
 
@@ -1156,6 +1323,7 @@ mod tests {
                     target_kind: "definition".to_owned(),
                     target: id('b'),
                 }],
+                handlers: Vec::new(),
             }],
         }
     }
@@ -1169,6 +1337,86 @@ mod tests {
         assert!(!rendered.starts_with('\u{feff}'));
         assert!(rendered.ends_with('\n'));
         assert!(!rendered.ends_with("\n\n"));
+    }
+
+    #[test]
+    fn handler_audit_revision_round_trips_eliminated_and_residual_rows() {
+        let mut model = model();
+        let module = &mut model.modules[0];
+        let handler_id = module.nodes[1].node_id.clone();
+        module.nodes[1].name = Some("handler".to_owned());
+        let mut body_node = module.nodes[1].clone();
+        body_node.node_id = id('1');
+        body_node.name = Some("application".to_owned());
+        body_node.owner = handler_id.clone();
+        body_node.ordinal = Some(1);
+        module.nodes.push(body_node);
+        let mut clause_node = module.nodes[1].clone();
+        clause_node.node_id = id('2');
+        clause_node.name = Some("application".to_owned());
+        clause_node.owner = handler_id.clone();
+        clause_node.ordinal = Some(2);
+        module.nodes.push(clause_node);
+        module.handlers.push(AuditHandler {
+            handler_id,
+            expression: 0,
+            source_start: 10,
+            source_end: 90,
+            body: 2,
+            return_type: "Unit".to_owned(),
+            input_row: "{Console.Write}".to_owned(),
+            eliminated_effects: vec!["Console.Write".to_owned()],
+            residual_row: "{}".to_owned(),
+            clauses: vec![AuditHandlerClause {
+                operation: "Console.Write::write(Text)->Unit::Once".to_owned(),
+                label: "Console.Write".to_owned(),
+                body: 3,
+                resume_mode: "once".to_owned(),
+                resume_use: "once".to_owned(),
+            }],
+        });
+        canonicalize(&mut model);
+
+        let rendered = render_audit(&model).expect("handler Audit renders");
+        assert!(rendered.starts_with("audit ling.audit/0.2 {\n"));
+        assert!(rendered.contains("eliminated = [\"Console.Write\"]"));
+        assert!(rendered.contains("residual = \"{}\""));
+        assert_eq!(parse_audit(&rendered).expect("handler Audit parses"), model);
+
+        let legacy_header = rendered.replacen(HANDLER_AUDIT_SCHEMA, AUDIT_SCHEMA, 1);
+        assert!(matches!(
+            parse_audit(&legacy_header)
+                .expect_err("0.1 rejects Handler fields")
+                .kind,
+            AuditFormatErrorKind::UnknownField { ref field } if field == "handler"
+        ));
+
+        let invalid_resume = rendered.replacen("resume_use = \"once\"", "resume_use = \"many\"", 1);
+        assert!(matches!(
+            parse_audit(&invalid_resume)
+                .expect_err("Once operation rejects Many use")
+                .kind,
+            AuditFormatErrorKind::InvalidModel { .. }
+        ));
+
+        let handler_id = &model.modules[0].handlers[0].handler_id;
+        let dangling_id = rendered.replacen(
+            &format!(
+                "handler {}",
+                quote(handler_id).expect("handler identity quotes")
+            ),
+            &format!(
+                "handler {}",
+                quote(&id('f')).expect("replacement identity quotes")
+            ),
+            1,
+        );
+        assert!(matches!(
+            parse_audit(&dangling_id)
+                .expect_err("handler identity must reference a graph node")
+                .kind,
+            AuditFormatErrorKind::InvalidModel { .. }
+        ));
     }
 
     #[test]

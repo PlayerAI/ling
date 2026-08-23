@@ -216,7 +216,7 @@ Unicode 17.0.0 的权威输入来自 Unicode Consortium 的版本化目录：
 - JSON writer 输出确定性顺序，reader 按 Schema 规则容忍未知扩展字段；“字段顺序非语义”和“writer 输出稳定”同时成立；
 - 由 `ling-semantic` 提供规范化 Audit model，由 `ling-format` 提供 G-12 接受的 grammar、renderer 和 parser；验证 `parse_audit(render_audit(graph)) = graph`（忽略已明确定义的显示元数据），避免在两个 crate 中各自定义语义。
 
-PRJ-1103 在不改变文件模式 `ling.semantic/0.1` 字节与 ID 的前提下，增加库级 package-aware `ling.semantic/0.2` 路径。该路径消费 RFC-0002 `PackageIdentity`，记录 package/module/definition 坐标，并验证跨包 import、export visibility 与跨文件 reference；CLI 工程选择仍由 PRJ-1107 负责，`ling.audit/0.1` 不虚构 package-aware 能力。
+PRJ-1103 在不改变文件模式 `ling.semantic/0.1` 字节与 ID 的前提下，增加库级 package-aware `ling.semantic/0.2` 路径。该路径消费 RFC-0002 `PackageIdentity`，记录 package/module/definition 坐标，并验证跨包 import、export visibility 与跨文件 reference；CLI 工程选择仍由 PRJ-1107 负责，`ling.audit/0.1` 与 `ling.audit/0.2` 均不虚构 package-aware 能力。
 
 PRJ-1105 增加 RFC-0002 `ling.lock/1` 的严格 reader、canonical writer 与库级 `Update`/`Locked` 策略。writer 仅在完整本地 dependency graph 验证后创建或替换 lock；reader 拒绝未知/重复字段、非 canonical bytes、无效或悬空 identity、cycle、不可达 package 与不兼容 format。版本 1 resolution 始终离线且不执行 shell；CLI `--locked`/`--offline` 参数仍由 PRJ-1107 负责。
 

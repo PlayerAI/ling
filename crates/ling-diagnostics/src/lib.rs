@@ -71,6 +71,7 @@ pub mod codes {
     pub const EFFECT_ROW_OCCURS_CHECK: DiagnosticCode = DiagnosticCode::new("L-EFFECT-0002");
     pub const EFFECT_UNHANDLED_RESIDUAL: DiagnosticCode = DiagnosticCode::new("L-EFFECT-0003");
     pub const UNSUPPORTED_HANDLER: DiagnosticCode = DiagnosticCode::new("L-EFFECT-0004");
+    pub const INVALID_HANDLER_CONTRACT: DiagnosticCode = DiagnosticCode::new("L-EFFECT-0005");
     pub const INVALID_ENTRY_MODULE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0001");
     pub const MISSING_MAIN: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0002");
     pub const INVALID_MAIN_SIGNATURE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0003");

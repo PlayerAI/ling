@@ -58,7 +58,7 @@ const REQUIRED_POLICY_PHRASES: &[&str] = &[
     "Tree-sitter package is an editor-oriented, tolerant parser",
     "Unknown values are recorded as `Not established`",
     "No Zed protocol",
-    "`ling.semantic/0.1` is Experimental and `ling.audit/0.1` is Preview",
+    "`ling.semantic/0.1` is Experimental and `ling.audit/0.1`/`0.2` are Preview",
     "`ling lsp --stdio`",
     "Windows grammar suite passed",
     "Unicode 17.0.0",

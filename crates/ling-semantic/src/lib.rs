@@ -288,6 +288,32 @@ pub struct AuditModule {
     pub definitions: Vec<AuditDefinition>,
     pub nodes: Vec<AuditNode>,
     pub references: Vec<AuditReference>,
+    pub handlers: Vec<AuditHandler>,
+}
+
+/// Canonical Audit Source projection of one checked first-order handler.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditHandler {
+    pub handler_id: String,
+    pub expression: u32,
+    pub source_start: u32,
+    pub source_end: u32,
+    pub body: u32,
+    pub return_type: String,
+    pub input_row: String,
+    pub eliminated_effects: Vec<String>,
+    pub residual_row: String,
+    pub clauses: Vec<AuditHandlerClause>,
+}
+
+/// Canonical operation evidence nested under an [`AuditHandler`].
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditHandlerClause {
+    pub operation: String,
+    pub label: String,
+    pub body: u32,
+    pub resume_mode: String,
+    pub resume_use: String,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -337,6 +363,22 @@ pub struct AuditReference {
 
 fn default_reference_source_kind() -> String {
     "expression".to_owned()
+}
+
+const fn resume_mode_name(mode: ling_effects::ResumeMode) -> &'static str {
+    match mode {
+        ling_effects::ResumeMode::Never => "never",
+        ling_effects::ResumeMode::Once => "once",
+        ling_effects::ResumeMode::Many => "many",
+    }
+}
+
+const fn resume_use_name(usage: ling_effects::ResumeUse) -> &'static str {
+    match usage {
+        ling_effects::ResumeUse::Never => "never",
+        ling_effects::ResumeUse::Once => "once",
+        ling_effects::ResumeUse::Many => "many",
+    }
 }
 
 fn semantic_package_identity(package: &PackageIdentity) -> SemanticPackageIdentity {
@@ -491,6 +533,7 @@ impl ProgramSnapshot {
                         definitions: Vec::new(),
                         nodes: Vec::new(),
                         references: Vec::new(),
+                        handlers: Vec::new(),
                     },
                 )
             })
@@ -511,6 +554,7 @@ impl ProgramSnapshot {
                     definitions: Vec::new(),
                     nodes: Vec::new(),
                     references: Vec::new(),
+                    handlers: Vec::new(),
                 });
             module.definitions.push(AuditDefinition {
                 definition_id: definition.definition_id.clone(),
@@ -540,6 +584,7 @@ impl ProgramSnapshot {
                     definitions: Vec::new(),
                     nodes: Vec::new(),
                     references: Vec::new(),
+                    handlers: Vec::new(),
                 })
                 .nodes
                 .push(AuditNode {
@@ -572,6 +617,63 @@ impl ProgramSnapshot {
                     target: reference.target.clone(),
                 });
         }
+        for (key, core) in self.checked.handler_cores() {
+            let resolved_module = resolved
+                .module(key.module())
+                .expect("checked Handler Core references an existing module");
+            let module_name = resolved_module.hir.module.name.normalized();
+            let handler_id = self
+                .graph
+                .nodes
+                .iter()
+                .find(|node| {
+                    node.module == module_name
+                        && node.kind == "expression"
+                        && node.name.as_deref() == Some("handler")
+                        && node.ordinal == Some(key.local().get())
+                })
+                .expect("checked Handler Core has a Semantic Graph expression node")
+                .node_id
+                .clone();
+            let span = core
+                .source_span()
+                .expect("checked source Handler Core retains its original byte span");
+            let input_names = core.input().canonical_names();
+            let residual_names = core.residual().canonical_names();
+            let eliminated_effects = input_names
+                .iter()
+                .filter(|name| !residual_names.contains(name))
+                .cloned()
+                .collect();
+            let clauses = core
+                .clauses()
+                .iter()
+                .map(|clause| AuditHandlerClause {
+                    operation: clause.clause().operation().canonical_name(),
+                    label: clause.clause().label().canonical_name(),
+                    body: clause.body().get(),
+                    resume_mode: resume_mode_name(clause.clause().operation().resume_mode())
+                        .to_owned(),
+                    resume_use: resume_use_name(clause.resume_use()).to_owned(),
+                })
+                .collect();
+            modules
+                .get_mut(&module_name)
+                .expect("checked Handler Core module exists in Audit model")
+                .handlers
+                .push(AuditHandler {
+                    handler_id,
+                    expression: key.local().get(),
+                    source_start: u32::try_from(span.start_byte()).unwrap_or(u32::MAX),
+                    source_end: u32::try_from(span.end_byte()).unwrap_or(u32::MAX),
+                    body: core.body().get(),
+                    return_type: core.return_type().as_str().to_owned(),
+                    input_row: core.input().canonical_name(),
+                    eliminated_effects,
+                    residual_row: core.residual().canonical_name(),
+                    clauses,
+                });
+        }
         for module in modules.values_mut() {
             module.capabilities.sort();
             module.imports.sort_by(|left, right| {
@@ -597,6 +699,9 @@ impl ProgramSnapshot {
                         &right.target,
                     ))
             });
+            module
+                .handlers
+                .sort_by(|left, right| left.handler_id.cmp(&right.handler_id));
         }
         AuditModel {
             language_version: self.graph.language_version.clone(),
@@ -610,27 +715,32 @@ impl ProgramSnapshot {
 }
 
 #[derive(Debug)]
-pub struct SnapshotError(serde_json::Error);
+pub enum SnapshotError {
+    Serialization(serde_json::Error),
+}
 
 impl fmt::Display for SnapshotError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            formatter,
-            "failed to serialize semantic snapshot: {}",
-            self.0
-        )
+        match self {
+            Self::Serialization(error) => {
+                write!(formatter, "failed to serialize semantic snapshot: {error}")
+            }
+        }
     }
 }
 
 impl Error for SnapshotError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
-        Some(&self.0)
+        match self {
+            Self::Serialization(error) => Some(error),
+        }
     }
 }
 
 #[derive(Debug)]
 pub enum ProjectSnapshotError {
     MissingProjectContext,
+    UnsupportedCheckedHandler,
     Serialization(serde_json::Error),
 }
 
@@ -639,6 +749,9 @@ impl fmt::Display for ProjectSnapshotError {
         match self {
             Self::MissingProjectContext => formatter.write_str(
                 "cannot build a package-aware semantic snapshot from a file-mode program",
+            ),
+            Self::UnsupportedCheckedHandler => formatter.write_str(
+                "checked handlers require an accepted package-aware graph and Audit projection",
             ),
             Self::Serialization(error) => {
                 write!(
@@ -653,7 +766,7 @@ impl fmt::Display for ProjectSnapshotError {
 impl Error for ProjectSnapshotError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            Self::MissingProjectContext => None,
+            Self::MissingProjectContext | Self::UnsupportedCheckedHandler => None,
             Self::Serialization(error) => Some(error),
         }
     }
@@ -779,6 +892,9 @@ pub enum SemanticReadErrorKind {
     TraitIdeMismatch {
         value: String,
     },
+    InvalidAuditHandler {
+        reason: String,
+    },
 }
 
 impl fmt::Display for SemanticReadError {
@@ -808,6 +924,9 @@ pub fn build_project(
 ) -> Result<ProjectProgramSnapshot, ProjectSnapshotError> {
     if checked.typed().resolved().project().is_none() {
         return Err(ProjectSnapshotError::MissingProjectContext);
+    }
+    if !checked.handler_cores().is_empty() {
+        return Err(ProjectSnapshotError::UnsupportedCheckedHandler);
     }
     SnapshotBuilder::new(checked, IdentityMode::Project).build_project()
 }
@@ -957,8 +1076,133 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
                 });
             }
         }
+        let expression_nodes = module
+            .nodes
+            .iter()
+            .filter(|node| node.kind == "expression")
+            .map(|node| (node.node_id.as_str(), node))
+            .collect::<BTreeMap<_, _>>();
+        let mut previous_handler_id: Option<&str> = None;
+        for (handler_index, handler) in module.handlers.iter().enumerate() {
+            let path = format!("$.modules[{module_index}].handlers[{handler_index}]");
+            if previous_handler_id.is_some_and(|previous| previous >= handler.handler_id.as_str()) {
+                return Err(invalid_audit_handler(
+                    &path,
+                    "handler identities must be unique and strictly sorted",
+                ));
+            }
+            previous_handler_id = Some(&handler.handler_id);
+            let Some(node) = expression_nodes.get(handler.handler_id.as_str()) else {
+                return Err(invalid_audit_handler(
+                    &format!("{path}.handler_id"),
+                    "handler identity must reference an expression node in the same module",
+                ));
+            };
+            if node.name.as_deref() != Some("handler")
+                || node.ordinal != Some(handler.expression)
+                || handler.source_start > handler.source_end
+                || handler.body == 0
+                || !expression_nodes
+                    .values()
+                    .any(|candidate| candidate.ordinal == Some(handler.body - 1))
+                || handler.return_type.is_empty()
+                || handler.input_row.is_empty()
+                || handler.residual_row.is_empty()
+                || handler.clauses.is_empty()
+            {
+                return Err(invalid_audit_handler(
+                    &path,
+                    "handler node, span, body, type, rows, or clauses are invalid",
+                ));
+            }
+            if !strictly_sorted_unique(&handler.eliminated_effects) {
+                return Err(invalid_audit_handler(
+                    &format!("{path}.eliminated_effects"),
+                    "eliminated effects must be unique and sorted",
+                ));
+            }
+            let mut previous_label: Option<&str> = None;
+            for (clause_index, clause) in handler.clauses.iter().enumerate() {
+                let clause_path = format!("{path}.clauses[{clause_index}]");
+                if previous_label.is_some_and(|previous| previous >= clause.label.as_str()) {
+                    return Err(invalid_audit_handler(
+                        &clause_path,
+                        "handler clause labels must be unique and strictly sorted",
+                    ));
+                }
+                previous_label = Some(&clause.label);
+                if clause.body == 0
+                    || !expression_nodes
+                        .values()
+                        .any(|candidate| candidate.ordinal == Some(clause.body - 1))
+                    || !valid_audit_handler_clause(clause)
+                {
+                    return Err(invalid_audit_handler(
+                        &clause_path,
+                        "handler clause operation, label, body, resume mode, or use is invalid",
+                    ));
+                }
+            }
+            let expected_eliminated = handler
+                .clauses
+                .iter()
+                .map(|clause| clause.label.clone())
+                .filter(|label| {
+                    row_contains_label(&handler.input_row, label)
+                        && !row_contains_label(&handler.residual_row, label)
+                })
+                .collect::<Vec<_>>();
+            if handler.eliminated_effects != expected_eliminated {
+                return Err(invalid_audit_handler(
+                    &format!("{path}.eliminated_effects"),
+                    "eliminated effects do not match the input, clauses, and residual row",
+                ));
+            }
+        }
     }
     Ok(())
+}
+
+fn invalid_audit_handler(path: &str, reason: &str) -> SemanticReadError {
+    SemanticReadError {
+        kind: SemanticReadErrorKind::InvalidAuditHandler {
+            reason: reason.to_owned(),
+        },
+        path: path.to_owned(),
+    }
+}
+
+fn strictly_sorted_unique(values: &[String]) -> bool {
+    values.windows(2).all(|pair| pair[0] < pair[1])
+}
+
+fn valid_audit_handler_clause(clause: &AuditHandlerClause) -> bool {
+    let expected = match clause.operation.as_str() {
+        "Clock::now()->Int::Once" => ("Clock", "once"),
+        "Console.Write::write(Text)->Unit::Once" => ("Console.Write", "once"),
+        "Random::next(Int)->Int::Many" => ("Random", "many"),
+        _ => return false,
+    };
+    if clause.label != expected.0 || clause.resume_mode != expected.1 {
+        return false;
+    }
+    matches!(
+        (clause.resume_mode.as_str(), clause.resume_use.as_str()),
+        ("never", "never") | ("once", "never" | "once") | ("many", "never" | "once" | "many")
+    )
+}
+
+fn row_contains_label(row: &str, label: &str) -> bool {
+    row.strip_prefix('{')
+        .and_then(|value| value.strip_suffix('}'))
+        .is_some_and(|contents| {
+            contents
+                .split('|')
+                .next()
+                .unwrap_or_default()
+                .split(',')
+                .any(|candidate| candidate == label)
+        })
 }
 
 fn validate_json_fields(
@@ -2112,7 +2356,7 @@ impl SnapshotBuilder {
             references,
             trait_ide,
         };
-        let json = serde_json::to_string(&graph).map_err(SnapshotError)?;
+        let json = serde_json::to_string(&graph).map_err(SnapshotError::Serialization)?;
         Ok(ProgramSnapshot {
             checked: self.checked,
             graph,
@@ -3018,8 +3262,22 @@ impl SnapshotBuilder {
                     self.encode_expression(module, element, encoder);
                 }
             }
-            hir::ExpressionKind::Handle { .. } => {
-                unreachable!("unresolved handler reached Semantic Graph encoding")
+            hir::ExpressionKind::Handle { body, clauses } => {
+                encoder.u8(15);
+                self.encode_expression(module, body, encoder);
+                encoder.u32(u32::try_from(clauses.len()).unwrap_or(u32::MAX));
+                for clause in clauses {
+                    encoder.string(&clause.operation.normalized());
+                    encoder.u32(u32::try_from(clause.parameters.len()).unwrap_or(u32::MAX));
+                    for parameter in &clause.parameters {
+                        self.encode_pattern(module, parameter, encoder);
+                    }
+                    encoder.bool(clause.resume.is_some());
+                    if let Some(resume) = &clause.resume {
+                        encoder.u32(resume.id.get());
+                    }
+                    self.encode_expression(module, &clause.body, encoder);
+                }
             }
         }
     }
@@ -3578,8 +3836,32 @@ fn add_expression_nodes(
                 add_expression_nodes(nodes, checked, context, owner, &field.value);
             }
         }
-        hir::ExpressionKind::Handle { .. } => {
-            unreachable!("unresolved handler reached Semantic Graph publication")
+        hir::ExpressionKind::Handle { body, clauses } => {
+            add_expression_nodes(nodes, checked, context, &expression_id, body);
+            for clause in clauses {
+                for parameter in &clause.parameters {
+                    add_pattern_nodes(nodes, typed, context, &expression_id, parameter);
+                }
+                if let Some(resume) = &clause.resume {
+                    let key = ling_resolve::BindingKey::new(context.module, resume.id);
+                    nodes.push(semantic_node(
+                        context.mode,
+                        context.package,
+                        "binding",
+                        context.module_name,
+                        &format!("local:{}", resume.id.get()),
+                        Some(&resume.name.normalized),
+                        &expression_id,
+                        typed.binding_type(key).map(|id| typed.display_type(id)),
+                        Some(false),
+                        Some(resume.id.get()),
+                        Vec::new(),
+                        Vec::new(),
+                        identifier_metadata(&resume.name),
+                    ));
+                }
+                add_expression_nodes(nodes, checked, context, &expression_id, &clause.body);
+            }
         }
         hir::ExpressionKind::Name { .. }
         | hir::ExpressionKind::Literal(_)
@@ -3590,9 +3872,7 @@ fn add_expression_nodes(
 fn expression_kind(expression: &hir::ExpressionKind) -> &'static str {
     match expression {
         hir::ExpressionKind::Sequence(_) => "sequence",
-        hir::ExpressionKind::Handle { .. } => {
-            unreachable!("unresolved handler reached Semantic Graph classification")
-        }
+        hir::ExpressionKind::Handle { .. } => "handler",
         hir::ExpressionKind::If { .. } => "if",
         hir::ExpressionKind::Match { .. } => "match",
         hir::ExpressionKind::Assignment { .. } => "assignment",
@@ -3822,9 +4102,18 @@ fn collect_expression_reference_sources(
                 );
             }
         }
-        hir::ExpressionKind::Handle { .. } => {
-            // Unresolved handler clauses do not own ReferenceIds and are
-            // rejected before this checked-only projection is called.
+        hir::ExpressionKind::Handle { body, clauses } => {
+            collect_expression_reference_sources(mode, package, module_name, module, body, sources);
+            for clause in clauses {
+                collect_expression_reference_sources(
+                    mode,
+                    package,
+                    module_name,
+                    module,
+                    &clause.body,
+                    sources,
+                );
+            }
         }
         hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
     }
@@ -4104,6 +4393,34 @@ mod tests {
         assert_eq!(first.json(), second.json());
         assert_eq!(first.program_id(), second.program_id());
         assert!(first.json().contains("\"schema\":\"ling.semantic/0.1\""));
+    }
+
+    #[test]
+    fn checked_handler_publishes_graph_identity_and_audit_evidence() {
+        let snapshot = snapshot_named(
+            "handler.ling",
+            "let value =\n    handle 1 with\n        operation Clock.now() -> 1\n",
+        );
+        let handler_node = snapshot
+            .graph()
+            .nodes
+            .iter()
+            .find(|node| node.kind == "expression" && node.name.as_deref() == Some("handler"))
+            .expect("handler expression node");
+        let audit = snapshot.audit_model();
+        let handler = audit
+            .modules
+            .iter()
+            .find(|module| module.name == "Main")
+            .expect("Main Audit module")
+            .handlers
+            .first()
+            .expect("checked handler Audit projection");
+        assert_eq!(handler.handler_id, handler_node.node_id);
+        assert_eq!(handler.input_row, "{}");
+        assert_eq!(handler.residual_row, "{}");
+        assert_eq!(handler.clauses[0].label, "Clock");
+        assert!(handler.source_start < handler.source_end);
     }
 
     #[test]

@@ -89,10 +89,12 @@ cargo run --locked --offline -- audit examples/tutorial-zh.ling
 ```
 
 Expected output is `存活` plus a line feed. Audit output starts with
-`audit ling.audit/0.1` and reports Unicode `17.0.0`.
+`audit ling.audit/0.1` for ordinary Seed input (`ling.audit/0.2` when checked
+Handler evidence is present) and reports Unicode `17.0.0`.
 
 运行命令如上；预期输出为 `存活` 和换行。Audit 输出以
-`audit ling.audit/0.1` 开始，并报告 Unicode `17.0.0`。
+普通 Seed 输入以 `audit ling.audit/0.1` 开始（含 checked Handler 证据时使用
+`ling.audit/0.2`），并报告 Unicode `17.0.0`。
 
 ## 3. Equivalent English tutorial / 等价英文教程
 

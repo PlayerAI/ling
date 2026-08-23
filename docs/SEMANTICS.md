@@ -1113,6 +1113,44 @@ Handler：
 handle 模拟 with 固定随机 42
 ```
 
+### 15.7 Experimental checked Handler
+
+v0.2 Experimental 接受以下 checked-only 表达式；其完整约束由 Accepted
+RFC-0006 与 DEC-0260 固定：
+
+```fsharp
+handle body with
+    operation Console.Write.write(message, resume) -> resume ()
+```
+
+当前 operation registry 仅包含：
+
+```text
+Console.Write.write : Text -> Unit   resume Once   handles Console.Write
+Clock.now           : Unit -> Int    resume Once   handles Clock
+Random.next         : Int -> Int     resume Many   handles Random
+```
+
+- operation 名称 NFC-normalized、区分大小写，且不进入普通 value namespace；
+- clause 参数在独立 lexical scope 中按注册输入类型检查；可选 `resume` 的类型为
+  `operation-output -> handler-result`；
+- 所有 clause body 与 handled body 的结果类型必须相同；`Once` 最多允许一个已解析
+  resume 引用，`Many` 允许有限源码中的任意引用数；
+- Handler 只从 handled body 的 Effect Row 中移除其显式注册标签，保留 open tail；
+  clause body Effect 位于该 clause 拦截之外，嵌套 Handler 先内后外计算；
+- `State<T>` 在当前 registry 中不可被消除；Effect 消除不授予或移除 Capability，
+  Capability closure 仍按未 masking 的可达 Effect 检查；
+- 成功检查后发布进程内 `HandlerCore`、现有 Semantic Graph 中的普通 expression/
+  binding/reference 身份，以及 `ling.audit/0.2` 的 canonical Handler 块；该块显式记录
+  input、eliminated、residual rows、operation、resume mode/use 和原始 UTF-8 byte span。
+  不含 Handler 的模型继续输出逐字节兼容的 `ling.audit/0.1`；两版 parser 均为隔离的
+  data-only reader，不能进入 evaluator。
+- 解释器、bytecode、VM 与 Task/Actor 跨越仍未授权，并在各自既有执行/lowering
+  边界结构化拒绝；Semantic Graph `ling.semantic/0.1` 不新增 Handler 专用 wire 字段。
+
+`L-EFFECT-0005` 报告 operation/arity/resume contract 错误并保留原始 UTF-8 span；
+任何投影都不得把路径、分配、线程、时间或 debug 输出作为语义事实。
+
 ---
 
 ## 16. Capability

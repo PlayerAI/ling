@@ -748,12 +748,21 @@ Remote.send actor 消息
 
 ### 8.4 Effect Handler
 
-后续版本允许处理和消除 Effect：
+v0.2 Experimental 提供 checked-only 的一阶 Handler：
 
 ```fsharp
-handle Random with 固定随机种子 42 in
-    模拟世界 初始状态
+handle body with
+    operation Console.Write.write(message, resume) -> resume ()
 ```
+
+当前仅接受 `Console.Write.write`、`Clock.now` 与 `Random.next` 三个固定 operation；
+参数、返回类型、resume cardinality、残留 Effect、Capability 分离和 canonical
+`HandlerCore` 规则见 `SEMANTICS.md` §15.7、RFC-0006 与 DEC-0260。
+
+此阶段不执行 Handler。成功检查的 Handler 使用现有 Semantic Graph expression 身份，
+并由 `ling.audit/0.2` 显式投影 input/eliminated/residual Effect、operation、resume 规则和
+原始 byte span；普通程序仍输出 `ling.audit/0.1`。解释器、bytecode、VM 与 Task/Actor
+边界必须等待各自 Accepted authority。
 
 ---
 

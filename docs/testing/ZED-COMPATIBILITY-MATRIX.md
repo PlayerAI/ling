@@ -33,7 +33,7 @@ instead of inferred from a development tool.
 | Tree-sitter grammar | `editors/tree-sitter-ling`, package `0.0.1-dev`, grammar metadata `source.ling`, `.ling` file type | Editor-only implementation; no Stable node compatibility |
 | Grammar revision | Current tracked grammar snapshot; generated parser and Unicode ranges were regenerated without worktree drift before the local suite | Pinned for this evidence snapshot, not a public Zed release tag |
 | Tree-sitter CLI / Node | `tree-sitter-cli@0.26.12` in `package-lock.json`; Node `>=20` in `package.json` | Locked development toolchain; no consumer guarantee |
-| Protocol/schema | No Zed protocol; `ling.semantic/0.1` is Experimental and `ling.audit/0.1` is Preview; Tree-sitter CST/query output is editor-internal | No Stable editor schema |
+| Protocol/schema | No Zed protocol; `ling.semantic/0.1` is Experimental and `ling.audit/0.1`/`0.2` are Preview; Tree-sitter CST/query output is editor-internal | No Stable editor schema |
 | Operating systems | Locked offline grammar verification passed on Windows with Node 24.15.0/npm 12.0.2; Linux/macOS and any Zed extension were not executed here | Windows grammar suite verified locally; no Zed OS support matrix |
 | Binary acquisition | The source-built `ling` CLI contains the Preview stdio lifecycle; no standalone language-server download, extension package, URL, checksum, signature, or installer exists | Source-built ling CLI only; no Zed acquisition contract |
 | Known limitations | LSP lifecycle, overlay, workspace reload, and bounded formatting exist, but diagnostics/hover/definition/references/rename/completion/code actions/semantic tokens and extension metadata/marketplace packaging do not | Explicitly unavailable; grammar-only development surface |

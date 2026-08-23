@@ -6730,6 +6730,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "DEC-0260"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0260-checked-handler-lowering.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compile single and nested handlers through resolution, typing, Effect checking, and HandlerCore publication; compare types, rows, bindings, spans, and canonical bytes.",
+  "Cover resume-use boundaries, operation and parameter failures, duplicate labels, type mismatch, shadowing, Unicode, BOM, and CRLF with stable bilingual diagnostics.",
+  "Prove transitive/nested subtraction, clause-body propagation, visible State, unmasked Capability closure, failure non-publication, Handler Audit 0.2 round-trip, and continued evaluator/bytecode/VM rejection.",
+  "Run focused conformance plus locked offline workspace, Clippy, CI, governance, support, status, RC0, traceability, formatting, checksum, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds checked-only Experimental handler resolution, typing, Effect subtraction, and HandlerCore publication for the fixed built-in operation registry.",
+  "Allocates L-EFFECT-0005, retires the provisional never-emitted L-EFFECT-0006 gate, adds Handler-aware Semantic IDs and ling.audit/0.2, and leaves runtime, bytecode, VM, ABI, Semantic Graph fields, non-handler identities/Audit bytes, and Unicode 17.0.0 unchanged.",
+]
+unresolved_alternatives = [
+  "User-declared or polymorphic operations, State masking, dynamic handlers, continuation runtime behavior, Fault/cancellation, Task/Actor crossing, execution, package-aware Handler Audit, migration, and Stable compatibility remain deferred.",
+]
+superseded_by = ""
+
+[[record]]
 id = "RFC-0027"
 kind = "RFC"
 status = "Accepted"
