@@ -22273,6 +22273,68 @@ notes = [
 ]
 
 [[task]]
+id = "EVD-5802-OBSERVATION"
+title = "Internal Independent Evidence Verifier boundary evidence"
+state = "Done"
+release = "G5"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["EVD-5801-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/SEMANTICS.md",
+  "docs/LANGUAGE.md",
+  "docs/ERROR-CODES.md",
+  "docs/decisions/0002-source-position-units.md",
+  "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0013-main-and-runtime-failures.md",
+  "docs/decisions/0015-audit-source-format.md",
+  "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/RFC-0001.md",
+  "docs/RFC-0014.md",
+  "docs/RFC-0018.md",
+  "docs/RFC-0019.md",
+  "docs/RFC-0020.md",
+  "docs/decisions/0209-evidence-bundle-schema-boundary-evidence.md",
+  "docs/decisions/0210-independent-evidence-verifier-boundary-evidence.md",
+  "docs/ling_execution_plan/09-G5-V0.5-CRITICAL.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/governance/gap-register.toml",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+]
+artifacts = [
+  "crates/ling-types/tests/independent_evidence_verifier_evidence.rs",
+  "docs/decisions/0210-independent-evidence-verifier-boundary-evidence.md",
+  "docs/status/EVD-5802-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/EVD-5802-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0210 authorizes only test-local Independent Evidence Verifier boundary evidence; no verifier/input/result, parser, certificate/signature rule, trust root/TCB, diagnostic, protocol, or support claim is made.",
+  "Inventory covers sixty input/check, identity, trust/TCB, isolation, result, failure, diagnostic, and fixture boundaries.",
+  "Forward/reverse same opaque bytes; duplicates rejected; offline/network and no-code/command/FFI-execution remain distinct; tag has no verifier, trust, diagnostic, or public protocol authority.",
+  "cargo test -p ling-types --test independent_evidence_verifier_evidence --locked --offline passes.",
+  "cargo clippy -p ling-types --all-targets --locked --offline -- -D warnings passes.",
+]
+verified_against_commit = "4da432f6e872d3a66f387108d8e672e826ecf10b"
+completion_commit = "4da432f6e872d3a66f387108d8e672e826ecf10b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test-only under DEC-0210; EVD-5802 remains BlockedSpec for bundle/verifier input/result, identity/linkage, certificate/trust/TCB, isolation, diagnostic, protocol, and support semantics.",
+  "No bundle verifier/input/result, parser, certificate/signature dependency, trust root/TCB, CLI route, dependency, diagnostic, public protocol, placeholder API, or Unicode behavior was added.",
+]
+
+[[task]]
 id = "EVD-5803"
 title = "Reproducible Build Binding"
 state = "BlockedSpec"

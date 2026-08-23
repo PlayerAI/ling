@@ -148,6 +148,7 @@
 | `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |
 | `EVD-5801-OBSERVATION` | Internal Evidence Bundle Schema boundary evidence | `G5` | `S` | `Done` | `TIM-5703-OBSERVATION` | `2c27d97a4de390d49eba648830883bf50963f668` |
 | `EVD-5802` | Independent Verifier | `G5` | `L` | `BlockedSpec` | `EVD-5801` | `` |
+| `EVD-5802-OBSERVATION` | Internal Independent Evidence Verifier boundary evidence | `G5` | `S` | `Done` | `EVD-5801-OBSERVATION` | `4da432f6e872d3a66f387108d8e672e826ecf10b` |
 | `EVD-5803` | Reproducible Build Binding | `G5` | `M` | `BlockedSpec` | `EVD-5802` | `` |
 | `EVD-5804` | AI Provenance | `G5` | `M` | `BlockedSpec` | `EVD-5803` | `` |
 | `FFI-3601` | FFI declaration model | `G3` | `M` | `BlockedSpec` | `BACK-3505` | `` |
