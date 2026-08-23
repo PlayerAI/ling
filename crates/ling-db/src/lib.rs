@@ -42,6 +42,7 @@ mod reference_span_index;
 mod rename_alias_index;
 mod rename_identifier;
 mod resolved_outline;
+mod semantic_token_index;
 mod token_source_index;
 mod typed_definition_index;
 
@@ -90,6 +91,11 @@ pub use resolved_outline::{
     MAX_RESOLVED_OUTLINE_NODES, ResolvedOutline, ResolvedOutlineError, ResolvedOutlineKind,
     ResolvedOutlineNode,
 };
+pub use semantic_token_index::{
+    SEMANTIC_TOKEN_GENERATION_VERSION, SemanticTokenEntry, SemanticTokenEvidence,
+    SemanticTokenGenerationMode, SemanticTokenIndex, SemanticTokenIndexError, SemanticTokenKind,
+    SemanticTokenModifier,
+};
 pub use token_source_index::{TokenSource, TokenSourceIndex, TokenSourceIndexError};
 pub use typed_definition_index::{TypedDefinitionIndex, TypedDefinitionSymbol};
 
@@ -105,6 +111,7 @@ pub enum QueryKind {
     Tokens,
     TokenSourceIndex,
     CheckedTokenSourceIndex,
+    SemanticTokenIndex,
     Parse,
     Ast,
     Hir,
@@ -528,6 +535,10 @@ pub enum QueryError {
     TokenSourceIndex {
         message: String,
     },
+    SemanticTokenIndex {
+        file: SourceId,
+        error: SemanticTokenIndexError,
+    },
     ResolvedOutline {
         file: SourceId,
         error: ResolvedOutlineError,
@@ -606,6 +617,11 @@ impl fmt::Display for QueryError {
             Self::TokenSourceIndex { message } => {
                 write!(formatter, "token source index failed: {message}")
             }
+            Self::SemanticTokenIndex { file, error } => write!(
+                formatter,
+                "semantic token index for source file {} failed: {error}",
+                file.get()
+            ),
             Self::ResolvedOutline { file, error } => {
                 write!(
                     formatter,
@@ -739,6 +755,12 @@ struct WorkspaceResolveKey {
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct SemanticTokenQueryKey {
+    source: QueryKey,
+    workspace: WorkspaceResolveKey,
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 struct ProjectSemanticKey {
     graph: PackageGraphId,
 }
@@ -782,6 +804,7 @@ pub struct CompilerDb {
     >,
     token_source_indexes: BTreeMap<QueryKey, Result<Arc<TokenSourceIndex>, String>>,
     checked_token_source_indexes: BTreeMap<QueryKey, Arc<CheckedTokenSourceIndex>>,
+    semantic_token_indexes: BTreeMap<SemanticTokenQueryKey, Arc<SemanticTokenIndex>>,
     semantic_fragments: BTreeMap<String, Arc<SemanticModuleFragment>>,
     trace: Vec<QueryEvent>,
 }
@@ -809,6 +832,7 @@ impl CompilerDb {
             project_semantic_snapshots: BTreeMap::new(),
             token_source_indexes: BTreeMap::new(),
             checked_token_source_indexes: BTreeMap::new(),
+            semantic_token_indexes: BTreeMap::new(),
             semantic_fragments: BTreeMap::new(),
             trace: Vec::new(),
         }
@@ -980,6 +1004,65 @@ impl CompilerDb {
             QueryOutcome::Miss,
         );
         Ok(index)
+    }
+
+    /// Generates RFC-0047 abstract semantic tokens for one immutable source.
+    ///
+    /// Complete workspace checking yields typed entries. Any analysis failure
+    /// yields the RFC-0046 conservative whole-source lexical fallback. This
+    /// query publishes no LSP positions, legend indices, or transport values.
+    pub fn semantic_token_index(
+        &mut self,
+        file: SourceId,
+    ) -> Result<Arc<SemanticTokenIndex>, QueryError> {
+        let (source_key, snapshot, source) = self.source(file)?;
+        let lexical = self.token_source_index(file)?;
+
+        let typed_context = (|| {
+            let (graph_key, graph) = self.module_graph_query()?;
+            let node = graph
+                .node(file)
+                .cloned()
+                .ok_or(QueryError::UnknownFile { file })?;
+            let workspace = self.workspace_resolve_key(&graph_key, &graph, &node.name)?;
+            let key = SemanticTokenQueryKey {
+                source: source_key,
+                workspace,
+            };
+            let checked = self.checked_workspace(&graph_key, &graph, &node.name)?;
+            Ok::<_, QueryError>((key, checked))
+        })();
+
+        match typed_context {
+            Ok((key, checked)) => {
+                if let Some(cached) = self.semantic_token_indexes.get(&key).cloned() {
+                    self.record(QueryKind::SemanticTokenIndex, &snapshot, QueryOutcome::Hit);
+                    return Ok(cached);
+                }
+                let index = SemanticTokenIndex::from_checked(
+                    &lexical,
+                    &checked,
+                    snapshot.revision(),
+                    source.original_text(),
+                )
+                .map(Arc::new)
+                .map_err(|error| QueryError::SemanticTokenIndex { file, error })?;
+                self.semantic_token_indexes.insert(key, index.clone());
+                self.record(QueryKind::SemanticTokenIndex, &snapshot, QueryOutcome::Miss);
+                Ok(index)
+            }
+            Err(_) => {
+                let index = SemanticTokenIndex::from_lexical_fallback(
+                    &lexical,
+                    snapshot.revision(),
+                    source.original_text(),
+                )
+                .map(Arc::new)
+                .map_err(|error| QueryError::SemanticTokenIndex { file, error })?;
+                self.record(QueryKind::SemanticTokenIndex, &snapshot, QueryOutcome::Miss);
+                Ok(index)
+            }
+        }
     }
 
     /// Returns the lossless parse result, including bounded syntax errors.
