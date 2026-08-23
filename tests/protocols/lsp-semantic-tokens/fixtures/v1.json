@@ -1,0 +1,221 @@
+{
+  "fixtureFormat": "ling.test.lsp-semantic-tokens/1",
+  "protocol": "ling.lsp.semantic-tokens/0.1",
+  "taxonomy": "ling.semantic-token-taxonomy/0.1",
+  "generation": "ling.semantic-token-generation/0.1",
+  "legend": {
+    "tokenTypes": [
+      "namespace",
+      "type",
+      "enum",
+      "interface",
+      "struct",
+      "typeParameter",
+      "parameter",
+      "variable",
+      "property",
+      "enumMember",
+      "function",
+      "method",
+      "keyword",
+      "comment",
+      "string",
+      "number",
+      "operator"
+    ],
+    "tokenModifiers": [
+      "declaration",
+      "definition",
+      "readonly",
+      "modification",
+      "documentation",
+      "defaultLibrary",
+      "mutable"
+    ]
+  },
+  "cases": [
+    {
+      "name": "utf16-bom-crlf-emoji-prefix-chinese-columns",
+      "positionEncoding": "utf-16",
+      "uri": "ling://workspace/fixtures/semantic-tokens/Unicode.ling",
+      "version": 7,
+      "source": "\ufeffmodule Unicode\r\n\r\n/*🙂*/ let 人物 = \"😀é\"\r\n",
+      "expected": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "data": [
+            0, 0, 6, 12, 0,
+            0, 7, 7, 0, 2,
+            2, 0, 6, 13, 0,
+            0, 7, 3, 12, 0,
+            0, 4, 2, 7, 6,
+            0, 3, 1, 16, 0,
+            0, 2, 6, 14, 0
+          ],
+          "resultId": "st1-5c711353fa58f11fcf3234e638e8dab508f4ca88ebb37be4d05b4e7551ea571f"
+        }
+      }
+    },
+    {
+      "name": "checked-scopes-mutable-fields-variants-and-capability-exclusion",
+      "positionEncoding": "utf-16",
+      "uri": "ling://workspace/fixtures/semantic-tokens/Roles.ling",
+      "version": 11,
+      "source": "module Roles\n    requires Console.Write\n\ntype Counter = { mutable value: Int }\n\ntype State =\n    | Ready\n    | Busy of Int\n\nlet main () =\n    let value = 1\n    let shadow value = value\n    let mutable counter: Counter = { value = value }\n    counter.value <- shadow value\n    match Busy counter.value with\n    | Ready -> 0\n    | Busy value -> value\n",
+      "expected": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "data": [
+            0, 0, 6, 12, 0,
+            0, 7, 5, 0, 2,
+            1, 4, 8, 12, 0,
+            2, 0, 4, 12, 0,
+            0, 5, 7, 4, 2,
+            0, 8, 1, 16, 0,
+            0, 4, 7, 12, 0,
+            0, 8, 5, 8, 66,
+            0, 7, 3, 1, 32,
+            2, 0, 4, 12, 0,
+            0, 5, 5, 2, 2,
+            0, 6, 1, 16, 0,
+            1, 4, 1, 16, 0,
+            0, 2, 5, 9, 2,
+            1, 4, 1, 16, 0,
+            0, 2, 4, 9, 2,
+            0, 5, 2, 12, 0,
+            0, 3, 3, 1, 32,
+            2, 0, 3, 12, 0,
+            0, 4, 4, 10, 6,
+            0, 8, 1, 16, 0,
+            1, 4, 3, 12, 0,
+            0, 4, 5, 7, 6,
+            0, 6, 1, 16, 0,
+            0, 2, 1, 15, 0,
+            1, 4, 3, 12, 0,
+            0, 4, 6, 10, 6,
+            0, 7, 5, 6, 6,
+            0, 6, 1, 16, 0,
+            0, 2, 5, 6, 4,
+            1, 4, 3, 12, 0,
+            0, 4, 7, 12, 0,
+            0, 8, 7, 7, 66,
+            0, 9, 7, 1, 0,
+            0, 8, 1, 16, 0,
+            0, 4, 5, 8, 0,
+            0, 6, 1, 16, 0,
+            0, 2, 5, 7, 4,
+            1, 4, 7, 7, 72,
+            0, 8, 5, 8, 0,
+            0, 6, 2, 16, 0,
+            0, 3, 6, 10, 4,
+            0, 7, 5, 7, 4,
+            1, 4, 5, 12, 0,
+            0, 6, 4, 9, 0,
+            0, 5, 7, 7, 64,
+            0, 8, 5, 8, 0,
+            0, 6, 4, 12, 0,
+            1, 4, 1, 16, 0,
+            0, 2, 5, 9, 0,
+            0, 6, 2, 16, 0,
+            0, 3, 1, 15, 0,
+            1, 4, 1, 16, 0,
+            0, 2, 4, 9, 0,
+            0, 5, 5, 6, 6,
+            0, 6, 2, 16, 0,
+            0, 3, 5, 6, 4
+          ],
+          "resultId": "st1-b66e44c4edb0d203804b016d7f7c7c702234c91255d41ff49393de5562b68160"
+        }
+      }
+    },
+    {
+      "name": "whole-source-error-recovery",
+      "positionEncoding": "utf-16",
+      "uri": "ling://workspace/fixtures/semantic-tokens/Broken.ling",
+      "version": 3,
+      "source": "module Broken\n\nlet broken =\n/// docs\n\"text\" + 1\n",
+      "expected": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "data": [
+            0, 0, 6, 12, 0,
+            2, 0, 3, 12, 0,
+            0, 11, 1, 16, 0,
+            1, 0, 8, 13, 0,
+            1, 0, 6, 14, 0,
+            0, 7, 1, 16, 0,
+            0, 2, 1, 15, 0
+          ],
+          "resultId": "st1-6e1b9dfdb25c7b581c93bdfe3d25df79a7a27fd0d43e54317c9e485f8ea4494e"
+        }
+      }
+    },
+    {
+      "name": "canonical-delta-equivalence",
+      "positionEncoding": "utf-16",
+      "uri": "ling://workspace/fixtures/semantic-tokens/Delta.ling",
+      "version": 1,
+      "source": "module Delta\n\nlet value = 1\n",
+      "expected": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "data": [
+            0, 0, 6, 12, 0,
+            0, 7, 5, 0, 2,
+            2, 0, 3, 12, 0,
+            0, 4, 5, 7, 6,
+            0, 6, 1, 16, 0,
+            0, 2, 1, 15, 0
+          ],
+          "resultId": "st1-2f8f3ce4440acac62fe86d9ce057b76cd530edbd8609c284c02e6be4b9755219"
+        }
+      },
+      "change": {
+        "version": 2,
+        "source": "module Delta\n\nlet value = 2\nlet next = value\n",
+        "expectedDelta": {
+          "jsonrpc": "2.0",
+          "id": 3,
+          "result": {
+            "edits": [
+              {
+                "start": 30,
+                "deleteCount": 0,
+                "data": [
+                  1, 0, 3, 12, 0,
+                  0, 4, 4, 7, 6,
+                  0, 5, 1, 16, 0,
+                  0, 2, 5, 7, 4
+                ]
+              }
+            ],
+            "resultId": "st1-4889de891eadde622987a9327a573df1a5746c4f3cb9156c93faee77b33b1e6c"
+          }
+        },
+        "expectedFull": {
+          "jsonrpc": "2.0",
+          "id": 4,
+          "result": {
+            "data": [
+              0, 0, 6, 12, 0,
+              0, 7, 5, 0, 2,
+              2, 0, 3, 12, 0,
+              0, 4, 5, 7, 6,
+              0, 6, 1, 16, 0,
+              0, 2, 1, 15, 0,
+              1, 0, 3, 12, 0,
+              0, 4, 4, 7, 6,
+              0, 5, 1, 16, 0,
+              0, 2, 5, 7, 4
+            ],
+            "resultId": "st1-4889de891eadde622987a9327a573df1a5746c4f3cb9156c93faee77b33b1e6c"
+          }
+        }
+      }
+    }
+  ]
+}

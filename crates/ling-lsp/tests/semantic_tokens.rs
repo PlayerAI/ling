@@ -224,6 +224,172 @@ fn integer_data(result: &Value) -> Vec<u32> {
 }
 
 #[test]
+fn semantic_token_fixture_corpus_matches_exact_preview_results() {
+    let corpus: Value = serde_json::from_str(include_str!(
+        "../../../tests/protocols/lsp-semantic-tokens/fixtures/v1.json"
+    ))
+    .expect("semantic-token fixture corpus JSON");
+    assert_eq!(corpus["fixtureFormat"], "ling.test.lsp-semantic-tokens/1");
+    assert_eq!(corpus["protocol"], SEMANTIC_TOKEN_PROTOCOL_VERSION);
+    assert_eq!(corpus["taxonomy"], SEMANTIC_TOKEN_TAXONOMY_VERSION);
+    assert_eq!(corpus["generation"], "ling.semantic-token-generation/0.1");
+    assert_eq!(corpus["legend"]["tokenTypes"], json!(TYPES));
+    assert_eq!(corpus["legend"]["tokenModifiers"], json!(MODIFIERS));
+
+    let cases = corpus["cases"].as_array().expect("fixture cases");
+    assert_eq!(cases.len(), 4);
+    let mut names = Vec::new();
+    for case in cases {
+        let name = case["name"].as_str().expect("fixture name");
+        assert!(!names.contains(&name), "duplicate fixture name: {name}");
+        names.push(name);
+        let encoding = case["positionEncoding"]
+            .as_str()
+            .expect("fixture position encoding");
+        let uri = case["uri"].as_str().expect("fixture URI");
+        let version = case["version"].as_i64().expect("fixture version");
+        let source = case["source"].as_str().expect("fixture source");
+        let run = || {
+            let (mut server, _) = ready(encoding, json!({"delta": true}), &TYPES, &MODIFIERS);
+            open(&mut server, uri, version, source);
+            response(
+                &mut server,
+                2,
+                "textDocument/semanticTokens/full",
+                json!({"textDocument": {"uri": uri}}),
+            )
+        };
+        let actual = run();
+        assert_eq!(actual, run(), "fresh-session determinism: {name}");
+        assert_eq!(actual, case["expected"], "exact fixture result: {name}");
+
+        let result_id = actual["result"]["resultId"]
+            .as_str()
+            .expect("fixture result ID");
+        assert!(result_id.starts_with("st1-") && result_id.len() == 68);
+        let data = actual["result"]["data"]
+            .as_array()
+            .expect("fixture token data");
+        let tokens = decode(data);
+        assert!(tokens.windows(2).all(|pair| {
+            (pair[0].line, pair[0].start + pair[0].length) <= (pair[1].line, pair[1].start)
+        }));
+
+        match name {
+            "utf16-bom-crlf-emoji-prefix-chinese-columns" => {
+                assert!(tokens.contains(&DecodedToken {
+                    line: 2,
+                    start: 0,
+                    length: 6,
+                    kind: 13,
+                    modifiers: 0,
+                }));
+                assert!(tokens.contains(&DecodedToken {
+                    line: 2,
+                    start: 11,
+                    length: 2,
+                    kind: 7,
+                    modifiers: 6,
+                }));
+                assert!(tokens.contains(&DecodedToken {
+                    line: 2,
+                    start: 16,
+                    length: 6,
+                    kind: 14,
+                    modifiers: 0,
+                }));
+            }
+            "checked-scopes-mutable-fields-variants-and-capability-exclusion" => {
+                assert_eq!(
+                    tokens
+                        .iter()
+                        .copied()
+                        .filter(|token| token.line == 1)
+                        .collect::<Vec<_>>(),
+                    vec![DecodedToken {
+                        line: 1,
+                        start: 4,
+                        length: 8,
+                        kind: 12,
+                        modifiers: 0,
+                    }],
+                    "Effect/Capability names in requires must be excluded"
+                );
+                assert!(
+                    tokens
+                        .iter()
+                        .any(|token| { token.kind == 8 && token.modifiers & (1 << 6) != 0 })
+                );
+                assert!(
+                    tokens
+                        .iter()
+                        .any(|token| { token.kind == 9 && token.modifiers & (1 << 1) != 0 })
+                );
+                assert!(
+                    tokens
+                        .iter()
+                        .any(|token| token.line == 10 && token.kind == 7)
+                );
+                assert!(
+                    tokens
+                        .iter()
+                        .any(|token| token.line == 11 && token.kind == 6)
+                );
+            }
+            "whole-source-error-recovery" => {
+                assert!(
+                    tokens
+                        .iter()
+                        .all(|token| { (12..=16).contains(&token.kind) && token.modifiers == 0 })
+                );
+            }
+            "canonical-delta-equivalence" => {
+                let base_data = integer_data(&actual["result"]);
+                let base_id = actual["result"]["resultId"]
+                    .as_str()
+                    .expect("delta base result ID");
+                let changed = &case["change"];
+                let (mut server, _) = ready(encoding, json!({"delta": true}), &TYPES, &MODIFIERS);
+                open(&mut server, uri, version, source);
+                assert_eq!(full(&mut server, 2, uri), actual["result"]);
+                change(
+                    &mut server,
+                    uri,
+                    changed["version"].as_i64().expect("changed version"),
+                    changed["source"].as_str().expect("changed source"),
+                );
+                let actual_delta = response(
+                    &mut server,
+                    3,
+                    "textDocument/semanticTokens/full/delta",
+                    json!({
+                        "previousResultId": base_id,
+                        "textDocument": {"uri": uri},
+                    }),
+                );
+                let actual_full = response(
+                    &mut server,
+                    4,
+                    "textDocument/semanticTokens/full",
+                    json!({"textDocument": {"uri": uri}}),
+                );
+                assert_eq!(actual_delta, changed["expectedDelta"]);
+                assert_eq!(actual_full, changed["expectedFull"]);
+                assert_eq!(
+                    apply_delta(base_data, &actual_delta["result"]),
+                    integer_data(&actual_full["result"])
+                );
+                assert_eq!(
+                    actual_delta["result"]["resultId"],
+                    actual_full["result"]["resultId"]
+                );
+            }
+            unexpected => panic!("unexpected fixture case: {unexpected}"),
+        }
+    }
+}
+
+#[test]
 fn initialize_negotiates_exact_full_delta_and_partial_legends() {
     let (server, initialized) = ready(
         "utf-16",

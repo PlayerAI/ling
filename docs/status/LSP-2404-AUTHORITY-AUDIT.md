@@ -2,104 +2,95 @@
 
 ## Outcome
 
-`LSP-2404` is correctly recorded as `BlockedSpec`. The execution plan asks for
-semantic-token fixtures covering Chinese columns, emoji prefixes, same names in
-different scopes, mutable fields, variant constructors, Effect/Capability, and
-error recovery. The repository has no accepted token taxonomy, typed/fallback
-origin contract, full/delta transport schema, position/version rule, or
-fixture schema that can make those expected outputs normative.
+`LSP-2404` is authorized for implementation. Its direct dependencies
+`LSP-2401`, `LSP-2402`, and `LSP-2403` are complete under Accepted RFC-0046,
+RFC-0047, and RFC-0048 respectively. Together those RFCs now define every
+semantic-token value frozen by the fixture corpus: canonical taxonomy and
+modifiers, checked versus whole-source fallback generation, original UTF-8
+span truth, negotiated position projection, snapshot binding, exact full and
+delta transport, deterministic result IDs, bounds, cancellation, freshness,
+privacy, and compatibility behavior.
 
-No semantic-token fixture corpus, expected token output, protocol schema,
-diagnostic allocation, Semantic ID change, or placeholder LSP surface was
-added. Accepted DEC-0087 and the bounded `LSP-2404-CHECKED-SOURCE-FIXTURES`
-child add only compiler-owned evidence for original bytes, spans, source order,
-and VFS revision invalidation; public semantic-token fixtures remain blocked.
+The corpus format marker `ling.test.lsp-semantic-tokens/1` is test-only. It is
+an executable representation of already Accepted public behavior, not a new
+public protocol, standalone schema, language feature, or compatibility promise.
 
 ## Normative traceability
 
-- The execution package is non-normative; its fixture list does not authorize
-  token categories, source positions, fallback behavior, or wire fields.
-- LSP-2401 taxonomy, LSP-2402 typed generation, and LSP-2403 full/delta
-  transport are `BlockedSpec`, so fixture expectations cannot freeze their
-  unresolved interfaces.
-- DEC-0002 makes original UTF-8 `SourceId + Span` authoritative and requires
-  an explicit SourceMap projection for LSP UTF-16 positions. It does not define
-  token legends, column encoding in fixtures, document versions, or recovery
-  markers.
-- DEC-0012 fixes Semantic IDs and canonical bytes. The registered Semantic
-  Graph projections are Experimental and do not define token fixture identity,
-  source provenance, or cache compatibility.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves snapshot/version preconditions and
-  Stable versus Experimental editor fields open, while
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves protocol stability, reader/writer
-  compatibility, stale rejection, and migration open.
-- DEC-0019 defines an internal incremental-query boundary and explicitly does
-  not authorize a public LSP request, position encoding, or protocol field.
-- Accepted DEC-0087 authorizes only internal checked-token source fixtures; no
-  expected semantic-token output or fixture wire schema is defined.
+- RFC-0046 §1–3 fixes the canonical token-type/modifier order and source-role
+  mapping, including scoped identities, mutable fields, variant constructors,
+  and modifier exclusivity.
+- RFC-0046 §4–7 fixes evidence precedence, conservative recovery, legend
+  projection, UTF-8 span truth, negotiated position units, ordering, privacy,
+  and the exclusion of Effect/Capability facts as source-token categories.
+- RFC-0047 §1–4 fixes snapshot-bound checked generation, exact identity and
+  structure evidence, field/constructor/reference mapping, shadowing, writes,
+  and modifier propagation.
+- RFC-0047 §5–7 fixes whole-source lexical fallback, multiline splitting,
+  non-overlap, atomic failure, and the prohibition on unchecked-AST or private
+  compiler data in output.
+- RFC-0048 §1–4 fixes the Preview protocol marker, selected legend, tracked
+  document/version input, UTF-8/16/32 projection, and standard relative groups.
+- RFC-0048 §5–8 fixes deterministic result IDs, bounded history, canonical
+  one-edit deltas, full/delta equivalence, cancellation, freshness, limits,
+  atomic failure, privacy, and migration boundaries.
+- RFC-0048's conformance plan expressly requires exact protocol fixtures for
+  Unicode projection, deterministic bytes and IDs, full/delta equivalence,
+  compiler failures, exclusions, limits, and privacy.
 
-## Current fixture evidence
+The lower-authority execution plan selects the requested examples but creates
+no additional semantics. General LSP-2501/LSP-2502 work remains future scope;
+RFC-0048 already supplies the bounded snapshot and cooperative-cancellation
+rules required by this implemented Preview surface.
 
-- Existing syntax, semantic-graph, project, diagnostic, and bytecode fixtures
-  validate their own accepted contracts; none emits or reads semantic-token
-  legends, typed/fallback origin, full/delta results, or token modifiers.
-- `ling-source` preserves original UTF-8 spans and SourceMap data, but no
-  fixture binds a token result to one document snapshot or validates UTF-16
-  projection, Chinese scalar columns, emoji surrogate pairs, CRLF, or BOM
-  behavior.
-- `ling-types`, `ling-effects`, and `ling-semantic` expose checked semantic
-  data, but no fixture defines token mapping for mutable bindings, variant
-  constructors, Effect/Capability labels, shadowed names, or generated and
-  dependency regions.
-- No fixture proves error-region fallback, rejects unchecked-AST-derived
-  tokens, compares full and delta results, validates non-overlap/order, or
-  fixes deterministic bytes and result-ID behavior.
-- The checked-source fixture child covers BOM/CRLF/Unicode original-byte
-  slices, source order, cache reuse, and revision invalidation without adding
-  token categories or protocol fields.
+## Authorized fixture boundary
 
-## Required authority before implementation
+The fixture corpus may contain only client-visible inputs and results already
+defined by the Accepted RFCs:
 
-An Accepted RFC or decision must define, at minimum:
+- a test-only format marker and the three Accepted taxonomy, generation, and
+  transport version markers;
+- the canonical client legend, negotiated position encoding, exact URI,
+  document version, and UTF-8 source text used as test input;
+- exact JSON-RPC full/delta results containing standard integer data, canonical
+  edits, and opaque `st1-` result IDs; and
+- deterministic test metadata such as a unique case name and changed document
+  input.
 
-1. a versioned fixture/schema model, token legend and modifiers, typed versus
-   parsed-fallback origin, source provenance, and the exact expected output
-   representation;
-2. UTF-8 span truth and UTF-8/UTF-16 position projection, including Chinese
-   scalar columns, emoji prefixes/surrogate pairs, CRLF, BOM, and document
-   snapshot/version binding;
-3. mapping rules for declarations, references, same-name different scopes,
-   mutable fields, variant constructors, Effect/Capability, generated or
-   dependency data, and redaction/unsupported cases;
-4. error recovery boundaries, incomplete input behavior, unchecked-AST
-   prohibition, full/delta equivalence, ordering/non-overlap, deterministic
-   serialization, cancellation, limits, stale results, and result-ID/base
-   handling; and
-5. executable positive/negative/migration fixtures with independent readers,
-   protocol inventory entries, Stable versus Experimental labels, diagnostic
-   expectations, and compatibility/version-upgrade rules.
+The corpus must not publish compiler identities, Semantic IDs, Definition IDs,
+VFS revisions, types, Effect rows, Capability sets, host paths, diagnostics,
+debug output, or a new token category. The reader must independently execute
+the provider, compare complete values, verify ordering/non-overlap, and reapply
+delta edits to the exact base.
 
-Until those decisions are Accepted, checked-in expected token outputs could
-turn an execution-plan example into an accidental public protocol, encode the
-wrong position unit, or bless semantic labels for unresolved/error data.
+## Required cases
 
-## Evidence and compatibility
+The smallest complete corpus covers:
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0002, DEC-0012, DEC-0019,
-`docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the current syntax, source, type, effect, semantic, diagnostic, and
-fixture directories.
+1. UTF-16 positions with a BOM, CRLF, an emoji prefix, combining text, and
+   Chinese identifier columns;
+2. same spelling at different checked scopes, mutable-field roles and writes,
+   variant constructors/patterns, and exclusion of names in a
+   `requires Console.Write` clause;
+3. whole-source error recovery that emits only unmodified lexer-proven token
+   families and never fabricates identifier roles; and
+4. exact deterministic full output, one canonical delta edit, the corresponding
+   current full output, equal result identity, and executable delta equivalence.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+Existing RFC-0048 transport tests remain the evidence for partial legends,
+UTF-8/UTF-32, invalid/foreign/expired bases, FIFO retention, temporary/closed
+documents, cancellation, malformed inputs, and limits; those cases need not be
+duplicated in the exact corpus.
 
-## Intentionally deferred
+## Specification gaps and compatibility
 
-The bounded checked-source fixture child is complete under DEC-0087. Public
-`LSP-2404` can begin after LSP-2401 taxonomy, LSP-2402 generation, LSP-2403
-transport, LSP-2501/LSP-2502 snapshot and cancellation decisions, and the
-Semantic Graph lifecycle contract are Accepted. The future fixture corpus must
-be independent, deterministic, versioned, position-unit explicit, and sourced
-only from checked Typed Core/Resolved HIR or explicitly marked parsed fallback.
+No unresolved semantic or public-protocol decision blocks LSP-2404. A new RFC
+would be required only to change the accepted taxonomy, generation evidence,
+position model, transport marker, result identity, delta algorithm, or public
+compatibility rules. Updating the test-only fixture format without changing
+public behavior does not create a protocol migration.
+
+This task allocates no diagnostic, adds no standalone public schema, changes no
+Semantic ID or canonical bytes, and changes no Ling syntax, Typed Core,
+interpreter, runtime, bytecode, VM, ABI, package behavior, filesystem/network
+behavior, or Unicode 17.0.0 tables.

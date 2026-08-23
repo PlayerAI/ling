@@ -1,4 +1,4 @@
-# `ling.lsp.semantic-tokens/0.1` Preview fixture
+# `ling.lsp.semantic-tokens/0.1` Preview fixtures
 
 Accepted RFC-0048 defines the bounded semantic-token transport:
 
@@ -18,7 +18,26 @@ Accepted RFC-0048 defines the bounded semantic-token transport:
 
 Executable evidence:
 
+- `fixtures/v1.json` is a deterministic, test-only corpus identified by
+  `ling.test.lsp-semantic-tokens/1`. It is not a public schema or compatibility
+  surface.
+- Each case fixes its negotiated position encoding, URI, document version,
+  exact UTF-8 source, and complete JSON-RPC result.
+- The corpus covers UTF-16 BOM/CRLF/emoji/Chinese projection; checked scope,
+  mutable-field and variant roles; Effect/Capability exclusion; conservative
+  error recovery; and an exact canonical delta plus its equivalent full result.
+- `crates/ling-lsp/tests/semantic_tokens.rs` is the independent reader. It
+  executes every case in fresh sessions, checks exact deterministic results,
+  validates order/non-overlap and category-specific invariants, and reapplies
+  the frozen delta to its base.
+
+Commands:
+
 ```text
 cargo test -p ling-db --test semantic_tokens --locked --offline
 cargo test -p ling-lsp --test semantic_tokens --locked --offline
 ```
+
+Incompatible public output requires a new Accepted taxonomy, generation, or
+transport marker. The test-only fixture format may be revised independently
+when it continues to encode the same Accepted public behavior.
