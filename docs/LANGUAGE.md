@@ -1321,6 +1321,13 @@ ling build --manifest-path ./ling.toml --locked --offline \
 The `native` and `critical` build forms in the broader draft catalog remain
 future design until their own Accepted profile/backend authority exists.
 
+Accepted DEC-0253 fixes the current bounded command model: the implemented
+roots are `run`, `check`, `semantic`, `audit`, `test`, `build`, `fmt`, `init`,
+`repl`, and `lsp`, with hierarchical `project check`. They share one exact
+parser/dispatcher and reuse the accepted checked service boundaries. Draft
+commands such as `explain`, `query`, and `patch` remain unimplemented and are
+not advertised.
+
 Accepted RFC-0026 adds bounded editor formatting to `ling lsp --stdio`:
 `textDocument/formatting` consumes the current open writable overlay and returns
 zero or one whole-document `TextEdit` using the negotiated position encoding.

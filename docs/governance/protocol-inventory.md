@@ -14,7 +14,7 @@
 
 | ID | Visibility | Category | Current version | Stability | Public schema | Canonical | Fixtures |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 4 |
+| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 5 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
@@ -53,10 +53,10 @@
 - Writer policy: Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines, semantic project commands emit ling.project.command/0.1 results, project graph check retains ling.project.check/0.1, and lsp --stdio retains protocol-only framed output.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
-- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `RFC-0004`, `RFC-0024`, `RFC-0025`
-- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs)
-- Fixtures: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
-- Notes: The compiler package version remains the broad CLI version. RFC-0025 adds the current-writer-only ling.project.command/0.1 JSON boundary for explicit locked/offline semantic project check/run/test/build while preserving positional file modes and RFC-0024 graph checking.
+- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0028`, `DEC-0038`, `DEC-0039`, `DEC-0253`, `RFC-0004`, `RFC-0024`, `RFC-0025`
+- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0253-current-cli-command-model.md`](../decisions/0253-current-cli-command-model.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs)
+- Fixtures: [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
+- Notes: The compiler package version remains the broad CLI version. DEC-0253 accepts the existing single parser/dispatcher and exact implemented command catalog without adding planned roots; command-specific authorities retain their own input, output, exit, schema, stability, and migration rules.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 

@@ -3822,3 +3822,16 @@ covers = ["TRAIT-1309 bounded current termination evidence", "composed cycle, de
 depends_on = ["RFC-0005", "DEC-0026", "DEC-0068", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0253"
+title = "Current CLI command model"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0253-current-cli-command-model.md"
+covers = ["CLI-1701 current single parser and dispatcher", "exact implemented command catalog and hierarchical project check identity", "reuse of accepted checked compiler, project, formatter, initializer, test, REPL, and LSP service boundaries without planned-command claims"]
+depends_on = ["DEC-0003", "DEC-0028", "DEC-0036", "DEC-0038", "DEC-0039", "RFC-0004", "RFC-0024", "RFC-0025", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

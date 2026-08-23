@@ -6546,3 +6546,29 @@ unresolved_alternatives = [
   "Production obligation integration, deterministic work units and exhaustion, benchmark corpora and thresholds, environment/variance policy, LSP cancellation/version/stale-result behavior, public evidence schemas, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0253"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0253-current-cli-command-model.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify the catalog contains each implemented command exactly once, parses each current root, preserves hierarchical project check identity, and rejects planned or stale roots.",
+  "Verify help contains every implemented catalog spelling and no query, patch, zero, or .zero spelling.",
+  "Retain command-specific parser, integration, stdout/stderr, exit-code, offline, deterministic, and nonmutation suites for every composed surface.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Accepts the already implemented command set and single selection/dispatch ownership as the current Preview model without adding or changing commands, aliases, options, outputs, or exits.",
+  "Updates only PROTO-CLI authority and evidence; Ling semantics, diagnostics, schemas, Semantic IDs, packages, bytecode, VM, ABI, and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Unified output/language/color/verbosity, Semantic Query and Transaction commands, completion/help fixtures, future explain/replay/evidence/support/migration/plugin/daemon surfaces, and Stable compatibility remain separately governed.",
+]
+superseded_by = ""

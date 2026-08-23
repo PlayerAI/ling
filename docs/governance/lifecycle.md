@@ -285,6 +285,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0250` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0250](../decisions/0250-current-project-surface-evidence.md) |
 | `DEC-0251` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0251](../decisions/0251-current-trait-ide-surface-evidence.md) |
 | `DEC-0252` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0252](../decisions/0252-current-trait-performance-evidence.md) |
+| `DEC-0253` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0253](../decisions/0253-current-cli-command-model.md) |
 
 ## Migration boundary
 
