@@ -142,6 +142,7 @@
 | `DOC-6702-SEED` | Seed example-matrix drift gate | `G6` | `S` | `Done` | `DOC-6701-SEED` | `dab9a240c3f83c3e671449b318ca9425df57df32` |
 | `DOC-6703` | Bilingual Chinese-first Tutorial | `G6` | `M` | `BlockedSpec` | `DOC-6702` | `` |
 | `DOC-6703-SEED` | Seed bilingual tutorial coverage drift gate | `G6` | `S` | `Done` | `DOC-6702-SEED` | `9f3386bab5c8f06c7ce76ac0ab5c66f8b8695ca4` |
+| `DOC-6703-SEMANTIC-EQUIVALENCE` | Bilingual tutorial Semantic-shape equivalence | `G6` | `S` | `Done` | `DOC-6702-EXECUTION-MANIFEST`, `DOC-6703-SEED` | `b5f3a3538a56f58652acc4e891ed58fcf57344d6` |
 | `EFF-2101` | Effect core model freeze | `G2` | `M` | `Done` | — | `61f68a93844431265eca725ee66aab894394c982` |
 | `EFF-2101-SEED-ROW` | Seed EffectRow canonical snapshot | `G2` | `S` | `Done` | — | `fb949ce2b28fc73a1668806952c3f8e790cd6d7a` |
 | `EFF-2102` | Effect inference and constraint solving | `G2` | `L` | `Done` | `EFF-2101` | `e1827e7ceee6ffba9d40d882119a949d4af65a00` |

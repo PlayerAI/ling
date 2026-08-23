@@ -25852,6 +25852,7 @@ spec = [
   "docs/testing/TUTORIAL-COVERAGE.md",
   "docs/status/DOC-6702-AUTHORITY-AUDIT.md",
   "docs/decisions/0047-seed-bilingual-tutorial-gate.md",
+  "docs/decisions/0240-bilingual-tutorial-semantic-equivalence.md",
   "docs/TUTORIAL.md",
   "examples/tutorial-zh.ling",
   "examples/tutorial-en.ling",
@@ -25861,6 +25862,8 @@ spec = [
 artifacts = [
   "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
   "docs/status/DOC-6703-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/DOC-6703-SEMANTIC-EQUIVALENCE-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6703-SEMANTIC-EQUIVALENCE-IMPLEMENTATION-REPORT.md",
   "docs/TUTORIAL.md",
   "docs/testing/TUTORIAL-COVERAGE.md",
   "examples/tutorial-zh.ling",
@@ -25872,6 +25875,7 @@ artifacts = [
 acceptance = [
   "The tutorial provides Chinese-first and semantically equivalent English source, with idiomatic rather than mechanically translated identifiers.",
   "Both sources compile and run through the shared checked pipeline, and the process-level example matrix checks their output and Semantic schema/name evidence.",
+  "The real Chinese and English Semantic Graphs have equal version/entry, module requirement, user-definition, node, and reference-kind shapes after only their user nominal type spellings are normalized.",
   "The tutorial documents Semantic/Audit commands, the registered missing-Capability negative fixture, bilingual terminology, Unicode 17.0.0, and original UTF-8 span boundaries.",
   "The audit records the G1-G5 and Stable support-matrix dependency; Profile, ownership, Native/FFI, concurrency, package, LSP, and Zed support remain explicit non-features.",
   "No placeholder syntax, API, protocol, backend, migration promise, security claim, or stale legacy name is added.",
@@ -25882,7 +25886,8 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "DOC-6703 is BlockedSpec because no current feature is Stable and G6 depends on G1-G5 exits before bilingual tutorials can document a frozen 1.0 support surface.",
-  "The two tutorial sources are Seed evidence only; they use existing grammar, Effect/Capability checks, diagnostics, and Semantic/Audit protocols.",
+  "Accepted DEC-0240 closes only the checked Semantic-shape equivalence child; it does not define localization aliases, Stable equivalence, or G6 completion.",
+  "The two tutorial sources and their structural comparison are Seed evidence only; they use existing grammar, Effect/Capability checks, diagnostics, and Semantic/Audit protocols.",
   "The audit changes no language semantics, diagnostics, schemas, Semantic IDs, CLI, package behavior, runtime, editor integration, dependencies, or public API.",
 ]
 
@@ -25936,6 +25941,50 @@ completed = "2026-08-22"
 notes = [
   "The verifier protects bilingual tutorial inventory and source/document markers only; tutorial execution and observed outputs remain existing Seed evidence.",
   "No syntax, localized alias, API, profile, ownership rule, migration promise, security claim, or placeholder public surface is added.",
+]
+
+[[task]]
+id = "DOC-6703-SEMANTIC-EQUIVALENCE"
+title = "Bilingual tutorial Semantic-shape equivalence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DOC-6702-EXECUTION-MANIFEST", "DOC-6703-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0047-seed-bilingual-tutorial-gate.md",
+  "docs/decisions/0239-seed-example-execution-manifest.md",
+  "docs/decisions/0240-bilingual-tutorial-semantic-equivalence.md",
+  "docs/TUTORIAL.md",
+  "docs/testing/TUTORIAL-COVERAGE.md",
+  "docs/status/DOC-6703-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "tests/examples/seed-cases.toml",
+  "examples/tutorial-zh.ling",
+  "examples/tutorial-en.ling",
+  "crates/ling-cli/tests/conformance.rs",
+  "docs/status/DOC-6703-SEMANTIC-EQUIVALENCE-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6703-SEMANTIC-EQUIVALENCE-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "The shared process test obtains one ASCII and one Chinese tutorial ling.semantic/0.1 graph after both sources pass check, exact-output run, and individual Semantic witness assertions.",
+  "The private projection retains schema/language/Unicode versions, entry module, module requirements, four user-definition kind/type/effect/capability shapes, eighty node shapes, and eleven reference source/target-kind shapes.",
+  "Only the single user nominal type spelling is normalized; localized identifiers/text, spans, source evidence, scripts, ordering, and Experimental IDs are excluded rather than treated as equivalence or compatibility requirements.",
+  "The two sorted projections compare exactly equal while runtime output remains localized as 存活 and alive.",
+  "Focused CLI tests and tutorial, examples, workspace, CI, governance, status, formatting, lint, deterministic, and offline gates pass.",
+]
+verified_against_commit = "b5f3a3538a56f58652acc4e891ed58fcf57344d6"
+completion_commit = "b5f3a3538a56f58652acc4e891ed58fcf57344d6"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "DOC-6703 remains BlockedSpec for Accepted localization/alias policy, Stable support entries, future capability tutorials, prose equivalence, profile/target and ownership guidance, cross-host samples, migration guidance, and G6 sign-off.",
+  "This child changes only private process-test comparison and documentation evidence; no Ling semantic, source, diagnostic, schema, Semantic ID, package, dependency, CLI/editor, runtime, Unicode, protocol, support, or public API changes.",
 ]
 
 [[task]]
