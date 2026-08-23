@@ -334,6 +334,7 @@ dependencies = [
 name = "ling-lsp"
 version = "0.0.1-dev"
 dependencies = [
+ "blake3",
  "ling-db",
  "ling-diagnostics",
  "ling-format",

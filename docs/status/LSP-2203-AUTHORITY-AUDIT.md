@@ -2,74 +2,68 @@
 
 ## Outcome
 
-`LSP-2203` is correctly recorded as `BlockedSpec`. The execution plan proposes
-an LSP pull-diagnostics Preview in addition to push diagnostics. No accepted
-request/result schema defines `resultId`, unchanged reports, workspace
-diagnostics, partial results, snapshot pinning, or lifecycle interaction.
-
-No pull-diagnostics method, result-id cache, workspace report, partial-result
-stream, or placeholder protocol field was added. Existing diagnostic writers
-and CLI behavior remain unchanged.
+`LSP-2203` is implementation-authorized by Accepted RFC-0033. That RFC closes
+the earlier request/result, result-ID, workspace, snapshot, bound, lifecycle,
+and push-parity gaps for a deliberately synchronous LSP 3.17 subset. It does
+not authorize dynamic registration, observable cancellation, progress,
+partial results, refresh, related-document maps, or Stable compatibility.
 
 ## Normative traceability
 
-- `docs/SEMANTICS.md` and `docs/ERROR-CODES.md` define diagnostic meaning,
-  ordering, spans, localization, and repairs, not LSP pull request/result
-  schemas or cache identity.
-- `PROTO-DIAGNOSTIC-JSON` is a Preview writer and cannot be treated as an LSP
-  pull response. No LSP protocol entry is inventoried.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` leaves snapshot/version and request/edit
-  fields open; `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leaves public semantic
-  result lifecycle open.
-- LSP-2101 through LSP-2202 remain blocked on transport, position, overlay,
-  change, and diagnostic adapter contracts; pull results cannot bypass those
-  dependencies.
+- RFC-0033 §§1–2 define conditional capability negotiation, method
+  availability, exact identifiers, request validation, forward-compatible
+  ignored fields, and the 1024-entry workspace bound.
+- RFC-0033 §§3–4 require one current immutable RFC-0032 analysis ticket, exact
+  adapter-value parity, no push-state mutation, and stateless domain-separated
+  BLAKE3 result identities.
+- RFC-0033 §§5–7 define document and workspace full/unchanged reports,
+  open/closed/removed version behavior, URI ordering, removal clearance,
+  response-size failure, and fixed JSON-RPC error classes.
+- RFC-0032/RFC-0031 retain authority over compilation, syntax precedence,
+  temporary-source isolation, diagnostic fields, order, and source-span
+  projection. RFC-0004 and RFC-0023/RFC-0029/RFC-0030 retain lifecycle,
+  overlay, revision, and workspace authority.
 
-## Current interface evidence
+## Accepted boundary
 
-The current repository confirms the missing boundary:
+The implementation may advertise `diagnosticProvider` only when the client
+declares object-valued `capabilities.textDocument.diagnostic`, then serve
+`textDocument/diagnostic` and `workspace/diagnostic` from current tracked
+bytes. Result IDs depend only on the exact URI and ordered diagnostic JSON
+array; no cache, document version, host path, time, or process state enters the
+identity. Pull must neither consume pending push work nor update its ledger.
 
-- `ling-diagnostics` and `ling-db` can produce checked diagnostics and semantic
-  snapshots internally, but no LSP request handler or result-id cache exists.
-- No code defines unchanged-result semantics, workspace-wide report limits,
-  partial result tokens, cancellation, or association with a document/project
-  revision.
-- The protocol inventory contains no LSP pull-diagnostics version or fixture;
-  adding one would publish an unregistered editor API.
+The current single-message server cannot observe a later cancellation message
+while synchronously handling a request. RFC-0033 therefore makes cancellation,
+progress, and partial results non-advertised future work instead of claiming a
+non-functional surface.
 
-## Required authority before implementation
+## Required evidence
 
-An implementation-ready decision or RFC must define, at minimum:
+- exact provider presence/absence and unnegotiated MethodNotFound behavior;
+- full, empty, unchanged, version-independent, and diagnostic-changing
+  document results;
+- byte-identical push/pull diagnostic arrays and retained pending push work;
+- URI-sorted workspace mixtures, open/closed versions, empty workspace, and
+  previous-only removal clearance;
+- result-ID domain/format/separation evidence, temporary syntax isolation,
+  Unicode position projection through the shared adapter, validation and
+  previous-result bounds, and oversized-response failure atomicity;
+- locked-offline focused and repository-wide quality/governance gates.
 
-1. document and workspace pull request/response schemas, result IDs, unchanged
-   reports, partial result/progress tokens, and limits;
-2. snapshot/document version pinning, stale-result behavior, cancellation,
-   cache invalidation, and push/pull interaction;
-3. diagnostic field mapping, position encoding, related documents, severity,
-   tags, experimental data, localization, and error responses;
-4. lifecycle/capability negotiation, project/offline policy, and Stable versus
-   Experimental protocol/version migration; and
-5. positive, negative, unchanged, stale, cancellation, workspace-limit,
-   deterministic, Unicode/CRLF, and migration fixtures.
+## Compatibility impact
 
-Until those decisions and fixtures are Accepted, a pull endpoint could return
-  diagnostics for the wrong revision or freeze an unsupported result-id/cache
-  contract.
-
-## Evidence and compatibility
-
-This audit was checked against `docs/SEMANTICS.md`, `docs/ERROR-CODES.md`,
-`docs/ROADMAP-1.0.md`, `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-diagnostics`, `crates/ling-db`, and the LSP-2201/2202 audit
-boundaries.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+This authority adds Preview `ling.lsp.pull-diagnostics/0.1` and
+`ling.lsp.pull-result/0.1:blake3:`. It changes neither
+`ling.lsp.diagnostic/0.2` nor `ling.lsp.publish-diagnostics/0.1`. No diagnostic
+code, severity, message, Facts, repair, Semantic ID, Ling semantics, Typed
+Core, runtime, bytecode, VM, ABI, filesystem/network behavior, or Unicode
+17.0.0 data changes.
 
 ## Intentionally deferred
 
-`LSP-2203` can begin after LSP lifecycle, snapshot/version, diagnostic adapter,
-and pull protocol decisions are Accepted. The implementation must pin results
-to immutable revisions, support deterministic unchanged handling, and keep
-Preview fields out of Stable contracts.
+Dynamic registration, request cancellation, work-done/partial progress,
+refresh, related-document maps, notebooks, result persistence, background
+workers, root-cause grouping, deduplication, caps, suppression, fixes,
+Workspace Edits, Semantic Transactions, and Stable lifecycle remain outside
+LSP-2203.

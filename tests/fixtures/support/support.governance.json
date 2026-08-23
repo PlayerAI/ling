@@ -510,6 +510,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-LSP-PULL-DIAGNOSTICS",
+      "visibility": "Public",
+      "version": "ling.lsp.pull-diagnostics/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-LSP-WORKSPACE",
       "visibility": "Public",
       "version": "ling.lsp.workspace/0.1",

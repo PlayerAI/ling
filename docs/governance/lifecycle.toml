@@ -6891,3 +6891,31 @@ unresolved_alternatives = [
   "Pull parity, wall-clock scheduling, worker fairness, cancellation requests, partial results, progress, root-cause grouping, deduplication, caps, suppression, tags, codeDescription, repair application, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0033"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0033.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact conditional provider capability, method availability, request/result fields, identifier and known-field validation, unknown-field tolerance, and bounded final-response failures.",
+  "Cover document full, empty, and unchanged reports; exact push parity; all position encodings; temporary isolation; and stateless deterministic result IDs.",
+  "Cover URI-sorted workspace full/unchanged mixtures, open/closed/removed versions and clearance, empty workspaces, reordered previous IDs, and repeated-process identity.",
+  "Reject invalid, duplicate, untracked, over-limit, stale, internal, and oversized cases without push-ledger, pending-work, document-state, or result-cache mutation.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds capability-gated Preview ling.lsp.pull-diagnostics/0.1 with no predecessor; clients without declared pull support see no provider or method.",
+  "Reuses ling.lsp.diagnostic/0.2 and ling.lsp.publish-diagnostics/0.1 values unchanged and stores no result-ID cache.",
+  "Adds no diagnostic allocation, Ling syntax/semantics, Typed Core, runtime, bytecode, VM, ABI, filesystem/network/cache, Semantic ID, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Dynamic registration, related-document maps, observable cancellation, progress, partial results, refresh, notebooks, root-cause control, fixes, Workspace Edits, Semantic Transactions, general scheduling, and Stable lifecycle remain deferred.",
+]
+superseded_by = ""

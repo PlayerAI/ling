@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 34 records: 30 current public, 1 internal, 3 Future.
-- Current public stability: 16 Experimental, 14 Preview, 0 Stable.
+- 35 records: 31 current public, 1 internal, 3 Future.
+- Current public stability: 16 Experimental, 15 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -22,6 +22,7 @@
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 7 |
 | `PROTO-LSP-OVERLAY` | Public | LSP | `ling.lsp.overlay/0.2` | `Experimental` | no | no | 5 |
 | `PROTO-LSP-PUBLISH-DIAGNOSTICS` | Public | LSP | `ling.lsp.publish-diagnostics/0.1` | `Experimental` | no | no | 4 |
+| `PROTO-LSP-PULL-DIAGNOSTICS` | Public | LSP | `ling.lsp.pull-diagnostics/0.1` | `Preview` | no | no | 5 |
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
@@ -153,7 +154,20 @@
 - Authority: `RFC-0032`, `RFC-0031`, `RFC-0030`, `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0034`, `DEC-0035`, `DEC-0071`, `DEC-0072`
 - Sources: [`docs/RFC-0032.md`](../RFC-0032.md), [`docs/RFC-0031.md`](../RFC-0031.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md`](../decisions/0034-lsp-internal-diagnostic-ordering-boundary.md), [`docs/decisions/0035-lsp-internal-diagnostic-batch-boundary.md`](../decisions/0035-lsp-internal-diagnostic-batch-boundary.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0072-lsp-diagnostic-span-projection.md`](../decisions/0072-lsp-diagnostic-span-projection.md), [`crates/ling-db/src/lib.rs`](../../crates/ling-db/src/lib.rs), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-lsp/src/publication.rs`](../../crates/ling-lsp/src/publication.rs)
 - Fixtures: [`crates/ling-lsp/tests/push_diagnostics.rs`](../../crates/ling-lsp/tests/push_diagnostics.rs), [`crates/ling-db/tests/workspace_diagnostics.rs`](../../crates/ling-db/tests/workspace_diagnostics.rs), [`tests/protocols/lsp-publish-diagnostics/README.md`](../../tests/protocols/lsp-publish-diagnostics/README.md), [`docs/status/LSP-2202-IMPLEMENTATION-REPORT.md`](../status/LSP-2202-IMPLEMENTATION-REPORT.md)
-- Notes: The 0.1 writer uses deterministic message-boundary debounce and synchronous locked-offline compilation without exposing host timing. Pull diagnostics, cancellation requests, partial results, progress, deduplication, root-cause grouping, caps, suppression, fixes, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
+- Notes: The 0.1 writer uses deterministic message-boundary debounce and synchronous locked-offline compilation without exposing host timing. RFC-0033 adds a separate capability-gated pull channel over the same immutable ticket and adapter values; neither channel mutates the other. Cancellation requests, partial results, progress, deduplication, root-cause grouping, caps, suppression, fixes, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
+
+### `PROTO-LSP-PULL-DIAGNOSTICS` — Ling LSP deterministic pull diagnostics
+
+- Producer: ling lsp --stdio; ling-lsp pull diagnostic provider
+- Consumer: LSP 3.17 pull-diagnostic clients; editor hosts; integration test harnesses
+- Reader policy: Negotiate only an object-valued capabilities.textDocument.diagnostic member; accept current exact Ling document requests or a bounded unique workspace previous-result list, the exact optional provider identifier, and ordinary forward-compatible fields without progress or partial-result work.
+- Writer policy: Return URI-sorted full or unchanged document/workspace reports from one current immutable RFC-0032 ticket, preserve exact adapter arrays and open-document versions, clear previous-only removed URIs, derive stateless domain-separated BLAKE3 result IDs, and replace oversized successes with bounded RequestFailed errors.
+- Unknown-field policy: Known members with wrong types, invalid identities, duplicates, unsupported identifiers, unknown current documents, and over-limit previous-result arrays are rejected before analysis; unknown ordinary fields and progress tokens are accepted and ignored. Incompatible provider, request, report, result-ID, bound, or failure behavior requires a new protocol marker and migration evidence.
+- Migration tool: None; ling.lsp.pull-diagnostics/0.1 is the first Preview pull provider and is advertised only to clients that declare textDocument.diagnostic support.
+- Authority: `RFC-0033`, `RFC-0032`, `RFC-0031`, `RFC-0030`, `RFC-0029`, `RFC-0023`, `RFC-0004`, `DEC-0019`, `DEC-0034`, `DEC-0071`, `DEC-0072`
+- Sources: [`docs/RFC-0033.md`](../RFC-0033.md), [`docs/RFC-0032.md`](../RFC-0032.md), [`docs/RFC-0031.md`](../RFC-0031.md), [`docs/RFC-0030.md`](../RFC-0030.md), [`docs/RFC-0029.md`](../RFC-0029.md), [`docs/RFC-0023.md`](../RFC-0023.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0019-incremental-query-boundary.md`](../decisions/0019-incremental-query-boundary.md), [`docs/decisions/0034-lsp-internal-diagnostic-ordering-boundary.md`](../decisions/0034-lsp-internal-diagnostic-ordering-boundary.md), [`docs/decisions/0071-lsp-workspace-state-snapshot.md`](../decisions/0071-lsp-workspace-state-snapshot.md), [`docs/decisions/0072-lsp-diagnostic-span-projection.md`](../decisions/0072-lsp-diagnostic-span-projection.md), [`crates/ling-lsp/src/lib.rs`](../../crates/ling-lsp/src/lib.rs), [`crates/ling-lsp/src/publication.rs`](../../crates/ling-lsp/src/publication.rs), [`crates/ling-lsp/src/pull_diagnostics.rs`](../../crates/ling-lsp/src/pull_diagnostics.rs)
+- Fixtures: [`crates/ling-lsp/tests/pull_diagnostics.rs`](../../crates/ling-lsp/tests/pull_diagnostics.rs), [`crates/ling-lsp/tests/push_diagnostics.rs`](../../crates/ling-lsp/tests/push_diagnostics.rs), [`crates/ling-lsp/tests/diagnostic_adapter.rs`](../../crates/ling-lsp/tests/diagnostic_adapter.rs), [`tests/protocols/lsp-pull-diagnostics/README.md`](../../tests/protocols/lsp-pull-diagnostics/README.md), [`docs/status/LSP-2203-IMPLEMENTATION-REPORT.md`](../status/LSP-2203-IMPLEMENTATION-REPORT.md)
+- Notes: The 0.1 provider is stateless and coexists with push diagnostics without consuming pending work or changing its ledger. Dynamic registration, cancellation, progress, partial results, refresh, related-document maps, notebooks, deduplication, caps, suppression, fixes, Workspace Edits, Semantic Transactions, and Stable compatibility remain deferred.
 
 ### `PROTO-LSP-WORKSPACE` — Ling LSP atomic workspace reload
 

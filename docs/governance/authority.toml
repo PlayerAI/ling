@@ -1016,6 +1016,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0033"
+title = "LSP pull diagnostics Preview"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0033.md"
+covers = ["ling.lsp.pull-diagnostics/0.1", "capability-gated LSP 3.17 document and workspace diagnostic pulls", "stateless deterministic full/unchanged result identity with push parity"]
+depends_on = ["RFC-0004", "RFC-0023", "RFC-0029", "RFC-0030", "RFC-0031", "RFC-0032", "DEC-0019", "DEC-0034", "DEC-0071", "DEC-0072", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

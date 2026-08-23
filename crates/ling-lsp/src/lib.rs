@@ -41,6 +41,8 @@ pub use publication::{
     DiagnosticAnalysisError, DiagnosticAnalysisResult, DiagnosticAnalysisTicket,
     PUBLISH_DIAGNOSTICS_PROTOCOL_VERSION,
 };
+mod pull_diagnostics;
+pub use pull_diagnostics::{MAX_PULL_PREVIOUS_RESULTS, PULL_DIAGNOSTICS_PROTOCOL_VERSION};
 // DEC-0035 remains the internal immutable collection child. RFC-0032 owns the
 // separate public push-publication lifecycle without broadening this module.
 #[allow(dead_code)]
@@ -551,6 +553,7 @@ pub struct LspServer {
     diagnostics_pending: bool,
     published_diagnostics: BTreeMap<String, Value>,
     outbound_notifications: Vec<Vec<u8>>,
+    pull_diagnostics_supported: bool,
 }
 
 impl Default for LspServer {
@@ -573,6 +576,7 @@ impl LspServer {
             diagnostics_pending: false,
             published_diagnostics: BTreeMap::new(),
             outbound_notifications: Vec::new(),
+            pull_diagnostics_supported: false,
         }
     }
 
@@ -748,6 +752,8 @@ impl LspServer {
             "textDocument/didChange" => self.did_change(id_present, id, params),
             "textDocument/didClose" => self.did_close(id_present, id, params),
             "textDocument/formatting" => self.document_formatting(id_present, id, params),
+            "textDocument/diagnostic" => self.document_diagnostic(id_present, id, params),
+            "workspace/diagnostic" => self.workspace_diagnostic(id_present, id, params),
             "ling/workspace/reload" => self.workspace_reload_request(id_present, id, params),
             _ => self.unknown_method(id_present, id, method),
         }
@@ -766,7 +772,8 @@ impl LspServer {
             );
         }
 
-        let (encoding, folders) = match parse_initialize_params(&params) {
+        let (encoding, folders, pull_diagnostics_supported) = match parse_initialize_params(&params)
+        {
             Ok(value) => value,
             Err(()) => {
                 return error_or_none(
@@ -779,8 +786,12 @@ impl LspServer {
         };
         self.position_encoding = encoding;
         self.workspace_folders = folders;
+        self.pull_diagnostics_supported = pull_diagnostics_supported;
         self.state = LifecycleState::AwaitingInitialized;
-        HandleOutcome::Response(success_response(id, initialize_result(encoding)))
+        HandleOutcome::Response(success_response(
+            id,
+            initialize_result(encoding, pull_diagnostics_supported),
+        ))
     }
 
     fn initialized(&mut self, is_request: bool, id: Value) -> HandleOutcome {
@@ -1314,12 +1325,15 @@ pub fn run_stdio<R: Read, W: Write>(input: R, output: W) -> Result<RunResult, Tr
     }
 }
 
-fn parse_initialize_params(params: &Value) -> Result<(PositionEncoding, Vec<WorkspaceFolder>), ()> {
+fn parse_initialize_params(
+    params: &Value,
+) -> Result<(PositionEncoding, Vec<WorkspaceFolder>, bool), ()> {
     let Some(object) = params.as_object() else {
         return Err(());
     };
 
     let mut labels = Vec::new();
+    let mut pull_diagnostics_supported = false;
     if let Some(capabilities) = object.get("capabilities") {
         let Some(capabilities) = capabilities.as_object() else {
             return Err(());
@@ -1340,6 +1354,17 @@ fn parse_initialize_params(params: &Value) -> Result<(PositionEncoding, Vec<Work
                 }
             }
         }
+        if let Some(text_document) = capabilities.get("textDocument") {
+            let Some(text_document) = text_document.as_object() else {
+                return Err(());
+            };
+            if let Some(diagnostic) = text_document.get("diagnostic") {
+                if !diagnostic.is_object() {
+                    return Err(());
+                }
+                pull_diagnostics_supported = true;
+            }
+        }
     }
     let encoding = negotiate_position_encoding(&labels);
 
@@ -1347,7 +1372,7 @@ fn parse_initialize_params(params: &Value) -> Result<(PositionEncoding, Vec<Work
         None | Some(Value::Null) => Vec::new(),
         Some(value) => parse_workspace_folders(value)?,
     };
-    Ok((encoding, folders))
+    Ok((encoding, folders, pull_diagnostics_supported))
 }
 
 fn parse_open_params(params: &Value) -> Result<(String, i64, String), OverlayError> {
@@ -1853,8 +1878,8 @@ fn formatting_internal_error(id: Value) -> HandleOutcome {
     )
 }
 
-fn initialize_result(encoding: PositionEncoding) -> Value {
-    json!({
+fn initialize_result(encoding: PositionEncoding, pull_diagnostics_supported: bool) -> Value {
+    let mut result = json!({
         "capabilities": {
             "positionEncoding": encoding.wire_name(),
             "documentFormattingProvider": true,
@@ -1890,7 +1915,16 @@ fn initialize_result(encoding: PositionEncoding) -> Value {
             "name": "ling",
             "version": env!("CARGO_PKG_VERSION"),
         },
-    })
+    });
+    if pull_diagnostics_supported {
+        result["capabilities"]["diagnosticProvider"] = json!({
+            "identifier": PULL_DIAGNOSTICS_PROTOCOL_VERSION,
+            "interFileDependencies": true,
+            "workDoneProgress": false,
+            "workspaceDiagnostics": true,
+        });
+    }
+    result
 }
 
 fn encode(value: &Value) -> Vec<u8> {

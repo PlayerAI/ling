@@ -198,6 +198,24 @@ fn compile_checked_workspace(
 }
 
 impl LspServer {
+    /// Computes diagnostics from one current immutable snapshot without
+    /// consuming pending push work or mutating the publication ledger.
+    pub(crate) fn analyze_current_diagnostics(
+        &self,
+    ) -> Result<DiagnosticAnalysisResult, DiagnosticAnalysisError> {
+        if self.state != LifecycleState::Ready {
+            return Err(DiagnosticAnalysisError::NotReady);
+        }
+        let result = DiagnosticAnalysisTicket {
+            snapshot: self.capture_request_snapshot()?,
+        }
+        .compile()?;
+        if self.capture_request_snapshot()? != result.snapshot {
+            return Err(DiagnosticAnalysisError::Stale);
+        }
+        Ok(result)
+    }
+
     /// Returns whether one or more successful mutations await diagnostics.
     #[must_use]
     pub const fn diagnostics_pending(&self) -> bool {
@@ -290,6 +308,23 @@ impl LspServer {
 fn publication_params(
     result: &DiagnosticAnalysisResult,
 ) -> Result<BTreeMap<String, Value>, DiagnosticAnalysisError> {
+    let grouped = grouped_diagnostics(result)?;
+    Ok(grouped
+        .into_iter()
+        .map(|(uri, diagnostics)| {
+            let version = result
+                .snapshot
+                .document(&uri)
+                .and_then(super::RequestDocument::client_version);
+            let params = diagnostic_params(&uri, diagnostics, version);
+            (uri, params)
+        })
+        .collect())
+}
+
+pub(crate) fn grouped_diagnostics(
+    result: &DiagnosticAnalysisResult,
+) -> Result<BTreeMap<String, Vec<Value>>, DiagnosticAnalysisError> {
     let mut grouped = result
         .snapshot
         .documents()
@@ -304,17 +339,7 @@ fn publication_params(
             })?
             .push(diagnostic.value().clone());
     }
-    Ok(grouped
-        .into_iter()
-        .map(|(uri, diagnostics)| {
-            let version = result
-                .snapshot
-                .document(&uri)
-                .and_then(super::RequestDocument::client_version);
-            let params = diagnostic_params(&uri, diagnostics, version);
-            (uri, params)
-        })
-        .collect())
+    Ok(grouped)
 }
 
 fn diagnostic_params(uri: &str, diagnostics: Vec<Value>, version: Option<i64>) -> Value {

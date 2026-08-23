@@ -329,6 +329,13 @@ stability = "Experimental"
 implemented = true
 
 [[protocol]]
+id = "PROTO-LSP-PULL-DIAGNOSTICS"
+visibility = "Public"
+version = "ling.lsp.pull-diagnostics/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-LSP-FORMATTING"
 visibility = "Public"
 version = "ling.lsp.formatting/0.1"
