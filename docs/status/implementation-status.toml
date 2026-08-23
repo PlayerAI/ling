@@ -24279,10 +24279,63 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "PKG-6403 is BlockedSpec because the G6 alternatives do not select Stable/Preview/deferred behavior and no accepted registry/index, publisher, installation, or support-matrix decision exists.",
-  "RFC-0002 explicitly excludes registry and publication behavior; UNSUP-PACKAGES keeps publication and registry installation out of scope, while local package/identity/lock protocols remain Experimental.",
-  "A future decision must either keep a lock-only/local-source 1.0 boundary or define a complete opt-in registry protocol and threat model; this audit does not choose or implement either path.",
+  "Accepted DEC-0228 now selects registry deferment through Ling 1.0, but PKG-6403 remains BlockedSpec because its declared predecessor PKG-6402 remains blocked and the registry implementation alternative is deliberately not authorized.",
+  "RFC-0002 excludes registry and publication behavior; UNSUP-PACKAGES now records publication, installation, and registry distribution as Unsupported through 1.0, while local package/identity/lock protocols remain Experimental.",
+  "Future registry work must reopen the decision through an Accepted RFC with a complete protocol and threat model; this parent task does not implement that deferred alternative.",
   "The audit changes no package, compiler, resolver, lockfile, identity, diagnostic, schema, CLI, registry, network, cache, dependency, or public API and creates no stale zero surface.",
+]
+
+[[task]]
+id = "PKG-6403-DEFERMENT"
+title = "Registry deferment strategy evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PKG-6402-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0228-registry-deferred-through-v1.md",
+  "docs/status/PKG-6403-AUTHORITY-AUDIT.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "tools/xtask/src/support.rs",
+  "crates/ling-types/tests/registry_deferment_evidence.rs",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "tests/fixtures/support/support.governance.json",
+  "docs/status/PKG-6403-DEFERMENT-AUTHORITY-AUDIT.md",
+  "docs/status/PKG-6403-DEFERMENT-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0228 selects registry deferment through Ling 1.0: package publication, installation, and registry distribution are explicitly Unsupported rather than Preview or Stable.",
+  "UNSUP-PACKAGES records the exact deferred capabilities and cites DEC-0228; its generated support fixture and report are current.",
+  "No PROTO-PACKAGE-REGISTRY record exists, while PROTO-PACKAGE-MANIFEST, PROTO-PACKAGE-IDENTITY, and PROTO-LOCKFILE remain implemented and Experimental without Stable promotion.",
+  "The test-local inventory covers sixty local-package, registry, trust, compatibility, support, authority, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "cargo test -p xtask --bin xtask registry_deferment --locked --offline passes.",
+  "cargo test -p ling-types --test registry_deferment_evidence --locked --offline passes.",
+  "cargo xtask support verify and cargo xtask governance check-protocols pass.",
+  "cargo clippy -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "governance, formatting, and diff checks pass without adding a registry protocol, schema, service, API, CLI, diagnostic, dependency, or Stable claim.",
+]
+verified_against_commit = "875926c368068a4790f7b08fb1710ddbdd749afc"
+completion_commit = "875926c368068a4790f7b08fb1710ddbdd749afc"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Product/governance decision under DEC-0228; PKG-6403 remains BlockedSpec because its parent dependency PKG-6402 remains blocked and no registry implementation is authorized or delivered.",
+  "Reopening requires a future Accepted RFC covering authenticated publisher coordinates, ownership/key lifecycle, archive/artifact/signature/provenance, operations, trust, availability, CLI, diagnostics, schemas, migration, and executable security/offline evidence.",
+  "The opaque ling.registry-deferment-observation/0 bytes are test evidence only and are not a registry, support, schema, identity, installation, or migration protocol.",
+  "No manifest, lock, package identity, resolver, compiler, diagnostic, CLI, Semantic ID, source span, dependency, Unicode, or existing protocol stability behavior changed.",
 ]
 
 [[task]]
