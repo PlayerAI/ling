@@ -334,6 +334,7 @@
 | `PKG-6401` | Package Publication Protocol | `G6` | `L` | `BlockedSpec` | `STD-6303` | `` |
 | `PKG-6401-OBSERVATION` | Local package and publication-exclusion boundary evidence | `G6` | `S` | `Done` | `STD-6303-OBSERVATION` | `a2b6d478256fe2578ba2ddccf2b38399a3b6b6f0` |
 | `PKG-6402` | Hermetic Build | `G6` | `L` | `BlockedSpec` | `PKG-6401` | `` |
+| `PKG-6402-OBSERVATION` | Hermetic-build exclusion boundary evidence | `G6` | `S` | `Done` | `PKG-6401-OBSERVATION` | `21b0ea6b75e70d8328c5b9f70ba1acdcbe959fee` |
 | `PKG-6403` | Registry Minimum Implementation or Deferment Strategy | `G6` | `L` | `BlockedSpec` | `PKG-6402` | `` |
 | `PKG-6404` | Supply-Chain Attack Tests | `G6` | `L` | `BlockedSpec` | `PKG-6403` | `` |
 | `PLC-4801` | Placement Constraint Model | `G4` | `M` | `BlockedSpec` | — | `` |

@@ -24188,6 +24188,56 @@ notes = [
 ]
 
 [[task]]
+id = "PKG-6402-OBSERVATION"
+title = "Hermetic-build exclusion boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PKG-6401-OBSERVATION"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0010-state-and-capability-model.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0022-disposable-persistent-query-cache.md",
+  "docs/decisions/0227-hermetic-build-exclusion-boundary-evidence.md",
+  "docs/status/PKG-6402-AUTHORITY-AUDIT.md",
+]
+artifacts = [
+  "crates/ling-project/tests/hermetic_build_boundary.rs",
+  "crates/ling-types/tests/hermetic_build_boundary_evidence.rs",
+  "crates/ling-project/tests/locked_project.rs",
+  "crates/ling-project/tests/lockfile_fixtures.rs",
+  "docs/status/PKG-6402-OBSERVATION-AUTHORITY-AUDIT.md",
+  "docs/status/PKG-6402-OBSERVATION-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0227 authorizes only negative evidence for RFC-0002's build-system exclusions; PKG-6402 remains BlockedSpec for a real build graph, executor, sandbox, artifact, cache, or replay protocol.",
+  "Manifest version 1 rejects representative build graph/script, generator/generated-source, input/output, Capability, sandbox, environment, network, artifact, and build-cache fields at top-level and package boundaries.",
+  "Local dependencies cannot acquire build or host authority through build-script, generator, Capability, environment, network, shell, command, artifact, or cache fields; ling-project has no build executor, script, shell, subprocess, or network route.",
+  "Existing locked local project loading remains repeatable, path-free, and non-mutating input evidence without becoming a build command or artifact producer.",
+  "The test-local inventory covers sixty build graph, execution, sandbox, identity, cache, compatibility, authority, and fixture boundaries with explicit ordering, duplicate rejection, and order-independent opaque bytes.",
+  "cargo test -p ling-project --locked --offline passes.",
+  "cargo test -p ling-types --test hermetic_build_boundary_evidence --locked --offline passes.",
+  "cargo clippy -p ling-project -p ling-types -p xtask --all-targets --locked --offline -- -D warnings passes.",
+  "governance, formatting, and diff checks pass without adding build execution, sandbox, artifact, cache/replay, CLI, diagnostic, dependency, or support semantics.",
+]
+verified_against_commit = "21b0ea6b75e70d8328c5b9f70ba1acdcbe959fee"
+completion_commit = "21b0ea6b75e70d8328c5b9f70ba1acdcbe959fee"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance/test-only under DEC-0227; PKG-6402 remains BlockedSpec for typed build nodes/graphs, declared inputs/outputs/Capabilities, sandbox/resource policy, plugins/generators, host authority, artifact identity, cache/replay, profiles/targets/toolchains, CLI, diagnostics, migration, and security evidence.",
+  "The opaque ling.hermetic-build-boundary-observation/0 bytes are test evidence only and are not a graph, plan, artifact, cache, replay, Capability, sandbox, command, or migration protocol.",
+  "No manifest, lock, package identity, dependency resolution, compiler/query/cache behavior, diagnostic, CLI, profile, target, artifact, Semantic ID, source span, dependency, or support claim changed.",
+]
+
+[[task]]
 id = "PKG-6403"
 title = "Registry Minimum Implementation or Deferment Strategy"
 state = "BlockedSpec"
