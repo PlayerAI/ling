@@ -17,11 +17,11 @@ const SCENARIOS: &[Scenario] = &[
     },
     Scenario {
         name: "disk full",
-        state: "Partial",
+        state: "Covered",
     },
     Scenario {
         name: "interrupted write",
-        state: "Partial",
+        state: "Covered",
     },
     Scenario {
         name: "process crash",
@@ -173,8 +173,8 @@ mod tests {
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("fault matrix is valid");
         assert_eq!(summary.scenario_count, 11);
-        assert_eq!(summary.covered_count, 1);
-        assert_eq!(summary.partial_count, 2);
+        assert_eq!(summary.covered_count, 3);
+        assert_eq!(summary.partial_count, 0);
         assert_eq!(summary.deferred_count, 8);
     }
 

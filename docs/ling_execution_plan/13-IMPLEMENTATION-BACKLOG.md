@@ -545,6 +545,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `REL-6601-SEMANTIC-SCHEMA` | G6 | Semantic Graph reader fuzz coverage | S | Done | Accepted `DEC-0234`; see `semantic_schema_bytes`, `cargo xtask fuzz verify`, and `docs/status/REL-6601-SEMANTIC-SCHEMA-IMPLEMENTATION-REPORT.md`; future-protocol harnesses and the G6 gate remain BlockedSpec |
 | `REL-6602` | G6 | 故障注入 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:340`, `docs/status/REL-6602-AUTHORITY-AUDIT.md`, `docs/testing/FAULT-INJECTION.md` |
 | `REL-6602-SEED` | G6 | Seed fault-matrix drift gate | S | Done | Accepted DEC-0042; see `cargo xtask fault verify` and `docs/status/REL-6602-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `REL-6602-LOCK-PERSISTENCE` | G6 | Lock-persistence fault injection | S | Done | Accepted `DEC-0235`; see private `LockPersistence`, `cargo xtask fault verify`, and `docs/status/REL-6602-LOCK-PERSISTENCE-IMPLEMENTATION-REPORT.md`; OS crash durability and eight future/process scenarios remain BlockedSpec |
 | `REL-6603` | G6 | 安全审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:354`, `docs/status/REL-6603-AUTHORITY-AUDIT.md`, `docs/testing/SECURITY-AUDIT.md` |
 | `REL-6603-SEED` | G6 | Seed security-audit matrix drift gate | S | Done | Accepted DEC-0043; see `cargo xtask security verify` and `docs/status/REL-6603-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `REL-6604` | G6 | 性能基线 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:368`, `docs/status/REL-6604-AUTHORITY-AUDIT.md`, `docs/testing/PERFORMANCE-BASELINE.md` |

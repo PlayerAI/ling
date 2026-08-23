@@ -6022,3 +6022,30 @@ unresolved_alternatives = [
   "Long-run coverage thresholds; dictionaries; resource-limit oracles; package-aware valid corpus expansion; cross-platform sanitizers; and archive, replay/evidence, FFI, device, LSP/DAP, and Zed harnesses remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0235"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0235-lock-persistence-fault-injection.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Inject a partial write followed by StorageFull and assert code/facts, exact prior-target preservation, and temporary cleanup.",
+  "Inject Interrupted after sync and before replace and assert the same atomicity and cleanup properties.",
+  "Retain canonical lock, update/locked mode, corrupt-input, offline, and no-network/process fixtures.",
+  "Update the exact fault matrix to three Covered, zero Partial, and eight Deferred scenarios.",
+  "Run project, diagnostic-registry, fault, governance, status, workspace, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Lock bytes, filenames, temporary naming, production write/sync/rename sequence, error code, bilingual messages, fact types, source spans, package/graph identities, CLI, and Unicode 17.0.0 remain unchanged.",
+  "Actual StorageFull errors use the compatible storage_full value in the existing io_kind:string field instead of the fallback other value; no new diagnostic or field is added.",
+]
+unresolved_alternatives = [
+  "Directory sync; replacement durability; OS quota harnesses; power loss; abrupt process kill; retry policy; failed-temporary retention; cross-process recovery; and future-system fault seams remain deferred.",
+]
+superseded_by = ""

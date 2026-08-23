@@ -1620,6 +1620,7 @@ pub(crate) const fn stable_io_kind(kind: io::ErrorKind) -> &'static str {
         io::ErrorKind::PermissionDenied => "permission_denied",
         io::ErrorKind::InvalidData => "invalid_data",
         io::ErrorKind::Interrupted => "interrupted",
+        io::ErrorKind::StorageFull => "storage_full",
         _ => "other",
     }
 }

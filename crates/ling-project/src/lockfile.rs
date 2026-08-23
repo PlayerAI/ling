@@ -710,16 +710,41 @@ fn read_exact_lock(project_root: &Path) -> Result<Option<Vec<u8>>, LockFileFailu
 }
 
 fn persist_lock(project_root: &Path, bytes: &[u8]) -> Result<(), LockFileFailure> {
+    persist_lock_with(project_root, bytes, &mut HostLockPersistence)
+}
+
+trait LockPersistence {
+    fn write_and_sync(&mut self, file: &mut File, bytes: &[u8]) -> io::Result<()>;
+    fn commit(&mut self, temporary: &Path, target: &Path) -> io::Result<()>;
+}
+
+struct HostLockPersistence;
+
+impl LockPersistence for HostLockPersistence {
+    fn write_and_sync(&mut self, file: &mut File, bytes: &[u8]) -> io::Result<()> {
+        file.write_all(bytes).and_then(|()| file.sync_all())
+    }
+
+    fn commit(&mut self, temporary: &Path, target: &Path) -> io::Result<()> {
+        fs::rename(temporary, target)
+    }
+}
+
+fn persist_lock_with(
+    project_root: &Path,
+    bytes: &[u8],
+    persistence: &mut impl LockPersistence,
+) -> Result<(), LockFileFailure> {
     let target = project_root.join(LOCK_FILE_NAME);
     let (temporary, mut file) = create_temporary_lock(project_root)
         .map_err(|error| lock_io_failure("write", error.kind()))?;
-    let write_result = file.write_all(bytes).and_then(|()| file.sync_all());
+    let write_result = persistence.write_and_sync(&mut file, bytes);
     drop(file);
     if let Err(error) = write_result {
         let _ = fs::remove_file(&temporary);
         return Err(lock_io_failure("write", error.kind()));
     }
-    if let Err(error) = commit_temporary_lock(&temporary, &target) {
+    if let Err(error) = persistence.commit(&temporary, &target) {
         let _ = fs::remove_file(&temporary);
         return Err(lock_io_failure("replace", error.kind()));
     }
@@ -740,10 +765,6 @@ fn create_temporary_lock(project_root: &Path) -> io::Result<(PathBuf, File)> {
         io::ErrorKind::AlreadyExists,
         "cannot reserve an adjacent temporary lock file",
     ))
-}
-
-fn commit_temporary_lock(temporary: &Path, target: &Path) -> io::Result<()> {
-    fs::rename(temporary, target)
 }
 
 fn invalid_lock_failure(
@@ -828,7 +849,82 @@ fn json_error_span(bytes: &[u8], error: &serde_json::Error) -> std::ops::Range<u
 
 #[cfg(test)]
 mod tests {
+    use std::sync::atomic::{AtomicU64, Ordering};
+
     use super::*;
+
+    static FAULT_TEST_SEQUENCE: AtomicU64 = AtomicU64::new(0);
+
+    #[derive(Clone, Copy)]
+    enum InjectedPersistenceFault {
+        StorageFullAfter(usize),
+        InterruptedBeforeCommit,
+    }
+
+    struct FaultingLockPersistence {
+        fault: InjectedPersistenceFault,
+    }
+
+    impl LockPersistence for FaultingLockPersistence {
+        fn write_and_sync(&mut self, file: &mut File, bytes: &[u8]) -> io::Result<()> {
+            match self.fault {
+                InjectedPersistenceFault::StorageFullAfter(limit) => {
+                    file.write_all(&bytes[..bytes.len().min(limit)])?;
+                    file.sync_all()?;
+                    Err(io::Error::from(io::ErrorKind::StorageFull))
+                }
+                InjectedPersistenceFault::InterruptedBeforeCommit => {
+                    file.write_all(bytes)?;
+                    file.sync_all()
+                }
+            }
+        }
+
+        fn commit(&mut self, temporary: &Path, target: &Path) -> io::Result<()> {
+            match self.fault {
+                InjectedPersistenceFault::StorageFullAfter(_) => fs::rename(temporary, target),
+                InjectedPersistenceFault::InterruptedBeforeCommit => {
+                    Err(io::Error::from(io::ErrorKind::Interrupted))
+                }
+            }
+        }
+    }
+
+    struct FaultTestRoot(PathBuf);
+
+    impl FaultTestRoot {
+        fn new(label: &str) -> Self {
+            let sequence = FAULT_TEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+            let path = std::env::temp_dir().join(format!(
+                "ling-lock-fault-{label}-{}-{sequence}",
+                std::process::id()
+            ));
+            if path.exists() {
+                fs::remove_dir_all(&path).expect("stale fault-test root is removable");
+            }
+            fs::create_dir(&path).expect("fault-test root is creatable");
+            Self(path)
+        }
+
+        fn temporary_lock_count(&self) -> usize {
+            fs::read_dir(&self.0)
+                .expect("fault-test root is readable")
+                .filter_map(Result::ok)
+                .filter(|entry| {
+                    entry
+                        .file_name()
+                        .to_str()
+                        .is_some_and(|name| name.starts_with(".ling.lock.tmp."))
+                })
+                .count()
+        }
+    }
+
+    impl Drop for FaultTestRoot {
+        fn drop(&mut self) {
+            fs::remove_dir_all(&self.0).expect("fault-test root is removable");
+        }
+    }
 
     #[test]
     fn content_ids_are_exact_lowercase_sha256_text() {
@@ -874,5 +970,51 @@ mod tests {
             assert!(span.start_byte() <= span.end_byte());
             assert!(span.end_byte() <= u64::try_from(bytes.len()).unwrap());
         }
+    }
+
+    #[test]
+    fn storage_full_during_write_preserves_target_and_cleans_temporary_file() {
+        let root = FaultTestRoot::new("storage-full");
+        let target = root.0.join(LOCK_FILE_NAME);
+        fs::write(&target, b"previous lock bytes").expect("old target is writable");
+        let mut persistence = FaultingLockPersistence {
+            fault: InjectedPersistenceFault::StorageFullAfter(4),
+        };
+
+        let failure = persist_lock_with(&root.0, b"replacement lock bytes", &mut persistence)
+            .expect_err("injected storage exhaustion must fail");
+        let diagnostic = failure.diagnostic();
+
+        assert_eq!(diagnostic.code(), codes::PROJECT_LOCK_IO_FAILED);
+        assert_eq!(diagnostic.facts()["operation"], "write");
+        assert_eq!(diagnostic.facts()["io_kind"], "storage_full");
+        assert_eq!(
+            fs::read(&target).expect("old target remains readable"),
+            b"previous lock bytes"
+        );
+        assert_eq!(root.temporary_lock_count(), 0);
+    }
+
+    #[test]
+    fn interruption_before_replace_preserves_target_and_cleans_temporary_file() {
+        let root = FaultTestRoot::new("interrupted-replace");
+        let target = root.0.join(LOCK_FILE_NAME);
+        fs::write(&target, b"previous lock bytes").expect("old target is writable");
+        let mut persistence = FaultingLockPersistence {
+            fault: InjectedPersistenceFault::InterruptedBeforeCommit,
+        };
+
+        let failure = persist_lock_with(&root.0, b"replacement lock bytes", &mut persistence)
+            .expect_err("injected interruption must fail");
+        let diagnostic = failure.diagnostic();
+
+        assert_eq!(diagnostic.code(), codes::PROJECT_LOCK_IO_FAILED);
+        assert_eq!(diagnostic.facts()["operation"], "replace");
+        assert_eq!(diagnostic.facts()["io_kind"], "interrupted");
+        assert_eq!(
+            fs::read(&target).expect("old target remains readable"),
+            b"previous lock bytes"
+        );
+        assert_eq!(root.temporary_lock_count(), 0);
     }
 }

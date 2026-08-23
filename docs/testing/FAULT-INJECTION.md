@@ -1,6 +1,6 @@
 # Ling fault-injection matrix
 
-Status: Seed-level evidence inventory (2026-08-22)
+Status: implemented-surface evidence inventory (2026-08-23)
 
 This matrix records the `REL-6602` scenarios against the implementation that
 actually exists. “Covered” means a deterministic test exercises an accepted
@@ -12,8 +12,8 @@ placeholder API.
 | Scenario | State | Current evidence | Missing evidence / owner |
 | --- | --- | --- | --- |
 | cache corruption | Covered | `ling-cache` treats malformed/version-mismatched envelopes as safe misses; `ling-db` reconstructs a corrupted line-index cache from the current source. | Cross-process persistence policy remains outside the disposable cache decision; query/cache maintainers own future expansion. |
-| disk full | Partial | Lock persistence and cache writes map host I/O failures to bounded errors or safe misses; no test claims an OS disk-full result. | A portable write-fault seam, cleanup guarantee, and platform matrix are required. Package/project maintainers own it. |
-| interrupted write | Partial | `ling.lock/1` uses adjacent temporary output and replacement; lock fixtures verify failure-atomic update and no silent rewrite of corrupt input. | Process interruption between flush and replacement needs an accepted fault-injection seam and cross-process fixtures. |
+| disk full | Covered | The private lock-persistence seam injects `StorageFull` after a partial temporary-file write; `L-IO-0002` reports `operation=write` and `io_kind=storage_full`, the prior lock remains exact, and the temporary file is removed. | OS-level disk exhaustion and cross-platform filesystem matrices remain release evidence owned by package/project maintainers. |
+| interrupted write | Covered | The private seam injects `Interrupted` after complete write/sync and before replacement; `L-IO-0002` reports `operation=replace`, the prior lock remains exact, and the temporary file is removed. | Abrupt process termination and directory-durability guarantees remain outside this library-level injected interruption. |
 | process crash | Deferred | No process-crash injector or restart protocol is part of the Seed implementation. | Accepted process/recovery contract and crash artifact policy; runtime maintainers. |
 | network partition | Deferred | Project graph resolution is deliberately local and has no network/process execution surface. | A package-service protocol and offline/partition semantics; package maintainers. |
 | remote duplicate / reorder | Deferred | No remote event or transport protocol exists. | Accepted event identity/order/divergence contract; protocol/runtime maintainers. |
@@ -58,10 +58,12 @@ The implemented Seed checks are run by the normal locked offline suite:
 cargo test -p ling-cache --locked --offline
 cargo test -p ling-db --locked --offline
 cargo test -p ling-project --test lockfile_fixtures --locked --offline
+cargo test -p ling-project lockfile::tests --locked --offline
 cargo test --workspace --all-targets --locked --offline
 ```
 
-The three deferred groups (remote/device/concurrency/replay/proof/editor)
+The eight deferred future scenarios (process, remote, device, concurrency,
+replay, proof/evidence, and editor lifecycle)
 remain explicit gaps. No public fault-injection command, network adapter,
 device simulator, actor API, replay tool, proof checker, or LSP server is
 created by this inventory.

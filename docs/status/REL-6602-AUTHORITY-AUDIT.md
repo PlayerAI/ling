@@ -9,7 +9,9 @@
 ## Decision
 
 `REL-6602` is `BlockedSpec` as a release-completion task. Accepted DEC-0042
-closes only the bounded `REL-6602-SEED` documentation drift gate. The checklist mixes
+closes only the bounded `REL-6602-SEED` documentation drift gate. Accepted
+DEC-0235 separately authorizes deterministic lock-persistence injection for
+storage exhaustion and interruption before replacement. The checklist mixes
 implemented Seed persistence/cache boundaries with future network, device,
 Actor, replay, proof/evidence, and language-server systems. There is no
 accepted fault protocol defining the injection point, retry/rollback/commit
@@ -50,8 +52,9 @@ includes:
 
 1. `ling-cache` corruption/version safe-miss tests;
 2. `ling-db` persistent line-index corruption recovery;
-3. project lock canonicality, failure-atomic update, malformed-input, and
-   no-silent-rewrite fixtures; and
+3. project lock canonicality, failure-atomic update, malformed-input,
+   no-silent-rewrite fixtures, injected partial-write `StorageFull`, and
+   injected post-sync/pre-replace `Interrupted` failures; and
 4. VM frame/heap resource-limit and cancellation tests for the implemented
    runtime boundary.
 
@@ -79,9 +82,12 @@ allocation, schema, package/lock behavior, CLI, editor protocol, dependency,
 or public API. It preserves `ling`/`.ling`, original UTF-8 spans, Unicode
 17.0.0, deterministic ordering, and offline builds.
 
-The completed child adds only `cargo xtask fault verify`, which validates the
-eleven documented scenario names/states and required policy phrases; it does
-not inject faults or change any state.
+The Seed child adds `cargo xtask fault verify`. The lock-persistence child adds
+a private production seam with the normal filesystem implementation plus two
+deterministic unit injectors. The prior lock remains byte-exact, adjacent
+temporary files are removed, and the registered `L-IO-0002` diagnostic reports
+the operation and stable I/O kind. Neither child claims process-crash or
+cross-platform filesystem guarantees.
 
 No network adapter, device simulator, Actor restart API, replay/proof/evidence
 decoder, LSP server, fault-injection CLI, or placeholder public surface is

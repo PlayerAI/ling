@@ -3562,3 +3562,16 @@ covers = ["REL-6601 bounded Semantic Graph reader fuzz coverage", "deterministic
 depends_on = ["DEC-0012", "RFC-0002", "DEC-0041", "PROTOCOL-INVENTORY", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0235"
+title = "Lock-persistence fault injection"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0235-lock-persistence-fault-injection.md"
+covers = ["REL-6602 bounded lock-persistence fault injection", "deterministic partial-write StorageFull and post-sync/pre-replace Interrupted evidence", "old-target preservation, temporary cleanup, and L-IO-0002 facts without public injector or OS crash claims"]
+depends_on = ["RFC-0002", "DEC-0001", "DEC-0042", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true
