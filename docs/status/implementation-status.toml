@@ -25542,6 +25542,7 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/ERROR-CODES.md",
   "docs/decisions/0045-seed-documentation-inventory-gate.md",
+  "docs/decisions/0238-documentation-evidence-path-gate.md",
   "docs/RFC-0002.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
@@ -25556,12 +25557,16 @@ spec = [
 artifacts = [
   "docs/status/DOC-6701-AUTHORITY-AUDIT.md",
   "docs/status/DOC-6701-SEED-IMPLEMENTATION-REPORT.md",
+  "docs/status/DOC-6701-EVIDENCE-PATHS-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6701-EVIDENCE-PATHS-IMPLEMENTATION-REPORT.md",
+  "tools/xtask/src/documentation_matrix.rs",
   "docs/testing/DOCUMENTATION-INVENTORY.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
   "The inventory maps all twelve planned manuals to current source/evidence and Covered, Partial, Future, or Unsupported boundaries.",
+  "Every formal-set row cites at least one exact existing repository file or directory; forty-six citations are checked and wildcard, traversal, non-portable, empty-component, and missing paths fail closed.",
   "Seed language, semantics, CLI, package, effect, capability, formatter, VM, and governance documents are indexed without promoting future capabilities.",
   "The inventory states Accepted authority, implementation/conformance/diagnostic/schema/protocol links, limitations, deterministic/offline evidence, and stale-name guards required for future manuals.",
   "The audit preserves explicit future, experimental, preview, and unsupported states and records the G1-G5 dependency; no unsupported manual is claimed complete.",
@@ -25573,7 +25578,8 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "DOC-6701 is BlockedSpec because G6 depends on G1-G5 exits and future manual subjects have no accepted semantics, implementations, support, or release evidence.",
-  "The Seed formal set and governance/status references are documented; future manuals remain planning/status evidence only.",
+  "Accepted DEC-0238 closes only the formal-inventory evidence-path child; exact path existence does not establish content completeness, semantic authority, implementation, or release readiness.",
+  "The Seed formal set and exact governance/status references are documented; future manuals remain planning/status evidence only.",
   "The audit changes no language semantics, protocols, CLI, package behavior, runtime, editor integration, dependencies, or public API.",
 ]
 
@@ -25621,6 +25627,47 @@ completed = "2026-08-22"
 notes = [
   "The verifier protects inventory consistency only; future manuals remain explicit Future / Unsupported or other bounded states.",
   "No documentation generator, source example, command, protocol, migration promise, security claim, or placeholder public API is added.",
+]
+
+[[task]]
+id = "DOC-6701-EVIDENCE-PATHS"
+title = "Formal inventory evidence-path gate"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["DOC-6701-SEED"]
+spec = [
+  "AGENTS.md",
+  "docs/decisions/0045-seed-documentation-inventory-gate.md",
+  "docs/decisions/0238-documentation-evidence-path-gate.md",
+  "docs/status/DOC-6701-AUTHORITY-AUDIT.md",
+  "docs/testing/DOCUMENTATION-INVENTORY.md",
+]
+artifacts = [
+  "tools/xtask/src/documentation_matrix.rs",
+  "tools/xtask/src/main.rs",
+  "docs/testing/DOCUMENTATION-INVENTORY.md",
+  "docs/status/DOC-6701-EVIDENCE-PATHS-AUTHORITY-AUDIT.md",
+  "docs/status/DOC-6701-EVIDENCE-PATHS-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "cargo xtask docs verify extracts recognized backticked evidence paths from all twelve formal-set rows and requires at least one exact citation per row.",
+  "The verifier accepts README.md and exact docs, tests, crates, tools, or editors paths using forward-slash normal components and rejects wildcard, traversal, backslash, colon, empty-component, and missing paths.",
+  "All forty-six current evidence citations exist; four manual groups remain exactly Future / Unsupported and no path citation promotes authority or implementation state.",
+  "A focused negative test rejects both a wildcard citation and a syntactically safe missing citation.",
+  "Focused xtask tests and the workspace, CI, governance, status, formatting, and lint gates pass offline.",
+]
+verified_against_commit = "6d04b188c7ddd7be1de6e5ac61bfa51d98b4b36b"
+completion_commit = "6d04b188c7ddd7be1de6e5ac61bfa51d98b4b36b"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "DOC-6701 remains BlockedSpec for content-level completeness, headings/anchors, external links, generated references, bilingual parity, missing feature manuals, publication, and G6 sign-off.",
+  "This child changes only internal documentation evidence validation and exact citations; no Ling semantic, diagnostic, schema, Semantic ID, package, dependency, CLI/editor, runtime, Unicode, protocol, support, or public API changes.",
 ]
 
 [[task]]

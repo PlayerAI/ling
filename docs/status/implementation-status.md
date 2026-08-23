@@ -135,6 +135,7 @@
 | `DIR-4503` | Device IR Canonicalization | `G4` | `M` | `BlockedSpec` | `DIR-4502` | `` |
 | `DIR-4503-OBSERVATION` | Internal Device IR canonicalization boundary evidence | `G4` | `S` | `Done` | `DIR-4502-OBSERVATION` | `de0d14b41b1c77e4eb81379d181cafcafbdf63f5` |
 | `DOC-6701` | Formal Documentation Set | `G6` | `L` | `BlockedSpec` | `REL-6604` | `` |
+| `DOC-6701-EVIDENCE-PATHS` | Formal inventory evidence-path gate | `G6` | `S` | `Done` | `DOC-6701-SEED` | `6d04b188c7ddd7be1de6e5ac61bfa51d98b4b36b` |
 | `DOC-6701-SEED` | Seed documentation-inventory drift gate | `G6` | `S` | `Done` | `REL-6604-SEED` | `77a905bbac64aaa7e9b6a56f8952a045d2760d87` |
 | `DOC-6702` | Two-layer Examples | `G6` | `M` | `BlockedSpec` | `DOC-6701` | `` |
 | `DOC-6702-SEED` | Seed example-matrix drift gate | `G6` | `S` | `Done` | `DOC-6701-SEED` | `dab9a240c3f83c3e671449b318ca9425df57df32` |
