@@ -262,7 +262,7 @@
 | `LSP-2104` | LSP incremental text changes | `G1` | `M` | `Done` | `LSP-2102`, `LSP-2103` | `492754b066da11e4ae2fe58774e5c7096e3703a5` |
 | `LSP-2104-POSITION-EDITS` | Bounded internal position-edit projection | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2104-UTF8-EDITS` | `94a990418730a768a7974f3f40629f1d32a5c05e` |
 | `LSP-2104-UTF8-EDITS` | Bounded internal UTF-8 edit application | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2103-OVERLAY` | `4abc84f81bab339c309a1e5a6227fc7f9483e013` |
-| `LSP-2105` | LSP workspace reload | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2103`, `PRJ-1107` | `` |
+| `LSP-2105` | LSP workspace reload | `G1` | `M` | `Done` | `LSP-2101`, `LSP-2103`, `PRJ-1107` | `49994b9132ff22ae3fd17ab172476d020a79febe` |
 | `LSP-2105-WORKSPACE-SNAPSHOT` | Bounded internal workspace-state snapshot | `G1` | `S` | `Done` | `INC-1402`, `LSP-2103-OVERLAY` | `60566b4cd547c1969c0deec512f11f59069e2e7c` |
 | `LSP-2201` | LSP compiler diagnostic adapter | `G1` | `M` | `BlockedSpec` | `LSP-2101`, `LSP-2102` | `` |
 | `LSP-2201-DIAGNOSTIC-POSITION` | Bounded internal diagnostic span projection | `G1` | `S` | `Done` | `LSP-2102-SOURCE-MAP`, `LSP-2201-ORDERING` | `e66669142f5b8720a39157532edd77b8bc46269a` |

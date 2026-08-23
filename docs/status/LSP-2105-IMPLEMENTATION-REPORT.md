@@ -57,7 +57,8 @@ private server/VFS candidate, and published only after the whole batch succeeds.
 The milestone is accepted only after focused source/database/LSP tests and the
 full locked offline workspace, strict Clippy, CI, governance, LSP, support,
 status, RC0, traceability, formatting, and deterministic-diff gates pass. The
-exact implementation commit is bound after it exists.
+exact implementation commit is
+`49994b9132ff22ae3fd17ab172476d020a79febe`, bound in the task registry.
 
 ## Intentionally deferred
 

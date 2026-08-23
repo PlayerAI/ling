@@ -6165,20 +6165,20 @@ acceptance = [
   "VirtualFileSystem::workspace_snapshot and CompilerDb::workspace_snapshot capture visible source files, workspace inputs, exact bytes, origins, per-input revisions, and the session high-water revision in canonical order.",
   "Focused tests cover deterministic ordering, overlay visibility, lookups, Unicode/BOM/CRLF-safe owned bytes, and immutability after later VFS mutation.",
   "cargo fmt --all -- --check, cargo test -p ling-source -p ling-db --all-targets --locked --offline (25 and 21 tests), cargo clippy -p ling-source -p ling-db --all-targets --locked --offline -- -D warnings, and cargo xtask governance check-all pass.",
-  "The public LSP-2105 target remains BlockedSpec for watcher, workspace identity, event coalescing, reload publication, stale-result, and protocol fixtures.",
+  "Accepted RFC-0030 now consumes this immutable snapshot for bounded logical reload publication; host watcher adapters, file URI mapping, compiler-result staleness, and diagnostics remain deferred.",
 ]
 verified_against_commit = "60566b4cd547c1969c0deec512f11f59069e2e7c"
 completion_commit = "60566b4cd547c1969c0deec512f11f59069e2e7c"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "The bounded compiler observation child is complete under DEC-0071; the public LSP-2105 workspace-reload target remains BlockedSpec and no protocol-inventory entry is added.",
+  "The bounded compiler observation child remains complete under DEC-0071 and is now consumed by Accepted RFC-0030 without changing its original acceptance evidence.",
 ]
 
 [[task]]
 id = "LSP-2105"
 title = "LSP workspace reload"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6189,31 +6189,49 @@ spec = [
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/RFC-0002.md",
+  "docs/RFC-0004.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0025.md",
+  "docs/RFC-0030.md",
   "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-source/src/vfs.rs",
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/tests/workspace_reload.rs",
+  "docs/RFC-0030.md",
+  "docs/governance/authority.toml",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
   "docs/status/LSP-2105-AUTHORITY-AUDIT.md",
+  "docs/status/LSP-2105-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-workspace/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit distinguishes accepted internal revision/invalidation boundaries from the missing LSP workspace event, project reload, watcher, and stale-result contract.",
-  "The audit covers workspace identity, event coalescing, manifest/lock/config/dependency changes, revision publication, cache invalidation, cancellation, and deterministic fixtures.",
-  "No watcher, reload notification, project revision API, diagnostic allocation, Semantic ID change, or placeholder LSP service is added while the authority is absent.",
-  "The future implementation must publish immutable revisions atomically, invalidate only affected queries, and reject stale results without exposing host watcher details.",
+  "Accepted RFC-0030 defines Experimental ling.lsp.workspace/0.1, exact capability limits, canonical-decimal base/result revisions, unique logical source and manifest/lock/config/profile/target deltas, and request-only Ready-state behavior.",
+  "Reload validates and canonicalizes the whole batch, applies it to a private LSP/VFS candidate, preserves open-overlay visibility and URI version history, publishes once on complete success, and leaves all state unchanged on stale, malformed, invalid-removal, unsupported, duplicate, or oversized input.",
+  "Package-lock bytes join disposable query/cache identity; source and project-input revisions invalidate their exact inputs without eager full compilation, while immutable request snapshots expose canonical project inputs.",
+  "Executable source/database/LSP tests cover canonical order equivalence, all input kinds, workspace/dependency sources, Unicode/BOM/CRLF exact bytes, no-op revisions, overlay and close behavior, removal, notification suppression, limits, stale bases, and later-operation failure atomicity.",
+  "The locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, v0.0.1 traceability, formatting, and diff gates pass against implementation commit 49994b9132ff22ae3fd17ab172476d020a79febe.",
+  "No diagnostic allocation, public cache schema, Semantic ID, language semantics, runtime, bytecode, VM, ABI, host filesystem/network, or Unicode 17.0.0 contract changes; watcher adapters, file URI mapping, compiler-result staleness, diagnostics, Workspace Edits, and Semantic Transactions remain deferred.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "49994b9132ff22ae3fd17ab172476d020a79febe"
+completion_commit = "49994b9132ff22ae3fd17ab172476d020a79febe"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "LSP-2105 is BlockedSpec by GAP-INCREMENTAL-CACHE-001, GAP-PROJECT-CLI-INTERFACE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, and LSP-2101/LSP-2103; DEC-0019's revisions are internal compiler service evidence.",
-  "The current project/VFS/query implementations remain explicit and deterministic; no editor watcher or public reload protocol is claimed.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "RFC-0030 resolves the bounded reload publication contract without treating host watcher policy, persistent-cache lifecycle, or broader Semantic Transactions as prerequisites.",
+  "The host/client owns filesystem observation and publishes exact logical deltas; Ling owns revision validation, deterministic ordering, targeted input invalidation, overlay precedence, and atomic state replacement.",
+  "The implementation is an Experimental editor/project-input boundary and makes no filesystem discovery, multi-root, diagnostics-refresh, compiler-result publication, or Stable compatibility claim.",
 ]
 
 [[task]]
