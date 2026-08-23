@@ -3,9 +3,9 @@
 ## Status
 
 `Done` for the bounded internal child authorized by Accepted DEC-0030. The
-parent LSP-2501 task remains `BlockedSpec` for the public JSON-RPC request,
-CompilerHost/query inputs, cancellation, stale-result publication, and
-protocol lifecycle.
+child is now consumed by completed LSP-2501 together with the request-specific
+Accepted RFCs; it still does not define a standalone JSON-RPC snapshot method
+or public revision identity.
 
 ## Normative clauses covered
 
@@ -56,9 +56,9 @@ revision values are not Semantic IDs, cache keys, client versions, or
 cross-process identities. Language, diagnostics, schemas, bytecode, VM,
 Unicode 17.0.0, CLI, and LSP wire behavior are unchanged.
 
-## Deferred work
+## Deferred work after parent integration
 
-Public request identity, project/profile/toolchain/dependency inputs,
-CompilerHost integration, cancellation/deadlines, memory limits, stale-result
-handling, Workspace Edits, Semantic Transactions, and Stable/Experimental
-wire compatibility remain in the parent LSP-2501 task.
+Public/cross-session snapshot identities, generalized CompilerHost integration,
+deadlines, asynchronous scheduling, persistent result identity, Semantic
+Transactions, and Stable wire compatibility remain future work outside
+completed LSP-2501.

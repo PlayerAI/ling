@@ -6,7 +6,8 @@ LSP-2501 is complete as the composed immutable request-analysis boundary for
 the current LSP Preview surfaces. The implementation reuses the accepted
 `RequestSnapshot` model and request-specific RFC contracts; it does not add a
 public snapshot method, serialized internal revision, or placeholder
-`CompilerHost` API.
+`CompilerHost` API. Integration-evidence commit:
+`e5434f632963d622834d90168980c9524414d12b`.
 
 ## Normative clauses covered
 
