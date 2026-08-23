@@ -26,32 +26,33 @@ const PROJECT_SURFACES: &[ProjectSurface] = &[
     },
     ProjectSurface {
         surface: "Public semantic project check",
-        state: "BlockedSpec",
+        state: "Experimental",
     },
     ProjectSurface {
         surface: "Project run",
-        state: "BlockedSpec",
+        state: "Experimental",
     },
     ProjectSurface {
         surface: "Project test",
-        state: "BlockedSpec",
+        state: "Experimental",
     },
     ProjectSurface {
         surface: "Project build and artifacts",
-        state: "BlockedSpec",
+        state: "Experimental",
     },
     ProjectSurface {
         surface: "Workspace and member selection",
-        state: "BlockedSpec",
+        state: "Experimental",
     },
 ];
 
 const REQUIRED_POLICY_PHRASES: &[&str] = &[
-    "The full `PRJ-1107` task remains `BlockedSpec`.",
-    "does not turn the graph-only command into semantic project checking",
-    "No project `run`, project `test`, project `build`, artifact, workspace-selection, or implicit-discovery API is implemented by this inventory.",
+    "The full `PRJ-1107` task is `Done` for its accepted v0.1 scope.",
+    "The semantic commands reuse `load_locked_project` and `CompilerDb::project_semantic_snapshot`",
+    "The checked semantic artifact is not executable bytecode, native/Wasm output, a publication package, or a Stable 1.0 format.",
+    "The complete v0.1 workspace rule is explicit single-root selection",
     "The verifier is deterministic, read-only, and offline.",
-    "No language semantics, diagnostic allocation, schema, Semantic ID, runtime, bytecode, VM, ABI, or Unicode 17.0.0 behavior changes.",
+    "`L-IO-0005` is the only new diagnostic allocation.",
     "Only `ling` and `.ling` are valid public names.",
 ];
 
@@ -146,16 +147,52 @@ const REQUIRED_EVIDENCE: &[(&str, &[&str])] = &[
     (
         "docs/status/PRJ-1107-AUTHORITY-AUDIT.md",
         &[
-            "PRJ-1107 remains `BlockedSpec`",
-            "GAP-PROJECT-CLI-INTERFACE-001",
-            "semantic project `check`",
-            "project `run`, `test`, and `build`",
+            "PRJ-1107 is `Done`",
+            "Accepted RFC-0025",
+            "explicit single-root workspace selection",
+            "checked semantic artifact",
+        ],
+    ),
+    (
+        "docs/RFC-0025.md",
+        &[
+            "ling.project.command/0.1",
+            "ling.project.artifact/0.1",
+            "CompilerDb::project_semantic_snapshot",
+        ],
+    ),
+    (
+        "crates/ling-cli/src/project.rs",
+        &[
+            "pub fn compile(manifest_path: &Path)",
+            "load_locked_project",
+            "project_semantic_snapshot",
+            "pub fn build",
+            "OpenOptions::new()",
+        ],
+    ),
+    (
+        "crates/ling-cli/tests/project_commands.rs",
+        &[
+            "semantic_check_is_path_free_repeatable_and_does_not_mutate_inputs",
+            "run_and_test_consume_the_checked_root_entry",
+            "build_publishes_exact_canonical_artifact_once",
+            "semantic_source_failure_uses_bilingual_registered_diagnostics",
+        ],
+    ),
+    (
+        "docs/status/PRJ-1107-IMPLEMENTATION-REPORT.md",
+        &[
+            "Status: **Done**",
+            "ling.project.command/0.1",
+            "ling.project.artifact/0.1",
+            "Intentionally deferred",
         ],
     ),
 ];
 
 const REQUIRED_TASK_STATES: &[(&str, &str)] = &[
-    ("PRJ-1107", "BlockedSpec"),
+    ("PRJ-1107", "Done"),
     ("PRJ-1107-CHECK", "Done"),
     ("PRJ-1107-LOAD", "Done"),
     ("PRJ-1107-SEMANTIC-SNAPSHOT", "Done"),
@@ -383,17 +420,17 @@ mod tests {
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("project status inventory is valid");
         assert_eq!(summary.surface_count, 8);
-        assert_eq!(summary.experimental_count, 1);
+        assert_eq!(summary.experimental_count, 6);
         assert_eq!(summary.internal_count, 2);
-        assert_eq!(summary.blocked_count, 5);
-        assert_eq!(summary.evidence_file_count, 12);
+        assert_eq!(summary.blocked_count, 0);
+        assert_eq!(summary.evidence_file_count, 16);
         assert_eq!(summary.task_count, 4);
     }
 
     #[test]
     fn rejects_surface_state_drift() {
         let matrix = valid_matrix().replace(
-            "| Project run | No command | BlockedSpec | Missing authority |",
+            "| Project run | No command | Experimental | Missing authority |",
             "| Project run | No command | Stable | Missing authority |",
         );
         let errors = validate_matrix(&matrix);
@@ -405,7 +442,7 @@ mod tests {
         let status = r#"
 [[task]]
 id = "PRJ-1107"
-state = "Done"
+state = "BlockedSpec"
 
 [[task]]
 id = "PRJ-1107-CHECK"
@@ -415,7 +452,7 @@ state = "Done"
         assert!(
             errors
                 .iter()
-                .any(|error| error.contains("PRJ-1107 must be BlockedSpec"))
+                .any(|error| error.contains("PRJ-1107 must be Done"))
         );
         assert!(errors.iter().any(|error| error.contains("PRJ-1107-LOAD")));
     }

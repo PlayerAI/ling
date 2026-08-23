@@ -1,6 +1,7 @@
 //! Shared compiler orchestration for file and session frontends.
 
 pub mod incident;
+pub mod project;
 pub mod session;
 
 use std::collections::{BTreeMap, BTreeSet};

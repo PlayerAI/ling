@@ -58,7 +58,7 @@
 
 ```text
 G0 Done：规范、协议、错误码、追踪、CI
-G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1106`、`PRJ-1108` 与 `VM-1201`～`VM-1210` Done；`PRJ-1107` 的 project `test`/`build` CLI 行为仍服从其接口前置
+G1：`TS-3101`～`TS-3108`、`ZQ-3201`～`ZQ-3203`、`PRJ-1101`～`PRJ-1108` 与 `VM-1201`～`VM-1210` Done；`PRJ-1107` 由 Accepted RFC-0025 完成显式 locked/offline 语义工程命令与 checked semantic artifact
 G2 Blocked：需 v0.1 exit + Effect/Task/Actor RFC
 G3 Blocked：需资源/ownership/native RFC
 G4 Blocked：需 G3 ABI/memory + Kernel RFC
@@ -89,7 +89,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `PRJ-1104` | G1/Editor | Dependency graph | L | Done | `03-G1-V0.1-LIVING.md:97`；见 `ling-project` package graph、dependency-v1 fixtures、机器状态与实施报告 |
 | `PRJ-1105` | G1/Editor | Lock file | L | Done | `03-G1-V0.1-LIVING.md:107`；见 `ling-project` lockfile reader/writer、`schemas/lock/1` corpus、机器状态与实施报告 |
 | `PRJ-1106` | G1/Editor | Project fixtures | M | Done | `03-G1-V0.1-LIVING.md:116`；见七组命名 fixture、expected diagnostics/graph/lock、机器状态与实施报告 |
-| `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | M | BlockedSpec | Accepted RFC-0024, DEC-0058, and DEC-0083 close only bounded graph-check, locked-load, and internal semantic-snapshot children; public semantic check/run/test/build/workspace/artifact behavior remains in `GAP-PROJECT-CLI-INTERFACE-001`; see `docs/status/PRJ-1107-AUTHORITY-AUDIT.md` |
+| `PRJ-1107` | G1/Editor | Project API 与 CLI 接入 | M | Done | Accepted RFC-0025；显式 `ling.toml` selection、locked/offline semantic check/run/test/build、`ling.project.command/0.1` 与 canonical checked semantic artifact；见实现、集成测试、权威审计与实施报告 |
 | `PRJ-1107-CHECK` | G1/Editor | Locked project graph check Preview | M | Done | Accepted RFC-0024; see `crates/ling-cli/tests/project_check.rs`, `tests/protocols/project-check/README.md`, and `docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for the deferred project surface |
 | `PRJ-1107-LOAD` | G1/Editor | Locked project snapshot boundary | S | Done | Accepted DEC-0058; see `crates/ling-project/src/workspace.rs`, `crates/ling-project/tests/locked_project.rs`, and `docs/status/PRJ-1107-LOAD-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for the deferred project surface |
 | `PRJ-1107-SEMANTIC-SNAPSHOT` | G1/Editor | Internal locked-project semantic snapshot | M | Done | Accepted DEC-0083; see `crates/ling-db/src/project_snapshot.rs`, `CompilerDb::project_semantic_snapshot`, and `docs/status/PRJ-1107-SEMANTIC-SNAPSHOT-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec for public project behavior |

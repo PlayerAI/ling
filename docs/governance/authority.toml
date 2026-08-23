@@ -912,6 +912,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0025"
+title = "Locked project command and artifact protocol"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0025.md"
+covers = ["manifest-selected project check/run/test/build", "ling.project.command/0.1", "ling.project.artifact/0.1"]
+depends_on = ["DEC-0003", "DEC-0013", "DEC-0058", "DEC-0083", "RFC-0002", "RFC-0024", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

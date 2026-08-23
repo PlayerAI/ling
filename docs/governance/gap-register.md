@@ -41,7 +41,7 @@
 | `GAP-GOV-RFC-STATUS-001` | `P0` | `Accepted` | RFC-0001 lifecycle status mismatch | `GOV-0103`, `PRJ-1101`, `VM-1201`, `TRAIT-1301`, `INC-1401`, `LSP-2101` | `RFC-0001` |
 | `GAP-PACKAGE-NAMESPACE-001` | `P0` | `Accepted` | Package namespace and domain ownership | `PRJ-1101`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
 | `GAP-PACKAGE-PROTOCOL-001` | `P0` | `Accepted` | Project manifest, dependency graph, visibility, and lock protocol | `PRJ-1101`, `PRJ-1102`, `PRJ-1103`, `PRJ-1104`, `PRJ-1105` | `RFC-0002` |
-| `GAP-PROJECT-CLI-INTERFACE-001` | `P0` | `Accepted` | Project workspace selection and build/test CLI contract | `PRJ-1107` | `RFC-0024` |
+| `GAP-PROJECT-CLI-INTERFACE-001` | `P0` | `Accepted` | Project workspace selection and build/test CLI contract | `PRJ-1107` | `RFC-0024`, `RFC-0025` |
 | `GAP-SEED-BOOLEAN-OPERATORS-001` | `P0` | `Accepted` | Seed boolean operator syntax, precedence, and short-circuit boundary | `TS-3105` | `RFC-0001` |
 | `GAP-TRAIT-COHERENCE-001` | `P0` | `Accepted` | Base Trait coherence, orphan rules, solving, and lowering | `TRAIT-1308` | `RFC-0005`, `RFC-0021`, `RFC-0022` |
 | `GAP-UNICODE-ALIAS-SYNTAX-001` | `P1` | `Open` | Unicode Alias syntax and localized display rules | `TS-3104`, `IDE-2306`, `FMT-1501` | `RFC-0003` |

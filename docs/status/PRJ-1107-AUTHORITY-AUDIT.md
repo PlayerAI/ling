@@ -2,99 +2,85 @@
 
 ## Outcome
 
-PRJ-1107 remains `BlockedSpec` for the full project API and CLI surface. The
-accepted RFC-0024 decision authorizes and the completed child
-`PRJ-1107-CHECK` implements one bounded Preview slice: an explicit, locked,
-offline project graph check. Accepted DEC-0058 and the completed child
-`PRJ-1107-LOAD` add a read-only locked-project snapshot boundary around the
-same graph/lock APIs. Accepted DEC-0083 and the completed child
-`PRJ-1107-SEMANTIC-SNAPSHOT` add an internal, read-only adapter from that
-validated snapshot to the existing package-aware checked semantic pipeline.
-These children do not promote the parent task to `Done` because public
-semantic project checking, run/test/build behavior, workspace selection, and
-artifact policy still lack accepted contracts.
+PRJ-1107 is `Done` for the complete accepted v0.1 scope. Accepted RFC-0025
+closes `GAP-PROJECT-CLI-INTERFACE-001` for manifest-selected semantic
+`check`, `run`, `test`, `build`, explicit single-root workspace selection,
+locked/offline behavior, exits, JSON results, and a checked semantic artifact.
 
-Accepted DEC-0250 adds `cargo xtask project verify` as a read-only current-
-surface evidence gate. It composes the three completed children and enforces
-the unresolved parent boundary; it adds no project behavior.
-
-The children reuse the accepted RFC-0002 `ling-project` manifest, module
-discovery, lockfile, and package-graph APIs. They do not duplicate package
-resolution or add a placeholder `CompilerHost` API. Existing file-oriented
-`ling` commands remain unchanged outside `ling project check`.
+RFC-0024 and the completed `PRJ-1107-CHECK` child remain the authority and
+implementation for the distinct graph-only `ling project check` command.
+Accepted DEC-0058/`PRJ-1107-LOAD` and DEC-0083/
+`PRJ-1107-SEMANTIC-SNAPSHOT` remain the internal library boundaries reused by
+the completed parent. DEC-0250's current-surface verifier is updated from a
+blocker inventory to executable completion evidence; it does not replace the
+RFC-0025 authority.
 
 ## Normative traceability
 
-- Accepted RFC-0002 §1 and §§2–14 fix explicit `ling.toml` selection, the
-  deterministic local package graph, package identities, and `ling.lock/1`
-  library protocols. They do not define the complete project CLI surface.
-- Accepted RFC-0024 §§1–9 authorize only `ling project check --manifest-path
-  PATH --locked [--format human|json]`: explicit-root selection, local locked
-  graph validation, path-free bilingual human output, the Experimental
-  `ling.project.check/0.1` JSON report, and no lock/network/artifact writes.
-- Accepted DEC-0003 fixes the current M0 CLI parser and command baseline;
-  RFC-0024 is the additional authority for the nested project-check command.
-- Accepted DEC-0013 supplies existing main/runtime failure categories and
-  exit semantics; RFC-0024 deliberately reuses existing diagnostics and does
-  not allocate a new code range.
-- Accepted DEC-0058 authorizes only the in-process `LockedProject` snapshot and
-  `load_locked_project` read-only locked boundary; it does not define a
-  compiler host, workspace, run/test/build, artifact, CLI, or protocol API.
-- Accepted DEC-0083 authorizes only the internal
-  `CompilerDb::project_semantic_snapshot(&LockedProject)` query. It fixes
-  canonical package/source traversal, path-free `package:<name>/<logical>`
-  source names, the existing parse-to-`build_project` pipeline, and
-  graph-identity caching; it does not define a compiler host or public project
-  semantic-check command.
-- `docs/SEMANTICS.md` and `docs/LANGUAGE.md` fix the executable name to
-  `ling`; stale `zero` spellings in lower-authority execution inputs are not
-  implementation authority.
+- RFC-0002 §§1–7 govern exact `ling.toml` selection, the local vendored
+  package graph, package/graph identities, canonical `ling.lock/1`, locked and
+  offline behavior, diagnostics, and profile/target inclusion in artifact
+  identity.
+- RFC-0024 §§1–9 continue to govern only
+  `ling project check --manifest-path PATH --locked` and
+  `ling.project.check/0.1` graph validation.
+- RFC-0025 §§1–2 define root `ling check/run/test/build` project mode,
+  mutually exclusive file/project inputs, required `--manifest-path`,
+  `--locked`, and `--offline`, and the exact one-root workspace rule.
+- RFC-0025 §§3–6 require the package-aware checked snapshot, semantic check,
+  checked root entry execution, and the isolated one-entry smoke test.
+- RFC-0025 §§7–9 define create-new canonical
+  `ling.project.artifact/0.1`, SHA-256 identity, shared
+  `ling.project.command/0.1` results, exits, and failure atomicity.
+- DEC-0003 and DEC-0013 retain command parser and exit-class authority;
+  DEC-0058 and DEC-0083 retain the locked project and semantic query
+  boundaries. No plan-only `CompilerHost` placeholder was introduced.
 
-## Specification gap and remaining parent scope
+## Implementation boundary
 
-`GAP-PROJECT-CLI-INTERFACE-001` remains open for the parent task's unresolved
-surface:
+`ling_cli::project::compile` reads exactly the explicit manifest, calls
+`load_locked_project`, and then calls
+`CompilerDb::project_semantic_snapshot`. It converts user-controlled syntax,
+resolution, type, and Effect failures into existing bilingual diagnostics with
+logical `package:<name>/<source>` spans. Project execution calls
+`ling_eval::execute_project_main`, whose interpreter now stores a
+`CheckedProgram` reference and therefore supports file and project snapshots
+without accepting unchecked AST.
 
-- semantic project `check` and its relationship to the checked compiler;
-- project `run`, `test`, and `build` semantics and artifact scope;
-- workspace/member selection, manifest discovery beyond an explicit root, and
-  `--locked`/`--offline` behavior outside RFC-0024;
-- process-exit mapping and machine-readable result contracts for those
-  commands; and
-- any `CompilerHost` or build-artifact API.
+The root CLI preserves positional file behavior and RFC-0024 graph checking.
+Manifest-selected `check` performs no entry execution; `run` captures output
+for JSON purity; `test` runs exactly one isolated root entry; and `build`
+publishes only a canonical checked semantic artifact for `explore` /
+`semantic`. Build uses exclusive create-new publication and removes a newly
+created partial file if writing or syncing fails. It never replaces an
+existing file or follows an existing symlink.
 
-The RFC-0024 child does not choose among those alternatives through code.
+The explicit single-root workspace selection contract is complete for
+manifest version 1: the root and its vendored dependencies are checked, while
+dependencies are not selectable members. No ambient search, current-directory
+default, member flag, registry, network, shell, environment, cache, or lock
+update occurs.
 
-## Evidence and compatibility
+## Compatibility
 
-The child implementations are recorded in
-`docs/status/PRJ-1107-CHECK-IMPLEMENTATION-REPORT.md` and
-`docs/status/PRJ-1107-LOAD-IMPLEMENTATION-REPORT.md`, and
-`docs/status/PRJ-1107-SEMANTIC-SNAPSHOT-IMPLEMENTATION-REPORT.md`. The existing command is
-covered by `crates/ling-cli/tests/project_check.rs` and the protocol evidence
-under `tests/protocols/project-check/`; the snapshot is covered by
-`crates/ling-project/tests/locked_project.rs` and the internal query test in
-`crates/ling-db/src/lib.rs`. The command still requires
-exactly one explicit `ling.toml` path and exactly one `--locked`, while the
-snapshots are read-only, path-free, and deterministic. The protocol inventory
-and support matrix register `ling.project.check/0.1` as Experimental only.
+- Source syntax, type/Effect semantics, entry rules, and runtime behavior are
+  unchanged; the new commands compose existing checked services.
+- Positional file commands and `ling.project.check/0.1` remain compatible.
+- `ling.project.command/0.1` and `ling.project.artifact/0.1` are new
+  Experimental, current-writer-only boundaries.
+- `L-IO-0005` is a monotonic Preview diagnostic allocation for artifact
+  publication. The Diagnostic JSON schema is unchanged.
+- Existing package-aware Semantic IDs are embedded by value and unchanged;
+  artifact SHA-256 identity is separate and includes profile/target through
+  the complete canonical bytes.
+- Artifacts and reports exclude host paths, timestamps, environment data,
+  unordered iteration, and allocation identity. Unicode remains 17.0.0.
 
-No language semantics, source spans, Semantic IDs, bytecode, VM behavior,
-Unicode tables, existing diagnostic allocations, or stable public schemas
-changed. The JSON report is current-writer-only and intentionally not
-canonical. The internal semantic adapter adds no protocol or diagnostic
-allocation. The implementation is local/offline and does not claim network,
-workspace, artifact, or performance behavior.
+## Remaining future work
 
-`docs/testing/PROJECT-CLI-STATUS.md` and
-`docs/status/PRJ-1107-CURRENT-EVIDENCE-IMPLEMENTATION-REPORT.md` record the
-composed current boundary. The verifier requires one Experimental, two
-Internal, and five `BlockedSpec` surface rows and checks the implementation,
-test, report, and task-state evidence directly.
-
-## Intentionally deferred
-
-The parent PRJ-1107 task remains blocked until accepted decisions define the
-remaining project CLI/API surface. FMT-1507 and the LSP/transaction work have
-separate registered authority gaps; this child does not combine their
-protocol choices or create a shared placeholder service.
+The parent task is not blocked by optional future extensions. Source-level
+test declarations, filters, parallelism, multi-member workspace manifests,
+implicit discovery, lock update mode, output replacement/default directories,
+caches, bytecode/native/Wasm backends, Native/Critical profiles, registry and
+publication, signatures, and Stable 1.0 lifecycle require later Accepted
+authority and are not claimed here.

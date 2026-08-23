@@ -12,7 +12,7 @@ EFFECT = 4
 ENTRY = 3
 IMPL = 1
 INTERNAL = 1
-IO = 4
+IO = 5
 LEX = 12
 MUT = 1
 NAME = 9
@@ -178,6 +178,12 @@ id = "L-IO-0004"
 core_sha256 = "sha256:1f18e13d8cf5a08e35d67064c5bdc44ad88fc81c98666e28c9133bc22f602370"
 retired = false
 facts = ["io_kind:string:required", "operation:string:required", "path:string:required"]
+
+[[code]]
+id = "L-IO-0005"
+core_sha256 = "sha256:aeac07ae3776cd2e61ced6057cca27cdd038cf070e69c6634a34aa65e5b8ddd6"
+retired = false
+facts = ["io_kind:string:required", "operation:string:required"]
 
 [[code]]
 id = "L-LEX-0001"

@@ -217,6 +217,7 @@ version = "0.0.1-dev"
 dependencies = [
  "blake3",
  "ling-ast",
+ "ling-db",
  "ling-diagnostics",
  "ling-effects",
  "ling-eval",
@@ -233,6 +234,7 @@ dependencies = [
  "rustyline",
  "serde",
  "serde_json",
+ "sha2",
  "toml",
 ]
 
@@ -249,6 +251,7 @@ version = "0.0.1-dev"
 dependencies = [
  "ling-ast",
  "ling-cache",
+ "ling-diagnostics",
  "ling-effects",
  "ling-eval",
  "ling-format",

@@ -1310,9 +1310,9 @@ mod tests {
             .and_then(Path::parent)
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("repository diagnostic registry is valid");
-        assert_eq!(summary.active_count, 88);
+        assert_eq!(summary.active_count, 89);
         assert_eq!(summary.retired_count, 1);
         assert_eq!(summary.domain_count, 17);
-        assert_eq!(summary.rust_constant_count, 88);
+        assert_eq!(summary.rust_constant_count, 89);
     }
 }

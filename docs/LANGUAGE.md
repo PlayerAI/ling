@@ -1307,6 +1307,20 @@ ling build --profile native
 ling build --profile critical
 ```
 
+Accepted RFC-0025 narrows the currently implemented project forms to one
+explicit RFC-0002 root and the `explore` / `semantic` artifact target:
+
+```bash
+ling check --manifest-path ./ling.toml --locked --offline
+ling run --manifest-path ./ling.toml --locked --offline
+ling test --manifest-path ./ling.toml --locked --offline
+ling build --manifest-path ./ling.toml --locked --offline \
+  --profile explore --target semantic --output ./app.ling-project.json
+```
+
+The `native` and `critical` build forms in the broader draft catalog remain
+future design until their own Accepted profile/backend authority exists.
+
 所有命令应支持：
 
 ```bash

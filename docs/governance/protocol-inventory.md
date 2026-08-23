@@ -6,15 +6,15 @@
 
 ## Summary
 
-- 27 records: 21 current public, 1 internal, 5 Future.
-- Current public stability: 11 Experimental, 10 Preview, 0 Stable.
+- 27 records: 22 current public, 1 internal, 4 Future.
+- Current public stability: 12 Experimental, 10 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
 
 | ID | Visibility | Category | Current version | Stability | Public schema | Canonical | Fixtures |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 2 |
+| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 4 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 3 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-LIFECYCLE` | Public | LSP | `ling.lsp.lifecycle/0.1` | `Preview` | no | no | 3 |
@@ -32,12 +32,12 @@
 | `PROTO-PACKAGE-IDENTITY` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 9 |
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 4 |
 | `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.1` | `Preview` | yes | yes | 2 |
+| `PROTO-BUILD-METADATA` | Public | Package metadata | `ling.project.artifact/0.1` | `Experimental` | no | yes | 3 |
 | `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 26 |
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.2` | `Experimental` | no | no | 7 |
 | `PROTO-VM-CONTROL` | Public | Runtime control | `ling.vm.control/0.1` | `Experimental` | no | no | 4 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
 | `PROTO-SEMANTIC-TRANSACTION` | Planned public | Transaction | — | `Future` | no | no | 0 |
-| `PROTO-BUILD-METADATA` | Planned public | Package metadata | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
 | `PROTO-ABI` | Planned public | ABI | — | `Future` | no | no | 0 |
 | `PROTO-EVIDENCE` | Planned public | Evidence | — | `Future` | no | no | 0 |
@@ -48,14 +48,14 @@
 
 - Producer: ling executable
 - Consumer: humans; shell scripts; editor and build integrations
-- Reader policy: The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Preview standalone test-file runner, the Experimental project check command, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2.
-- Writer policy: Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, ling test routes to the deterministic standalone-file runner, project check routes to the locked RFC-0002 graph boundary, lsp --stdio routes to the framed lifecycle server, and no unimplemented project/workspace command is advertised.
+- Reader policy: The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; unknown commands/options, mixed file/project selection, unsupported build profiles/targets, and invalid arity are rejected with exit 2.
+- Writer policy: Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines, semantic project commands emit ling.project.command/0.1 results, project graph check retains ling.project.check/0.1, and lsp --stdio retains protocol-only framed output.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
-- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `RFC-0004`, `RFC-0024`
-- Sources: [`Cargo.toml`](../../Cargo.toml), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
-- Fixtures: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
-- Notes: The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds the Preview `ling lsp --stdio` launcher, RFC-0024 adds only the Experimental locked project graph check, and DEC-0039 adds only the Preview standalone-file `ling test` child.
+- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `RFC-0004`, `RFC-0024`, `RFC-0025`
+- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs)
+- Fixtures: [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
+- Notes: The compiler package version remains the broad CLI version. RFC-0025 adds the current-writer-only ling.project.command/0.1 JSON boundary for explicit locked/offline semantic project check/run/test/build while preserving positional file modes and RFC-0024 graph checking.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 
@@ -278,6 +278,19 @@
 - Fixtures: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
 - Notes: The accepted 0.1 format is Preview rather than 1.0 Stable and embeds Experimental semantic identities.
 
+### `PROTO-BUILD-METADATA` — Ling checked project artifact
+
+- Producer: ling build --profile explore --target semantic
+- Consumer: local checked-semantic tooling; future build and IDE integrations
+- Reader policy: Consumers must gate on the exact ling.project.artifact/0.1 canonical JSON envelope with graph, explore profile, package-aware ProgramId, embedded ling.semantic/0.2 object, and semantic target; the repository provides the canonical writer but no standalone public artifact reader.
+- Writer policy: Emit exact UTF-8 canonical JSON plus LF only after the complete locked project checks; publish with create-new semantics, include no host path or ambient input, and report SHA-256 of the complete bytes.
+- Unknown-field policy: Unknown or reordered top-level fields are not accepted as canonical 0.1 bytes; incompatible extensions require a new artifact version.
+- Migration tool: None; ling.project.artifact/0.1 has no predecessor and is Experimental.
+- Authority: `RFC-0025`, `RFC-0002`, `DEC-0058`, `DEC-0083`
+- Sources: [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
+- Fixtures: [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
+- Notes: This is a checked semantic artifact, not executable bytecode, native/Wasm output, a dependency-substitution cache key, a publication package, or a Stable 1.0 format.
+
 ### `PROTO-PACKAGE-MANIFEST` — Ling package/project manifest
 
 - Producer: Ling project authors and future project tooling
@@ -342,19 +355,6 @@
 - Sources: [`docs/SEMANTICS.md`](../SEMANTICS.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
 - Fixtures: —
 - Notes: Blocked by GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 and related edit/snapshot gaps.
-
-### `PROTO-BUILD-METADATA` — Ling build graph and artifact metadata
-
-- Producer: Future Ling build planner
-- Consumer: Future cache, package, IDE, and release tooling
-- Reader policy: Not defined; current Cargo target metadata is an implementation concern, not a Ling public schema.
-- Writer policy: Not defined; toolchain identity, target/profile inputs, artifact identity, and cache boundaries require accepted specifications.
-- Unknown-field policy: Not defined.
-- Migration tool: Not defined.
-- Authority: `ROADMAP-1.0`, `GAP-REGISTER`
-- Sources: [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
-- Fixtures: —
-- Notes: No build metadata is exposed as a Ling compatibility surface in v0.0.1.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

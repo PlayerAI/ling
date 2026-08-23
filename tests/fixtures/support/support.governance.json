@@ -378,10 +378,10 @@
     },
     {
       "id": "PROTO-BUILD-METADATA",
-      "visibility": "Planned public",
-      "version": "",
-      "stability": "Future",
-      "implemented": false
+      "visibility": "Public",
+      "version": "ling.project.artifact/0.1",
+      "stability": "Experimental",
+      "implemented": true
     },
     {
       "id": "PROTO-BYTECODE",

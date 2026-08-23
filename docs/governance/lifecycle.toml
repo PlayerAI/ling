@@ -1225,6 +1225,32 @@ unresolved_alternatives = [
 superseded_by = ""
 
 [[record]]
+id = "RFC-0025"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0025.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact manifest-selected check/run/test/build parsing, locked/offline selection, fixed build profile/target, and file-mode compatibility.",
+  "Run valid and invalid local project fixtures through semantic checking, root entry execution, isolated entry smoke testing, and canonical artifact publication.",
+  "Compare path-free reports, artifact bytes, SHA-256 identities, diagnostics, exits, and project-input nonmutation across distinct roots and processes.",
+  "Reject existing/symlink outputs and every failed compilation or publication without a partial artifact; prove no parent search, network, shell, environment, cache, or lock update occurs.",
+]
+compatibility_impact = [
+  "Adds Experimental manifest-selected project modes to check/run/test and a project-only semantic build command while preserving positional file modes and RFC-0024 graph checking.",
+  "Adds ling.project.command/0.1, canonical ling.project.artifact/0.1, and one artifact-I/O diagnostic; Semantic IDs and Unicode 17.0.0 remain unchanged.",
+]
+unresolved_alternatives = [
+  "Multi-member workspaces, manifest discovery, source-level tests, output replacement/default directories, caches, registry/network sources, bytecode/native/Wasm targets, Native/Critical profiles, publication, and Stable compatibility remain future work.",
+]
+superseded_by = ""
+
+[[record]]
 id = "DEC-0001"
 kind = "Decision"
 status = "Accepted"

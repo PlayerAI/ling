@@ -13,6 +13,7 @@ pub(crate) enum Command {
     Format,
     Init,
     Test,
+    Build,
     ProjectCheck,
     Lsp,
 }
@@ -29,6 +30,7 @@ impl Command {
             Self::Format,
             Self::Init,
             Self::Test,
+            Self::Build,
             Self::ProjectCheck,
             Self::Lsp,
         ]
@@ -44,6 +46,7 @@ impl Command {
             "fmt" => Some(Self::Format),
             "init" => Some(Self::Init),
             "test" => Some(Self::Test),
+            "build" => Some(Self::Build),
             "lsp" => Some(Self::Lsp),
             _ => None,
         }
@@ -59,6 +62,7 @@ impl Command {
             Self::Format => "fmt",
             Self::Init => "init",
             Self::Test => "test",
+            Self::Build => "build",
             Self::ProjectCheck => "project check",
             Self::Lsp => "lsp",
         }
@@ -86,6 +90,7 @@ mod tests {
             ("fmt", Command::Format),
             ("init", Command::Init),
             ("test", Command::Test),
+            ("build", Command::Build),
             ("lsp", Command::Lsp),
         ];
         for (name, command) in roots {
@@ -95,12 +100,12 @@ mod tests {
         assert_eq!(
             roots.map(|(name, _)| name),
             [
-                "run", "check", "repl", "semantic", "audit", "fmt", "init", "test", "lsp",
+                "run", "check", "repl", "semantic", "audit", "fmt", "init", "test", "build", "lsp",
             ]
         );
         for planned_only in [
-            "project", "build", "query", "patch", "replay", "explain", "evidence", "version",
-            "support", "migrate",
+            "project", "query", "patch", "replay", "explain", "evidence", "version", "support",
+            "migrate",
         ] {
             assert_eq!(
                 Command::parse(planned_only),
@@ -114,7 +119,7 @@ mod tests {
     #[test]
     fn catalog_contains_each_implemented_command_once() {
         let commands = Command::all();
-        assert_eq!(commands.len(), 10);
+        assert_eq!(commands.len(), 11);
         assert_eq!(
             commands
                 .iter()
@@ -129,6 +134,7 @@ mod tests {
                 "fmt",
                 "init",
                 "test",
+                "build",
                 "project check",
                 "lsp",
             ]

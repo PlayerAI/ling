@@ -57,15 +57,15 @@ public_schema = false
 canonical = false
 producer = ["ling executable"]
 consumer = ["humans", "shell scripts", "editor and build integrations"]
-reader_policy = "The hand-written parser accepts --help/-h, --version/-V, run, check, semantic, audit, repl, fmt, the Preview standalone test-file runner, the Experimental project check command, the Preview lsp --stdio launcher, --format human|json where applicable, and the REPL-only --capability Console.Write; unknown commands/options and invalid arity are rejected with exit 2."
-writer_policy = "Help and version output describe only implemented commands; compiler commands route through the shared checked pipeline, ling test routes to the deterministic standalone-file runner, project check routes to the locked RFC-0002 graph boundary, lsp --stdio routes to the framed lifecycle server, and no unimplemented project/workspace command is advertised."
+reader_policy = "The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; unknown commands/options, mixed file/project selection, unsupported build profiles/targets, and invalid arity are rejected with exit 2."
+writer_policy = "Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines, semantic project commands emit ling.project.command/0.1 results, project graph check retains ling.project.check/0.1, and lsp --stdio retains protocol-only framed output."
 unknown_field_policy = "Not field-based: unknown commands, options, formats, and capabilities are rejected."
 migration_tool = "None; incompatible command or option changes require an accepted specification and release migration notes."
-fixtures = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs"]
-sources = ["Cargo.toml", "crates/ling-cli/src/main.rs"]
-version_markers = ["0.0.1-dev"]
-authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "RFC-0004", "RFC-0024"]
-notes = ["The compiler package version is the current CLI version; no independent CLI schema identifier exists. RFC-0004 adds the Preview `ling lsp --stdio` launcher, RFC-0024 adds only the Experimental locked project graph check, and DEC-0039 adds only the Preview standalone-file `ling test` child."]
+fixtures = ["crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/project_commands.rs", "tests/protocols/project-command/README.md"]
+sources = ["Cargo.toml", "docs/RFC-0025.md", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/project.rs"]
+version_markers = ["0.0.1-dev", "ling.project.command/0.1"]
+authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "RFC-0004", "RFC-0024", "RFC-0025"]
+notes = ["The compiler package version remains the broad CLI version. RFC-0025 adds the current-writer-only ling.project.command/0.1 JSON boundary for explicit locked/offline semantic project check/run/test/build while preserving positional file modes and RFC-0024 graph checking."]
 
 [[protocol]]
 id = "PROTO-PROJECT-CHECK"
@@ -531,25 +531,25 @@ notes = ["PRJ-1105 implements the library reader, writer, Update/Locked policy, 
 
 [[protocol]]
 id = "PROTO-BUILD-METADATA"
-title = "Ling build graph and artifact metadata"
+title = "Ling checked project artifact"
 category = "Package metadata"
-visibility = "Planned public"
-current_version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+current_version = "ling.project.artifact/0.1"
+stability = "Experimental"
+implemented = true
 public_schema = false
-canonical = false
-producer = ["Future Ling build planner"]
-consumer = ["Future cache, package, IDE, and release tooling"]
-reader_policy = "Not defined; current Cargo target metadata is an implementation concern, not a Ling public schema."
-writer_policy = "Not defined; toolchain identity, target/profile inputs, artifact identity, and cache boundaries require accepted specifications."
-unknown_field_policy = "Not defined."
-migration_tool = "Not defined."
-fixtures = []
-sources = ["docs/ROADMAP-1.0.md", "docs/governance/gap-register.toml"]
-version_markers = []
-authority = ["ROADMAP-1.0", "GAP-REGISTER"]
-notes = ["No build metadata is exposed as a Ling compatibility surface in v0.0.1."]
+canonical = true
+producer = ["ling build --profile explore --target semantic"]
+consumer = ["local checked-semantic tooling", "future build and IDE integrations"]
+reader_policy = "Consumers must gate on the exact ling.project.artifact/0.1 canonical JSON envelope with graph, explore profile, package-aware ProgramId, embedded ling.semantic/0.2 object, and semantic target; the repository provides the canonical writer but no standalone public artifact reader."
+writer_policy = "Emit exact UTF-8 canonical JSON plus LF only after the complete locked project checks; publish with create-new semantics, include no host path or ambient input, and report SHA-256 of the complete bytes."
+unknown_field_policy = "Unknown or reordered top-level fields are not accepted as canonical 0.1 bytes; incompatible extensions require a new artifact version."
+migration_tool = "None; ling.project.artifact/0.1 has no predecessor and is Experimental."
+fixtures = ["crates/ling-cli/src/project.rs", "crates/ling-cli/tests/project_commands.rs", "tests/protocols/project-command/README.md"]
+sources = ["docs/RFC-0025.md", "crates/ling-cli/src/project.rs", "crates/ling-cli/src/main.rs"]
+version_markers = ["ling.project.artifact/0.1", "sha256:", "explore", "semantic"]
+authority = ["RFC-0025", "RFC-0002", "DEC-0058", "DEC-0083"]
+notes = ["This is a checked semantic artifact, not executable bytecode, native/Wasm output, a dependency-substitution cache key, a publication package, or a Stable 1.0 format."]
 
 [[protocol]]
 id = "PROTO-BYTECODE"

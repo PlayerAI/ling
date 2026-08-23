@@ -7,12 +7,13 @@ use std::fmt;
 use std::rc::Rc;
 
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
+use ling_effects::CheckedProgram;
 use ling_hir as hir;
 use ling_resolve::{
     BindingKey, Builtin, DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey, ModuleId,
     ReferenceTarget,
 };
-use ling_semantic::ProgramSnapshot;
+use ling_semantic::{ProgramSnapshot, ProjectProgramSnapshot};
 use ling_source::Span;
 use ling_types::Type;
 use num_bigint::BigInt;
@@ -169,7 +170,17 @@ pub fn execute_main(
     main: &DefinitionId,
     console: &mut dyn Console,
 ) -> Result<(), RuntimeFault> {
-    Interpreter::new(snapshot, console).execute_main(main)
+    Interpreter::new(snapshot.checked(), console).execute_main(main)
+}
+
+/// Executes a previously validated root entry from a package-aware checked
+/// project snapshot. The interpreter consumes only checked Typed Core.
+pub fn execute_project_main(
+    snapshot: &ProjectProgramSnapshot,
+    main: &DefinitionId,
+    console: &mut dyn Console,
+) -> Result<(), RuntimeFault> {
+    Interpreter::new(snapshot.checked(), console).execute_main(main)
 }
 
 /// Canonical, host-independent result of evaluating one checked definition.
@@ -198,7 +209,7 @@ pub fn evaluate_definition(
     definition: &DefinitionId,
     console: &mut dyn Console,
 ) -> Result<EvaluatedValue, RuntimeFault> {
-    let value = Interpreter::new(snapshot, console).definition_value(definition)?;
+    let value = Interpreter::new(snapshot.checked(), console).definition_value(definition)?;
     Ok(EvaluatedValue {
         rendered: render_value(&value),
         unit: matches!(value, Value::Unit),
@@ -246,17 +257,17 @@ struct Closure {
 }
 
 struct Interpreter<'snapshot, 'console> {
-    snapshot: &'snapshot ProgramSnapshot,
+    checked: &'snapshot CheckedProgram,
     console: &'console mut dyn Console,
 }
 
 impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
-    const fn new(snapshot: &'snapshot ProgramSnapshot, console: &'console mut dyn Console) -> Self {
-        Self { snapshot, console }
+    const fn new(checked: &'snapshot CheckedProgram, console: &'console mut dyn Console) -> Self {
+        Self { checked, console }
     }
 
     fn execute_main(&mut self, main: &DefinitionId) -> Result<(), RuntimeFault> {
-        let checked = self.snapshot.checked();
+        let checked = self.checked;
         let Some(info) = checked.typed().resolved().definition(main) else {
             return Err(self.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
                 invariant: "main DefinitionId is absent",
@@ -372,13 +383,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                     values.push(self.eval_expression(module, argument, environment)?);
                 }
                 let key = ExpressionKey::new(module, expression.id);
-                if let Some(call) = self
-                    .snapshot
-                    .checked()
-                    .typed()
-                    .trait_member_call(key)
-                    .cloned()
-                {
+                if let Some(call) = self.checked.typed().trait_member_call(key).cloned() {
                     let callable = self.definition_value(call.implementation())?;
                     return self.apply(callable, values, expression.span);
                 }
@@ -391,8 +396,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 field,
             } => {
                 if self
-                    .snapshot
-                    .checked()
+                    .checked
                     .typed()
                     .resolved()
                     .reference(module, *reference)
@@ -452,8 +456,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
             }
             hir::ExpressionKind::Literal(literal) => match literal {
                 hir::Literal::Integer { .. } => self
-                    .snapshot
-                    .checked()
+                    .checked
                     .typed()
                     .integer(ExpressionKey::new(module, expression.id))
                     .cloned()
@@ -483,13 +486,12 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
             }
             hir::ExpressionKind::Record(fields) => {
                 let type_id = self
-                    .snapshot
-                    .checked()
+                    .checked
                     .typed()
                     .expression_type(ExpressionKey::new(module, expression.id))
                     .ok_or_else(|| self.fault(module, expression.span, "record type is absent"))?;
                 let Type::NominalRecord { definition, .. } =
-                    self.snapshot.checked().typed().arena().get(type_id)
+                    self.checked.typed().arena().get(type_id)
                 else {
                     return Err(self.fault(module, expression.span, "record has non-record type"));
                 };
@@ -579,8 +581,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
         module: ModuleId,
         reference: hir::ReferenceId,
     ) -> Result<ReferenceTarget, RuntimeFault> {
-        self.snapshot
-            .checked()
+        self.checked
             .typed()
             .resolved()
             .reference(module, reference)
@@ -595,7 +596,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     }
 
     fn definition_value(&mut self, definition: &DefinitionId) -> Result<Value, RuntimeFault> {
-        let resolved = self.snapshot.checked().typed().resolved();
+        let resolved = self.checked.typed().resolved();
         let info = resolved.definition(definition).cloned().ok_or_else(|| {
             self.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
                 invariant: "definition is absent",
@@ -694,7 +695,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     }
 
     fn find_constructor(&self, constructor: &DefinitionId) -> Option<(DefinitionId, String, bool)> {
-        let typed = self.snapshot.checked().typed();
+        let typed = self.checked.typed();
         typed.variants().iter().find_map(|(definition, variant)| {
             variant
                 .cases
@@ -792,7 +793,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 invariant: "checked builtin call supplied too many arguments",
             }));
         }
-        let module = self.snapshot.checked().typed().resolved().entry();
+        let module = self.checked.typed().resolved().entry();
         match builtin {
             Builtin::ConsoleWrite => {
                 let [Value::Text(text)] = arguments.as_slice() else {
@@ -958,7 +959,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
         module: ModuleId,
         pattern: &hir::Pattern,
     ) -> Option<(DefinitionId, String)> {
-        let resolved = self.snapshot.checked().typed().resolved();
+        let resolved = self.checked.typed().resolved();
         let constructor = resolved.pattern_constructor(module, pattern.id)?;
         self.find_constructor(constructor)
             .map(|(definition, case, _)| (definition, case))
@@ -1038,7 +1039,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     }
 
     fn fault_at_entry(&self, kind: RuntimeFaultKind) -> RuntimeFault {
-        let module = self.snapshot.checked().typed().resolved().entry_module();
+        let module = self.checked.typed().resolved().entry_module();
         RuntimeFault {
             kind,
             source_name: module.hir.source_name.clone(),
@@ -1047,8 +1048,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     }
 
     fn module_source(&self, module: ModuleId) -> String {
-        self.snapshot
-            .checked()
+        self.checked
             .typed()
             .resolved()
             .module(module)
@@ -1057,23 +1057,10 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
     }
 
     fn module_span(&self, module: ModuleId) -> Span {
-        self.snapshot
-            .checked()
-            .typed()
-            .resolved()
-            .module(module)
-            .map_or_else(
-                || {
-                    self.snapshot
-                        .checked()
-                        .typed()
-                        .resolved()
-                        .entry_module()
-                        .hir
-                        .span
-                },
-                |module| module.hir.span,
-            )
+        self.checked.typed().resolved().module(module).map_or_else(
+            || self.checked.typed().resolved().entry_module().hir.span,
+            |module| module.hir.span,
+        )
     }
 }
 

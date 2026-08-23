@@ -149,9 +149,9 @@ status = "Accepted"
 priority = "P0"
 blocked_releases = ["v0.1"]
 blocked_tasks = ["PRJ-1107"]
-observable_behavior = "RFC-0024 now fixes the bounded ling project check command, explicit manifest selection, locked/offline graph validation, exit classes, and path-free human/JSON output; project semantic check/run/test/build and workspace selection remain open."
-authority = ["ROADMAP-1.0", "RFC-0002", "RFC-0024", "DEC-0003", "DEC-0013"]
-candidate_rfcs = ["RFC-0024"]
+observable_behavior = "RFC-0024 fixes the distinct graph-only ling project check command; RFC-0025 fixes manifest-selected semantic check/run/test/build, exact single-root workspace selection, locked/offline behavior, exits, JSON results, and the checked semantic artifact."
+authority = ["ROADMAP-1.0", "RFC-0002", "RFC-0024", "RFC-0025", "DEC-0003", "DEC-0013"]
+candidate_rfcs = ["RFC-0024", "RFC-0025"]
 source_items = ["03-G1-V0.1-LIVING.md:132-138", "RFC-0002:29-34", "RFC-0002:46", "PROTOCOL-INVENTORY:134,398"]
 options = [
   "Accept a versioned project CLI contract that selects one RFC-0002 workspace and specifies check/run/test/build, manifest-path, lock/offline, exit, and JSON behavior.",
@@ -160,8 +160,8 @@ options = [
 irreversible_consequences = ["Project command names, selection precedence, exit statuses, and JSON fields become automation and editor compatibility commitments; an implicit build/test contract can publish incompatible artifacts or bypass the checked project graph."]
 required_evidence = ["positive", "negative", "migration", "manifest-path", "locked-offline", "exit-codes", "json-output"]
 owner_role = "package-design"
-next_action = "Implement the RFC-0024 bounded graph-check child; retain PRJ-1107 blocked for semantic check/run/test/build and workspace-selection contracts."
-resolution = ["RFC-0024"]
+next_action = "Implement RFC-0025 as the complete PRJ-1107 semantic project CLI and checked-artifact vertical slice."
+resolution = ["RFC-0024", "RFC-0025"]
 superseded_by = ""
 observed_markers = []
 

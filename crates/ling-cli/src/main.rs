@@ -16,11 +16,12 @@ use exit_catalog::{
     EXIT_SNAPSHOT_MISMATCH, EXIT_SUCCESS,
 };
 use ling_cli::incident::{InternalIncident, Reproduction};
+use ling_cli::project::{self, BUILD_PROFILE, BUILD_TARGET, CheckedProject, ProjectFailure};
 use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
 use ling_cli::{CompileFailure, compile_path};
 use ling_diagnostics::{Diagnostic, MessageLanguage};
 use ling_effects::locate_main;
-use ling_eval::{Console, HostError, HostErrorCategory};
+use ling_eval::{Console, HostError, HostErrorCategory, MemoryConsole};
 use ling_format::{FormatDisposition, build_format_ir, format_core_with_disposition};
 use ling_project::{
     LockMode, LockedGraphFailure, ManifestError, PackageGraph, discover_modules, parse_manifest,
@@ -83,6 +84,14 @@ fn execute(options: Options) -> u8 {
             options.init_name,
             options.init_display_name,
         );
+    }
+    if options.command == Command::Build
+        || (matches!(
+            options.command,
+            Command::Check | Command::Run | Command::Test
+        ) && options.manifest_path.is_some())
+    {
+        return execute_project_command(options);
     }
     if options.command == Command::Test {
         return execute_test(
@@ -204,6 +213,322 @@ fn execute(options: Options) -> u8 {
         Command::Lsp => unreachable!("handled before compilation"),
         Command::Init => unreachable!("handled before compilation"),
         Command::Test => unreachable!("handled before test execution"),
+        Command::Build => unreachable!("handled before file compilation"),
+    }
+}
+
+fn execute_project_command(options: Options) -> u8 {
+    let operation = options.command.name();
+    let manifest_path = options
+        .manifest_path
+        .as_deref()
+        .expect("project commands require a manifest path");
+    let project = match project::compile(manifest_path) {
+        Ok(project) => project,
+        Err(failure) => return emit_project_command_failure(operation, failure, options.format),
+    };
+    if !project.snapshot().checked().warnings().is_empty() {
+        let status = emit_diagnostics(
+            project.snapshot().checked().warnings(),
+            options.format,
+            EXIT_SUCCESS,
+        );
+        if status != EXIT_SUCCESS {
+            return status;
+        }
+    }
+
+    match options.command {
+        Command::Check => emit_project_check_success(&project, options.format),
+        Command::Run => execute_project_run(&project, options.format),
+        Command::Test => execute_project_test(&project, options.format),
+        Command::Build => execute_project_build(
+            &project,
+            options.output.expect("project build requires output"),
+            options.format,
+        ),
+        _ => unreachable!("only semantic project commands reach this function"),
+    }
+}
+
+fn execute_project_run(project: &CheckedProject, format: OutputFormat) -> u8 {
+    let main = match locate_main(project.snapshot().checked()) {
+        Ok(main) => main,
+        Err(error) => {
+            return emit_project_command_diagnostics(
+                "run",
+                &[error.to_diagnostic()],
+                None,
+                format,
+                EXIT_COMPILE_ERROR,
+            );
+        }
+    };
+    let mut console = MemoryConsole::default();
+    match ling_eval::execute_project_main(project.snapshot(), &main, &mut console) {
+        Ok(()) => match format {
+            OutputFormat::Human => match write_stdout(console.output().as_bytes()) {
+                Ok(()) => EXIT_SUCCESS,
+                Err(error) => emit_host_io_failure("project.run.stdout", &error, format),
+            },
+            OutputFormat::Json => emit_project_command_success(
+                project,
+                "run",
+                serde_json::json!({"stdout": console.output()}),
+                format,
+            ),
+        },
+        Err(fault) => emit_project_command_diagnostics(
+            "run",
+            &[fault.to_diagnostic()],
+            Some(console.output()),
+            format,
+            EXIT_RUNTIME_FAULT,
+        ),
+    }
+}
+
+fn execute_project_test(project: &CheckedProject, format: OutputFormat) -> u8 {
+    let name = format!(
+        "{}::{}",
+        project.manifest().package().name(),
+        project.manifest().source().entry()
+    );
+    let main = match locate_main(project.snapshot().checked()) {
+        Ok(main) => main,
+        Err(error) => {
+            return emit_project_command_diagnostics(
+                "test",
+                &[error.to_diagnostic()],
+                None,
+                format,
+                EXIT_COMPILE_ERROR,
+            );
+        }
+    };
+    let mut console = MemoryConsole::default();
+    match ling_eval::execute_project_main(project.snapshot(), &main, &mut console) {
+        Ok(()) => match format {
+            OutputFormat::Human => {
+                println!(
+                    "工程测试通过 / project test passed: name={name} total=1 passed=1 failed=0"
+                );
+                EXIT_SUCCESS
+            }
+            OutputFormat::Json => emit_project_command_success(
+                project,
+                "test",
+                serde_json::json!({
+                    "tests": [{"name": name, "status": "passed", "stdout": console.output()}],
+                    "counts": {"total": 1, "passed": 1, "failed": 0},
+                }),
+                format,
+            ),
+        },
+        Err(fault) => emit_project_command_diagnostics(
+            "test",
+            &[fault.to_diagnostic()],
+            Some(console.output()),
+            format,
+            EXIT_RUNTIME_FAULT,
+        ),
+    }
+}
+
+fn execute_project_build(checked: &CheckedProject, output: PathBuf, format: OutputFormat) -> u8 {
+    let artifact = match project::build(checked, output) {
+        Ok(artifact) => artifact,
+        Err(failure) => return emit_project_command_failure("build", failure, format),
+    };
+    match format {
+        OutputFormat::Human => {
+            println!(
+                "工程构建完成 / project build completed: artifact={} identity={} bytes={} profile={} target={}",
+                project::ARTIFACT_PROTOCOL,
+                artifact.identity(),
+                artifact.bytes().len(),
+                BUILD_PROFILE,
+                BUILD_TARGET,
+            );
+            EXIT_SUCCESS
+        }
+        OutputFormat::Json => emit_project_command_success(
+            checked,
+            "build",
+            serde_json::json!({
+                "artifact": {
+                    "protocol": project::ARTIFACT_PROTOCOL,
+                    "identity": artifact.identity(),
+                    "bytes": artifact.bytes().len(),
+                    "profile": BUILD_PROFILE,
+                    "target": BUILD_TARGET,
+                }
+            }),
+            format,
+        ),
+    }
+}
+
+fn emit_project_check_success(project: &CheckedProject, format: OutputFormat) -> u8 {
+    match format {
+        OutputFormat::Human => {
+            println!(
+                "工程语义检查通过 / project semantic check passed: package={} version={} entry={} packages={} modules={} graph={} program={}",
+                project.manifest().package().name(),
+                project.manifest().package().version(),
+                project.manifest().source().entry(),
+                project.locked().graph().packages().len(),
+                project.snapshot().graph().modules.len(),
+                project.locked().graph().id(),
+                project.snapshot().program_id(),
+            );
+            EXIT_SUCCESS
+        }
+        OutputFormat::Json => {
+            emit_project_command_success(project, "check", serde_json::json!({}), format)
+        }
+    }
+}
+
+fn emit_project_command_success(
+    project: &CheckedProject,
+    operation: &str,
+    extra: serde_json::Value,
+    format: OutputFormat,
+) -> u8 {
+    debug_assert_eq!(format, OutputFormat::Json);
+    let mut report = serde_json::json!({
+        "protocol": project::COMMAND_PROTOCOL,
+        "operation": operation,
+        "status": "ok",
+        "package": {
+            "name": project.manifest().package().name().as_str(),
+            "version": project.manifest().package().version().to_string(),
+        },
+        "entry": project.manifest().source().entry().as_str(),
+        "graph": project.locked().graph().id().as_str(),
+        "program": project.snapshot().program_id().to_string(),
+    });
+    if let (Some(report), Some(extra)) = (report.as_object_mut(), extra.as_object()) {
+        report.extend(extra.clone());
+    }
+    match serde_json::to_vec(&report) {
+        Ok(mut rendered) => {
+            rendered.push(b'\n');
+            match write_stdout(&rendered) {
+                Ok(()) => EXIT_SUCCESS,
+                Err(error) => emit_host_io_failure("project.success.stdout", &error, format),
+            }
+        }
+        Err(error) => emit_internal_incident(
+            "project.success-json",
+            error.to_string(),
+            Reproduction::new(format!("ling {operation} --manifest-path ling.toml")),
+            format,
+        ),
+    }
+}
+
+fn emit_project_command_failure(
+    operation: &str,
+    failure: ProjectFailure,
+    format: OutputFormat,
+) -> u8 {
+    match failure {
+        ProjectFailure::Diagnostics(diagnostics) => emit_project_command_diagnostics(
+            operation,
+            &diagnostics,
+            None,
+            format,
+            EXIT_COMPILE_ERROR,
+        ),
+        ProjectFailure::SnapshotMismatch(message) => emit_project_command_diagnostics(
+            operation,
+            &[snapshot_mismatch_diagnostic(&message)],
+            None,
+            format,
+            EXIT_SNAPSHOT_MISMATCH,
+        ),
+        ProjectFailure::ArtifactIo {
+            operation: stage,
+            kind,
+        } => {
+            let diagnostic = Diagnostic::new(
+                ling_diagnostics::codes::PROJECT_ARTIFACT_IO_FAILED,
+                ling_diagnostics::Severity::Error,
+                "工程构建产物操作失败",
+                "project build artifact operation failed",
+            )
+            .with_fact("io_kind", project::stable_io_kind(kind))
+            .with_fact("operation", stage);
+            emit_project_command_diagnostics(
+                operation,
+                &[diagnostic],
+                None,
+                format,
+                EXIT_RUNTIME_FAULT,
+            )
+        }
+        ProjectFailure::Internal(message) => {
+            let incident = InternalIncident::capture(
+                "project.compile",
+                message,
+                Reproduction::new(format!("ling {operation} --manifest-path ling.toml")),
+            );
+            emit_project_command_diagnostics(
+                operation,
+                &[incident.diagnostic()],
+                None,
+                format,
+                EXIT_INTERNAL_ERROR,
+            )
+        }
+    }
+}
+
+fn emit_project_command_diagnostics(
+    operation: &str,
+    diagnostics: &[Diagnostic],
+    stdout: Option<&str>,
+    format: OutputFormat,
+    exit_code: u8,
+) -> u8 {
+    match format {
+        OutputFormat::Human => emit_diagnostics(diagnostics, format, exit_code),
+        OutputFormat::Json => {
+            let values = match diagnostic_values(diagnostics) {
+                Ok(values) => values,
+                Err(status) => return status,
+            };
+            let mut report = serde_json::json!({
+                "protocol": project::COMMAND_PROTOCOL,
+                "operation": operation,
+                "status": "error",
+                "diagnostics": values,
+            });
+            if let Some(stdout) = stdout {
+                report["stdout"] = serde_json::Value::String(stdout.to_owned());
+            }
+            match serde_json::to_vec(&report) {
+                Ok(mut rendered) => {
+                    rendered.push(b'\n');
+                    match std::io::stderr().lock().write_all(&rendered) {
+                        Ok(()) => exit_code,
+                        Err(error) => emit_host_io_failure(
+                            "project.failure.stderr",
+                            &error,
+                            OutputFormat::Human,
+                        ),
+                    }
+                }
+                Err(error) => emit_internal_incident(
+                    "project.failure-json",
+                    error.to_string(),
+                    Reproduction::new(format!("ling {operation} --manifest-path ling.toml")),
+                    format,
+                ),
+            }
+        }
     }
 }
 
@@ -1387,7 +1712,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} test [--format human|json] <file-or-directory>\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} init [--format human|json] [--name package] [--display-name text] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [--format human|json] <file>\n  {CLI_NAME} test [--format human|json] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [--format human|json]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [--format human|json]\n  {CLI_NAME} fmt [--check] [--format human|json] [--stdin-name name] <file|->\n  {CLI_NAME} init [--format human|json] [--name package] [--display-name text] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [--format human|json]\n  {CLI_NAME} repl [--format human|json] [--capability Console.Write]\n  {CLI_NAME} lsp --stdio"
     )
 }
 
@@ -1416,6 +1741,10 @@ struct Options {
     capabilities: Vec<String>,
     check: bool,
     locked: bool,
+    offline: bool,
+    profile: Option<String>,
+    target: Option<String>,
+    output: Option<PathBuf>,
     stdin_name: Option<String>,
     stdio: bool,
     init_name: Option<String>,
@@ -1425,11 +1754,16 @@ struct Options {
 impl Options {
     fn parse(command: Command, arguments: &[OsString]) -> Result<Self, String> {
         let mut format = OutputFormat::Human;
+        let mut format_seen = false;
         let mut path = None;
         let mut manifest_path = None;
         let mut capabilities = Vec::new();
         let mut check = false;
         let mut locked = false;
+        let mut offline = false;
+        let mut profile = None;
+        let mut target = None;
+        let mut output = None;
         let mut stdin_name = None;
         let mut stdio = false;
         let mut init_name = None;
@@ -1445,6 +1779,9 @@ impl Options {
                             .to_owned(),
                     );
                 }
+                if format_seen {
+                    return Err("only one `--format` may be provided".to_owned());
+                }
                 let value = arguments
                     .get(index + 1)
                     .ok_or_else(|| "`--format` requires `human` or `json`".to_owned())?;
@@ -1453,6 +1790,7 @@ impl Options {
                     .ok_or_else(|| "the output format must be valid Unicode".to_owned())?;
                 format = OutputFormat::parse(value)
                     .ok_or_else(|| format!("unsupported output format `{value}`"))?;
+                format_seen = true;
                 index += 2;
                 continue;
             }
@@ -1553,8 +1891,17 @@ impl Options {
             }
 
             if argument == "--manifest-path" {
-                if command != Command::ProjectCheck {
-                    return Err("`--manifest-path` is only valid with `project check`".to_owned());
+                if !matches!(
+                    command,
+                    Command::Check
+                        | Command::Run
+                        | Command::Test
+                        | Command::Build
+                        | Command::ProjectCheck
+                ) {
+                    return Err(
+                        "`--manifest-path` is only valid with project-capable commands".to_owned(),
+                    );
                 }
                 let value = arguments
                     .get(index + 1)
@@ -1576,8 +1923,15 @@ impl Options {
             }
 
             if argument == "--locked" {
-                if command != Command::ProjectCheck {
-                    return Err("`--locked` is only valid with `project check`".to_owned());
+                if !matches!(
+                    command,
+                    Command::Check
+                        | Command::Run
+                        | Command::Test
+                        | Command::Build
+                        | Command::ProjectCheck
+                ) {
+                    return Err("`--locked` is only valid with project-capable commands".to_owned());
                 }
                 if locked {
                     return Err("only one `--locked` may be provided".to_owned());
@@ -1587,11 +1941,88 @@ impl Options {
                 continue;
             }
 
+            if argument == "--offline" {
+                if !matches!(
+                    command,
+                    Command::Check | Command::Run | Command::Test | Command::Build
+                ) {
+                    return Err(
+                        "`--offline` is only valid with semantic project commands".to_owned()
+                    );
+                }
+                if offline {
+                    return Err("only one `--offline` may be provided".to_owned());
+                }
+                offline = true;
+                index += 1;
+                continue;
+            }
+
+            if argument == "--profile" {
+                if command != Command::Build {
+                    return Err("`--profile` is only valid with `build`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--profile` requires `explore`".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the build profile must be valid Unicode".to_owned())?;
+                if value != BUILD_PROFILE {
+                    return Err(format!("unsupported project build profile `{value}`"));
+                }
+                if profile.replace(value.to_owned()).is_some() {
+                    return Err("only one `--profile` may be provided".to_owned());
+                }
+                index += 2;
+                continue;
+            }
+
+            if argument == "--target" {
+                if command != Command::Build {
+                    return Err("`--target` is only valid with `build`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--target` requires `semantic`".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the build target must be valid Unicode".to_owned())?;
+                if value != BUILD_TARGET {
+                    return Err(format!("unsupported project build target `{value}`"));
+                }
+                if target.replace(value.to_owned()).is_some() {
+                    return Err("only one `--target` may be provided".to_owned());
+                }
+                index += 2;
+                continue;
+            }
+
+            if argument == "--output" {
+                if command != Command::Build {
+                    return Err("`--output` is only valid with `build`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--output` requires a path".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the build output path must be valid Unicode".to_owned())?;
+                if value.is_empty() || value == "-" {
+                    return Err("`--output` must name a filesystem path".to_owned());
+                }
+                if output.replace(PathBuf::from(value)).is_some() {
+                    return Err("only one `--output` may be provided".to_owned());
+                }
+                index += 2;
+                continue;
+            }
+
             if argument.to_string_lossy().starts_with('-') && argument != "-" {
                 return Err(format!("unknown option `{}`", argument.to_string_lossy()));
             }
-            if command == Command::ProjectCheck {
-                return Err("`project check` does not accept a positional path".to_owned());
+            if matches!(command, Command::ProjectCheck | Command::Build) {
+                return Err(format!("`{command}` does not accept a positional path"));
             }
             if path.replace(PathBuf::from(argument)).is_some() {
                 return Err(if command == Command::Init {
@@ -1603,9 +2034,16 @@ impl Options {
             index += 1;
         }
 
+        let semantic_project = matches!(
+            command,
+            Command::Check | Command::Run | Command::Test | Command::Build
+        ) && manifest_path.is_some();
+        if semantic_project && path.is_some() {
+            return Err("project mode does not accept a positional source path".to_owned());
+        }
         if matches!(
             command,
-            Command::Repl | Command::Lsp | Command::ProjectCheck
+            Command::Repl | Command::Lsp | Command::ProjectCheck | Command::Build
         ) && path.is_some()
         {
             return Err(format!("`{command}` does not accept a source file"));
@@ -1613,6 +2051,8 @@ impl Options {
         if command != Command::Repl
             && command != Command::Lsp
             && command != Command::ProjectCheck
+            && command != Command::Build
+            && !semantic_project
             && path.is_none()
         {
             return Err(if command == Command::Init {
@@ -1654,8 +2094,33 @@ impl Options {
             if !locked {
                 return Err("`project check` requires `--locked`".to_owned());
             }
-        } else if manifest_path.is_some() || locked {
-            return Err("project options require `project check`".to_owned());
+        } else if semantic_project {
+            if !locked {
+                return Err(format!("project `{command}` requires `--locked`"));
+            }
+            if !offline {
+                return Err(format!("project `{command}` requires `--offline`"));
+            }
+            if command == Command::Build {
+                if profile.as_deref() != Some(BUILD_PROFILE) {
+                    return Err("`build` requires `--profile explore`".to_owned());
+                }
+                if target.as_deref() != Some(BUILD_TARGET) {
+                    return Err("`build` requires `--target semantic`".to_owned());
+                }
+                if output.is_none() {
+                    return Err("`build` requires `--output path`".to_owned());
+                }
+            }
+        } else if manifest_path.is_some() || locked || offline {
+            return Err("project options require an explicit `--manifest-path`".to_owned());
+        }
+        if command == Command::Build && !semantic_project {
+            return Err("`build` requires `--manifest-path path`".to_owned());
+        }
+        if command != Command::Build && (profile.is_some() || target.is_some() || output.is_some())
+        {
+            return Err("build-only options require `build`".to_owned());
         }
 
         if command != Command::Init && (init_name.is_some() || init_display_name.is_some()) {
@@ -1673,6 +2138,10 @@ impl Options {
             capabilities,
             check,
             locked,
+            offline,
+            profile,
+            target,
+            output,
             stdin_name,
             stdio,
             init_name,
@@ -1791,7 +2260,7 @@ mod tests {
                 command.name()
             );
         }
-        for stale in ["build", "query", "patch", "zero", ".zero"] {
+        for stale in ["query", "patch", "zero", ".zero"] {
             assert!(
                 !help.contains(stale),
                 "help advertises stale command `{stale}`"
