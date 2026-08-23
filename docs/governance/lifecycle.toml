@@ -6676,3 +6676,29 @@ unresolved_alternatives = [
   "Projects, workspaces, general graph queries, references, pagination, partial edits, rename, Graph.Commit, atomic disk publication, LSP WorkspaceEdit, delegated authority, tests, benchmarks, proofs, ABI preservation, migration, and Stable compatibility remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0028"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0028.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compare independent Bash, Zsh, Fish, and PowerShell generation against exact UTF-8/LF canonical fixtures and repeat-process bytes.",
+  "Verify parser-catalog root parity, command options, fixed values, project/completion subcommands, stale-name exclusion, and truthful help coverage.",
+  "Verify usage failures, nonmutation, offline behavior, and syntax parsing by every corresponding shell available on the test host.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds one Preview completion root, four operands, and canonical ling.cli-completion/0.1 text fixtures while preserving existing commands and exit meanings.",
+  "Changes no Ling semantics, JSON schema, diagnostic identity, Semantic ID, span, runtime, bytecode, VM, ABI, filesystem state, or Unicode 17.0.0 behavior.",
+]
+unresolved_alternatives = [
+  "Dynamic path/package/module/symbol completion, installation, descriptions, localization, plugins, future command discovery, and Stable compatibility remain separately governed.",
+]
+superseded_by = ""

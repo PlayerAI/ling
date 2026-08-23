@@ -75,3 +75,7 @@ RFC-0027 subsequently implements and advertises `query` and `patch`. The
 fixture therefore continues to reject only still-unimplemented plan names and
 the stale `zero` / `.zero` spellings; this historical decision does not
 override the later Accepted command authority.
+
+RFC-0028 subsequently implements and advertises `completion` and versions the
+four generated shell scripts. It preserves this decision's rule that ordinary
+help wording and layout are not a canonical byte protocol.

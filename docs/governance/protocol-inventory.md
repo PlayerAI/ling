@@ -6,15 +6,15 @@
 
 ## Summary
 
-- 30 records: 26 current public, 1 internal, 3 Future.
-- Current public stability: 13 Experimental, 13 Preview, 0 Stable.
+- 31 records: 27 current public, 1 internal, 3 Future.
+- Current public stability: 13 Experimental, 14 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
 
 | ID | Visibility | Category | Current version | Stability | Public schema | Canonical | Fixtures |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
-| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 7 |
+| `PROTO-CLI` | Public | CLI | `0.0.1-dev` | `Preview` | no | no | 10 |
 | `PROTO-CLI-EXIT` | Public | CLI | `0.0.1-dev` | `Preview` | no | yes | 4 |
 | `PROTO-PROJECT-CHECK` | Public | CLI | `ling.project.check/0.1` | `Experimental` | no | no | 2 |
 | `PROTO-LSP-FORMATTING` | Public | LSP | `ling.lsp.formatting/0.1` | `Experimental` | no | no | 2 |
@@ -36,6 +36,7 @@
 | `PROTO-PACKAGE-IDENTITY` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 9 |
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 4 |
 | `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.1` | `Preview` | yes | yes | 2 |
+| `PROTO-CLI-COMPLETION` | Public | Text protocol | `ling.cli-completion/0.1` | `Preview` | yes | yes | 5 |
 | `PROTO-BUILD-METADATA` | Public | Package metadata | `ling.project.artifact/0.1` | `Experimental` | no | yes | 3 |
 | `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 26 |
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.2` | `Experimental` | no | no | 7 |
@@ -51,14 +52,14 @@
 
 - Producer: ling executable
 - Consumer: humans; shell scripts; editor and build integrations
-- Reader policy: The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; current non-LSP commands accept the DEC-0254 format/language/color/verbosity policy, while unknown, duplicate, mixed, or incompatible forms are rejected with exit 2.
-- Writer policy: Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines; non-LSP output follows DEC-0254 without changing machine schemas or exit classes; and lsp --stdio rejects output-policy flags and retains protocol-only framed output.
+- Reader policy: The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, query, patch, completion, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; current non-LSP non-completion commands accept the DEC-0254 format/language/color/verbosity policy, while unknown, duplicate, mixed, or incompatible forms are rejected with exit 2.
+- Writer policy: Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines; non-LSP output follows DEC-0254 without changing machine schemas or exit classes; completion emits only its versioned protocol script; and lsp --stdio rejects output-policy flags and retains protocol-only framed output.
 - Unknown-field policy: Not field-based: unknown commands, options, formats, and capabilities are rejected.
 - Migration tool: None; incompatible command or option changes require an accepted specification and release migration notes.
-- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0028`, `DEC-0037`, `DEC-0038`, `DEC-0039`, `DEC-0253`, `DEC-0254`, `DEC-0255`, `DEC-0256`, `RFC-0004`, `RFC-0024`, `RFC-0025`
-- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0253-current-cli-command-model.md`](../decisions/0253-current-cli-command-model.md), [`docs/decisions/0254-cli-output-policy.md`](../decisions/0254-cli-output-policy.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/output_policy.rs`](../../crates/ling-cli/src/output_policy.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs)
-- Fixtures: [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/output_policy.rs`](../../crates/ling-cli/tests/output_policy.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`tests/protocols/cli-output-policy/README.md`](../../tests/protocols/cli-output-policy/README.md), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md)
-- Notes: The compiler package version remains the broad CLI version. DEC-0253 accepts the command model, DEC-0254 the output policy, DEC-0255 the initializer, and DEC-0256 the standalone/project test-mode composition while preserving command-specific schemas and exits.
+- Authority: `DEC-0003`, `DEC-0013`, `DEC-0015`, `DEC-0016`, `DEC-0028`, `DEC-0037`, `DEC-0038`, `DEC-0039`, `DEC-0253`, `DEC-0254`, `DEC-0255`, `DEC-0256`, `RFC-0004`, `RFC-0024`, `RFC-0025`, `RFC-0027`, `RFC-0028`
+- Sources: [`Cargo.toml`](../../Cargo.toml), [`docs/decisions/0253-current-cli-command-model.md`](../decisions/0253-current-cli-command-model.md), [`docs/decisions/0254-cli-output-policy.md`](../decisions/0254-cli-output-policy.md), [`docs/RFC-0025.md`](../RFC-0025.md), [`docs/RFC-0027.md`](../RFC-0027.md), [`docs/RFC-0028.md`](../RFC-0028.md), [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/src/output_policy.rs`](../../crates/ling-cli/src/output_policy.rs), [`crates/ling-cli/src/project.rs`](../../crates/ling-cli/src/project.rs), [`crates/ling-cli/src/completion.rs`](../../crates/ling-cli/src/completion.rs)
+- Fixtures: [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/help.rs`](../../crates/ling-cli/tests/help.rs), [`crates/ling-cli/tests/output_policy.rs`](../../crates/ling-cli/tests/output_policy.rs), [`crates/ling-cli/tests/project_commands.rs`](../../crates/ling-cli/tests/project_commands.rs), [`crates/ling-cli/tests/completion.rs`](../../crates/ling-cli/tests/completion.rs), [`tests/protocols/cli-output-policy/README.md`](../../tests/protocols/cli-output-policy/README.md), [`tests/protocols/project-command/README.md`](../../tests/protocols/project-command/README.md), [`tests/protocols/cli-completion/README.md`](../../tests/protocols/cli-completion/README.md)
+- Notes: The compiler package version remains the broad CLI version. DEC-0253 accepts the command model, DEC-0254 the output policy, DEC-0255 the initializer, DEC-0256 the standalone/project test-mode composition, RFC-0027 query/patch, and RFC-0028 completion while preserving command-specific schemas and exits.
 
 ### `PROTO-CLI-EXIT` — Ling process exit-code mapping
 
@@ -332,6 +333,19 @@
 - Sources: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`docs/decisions/0015-audit-source-format.md`](../decisions/0015-audit-source-format.md)
 - Fixtures: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs)
 - Notes: The accepted 0.1 format is Preview rather than 1.0 Stable and embeds Experimental semantic identities.
+
+### `PROTO-CLI-COMPLETION` — Ling canonical shell completion scripts
+
+- Producer: ling completion
+- Consumer: Bash; Zsh; Fish; PowerShell; shell integration tooling
+- Reader policy: Select exactly one supported shell operand and consume only the matching script; the embedded ling.cli-completion/0.1 marker identifies this exact current inventory and byte contract.
+- Writer policy: Emit the matching BOM-free UTF-8/LF canonical fixture with one final LF, fixed accepted command/option/value ordering, no filesystem or environment discovery, and no stderr on success.
+- Unknown-field policy: Not field-based: unsupported shells and extra operands or flags are rejected with usage exit 2; scripts contain no extension namespace.
+- Migration tool: None; incompatible command inventory, quoting, registration, or byte changes require a new protocol version and fixtures.
+- Authority: `RFC-0028`, `DEC-0003`, `DEC-0040`, `DEC-0253`, `DEC-0254`, `RFC-0025`, `RFC-0027`
+- Sources: [`docs/RFC-0028.md`](../RFC-0028.md), [`crates/ling-cli/src/command_catalog.rs`](../../crates/ling-cli/src/command_catalog.rs), [`crates/ling-cli/src/completion.rs`](../../crates/ling-cli/src/completion.rs), [`crates/ling-cli/src/main.rs`](../../crates/ling-cli/src/main.rs)
+- Fixtures: [`tests/protocols/cli-completion/ling.bash`](../../tests/protocols/cli-completion/ling.bash), [`tests/protocols/cli-completion/_ling`](../../tests/protocols/cli-completion/_ling), [`tests/protocols/cli-completion/ling.fish`](../../tests/protocols/cli-completion/ling.fish), [`tests/protocols/cli-completion/ling.ps1`](../../tests/protocols/cli-completion/ling.ps1), [`crates/ling-cli/tests/completion.rs`](../../crates/ling-cli/tests/completion.rs)
+- Notes: Version 0.1 is static Preview completion only. It does not scan paths/projects/symbols, install shell startup files, localize descriptions, advertise planned commands, or freeze ordinary help bytes.
 
 ### `PROTO-BUILD-METADATA` — Ling checked project artifact
 

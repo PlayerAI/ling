@@ -951,6 +951,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0028"
+title = "Deterministic shell completion scripts"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0028.md"
+covers = ["ling completion command", "ling.cli-completion/0.1", "Bash Zsh Fish PowerShell canonical completion scripts"]
+depends_on = ["DEC-0003", "DEC-0040", "DEC-0253", "DEC-0254", "RFC-0025", "RFC-0027"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

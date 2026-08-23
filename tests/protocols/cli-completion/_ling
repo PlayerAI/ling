@@ -1,0 +1,44 @@
+#compdef ling
+# ling.cli-completion/0.1
+_ling() {
+  local current previous command
+  current="${words[CURRENT]}"
+  previous="${words[CURRENT-1]}"
+  command="${words[2]}"
+  case "$previous" in
+    --format) compadd -- human json; return ;;
+    --language) compadd -- bilingual zh-CN en; return ;;
+    --color) compadd -- auto always never; return ;;
+    --capability) compadd -- Console.Write; return ;;
+    --profile) compadd -- explore; return ;;
+    --target) compadd -- semantic; return ;;
+  esac
+  if (( CURRENT == 2 )); then
+    compadd -- run check repl semantic audit query patch fmt init test build project lsp completion --help -h --version -V
+    return
+  fi
+  if [[ "$command" == project && CURRENT -eq 3 ]]; then
+    compadd -- check
+    return
+  fi
+  if [[ "$command" == completion && CURRENT -eq 3 ]]; then
+    compadd -- bash zsh fish powershell
+    return
+  fi
+  case "$command" in
+    run) compadd -- --format --language --color --quiet --verbose --manifest-path --locked --offline ;;
+    check) compadd -- --format --language --color --quiet --verbose --manifest-path --locked --offline ;;
+    repl) compadd -- --format --language --color --quiet --verbose --capability ;;
+    semantic) compadd -- --format --language --color --quiet --verbose ;;
+    audit) compadd -- --format --language --color --quiet --verbose ;;
+    query) compadd -- --format --language --color --quiet --verbose --symbol ;;
+    patch) compadd -- --format --language --color --quiet --verbose ;;
+    fmt) compadd -- --format --language --color --quiet --verbose --check --stdin-name ;;
+    init) compadd -- --format --language --color --quiet --verbose --name --display-name ;;
+    test) compadd -- --format --language --color --quiet --verbose --manifest-path --locked --offline ;;
+    build) compadd -- --format --language --color --quiet --verbose --manifest-path --locked --offline --profile --target --output ;;
+    project) compadd -- --format --language --color --quiet --verbose --manifest-path --locked ;;
+    lsp) compadd -- --stdio ;;
+  esac
+}
+compdef _ling ling

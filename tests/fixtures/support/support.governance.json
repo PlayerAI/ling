@@ -405,6 +405,13 @@
       "implemented": true
     },
     {
+      "id": "PROTO-CLI-COMPLETION",
+      "visibility": "Public",
+      "version": "ling.cli-completion/0.1",
+      "stability": "Preview",
+      "implemented": true
+    },
+    {
       "id": "PROTO-CLI-EXIT",
       "visibility": "Public",
       "version": "0.0.1-dev",

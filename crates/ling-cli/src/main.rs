@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 mod command_catalog;
+mod completion;
 mod exit_catalog;
 mod init;
 mod output_policy;
@@ -73,12 +74,35 @@ fn run(arguments: Vec<OsString>) -> u8 {
         (command, &arguments[1..])
     };
 
+    if command == Command::Completion {
+        return execute_completion(command_arguments);
+    }
+
     let options = match Options::parse(command, command_arguments) {
         Ok(options) => options,
         Err(message) => return invalid_usage(&message),
     };
 
     execute(options)
+}
+
+fn execute_completion(arguments: &[OsString]) -> u8 {
+    let [shell] = arguments else {
+        return invalid_usage(
+            "`completion` requires exactly one shell: bash, zsh, fish, or powershell",
+        );
+    };
+    let Some(shell) = shell.to_str() else {
+        return invalid_usage("the completion shell must be valid Unicode");
+    };
+    let Some(shell) = completion::Shell::parse(shell) else {
+        return invalid_usage(&format!("unsupported completion shell `{shell}`"));
+    };
+    let rendered = completion::render(shell);
+    match write_stdout(rendered.as_bytes()) {
+        Ok(()) => EXIT_SUCCESS,
+        Err(error) => emit_host_io_failure("completion.stdout", &error, OutputPolicy::human()),
+    }
 }
 
 fn execute(options: Options) -> u8 {
@@ -239,6 +263,7 @@ fn execute(options: Options) -> u8 {
         Command::Init => unreachable!("handled before compilation"),
         Command::Test => unreachable!("handled before test execution"),
         Command::Build => unreachable!("handled before file compilation"),
+        Command::Completion => unreachable!("handled before option parsing"),
     }
 }
 
@@ -1957,7 +1982,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [OUTPUT] <file>\n  {CLI_NAME} query --symbol name [OUTPUT] <file>\n  {CLI_NAME} patch [OUTPUT] <transaction.json> <file>\n  {CLI_NAME} test [OUTPUT] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [OUTPUT]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [OUTPUT]\n  {CLI_NAME} fmt [--check] [--stdin-name name] [OUTPUT] <file|->\n  {CLI_NAME} init [--name package] [--display-name text] [OUTPUT] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [OUTPUT]\n  {CLI_NAME} repl [--capability Console.Write] [OUTPUT]\n  {CLI_NAME} lsp --stdio\n\nOUTPUT:\n  [--format human|json] [--language bilingual|zh-CN|en]\n  [--color auto|always|never] [--quiet|--verbose]"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [OUTPUT] <file>\n  {CLI_NAME} query --symbol name [OUTPUT] <file>\n  {CLI_NAME} patch [OUTPUT] <transaction.json> <file>\n  {CLI_NAME} test [OUTPUT] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [OUTPUT]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [OUTPUT]\n  {CLI_NAME} fmt [--check] [--stdin-name name] [OUTPUT] <file|->\n  {CLI_NAME} init [--name package] [--display-name text] [OUTPUT] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [OUTPUT]\n  {CLI_NAME} repl [--capability Console.Write] [OUTPUT]\n  {CLI_NAME} lsp --stdio\n  {CLI_NAME} completion <bash|zsh|fish|powershell>\n\nOUTPUT:\n  [--format human|json] [--language bilingual|zh-CN|en]\n  [--color auto|always|never] [--quiet|--verbose]"
     )
 }
 

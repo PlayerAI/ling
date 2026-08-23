@@ -33,6 +33,7 @@ fn help_aliases_have_the_same_truthful_surface() {
         "build",
         "project check",
         "lsp",
+        "completion",
     ] {
         assert!(help.contains(command), "help is missing `{command}`");
     }

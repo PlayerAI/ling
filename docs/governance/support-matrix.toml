@@ -273,6 +273,13 @@ stability = "Preview"
 implemented = true
 
 [[protocol]]
+id = "PROTO-CLI-COMPLETION"
+visibility = "Public"
+version = "ling.cli-completion/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-CLI-INIT"
 visibility = "Public"
 version = "ling.init/0.1"

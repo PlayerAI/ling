@@ -358,3 +358,9 @@ protocol_id = "PROTO-AUDIT-SOURCE"
 format = "CanonicalText"
 reason = "Audit Source is an accepted canonical text grammar with an isolated parser; it is not representable as a JSON schema package."
 evidence = ["docs/decisions/0015-audit-source-format.md", "crates/ling-format/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
+
+[[non_json_boundary]]
+protocol_id = "PROTO-CLI-COMPLETION"
+format = "CanonicalText"
+reason = "Shell completion 0.1 consists of four accepted canonical shell-language documents; JSON Schema cannot validate their syntax or exact bytes."
+evidence = ["docs/RFC-0028.md", "crates/ling-cli/src/completion.rs", "crates/ling-cli/tests/completion.rs", "tests/protocols/cli-completion"]

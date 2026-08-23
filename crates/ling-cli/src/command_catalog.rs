@@ -18,6 +18,7 @@ pub(crate) enum Command {
     Build,
     ProjectCheck,
     Lsp,
+    Completion,
 }
 
 impl Command {
@@ -37,6 +38,7 @@ impl Command {
             Self::Build,
             Self::ProjectCheck,
             Self::Lsp,
+            Self::Completion,
         ]
     }
 
@@ -54,6 +56,7 @@ impl Command {
             "test" => Some(Self::Test),
             "build" => Some(Self::Build),
             "lsp" => Some(Self::Lsp),
+            "completion" => Some(Self::Completion),
             _ => None,
         }
     }
@@ -73,6 +76,7 @@ impl Command {
             Self::Build => "build",
             Self::ProjectCheck => "project check",
             Self::Lsp => "lsp",
+            Self::Completion => "completion",
         }
     }
 }
@@ -102,6 +106,7 @@ mod tests {
             ("test", Command::Test),
             ("build", Command::Build),
             ("lsp", Command::Lsp),
+            ("completion", Command::Completion),
         ];
         for (name, command) in roots {
             assert_eq!(Command::parse(name), Some(command));
@@ -110,8 +115,19 @@ mod tests {
         assert_eq!(
             roots.map(|(name, _)| name),
             [
-                "run", "check", "repl", "semantic", "audit", "query", "patch", "fmt", "init",
-                "test", "build", "lsp",
+                "run",
+                "check",
+                "repl",
+                "semantic",
+                "audit",
+                "query",
+                "patch",
+                "fmt",
+                "init",
+                "test",
+                "build",
+                "lsp",
+                "completion",
             ]
         );
         for planned_only in [
@@ -129,7 +145,7 @@ mod tests {
     #[test]
     fn catalog_contains_each_implemented_command_once() {
         let commands = Command::all();
-        assert_eq!(commands.len(), 13);
+        assert_eq!(commands.len(), 14);
         assert_eq!(
             commands
                 .iter()
@@ -149,6 +165,7 @@ mod tests {
                 "build",
                 "project check",
                 "lsp",
+                "completion",
             ]
         );
         for (index, command) in commands.iter().enumerate() {

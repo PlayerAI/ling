@@ -57,15 +57,37 @@ public_schema = false
 canonical = false
 producer = ["ling executable"]
 consumer = ["humans", "shell scripts", "editor and build integrations"]
-reader_policy = "The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; current non-LSP commands accept the DEC-0254 format/language/color/verbosity policy, while unknown, duplicate, mixed, or incompatible forms are rejected with exit 2."
-writer_policy = "Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines; non-LSP output follows DEC-0254 without changing machine schemas or exit classes; and lsp --stdio rejects output-policy flags and retains protocol-only framed output."
+reader_policy = "The hand-written parser accepts --help/-h, --version/-V, file-oriented run/check/semantic/audit/test, manifest-selected locked/offline project run/check/test/build, repl, fmt, init, query, patch, completion, the distinct Experimental project graph check, and the Preview lsp --stdio launcher; current non-LSP non-completion commands accept the DEC-0254 format/language/color/verbosity policy, while unknown, duplicate, mixed, or incompatible forms are rejected with exit 2."
+writer_policy = "Help and version output describe only implemented commands; file and project compiler commands route through their shared checked pipelines; non-LSP output follows DEC-0254 without changing machine schemas or exit classes; completion emits only its versioned protocol script; and lsp --stdio rejects output-policy flags and retains protocol-only framed output."
 unknown_field_policy = "Not field-based: unknown commands, options, formats, and capabilities are rejected."
 migration_tool = "None; incompatible command or option changes require an accepted specification and release migration notes."
-fixtures = ["crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/output_policy.rs", "crates/ling-cli/tests/project_commands.rs", "tests/protocols/cli-output-policy/README.md", "tests/protocols/project-command/README.md"]
-sources = ["Cargo.toml", "docs/decisions/0253-current-cli-command-model.md", "docs/decisions/0254-cli-output-policy.md", "docs/RFC-0025.md", "crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/output_policy.rs", "crates/ling-cli/src/project.rs"]
-version_markers = ["0.0.1-dev", "ling.project.command/0.1"]
-authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "DEC-0028", "DEC-0037", "DEC-0038", "DEC-0039", "DEC-0253", "DEC-0254", "DEC-0255", "DEC-0256", "RFC-0004", "RFC-0024", "RFC-0025"]
-notes = ["The compiler package version remains the broad CLI version. DEC-0253 accepts the command model, DEC-0254 the output policy, DEC-0255 the initializer, and DEC-0256 the standalone/project test-mode composition while preserving command-specific schemas and exits."]
+fixtures = ["crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/help.rs", "crates/ling-cli/tests/output_policy.rs", "crates/ling-cli/tests/project_commands.rs", "crates/ling-cli/tests/completion.rs", "tests/protocols/cli-output-policy/README.md", "tests/protocols/project-command/README.md", "tests/protocols/cli-completion/README.md"]
+sources = ["Cargo.toml", "docs/decisions/0253-current-cli-command-model.md", "docs/decisions/0254-cli-output-policy.md", "docs/RFC-0025.md", "docs/RFC-0027.md", "docs/RFC-0028.md", "crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/main.rs", "crates/ling-cli/src/output_policy.rs", "crates/ling-cli/src/project.rs", "crates/ling-cli/src/completion.rs"]
+version_markers = ["0.0.1-dev", "ling.project.command/0.1", "ling.cli-completion/0.1"]
+authority = ["DEC-0003", "DEC-0013", "DEC-0015", "DEC-0016", "DEC-0028", "DEC-0037", "DEC-0038", "DEC-0039", "DEC-0253", "DEC-0254", "DEC-0255", "DEC-0256", "RFC-0004", "RFC-0024", "RFC-0025", "RFC-0027", "RFC-0028"]
+notes = ["The compiler package version remains the broad CLI version. DEC-0253 accepts the command model, DEC-0254 the output policy, DEC-0255 the initializer, DEC-0256 the standalone/project test-mode composition, RFC-0027 query/patch, and RFC-0028 completion while preserving command-specific schemas and exits."]
+
+[[protocol]]
+id = "PROTO-CLI-COMPLETION"
+title = "Ling canonical shell completion scripts"
+category = "Text protocol"
+visibility = "Public"
+current_version = "ling.cli-completion/0.1"
+stability = "Preview"
+implemented = true
+public_schema = true
+canonical = true
+producer = ["ling completion"]
+consumer = ["Bash", "Zsh", "Fish", "PowerShell", "shell integration tooling"]
+reader_policy = "Select exactly one supported shell operand and consume only the matching script; the embedded ling.cli-completion/0.1 marker identifies this exact current inventory and byte contract."
+writer_policy = "Emit the matching BOM-free UTF-8/LF canonical fixture with one final LF, fixed accepted command/option/value ordering, no filesystem or environment discovery, and no stderr on success."
+unknown_field_policy = "Not field-based: unsupported shells and extra operands or flags are rejected with usage exit 2; scripts contain no extension namespace."
+migration_tool = "None; incompatible command inventory, quoting, registration, or byte changes require a new protocol version and fixtures."
+fixtures = ["tests/protocols/cli-completion/ling.bash", "tests/protocols/cli-completion/_ling", "tests/protocols/cli-completion/ling.fish", "tests/protocols/cli-completion/ling.ps1", "crates/ling-cli/tests/completion.rs"]
+sources = ["docs/RFC-0028.md", "crates/ling-cli/src/command_catalog.rs", "crates/ling-cli/src/completion.rs", "crates/ling-cli/src/main.rs"]
+version_markers = ["ling.cli-completion/0.1", "ling completion"]
+authority = ["RFC-0028", "DEC-0003", "DEC-0040", "DEC-0253", "DEC-0254", "RFC-0025", "RFC-0027"]
+notes = ["Version 0.1 is static Preview completion only. It does not scan paths/projects/symbols, install shell startup files, localize descriptions, advertise planned commands, or freeze ordinary help bytes."]
 
 [[protocol]]
 id = "PROTO-PROJECT-CHECK"
