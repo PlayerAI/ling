@@ -7454,3 +7454,30 @@ unresolved_alternatives = [
   "Allocator/RSS limits, configurable non-diagnostic quotas, eviction, partial results, progress, deadlines, total compiler fuel, general dependency/workspace memory accounting, persistence, Stable lifecycle, and Semantic Transactions remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0261"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0261-handler-runtime-and-bytecode.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Execute direct, sequenced, conditional, nested, transitive, zero-resume, and one-resume Console handlers in the checked interpreter with deep lexical dispatch and original Unicode/BOM/CRLF spans.",
+  "Cover higher-order repeated Once resume rejection, mutable Cell visibility, Fault propagation, committed host effects, cancellation, and bounded handler/continuation resources without rollback.",
+  "Lower handlers only to ling.bytecode/1.3 and verify exact encoding, decoding, disassembly, canonical re-encoding, source maps, signatures, captures, operation ordering, malformed records, and older-reader rejection.",
+  "Compare interpreter and verifier-created VM results, events, stable Fault facts, resume counts, committed mutations, cancellation boundaries, Program IDs, and repeated path-independent bytes.",
+]
+compatibility_impact = [
+  "Defines execution only for already checked DEC-0260 handlers and the existing Console.write producer; Clock/Random producers and Task/Actor crossing remain unavailable.",
+  "Plans backward-compatible Experimental ling.bytecode/1.3 while preserving exact 1.0 through 1.2 bytes, readers, writers, and execution.",
+  "Uses existing L-RUNTIME-0001 with handler_resume_cardinality facts and adds no diagnostic code, Semantic Graph/Audit field, CLI/LSP/package/ABI surface, or Unicode-version change.",
+]
+unresolved_alternatives = [
+  "Clock/Random producers, Never and user-defined operations, shallow/dynamic handlers, continuation serialization or cross-task transfer, rollback/cleanup, catchable Fault/cancellation, Native/Wasm lowering, migration, and Stable compatibility remain deferred.",
+]
+superseded_by = ""

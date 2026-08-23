@@ -4251,3 +4251,16 @@ covers = ["EFF-2103 source-to-checked Handler Core lowering", "lexical handler b
 depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "DEC-0010", "DEC-0012", "DEC-0015", "DEC-0062", "DEC-0063", "DEC-0064", "DEC-0065", "DEC-0066", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0261"
+title = "First-order handler runtime and bytecode"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0261-handler-runtime-and-bytecode.md"
+covers = ["EFF-2104 checked interpreter handler execution", "deep delimited continuation, resume, State, Fault, Capability, cancellation, and resource semantics", "planned verifier-gated ling.bytecode/1.3 Handle instruction and VM continuation ABI", "interpreter and VM differential evidence for current Console.Write operation production"]
+depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "RFC-0014", "RFC-0015", "RFC-0016", "RFC-0018", "RFC-0019", "RFC-0020", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0063", "DEC-0088", "DEC-0260", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = true

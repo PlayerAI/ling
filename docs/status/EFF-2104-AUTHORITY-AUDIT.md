@@ -2,41 +2,36 @@
 
 ## Outcome
 
-`EFF-2104` is correctly recorded as `BlockedSpec`. The G2 plan requires an
-interpreter reference path followed by VM execution and a differential corpus
-for single/nested handlers, propagation, resume, handler Faults, mutable State,
-and cancellation. RFC-0006 now accepts the Experimental Effect model and the
-EFF-2103 bounded source/Core/HIR children preserve checked-only boundaries, but
-operation dispatch, continuation representation, runtime residual-row
-behavior, bytecode encoding, and runtime failure contracts remain unaccepted.
+`EFF-2104` is ready for implementation under Accepted DEC-0261. EFF-2103 now
+publishes checked Handler Core, RFC-0006 supplies the first-order Effect model,
+and DEC-0261 fixes deep lexical dispatch, delimited continuation behavior,
+State/Fault/Capability/cancellation boundaries, the interpreter oracle,
+`ling.bytecode/1.3`, verifier rules, VM continuation ABI, and differential
+evidence for the currently executable `Console.write` producer.
 
-No handler evaluator, continuation object, VM instruction, bytecode version,
-runtime Fault mapping, differential fixture, diagnostic allocation, or
-placeholder G2 API was added. Accepted DEC-0088 and the bounded
-`EFF-2104-REJECTION-GATE` child add only a negative CLI compilation fixture
-proving unresolved handlers are rejected before checked snapshot publication
-or execution.
+Clock/Random clauses remain checked but dormant until separate source/Core
+producer authority exists. Task/Actor crossings, dynamic/user operations,
+Fault catching, rollback, and Stable behavior remain outside EFF-2104.
 
 ## Normative traceability
 
 - The G2 execution package is non-normative; its interpreter-first order and
   differential list do not authorize handler execution semantics or a VM ABI.
-- EFF-2101 and EFF-2102 and the bounded EFF-2103 children have accepted model
-  authority, but no source handler has yet become checked Typed Core. Without
-  an accepted runtime/ABI contract there is no valid handler input for either
-  backend.
-- `docs/SEMANTICS.md` and DEC-0010 keep Seed evaluation on checked
-  `ProgramSnapshot` data and define current State/Capability behavior, but do
-  not define handler dispatch, continuation lifetime, or residual effects.
-- DEC-0013 defines current main/runtime failure classes and exit behavior;
-  RFC-0020 defines VM host cancellation only. Neither defines handler Faults,
-  operation effects, or a new bytecode instruction.
-- `GAP-EFFECT-HANDLER-001` is resolved for the Experimental model by RFC-0006,
-  while matching execution, resumption runtime, and differential evidence
-  remain open. `GAP-EFFECT-STATE-MASKING-001` is resolved by the accepted
-  visible-State rule, but runtime State interaction remains unimplemented.
-- Accepted DEC-0088 authorizes only the existing `L-EFFECT-0004` rejection
-  through the shared CLI compiler; it does not authorize handler execution.
+- EFF-2101 through EFF-2103 provide accepted model, solver, source, and checked
+  Core authority. DEC-0260 supplies exact operation/binding/type/effect/Audit
+  lowering and DEC-0261 supplies the previously missing runtime/ABI contract.
+- `docs/SEMANTICS.md`, DEC-0010, and DEC-0261 keep evaluation on checked
+  `ProgramSnapshot` data and jointly define current Handler, State, Capability,
+  continuation, Fault, and cancellation composition.
+- DEC-0013 and RFC-0020 retain their existing runtime-failure and host-control
+  contracts; DEC-0261 composes handlers with them without making Fault or
+  cancellation catchable Effects.
+- `GAP-EFFECT-HANDLER-001` is resolved for the Experimental model by RFC-0006
+  and DEC-0261; execution and differential implementation evidence remains to
+  be produced. `GAP-EFFECT-STATE-MASKING-001` is resolved by the accepted
+  visible-State rule, while its runtime evidence remains to be implemented.
+- Accepted DEC-0088 remains historical rejection evidence for unchecked input;
+  DEC-0261 never weakens the no-unchecked-AST execution boundary.
 
 ## Current implementation evidence
 
@@ -56,31 +51,30 @@ or execution.
   diagnostic serialization; it has no checked snapshot, runtime, bytecode, VM,
   Fault, cancellation, or differential behavior.
 
-## Required authority before implementation
+## Accepted implementation contract
 
-An Accepted RFC or decision must define, at minimum:
+Accepted DEC-0261 defines:
 
-1. operation dispatch and handler-stack semantics, continuation capture and
-   lifetime, resume linearity/multiplicity, tail/resumption recursion, nested
-   handlers, propagation, and unhandled-effect behavior;
-2. the checked Typed Core contract, residual Effect Row/result representation,
-   State/Capability/aliasing rules, mutable-State and Fault interaction,
-   cancellation and cleanup semantics, and source-span/provenance mapping;
+1. exact current operation dispatch and handler-stack semantics, delimited
+   continuation capture/lifetime, Once/Many invocation, deep nested handlers,
+   propagation, and the existing unmatched Console host boundary;
+2. the checked Typed Core contract, State/Capability/Cell identity rules,
+   mutable-State and Fault interaction, host cancellation without cleanup or
+   rollback, and source-span/provenance mapping;
 3. interpreter reference semantics and VM lowering/ABI: instruction/table
    encoding, bytecode/schema versioning, verifier rules, resource limits,
    deterministic ordering, malformed input rejection, and profile boundaries;
-4. equivalence relation for interpreter versus VM results, residual rows,
-   Fault categories, cancellation, committed external effects, diagnostics,
-   Semantic IDs, Audit Source, and migration; and
-5. executable positive/negative/migration/differential fixtures for single and
-   nested handlers, propagation, resume, handler Faults, mutable State,
-   cancellation, missing/unhandled operations, malformed bytecode, resource
-   limits, Unicode/CRLF/BOM spans, deterministic output, and no unchecked-AST
-   execution.
+4. equivalence for interpreter versus VM results, host events, resume counts,
+   Fault categories, cancellation, committed effects/mutations, source spans,
+   Program IDs, and canonical bytecode; and
+5. executable positive, negative, malformed, resource, cancellation, and
+   differential fixtures for direct/nested/transitive handlers, resume, Fault,
+   mutable State, Unicode/CRLF/BOM spans, deterministic output, and the
+   no-unchecked-AST boundary.
 
-Until the runtime and VM decisions are Accepted, a runtime could resume with
-the wrong continuation, duplicate or lose effects, diverge between interpreter
-and VM, or execute handler data that was never checked.
+Implementation must now follow those accepted rules exactly and publish no
+partial public execution claim before interpreter, 1.3 verifier/VM, malformed
+input, cancellation/resource, and differential evidence all pass.
 
 ## Evidence and compatibility
 
@@ -91,14 +85,14 @@ This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and `crates/ling-eval`, `crates/ling-bytecode`, and `crates/ling-vm`.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+The authority milestone changes specifications and plans `ling.bytecode/1.3`;
+it does not itself claim an implemented evaluator, writer, reader, verifier, or
+VM. Current code continues to reject handler execution until implementation
+evidence is complete.
 
 ## Intentionally deferred
 
-The bounded rejection-gate child is complete under DEC-0088. Public
-`EFF-2104` can begin after the accepted EFF-2101 through EFF-2103 model slices
-and explicit bytecode/VM authority. The future
-implementation must use checked Typed Core only, establish the interpreter as
-the reference, version and verify any VM encoding, and publish differential
-evidence before exposing handler execution.
+The bounded rejection-gate child remains complete under DEC-0088. EFF-2104 may
+now implement only DEC-0261's checked interpreter and verified bytecode/VM
+slice. Clock/Random producers, Task/Actor lifecycle, Replay, Remote, Native,
+GPU, FFI, migrations, and Stable compatibility remain deferred.

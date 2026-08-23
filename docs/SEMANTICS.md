@@ -1145,8 +1145,14 @@ Random.next         : Int -> Int     resume Many   handles Random
   input、eliminated、residual rows、operation、resume mode/use 和原始 UTF-8 byte span。
   不含 Handler 的模型继续输出逐字节兼容的 `ling.audit/0.1`；两版 parser 均为隔离的
   data-only reader，不能进入 evaluator。
-- 解释器、bytecode、VM 与 Task/Actor 跨越仍未授权，并在各自既有执行/lowering
-  边界结构化拒绝；Semantic Graph `ling.semantic/0.1` 不新增 Handler 专用 wire 字段。
+- Accepted DEC-0261 规定当前可执行 producer `Console.write` 的 deep lexical Handler
+  语义：最近的匹配 Handler 截获 operation，clause 在该 Handler 外执行，`resume` 从
+  operation 后恢复并重新安装该 Handler；`Once` 在运行时最多调用一次，已提交的 State/
+  host Effect 不回滚，Fault 与 host cancellation 不可被 Handler 捕获；
+- 参考解释器使用显式 continuation frame，VM 使用 verifier-gated `ling.bytecode/1.3`
+  `Handle` 指令与私有 continuation value。Clock/Random clause 在 producer 获得独立
+  Accepted authority 前不会 dispatch；Task/Actor 跨越仍未授权。Semantic Graph
+  `ling.semantic/0.1` 不新增 Handler 专用 wire 字段。
 
 `L-EFFECT-0005` 报告 operation/arity/resume contract 错误并保留原始 UTF-8 span；
 任何投影都不得把路径、分配、线程、时间或 debug 输出作为语义事实。

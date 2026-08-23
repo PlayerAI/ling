@@ -759,10 +759,16 @@ handle body with
 参数、返回类型、resume cardinality、残留 Effect、Capability 分离和 canonical
 `HandlerCore` 规则见 `SEMANTICS.md` §15.7、RFC-0006 与 DEC-0260。
 
-此阶段不执行 Handler。成功检查的 Handler 使用现有 Semantic Graph expression 身份，
-并由 `ling.audit/0.2` 显式投影 input/eliminated/residual Effect、operation、resume 规则和
-原始 byte span；普通程序仍输出 `ling.audit/0.1`。解释器、bytecode、VM 与 Task/Actor
-边界必须等待各自 Accepted authority。
+Accepted DEC-0261 定义当前 `Console.write` producer 的 Experimental deep lexical
+执行：最近的匹配 Handler 截获 operation；clause 在该 Handler 外运行；`resume` 从
+operation 后继续并在 continuation 中重新安装该 Handler。`Once` continuation 动态最多
+调用一次，State、已提交 host Effect 和 Fault 不回滚，host cancellation 不可捕获。
+解释器是参考语义，Handler bytecode 使用 verifier-gated `ling.bytecode/1.3`；Clock/
+Random 仅有 checked clause contract，在独立 producer authority 前不可执行。
+
+成功检查的 Handler 使用现有 Semantic Graph expression 身份，并由 `ling.audit/0.2`
+显式投影 input/eliminated/residual Effect、operation、resume 规则和原始 byte span；
+普通程序仍输出 `ling.audit/0.1`。Task/Actor 边界仍需各自 Accepted authority。
 
 ---
 
