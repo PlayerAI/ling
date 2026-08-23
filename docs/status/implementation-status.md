@@ -5,7 +5,7 @@
 
 - Registry schema: `2`
 - Feature schema: `1`
-- Updated: `2026-08-23`
+- Updated: `2026-08-24`
 - Feature release: `v0.0.1`
 - Baseline release: `v0.0.1`
 - Baseline commit: `639790f4c609d137932d8432d9c5be681aa3e3c1`
@@ -282,7 +282,7 @@
 | `LSP-2404-CHECKED-SOURCE-FIXTURES` | Internal checked-token source fixture corpus | `G1` | `S` | `Done` | `LSP-2403-SNAPSHOT-IDENTITY` | `cee068af008cbd1e0327799a418078be850db754` |
 | `LSP-2501` | LSP request snapshot | `G1` | `L` | `Done` | `INC-1401`, `INC-1402`, `LSP-2103`, `LSP-2104` | `e5434f632963d622834d90168980c9524414d12b` |
 | `LSP-2501-SNAPSHOT` | Internal immutable LSP request snapshot capture | `G1` | `S` | `Done` | `INC-1402`, `LSP-2102-NEGOTIATION`, `LSP-2103-OVERLAY` | `64eb8e858f87bc4f5896bbb8ac00f53afc48c97d` |
-| `LSP-2502` | LSP request cancellation | `G1` | `L` | `BlockedSpec` | `INC-1401`, `LSP-2501` | `` |
+| `LSP-2502` | LSP request cancellation | `G1` | `L` | `Done` | `INC-1401`, `LSP-2501` | `9d6edd7b2a6fbf751afffaae46b249f0ee6e52e4` |
 | `LSP-2502-CANCELLATION` | Internal cooperative LSP cancellation token | `G1` | `S` | `Done` | `INC-1401`, `LSP-2501-SNAPSHOT` | `132fcc9073bebf2a5e49716bc61048248cc4305a` |
 | `LSP-2503` | LSP debounce and priority scheduling | `G1` | `L` | `BlockedSpec` | `LSP-2103`, `LSP-2104`, `LSP-2202`, `LSP-2501`, `LSP-2502` | `` |
 | `LSP-2503-SCHEDULER` | Internal deterministic LSP work ordering | `G1` | `S` | `Done` | `LSP-2501-SNAPSHOT`, `LSP-2502-CANCELLATION` | `bca5b93faeaf582c00cdd0d39b52fb2f741c9ccd` |

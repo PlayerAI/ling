@@ -1,6 +1,6 @@
 schema_version = 2
 feature_schema_version = 1
-updated = "2026-08-23"
+updated = "2026-08-24"
 authority = "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md"
 plan_root = "docs/ling_execution_plan"
 recommended_plan_root = "docs/execution"
@@ -8388,7 +8388,7 @@ notes = [
 [[task]]
 id = "LSP-2502"
 title = "LSP request cancellation"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -8400,33 +8400,55 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/decisions/0019-incremental-query-boundary.md",
+  "docs/decisions/0031-lsp-internal-cancellation-boundary.md",
   "docs/RFC-0020.md",
+  "docs/RFC-0036.md",
+  "docs/RFC-0040.md",
+  "docs/RFC-0045.md",
+  "docs/RFC-0048.md",
+  "docs/RFC-0049.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/lib.rs",
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/src/request_cancellation.rs",
+  "crates/ling-lsp/src/completion.rs",
+  "crates/ling-lsp/src/completion_resolve.rs",
+  "crates/ling-lsp/src/rename.rs",
+  "crates/ling-lsp/src/semantic_tokens.rs",
+  "crates/ling-lsp/src/workspace_symbols.rs",
+  "crates/ling-lsp/tests/cancellation.rs",
+  "crates/ling-lsp/tests/completion.rs",
+  "crates/ling-lsp/tests/rename.rs",
+  "crates/ling-types/src/lib.rs",
+  "crates/ling-types/src/solver.rs",
+  "docs/RFC-0049.md",
   "docs/status/LSP-2502-AUTHORITY-AUDIT.md",
   "docs/status/LSP-2502-CANCELLATION-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
+  "tests/protocols/lsp-request-cancellation/README.md",
+  "tests/protocols/lsp-request-cancellation/fixtures/v1.json",
 ]
 acceptance = [
-  "The audit records the missing public JSON-RPC cancellation method, request-ID lifecycle, propagation, partial-result suppression, publication precedence, cleanup, and protocol lifecycle contracts.",
-  "Accepted DEC-0031 and child LSP-2502-CANCELLATION provide only an internal cooperative token; the parent remains blocked for public/compiler behavior.",
-  "The audit distinguishes DEC-0019 internal cancellation and RFC-0020 VM cancellation from the missing compiler/LSP request protocol.",
-  "No JSON-RPC cancellation handler, public request token, compiler cancellation API, partial-result suppression mechanism, diagnostic allocation, protocol schema, or placeholder server is added while the authority is absent.",
-  "The future implementation must propagate cancellation cooperatively, publish no partial checked result or Workspace Edit, keep VM cancellation separate, and make state transitions deterministic.",
+  "Accepted RFC-0049 defines exact string/number request identity, standard $/cancelRequest notification handling, -32800 cancellation responses, duplicate-live rejection, late-notification no-op behavior, cleanup, and Preview discovery.",
+  "The stdio reader progresses independently from one ordered mutable executor, registers requests before dispatch, and propagates clone-shared cooperative tokens through workspace symbols, rename, completion, completion resolve, semantic tokens, ling-db, type checking, and Trait obligation solving.",
+  "Cancellation is checked before final success and mutable publication; cancelled analysis publishes no partial Typed Core cache entry, Workspace Edit, completion resolve handle, workspace-symbol cache, or semantic-token history.",
+  "Executable fixtures and tests cover live wire cancellation, response-free notifications, exact request IDs, duplicate/unknown/late cancellation, safe ID reuse, malformed and request-form messages, independent subsequent requests, and additive initialize discovery.",
+  "The complete locked offline workspace tests, strict Clippy, governance, LSP, support, status, RC0, traceability, formatting, diff, and execution-plan checksum gates pass without changing Ling semantics, diagnostics, Semantic IDs, runtime behavior, or Unicode 17.0.0.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "9d6edd7b2a6fbf751afffaae46b249f0ee6e52e4"
+completion_commit = "9d6edd7b2a6fbf751afffaae46b249f0ee6e52e4"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "LSP-2502 remains BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2501, and DEC-0019's explicit separation of compiler/LSP cancellation; DEC-0031 authorizes only the internal child and RFC-0020 applies only to VM host control.",
-  "ling-lsp now provides an internal clone-shared cancellation token, but no LSP transport, request scheduler, compiler cancellation result, partial-result cache, Workspace Edit publisher, or cancellation protocol inventory entry exists.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "Implementation commit 9d6edd7b2a6fbf751afffaae46b249f0ee6e52e4 closes the LSP-2502 boundary under Accepted RFC-0049 and registers ling.lsp.request-cancellation/0.1 as an implemented Preview protocol.",
+  "The request registry is session-local and identity-safe; cancellation state, timing, thread identity, host paths, source text, and allocation details do not enter compiler caches or public identities.",
+  "Deadlines, quotas, priority/fairness, progress, server-initiated cancellation, parallel compiler mutation, non-stdio transports, Stable lifecycle, and general Semantic Transactions remain intentionally deferred.",
 ]
 
 [[task]]
