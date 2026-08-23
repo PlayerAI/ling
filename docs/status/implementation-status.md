@@ -146,6 +146,7 @@
 | `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `BlockedSpec` | `EFF-2104` | `` |
 | `EFF-2105-MODEL-PROPERTIES` | Effect model deterministic property corpus | `G2` | `S` | `Done` | `EFF-2102`, `EFF-2103-CORE` | `f40c69f0311d3bd970e9613772ddf7135d17772c` |
 | `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |
+| `EVD-5801-OBSERVATION` | Internal Evidence Bundle Schema boundary evidence | `G5` | `S` | `Done` | `TIM-5703-OBSERVATION` | `2c27d97a4de390d49eba648830883bf50963f668` |
 | `EVD-5802` | Independent Verifier | `G5` | `L` | `BlockedSpec` | `EVD-5801` | `` |
 | `EVD-5803` | Reproducible Build Binding | `G5` | `M` | `BlockedSpec` | `EVD-5802` | `` |
 | `EVD-5804` | AI Provenance | `G5` | `M` | `BlockedSpec` | `EVD-5803` | `` |
