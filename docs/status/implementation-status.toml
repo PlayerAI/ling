@@ -7746,7 +7746,7 @@ notes = [
 [[task]]
 id = "IDE-2311"
 title = "IDE workspace symbols"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -7758,36 +7758,58 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/RFC-0002.md",
+  "docs/RFC-0004.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0022-disposable-persistent-query-cache.md",
   "docs/RFC-0005.md",
   "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/RFC-0023.md",
+  "docs/RFC-0029.md",
+  "docs/RFC-0030.md",
+  "docs/RFC-0036.md",
+  "docs/RFC-0045.md",
+  "docs/decisions/0029-lsp-position-encoding-projection.md",
+  "docs/decisions/0031-lsp-internal-cancellation-boundary.md",
+  "docs/decisions/0071-lsp-workspace-state-snapshot.md",
+  "docs/decisions/0073-ide-resolved-definition-index.md",
+  "docs/decisions/0082-ide-workspace-symbol-lookups.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-lsp/src/lib.rs",
+  "crates/ling-lsp/src/workspace_symbols.rs",
+  "crates/ling-lsp/tests/diagnostic_transcripts.rs",
+  "crates/ling-lsp/tests/workspace_symbols.rs",
+  "docs/RFC-0045.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
   "docs/status/IDE-2311-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2311-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
+  "tests/fixtures/lsp-diagnostics-v1/manifest.json",
+  "tests/protocols/lsp-workspace-symbol/README.md",
 ]
 acceptance = [
-  "The audit records the missing workspace scope/package selection, symbol taxonomy/location, index/invalidation, position/version, limits/cancellation, Semantic ID, and protocol lifecycle contracts.",
-  "The audit covers package/module context, exact/prefix/fuzzy matching, duplicate/overload ordering, cross-package/generated/builtin symbols, Unicode/CRLF/BOM, revisions, stale results, limits, cancellation, deterministic truncation, and required fixtures.",
-  "No workspace-symbol handler, incremental index, query API, result-limit or cancellation protocol, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must use checked graph data, preserve source-span/ID truth, invalidate deterministically, enforce limits, and label experimental fields.",
+  "Accepted RFC-0045 defines and the server advertises the exact Public Preview ling.lsp.workspace-symbol/0.1 provider and Experimental discovery object.",
+  "Ready-state workspace/symbol captures and revalidates one complete immutable snapshot, searches resolver-owned definitions from tracked writable non-temporary workspace sources, and emits exact standard SymbolInformation without internal identities or host paths.",
+  "Empty, exact, and case-sensitive prefix matching, five resolver-kind mappings, exact-first total ordering, deterministic 256-result truncation, module/URI context, and original UTF-8/16/32 projection are executable across Unicode, BOM, CRLF, disconnected modules, dependency and temporary exclusions, and insertion orders.",
+  "The one-entry complete-snapshot cache reuses equal snapshots, invalidates on document changes, and publishes only after bounded fresh success; malformed input, cancellation, compiler failure, lifecycle failures, and recovery are atomic and use fixed bilingual JSON-RPC errors.",
+  "Locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, diff, and all 27 execution-plan checksum gates pass before status binding.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "58a425fe42e5112071ddeda922e29cbf2f974148"
+completion_commit = "58a425fe42e5112071ddeda922e29cbf2f974148"
+integration_state = "committed"
+completed = "2026-08-24"
 notes = [
-  "IDE-2311 is BlockedSpec by GAP-INCREMENTAL-CACHE-001, GAP-SEMANTIC-HASH-LIFECYCLE-001, GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2101/LSP-2102, and IDE-2301; RFC-0002 package identity is library authority but no workspace-symbol wire contract exists.",
-  "Current semantic/project/source code exposes deterministic graph/package/revision inputs, while broader dependent-query invalidation, workspace scope, result schema, cancellation, and stale-query behavior remain unspecified.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, cache behavior, runtime, or Unicode 17.0.0 behavior.",
+  "Authority commit 7da4441179da8427569e268ed17bfd01d66ce359 accepts RFC-0045; implementation commit 58a425fe42e5112071ddeda922e29cbf2f974148 adds the bounded vertical slice and evidence.",
+  "Dependency/generated/builtin/Prelude results, filesystem discovery, fuzzy/normalized/module matching, persistent or concurrent indexes, partial results, resolve, work-done progress, stdio cancellation, Semantic Transactions, and Stable behavior remain deferred and unclaimed.",
+  "No diagnostic allocation, schema, Semantic ID/canonical-byte, Ling syntax/semantics, Typed Core evaluation, interpreter/VM/bytecode/ABI/package, filesystem/network, source-span truth, or Unicode 17.0.0 table changes.",
 ]
 
 [[task]]
