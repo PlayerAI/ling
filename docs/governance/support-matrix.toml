@@ -392,11 +392,25 @@ stability = "Internal"
 implemented = true
 
 [[protocol]]
+id = "PROTO-SEMANTIC-QUERY"
+visibility = "Public"
+version = "ling.semantic-query/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
 id = "PROTO-SEMANTIC-TRANSACTION"
-visibility = "Planned public"
-version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+version = "ling.semantic-transaction/0.1"
+stability = "Preview"
+implemented = true
+
+[[protocol]]
+id = "PROTO-SEMANTIC-TRANSACTION-RESULT"
+visibility = "Public"
+version = "ling.semantic-transaction-result/0.1"
+stability = "Preview"
+implemented = true
 
 [[protocol]]
 id = "PROTO-PACKAGE-MANIFEST"

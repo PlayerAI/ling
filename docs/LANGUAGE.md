@@ -1321,12 +1321,11 @@ ling build --manifest-path ./ling.toml --locked --offline \
 The `native` and `critical` build forms in the broader draft catalog remain
 future design until their own Accepted profile/backend authority exists.
 
-Accepted DEC-0253 fixes the current bounded command model: the implemented
-roots are `run`, `check`, `semantic`, `audit`, `test`, `build`, `fmt`, `init`,
-`repl`, and `lsp`, with hierarchical `project check`. They share one exact
-parser/dispatcher and reuse the accepted checked service boundaries. Draft
-commands such as `explain`, `query`, and `patch` remain unimplemented and are
-not advertised.
+Accepted DEC-0253 fixes the bounded command model, and RFC-0027 extends its
+implemented roots with `query` and `patch`. All roots share one exact
+parser/dispatcher and reuse accepted checked service boundaries. Draft commands
+such as `explain`, `replay`, and `evidence` remain unimplemented and are not
+advertised.
 
 Accepted DEC-0255 fixes the current `ling init` boundary: it creates a missing
 destination with `.gitignore`, `ling.toml`, `src/Main.ling`, and `ling.lock`
@@ -1339,6 +1338,21 @@ file or directory selects deterministic standalone-program tests; an explicit
 `--manifest-path ... --locked --offline` selects one isolated root-project
 entry smoke test. No source test declaration, annotation, hidden convention,
 workspace selection, or dependency test execution is implied.
+
+Accepted RFC-0027 fixes the current bounded Semantic Query and Transaction
+proposal forms:
+
+```bash
+ling query --symbol 人物 --format json ./Main.ling
+ling patch --format json ./transaction.json ./Main.ling
+```
+
+Both commands accept only one import-free file program. Query performs exact
+Unicode-17.0.0 NFC lookup over checked user definitions. Patch validates one
+full-source replacement in memory against the exact base Program ID, authorized
+target IDs, and definition/type/Effect/Capability preservation. It reports a
+proposal with `committed: false` and never writes source or claims
+`Graph.Commit` or an LSP `WorkspaceEdit`.
 
 Accepted RFC-0026 adds bounded editor formatting to `ling lsp --stdio`:
 `textDocument/formatting` consumes the current open writable overlay and returns

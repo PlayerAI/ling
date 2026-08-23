@@ -6650,3 +6650,29 @@ unresolved_alternatives = [
   "Test declarations, manifest targets, workspaces, filters, assertions, snapshots, property tests, parallelism, cancellation, coverage, benchmarks, and Stable compatibility remain separately governed.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0027"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0027.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Verify exact NFC user-definition queries, canonical ordering, empty results, malformed input, one-module/no-import scope, JSON/human rendering, process determinism, and nonmutation.",
+  "Verify valid body-only proposals, exact stale-base rejection, target authorization, checked in-memory candidate compilation, all four preserve constraints, deterministic diff reports, and source nonmutation.",
+  "Validate semantic-query, transaction-request, and transaction-result schemas with positive, negative, and canonical fixtures and register every protocol/version marker.",
+  "Run workspace, CI, governance, support, status, RC0, traceability, Clippy, formatting, offline, and deterministic-diff gates.",
+]
+compatibility_impact = [
+  "Adds two Preview CLI roots, one option, three versioned JSON protocols, and registered transaction diagnostics while preserving every existing command and exit meaning.",
+  "Consumes existing checked Semantic Graph and Program IDs without changing Ling source semantics, canonical identity bytes, spans, runtime, bytecode, VM, ABI, or Unicode 17.0.0.",
+]
+unresolved_alternatives = [
+  "Projects, workspaces, general graph queries, references, pagination, partial edits, rename, Graph.Commit, atomic disk publication, LSP WorkspaceEdit, delegated authority, tests, benchmarks, proofs, ABI preservation, migration, and Stable compatibility remain deferred.",
+]
+superseded_by = ""

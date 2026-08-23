@@ -68,3 +68,10 @@ later Accepted authority.
 
 - Supersedes: `None`
 - Superseded by: `None`
+
+## Subsequent accepted authority
+
+RFC-0027 subsequently implements and advertises `query` and `patch`. The
+fixture therefore continues to reject only still-unimplemented plan names and
+the stale `zero` / `.zero` spellings; this historical decision does not
+override the later Accepted command authority.

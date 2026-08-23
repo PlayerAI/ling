@@ -24,6 +24,8 @@ fn help_aliases_have_the_same_truthful_surface() {
         "check",
         "semantic",
         "audit",
+        "query",
+        "patch",
         "repl",
         "fmt",
         "init",
@@ -35,8 +37,7 @@ fn help_aliases_have_the_same_truthful_surface() {
         assert!(help.contains(command), "help is missing `{command}`");
     }
     for stale in [
-        "query", "patch", "replay", "explain", "evidence", "version", "support", "features",
-        "zero", ".zero",
+        "replay", "explain", "evidence", "version", "support", "features", "zero", ".zero",
     ] {
         assert!(
             !help.contains(&format!("  ling {stale}")),
@@ -48,7 +49,7 @@ fn help_aliases_have_the_same_truthful_surface() {
 #[test]
 fn unknown_future_command_is_rejected_with_usage_on_stderr() {
     for command in [
-        "query", "patch", "replay", "explain", "evidence", "version", "support", "features",
+        "replay", "explain", "evidence", "version", "support", "features",
     ] {
         let output = run(&[command]);
 

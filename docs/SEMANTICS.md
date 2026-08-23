@@ -1723,6 +1723,15 @@ Target.Build
 
 Proposal 与 Commit 应可分离。
 
+Accepted RFC-0027 defines the first bounded proposal-only realization of this
+section. `ling patch` checks one import-free file snapshot, exact
+`base_program_id`, authorized target IDs, a checked in-memory full-source
+replacement, and definition/type/Effect/Capability preservation. Its result is
+always `committed: false`; it cannot mutate source or represent `Graph.Commit`.
+`ling query` is the corresponding exact-NFC, checked-graph, read-only surface.
+Project transactions, partial edits, tests/proofs, atomic publication, and LSP
+projection remain outside that accepted slice.
+
 ---
 
 ## 26. 诊断语义

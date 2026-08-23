@@ -95,7 +95,9 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | `PROTO-REPLAY` | `Planned public` | — | `Future` | no |
 | `PROTO-SEMANTIC-GRAPH-JSON` | `Public` | `ling.semantic/0.1` | `Experimental` | yes |
 | `PROTO-SEMANTIC-ID` | `Public` | `experimental:blake3:` | `Experimental` | yes |
-| `PROTO-SEMANTIC-TRANSACTION` | `Planned public` | — | `Future` | no |
+| `PROTO-SEMANTIC-QUERY` | `Public` | `ling.semantic-query/0.1` | `Preview` | yes |
+| `PROTO-SEMANTIC-TRANSACTION` | `Public` | `ling.semantic-transaction/0.1` | `Preview` | yes |
+| `PROTO-SEMANTIC-TRANSACTION-RESULT` | `Public` | `ling.semantic-transaction-result/0.1` | `Preview` | yes |
 | `PROTO-VM-CONTROL` | `Public` | `ling.vm.control/0.1` | `Experimental` | yes |
 
 ## Explicitly unsupported

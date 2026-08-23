@@ -103,3 +103,9 @@ surfaces; and Stable command compatibility remain separately governed.
 
 - Supersedes: `None`
 - Superseded by: `None`
+
+## Subsequent accepted authority
+
+RFC-0027 extends this exact catalog with implemented `query` and `patch` roots.
+They use the same parser/dispatcher and checked compiler services; no other
+planned root is promoted by that extension.

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:semantic-transaction:0.1",
+  "title": "Ling Semantic Transaction proposal request 0.1",
+  "type": "object",
+  "required": ["schema", "base_program_id", "target_ids", "operation", "preserve", "provenance"],
+  "properties": {
+    "schema": { "const": "ling.semantic-transaction/0.1" },
+    "base_program_id": { "type": "string", "minLength": 1 },
+    "target_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "operation": {
+      "type": "object",
+      "required": ["kind", "content"],
+      "properties": {
+        "kind": { "const": "replace_source" },
+        "content": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "preserve": {
+      "const": ["definition_set", "types", "effects", "capabilities"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["actor", "reason"],
+      "properties": {
+        "actor": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

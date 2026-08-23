@@ -17,10 +17,12 @@ LEX = 12
 MUT = 1
 NAME = 9
 PROJECT = 19
+QUERY = 1
 RUNTIME = 1
 SNAPSHOT = 1
 SYNTAX = 11
 TEST = 1
+TRANSACTION = 3
 TYPE = 11
 
 [[code]]
@@ -432,6 +434,12 @@ retired = false
 facts = ["reason:string:required"]
 
 [[code]]
+id = "L-QUERY-0001"
+core_sha256 = "sha256:d0ccd8637a5fc61b1f11f13f75b9c2c5b2c1982f546595db14f1c57b22512e08"
+retired = false
+facts = ["detail:string:required"]
+
+[[code]]
 id = "L-RUNTIME-0001"
 core_sha256 = "sha256:8cd7d078fb4b96c21dab458e16f351ca42211ff0a746997fa15575ffd6b2b493"
 retired = false
@@ -496,6 +504,24 @@ id = "L-TEST-0001"
 core_sha256 = "sha256:a3bae43c2b21aa0eeb82a164aa2ae2fdedd3c8a95608803a5500d9da30108ad0"
 retired = false
 facts = ["root:string:required"]
+
+[[code]]
+id = "L-TRANSACTION-0001"
+core_sha256 = "sha256:a4afc9165a7517cc177aca50b656a8aedbb7ff1dcc4b1388c5cf328da8d9150b"
+retired = false
+facts = ["detail:string:required"]
+
+[[code]]
+id = "L-TRANSACTION-0002"
+core_sha256 = "sha256:3f8fc9fb485f0b14eef7197e95e516698042926a43c1cc474f80ea522bfffe6c"
+retired = false
+facts = ["expected:string:required", "found:string:required"]
+
+[[code]]
+id = "L-TRANSACTION-0003"
+core_sha256 = "sha256:b0d14046c564f2aede2f55eb39f63417cd633aa3aa345e480ef8d2ce5212c4c5"
+retired = false
+facts = ["constraint:string:required"]
 
 [[code]]
 id = "L-TYPE-0001"

@@ -938,6 +938,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0027"
+title = "Bounded semantic query and patch proposal"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0027.md"
+covers = ["ling semantic query exact symbol lookup", "ling.semantic-query/0.1", "ling.semantic-transaction/0.1 proposal validation", "ling.semantic-transaction-result/0.1"]
+depends_on = ["DEC-0012", "DEC-0253", "DEC-0254", "SEMANTICS", "LANGUAGE"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

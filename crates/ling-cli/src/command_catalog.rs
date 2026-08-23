@@ -10,6 +10,8 @@ pub(crate) enum Command {
     Repl,
     Semantic,
     Audit,
+    Query,
+    Patch,
     Format,
     Init,
     Test,
@@ -27,6 +29,8 @@ impl Command {
             Self::Repl,
             Self::Semantic,
             Self::Audit,
+            Self::Query,
+            Self::Patch,
             Self::Format,
             Self::Init,
             Self::Test,
@@ -43,6 +47,8 @@ impl Command {
             "repl" => Some(Self::Repl),
             "semantic" => Some(Self::Semantic),
             "audit" => Some(Self::Audit),
+            "query" => Some(Self::Query),
+            "patch" => Some(Self::Patch),
             "fmt" => Some(Self::Format),
             "init" => Some(Self::Init),
             "test" => Some(Self::Test),
@@ -59,6 +65,8 @@ impl Command {
             Self::Repl => "repl",
             Self::Semantic => "semantic",
             Self::Audit => "audit",
+            Self::Query => "query",
+            Self::Patch => "patch",
             Self::Format => "fmt",
             Self::Init => "init",
             Self::Test => "test",
@@ -87,6 +95,8 @@ mod tests {
             ("repl", Command::Repl),
             ("semantic", Command::Semantic),
             ("audit", Command::Audit),
+            ("query", Command::Query),
+            ("patch", Command::Patch),
             ("fmt", Command::Format),
             ("init", Command::Init),
             ("test", Command::Test),
@@ -100,12 +110,12 @@ mod tests {
         assert_eq!(
             roots.map(|(name, _)| name),
             [
-                "run", "check", "repl", "semantic", "audit", "fmt", "init", "test", "build", "lsp",
+                "run", "check", "repl", "semantic", "audit", "query", "patch", "fmt", "init",
+                "test", "build", "lsp",
             ]
         );
         for planned_only in [
-            "project", "query", "patch", "replay", "explain", "evidence", "version", "support",
-            "migrate",
+            "project", "replay", "explain", "evidence", "version", "support", "migrate",
         ] {
             assert_eq!(
                 Command::parse(planned_only),
@@ -119,7 +129,7 @@ mod tests {
     #[test]
     fn catalog_contains_each_implemented_command_once() {
         let commands = Command::all();
-        assert_eq!(commands.len(), 11);
+        assert_eq!(commands.len(), 13);
         assert_eq!(
             commands
                 .iter()
@@ -131,6 +141,8 @@ mod tests {
                 "repl",
                 "semantic",
                 "audit",
+                "query",
+                "patch",
                 "fmt",
                 "init",
                 "test",

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ling:schema:semantic-transaction-result:0.1",
+  "title": "Ling Semantic Transaction proposal result 0.1",
+  "type": "object",
+  "required": ["schema", "transaction_schema", "status", "committed", "base_program_id", "candidate_program_id", "target_ids", "changed_body_ids", "preserved", "provenance"],
+  "properties": {
+    "schema": { "const": "ling.semantic-transaction-result/0.1" },
+    "transaction_schema": { "const": "ling.semantic-transaction/0.1" },
+    "status": { "const": "validated" },
+    "committed": { "const": false },
+    "base_program_id": { "type": "string", "minLength": 1 },
+    "candidate_program_id": { "type": "string", "minLength": 1 },
+    "target_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "changed_body_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "preserved": { "const": ["definition_set", "types", "effects", "capabilities"] },
+    "provenance": {
+      "type": "object",
+      "required": ["actor", "reason"],
+      "properties": {
+        "actor": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

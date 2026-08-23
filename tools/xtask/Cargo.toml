@@ -8,6 +8,7 @@ repository.workspace = true
 publish = false
 
 [dependencies]
+ling-cli = { path = "../../crates/ling-cli" }
 ling-db = { path = "../../crates/ling-db" }
 ling-project = { path = "../../crates/ling-project" }
 ling-semantic = { path = "../../crates/ling-semantic" }

@@ -101,7 +101,14 @@ pub mod codes {
     pub const PRIVATE_PROJECT_MODULE_ACCESS: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0017");
     pub const INVALID_PROJECT_LOCK: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0018");
     pub const PROJECT_LOCK_MISMATCH: DiagnosticCode = DiagnosticCode::new("L-PROJECT-0019");
+    pub const INVALID_SEMANTIC_QUERY: DiagnosticCode = DiagnosticCode::new("L-QUERY-0001");
     pub const TEST_NO_CASES: DiagnosticCode = DiagnosticCode::new("L-TEST-0001");
+    pub const INVALID_SEMANTIC_TRANSACTION: DiagnosticCode =
+        DiagnosticCode::new("L-TRANSACTION-0001");
+    pub const STALE_SEMANTIC_TRANSACTION: DiagnosticCode =
+        DiagnosticCode::new("L-TRANSACTION-0002");
+    pub const SEMANTIC_PRESERVE_VIOLATION: DiagnosticCode =
+        DiagnosticCode::new("L-TRANSACTION-0003");
     pub const INVALID_BYTECODE_ENVELOPE: DiagnosticCode = DiagnosticCode::new("L-BYTECODE-0001");
     pub const BYTECODE_RESOURCE_LIMIT_EXCEEDED: DiagnosticCode =
         DiagnosticCode::new("L-BYTECODE-0002");

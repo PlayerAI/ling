@@ -147,7 +147,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `CLI-1703-INIT` | G1/Editor | Offline `ling init` scaffold | M | Done | Accepted DEC-0038; see `crates/ling-cli/src/init.rs`, `schemas/init/0.1/`, and `docs/status/CLI-1703-INIT-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `CLI-1704` | G1/Editor | `test` | L | Done | Accepted DEC-0256 composes DEC-0039 standalone file/directory execution with RFC-0025's locked/offline single project-entry smoke test; test syntax and expanded runners remain deferred |
 | `CLI-1704-FILE` | G1/Editor | Explicit standalone test-file runner Preview | M | Done | Accepted DEC-0039; verified/committed as `72d85d7de77f188b0706acde7a559169d4ac149e`; see `crates/ling-cli/src/test_runner.rs`, `schemas/test/0.1/`, and `docs/status/CLI-1704-TEST-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
-| `CLI-1705` | G1/Editor | `query/patch` | — | BlockedSpec | `03-G1-V0.1-LIVING.md:478`, `docs/status/CLI-1705-AUTHORITY-AUDIT.md` |
+| `CLI-1705` | G1/Editor | `query/patch` | L | Done | Accepted RFC-0027; exact-NFC read-only query plus stale-base/preserve-checked proposal-only patch with `committed: false`; see `crates/ling-cli/src/semantic_commands.rs`, protocol schemas, authority audit, and implementation report |
 | `CLI-1706` | G1/Editor | Shell completion 与 help fixtures | — | BlockedSpec | `03-G1-V0.1-LIVING.md:482`, `docs/status/CLI-1706-AUTHORITY-AUDIT.md` |
 | `CLI-1706-HELP` | G1/Editor | Truthful implemented-command help fixture | S | Done | Accepted DEC-0040; see `crates/ling-cli/tests/help.rs` and `docs/status/CLI-1706-HELP-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `LSP-2101` | G1/Editor | 初始化与生命周期 | S | BlockedSpec | `04-LSP-IMPLEMENTATION.md:137`, `docs/status/LSP-2101-AUTHORITY-AUDIT.md` |

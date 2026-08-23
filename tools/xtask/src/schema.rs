@@ -596,6 +596,7 @@ fn validate_schema_record(
                     ("ling.semantic/0.1", "SemanticGraphV0_1")
                         | ("ling.semantic/0.2", "SemanticGraphV0_2")
                         | ("ling.lock/1", "LockFileV1")
+                        | ("ling.semantic-transaction/0.1", "SemanticTransactionV0_1")
                 ) => {}
         _ => errors.push(format!(
             "GOV-SCHEMA-0011: {} has an unsupported or inconsistent reader declaration",
@@ -1336,6 +1337,11 @@ fn reader_accepts(record: &SchemaRecord, input: &str) -> Result<(), String> {
                 .map(|_| ())
                 .map_err(|error| error.to_string())
         }
+        "SemanticTransactionV0_1" => {
+            ling_cli::semantic_commands::TransactionRequest::parse(input.as_bytes())
+                .map(|_| ())
+                .map_err(|error| format!("{error:?}"))
+        }
         adapter => Err(format!("unsupported reader adapter {adapter}")),
     }
 }
@@ -1701,9 +1707,9 @@ mod tests {
     #[test]
     fn repository_schema_corpus_is_valid_and_current() {
         let summary = validate_all(repository_root()).expect("schema corpus is valid");
-        assert_eq!(summary.schema_count, 8);
-        assert_eq!(summary.valid_fixture_count, 12);
-        assert_eq!(summary.invalid_fixture_count, 25);
+        assert_eq!(summary.schema_count, 11);
+        assert_eq!(summary.valid_fixture_count, 16);
+        assert_eq!(summary.invalid_fixture_count, 31);
         assert_eq!(summary.canonical_fixture_count, 3);
     }
 
@@ -1712,13 +1718,13 @@ mod tests {
         let summary = compatibility(repository_root(), "N-1", "N")
             .expect("first-version compatibility state is valid");
         assert_eq!(summary.verified_edge_count, 0);
-        assert_eq!(summary.no_previous_version_count, 8);
+        assert_eq!(summary.no_previous_version_count, 11);
     }
 
     #[test]
     fn repository_reader_writer_scope_is_exact_and_current_only() {
         let registry = load_registry(repository_root()).expect("registry parses");
-        assert_eq!(registry.schema.len(), 8);
+        assert_eq!(registry.schema.len(), 11);
         assert!(
             registry
                 .schema
@@ -1731,7 +1737,7 @@ mod tests {
                 .iter()
                 .filter(|record| record.reader == "CurrentOnly")
                 .count(),
-            3
+            4
         );
         assert_eq!(
             registry
@@ -1739,7 +1745,7 @@ mod tests {
                 .iter()
                 .filter(|record| record.reader == "None")
                 .count(),
-            5
+            7
         );
         assert!(registry.schema.iter().all(|record| {
             record.compatibility == "NoPreviousVersion"

@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 28 records: 23 current public, 1 internal, 4 Future.
-- Current public stability: 13 Experimental, 10 Preview, 0 Stable.
+- 30 records: 26 current public, 1 internal, 3 Future.
+- Current public stability: 13 Experimental, 13 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -29,6 +29,9 @@
 | `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.2` | `Experimental` | yes | yes | 6 |
 | `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 6 |
+| `PROTO-SEMANTIC-QUERY` | Public | JSON | `ling.semantic-query/0.1` | `Preview` | yes | no | 6 |
+| `PROTO-SEMANTIC-TRANSACTION` | Public | JSON | `ling.semantic-transaction/0.1` | `Preview` | yes | no | 6 |
+| `PROTO-SEMANTIC-TRANSACTION-RESULT` | Public | JSON | `ling.semantic-transaction-result/0.1` | `Preview` | yes | no | 6 |
 | `PROTO-CANONICAL-BYTES` | Public | Canonical identity | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | no | yes | 2 |
 | `PROTO-PACKAGE-IDENTITY` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 9 |
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 4 |
@@ -38,7 +41,6 @@
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.2` | `Experimental` | no | no | 7 |
 | `PROTO-VM-CONTROL` | Public | Runtime control | `ling.vm.control/0.1` | `Experimental` | no | no | 4 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
-| `PROTO-SEMANTIC-TRANSACTION` | Planned public | Transaction | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
 | `PROTO-ABI` | Planned public | ABI | — | `Future` | no | no | 0 |
 | `PROTO-EVIDENCE` | Planned public | Evidence | — | `Future` | no | no | 0 |
@@ -240,6 +242,45 @@
 - Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`schemas/semantic/0.1/valid`](../../schemas/semantic/0.1/valid), [`schemas/semantic/0.1/invalid`](../../schemas/semantic/0.1/invalid), [`schemas/semantic/0.1/canonical`](../../schemas/semantic/0.1/canonical)
 - Notes: GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.; RFC-0022 defines the optional Experimental x-ling-trait-ide witness/member projection; it does not add a core field or an LSP wire method.
 
+### `PROTO-SEMANTIC-QUERY` — Semantic Query response
+
+- Producer: ling query
+- Consumer: CLI users and semantic tooling experiments
+- Reader policy: No public reader is implemented; consumers must validate and gate on the exact 0.1 schema marker.
+- Writer policy: Emit one deterministic path-free exact-NFC definition projection from the checked canonical Semantic Graph.
+- Unknown-field policy: Reject unknown core fields; version 0.1 defines no extension namespace.
+- Migration tool: None; no predecessor exists and incompatible changes require a new version.
+- Authority: `RFC-0027`
+- Sources: [`docs/RFC-0027.md`](../RFC-0027.md), [`crates/ling-cli/src/semantic_commands.rs`](../../crates/ling-cli/src/semantic_commands.rs), [`schemas/registry.toml`](../../schemas/registry.toml)
+- Fixtures: [`crates/ling-cli/src/semantic_commands.rs`](../../crates/ling-cli/src/semantic_commands.rs), [`crates/ling-cli/tests/semantic_commands.rs`](../../crates/ling-cli/tests/semantic_commands.rs), [`tests/protocols/semantic-query/README.md`](../../tests/protocols/semantic-query/README.md), [`schemas/semantic-query/0.1/schema.json`](../../schemas/semantic-query/0.1/schema.json), [`schemas/semantic-query/0.1/valid`](../../schemas/semantic-query/0.1/valid), [`schemas/semantic-query/0.1/invalid`](../../schemas/semantic-query/0.1/invalid)
+- Notes: Exact user-definition lookup only; no project, reference, fuzzy, paginated, or general graph-query behavior is implied.
+
+### `PROTO-SEMANTIC-TRANSACTION` — Semantic Transaction proposal request
+
+- Producer: Semantic tooling clients and repository conformance fixtures
+- Consumer: ling patch exact-version proposal validator
+- Reader policy: Require exact 0.1 schema, fields, canonical target/constraint order, bounds, current Program ID, and checked one-file scope before candidate validation.
+- Writer policy: Writers provide one full-source replacement, explicit sorted target IDs, all four preserve constraints, and bounded provenance; the repository provides no general request writer.
+- Unknown-field policy: Reject every unknown or duplicate core field.
+- Migration tool: None; no predecessor exists and incompatible changes require a new version.
+- Authority: `RFC-0027`, `DEC-0012`
+- Sources: [`docs/RFC-0027.md`](../RFC-0027.md), [`docs/SEMANTICS.md`](../SEMANTICS.md), [`crates/ling-cli/src/semantic_commands.rs`](../../crates/ling-cli/src/semantic_commands.rs), [`schemas/registry.toml`](../../schemas/registry.toml)
+- Fixtures: [`crates/ling-cli/src/semantic_commands.rs`](../../crates/ling-cli/src/semantic_commands.rs), [`crates/ling-cli/tests/semantic_commands.rs`](../../crates/ling-cli/tests/semantic_commands.rs), [`tests/protocols/semantic-query/README.md`](../../tests/protocols/semantic-query/README.md), [`schemas/semantic-transaction/0.1/schema.json`](../../schemas/semantic-transaction/0.1/schema.json), [`schemas/semantic-transaction/0.1/valid`](../../schemas/semantic-transaction/0.1/valid), [`schemas/semantic-transaction/0.1/invalid`](../../schemas/semantic-transaction/0.1/invalid)
+- Notes: This version grants Graph.Read and Graph.Propose only; it cannot write source, emit an edit, or claim Graph.Commit, atomic publication, or LSP WorkspaceEdit.
+
+### `PROTO-SEMANTIC-TRANSACTION-RESULT` — Semantic Transaction proposal result
+
+- Producer: ling patch
+- Consumer: CLI users and semantic tooling experiments
+- Reader policy: No public reader is implemented; consumers must validate and gate on the exact 0.1 schema marker.
+- Writer policy: Emit a deterministic path-free validated/not-committed result after stale, target, checked-candidate, preserve, and authorization checks succeed.
+- Unknown-field policy: Reject unknown core fields; version 0.1 defines no extension namespace.
+- Migration tool: None; no predecessor exists and incompatible changes require a new version.
+- Authority: `RFC-0027`, `DEC-0012`
+- Sources: [`docs/RFC-0027.md`](../RFC-0027.md), [`crates/ling-cli/src/semantic_commands.rs`](../../crates/ling-cli/src/semantic_commands.rs), [`schemas/registry.toml`](../../schemas/registry.toml)
+- Fixtures: [`crates/ling-cli/src/semantic_commands.rs`](../../crates/ling-cli/src/semantic_commands.rs), [`crates/ling-cli/tests/semantic_commands.rs`](../../crates/ling-cli/tests/semantic_commands.rs), [`tests/protocols/semantic-query/README.md`](../../tests/protocols/semantic-query/README.md), [`schemas/semantic-transaction-result/0.1/schema.json`](../../schemas/semantic-transaction-result/0.1/schema.json), [`schemas/semantic-transaction-result/0.1/valid`](../../schemas/semantic-transaction-result/0.1/valid), [`schemas/semantic-transaction-result/0.1/invalid`](../../schemas/semantic-transaction-result/0.1/invalid)
+- Notes: committed is always false in version 0.1; a commit result requires separate Accepted atomic-publication authority and a new protocol version.
+
 ### `PROTO-CANONICAL-BYTES` — Canonical bytes for semantic identities
 
 - Producer: ling-resolve identity encoder; ling-semantic identity encoders
@@ -356,19 +397,6 @@
 - Sources: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Fixtures: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Notes: This record prevents a versioned implementation artifact from being mistaken for a public 1.x commitment; it is not the Future evidence-bundle protocol.
-
-### `PROTO-SEMANTIC-TRANSACTION` — Semantic Transaction
-
-- Producer: Future checked semantic-edit planner
-- Consumer: Future compiler transaction verifier and AI/editor tooling
-- Reader policy: Not defined; Draft SEMANTICS sketches input and atomicity but does not authorize a wire schema or reader.
-- Writer policy: Not defined; no public writer or placeholder API exists.
-- Unknown-field policy: Not defined.
-- Migration tool: Not defined.
-- Authority: `SEMANTICS`, `ROADMAP-1.0`, `GAP-REGISTER`
-- Sources: [`docs/SEMANTICS.md`](../SEMANTICS.md), [`docs/ROADMAP-1.0.md`](../ROADMAP-1.0.md), [`docs/governance/gap-register.toml`](../governance/gap-register.toml)
-- Fixtures: —
-- Notes: Blocked by GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 and related edit/snapshot gaps.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

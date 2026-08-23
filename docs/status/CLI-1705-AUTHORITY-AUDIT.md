@@ -2,86 +2,76 @@
 
 ## Outcome
 
-`CLI-1705` is correctly recorded as `BlockedSpec`. The execution plan asks the
-CLI to expose versioned Semantic Query and Transaction operations, with
-read-only queries by default and patches checked against a ProgramSnapshot and
-preserve constraints. The repository has no accepted query CLI contract, and
-`PROTO-SEMANTIC-TRANSACTION` is explicitly inventoried as Future.
+`CLI-1705` is implementation-ready under Accepted RFC-0027. The RFC resolves
+the command's bounded G1 requirement without pretending that the broader
+Semantic Transaction lifecycle is complete: `query` is an exact read-only
+projection, while `patch` validates a proposal and always reports
+`committed: false`.
 
-No `query` or `patch` command, mutation API, transaction parser, capability
-surface, preserve checker, or placeholder protocol field was added. Existing
-file-oriented `ling semantic`/`ling audit` behavior remains unchanged.
+The open semantic/LSP transaction gaps continue to block project/multi-file
+edits, source ranges, `Graph.Commit`, atomic disk publication, LSP
+`WorkspaceEdit`, migration, and Stable compatibility. They no longer block the
+explicit one-file proposal-only slice accepted for CLI-1705.
 
 ## Normative traceability
 
-- Accepted DEC-0012 fixes canonical Semantic IDs and bytes, but does not define
-  a query request schema or mutation/transaction protocol.
-- `docs/SEMANTICS.md` §25 describes the conceptual Transaction input,
-  stale-base rejection, temporary-graph validation, preserve constraints, and
-  commit/rollback sequence. It is not a versioned wire/CLI schema and does not
-  define command argument, output, or capability negotiation.
-- `PROTO-SEMANTIC-GRAPH-JSON` is Experimental and file/project projection
-  details remain versioned; `PROTO-SEMANTIC-TRANSACTION` is Planned public and
-  Future with no implementation or fixtures.
-- `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` and
-  `GAP-LSP-TRANSACTION-PROTOCOL-001` leave protocol lifecycle, snapshot/version
-  preconditions, Workspace Edits, and Stable versus Experimental fields open.
-- `GAP-PROJECT-CLI-INTERFACE-001` leaves project selection, lock/offline
-  behavior, command exits, and JSON output open. No accepted CLI can safely
-  project a package-aware patch until that contract exists.
+- `SEMANTICS.md` §25 requires exact stale-base rejection, temporary checked
+  state, preserve validation, and Proposal/Commit separation.
+- Accepted DEC-0012 fixes Program/Definition/Body identity and canonical bytes.
+- Accepted DEC-0253 and DEC-0254 fix command dispatch and output policy.
+- Accepted RFC-0027 defines exact command grammar, one-file/no-import scope,
+  query matching, request/result schemas, validation order, nonmutation,
+  diagnostics, exits, bounds, compatibility, and deferred work.
+- `PROTO-SEMANTIC-QUERY`, `PROTO-SEMANTIC-TRANSACTION`, and
+  `PROTO-SEMANTIC-TRANSACTION-RESULT` register the three Preview protocols.
 
-## Current interface evidence
+Lower-authority references to `zero`, `.zero`, arbitrary query languages,
+project selection, or patch commit do not authorize implementation behavior.
 
-The current repository confirms the missing boundary:
+## Authorized surface
 
-- `crates/ling-cli/src/main.rs` implements file-oriented `semantic` and
-  `audit` rendering only; it has no query or patch branch.
-- `ling-semantic` produces an Experimental canonical snapshot/JSON projection,
-  but no public query language, transaction decoder, preserve validator, or
-  commit/rollback service is exposed.
-- The current project/query database APIs are internal library boundaries;
-  they do not establish a CLI protocol or authorization model for
-  `Graph.Read`, `Graph.Propose`, or `Graph.Commit`.
-- Adding patch operations before the transaction contract would risk applying a
-  stale or mispositioned edit and would turn an unversioned internal shape into
-  a public compatibility surface.
+```text
+ling query --symbol NAME [OUTPUT] SOURCE.ling
+ling patch [OUTPUT] TRANSACTION.json SOURCE.ling
+```
 
-## Required authority before implementation
+Query validates and NFC-normalizes one Unicode 17.0.0 Ling identifier, then
+selects exact checked user definitions in canonical Semantic Graph order. Zero
+matches is successful. The response exposes semantic identities and checked
+type/Effect/Capability facts, but no path, span, evaluation, or mutation.
 
-An implementation-ready decision or RFC must define, at minimum:
+Patch compiles the current source first, reads a bounded exact-version request,
+checks the base Program ID and target authorization, compiles the replacement
+in memory, and compares canonical checked definitions. It requires an unchanged
+definition set, types, Effects, and Capabilities; every changed Body ID must be
+listed. Success is a deterministic proposal report and never a write.
 
-1. versioned query request/response schemas, target identity and selection,
-   pagination/limits, deterministic ordering, and file/project scope;
-2. Transaction encoding, base graph/program identity, stale-version behavior,
-   operation and preserve-constraint schemas, provenance, and capability
-   authorization;
-3. temporary-graph validation, name/type/effect/capability/ownership/contract
-   checks, required-test policy, semantic diff, atomic commit/rollback, and
-   filesystem failure behavior;
-4. CLI command/option, human/JSON output, localization, exit/error mapping,
-   offline/lock selection, and interaction with LSP Workspace Edits; and
-5. protocol inventory/lifecycle updates plus positive, negative, stale-base,
-   preserve-failure, authorization, deterministic, cross-package, Unicode,
-   CRLF, and migration fixtures.
+## Compatibility and safety boundary
 
-Until those decisions and fixtures are Accepted, implementing `query` or
-`patch` would either expose an Experimental graph as a stable API or permit
-unsafe mutation without the required stale-snapshot and preserve guarantees.
+- Public failures use registered bilingual `L-QUERY-0001` and
+  `L-TRANSACTION-0001` through `0003` diagnostics.
+- Existing compiler diagnostics and exit classes retain their meanings.
+- Source bytes, transaction bytes, metadata, directories, runtime state,
+  Semantic ID algorithms, and Unicode 17.0.0 data remain unchanged.
+- JSON schemas reject unknown fields; the transaction schema also exercises the
+  real exact-version reader in governance validation.
+- No source content or compiler-derived host path appears in a successful
+  protocol result; caller provenance remains untrusted audit text.
 
-## Evidence and compatibility
+## Required evidence
 
-This audit was checked against `docs/decisions/0012-semantic-identity-and-canonical-bytes.md`,
-`docs/SEMANTICS.md`, `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`,
-`docs/governance/protocol-inventory.toml`, `docs/governance/gap-register.toml`,
-`crates/ling-cli/src/main.rs`, `crates/ling-semantic`, `crates/ling-db`, and
-the current status/backlog registries.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+- unit and process tests for NFC query, empty results, deterministic output,
+  stale precedence, checked candidate compilation, target authorization,
+  preserve failures, and exact nonmutation;
+- valid/invalid schema fixtures plus deterministic corrupt-input mutations;
+- truthful help/catalog and output-policy regression suites;
+- repository-wide offline tests, Clippy, CI, governance, support, status, RC0,
+  traceability, formatting, and deterministic-diff gates.
 
 ## Intentionally deferred
 
-`CLI-1705` can begin after the query and Transaction protocols are Accepted,
-their lifecycle/authorization is registered, and executable fixtures exist.
-The implementation must default to read-only queries, reject stale bases, and
-commit patches atomically without inventing a second semantic authority.
+Project/workspace queries, imports, references, fuzzy search, pagination,
+general graph expressions, ranges, partial edits, rename, formatter edits,
+tests, benchmarks, proofs, contracts, ABI preservation, delegated capability
+tokens, `Graph.Commit`, atomic publication/rollback, LSP projection, migration,
+and Stable compatibility require later Accepted authority.

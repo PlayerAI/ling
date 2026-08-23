@@ -18,8 +18,11 @@ use exit_catalog::{
 };
 use ling_cli::incident::{InternalIncident, Reproduction};
 use ling_cli::project::{self, BUILD_PROFILE, BUILD_TARGET, CheckedProject, ProjectFailure};
+use ling_cli::semantic_commands::{
+    QueryError, QueryReport, TransactionError, TransactionReport, TransactionRequest,
+};
 use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
-use ling_cli::{CompileFailure, compile_path};
+use ling_cli::{CompileFailure, compile_path, compile_source};
 use ling_diagnostics::Diagnostic;
 use ling_effects::locate_main;
 use ling_eval::{Console, HostError, HostErrorCategory, MemoryConsole};
@@ -88,6 +91,22 @@ fn execute(options: Options) -> u8 {
             options.path.expect("init requires a destination"),
             options.init_name,
             options.init_display_name,
+        );
+    }
+    if options.command == Command::Query {
+        return execute_query(
+            options.policy,
+            options.path.expect("query requires a source path"),
+            options.symbol.expect("query requires a symbol"),
+        );
+    }
+    if options.command == Command::Patch {
+        return execute_patch(
+            options.policy,
+            options.path.expect("patch requires a source path"),
+            options
+                .transaction_path
+                .expect("patch requires a transaction path"),
         );
     }
     if options.command == Command::Build
@@ -197,6 +216,7 @@ fn execute(options: Options) -> u8 {
                 Err(error) => emit_host_io_failure("audit.stdout", &error, options.policy),
             }
         }
+        Command::Query | Command::Patch => unreachable!("handled before compilation"),
         Command::Run => {
             let main = match locate_main(compiled.snapshot.checked()) {
                 Ok(main) => main,
@@ -219,6 +239,182 @@ fn execute(options: Options) -> u8 {
         Command::Init => unreachable!("handled before compilation"),
         Command::Test => unreachable!("handled before test execution"),
         Command::Build => unreachable!("handled before file compilation"),
+    }
+}
+
+fn execute_query(policy: OutputPolicy, source_path: PathBuf, symbol: String) -> u8 {
+    let reproduction = Reproduction::new("ling query").with_input(source_path.to_string_lossy());
+    let compiled = match compile_path(&source_path) {
+        Ok(compiled) => compiled,
+        Err(failure) => return emit_compile_failure(failure, reproduction, policy),
+    };
+    if !compiled.snapshot.checked().warnings().is_empty() {
+        let status = emit_diagnostics(compiled.snapshot.checked().warnings(), policy, EXIT_SUCCESS);
+        if status != EXIT_SUCCESS {
+            return status;
+        }
+    }
+    let report = match QueryReport::build(&compiled.snapshot, &symbol) {
+        Ok(report) => report,
+        Err(QueryError::InvalidSymbol(detail) | QueryError::Scope(detail)) => {
+            let diagnostic = Diagnostic::new(
+                ling_diagnostics::codes::INVALID_SEMANTIC_QUERY,
+                ling_diagnostics::Severity::Error,
+                "Semantic Query 输入无效",
+                "invalid Semantic Query input",
+            )
+            .with_fact("detail", detail);
+            return emit_compile_error(diagnostic, policy);
+        }
+    };
+    let rendered = match policy.format() {
+        OutputFormat::Json => report.to_json().map(|json| format!("{json}\n")),
+        OutputFormat::Human => Ok(render_query_human(&report, policy)),
+    };
+    emit_protocol_stdout("query.stdout", rendered, reproduction, policy)
+}
+
+fn render_query_human(report: &QueryReport, policy: OutputPolicy) -> String {
+    let mut output = policy.human_summary(
+        "Semantic Query 完成",
+        "Semantic Query completed",
+        &format!(
+            "symbol={} matches={}",
+            report.symbol(),
+            report.matches().len()
+        ),
+    );
+    output.push('\n');
+    for result in report.matches() {
+        output.push_str(&result.summary());
+        output.push('\n');
+    }
+    output
+}
+
+fn execute_patch(policy: OutputPolicy, source_path: PathBuf, transaction_path: PathBuf) -> u8 {
+    let reproduction = Reproduction::new("ling patch")
+        .with_input(source_path.to_string_lossy())
+        .with_input(transaction_path.to_string_lossy());
+    let current = match compile_path(&source_path) {
+        Ok(compiled) => compiled,
+        Err(failure) => return emit_compile_failure(failure, reproduction.clone(), policy),
+    };
+    let transaction_bytes = match fs::read(&transaction_path) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            return emit_transaction_error(
+                TransactionError::InvalidInput(format!(
+                    "cannot read transaction document: {}",
+                    host_error_category(error.kind()).name()
+                )),
+                policy,
+            );
+        }
+    };
+    let request = match TransactionRequest::parse(&transaction_bytes) {
+        Ok(request) => request,
+        Err(error) => return emit_transaction_error(error, policy),
+    };
+    if let Err(error) = request.validate_current(&current.snapshot) {
+        return emit_transaction_error(error, policy);
+    }
+    let logical_name = source_path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .unwrap_or("proposal.ling")
+        .to_owned();
+    let candidate = match compile_source(logical_name, request.replacement().as_bytes().to_vec()) {
+        Ok(compiled) => compiled,
+        Err(failure) => return emit_compile_failure(failure, reproduction.clone(), policy),
+    };
+    for warnings in [
+        current.snapshot.checked().warnings(),
+        candidate.snapshot.checked().warnings(),
+    ] {
+        if !warnings.is_empty() {
+            let status = emit_diagnostics(warnings, policy, EXIT_SUCCESS);
+            if status != EXIT_SUCCESS {
+                return status;
+            }
+        }
+    }
+    let report = match TransactionReport::validate(&current.snapshot, &candidate.snapshot, &request)
+    {
+        Ok(report) => report,
+        Err(error) => return emit_transaction_error(error, policy),
+    };
+    let rendered = match policy.format() {
+        OutputFormat::Json => report.to_json().map(|json| format!("{json}\n")),
+        OutputFormat::Human => Ok(format!(
+            "{}\n",
+            policy.human_summary(
+                "Semantic Transaction 提案已验证；未提交",
+                "Semantic Transaction proposal validated; not committed",
+                &format!("changed_body_ids={}", report.changed_body_ids().join(",")),
+            )
+        )),
+    };
+    emit_protocol_stdout("patch.stdout", rendered, reproduction, policy)
+}
+
+fn emit_compile_failure(
+    failure: CompileFailure,
+    reproduction: Reproduction,
+    policy: OutputPolicy,
+) -> u8 {
+    match failure {
+        CompileFailure::Diagnostics(diagnostics) => emit_compile_errors(&diagnostics, policy),
+        CompileFailure::Internal(message) => {
+            emit_internal_incident("compile.pipeline", message, reproduction, policy)
+        }
+        CompileFailure::SnapshotMismatch(message) => emit_snapshot_mismatch(&message, policy),
+    }
+}
+
+fn emit_transaction_error(error: TransactionError, policy: OutputPolicy) -> u8 {
+    let diagnostic = match error {
+        TransactionError::InvalidInput(detail) => Diagnostic::new(
+            ling_diagnostics::codes::INVALID_SEMANTIC_TRANSACTION,
+            ling_diagnostics::Severity::Error,
+            "Semantic Transaction 输入无效",
+            "invalid Semantic Transaction input",
+        )
+        .with_fact("detail", detail),
+        TransactionError::StaleBase { expected, found } => Diagnostic::new(
+            ling_diagnostics::codes::STALE_SEMANTIC_TRANSACTION,
+            ling_diagnostics::Severity::Error,
+            "Semantic Transaction 基础快照已过期",
+            "Semantic Transaction base snapshot is stale",
+        )
+        .with_fact("expected", expected)
+        .with_fact("found", found),
+        TransactionError::PreserveViolation(constraint) => Diagnostic::new(
+            ling_diagnostics::codes::SEMANTIC_PRESERVE_VIOLATION,
+            ling_diagnostics::Severity::Error,
+            "Semantic Transaction 未保持要求的语义",
+            "Semantic Transaction did not preserve required semantics",
+        )
+        .with_fact("constraint", constraint),
+    };
+    emit_compile_error(diagnostic, policy)
+}
+
+fn emit_protocol_stdout(
+    stage: &str,
+    rendered: Result<String, serde_json::Error>,
+    reproduction: Reproduction,
+    policy: OutputPolicy,
+) -> u8 {
+    let rendered = match rendered {
+        Ok(rendered) => rendered,
+        Err(error) => {
+            return emit_internal_incident(stage, error.to_string(), reproduction, policy);
+        }
+    };
+    match std::io::stdout().lock().write_all(rendered.as_bytes()) {
+        Ok(()) => EXIT_SUCCESS,
+        Err(error) => emit_host_io_failure(stage, &error, policy),
     }
 }
 
@@ -1761,7 +1957,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [OUTPUT] <file>\n  {CLI_NAME} test [OUTPUT] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [OUTPUT]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [OUTPUT]\n  {CLI_NAME} fmt [--check] [--stdin-name name] [OUTPUT] <file|->\n  {CLI_NAME} init [--name package] [--display-name text] [OUTPUT] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [OUTPUT]\n  {CLI_NAME} repl [--capability Console.Write] [OUTPUT]\n  {CLI_NAME} lsp --stdio\n\nOUTPUT:\n  [--format human|json] [--language bilingual|zh-CN|en]\n  [--color auto|always|never] [--quiet|--verbose]"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [OUTPUT] <file>\n  {CLI_NAME} query --symbol name [OUTPUT] <file>\n  {CLI_NAME} patch [OUTPUT] <transaction.json> <file>\n  {CLI_NAME} test [OUTPUT] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [OUTPUT]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [OUTPUT]\n  {CLI_NAME} fmt [--check] [--stdin-name name] [OUTPUT] <file|->\n  {CLI_NAME} init [--name package] [--display-name text] [OUTPUT] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [OUTPUT]\n  {CLI_NAME} repl [--capability Console.Write] [OUTPUT]\n  {CLI_NAME} lsp --stdio\n\nOUTPUT:\n  [--format human|json] [--language bilingual|zh-CN|en]\n  [--color auto|always|never] [--quiet|--verbose]"
     )
 }
 
@@ -1770,6 +1966,8 @@ struct Options {
     command: Command,
     policy: OutputPolicy,
     path: Option<PathBuf>,
+    transaction_path: Option<PathBuf>,
+    symbol: Option<String>,
     manifest_path: Option<PathBuf>,
     capabilities: Vec<String>,
     check: bool,
@@ -1794,6 +1992,8 @@ impl Options {
         let mut color_seen = false;
         let mut verbosity = Verbosity::Normal;
         let mut path = None;
+        let mut transaction_path = None;
+        let mut symbol = None;
         let mut manifest_path = None;
         let mut capabilities = Vec::new();
         let mut check = false;
@@ -1913,6 +2113,23 @@ impl Options {
                     return Err(format!("unsupported REPL capability `{value}`"));
                 }
                 capabilities.push(value.to_owned());
+                index += 2;
+                continue;
+            }
+
+            if argument == "--symbol" {
+                if command != Command::Query {
+                    return Err("`--symbol` is only valid with `query`".to_owned());
+                }
+                let value = arguments
+                    .get(index + 1)
+                    .ok_or_else(|| "`--symbol` requires an identifier".to_owned())?;
+                let value = value
+                    .to_str()
+                    .ok_or_else(|| "the query symbol must be valid Unicode".to_owned())?;
+                if symbol.replace(value.to_owned()).is_some() {
+                    return Err("only one `--symbol` may be provided".to_owned());
+                }
                 index += 2;
                 continue;
             }
@@ -2128,6 +2345,11 @@ impl Options {
             if matches!(command, Command::ProjectCheck | Command::Build) {
                 return Err(format!("`{command}` does not accept a positional path"));
             }
+            if command == Command::Patch && transaction_path.is_none() {
+                transaction_path = Some(PathBuf::from(argument));
+                index += 1;
+                continue;
+            }
             if path.replace(PathBuf::from(argument)).is_some() {
                 return Err(if command == Command::Init {
                     "only one init destination may be provided".to_owned()
@@ -2151,6 +2373,36 @@ impl Options {
         ) && path.is_some()
         {
             return Err(format!("`{command}` does not accept a source file"));
+        }
+        if command == Command::Query && symbol.is_none() {
+            return Err("`query` requires `--symbol name`".to_owned());
+        }
+        if command != Command::Query && symbol.is_some() {
+            return Err("`--symbol` is only valid with `query`".to_owned());
+        }
+        if command == Command::Patch {
+            if transaction_path.is_none() || path.is_none() {
+                return Err("`patch` requires a transaction JSON file and a source file".to_owned());
+            }
+            if transaction_path
+                .as_deref()
+                .and_then(Path::extension)
+                .and_then(|extension| extension.to_str())
+                != Some("json")
+            {
+                return Err("`patch` transaction input must end in `.json`".to_owned());
+            }
+        } else if transaction_path.is_some() {
+            return Err("a transaction path is only valid with `patch`".to_owned());
+        }
+        if matches!(command, Command::Query | Command::Patch)
+            && path
+                .as_deref()
+                .and_then(Path::extension)
+                .and_then(|extension| extension.to_str())
+                != Some("ling")
+        {
+            return Err(format!("`{command}` source input must end in `.ling`"));
         }
         if command != Command::Repl
             && command != Command::Lsp
@@ -2244,6 +2496,8 @@ impl Options {
             command,
             policy: OutputPolicy::new(format, language, color, verbosity),
             path,
+            transaction_path,
+            symbol,
             manifest_path,
             capabilities,
             check,
@@ -2503,7 +2757,7 @@ mod tests {
                 command.name()
             );
         }
-        for stale in ["query", "patch", "zero", ".zero"] {
+        for stale in ["zero", ".zero"] {
             assert!(
                 !help.contains(stale),
                 "help advertises stale command `{stale}`"

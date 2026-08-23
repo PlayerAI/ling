@@ -12,6 +12,8 @@ use ling_hir::{LowerErrorKind, Program as HirProgram};
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceError, SourceFile, SourceId};
 
+pub mod semantic_commands;
+
 #[derive(Debug)]
 pub struct Compiled {
     pub snapshot: ProgramSnapshot,
