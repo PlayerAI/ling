@@ -6748,7 +6748,7 @@ notes = [
 [[task]]
 id = "IDE-2301"
 title = "IDE document symbols"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -6760,30 +6760,37 @@ spec = [
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/RFC-0036.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/resolved_outline.rs",
+  "crates/ling-lsp/src/document_symbols.rs",
+  "crates/ling-lsp/tests/document_symbols.rs",
+  "docs/RFC-0036.md",
   "docs/status/IDE-2301-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2301-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-document-symbol/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing LSP document-symbol kinds, hierarchy, ranges, URI/version binding, Semantic ID projection, limits, and lifecycle contract.",
-  "The audit covers nested/flat symbols, Unicode/CRLF/BOM, cross-module/package, generated/dependency, stale-version, deterministic ordering, and migration fixtures.",
-  "No symbol handler, kind mapping, location adapter, protocol field, diagnostic allocation, Semantic ID change, or placeholder editor API is added while the authority is absent.",
-  "The future implementation must derive locations from approved source maps and preserve Semantic Graph identity separately from presentation.",
+  "Accepted RFC-0036 fixes capability negotiation, exact discovery, immutable snapshot scope, structural kinds, hierarchy and flat fallback, source ordering, 4096-node and 1 MiB bounds, fixed failures, and Preview migration behavior.",
+  "The compiler query emits one resolver-validated module outline with original UTF-8 full/selection spans; the LSP adapter projects it through negotiated UTF-8/16/32 without publishing Semantic IDs or host paths.",
+  "Executable tests cover all reachable Seed structures, BOM/CRLF/Chinese/emoji/combining text, hierarchy, flat containers, dependencies, insertion-order invariance, repeated requests, temporary isolation, malformed inputs, resolution recovery, notifications, unknown URIs, and overflow.",
+  "Locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass against implementation commit 7ab847af0336d5c3de32d55e66cc3d8a932f1080.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "7ab847af0336d5c3de32d55e66cc3d8a932f1080"
+completion_commit = "7ab847af0336d5c3de32d55e66cc3d8a932f1080"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "IDE-2301 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, and LSP-2101/LSP-2102; the Experimental Semantic Graph JSON is not an LSP symbol schema.",
-  "Current semantic/index code preserves graph identity and byte spans but exposes no public document-symbol protocol or editor range mapping.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit 7ab847af0336d5c3de32d55e66cc3d8a932f1080 adds Accepted RFC-0036, the bounded compiler outline, the LSP provider, exact transcript migration, protocol/governance records, and implementation evidence.",
+  "Seed rejects mutable top-level definitions, so RFC-0036 deliberately exposes no unreachable Variable kind; local mutable bindings remain outside document outlines.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core, runtime, bytecode, VM, ABI, Semantic ID/schema, or Unicode 17.0.0 behavior changes.",
 ]
 
 [[task]]

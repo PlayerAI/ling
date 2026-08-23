@@ -170,8 +170,8 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | Done | `04-LSP-IMPLEMENTATION.md:215`, `docs/RFC-0033.md`, `docs/status/LSP-2203-IMPLEMENTATION-REPORT.md` |
 | `LSP-2204` | G1/Editor | Root-cause 与错误风暴控制 | — | Done | `RFC-0034`, `docs/status/LSP-2204-IMPLEMENTATION-REPORT.md`, `b70308c1e215fd2f4a4736aa56d7372c368af599` |
 | `LSP-2205` | G1/Editor | Diagnostic fixtures | — | Done | `RFC-0035`, `docs/status/LSP-2205-IMPLEMENTATION-REPORT.md`, `93a58e9090ce5a3be17bcfb8569d7246ce7d71ec` |
-| `IDE-2301` | G1/Editor | Document symbols | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:244`, `docs/status/IDE-2301-AUTHORITY-AUDIT.md` |
-| `IDE-2301-INDEX` | G1/Editor | Internal resolved-definition source-order index | S | Done | Accepted `DEC-0073`; see `crates/ling-db/src/definition_index.rs` and `docs/status/IDE-2301-INDEX-IMPLEMENTATION-REPORT.md`; public DocumentSymbol behavior remains BlockedSpec in `IDE-2301` |
+| `IDE-2301` | G1/Editor | Document symbols | — | Done | Accepted `RFC-0036`; `docs/status/IDE-2301-IMPLEMENTATION-REPORT.md`; `7ab847af0336d5c3de32d55e66cc3d8a932f1080` |
+| `IDE-2301-INDEX` | G1/Editor | Internal resolved-definition source-order index | S | Done | Accepted `DEC-0073`; see `crates/ling-db/src/definition_index.rs` and `docs/status/IDE-2301-INDEX-IMPLEMENTATION-REPORT.md`; public Document Symbols are separately complete under `RFC-0036` |
 | `IDE-2302` | G1/Editor | Hover | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:248`, `docs/status/IDE-2302-AUTHORITY-AUDIT.md` |
 | `IDE-2302-TYPED-INDEX` | G1/Editor | Internal typed-definition observation | S | Done | Accepted `DEC-0074`; see `crates/ling-db/src/typed_definition_index.rs` and `docs/status/IDE-2302-TYPED-INDEX-IMPLEMENTATION-REPORT.md`; public hover behavior remains BlockedSpec in `IDE-2302` |
 | `IDE-2303` | G1/Editor | Go to definition/declaration/type definition | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:262`, `docs/status/IDE-2303-AUTHORITY-AUDIT.md` |

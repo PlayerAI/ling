@@ -1,6 +1,6 @@
 # IDE-2301 implementation report
 
-> Status: implementation complete; status binding pending
+> Status: Done
 > Task: `IDE-2301`
 > Authority: Accepted `RFC-0036`, `RFC-0004`, `RFC-0023`, `RFC-0029`,
 > `RFC-0030`, `DEC-0002`, `DEC-0012`, `DEC-0019`, `DEC-0029`, `DEC-0071`,
@@ -57,8 +57,8 @@ fallback otherwise.
 - `cargo test -p ling-lsp --locked --offline` passes, including exact
   diagnostic transcript replay.
 - Focused strict Clippy for `ling-db` and `ling-lsp` passes.
-- The complete repository gate result and implementation commit are bound in
-  the final status update after the implementation commit exists.
+- The complete repository gate set passed against implementation commit
+  `7ab847af0336d5c3de32d55e66cc3d8a932f1080` before status binding.
 
 ## Compatibility, determinism, and Unicode impact
 
