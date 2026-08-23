@@ -5296,7 +5296,7 @@ notes = [
 [[task]]
 id = "CLI-1704"
 title = "Project test command"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "L"
 owner = "Codex"
@@ -5311,29 +5311,51 @@ spec = [
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0039-cli-test-file-runner.md",
+  "docs/decisions/0253-current-cli-command-model.md",
+  "docs/decisions/0254-cli-output-policy.md",
+  "docs/decisions/0256-current-test-command.md",
+  "docs/RFC-0025.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/src/project.rs",
+  "crates/ling-cli/src/test_runner.rs",
+  "crates/ling-cli/tests/test.rs",
+  "crates/ling-cli/tests/project_commands.rs",
+  "crates/ling-cli/tests/output_policy.rs",
+  "docs/decisions/0256-current-test-command.md",
   "docs/status/CLI-1704-AUTHORITY-AUDIT.md",
+  "docs/status/CLI-1704-IMPLEMENTATION-REPORT.md",
+  "docs/status/CLI-1704-TEST-IMPLEMENTATION-REPORT.md",
+  "schemas/test/0.1/schema.json",
+  "tests/protocols/test/README.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit distinguishes the unresolved project/workspace test convention from the accepted standalone-file child and records the remaining discovery, isolation, event, and exit contracts.",
-  "The audit explicitly rejects stale names and unregistered source annotations outside DEC-0039's bounded file runner.",
-  "The parent remains without project/workspace test behavior while the child reuses checked services and provides deterministic offline file fixtures.",
+  "Accepted DEC-0256 composes DEC-0039 standalone file/directory execution and RFC-0025's explicit locked/offline root-entry smoke test as the complete current ling test command.",
+  "The two modes are mutually exclusive, deterministic, sequential, offline, checked-Typed-Core consumers with captured Console output and versioned machine reports.",
+  "No source annotation, hidden convention, manifest target, workspace selection, dependency tests, filters, assertions, snapshots, property tests, parallelism, or cancellation is inferred.",
+  "Focused standalone/project/output-policy tests and repository-wide offline tests, Clippy, CI, governance, support, status, RC0, traceability, formatting, and deterministic-diff gates pass without a schema, diagnostic-code, Semantic-ID, span, runtime, or Unicode change.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "69beaefd41c452ae25b698d15a4b1e5820519d79"
+completion_commit = "69beaefd41c452ae25b698d15a4b1e5820519d79"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "CLI-1704 is BlockedSpec by GAP-PROJECT-CLI-INTERFACE-001 and CLI-1701; DEC-0003's Rust/conformance runner is implementation evidence, not a user test protocol.",
-  "Accepted DEC-0039 closes only the explicit standalone-file child; project/workspace targets, declarations, filtering, assertions, and event contracts remain open.",
-  "The authority audit preserves Seed behavior and does not change VM, bytecode, Semantic IDs, or Unicode 17.0.0 behavior beyond the bounded checked-pipeline runner.",
+  "Implementation commit: 69beaefd41c452ae25b698d15a4b1e5820519d79 (`docs(cli): accept current test command`).",
+  "Verified with focused test/project-command/output-policy suites, all workspace targets, Clippy with warnings denied, and CI/governance/support/status/RC0/traceability/formatting/diff gates; the final status-bound full gate is recorded by the following status commit.",
+  "Test syntax, expanded project targets, workspaces, filtering, assertions, snapshots, property tests, parallelism, cancellation, coverage, benchmarks, and Stable compatibility remain intentionally deferred.",
 ]
 
 [[task]]

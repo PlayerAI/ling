@@ -77,7 +77,7 @@
 | `CLI-1702-EXIT` | Internal CLI exit-code catalog | `G1` | `S` | `Done` | `CLI-1701-CATALOG` | `b55db2ca22e597da4266f1af3deb664f610cd1ea` |
 | `CLI-1703` | Project initialization command | `G1` | `M` | `Done` | `CLI-1701`, `PRJ-1107` | `3feaca220e308ebd6a1505c02d2c0229419655ee` |
 | `CLI-1703-INIT` | Offline `ling init` scaffold | `G1` | `M` | `Done` | `CLI-1701-CATALOG`, `PRJ-1101` | `8c2ef94e58da75d6c530a4ac60cfbe2eeea11bbf` |
-| `CLI-1704` | Project test command | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
+| `CLI-1704` | Project test command | `G1` | `L` | `Done` | `CLI-1701`, `PRJ-1107` | `69beaefd41c452ae25b698d15a4b1e5820519d79` |
 | `CLI-1704-FILE` | Explicit standalone test-file runner Preview | `G1` | `M` | `Done` | `CLI-1701-CATALOG`, `CLI-1702-EXIT` | `72d85d7de77f188b0706acde7a559169d4ac149e` |
 | `CLI-1705` | Semantic query and patch commands | `G1` | `L` | `BlockedSpec` | `CLI-1701`, `PRJ-1107` | `` |
 | `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `CLI-1702` | `` |
