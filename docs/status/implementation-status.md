@@ -89,6 +89,7 @@
 | `COMPAT-6503` | Language Migration Tool | `G6` | `L` | `BlockedSpec` | `COMPAT-6502` | `` |
 | `COMPAT-6503-READINESS` | Migration Tool Readiness Boundary | `G6` | `S` | `Done` | `COMPAT-6502-CURRENT` | `3ccbc058cd6de3ad447712ffb77bfeb1e2e7cb10` |
 | `COMPAT-6504` | Deprecation Policy | `G6` | `L` | `BlockedSpec` | `COMPAT-6503` | `` |
+| `COMPAT-6504-READINESS` | Deprecation-policy Readiness Boundary Evidence | `G6` | `S` | `Done` | `COMPAT-6503-READINESS` | `1b2390344b788e0abf6d299afaabc420a27b2d98` |
 | `CPU-4201` | Scalar Reference Backend | `G4` | `L` | `BlockedSpec` | `KCHK-4105` | `` |
 | `CPU-4201-OBSERVATION` | Internal CPU scalar-reference boundary evidence | `G4` | `S` | `Done` | `KCHK-4105-OBSERVATION` | `9f723650d65177833a34d623b5b0123e57cb9ecf` |
 | `CPU-4202` | Reference Trace | `G4` | `M` | `BlockedSpec` | `CPU-4201` | `` |

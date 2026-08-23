@@ -24807,6 +24807,9 @@ spec = [
   "docs/RFC-0002.md",
   "docs/decisions/0001-error-code-policy.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md",
+  "docs/decisions/0232-migration-tool-deferred-until-version-pair.md",
+  "docs/decisions/0233-deprecation-policy-readiness-boundary-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/authority.toml",
@@ -24820,6 +24823,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/COMPAT-6504-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6504-READINESS-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6504-READINESS-IMPLEMENTATION-REPORT.md",
+  "docs/governance/deprecation-readiness.toml",
+  "docs/governance/deprecation-readiness.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -24836,8 +24843,60 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "COMPAT-6504 is BlockedSpec because no accepted policy defines deprecation subjects, minimum periods, version ranges, warning semantics, removal/replacement, general schema N-1, target/profile lifecycle, security exceptions, or migration-tooling commitments.",
+  "Accepted DEC-0233 authorizes a completed readiness-evidence child only; it does not publish or stabilize a public deprecation policy.",
   "DEC-0001 preserves diagnostic identities and retired allocations only; SCHEMA-LIFECYCLE-POLICY and SUPPORT-MATRIX remain Draft, and RFC-0002 remains limited to manifest/lock migration.",
   "The audit changes no source, parser, resolver, evaluator, diagnostic, schema, package/lock, CLI, profile, target, protocol, dependency, or public API and preserves explicit stability states.",
+]
+
+[[task]]
+id = "COMPAT-6504-READINESS"
+title = "Deprecation-policy Readiness Boundary Evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["COMPAT-6503-READINESS"]
+spec = [
+  "AGENTS.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0001-error-code-policy.md",
+  "docs/decisions/0231-current-compiler-compatibility-boundary-evidence.md",
+  "docs/decisions/0232-migration-tool-deferred-until-version-pair.md",
+  "docs/decisions/0233-deprecation-policy-readiness-boundary-evidence.md",
+  "docs/status/COMPAT-6504-AUTHORITY-AUDIT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+  "docs/ERROR-CODES.md",
+  "schemas/registry.toml",
+]
+artifacts = [
+  ".github/workflows/ci.yml",
+  "tools/xtask/src/deprecation_readiness.rs",
+  "tools/xtask/src/main.rs",
+  "tools/xtask/src/ci.rs",
+  "docs/governance/deprecation-readiness.toml",
+  "docs/governance/deprecation-readiness.md",
+  "docs/status/COMPAT-6504-READINESS-AUTHORITY-AUDIT.md",
+  "docs/status/COMPAT-6504-READINESS-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0233 records zero released major versions, an absent public deprecation policy, and the exact seven G6 policy areas in canonical order.",
+  "Six areas remain Unavailable; diagnostic lifecycle is a GuardedSubset limited to DEC-0001 code non-reuse, retained retired allocations, and retired-code exclusion from constants and emitters.",
+  "The verifier proves SCHEMA-LIFECYCLE-POLICY and SUPPORT-MATRIX remain Draft with stable_basis false, and migration readiness still has no accepted version pair or public command.",
+  "cargo xtask deprecation verify validates markers, exact states, evidence paths, source-backed boundaries, and generated report drift; the verifier is included in the CI contract.",
+  "Focused deprecation, error-code, schema, support, migration, compatibility, governance, xtask, Clippy, formatting, and diff checks pass without changing public behavior.",
+]
+verified_against_commit = "1b2390344b788e0abf6d299afaabc420a27b2d98"
+completion_commit = "1b2390344b788e0abf6d299afaabc420a27b2d98"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Governance and verification evidence only under DEC-0233; COMPAT-6504 remains BlockedSpec until a complete public policy and cross-version evidence are Accepted.",
+  "No compatibility promise, minimum period, source attribute, warning/rejection, suppression, transition, removal, schema/protocol reader range, support guarantee, security exception, migration commitment, diagnostic allocation, dependency, Semantic ID, runtime, or Unicode behavior is added.",
 ]
 
 [[task]]
