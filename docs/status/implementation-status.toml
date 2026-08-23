@@ -24357,6 +24357,8 @@ spec = [
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
   "docs/decisions/0022-disposable-persistent-query-cache.md",
+  "docs/decisions/0228-registry-deferred-through-v1.md",
+  "docs/decisions/0229-local-supply-chain-attack-boundary-evidence.md",
   "docs/ling_execution_plan/10-G6-V1.0-STABILIZATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -24367,6 +24369,8 @@ spec = [
 ]
 artifacts = [
   "docs/status/PKG-6404-AUTHORITY-AUDIT.md",
+  "docs/status/PKG-6404-LOCAL-AUTHORITY-AUDIT.md",
+  "docs/status/PKG-6404-LOCAL-IMPLEMENTATION-REPORT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
@@ -24383,9 +24387,63 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "PKG-6404 is BlockedSpec because the attack list includes registry, archive, signature, yanking, cache, and build-capability surfaces that have no accepted protocols or unambiguous test oracle.",
-  "RFC-0002 and current fixtures already cover bounded local path, Unicode, graph, identity, lock, offline, and no-code-execution defenses; these remain unchanged and do not imply global supply-chain security.",
+  "Accepted DEC-0229 and child PKG-6404-LOCAL now cover the bounded RFC-0002 local subset; this does not imply global or complete 1.0 supply-chain security.",
   "DEC-0019/DEC-0021/DEC-0022 authorize internal deterministic query/scheduling/disposable-cache slices only; they do not authorize shared package-cache, registry, archive, signature, or hermetic-build tests.",
-  "The audit changes no package, compiler, resolver, lockfile, identity, Unicode, cache, build, diagnostic, schema, CLI, dependency, or public API and creates no stale zero surface.",
+  "The bounded child changes tests and governance evidence only; it adds no package, registry, archive, signing, yanking, package-cache, build, diagnostic, schema, CLI, dependency, or public API and creates no stale zero surface.",
+]
+
+[[task]]
+id = "PKG-6404-LOCAL"
+title = "Local supply-chain attack-boundary evidence"
+state = "Done"
+release = "G6"
+size = "S"
+owner = "Codex"
+branch = "main"
+depends_on = ["PKG-6403-DEFERMENT"]
+spec = [
+  "AGENTS.md",
+  "docs/RFC-0002.md",
+  "docs/ROADMAP-1.0.md",
+  "docs/decisions/0022-disposable-persistent-query-cache.md",
+  "docs/decisions/0228-registry-deferred-through-v1.md",
+  "docs/decisions/0229-local-supply-chain-attack-boundary-evidence.md",
+  "docs/status/PKG-6404-AUTHORITY-AUDIT.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
+]
+artifacts = [
+  "crates/ling-project/tests/supply_chain_boundary.rs",
+  "crates/ling-project/tests/package_graph_fixtures.rs",
+  "crates/ling-project/tests/lockfile_fixtures.rs",
+  "crates/ling-cache/src/lib.rs",
+  "crates/ling-types/tests/supply_chain_boundary_evidence.rs",
+  "docs/status/PKG-6404-LOCAL-AUTHORITY-AUDIT.md",
+  "docs/status/PKG-6404-LOCAL-IMPLEMENTATION-REPORT.md",
+  "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
+  "docs/status/implementation-status.toml",
+]
+acceptance = [
+  "Accepted DEC-0229 classifies all ten PKG-6404 attacks: dependency confusion, namespace spoofing, Unicode-confusable packages, and malicious manifests have bounded RFC-0002 local-subset evidence; the other six require unavailable protocols.",
+  "Representative technical-name and Unicode spoofing, hostile manifest fields, traversal/external locators, and absent network/process/archive/signing/yanking/build execution routes are tested directly.",
+  "Existing package tests retain graph-local name/content collision, transitive visibility, source path/symlink escape, bounded manifest/lock input, canonical identity and lock, deterministic traversal, offline, and failure-atomic evidence.",
+  "DEC-0022 disposable internal-cache tests reject corrupt checksums, incompatible versions, truncation, excessive declared sizes, and foreign keys as safe misses without claiming package-cache coverage.",
+  "The exact ten-attack test-local inventory is deterministic, order-independent, and duplicate checked; its opaque bytes are not a public security protocol.",
+  "cargo test -p ling-project --all-targets --locked --offline passes.",
+  "cargo test -p ling-cache --all-targets --locked --offline passes.",
+  "cargo test -p ling-types --test supply_chain_boundary_evidence --locked --offline passes.",
+  "cargo test -p xtask --bin xtask --locked --offline and cargo xtask governance check-all pass.",
+  "workspace tests, clippy, CI, governance, status, formatting, and diff checks pass without adding an unsupported protocol or support claim.",
+]
+verified_against_commit = "7eb48376bc3ee70ad20a74a7a732bb3498b4af52"
+completion_commit = "7eb48376bc3ee70ad20a74a7a732bb3498b4af52"
+integration_state = "committed"
+completed = "2026-08-23"
+notes = [
+  "Test/governance evidence under DEC-0229; parent PKG-6404 remains BlockedSpec because six listed attacks require absent registry, archive, signing, package-cache, or build-sandbox protocols.",
+  "Dependency-confusion and namespace-spoofing evidence is explicitly graph-local and does not claim authenticated global ownership or registry behavior.",
+  "The disposable internal query cache remains distinct from a package cache; no cache format or runtime behavior changed.",
+  "No manifest, lock, package identity, resolver, compiler, diagnostic, CLI, Semantic ID, source span, dependency, Unicode, protocol stability, or support behavior changed.",
 ]
 
 [[task]]
