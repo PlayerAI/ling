@@ -80,7 +80,7 @@
 | `CLI-1704` | Project test command | `G1` | `L` | `Done` | `CLI-1701`, `PRJ-1107` | `69beaefd41c452ae25b698d15a4b1e5820519d79` |
 | `CLI-1704-FILE` | Explicit standalone test-file runner Preview | `G1` | `M` | `Done` | `CLI-1701-CATALOG`, `CLI-1702-EXIT` | `72d85d7de77f188b0706acde7a559169d4ac149e` |
 | `CLI-1705` | Semantic query and patch commands | `G1` | `L` | `Done` | `CLI-1701`, `PRJ-1107` | `d72cdbf3134b960ca07888404d55ea27eadb38ca` |
-| `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `BlockedSpec` | `CLI-1701`, `CLI-1702` | `` |
+| `CLI-1706` | Shell completion and help fixtures | `G1` | `M` | `Done` | `CLI-1701`, `CLI-1702` | `a56ca37f1d5686f691f195a39dbe798fd2f96132` |
 | `CLI-1706-HELP` | Truthful implemented-command help fixture | `G1` | `S` | `Done` | `CLI-1701-CATALOG`, `CLI-1702-EXIT` | `27c5f1d58a3add59abc87b0cf4dc29128d7be226` |
 | `COMPAT-6501` | Historical Corpus | `G6` | `L` | `BlockedSpec` | `PKG-6404` | `` |
 | `COMPAT-6501-SEED` | Seed historical-corpus freeze evidence | `G6` | `S` | `Done` | `PKG-6404-LOCAL` | `80ea137740a23bd924fcf40234a5f9c95b21b940` |

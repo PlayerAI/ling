@@ -5486,7 +5486,7 @@ notes = [
 [[task]]
 id = "CLI-1706"
 title = "Shell completion and help fixtures"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -5499,31 +5499,54 @@ spec = [
   "docs/decisions/0003-m0-tooling.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0040-cli-help-truth-fixture.md",
+  "docs/decisions/0253-current-cli-command-model.md",
+  "docs/decisions/0254-cli-output-policy.md",
+  "docs/RFC-0025.md",
+  "docs/RFC-0027.md",
+  "docs/RFC-0028.md",
   "docs/ling_execution_plan/03-G1-V0.1-LIVING.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/protocol-inventory.toml",
   "docs/governance/gap-register.toml",
 ]
 artifacts = [
+  "crates/ling-cli/src/command_catalog.rs",
+  "crates/ling-cli/src/completion.rs",
+  "crates/ling-cli/src/main.rs",
+  "crates/ling-cli/tests/completion.rs",
+  "crates/ling-cli/tests/help.rs",
+  "docs/RFC-0028.md",
   "docs/status/CLI-1706-AUTHORITY-AUDIT.md",
   "docs/status/CLI-1706-HELP-IMPLEMENTATION-REPORT.md",
+  "docs/status/CLI-1706-IMPLEMENTATION-REPORT.md",
+  "docs/governance/authority.toml",
+  "docs/governance/authority.md",
+  "docs/governance/lifecycle.toml",
+  "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
+  "schemas/registry.toml",
+  "tests/protocols/cli-completion",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the current truthful Preview help surface and distinguishes it from the unaccepted command/flag/exit inventory and shell completion contract.",
-  "The missing help lifecycle, locale/order, shell quoting, generated-script, deprecated-command, and deterministic fixture rules are identified with direct authority references.",
-  "No completion generator, script, help snapshot, public command registry, diagnostic allocation, or placeholder entry is added while the CLI contracts are absent.",
-  "The future implementation must generate only from the accepted command registry and keep help truthful without making help bytes a semantic authority.",
+  "Accepted RFC-0028 defines exactly `ling completion <bash|zsh|fish|powershell>`, the current static parser inventory, Preview lifecycle, canonical UTF-8/LF script bytes, usage/host-fault exits, and explicit nonmutation boundary.",
+  "One internal inventory drives deterministic Bash, Zsh, Fish, and PowerShell renderers; parser-catalog parity, every accepted command-specific flag, fixed enumerated values, project hierarchy, and stale-name exclusion are executable invariants.",
+  "Independent process output matches four committed canonical fixtures byte-for-byte, repeats deterministically, rejects missing/unknown/extra/output-policy operands with exit 2 and empty stdout, and is parsed by every corresponding shell available on the host.",
+  "Help aliases truthfully advertise completion without freezing ordinary help wording or layout, and the canonical non-JSON protocol, support matrix, authority, lifecycle, schema boundary, and implementation report are registered and generated consistently.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "a56ca37f1d5686f691f195a39dbe798fd2f96132"
+completion_commit = "a56ca37f1d5686f691f195a39dbe798fd2f96132"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "CLI-1706 is BlockedSpec downstream of CLI-1701 and CLI-1702; PROTO-CLI currently inventories only implemented commands and rejects unknown options.",
-  "No shell-specific completion or stale `zero` command is advertised by the current CLI; completion remains a future Preview surface.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, or Unicode 17.0.0 behavior.",
+  "Implementation commit: a56ca37f1d5686f691f195a39dbe798fd2f96132 (`feat(cli): add deterministic shell completion`). RFC-0028 closes the original authority audit after CLI-1701 through CLI-1705 established the complete current parser inventory.",
+  "Verified with exact four-shell byte fixtures, repeat-process determinism, invalid usage, available-shell parsing, parser-catalog parity, truthful help, all workspace targets, Clippy with warnings denied, and CI/governance/schema/support/status/RC0/traceability/formatting/diff gates; the final status-bound full gate is recorded by the following status commit.",
+  "The generator performs no path, project, symbol, environment, clock, filesystem, network, plugin, daemon, or LSP discovery and never installs or activates shell configuration.",
+  "No Ling semantics, diagnostic allocation, JSON schema, Semantic ID, source span, runtime, bytecode, VM, ABI, artifact, cache, or Unicode 17.0.0 behavior changed.",
 ]
 
 [[task]]
