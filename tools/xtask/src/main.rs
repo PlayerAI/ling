@@ -566,11 +566,12 @@ fn main() -> ExitCode {
             match rc2_change_control::check_repository(&root) {
                 Ok(summary) => {
                     println!(
-                        "RC2 inventory OK: {} evidence classes ({} BlockedSpec, {} partial), {} audit files",
+                        "RC2 inventory OK: {} evidence classes ({} BlockedSpec, {} partial), {} audit files, {} upstream gate",
                         summary.evidence_class_count,
                         summary.blocked_count,
                         summary.partial_count,
-                        summary.audit_file_count
+                        summary.audit_file_count,
+                        summary.upstream_gate_count
                     );
                     ExitCode::SUCCESS
                 }

@@ -50,6 +50,12 @@ blocker-only/no-claim boundary, and seven linked audit-marker files. It
 validates inventory drift only and does not approve a blocker, create a
 candidate, or produce a Final result.
 
+Accepted `DEC-0248` additionally authorizes the bounded
+`RC-6904-CURRENT-EVIDENCE` child. The RC2 verifier composes the current
+RC3→RC1→RC0 chain and corrects the protocol inventory total from 21 to 27.
+Every predecessor parent remains blocked; this does not classify or approve a
+blocker fix, candidate, or Final result.
+
 ## Compatibility and deferred work
 
 This audit changes no language semantics, diagnostics, schemas, Semantic IDs,

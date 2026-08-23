@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+use crate::rc3_verification;
+
 const MATRIX_PATH: &str = "docs/testing/RC2-FINAL-CHANGE-CONTROL.md";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -91,6 +93,7 @@ pub struct CheckSummary {
     pub blocked_count: usize,
     pub partial_count: usize,
     pub audit_file_count: usize,
+    pub upstream_gate_count: usize,
 }
 
 pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
@@ -101,6 +104,10 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
     })?;
     let mut errors = validate_matrix(&matrix);
     errors.extend(validate_audits(root));
+    if let Err(upstream_errors) = rc3_verification::check_repository(root) {
+        errors.extend(upstream_errors);
+    }
+    errors.extend(validate_current_evidence(&matrix));
     finish(errors).map(|()| CheckSummary {
         evidence_class_count: EVIDENCE_CLASSES.len(),
         blocked_count: count_state("BlockedSpec"),
@@ -109,7 +116,26 @@ pub fn check_repository(root: &Path) -> Result<CheckSummary, Vec<String>> {
             .filter(|class| class.state.starts_with("Partial"))
             .count(),
         audit_file_count: REQUIRED_AUDIT_MARKERS.len(),
+        upstream_gate_count: 1,
     })
+}
+
+fn validate_current_evidence(matrix: &str) -> Vec<String> {
+    const REQUIRED: &[&str] = &[
+        "The current RC3→RC1→RC0 bounded inventory chain passes",
+        "all three predecessor release gates remain `BlockedSpec`",
+        "The 27-record protocol inventory",
+    ];
+    let normalized = normalize(matrix);
+    REQUIRED
+        .iter()
+        .filter(|marker| !normalized.contains(&normalize(marker)))
+        .map(|marker| {
+            format!(
+                "GOV-RC2-CHANGE-CONTROL-0011: {MATRIX_PATH} is missing current evidence marker {marker:?}"
+            )
+        })
+        .collect()
 }
 
 fn validate_matrix(matrix: &str) -> Vec<String> {
@@ -261,6 +287,7 @@ mod tests {
         assert_eq!(summary.blocked_count, 5);
         assert_eq!(summary.partial_count, 1);
         assert_eq!(summary.audit_file_count, 7);
+        assert_eq!(summary.upstream_gate_count, 1);
     }
 
     #[test]
@@ -282,6 +309,17 @@ mod tests {
             errors
                 .iter()
                 .any(|error| error.contains("missing audit marker"))
+        );
+    }
+
+    #[test]
+    fn rejects_stale_upstream_and_protocol_evidence() {
+        let errors = validate_current_evidence("The 21-record protocol inventory");
+        assert_eq!(errors.len(), 3);
+        assert!(
+            errors
+                .iter()
+                .all(|error| error.contains("GOV-RC2-CHANGE-CONTROL-0011"))
         );
     }
 

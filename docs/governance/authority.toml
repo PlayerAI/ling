@@ -3731,3 +3731,16 @@ covers = ["RC-6903 bounded current RC1-to-RC0 upstream evidence", "composed boun
 depends_on = ["DEC-0054", "DEC-0246", "ROADMAP-1.0"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0248"
+title = "Current RC2 boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0248-current-rc2-boundary-evidence.md"
+covers = ["RC-6904 bounded current RC3-to-RC1-to-RC0 and protocol evidence", "composed predecessor inventory chain plus corrected 27-record protocol fact", "internal evidence without blocker approval, source fix, candidate, artifact, Final decision, or G6 completion claims"]
+depends_on = ["DEC-0055", "DEC-0247", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

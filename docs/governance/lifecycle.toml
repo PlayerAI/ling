@@ -6364,3 +6364,29 @@ unresolved_alternatives = [
   "Immutable candidate; reviewer independence/conflict policy; clean environment/toolchain capture; artifact/security verification; complete reproduction; retention/rerun rules; signed comparison; and Go/No-Go remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0248"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0248-current-rc2-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Run cargo xtask rc2 verify and require six classes, seven audit files, and one composed upstream gate.",
+  "Run RC3, RC1, RC0, and protocol inventory verification independently.",
+  "Replace current upstream/protocol markers with stale facts in a focused test and require fail-closed errors.",
+  "Run workspace, CI, governance, support, status, traceability, Clippy, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Corrects documentation and composes internal evidence gates only; Ling semantics, diagnostics, schemas, Semantic IDs, packages, dependencies, CLI/LSP/DAP behavior, runtime, Unicode, protocol states, support states, and public APIs remain unchanged.",
+  "Adds no blocker approval, source fix, candidate, artifact, Final decision, network behavior, or G6 completion claim.",
+]
+unresolved_alternatives = [
+  "Blocker taxonomy/disposition; candidate baseline; regression/risk/impact/rollback records; matrix rerun; immutable candidate/provenance; reviewer approval; regeneration; and Final/Go remain deferred.",
+]
+superseded_by = ""

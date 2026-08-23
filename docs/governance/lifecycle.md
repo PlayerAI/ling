@@ -278,6 +278,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0245` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0245](../decisions/0245-current-rc0-registry-evidence.md) |
 | `DEC-0246` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0246](../decisions/0246-current-rc1-boundary-evidence.md) |
 | `DEC-0247` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0247](../decisions/0247-current-rc3-upstream-evidence.md) |
+| `DEC-0248` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0248](../decisions/0248-current-rc2-boundary-evidence.md) |
 
 ## Migration boundary
 
