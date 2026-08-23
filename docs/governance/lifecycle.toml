@@ -7257,3 +7257,33 @@ unresolved_alternatives = [
   "Dependency, generated, builtin and Prelude search, explicit package fields, top-level-only filtering, fuzzy, case-folded, normalized and module search, scores, configurable limits, resolve, partial results, work-done progress, stdio $/cancelRequest, concurrent scheduling, persistence, filesystem discovery, Stable lifecycle, and general Semantic Transactions remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0046"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0046.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = "2026-08-24"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Freeze the exact canonical type and modifier order, standard and custom status, source-role mapping, modifier exclusivity, and client projection algorithm.",
+  "Cover module and import roles, aliases, records, variants, cases, Traits, implementations, type parameters, parameters, immutable and mutable values, fields, calls, assignments, builtins and Prelude shadowing, keywords, booleans, comments, literals, and operators.",
+  "Verify checked identity wins over structural and lexical evidence; invalid and unresolved identifiers are omitted while conservative lexical fallback never fabricates checked roles or modifiers.",
+  "Cover Unicode identifiers, emoji prefixes, BOM, CRLF, multiline spans, UTF-8, UTF-16 and UTF-32 projection, nonempty line splitting, non-overlap, deterministic order, repeated snapshots, edits, and stale versions once transport exists.",
+  "Cover clients supporting all, partial, standard-only, custom mutable, and no types or modifiers, plus unknown capability fields and malformed known fields.",
+  "Prove no Semantic ID, DefinitionId, type, Effect, Capability, host path, future language category, or compiler debug fact enters a semantic-token result.",
+]
+compatibility_impact = [
+  "Adds Accepted ling.semantic-token-taxonomy/0.1 with no predecessor and registers one Future planned public semantic-token surface without advertising or implementing a provider.",
+  "Uses existing lexical, resolved, checked, source-map, and snapshot observations without changing compiler identity or language semantics.",
+  "Adds no diagnostic code, JSON schema, Semantic ID, DefinitionId, canonical byte, Typed Core evaluation, runtime, bytecode, VM, ABI, package, filesystem, network, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Typed reference generation, provider shape, full and delta transport, result IDs, request and document policy, temporary and dependency scope, limits, cancellation, caching, stale errors, fixture schema, Zed presentation, Stable lifecycle, and Semantic Transactions remain deferred.",
+  "Effect, Capability, resource, actor, node, kernel, Semantic ID, ownership, borrow, unsafe, and generated categories remain excluded until exact source-span, privacy, fallback, negotiation, and migration authority exists.",
+]
+superseded_by = ""

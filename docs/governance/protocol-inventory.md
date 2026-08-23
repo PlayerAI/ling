@@ -6,7 +6,7 @@
 
 ## Summary
 
-- 45 records: 41 current public, 1 internal, 3 Future.
+- 46 records: 41 current public, 1 internal, 4 Future.
 - Current public stability: 16 Experimental, 25 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
@@ -56,6 +56,7 @@
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.2` | `Experimental` | no | no | 7 |
 | `PROTO-VM-CONTROL` | Public | Runtime control | `ling.vm.control/0.1` | `Experimental` | no | no | 4 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
+| `PROTO-LSP-SEMANTIC-TOKENS` | Planned public | LSP | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
 | `PROTO-ABI` | Planned public | ABI | — | `Future` | no | no | 0 |
 | `PROTO-EVIDENCE` | Planned public | Evidence | — | `Future` | no | no | 0 |
@@ -607,6 +608,19 @@
 - Sources: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Fixtures: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Notes: This record prevents a versioned implementation artifact from being mistaken for a public 1.x commitment; it is not the Future evidence-bundle protocol.
+
+### `PROTO-LSP-SEMANTIC-TOKENS` — Ling LSP semantic tokens
+
+- Producer: Future ling-lsp typed semantic-token provider
+- Consumer: Future LSP 3.17 clients and editor hosts
+- Reader policy: Accepted RFC-0046 defines taxonomy and deterministic client-supported legend projection only; request, document, full/delta, result-ID, stale, cancellation, and limit semantics remain undefined.
+- Writer policy: No writer exists. A future writer must consume compiler-owned checked, structural, and lexical evidence under RFC-0046 and must obtain Accepted LSP-2402/LSP-2403 transport authority before advertising a provider.
+- Unknown-field policy: Not yet defined for the future request protocol; RFC-0046 requires ordinary unknown initialize capability members to be ignored and malformed known semantic-token capability members to fail initialization.
+- Migration tool: Not defined; ling.semantic-token-taxonomy/0.1 is an Accepted taxonomy basis, not a current public wire version.
+- Authority: `RFC-0046`, `RFC-0004`, `DEC-0002`, `DEC-0012`, `DEC-0029`, `DEC-0084`, `DEC-0085`, `DEC-0086`, `DEC-0087`
+- Sources: [`docs/RFC-0046.md`](../RFC-0046.md), [`docs/RFC-0004.md`](../RFC-0004.md), [`docs/decisions/0002-source-position-units.md`](../decisions/0002-source-position-units.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0029-lsp-position-encoding-projection.md`](../decisions/0029-lsp-position-encoding-projection.md), [`docs/decisions/0084-lsp-lexical-token-source-index.md`](../decisions/0084-lsp-lexical-token-source-index.md), [`docs/decisions/0085-lsp-checked-token-identity-observation.md`](../decisions/0085-lsp-checked-token-identity-observation.md), [`docs/decisions/0086-lsp-checked-token-snapshot-identity.md`](../decisions/0086-lsp-checked-token-snapshot-identity.md), [`docs/decisions/0087-lsp-checked-token-source-fixtures.md`](../decisions/0087-lsp-checked-token-source-fixtures.md)
+- Fixtures: —
+- Notes: No semanticTokensProvider, request method, legend, result, protocol marker, custom token type, or compatibility claim is implemented. Effect, Capability, resource, actor, node, kernel, Semantic ID, ownership, borrow, unsafe, and generated categories remain excluded.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 
