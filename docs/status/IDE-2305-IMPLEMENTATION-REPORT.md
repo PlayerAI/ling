@@ -1,7 +1,8 @@
 # IDE-2305 implementation report
 
-> Status: Implemented; status-ledger binding pending the implementation commit
+> Status: Done (2026-08-23)
 > Task: `IDE-2305`
+> Implementation commit: `9619693d5e2ae5c9ffd4ec05ef578606b87fcce9`
 > Authority: Accepted `RFC-0040`, `RFC-0039`, `RFC-0038`, `RFC-0004`,
 > `RFC-0005`, `RFC-0023`, `RFC-0029`, `RFC-0030`, `DEC-0002`, `DEC-0012`,
 > `DEC-0019`, `DEC-0029`, `DEC-0071`, `DEC-0075`, `DEC-0077`, `DEC-0078`
@@ -33,10 +34,9 @@ mutation actually exist. IDE-2305 makes no false validation or identity claim.
 
 - `cargo test -p ling-db reference_search_index --locked --offline` passes.
 - `cargo test -p ling-lsp --test prepare_rename --locked --offline` passes.
-- Focused formatting and compilation pass.
-- Exact transcript, workspace, governance, release, and strict Clippy gates are
-  recorded only after the generated evidence and implementation commit are
-  complete.
+- Locked offline workspace tests, strict Clippy, CI, governance, LSP, support,
+  status, RC0, v0.0.1 traceability, formatting, and diff checks pass against
+  implementation commit `9619693d5e2ae5c9ffd4ec05ef578606b87fcce9`.
 
 ## Compatibility, determinism, and Unicode impact
 

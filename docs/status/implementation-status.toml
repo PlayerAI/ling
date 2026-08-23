@@ -7096,7 +7096,7 @@ acceptance = [
   "The observation preserves raw spelling and NFC name, copies Unicode 17 Script/Identifier_Type/status/skeleton/mixed-script facts, and returns the existing IdentifierError for invalid input.",
   "Owned strings and the authoritative sorted Unicode tables make repeated observations equal without map-order, host-path, allocation-address, locale, cache, or protocol state.",
   "Focused cargo fmt, ling-db check/tests, and subsequent repository gates pass; decomposed/NFC, confusable mixed-script, invalid XID, repeated deterministic, and raw-spelling cases are covered.",
-  "The public IDE-2305 prepare-rename target remains BlockedSpec for keywords, targets, ranges, aliases, collisions, visibility/coherence, snapshots, versions, diagnostics, edits, and protocol behavior.",
+  "Completed IDE-2305 consumes this Unicode observation under Accepted RFC-0040 while retaining its own checked-target, exact-range, snapshot, mutability, placeholder, failure, and protocol contracts.",
 ]
 verified_against_commit = "e2681b0fe08ec95805e6a1346b3e8693ba83a3af"
 completion_commit = "e2681b0fe08ec95805e6a1346b3e8693ba83a3af"
@@ -7110,7 +7110,7 @@ notes = [
 [[task]]
 id = "IDE-2305"
 title = "IDE prepare rename"
-state = "BlockedSpec"
+state = "Done"
 release = "G1"
 size = "M"
 owner = "Codex"
@@ -7123,32 +7123,41 @@ spec = [
   "docs/LANGUAGE.md",
   "docs/decisions/0002-source-position-units.md",
   "docs/decisions/0012-semantic-identity-and-canonical-bytes.md",
+  "docs/decisions/0019-incremental-query-boundary.md",
   "docs/RFC-0005.md",
-  "docs/decisions/0027-trait-checked-core-dictionary-witness.md",
+  "docs/RFC-0040.md",
+  "docs/decisions/0077-ide-rename-identifier-observation.md",
   "docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "crates/ling-db/src/reference_search_index.rs",
+  "crates/ling-lsp/src/location_projection.rs",
+  "crates/ling-lsp/src/prepare_rename.rs",
+  "crates/ling-lsp/tests/prepare_rename.rs",
+  "docs/RFC-0040.md",
   "docs/status/IDE-2305-AUTHORITY-AUDIT.md",
+  "docs/status/IDE-2305-IMPLEMENTATION-REPORT.md",
+  "tests/protocols/lsp-prepare-rename/README.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing prepare-rename target/range, name-validation, alias/confusable, visibility/coherence, read-only, position/version, Semantic ID, and protocol lifecycle contracts.",
-  "The audit covers keywords/builtins, generated/dependency targets, Unicode 17.0.0/XID/NFC/confusables, aliases, ambiguity, visibility/coherence, CRLF/BOM, stale snapshots, deterministic placeholders, and required fixtures.",
-  "No prepare-rename handler, validator, placeholder editor API, protocol field, diagnostic allocation, Semantic ID change, or mutation surface is added while the authority is absent.",
-  "The future implementation must use checked resolution, preserve byte-span truth, make DefinitionId changes explicit, reject unsafe/stale targets deterministically, and label experimental fields.",
+  "Accepted RFC-0040 fixes capability negotiation, exact Preview discovery, immutable checked snapshots, exact declaration/reference selection, writable source-backed target eligibility, original-spelling placeholders, null results, failures, freshness, bounds, and migration behavior.",
+  "The checked compiler index includes source-backed definitions and bindings without references and exposes a borrowed exact selection view; the LSP handler preserves original UTF-8 byte-span truth and projects only through the negotiated position encoding.",
+  "Executable tests cover declarations, references, unused declarations, locals, trait and implementation members, NFC-equivalent spellings, source-less builtins, read-only dependencies, temporary documents, UTF-8/16/32, BOM/CRLF/Unicode, invalid parameters, notifications, null results, and checked failure.",
+  "Locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates pass against implementation commit 9619693d5e2ae5c9ffd4ec05ef578606b87fcce9.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "9619693d5e2ae5c9ffd4ec05ef578606b87fcce9"
+completion_commit = "9619693d5e2ae5c9ffd4ec05ef578606b87fcce9"
+integration_state = "committed"
+completed = "2026-08-23"
 notes = [
-  "IDE-2305 is BlockedSpec by GAP-LSP-TRANSACTION-PROTOCOL-001, GAP-UNICODE-ALIAS-SYNTAX-001, GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001, LSP-2102, and IDE-2304; DEC-0012 also makes rename-induced DefinitionId changes explicit.",
-  "Current source, resolver, and semantic code supplies internal spans/identity but no approved prepare-rename target policy, new-name validation contract, or stale-version behavior.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, or Unicode 17.0.0 behavior.",
+  "Implementation commit 9619693d5e2ae5c9ffd4ec05ef578606b87fcce9 adds Accepted RFC-0040, checked zero-reference target selection, the standard prepareRename provider, exact Preview discovery, protocol/governance records, fixtures, and implementation evidence.",
+  "Standard prepareRename has no newName; new-name legality, aliases, confusable/collision policy, visibility/coherence simulation, generated/virtual documents, edits, stale edit application, DefinitionId migration, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deliberately deferred to IDE-2306 or later work.",
+  "No diagnostic allocation, Ling syntax/semantics, Typed Core evaluation, runtime, bytecode, VM, ABI, Semantic ID/schema, persistent cache, package format, or Unicode 17.0.0 behavior changes.",
 ]
 
 [[task]]
