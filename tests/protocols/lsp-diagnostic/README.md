@@ -15,13 +15,15 @@ RFC-0032 backward-compatible temporary-source extension:
   repeatably;
 - an invalid source, primary span, related span, or later input rejects the
   complete call without partial output;
-- push publication is separately covered by
-  `ling.lsp.publish-diagnostics/0.1`; suppression, caps, pull diagnostics, and
-  Workspace Edits remain outside this fixture.
+- push publication, pull parity, and diagnostic control are separately covered
+  by their current 0.2/0.1 protocol fixtures; Accepted RFC-0035 also records
+  exact stdio transcript composition across those boundaries. Workspace Edits
+  remain outside this fixture.
 
 Executable evidence:
 
 ```text
 cargo test -p ling-diagnostics --all-targets --locked --offline
 cargo test -p ling-lsp --test diagnostic_adapter --locked --offline
+cargo test -p ling-lsp --test diagnostic_transcripts --locked --offline
 ```

@@ -1,72 +1,75 @@
-# LSP-2205 Authority Audit: Diagnostic fixtures
+# LSP-2205 authority audit: diagnostic fixtures
 
 ## Outcome
 
-`LSP-2205` is correctly recorded as `BlockedSpec`. The execution plan asks for
-LSP diagnostic fixtures covering stable codes, spans, related information,
-stale results, and publication behavior. Existing compiler/CLI diagnostic
-fixtures exercise Ling diagnostics and JSON, not an accepted LSP schema.
+`LSP-2205` is implementation-authorized by Accepted RFC-0035. Its prerequisites
+are also Accepted and implemented: RFC-0031 defines diagnostic values,
+RFC-0032 push publication, RFC-0033 pull reports, and RFC-0034 root-control and
+omission summaries. The earlier missing-authority blocker no longer applies.
 
-No LSP fixture corpus, expected JSON-RPC messages, position snapshots, result
-IDs, stale-result vectors, or placeholder editor protocol was added.
+The authorized slice is an internal, path-free, exact-byte JSON-RPC transcript
+corpus. It adds no public method, compiler diagnostic meaning, editor-specific
+contract, or automatic golden update mechanism.
 
 ## Normative traceability
 
-- `docs/ERROR-CODES.md`, `docs/SEMANTICS.md`, and existing diagnostic fixtures
-  define compiler-level bilingual codes, byte spans, Facts, repairs, and
-  deterministic ordering; they do not define LSP request/response fixtures.
-- `PROTO-DIAGNOSTIC-JSON` is a Preview writer and cannot serve as an LSP
-  fixture schema. No LSP protocol inventory entry exists.
-- `GAP-LSP-TRANSACTION-PROTOCOL-001` and
-  `GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001` leave positions, snapshots, versions,
-  publication, and protocol lifecycle open.
-- LSP-2201 through LSP-2204 are prerequisite adapter/publication/policy
-  boundaries; fixtures cannot be normative before those decisions are accepted.
+- RFC-0035 §§1–3 define the manifest, compact UTF-8/LF payload grammar,
+  RFC-0004 framing boundary, exact output comparison, repeated fresh-server
+  replay, and host-input isolation.
+- RFC-0035 §4 requires Unicode incremental recovery, push/pull parity,
+  diagnostic-storm control, and invalid-initialize cases.
+- RFC-0035 §5 separates sequential wire evidence from stale-ticket,
+  cancellation, related-file, alternate-encoding, oversized, and internal
+  failure-injection tests that cannot be represented honestly as transcripts.
+- RFC-0031 through RFC-0034 remain the authority for every expected LSP field,
+  protocol marker, ordering rule, result ID, cap, and omission diagnostic.
+- `docs/ERROR-CODES.md` remains the sole diagnostic allocation source; the
+  fixture corpus only records emitted `L-TYPE-0001`, `L-LEX-0004`, and
+  `L-LSP-0001` values.
 
-## Current interface evidence
+## Resolved plan drift
 
-The current repository confirms the missing boundary:
+The previous audit correctly blocked fixtures before the parent protocols were
+Accepted, but its current-interface observations became stale after LSP-2201
+through LSP-2204 landed. The repository now has an executable stdio host,
+negotiated position projection, push notifications, pull full/unchanged
+reports, stateless result IDs, deterministic caps, and recovery behavior.
 
-- `crates/ling-diagnostics` and `crates/ling-cli/tests` cover human/JSON
-  rendering, stable codes, byte spans, and CLI/REPL behavior.
-- No test harness consumes JSON-RPC messages, LSP diagnostics, negotiated
-  positions, document versions, push/pull result IDs, or error-storm metadata.
-- No fixture metadata records protocol version, Stable/Experimental fields,
-  workspace snapshot identity, or migration vectors for an LSP adapter.
+RFC-0035 deliberately does not claim that a sequential transcript can race a
+later cancel notification or inject completion of an old analysis ticket.
+Those boundaries stay in focused Rust integration tests. This avoids freezing
+fabricated messages or treating implementation-only hooks as public protocol.
 
-## Required authority before implementation
+## Authorized evidence
 
-An implementation-ready decision or RFC must define, at minimum:
+- `tests/fixtures/lsp-diagnostics-v1/manifest.json` records the four required
+  cases and exact active protocol markers.
+- Paired `*.input.jsonl` and `*.output.jsonl` files contain raw compact
+  JSON-RPC bodies with only path-free Ling URIs.
+- `crates/ling-lsp/tests/diagnostic_transcripts.rs` validates grammar and
+  metadata, frames the real stdio host, compares exact bytes and order, repeats
+  every case in a fresh server, and asserts semantic cross-frame invariants.
+- `.gitattributes` fixes the corpus at LF across supported checkout hosts.
+- Existing adapter, push, pull, control, position, overlay, cancellation, and
+  lifecycle suites provide the non-transcript failure-injection matrix required
+  by RFC-0035 §5.
 
-1. LSP protocol/schema versions, request/notification transport, field
-   stability, and fixture metadata/loader rules;
-2. diagnostic mapping, positions, related information, severity/tags,
-   experimental data, result IDs, snapshot/version, and stale behavior;
-3. push/pull publication, cancellation, error-storm caps, clear/recovery,
-   workspace/related-file scope, and deterministic ordering;
-4. cross-platform stdout/stderr/stdio behavior, localization, offline/project
-   setup, and migration/compatibility policy; and
-5. positive, negative, malformed, Unicode/CRLF/BOM, stale/cancelled,
-   cross-file, deterministic, and schema-migration fixtures.
+## Compatibility and determinism
 
-Until those decisions and fixtures are Accepted, writing expected LSP bytes
-would freeze an unregistered protocol and could turn implementation details
-into compatibility commitments.
+The internal fixture marker is Preview test metadata, not a public Ling
+protocol. No existing diagnostic code, message, severity, Facts, repair,
+Semantic ID, source span, protocol behavior, schema, or result-ID algorithm is
+changed. Repeated-process output identity is executable; no host path,
+filesystem discovery, environment, network, cache, clock, allocation, or
+hash-map iteration enters the corpus.
 
-## Evidence and compatibility
-
-This audit was checked against `docs/ERROR-CODES.md`, `docs/SEMANTICS.md`,
-`docs/ROADMAP-1.0.md`, `docs/ling_execution_plan/04-LSP-IMPLEMENTATION.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-`crates/ling-diagnostics`, `crates/ling-cli/tests`, and the LSP-2201–2204
-authority audits.
-No code or public protocol behavior changed; no diagnostic allocation, schema,
-Semantic ID, source-span, runtime, bytecode, VM, or Unicode 17.0.0 claim is
-made.
+Unicode behavior remains Unicode 17.0.0. The corpus specifically preserves
+original BOM/CRLF/Chinese/emoji source bytes while asserting negotiated UTF-16
+wire ranges.
 
 ## Intentionally deferred
 
-`LSP-2205` can begin after the LSP diagnostic schema and publication/error-storm
-decisions are Accepted. The fixture corpus must be generated from those
-contracts, include both polarities and migration evidence, and remain separate
-from the compiler diagnostic authority.
+Dynamic registration, observable asynchronous cancellation, progress, partial
+results, background scheduling, editor launch, automatic fixture rewriting,
+code-description URLs, repair application, Workspace Edits, Semantic
+Transactions, and Stable lifecycle remain outside LSP-2205.

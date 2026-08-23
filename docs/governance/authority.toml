@@ -1042,6 +1042,19 @@ supersedes = []
 stable_basis = true
 
 [[document]]
+id = "RFC-0035"
+title = "LSP diagnostic transcript fixtures"
+kind = "RFC"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/RFC-0035.md"
+covers = ["ling.test.lsp-diagnostic-transcripts/1 internal fixture manifest", "exact raw JSON-RPC diagnostic transcript bodies and deterministic stdio replay", "Unicode recovery, push/pull parity, storm-control, and invalid-initialize wire evidence"]
+depends_on = ["RFC-0004", "RFC-0023", "RFC-0029", "RFC-0031", "RFC-0032", "RFC-0033", "RFC-0034", "DEC-0001", "DEC-0002", "DEC-0029", "DEC-0034", "DEC-0071", "DEC-0072", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true
+
+[[document]]
 id = "SEMANTICS"
 title = "Ling core semantics"
 kind = "Core specification"

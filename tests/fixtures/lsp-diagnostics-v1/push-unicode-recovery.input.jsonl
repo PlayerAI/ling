@@ -1,0 +1,7 @@
+{"id":1,"jsonrpc":"2.0","method":"initialize","params":{"capabilities":{"general":{"positionEncodings":["utf-16"]}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"languageId":"ling","text":"﻿module Main\r\n\r\nlet 问候: Int = 1\r\nlet 图标 = \"🙂\"\r\n","uri":"ling://workspace/src/Main.ling","version":1}}}
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"contentChanges":[{"range":{"end":{"character":15,"line":2},"start":{"character":14,"line":2}},"text":"\"错\""}],"textDocument":{"uri":"ling://workspace/src/Main.ling","version":2}}}
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"contentChanges":[{"range":{"end":{"character":17,"line":2},"start":{"character":14,"line":2}},"text":"1"}],"textDocument":{"uri":"ling://workspace/src/Main.ling","version":3}}}
+{"id":2,"jsonrpc":"2.0","method":"shutdown","params":null}
+{"jsonrpc":"2.0","method":"exit","params":{}}

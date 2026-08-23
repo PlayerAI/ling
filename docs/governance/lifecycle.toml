@@ -6947,3 +6947,31 @@ unresolved_alternatives = [
   "Dynamic settings, severity and user-code filters, repair/related-information merging, parser recovery changes, production Trait solver integration, telemetry, persistence, cancellation, progress, Workspace Edits, Semantic Transactions, and Stable lifecycle remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "RFC-0035"
+kind = "RFC"
+status = "Accepted"
+path = "docs/RFC-0035.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Validate the exact internal manifest shape, sorted unique safe paths, active protocol markers, compact JSON object grammar, UTF-8 without BOM, and final LF.",
+  "Frame raw input payloads through the real RFC-0004 stdio host, decode every output strictly, and compare body bytes, order, count, exit code, lifecycle state, and repeated fresh-server runs.",
+  "Cover UTF-16 Chinese/emoji/BOM/CRLF incremental recovery, exact push/pull diagnostic-array parity and result migration, controlled omission summaries, and invalid-control initialization atomicity.",
+  "Keep stale-ticket, sequential cancellation, related-file, other-encoding, malformed-internal, oversized, and insertion-order boundaries in their focused executable integration tests without fabricated wire behavior.",
+  "Run locked offline workspace tests, strict Clippy, CI, governance, LSP, support, status, RC0, traceability, formatting, and diff gates.",
+]
+compatibility_impact = [
+  "Adds internal Preview ling.test.lsp-diagnostic-transcripts/1 fixture metadata and exact JSON-RPC response-body evidence but no public protocol or editor method.",
+  "Changes no registered diagnostic code, message, severity, Facts, repair, Semantic ID, compiler schema, or accepted LSP behavior.",
+  "Adds no Ling syntax/semantics, Typed Core, runtime, bytecode, VM, ABI, filesystem/network/cache behavior, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Golden transport headers, editor-driven snapshots, automatic fixture update mode, fabricated stale/cancellation races, Workspace Edits, Semantic Transactions, and Stable lifecycle remain excluded or deferred.",
+]
+superseded_by = ""

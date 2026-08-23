@@ -1,0 +1,2 @@
+{"id":1,"jsonrpc":"2.0","method":"initialize","params":{"initializationOptions":{"lingDiagnosticControl":{"maxPerDocument":0}}}}
+{"jsonrpc":"2.0","method":"exit","params":{}}

@@ -18,3 +18,6 @@ tests/projects/**/*.lock -text
 tests/bytecode/**/*.ling text eol=lf
 tests/bytecode/**/*.dis text eol=lf
 tests/bytecode/**/*.hex text eol=lf
+
+# LSP transcript payloads are exact UTF-8/LF wire-body fixtures.
+tests/fixtures/lsp-diagnostics-v1/** text eol=lf

@@ -1,0 +1,8 @@
+{"id":1,"jsonrpc":"2.0","method":"initialize","params":{"capabilities":{"general":{"positionEncodings":["utf-16"]},"textDocument":{"diagnostic":{}}}}}
+{"jsonrpc":"2.0","method":"initialized","params":{}}
+{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"languageId":"ling","text":"module Main\n\nlet value: Int = \"text\"\n","uri":"ling://workspace/src/Main.ling","version":1}}}
+{"id":2,"jsonrpc":"2.0","method":"textDocument/diagnostic","params":{"identifier":"ling.lsp.pull-diagnostics/0.2","textDocument":{"uri":"ling://workspace/src/Main.ling"}}}
+{"jsonrpc":"2.0","method":"textDocument/didChange","params":{"contentChanges":[{"text":"module Main\n\nlet value: Int = 1\n"}],"textDocument":{"uri":"ling://workspace/src/Main.ling","version":2}}}
+{"id":3,"jsonrpc":"2.0","method":"textDocument/diagnostic","params":{"identifier":"ling.lsp.pull-diagnostics/0.2","previousResultId":"ling.lsp.pull-result/0.1:blake3:50452c8837a0d38c95cda449204b889efbf042799d1d672371875ac824b3966f","textDocument":{"uri":"ling://workspace/src/Main.ling"}}}
+{"id":4,"jsonrpc":"2.0","method":"shutdown","params":null}
+{"jsonrpc":"2.0","method":"exit","params":{}}
