@@ -41,7 +41,7 @@
 | 19 | `VM-1203` | 独立 decoder/verifier | VM-1201 | 与 lowering | **Done**；bounded decoder/verifier、22 个 malformed vectors、arbitrary-byte/fuzz boundary；VM-1204 承接执行 |
 | 20 | `PRJ-1102` | module discovery | PRJ-1101 | 与 VM | deterministic graph |
 | 21 | `INC-1402` | VFS/revision | INC-1401 | 与 VM | overlay/revision tests |
-| 22 | `LSP-2201` | Diagnostic adapter | LSP lifecycle + compiler diagnostics | 与 Zed | stable code/span/related info |
+| 22 | `LSP-2201` | Diagnostic adapter | LSP lifecycle + compiler diagnostics | 与 Zed | **Done**；Accepted `RFC-0031`；Experimental `ling.lsp.diagnostic/0.1`；implementation `9a5310fbe48fd40ae5c3d05c7720656361f0b08f` |
 | 23 | `ZQ-3201` | 基础 highlights | TS grammar | 与 LSP | highlight fixtures |
 | 24 | `ZQ-3202` | brackets | TS grammar | 与 ZQ-3201 | pair fixtures |
 | 25 | `ZQ-3204` | outline | TS declarations | 与 query tasks | symbols visible in Zed |
@@ -162,9 +162,9 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `LSP-2104` | G1/Editor | 增量文本变更 | — | Done | Accepted `RFC-0029`; implementation `492754b066da11e4ae2fe58774e5c7096e3703a5`; see `docs/status/LSP-2104-IMPLEMENTATION-REPORT.md` |
 | `LSP-2105` | G1/Editor | Workspace reload | — | Done | Accepted `RFC-0030`; implementation `49994b9132ff22ae3fd17ab172476d020a79febe`; see `docs/status/LSP-2105-IMPLEMENTATION-REPORT.md` |
 | `LSP-2105-WORKSPACE-SNAPSHOT` | G1/Editor | Bounded internal workspace-state snapshot | S | Done | Accepted `DEC-0071`; consumed by Accepted `RFC-0030`; see `docs/status/LSP-2105-WORKSPACE-SNAPSHOT-IMPLEMENTATION-REPORT.md` |
-| `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | BlockedSpec | Accepted DEC-0034 closes only the internal ordering child; public adapter, positions, fields, and publication remain open; see `docs/status/LSP-2201-AUTHORITY-AUDIT.md` |
-| `LSP-2201-DIAGNOSTIC-POSITION` | G1/Editor | Bounded internal diagnostic span projection | S | Done | Accepted `DEC-0072`; see `docs/status/LSP-2201-DIAGNOSTIC-POSITION-IMPLEMENTATION-REPORT.md`; public adapter fields/publication remain BlockedSpec in `LSP-2201` |
-| `LSP-2201-ORDERING` | G1/Editor | Internal canonical diagnostic ordering | S | Done | Accepted DEC-0034; see `crates/ling-lsp/src/diagnostics.rs` and `docs/status/LSP-2201-ORDERING-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `LSP-2201` | G1/Editor | Compiler diagnostic adapter | — | Done | Accepted `RFC-0031`; implementation `9a5310fbe48fd40ae5c3d05c7720656361f0b08f`; see `docs/status/LSP-2201-IMPLEMENTATION-REPORT.md` |
+| `LSP-2201-DIAGNOSTIC-POSITION` | G1/Editor | Bounded internal diagnostic span projection | S | Done | Accepted `DEC-0072`; consumed by Accepted `RFC-0031`; see `docs/status/LSP-2201-DIAGNOSTIC-POSITION-IMPLEMENTATION-REPORT.md` |
+| `LSP-2201-ORDERING` | G1/Editor | Internal canonical diagnostic ordering | S | Done | Accepted DEC-0034; consumed by Accepted `RFC-0031`; see `docs/status/LSP-2201-ORDERING-IMPLEMENTATION-REPORT.md` |
 | `LSP-2202` | G1/Editor | Push diagnostics v0 | — | BlockedSpec | Accepted DEC-0035 closes only the internal diagnostic-batch child; public publish/trigger/version/clear behavior remains open; see `docs/status/LSP-2202-AUTHORITY-AUDIT.md` |
 | `LSP-2202-BATCH` | G1/Editor | Internal immutable diagnostic batch | S | Done | Accepted DEC-0035; see `crates/ling-lsp/src/diagnostic_batch.rs` and `docs/status/LSP-2202-BATCH-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `LSP-2203` | G1/Editor | Pull diagnostics Preview | — | BlockedSpec | `04-LSP-IMPLEMENTATION.md:215`, `docs/status/LSP-2203-AUTHORITY-AUDIT.md` |

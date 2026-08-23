@@ -1,6 +1,6 @@
 # LSP-2201 implementation report
 
-> Status: implementation complete; registry binding pending
+> Status: Done / 已完成
 > Task: `LSP-2201`
 > Authority: Accepted `RFC-0031`, `DEC-0001`, `DEC-0002`, `DEC-0029`,
 > `DEC-0034`, and `DEC-0072`
@@ -57,9 +57,9 @@ input atomicity.
 
 ## Verification
 
-The exact implementation commit will be bound here and in
-`docs/status/implementation-status.toml` after the focused and full locked
-offline repository gates pass.
+The focused and full locked offline repository gates passed. The exact
+implementation commit is `9a5310fbe48fd40ae5c3d05c7720656361f0b08f`,
+bound in `docs/status/implementation-status.toml`.
 
 ## Intentionally deferred
 
