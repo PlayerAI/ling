@@ -3276,3 +3276,16 @@ covers = ["EVD-5804 bounded AI Provenance boundary evidence", "test-only provena
 depends_on = ["DEC-0211", "ROADMAP-1.0", "GAP-REGISTER"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0213"
+title = "Internal Trusted Compiler Route boundary evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0213-trusted-compiler-route-boundary-evidence.md"
+covers = ["CBK-5901 bounded Trusted Compiler Route boundary evidence", "test-only route/proof/support vocabulary", "compiler-route boundaries without Native/ABI/target selection semantics"]
+depends_on = ["DEC-0212", "ROADMAP-1.0", "GAP-REGISTER"]
+supersedes = []
+stable_basis = true

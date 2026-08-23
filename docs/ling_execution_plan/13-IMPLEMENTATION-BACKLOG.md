@@ -499,6 +499,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EVD-5804` | G5 | AI Provenance | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:566`, `docs/status/EVD-5804-AUTHORITY-AUDIT.md` |
 | `EVD-5804-OBSERVATION` | G5 | Internal AI Provenance boundary evidence | S | Done | Accepted `DEC-0212`; see `crates/ling-types/tests/ai_provenance_evidence.rs` and `docs/status/EVD-5804-OBSERVATION-IMPLEMENTATION-REPORT.md`; provenance/privacy/approval semantics remain BlockedSpec |
 | `CBK-5901` | G5 | 可信编译路线决策 | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:585`, `docs/status/CBK-5901-AUTHORITY-AUDIT.md` |
+| `CBK-5901-OBSERVATION` | G5 | Internal Trusted Compiler Route boundary evidence | S | Done | Accepted `DEC-0213`; see `crates/ling-types/tests/trusted_compiler_route_evidence.rs` and `docs/status/CBK-5901-OBSERVATION-IMPLEMENTATION-REPORT.md`; Native/ABI/target/route semantics remain BlockedSpec |
 | `CBK-5902` | G5 | Lowering Validator | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:599`, `docs/status/CBK-5902-AUTHORITY-AUDIT.md` |
 | `CBK-5903` | G5 | Critical Runtime/Target Package | — | BlockedSpec | `09-G5-V0.5-CRITICAL.md:611`, `docs/status/CBK-5903-AUTHORITY-AUDIT.md` |
 | `STAB-6101` | G6 | 逐项支持矩阵审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:32`, `docs/status/STAB-6101-AUTHORITY-AUDIT.md` |

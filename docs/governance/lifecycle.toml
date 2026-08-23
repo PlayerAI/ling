@@ -5447,3 +5447,27 @@ unresolved_alternatives = [
   "Versioned provenance schema and canonical bytes; agent/tool/reviewer identity and version authorities; semantic snapshot, changed-node, contract, obligation, artifact, evidence, and review linkage; task/goal and verification-command/result representation; automated versus human actions; approval decision, authority, revocation, and contradiction; traceability/non-proof semantics; prompt/source disclosure scopes; secret, credential, PII, private-conversation redaction; retention, deletion, access control, export, and incident response; tamper evidence, signatures, trust, and TCB; incomplete/contradictory/stale/malformed/corrupt/unsupported/migration and fail-closed behavior; bilingual stable diagnostics and exits; positive, negative, redaction, secret/PII, private-conversation, approval, tamper, Unicode 17.0.0, BOM/CRLF, source-span, and determinism fixtures; protocol inventory and public support remain open under EVD-5804, EVD-5801, EVD-5802, EVD-5803, RFC-K507, GAP-CRITICAL-PROFILE-001, PROTO-EVIDENCE, PROTO-SEMANTIC-GRAPH-JSON, and missing provenance/privacy/approval authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0213"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0213-trusted-compiler-route-boundary-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Assert all sixty compiler-route categories and local order; compare forward/reverse opaque bytes; reject duplicates; retain all five route alternatives, checked-Typed-Core input, and support-matrix boundaries together.",
+  "Defer route selection, Native IR/ABI/FFI, target, proof/equivalence/TCB, diagnostics, protocols, and support claims until Accepted authority and offline cross-target fixtures exist.",
+]
+compatibility_impact = [
+  "Adds only test-local boundary evidence. Accepted Seed behavior, diagnostics, schemas, Semantic IDs, source spans, CLI/LSP, runtime, bytecode, VM, dependencies, support matrix, and Unicode 17.0.0 remain unchanged; existing bytecode lowering/verifier behavior is not reinterpreted as Native/Critical route evidence.",
+  "No Native backend/IR, ABI/FFI dependency, target package, translation validator, proof producer/checker, C bridge, machine-code verifier, route selector, diagnostic allocation, CLI/LSP route, protocol, or support claim is registered.",
+]
+unresolved_alternatives = [
+  "Route selection and rejected alternatives; initial Critical Core and targets; Native/backend-neutral IR validity; type/layout/calling convention; ownership/resource/effect/capability, FFI, Fault/unwinding, thread/reentry, startup/shutdown, and Target Primitive Package semantics; checked Typed Core versus a versioned derived representation; target/toolchain/profile/build/artifact identity; source/binary mapping; semantics-preserving equivalence; proof obligations and certificates; independent checker, trust, TCB, assumptions, and optimization boundaries; controlled-C and machine-code boundaries; fail-closed unsupported/invalid/ABI/target/proof/certificate/verifier/bridge failures; bilingual stable diagnostics and exits; differential, translation, proof, reproducibility, Unicode 17.0.0, BOM/CRLF, source-span, ownership/FFI, and cross-target fixtures; protocol inventory and truthful support remain open under CBK-5901, CBK-5902, CBK-5903, RFC-K508, GAP-NATIVE-BACKEND-ABI-001, GAP-OWNERSHIP-MODEL-001, GAP-KERNEL-DEVICE-001, GAP-CRITICAL-PROFILE-001, PROTO-ABI, and missing Native/Critical route authority.",
+]
+superseded_by = ""
