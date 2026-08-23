@@ -45,6 +45,12 @@ const HARNESSES: &[Harness] = &[
         seed_count: 1,
     },
     Harness {
+        name: "semantic_schema_bytes",
+        target_path: "fuzz/fuzz_targets/semantic_schema_bytes.rs",
+        corpus_dir: "semantic_schema_bytes",
+        seed_count: 2,
+    },
+    Harness {
         name: "manifest_bytes",
         target_path: "fuzz/fuzz_targets/manifest_bytes.rs",
         corpus_dir: "manifest_bytes",
@@ -265,8 +271,8 @@ mod tests {
             .and_then(Path::parent)
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("fuzz inventory is valid");
-        assert_eq!(summary.target_count, 8);
-        assert_eq!(summary.corpus_file_count, 18);
+        assert_eq!(summary.target_count, 9);
+        assert_eq!(summary.corpus_file_count, 20);
     }
 
     #[test]

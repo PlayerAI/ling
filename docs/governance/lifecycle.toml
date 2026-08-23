@@ -5995,3 +5995,30 @@ unresolved_alternatives = [
   "Eligible subjects; 1.x ranges; minimum periods; warnings and suppressions; replacement/removal obligations; schema/protocol N-1; target/profile transitions; security exceptions; migration commitments; distribution; and cross-version/platform evidence remain deferred.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0234"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0234-semantic-schema-reader-fuzz-coverage.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-23"
+proposed = "2026-08-23"
+decided = "2026-08-23"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Compile all fuzz binaries offline and locked.",
+  "Verify the positive and malformed semantic corpus through a normal workspace test and both exact-version reader calls through the fuzz harness.",
+  "Verify nine declared targets and twenty corpus files through xtask.",
+  "Replay semantic_schema_bytes in the pinned Ubuntu fuzz job.",
+  "Run semantic, fuzz, CI-contract, governance, status, workspace, lint, formatting, deterministic, and offline gates.",
+]
+compatibility_impact = [
+  "Adds a fuzz-only ling-semantic dependency edge, one harness, two corpus files, and test/governance evidence; public schemas, reader behavior, Semantic IDs, diagnostics, CLI, packages, Unicode 17.0.0, and runtime behavior remain unchanged.",
+  "Adds no migration, compatibility edge, executable decoded-graph path, future-protocol harness, or G6 release claim.",
+]
+unresolved_alternatives = [
+  "Long-run coverage thresholds; dictionaries; resource-limit oracles; package-aware valid corpus expansion; cross-platform sanitizers; and archive, replay/evidence, FFI, device, LSP/DAP, and Zed harnesses remain deferred.",
+]
+superseded_by = ""

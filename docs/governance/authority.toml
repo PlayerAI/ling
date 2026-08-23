@@ -3549,3 +3549,16 @@ covers = ["COMPAT-6504 bounded deprecation-policy readiness evidence", "exact se
 depends_on = ["DEC-0001", "DEC-0231", "DEC-0232", "ROADMAP-1.0", "SCHEMA-LIFECYCLE-POLICY", "SUPPORT-MATRIX"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0234"
+title = "Semantic-schema reader fuzz coverage"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0234-semantic-schema-reader-fuzz-coverage.md"
+covers = ["REL-6601 bounded Semantic Graph reader fuzz coverage", "deterministic data-only ling.semantic/0.1 and ling.semantic/0.2 reader harness with reviewed positive/malformed corpus", "fuzz inventory and Ubuntu replay without schema, migration, execution, future-protocol, or G6 completion claims"]
+depends_on = ["DEC-0012", "RFC-0002", "DEC-0041", "PROTOCOL-INVENTORY", "ROADMAP-1.0"]
+supersedes = []
+stable_basis = true

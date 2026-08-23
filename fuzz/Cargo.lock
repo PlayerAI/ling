@@ -231,6 +231,8 @@ dependencies = [
  "ling-resolve",
  "ling-source",
  "ling-types",
+ "ling-unicode",
+ "unicode-normalization",
 ]
 
 [[package]]
@@ -253,6 +255,7 @@ dependencies = [
  "ling-bytecode",
  "ling-format",
  "ling-project",
+ "ling-semantic",
  "ling-source",
  "ling-syntax",
 ]

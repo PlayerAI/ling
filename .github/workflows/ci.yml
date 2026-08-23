@@ -150,6 +150,10 @@ jobs:
         env:
           CARGO_NET_OFFLINE: "true"
         run: cargo fuzz run audit_schema_bytes fuzz/corpus/audit_schema_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
+      - name: Replay Semantic Graph schema corpus
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: cargo fuzz run semantic_schema_bytes fuzz/corpus/semantic_schema_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
       - name: Replay project manifest corpus
         env:
           CARGO_NET_OFFLINE: "true"

@@ -16,6 +16,7 @@ Targets:
 - `parser_utf8`: valid UTF-8 through Source, Parser/CST, and valid-CST AST lowering.
 - `formatter_utf8`: valid and invalid UTF-8 through the compiler CST-backed Format IR and formatter disposition.
 - `audit_schema_bytes`: UTF-8 bytes through the canonical Audit schema decoder and bilingual diagnostic JSON renderer.
+- `semantic_schema_bytes`: bounded UTF-8 JSON through both isolated Semantic Graph readers (`ling.semantic/0.1` and `ling.semantic/0.2`) with deterministic success/error results; returned graphs remain data-only.
 - `manifest_bytes`: arbitrary bytes through two bounded `ling.toml` version 1 reads with distinct diagnostic source labels; successful semantic models, failure codes/spans, and Diagnostic JSON rendering must remain deterministic.
 - `lock_bytes`: arbitrary bytes through two bounded `ling.lock/1` reads; validated models, canonical bytes, failure codes/spans, and Diagnostic JSON rendering must remain deterministic.
 - `bytecode_bytes`: arbitrary bytes through the bounded `ling.bytecode/1.0` decoder and independent verifier twice; verified models or structured bilingual diagnostics must be deterministic and diagnostics remain bounded. Checked-in `hex:` seeds preserve exact valid/corrupt binary fixtures in reviewable text.
@@ -41,6 +42,7 @@ cargo +nightly-2026-08-15 fuzz run lexer_utf8 fuzz/corpus/lexer_utf8 -- -runs=25
 cargo +nightly-2026-08-15 fuzz run parser_utf8 fuzz/corpus/parser_utf8 -- -runs=256 -timeout=120 -rss_limit_mb=2048
 cargo +nightly-2026-08-15 fuzz run formatter_utf8 fuzz/corpus/formatter_utf8 -- -runs=256 -timeout=120 -rss_limit_mb=2048
 cargo +nightly-2026-08-15 fuzz run audit_schema_bytes fuzz/corpus/audit_schema_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
+cargo +nightly-2026-08-15 fuzz run semantic_schema_bytes fuzz/corpus/semantic_schema_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
 cargo +nightly-2026-08-15 fuzz run manifest_bytes fuzz/corpus/manifest_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
 cargo +nightly-2026-08-15 fuzz run lock_bytes fuzz/corpus/lock_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048
 cargo +nightly-2026-08-15 fuzz run bytecode_bytes fuzz/corpus/bytecode_bytes -- -runs=256 -timeout=120 -rss_limit_mb=2048

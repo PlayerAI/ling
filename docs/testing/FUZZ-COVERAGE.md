@@ -1,6 +1,6 @@
 # Ling fuzz coverage inventory
 
-Status: Seed-level inventory and smoke coverage (2026-08-22)
+Status: implemented-reader inventory and smoke coverage (2026-08-23)
 
 This document is the evidence record for `REL-6601`. It distinguishes a
 checked-in fuzz harness from a planned entry point that has no implementation.
@@ -33,14 +33,16 @@ MSVC AddressSanitizer runtime is an optional host component.
 | --- | --- | ---: | --- | --- | --- | --- |
 | lexer / parser / Unicode | `source_bytes`, `lexer_utf8`, `parser_utf8` | 2 / 2 / 5 | none | 120 s / 2048 MB | compiler maintainers | `fuzz/fuzz_targets/*.rs`, `fuzz/corpus/{source_bytes,lexer_utf8,parser_utf8}` |
 | formatter | `formatter_utf8` | 1 | none | 120 s / 2048 MB | formatter/compiler maintainers | `fuzz/fuzz_targets/formatter_utf8.rs` |
-| diagnostic / schema decoder | `audit_schema_bytes` | 1 | none | 120 s / 2048 MB | diagnostics/format maintainers | `fuzz/fuzz_targets/audit_schema_bytes.rs` |
+| diagnostic / schema decoder | `audit_schema_bytes`, `semantic_schema_bytes` | 1 / 2 | none | 120 s / 2048 MB | diagnostics/format/semantic maintainers | `fuzz/fuzz_targets/{audit_schema_bytes,semantic_schema_bytes}.rs` |
 | bytecode verifier | `bytecode_bytes` | 2 | none | 120 s / 2048 MB | bytecode/VM maintainers | `fuzz/fuzz_targets/bytecode_bytes.rs` |
 | package / lock | `manifest_bytes`, `lock_bytes` | 4 / 1 | none | 120 s / 2048 MB | project/package maintainers | `fuzz/fuzz_targets/{manifest_bytes,lock_bytes}.rs` |
 
 The available targets compare repeated decoding or projection, preserve the
 original source labels and byte spans where the API exposes them, and bound
 diagnostic rendering. The formatter target exercises the compiler-owned Format
-IR and does not introduce a formatter CLI or an edit protocol.
+IR and does not introduce a formatter CLI or an edit protocol. The semantic
+schema target exercises both isolated exact-version readers (`ling.semantic/0.1`
+and `ling.semantic/0.2`) without treating either as executable checked input.
 
 ## Planned entry points without a current harness
 

@@ -13,6 +13,7 @@ ling-ast = { path = "../crates/ling-ast" }
 ling-bytecode = { path = "../crates/ling-bytecode" }
 ling-format = { path = "../crates/ling-format" }
 ling-project = { path = "../crates/ling-project" }
+ling-semantic = { path = "../crates/ling-semantic" }
 ling-source = { path = "../crates/ling-source" }
 ling-syntax = { path = "../crates/ling-syntax" }
 
@@ -61,6 +62,13 @@ bench = false
 [[bin]]
 name = "audit_schema_bytes"
 path = "fuzz_targets/audit_schema_bytes.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "semantic_schema_bytes"
+path = "fuzz_targets/semantic_schema_bytes.rs"
 test = false
 doc = false
 bench = false

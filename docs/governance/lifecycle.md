@@ -264,6 +264,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0231` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0231](../decisions/0231-current-compiler-compatibility-boundary-evidence.md) |
 | `DEC-0232` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0232](../decisions/0232-migration-tool-deferred-until-version-pair.md) |
 | `DEC-0233` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0233](../decisions/0233-deprecation-policy-readiness-boundary-evidence.md) |
+| `DEC-0234` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-23` | [DEC-0234](../decisions/0234-semantic-schema-reader-fuzz-coverage.md) |
 
 ## Migration boundary
 

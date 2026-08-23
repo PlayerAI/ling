@@ -8,15 +8,16 @@
 
 ## Decision
 
-The repository can and does maintain deterministic Seed-level fuzz harnesses
+The repository can and does maintain deterministic implemented-surface fuzz harnesses
 for source decoding, lexing, parsing/AST lowering, the compiler-owned Format
-IR, Audit schema decoding, project manifests, project locks, and bytecode
-decoding/verifying. Those harnesses are added or inventoried without changing
+IR, Audit and Semantic Graph schema decoding, project manifests, project locks,
+and bytecode decoding/verifying. Those harnesses are added or inventoried without changing
 language semantics or public protocols.
 
 `REL-6601` cannot be marked complete as a G6 release task yet. Accepted
 DEC-0041 closes only the bounded `REL-6601-SEED` internal inventory and corpus
-drift gate. The plan asks
+drift gate. Accepted DEC-0234 separately closes the data-only Semantic Graph
+reader fuzz child; it does not close the parent. The plan asks
 for continuous fuzz coverage across replay/evidence, FFI, device metadata,
 LSP/DAP, archives, and editor integrations, while G6 itself is gated by the
 G1--G5 exits. Several of those surfaces are Future or Unsupported and have no
@@ -55,9 +56,14 @@ are:
 2. `formatter_utf8` for deterministic compiler-CST Format IR projection and
    formatter disposition;
 3. `audit_schema_bytes` for the Audit decoder and bounded bilingual
-   diagnostic JSON;
+   diagnostic JSON, plus `semantic_schema_bytes` for the isolated exact-version
+   `ling.semantic/0.1` and `ling.semantic/0.2` data-only readers;
 4. `manifest_bytes` and `lock_bytes` for project manifest/lock readers; and
 5. `bytecode_bytes` for the bounded decoder and verifier.
+
+The current exact inventory is nine harnesses and twenty checked-in corpus
+files. `crates/ling-semantic/tests/fuzz_corpus.rs` independently proves the
+semantic corpus contains a successful Seed read and deterministic failures.
 
 `cargo check --manifest-path fuzz/Cargo.toml --bins --locked --offline` is the
 portable local evidence. The pinned Ubuntu CI job executes each corpus with
@@ -87,9 +93,9 @@ reliability gate, the repository needs:
 
 ## Compatibility and deferred work
 
-The completed child adds only `cargo xtask fuzz verify`, which checks the
-existing target declarations, source entry points, corpus counts, and
-inventory names without executing libFuzzer or claiming G6 coverage.
+The completed Seed child adds `cargo xtask fuzz verify`; the semantic-schema
+child adds an actual libFuzzer consumer, corpus, normal regression test, and
+pinned Ubuntu replay. Neither claims G6 completion.
 
 This audit changes no language grammar, parser semantics, resolver, evaluator,
 Typed Core, diagnostic allocation, schema version, package publication,

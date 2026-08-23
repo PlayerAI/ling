@@ -542,6 +542,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `COMPAT-6504-READINESS` | G6 | Deprecation-policy readiness boundary evidence | S | Done | Accepted `DEC-0233`; see `cargo xtask deprecation verify`, `docs/governance/deprecation-readiness.toml`, and `docs/status/COMPAT-6504-READINESS-IMPLEMENTATION-REPORT.md`; the public policy and six lifecycle commitments remain BlockedSpec |
 | `REL-6601` | G6 | Fuzz 总覆盖盘点 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:321`, `docs/status/REL-6601-AUTHORITY-AUDIT.md`, `docs/testing/FUZZ-COVERAGE.md` |
 | `REL-6601-SEED` | G6 | Seed fuzz inventory and corpus drift gate | S | Done | Accepted DEC-0041; see `cargo xtask fuzz verify`, `fuzz/README.md`, and `docs/status/REL-6601-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
+| `REL-6601-SEMANTIC-SCHEMA` | G6 | Semantic Graph reader fuzz coverage | S | Done | Accepted `DEC-0234`; see `semantic_schema_bytes`, `cargo xtask fuzz verify`, and `docs/status/REL-6601-SEMANTIC-SCHEMA-IMPLEMENTATION-REPORT.md`; future-protocol harnesses and the G6 gate remain BlockedSpec |
 | `REL-6602` | G6 | 故障注入 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:340`, `docs/status/REL-6602-AUTHORITY-AUDIT.md`, `docs/testing/FAULT-INJECTION.md` |
 | `REL-6602-SEED` | G6 | Seed fault-matrix drift gate | S | Done | Accepted DEC-0042; see `cargo xtask fault verify` and `docs/status/REL-6602-SEED-IMPLEMENTATION-REPORT.md`; parent remains BlockedSpec |
 | `REL-6603` | G6 | 安全审计 | — | BlockedSpec | `10-G6-V1.0-STABILIZATION.md:354`, `docs/status/REL-6603-AUTHORITY-AUDIT.md`, `docs/testing/SECURITY-AUDIT.md` |
