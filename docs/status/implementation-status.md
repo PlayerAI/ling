@@ -152,6 +152,7 @@
 | `EVD-5803` | Reproducible Build Binding | `G5` | `M` | `BlockedSpec` | `EVD-5802` | `` |
 | `EVD-5803-OBSERVATION` | Internal Reproducible Build Binding boundary evidence | `G5` | `S` | `Done` | `EVD-5802-OBSERVATION` | `cb4ff8a861327d616aef6cd3b210e41da347800e` |
 | `EVD-5804` | AI Provenance | `G5` | `M` | `BlockedSpec` | `EVD-5803` | `` |
+| `EVD-5804-OBSERVATION` | Internal AI Provenance boundary evidence | `G5` | `S` | `Done` | `EVD-5803-OBSERVATION` | `bc0cf44884443d1b34cf4e47643c82125a8f633a` |
 | `FFI-3601` | FFI declaration model | `G3` | `M` | `BlockedSpec` | `BACK-3505` | `` |
 | `FFI-3601-OBSERVATION` | Internal FFI declaration boundary evidence | `G3` | `S` | `Done` | `BACK-3505-OBSERVATION` | `d254184a0f8a3e123e746c1c2f34973756ff6ba0` |
 | `FFI-3602` | Minimal C ABI interoperability | `G3` | `M` | `BlockedSpec` | `FFI-3601` | `` |
