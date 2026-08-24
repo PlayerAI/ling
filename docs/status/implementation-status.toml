@@ -9295,7 +9295,7 @@ notes = [
 [[task]]
 id = "EFF-2105"
 title = "Effect fuzz and property tests"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9335,11 +9335,11 @@ acceptance = [
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "planned"
 completed = ""
 notes = [
-  "EFF-2104 and DEC-0262 now supply accepted Handler runtime, residual-row, bytecode 1.4, VM, Fault/State/cancellation, and differential authority; only the checked-source generator, deterministic shrink/replay, and general property-oracle boundary remains unresolved.",
-  "Proposed DEC-0263 specifies that remaining boundary but is not implementation authority until Accepted.",
+  "EFF-2104 and DEC-0262 supply accepted Handler runtime, residual-row, bytecode 1.4, VM, Fault/State/cancellation, and differential authority.",
+  "Accepted DEC-0263 closes the checked-source generator, deterministic shrink/replay, and general property-oracle boundary without adding a public protocol.",
   "The excluded fuzz workspace covers source, lexer/parser, manifests, and bytecode verification; current Handler differential tests are fixed evidence rather than a generated property corpus.",
   "The bounded model-property child adds offline tests only; no compiler, interpreter, VM, bytecode, fuzz protocols, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior changes.",
 ]
@@ -9347,7 +9347,7 @@ notes = [
 [[task]]
 id = "TASK-2201"
 title = "Structured Task syntax and Checked Core"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "M"
 owner = "Codex"
@@ -9393,10 +9393,10 @@ acceptance = [
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "planned"
 completed = ""
 notes = [
-  "EFF-2103 is complete; TASK-2201 remains BlockedSpec only until the checked-only frontend, handle ownership, suspension, identity, diagnostic, and Audit choices in Proposed DEC-0264 are Accepted.",
+  "EFF-2103 is complete and Accepted DEC-0264 authorizes the checked-only frontend, handle ownership, suspension, identity, diagnostic, and Audit implementation boundary.",
   "The broader GAP-STRUCTURED-TASK-001 remains open for TASK-2202 through TASK-2206 lifecycle, cancellation, cleanup, Fault aggregation, scheduler, runtime, and detach authority; RFC-0020 covers only host VM cancellation.",
   "DEC-0091 and TASK-2201-CORE-MODEL cover only an internal checked identity graph and do not authorize positive Task source or runtime behavior.",
   "Current syntax/AST/HIR/types/effects/evaluator/bytecode/VM implement Seed only; no Task lifecycle node, scope identity, suspension state, cleanup region, or structured runtime exists.",

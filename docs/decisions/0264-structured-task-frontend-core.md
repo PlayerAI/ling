@@ -1,17 +1,17 @@
 # DEC-0264: Structured Task frontend and Checked Core / Structured Task 前端与 Checked Core
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-24<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-25<br>
 > Owner role：concurrency-design<br>
 > 相关 RFC/缺口：DEC-0091 | DEC-0260 | GAP-STRUCTURED-TASK-001 | TASK-2201<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This proposal closes only the source-to-checked boundary of TASK-2201. It does
+This decision closes only the source-to-checked boundary of TASK-2201. It does
 not authorize Task state-machine lowering, execution, scheduling, detach,
 deadlines, or a production runtime.
 
-本提案仅关闭 TASK-2201 从源码到 checked 表示的边界，不授权 Task 状态机 lowering、
+本决定仅关闭 TASK-2201 从源码到 checked 表示的边界，不授权 Task 状态机 lowering、
 执行、调度、detach、deadline 或生产 runtime。
 
 ## Question

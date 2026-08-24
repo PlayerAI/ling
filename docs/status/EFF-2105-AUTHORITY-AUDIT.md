@@ -2,14 +2,14 @@
 
 ## Outcome
 
-`EFF-2105` remains correctly recorded as `BlockedSpec`. Accepted `RFC-0006`,
+`EFF-2105` is ready for implementation. Accepted `RFC-0006`,
 `DEC-0062`, and `DEC-0067` authorize the deterministic in-process model child;
 accepted `DEC-0262` and completed `EFF-2104` now provide Handler interpreter,
 bytecode 1.4, VM, residual-row, Fault, State, cancellation, resource, and
-differential semantics. The only remaining authority gap is the exact internal
-checked-source generator, replay/shrinking bounds, and property-oracle contract.
-Proposed `DEC-0263` specifies that boundary but is not implementation authority
-until accepted.
+differential semantics. Accepted `DEC-0263` closes the final authority gap for
+the internal checked-source generator, replay/shrinking bounds, and
+property-oracle contract without adding a public protocol or changing language
+semantics.
 
 No Core generator, handler/effect oracle, residual-row comparator, new
 property-test protocol, fuzz corpus, diagnostic allocation, or placeholder G2
@@ -55,9 +55,9 @@ API was added.
   make host behavior, Fault mapping, or canonical bytes part of the language
   contract.
 
-## Required authority before implementation
+## Accepted implementation authority
 
-An Accepted RFC or decision must now define:
+Accepted DEC-0263 defines:
 
 1. generator constraints and shrinking rules for only well-typed, bounded,
    source-mapped Core; recursion, allocation, depth, output, and diagnostic
@@ -71,10 +71,9 @@ An Accepted RFC or decision must now define:
    unhandled operations, malformed bytecode, resource limits, deterministic
    output, and no unchecked-AST execution.
 
-Until the generator/oracle decision is Accepted, a full property test could
-silently bias its input domain, discard meaningful divergence, or turn a
-generator panic, unstable shrink, or host observation into an accidental
-language guarantee.
+The implementation must follow those bounds exactly so a generator panic,
+unstable shrink, biased input domain, or host observation cannot become an
+accidental language guarantee.
 
 ## Evidence and compatibility
 
@@ -93,8 +92,8 @@ bounded model-property child adds offline tests only.
 
 ## Intentionally deferred
 
-The full `EFF-2105` target can begin after Proposed DEC-0263 is reviewed and
-Accepted. The future implementation must generate only checked, bounded Core,
+The full `EFF-2105` target may now begin under Accepted DEC-0263. The
+implementation must generate only checked, bounded Core,
 compare stable semantic projections, retain reproducible seeds and minimized
 corpus entries, and publish differential evidence without exposing a public
 protocol. `EFF-2105-MODEL-PROPERTIES` remains complete under DEC-0067.

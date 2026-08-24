@@ -7512,13 +7512,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0263"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0263-effect-property-generator-and-oracle.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-24"
 proposed = "2026-08-24"
-decided = ""
-stable_basis = false
+decided = "2026-08-25"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Generate only bounded source that re-enters the complete checked pipeline, with fixed seeds and deterministic shrinking.",
@@ -7538,13 +7538,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0264"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0264-structured-task-frontend-core.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-24"
 proposed = "2026-08-24"
-decided = ""
-stable_basis = false
+decided = "2026-08-25"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Cover contextual Task declarations, nested scopes, direct spawn/await, fused let!, path-complete handle observation, and checked Task Core publication.",

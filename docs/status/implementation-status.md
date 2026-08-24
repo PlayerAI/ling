@@ -153,7 +153,7 @@
 | `EFF-2103-SYNTAX` | Handler source CST projection | `G2` | `S` | `Done` | `EFF-2103-CORE` | `73807f551753620b52b685d7aca25c2032ec1a77` |
 | `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `Done` | `EFF-2103` | `1188b2472ff0a61ac3d96c4ae21bbe9b6bd7eaba` |
 | `EFF-2104-REJECTION-GATE` | Internal unresolved-handler execution rejection gate | `G2` | `S` | `Done` | `EFF-2103-HIR` | `e265b451985a2afac071da6862c4bf9451faf9a0` |
-| `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `BlockedSpec` | `EFF-2104` | `` |
+| `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `Ready` | `EFF-2104` | `` |
 | `EFF-2105-MODEL-PROPERTIES` | Effect model deterministic property corpus | `G2` | `S` | `Done` | `EFF-2102`, `EFF-2103-CORE` | `f40c69f0311d3bd970e9613772ddf7135d17772c` |
 | `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |
 | `EVD-5801-OBSERVATION` | Internal Evidence Bundle Schema boundary evidence | `G5` | `S` | `Done` | `TIM-5703-OBSERVATION` | `2c27d97a4de390d49eba648830883bf50963f668` |
@@ -463,7 +463,7 @@
 | `SUP-2402-OBSERVATION` | Internal restart-budget observation | `G2` | `S` | `Done` | `SUP-2401-OBSERVATION` | `7ee0cf0bf90971bb6844c8bf467f5506e5e5e796` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
 | `SUP-2403-OBSERVATION` | Internal supervision test evidence | `G2` | `S` | `Done` | `SUP-2402-OBSERVATION` | `73046c5049324455ec87d0011e62482de97c07aa` |
-| `TASK-2201` | Structured Task syntax and Checked Core | `G2` | `M` | `BlockedSpec` | `EFF-2103` | `` |
+| `TASK-2201` | Structured Task syntax and Checked Core | `G2` | `M` | `Ready` | `EFF-2103` | `` |
 | `TASK-2201-CORE-MODEL` | Internal Structured Task Checked-Core identity model | `G2` | `S` | `Done` | `TASK-2201-TASK-SYNTAX-REJECTION` | `6028e78ce4091e58d5df1289c59b8fd6b0f61c4e` |
 | `TASK-2201-TASK-SYNTAX-REJECTION` | Internal Task-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `b3ede69c33d72d4419775650b820f1b5797dc652` |
 | `TASK-2202` | Task state-machine lowering | `G2` | `L` | `BlockedSpec` | `TASK-2201` | `` |

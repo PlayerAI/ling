@@ -1,17 +1,17 @@
 # DEC-0263: Effect property generator and differential oracle / Effect 性质生成器与差分判定器
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-24<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-25<br>
 > Owner role：effect-runtime-design<br>
 > 相关 RFC/缺口：RFC-0006 | DEC-0067 | DEC-0262 | EFF-2105<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This proposal defines only an internal, bounded evidence harness over semantics
+This decision defines only an internal, bounded evidence harness over semantics
 already accepted by RFC-0006 and DEC-0262. It does not add a source construct,
 runtime behavior, public fuzz protocol, or compatibility promise.
 
-本提案仅定义一个内部、有界的证据工具，覆盖 RFC-0006 与 DEC-0262 已接受的
+本决定仅定义一个内部、有界的证据工具，覆盖 RFC-0006 与 DEC-0262 已接受的
 语义；不增加源码构造、运行时行为、公共 fuzz 协议或兼容性承诺。
 
 ## Question
@@ -111,7 +111,7 @@ randomness and test implementation details part of Ling semantics?
 
 - Source language, runtime semantics, Capability rules, bytecode 1.0–1.4,
   diagnostics, schemas, Semantic/Definition/Program IDs, CLI, LSP, packages,
-  Native/Wasm, and Unicode 17.0.0: unchanged; the proposal tests only accepted
+  Native/Wasm, and Unicode 17.0.0: unchanged; the decision tests only accepted
   behavior.
 - Adds no public seed, corpus, replay, or property-test protocol. Generator
   source and failure text are internal test evidence and are not compatibility
