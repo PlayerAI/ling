@@ -481,7 +481,7 @@ fn bytecode_1_3_verifies_clause_order_uniqueness_signature_and_bounds() {
 }
 
 #[test]
-fn bytecode_1_3_rejects_unrepresentable_handler_state_and_refutable_parameters() {
+fn bytecode_1_3_rejects_unrepresentable_handler_state() {
     let mutable = concat!(
         "module Main\n",
         "    requires Console.Write\n\n",
@@ -499,23 +499,6 @@ fn bytecode_1_3_rejects_unrepresentable_handler_state_and_refutable_parameters()
         error.kind(),
         &LoweringErrorKind::UnsupportedFeature {
             feature: "mutable Handler capture".to_owned()
-        }
-    );
-
-    let refutable = concat!(
-        "module Main\n",
-        "    requires Console.Write\n\n",
-        "let main () =\n",
-        "    handle Console.write \"body\" with\n",
-        "        operation Console.Write.write(\"expected\", resume) -> resume ()\n",
-    );
-    let (source, snapshot) = checked_source("handler-pattern.ling", refutable);
-    let error = lower_v1_3(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
-        .expect_err("the accepted wire has no refutable parameter representation");
-    assert_eq!(
-        error.kind(),
-        &LoweringErrorKind::UnsupportedFeature {
-            feature: "parameter destructuring".to_owned()
         }
     );
 }

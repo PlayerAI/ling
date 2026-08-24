@@ -158,6 +158,114 @@ fn registry_arity_and_resume_cardinality_fail_before_checked_publication() {
 }
 
 #[test]
+fn handler_operation_inputs_accept_only_bindings_and_wildcards() {
+    let accepted = concat!(
+        "module Main\n\n",
+        "let bound =\n",
+        "    handle 1 with\n",
+        "        operation Random.next(seed, resume) -> seed\n\n",
+        "let ignored =\n",
+        "    handle () with\n",
+        "        operation Console.Write.write(_, resume) -> ()\n",
+    );
+    let checked = compile_checked(accepted).expect("binding and wildcard inputs are total");
+    assert_eq!(checked.handler_cores().len(), 2);
+
+    let cases = [
+        (
+            concat!(
+                "module Main\n\n",
+                "let value =\n",
+                "    handle 1 with\n",
+                "        operation Random.next(0, resume) -> 1\n",
+            ),
+            "0",
+        ),
+        (
+            concat!(
+                "module Main\n\n",
+                "let value =\n",
+                "    handle 1 with\n",
+                "        operation Random.next((left, right), resume) -> left\n",
+            ),
+            "(left, right)",
+        ),
+        (
+            concat!(
+                "module Main\n\n",
+                "let value =\n",
+                "    handle 1 with\n",
+                "        operation Random.next({ value = item }, resume) -> item\n",
+            ),
+            "{ value = item }",
+        ),
+        (
+            concat!(
+                "\u{feff}module Main\r\n\r\n",
+                "type 包装 =\r\n",
+                "    | 包裹 of Int\r\n\r\n",
+                "let value =\r\n",
+                "    handle 1 with\r\n",
+                "        operation Random.next((包裹 值), resume) -> 值\r\n",
+            ),
+            "(包裹 值)",
+        ),
+    ];
+
+    for (source, rejected_pattern) in cases {
+        let errors = resolve_source(source).expect_err("refutable input prevents publication");
+        let error = errors
+            .iter()
+            .find(|error| {
+                matches!(
+                    error.kind,
+                    ling_resolve::ResolveErrorKind::InvalidHandlerContract {
+                        reason: "refutable_parameter",
+                        ..
+                    }
+                )
+            })
+            .expect("registered refutable-parameter diagnostic");
+        let expected_start = source
+            .find(rejected_pattern)
+            .expect("pattern spelling occurs in source");
+        let diagnostic = error.to_diagnostic();
+        let span = diagnostic.primary_span().expect("pattern span");
+
+        assert_eq!(diagnostic.code(), codes::INVALID_HANDLER_CONTRACT);
+        assert_eq!(span.start_byte(), expected_start as u64);
+        assert_eq!(
+            span.end_byte(),
+            (expected_start + rejected_pattern.len()) as u64
+        );
+        assert_eq!(
+            diagnostic
+                .facts()
+                .get("operation")
+                .and_then(|value| value.as_str()),
+            Some("Random.next")
+        );
+        assert_eq!(
+            diagnostic
+                .facts()
+                .get("reason")
+                .and_then(|value| value.as_str()),
+            Some("refutable_parameter")
+        );
+        assert!(
+            diagnostic
+                .message_zh()
+                .contains("Handler clause contract 无效")
+        );
+        assert!(
+            diagnostic
+                .message_en()
+                .contains("handler clause contract is invalid")
+        );
+    }
+}
+
+#[test]
 fn many_resume_and_clause_body_effects_are_checked() {
     let many = concat!(
         "module Main\n\n",

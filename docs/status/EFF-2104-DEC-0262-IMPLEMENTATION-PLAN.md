@@ -11,7 +11,12 @@ The implementation starts only from a clean commit that passes governance and
 status verification. Each phase must keep bytecode 1.0–1.3 bytes and behavior
 unchanged and must not publish partial 1.4 execution authority.
 
-## Phase 1: close the checked-source pattern boundary
+## Phase 1: close the checked-source pattern boundary — Complete
+
+Implemented on 2026-08-24 in the resolver boundary before typed publication.
+Focused evidence covers binding/wildcard acceptance; literal, tuple, record,
+and constructor rejection; stable bilingual facts; and exact Unicode/BOM/CRLF
+pattern spans. No Handler Core or ProgramSnapshot is published on rejection.
 
 1. Add one total `is_handler_input_irrefutable` predicate over checked HIR.
    For the current registered scalar operation inputs, only `Binding` and
@@ -165,7 +170,7 @@ Required vertical fixtures:
 
 Deliver the smallest complete commits in this dependency order:
 
-1. Accepted authority/lifecycle/gap transition, followed by negative
+1. **Complete:** Accepted authority/lifecycle/gap transition and negative
    checked-pattern evidence.
 2. Format/model/codec/disassembly plus malformed verifier evidence.
 3. Binding-storage refactor with unchanged 1.0–1.3 golden evidence.

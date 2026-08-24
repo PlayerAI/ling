@@ -1776,6 +1776,9 @@ impl Resolver {
                 for clause in clauses {
                     let operation_name = clause.operation.normalized();
                     let operation = resolve_handler_operation(&operation_name);
+                    let inputs_are_checkable = operation.is_some_and(|operation| {
+                        clause.parameters.len() == operation.inputs().len()
+                    });
                     if let Some(operation) = operation {
                         if !handled_labels.insert(operation.label()) {
                             self.invalid_handler_contract(
@@ -1811,6 +1814,18 @@ impl Resolver {
                     scopes.push(Scope::default());
                     for parameter in &clause.parameters {
                         self.bind_pattern(module, parameter, true, scopes);
+                        if inputs_are_checkable
+                            && !self.is_handler_input_irrefutable(module, parameter)
+                        {
+                            self.invalid_handler_contract(
+                                module,
+                                parameter.span,
+                                &operation_name,
+                                "refutable_parameter",
+                                None,
+                                None,
+                            );
+                        }
                     }
                     if let Some(resume) = &clause.resume {
                         self.bind_name(module, resume.id, &resume.name, false, true, scopes);
@@ -1871,6 +1886,20 @@ impl Resolver {
             source_name: self.modules[module.0 as usize].hir.source_name.clone(),
             span,
         });
+    }
+
+    fn is_handler_input_irrefutable(&self, module: ModuleId, pattern: &hir::Pattern) -> bool {
+        match &pattern.kind {
+            hir::PatternKind::Wildcard => true,
+            hir::PatternKind::Binding { .. } => !self
+                .pattern_constructors
+                .contains_key(&PatternKey::new(module, pattern.id)),
+            hir::PatternKind::Unit
+            | hir::PatternKind::Literal(_)
+            | hir::PatternKind::Tuple(_)
+            | hir::PatternKind::Record(_)
+            | hir::PatternKind::Constructor { .. } => false,
+        }
     }
 
     fn count_binding_references(

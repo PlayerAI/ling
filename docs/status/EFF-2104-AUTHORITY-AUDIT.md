@@ -49,9 +49,11 @@ Fault catching, rollback, and Stable behavior remain outside EFF-2104.
   independent verification, unmasked Capability preflight, private VM
   continuations, deep restoration, malformed records, limits, cancellation,
   and interpreter/VM differential fixtures.
-- The 1.3 lowerer fails atomically for mutable Handler captures and refutable
-  clause parameters. Those failures are evidence of the wire gap, not a claim
-  that the accepted source behavior is unsupported or that EFF-2104 is Done.
+- The checked resolver now accepts only binding/wildcard operation inputs and
+  rejects literal, tuple, record, and constructor forms with `L-EFFECT-0005`
+  reason `refutable_parameter`, canonical operation facts, and original
+  Unicode/BOM/CRLF spans before typed or Handler Core publication. The 1.3
+  lowerer retains its historical mutable Handler-capture rejection.
 - The rejection-gate child covers only the negative compile boundary and
   diagnostic serialization; it has no checked snapshot, runtime, bytecode, VM,
   Fault, cancellation, or differential behavior.
@@ -77,10 +79,9 @@ Accepted DEC-0262 retains the applicable DEC-0261 rules and refines them with:
    mutable State, Unicode/CRLF/BOM spans, deterministic output, and the
    no-unchecked-AST boundary.
 
-Implementation must follow those accepted rules exactly. EFF-2104 cannot be
-marked Done until bytecode 1.4 is implemented, the VM preserves shared Cell
-identity and checked clause-pattern behavior, all differential evidence
-passes, and the completion commit is recorded.
+The checked-source pattern gate is implemented. EFF-2104 cannot be marked Done
+until bytecode 1.4 is implemented, the VM preserves shared Cell identity, all
+differential evidence passes, and the completion commit is recorded.
 
 ## Evidence and compatibility
 

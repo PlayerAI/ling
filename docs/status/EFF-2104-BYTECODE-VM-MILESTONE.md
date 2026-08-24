@@ -4,8 +4,9 @@
 
 This milestone implements the verifier-gated immutable/irrefutable
 `ling.bytecode/1.3` Handler slice and its VM continuation ABI. It is executable
-evidence for EFF-2104, not a Done claim: `GAP-EFFECT-HANDLER-BYTECODE-001`
-blocks shared mutable Cell identity and refutable clause-parameter completion.
+evidence for EFF-2104, not a Done claim. Accepted DEC-0262 now retains this
+historical slice while assigning complete shared Cell/State lowering to 1.4;
+its checked-source irrefutable-parameter gate is implemented separately.
 
 ## Normative clauses covered
 
@@ -53,8 +54,8 @@ milestone commit evidence; this report does not claim future CI execution.
 
 ## Specification gaps and compatibility impact
 
-`GAP-EFFECT-HANDLER-BYTECODE-001` records two contradictions exposed during
-implementation:
+`GAP-EFFECT-HANDLER-BYTECODE-001` recorded two contradictions exposed during
+this milestone:
 
 1. DEC-0261 requires repeated restoration to retain the same lexical Cell
    identities and keep `State<T>` unmasked, but its exact 1.3 record has
@@ -64,10 +65,11 @@ implementation:
    signatures and has no representation or accepted failure rule for a
    refutable parameter that does not match an operation input.
 
-Lowering rejects both cases atomically with original source spans and an
-explicit experimental specification marker. No code or snapshot invents the
-missing semantics. Published protocol inventory remains at 1.2 until an
-Accepted decision closes the gap and complete evidence passes.
+Accepted DEC-0262 resolves both questions normatively. The checked resolver now
+rejects every refutable or structurally redundant operation input with
+`L-EFFECT-0005` before typed or Handler Core publication; 1.3 lowering retains
+only its historical mutable-capture rejection. Published protocol inventory
+remains at 1.2 until the complete 1.4 implementation and evidence pass.
 
 No diagnostic code or schema field changes. `L-RUNTIME-0001` gains only the
 accepted `handler_resume_cardinality` category/operation projection. Semantic
@@ -77,8 +79,8 @@ preserved; their readers reject 1.3 as required.
 
 ## Intentionally deferred
 
-Shared mutable Handler captures, refutable clause parameters, complete
-committed-mutation differential evidence, Clock/Random producers, Many-runtime
-production, user operations, Task/Actor transfer, rollback/cleanup,
-continuation serialization, Native/Wasm, migrations, and Stable claims remain
-deferred. EFF-2104 stays In Progress.
+Shared mutable Handler captures, bytecode 1.4 Cell/State implementation,
+complete committed-mutation differential evidence, Clock/Random producers,
+Many-runtime production, user operations, Task/Actor transfer,
+rollback/cleanup, continuation serialization, Native/Wasm, migrations, and
+Stable claims remain deferred. EFF-2104 stays In Progress.

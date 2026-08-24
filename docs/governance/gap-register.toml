@@ -724,6 +724,4 @@ owner_role = "effect-runtime-design"
 next_action = "Implement DEC-0262 as the complete Handler bytecode 1.4 vertical slice; retain EFF-2104 In Progress until all required conformance evidence and the completion commit exist."
 resolution = ["DEC-0262"]
 superseded_by = ""
-observed_markers = [
-  "experimental:crates/ling-bytecode/src/lower/v1_1.rs",
-]
+observed_markers = []

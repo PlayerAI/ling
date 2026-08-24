@@ -504,8 +504,8 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                         "captured binding metadata is absent",
                     )
                 })?;
-                // experimental: bounded 1.3 Handler lowering pending shared Cell and
-                // clause-pattern wire authority. TODO(spec:GAP-EFFECT-HANDLER-BYTECODE-001)
+                // Experimental 1.3 Handler lowering retains its historical
+                // immutable-capture boundary; DEC-0262 assigns shared Cells to 1.4.
                 if info.mutable {
                     return Err(unsupported_module(
                         owner_plan.module,

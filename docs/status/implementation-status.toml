@@ -9225,6 +9225,7 @@ notes = [
   "No Done claim is permitted until bytecode 1.4 Cell/State lowering, verifier, VM, malformed/resource/cancellation, differential, governance, and full repository gates pass and an implementation commit is recorded.",
   "The committed interpreter and bytecode/VM 1.3 milestones cover immutable, irrefutable Console handlers, deep restoration, Once cardinality, unmasked Capability preflight, malformed records, resource limits, cancellation, and differential Fault/event/span evidence.",
   "Accepted DEC-0262 resolves GAP-EFFECT-HANDLER-BYTECODE-001 at the specification level with bytecode 1.4 Cell<T>/State<T> records and irrefutable operation inputs; v1.3 remains the bounded historical slice.",
+  "DEC-0262 Phase 1 is implemented at the resolver boundary: only true binding and wildcard operation inputs proceed, while literal, tuple, record, and constructor forms produce L-EFFECT-0005 reason refutable_parameter at the original pattern span before typed or Handler Core publication.",
   "EFF-2104 remains In Progress because bytecode 1.4 lowering, verification, VM Cell identity, State rows, and the required conformance evidence are not yet implemented.",
   "The non-normative DEC-0262 implementation plan maps the checked pattern gate, isolated 1.4 codec/verifier, binding-storage refactor, non-cyclic VM Cell store, evidence matrix, and integration order without adding public placeholder APIs.",
 ]
