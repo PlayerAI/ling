@@ -321,6 +321,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0261` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [DEC-0261](../decisions/0261-handler-runtime-and-bytecode.md) |
 | `DEC-0262` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-24` | [DEC-0262](../decisions/0262-handler-cell-state-bytecode.md) |
 | `DEC-0263` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0263](../decisions/0263-effect-property-generator-and-oracle.md) |
+| `DEC-0264` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0264](../decisions/0264-structured-task-frontend-core.md) |
 
 ## Migration boundary
 

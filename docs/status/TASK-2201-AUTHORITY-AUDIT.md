@@ -2,15 +2,17 @@
 
 ## Outcome
 
-`TASK-2201` is correctly recorded as `BlockedSpec`. Accepted `DEC-0089` now
+`TASK-2201` remains correctly recorded as `BlockedSpec`. Accepted `DEC-0089`
 closes the bounded `TASK-2201-TASK-SYNTAX-REJECTION` evidence child without
 adding a Task grammar, and Accepted `DEC-0091` closes the separate
 publish-disabled `TASK-2201-CORE-MODEL` identity-graph child. The G2 plan
-proposes a minimal `task`/`scope`/`let!`/`return` surface and requires Checked Core fields
-for scope identity, parent/child relation, spawn/join, suspension points,
-cancellation, cleanup, and optionally capability-gated detach. The syntax,
-lifecycle, cancellation, suspension, Fault aggregation, and detach contracts
-are not accepted.
+proposes a minimal `task`/`scope`/`let!`/`return` surface and requires Checked
+Core fields for scope identity, parent/child relation, spawn/join, suspension points,
+cancellation, cleanup, and optionally capability-gated detach. EFF-2103 and
+its checked Handler Core are now complete. Proposed `DEC-0264` defines a
+checked-only, non-executable Task frontend boundary, but it is not
+implementation authority until Accepted; runtime lifecycle, Fault aggregation,
+scheduling, and detach remain later decisions.
 
 The rejection child proves only that a Task-shaped top-level declaration is
 rejected by the existing bilingual syntax diagnostic before checked snapshot
@@ -34,10 +36,10 @@ diagnostic allocation, or placeholder G2 API was added.
 - The plan dependency `RFC-C202` is only a planning placeholder. No Accepted
   RFC-0008 (or replacement) defines Task syntax or Checked Core, and RFC-0001
   remains a Draft design baseline under DEC-0018.
-- `GAP-STRUCTURED-TASK-001` leaves parent/child lifetime, cancellation
+- `GAP-STRUCTURED-TASK-001` leaves parent/child runtime lifetime, cancellation
   propagation, Fault aggregation, detach authority, suspension points, and
-  cleanup ordering open. EFF-2103 is also not accepted, so the planned
-  `let!`/Effect interaction has no checked foundation.
+  cleanup ordering open. EFF-2103 now provides the accepted checked Handler
+  foundation needed to define Task suspension interaction.
 - RFC-0020 accepts only host-owned VM cancellation for the existing Seed
   bytecode entry point. It does not define source Task cancellation,
   structured cleanup, suspension, or child Fault propagation.
@@ -69,37 +71,33 @@ diagnostic allocation, or placeholder G2 API was added.
 
 ## Required authority before implementation
 
-An Accepted RFC or decision must define, at minimum:
+Before TASK-2201 implementation, an Accepted RFC or decision must define:
 
 1. source grammar, AST/HIR/Checked Core representation, type/effect rules for
    `task`, `scope`, `let!`, `return`, `await`, spawn, join, and result
    observation, including original UTF-8 source spans and stable identities;
-2. lexical parent/child ownership, scope exit obligations, join/cancel/transfer
-   ordering, unobserved-result behavior, detach authority, supervisor/owner
-   requirements, and whether detach is available in the initial profile;
-3. suspension semantics: continuation/frame shape, active locals, borrow and
-   mutable-State restrictions, cancellation checkpoints, cleanup ordering,
-   idempotence, deadlines, and interaction with Effect/Capability handlers;
-4. child Fault representation and aggregation, propagation and recovery rules,
-   resource limits, scheduler determinism, interpreter reference behavior, VM
-   lowering/state-machine ABI, verifier rules, diagnostics, schemas, Semantic
-   IDs, Audit Source, and compatibility/migration policy; and
-5. executable positive/negative/migration/differential fixtures for nested
-   scopes, multiple suspension points, match/loop paths, cancellation before
-   and after effects, cleanup on success/cancel/Fault, child Fault aggregation,
-   unobserved results, detach rejection/acceptance, Unicode/CRLF/BOM spans,
-   deterministic scheduling, bounded resources, and no unchecked-AST
-   execution.
+2. lexical scope/handle ownership, path-complete observation, initial detach
+   rejection, suspension live-value restrictions, and interaction with
+   Effect/Capability handlers;
+3. diagnostics, Semantic IDs, Audit Source, deterministic identities, and the
+   checked-only rejection boundary before runtime authority; and
+4. positive/negative/migration fixtures for nested scopes, multiple suspension
+   points, conditional/match paths, exact handle observation, invalid live
+   values, detach rejection, Unicode/CRLF/BOM spans, deterministic identities,
+   checked-only execution rejection, and no unchecked-AST execution.
 
-Until these decisions are Accepted, a Task node could leak children, skip
-cleanup, resume with invalid borrows, lose or duplicate cancellation, or make
-interpreter and VM behavior diverge.
+Proposed DEC-0264 specifies these TASK-2201 frontend choices. Until it is
+Accepted, implementing them would prematurely freeze public syntax and checked
+identity. Runtime join/cancel/cleanup, Fault aggregation, scheduling,
+interpreter/VM execution, and resource limits remain TASK-2202 through
+TASK-2206 authority even after TASK-2201 is unblocked.
 
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
-RFC-0001, RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
+Proposed DEC-0264, RFC-0001, RFC-0020,
+`docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and the current syntax, AST, HIR, types, effects, evaluator, bytecode, and VM
@@ -114,9 +112,10 @@ fixture and an internal checked-data model.
 
 The bounded `TASK-2201-TASK-SYNTAX-REJECTION` child is complete under
 `DEC-0089`, and `TASK-2201-CORE-MODEL` is complete under `DEC-0091`. Public
-`TASK-2201` can begin only after an Accepted RFC-0008 (or replacement), a
-resolved `GAP-STRUCTURED-TASK-001`, and the required EFF-2103 handler/Core
-authority. The future implementation must lower only accepted Task syntax to
-checked Typed Core, make every suspension and cleanup edge explicit, preserve
-source identity, and prove interpreter/VM and cancellation/cleanup equivalence
-before exposing Task execution.
+`TASK-2201` can begin after Proposed DEC-0264 is reviewed and Accepted; EFF-2103
+is already complete. The broader `GAP-STRUCTURED-TASK-001` remains open for
+TASK-2202 through TASK-2206 runtime work. The implementation must lower only
+accepted Task syntax to checked Typed Core, make every suspension and cleanup
+identity explicit, and preserve source identity. Later tasks must prove
+interpreter/VM and cancellation/cleanup equivalence before exposing Task
+execution.

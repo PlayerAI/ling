@@ -7534,3 +7534,29 @@ unresolved_alternatives = [
   "Direct Typed Core fabrication, ambient randomness, automatic corpus writes, public replay formats, Many, new effect producers, Task/Actor crossing, Native/Wasm, and Stable compatibility remain rejected or separate work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0264"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0264-structured-task-frontend-core.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Cover contextual Task declarations, nested scopes, direct spawn/await, fused let!, path-complete handle observation, and checked Task Core publication.",
+  "Reject out-of-context forms, missing return, indirect/recursive targets, handle escape/copy/leak/double observation, invalid suspension live sets, and detach before checked publication.",
+  "Freeze canonical scope, task, suspension, cancellation, cleanup, Effect, Semantic identity, Audit, physical-path, and insertion-order evidence.",
+  "Prove every execution and bytecode path rejects checked Task programs before evaluation until later Task authorities are Accepted.",
+]
+compatibility_impact = [
+  "Proposes Experimental contextual Task syntax, internal Task signatures/handles, structural Effect labels, checked metadata, diagnostics, and a future Audit revision without changing existing program identities or bytes.",
+  "Adds no executable Task behavior, scheduling order, bytecode/ABI, detach, deadline, replay, package, Native/Wasm, Stable, or Unicode 17.0.0 promise.",
+]
+unresolved_alternatives = [
+  "Implicit Task calls, first-class Task values, global keywords, automatic non-Unit observation, cross-scope handles, recursion, Handler interception, detach, lowering, runtime lifecycle, Fault aggregation, schedulers, resource limits, Actor crossing, Replay, and migration remain rejected or later work.",
+]
+superseded_by = ""

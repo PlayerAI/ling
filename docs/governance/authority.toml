@@ -4290,3 +4290,16 @@ covers = ["EFF-2105 checked-source property generator", "residual Effect Row ora
 depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "RFC-0014", "RFC-0020", "DEC-0010", "DEC-0013", "DEC-0067", "DEC-0262", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = false
+
+[[document]]
+id = "DEC-0264"
+title = "Structured Task frontend and Checked Core"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0264-structured-task-frontend-core.md"
+covers = ["TASK-2201 contextual source syntax", "Task handle static ownership and observation", "Task latent Effect and suspension checking", "checked-only Task Core publication boundary"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0091", "DEC-0260", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false
