@@ -3198,11 +3198,17 @@ fn type_dependencies(value: &ValueType) -> Vec<usize> {
     match value {
         ValueType::Unit | ValueType::Bool | ValueType::Int | ValueType::Text => Vec::new(),
         ValueType::Function {
-            parameters, result, ..
+            parameters,
+            result,
+            effects,
         } => parameters
             .iter()
             .chain(std::iter::once(result))
             .map(|index| to_usize(index.get()))
+            .chain(effects.iter().filter_map(|effect| match effect {
+                Effect::ConsoleWrite => None,
+                Effect::State(value) => Some(to_usize(value.get())),
+            }))
             .collect(),
         ValueType::Tuple { elements } => {
             elements.iter().map(|index| to_usize(index.get())).collect()

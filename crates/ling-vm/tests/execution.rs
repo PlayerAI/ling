@@ -3,7 +3,8 @@ mod support;
 use ling_bytecode::{
     Instruction, LoweringSource, SourceMapEntry, VerifiedProgramV1, decode_and_verify_v1,
     decode_and_verify_v1_1, decode_and_verify_v1_2, decode_and_verify_v1_3, decode_and_verify_v1_4,
-    encode_v1, encode_v1_1, encode_v1_2, encode_v1_3, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
+    encode_v1, encode_v1_1, encode_v1_2, encode_v1_3, encode_v1_4, lower_v1, lower_v1_1,
+    lower_v1_2, lower_v1_3, lower_v1_4,
 };
 use ling_diagnostics::codes;
 use ling_effects::locate_main;
@@ -93,6 +94,16 @@ fn verified_v1_3(fixture: &Fixture) -> VerifiedProgramV1 {
     .expect("fixture lowers to bytecode 1.3");
     let bytes = encode_v1_3(&lowered).expect("fixture encodes");
     decode_and_verify_v1_3(&bytes).expect("fixture independently verifies")
+}
+
+fn verified_v1_4(fixture: &Fixture) -> VerifiedProgramV1 {
+    let lowered = lower_v1_4(
+        &fixture.snapshot,
+        &[LoweringSource::new(&fixture.source, "src/Main.ling")],
+    )
+    .expect("fixture lowers to bytecode 1.4");
+    let bytes = encode_v1_4(&lowered).expect("fixture encodes");
+    decode_and_verify_v1_4(&bytes).expect("fixture independently verifies")
 }
 
 fn generous_limits() -> ExecutionLimits {
@@ -246,6 +257,202 @@ fn vm_executes_checked_console_handlers_without_intercepted_host_output() {
         execute_v1(&program, generous_limits(), &mut host).expect("Handler executes");
         assert_eq!(console.output, "", "{name}");
     }
+}
+
+#[test]
+fn vm_cells_match_interpreter_mutation_before_after_and_without_resume() {
+    for (name, clause_body, expected) in [
+        ("cell-zero-resume.ling", "cell <- 1", "1\n"),
+        (
+            "cell-before-resume.ling",
+            "cell <- 2\n                resume ()",
+            "2\n",
+        ),
+        (
+            "cell-after-resume.ling",
+            "resume ()\n                cell <- 3",
+            "3\n",
+        ),
+    ] {
+        let text = format!(
+            concat!(
+                "module Main\n",
+                "    requires Console.Write\n\n",
+                "let main () =\n",
+                "    let mutable cell = 0\n",
+                "    let ignored =\n",
+                "        handle Console.write \"handled\" with\n",
+                "            operation Console.Write.write(message, resume) ->\n",
+                "                {clause_body}\n",
+                "    Console.write (Text.format \"{{}}\" cell)\n",
+            ),
+            clause_body = clause_body,
+        );
+        let fixture = fixture(name, &text);
+        let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+        let mut interpreter_console = MemoryConsole::default();
+        execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+            .expect("checked interpreter executes shared mutation");
+
+        let program = verified_v1_4(&fixture);
+        let mut vm_console = RecordingConsole::default();
+        let mut host = HostCapabilities::with_console(&mut vm_console);
+        execute_v1(&program, generous_limits(), &mut host)
+            .expect("VM executes shared Cell mutation");
+        assert_eq!(interpreter_console.output(), expected, "{name}");
+        assert_eq!(vm_console.output, expected, "{name}");
+    }
+}
+
+#[test]
+fn vm_closure_and_handler_capture_the_same_cell_identity() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let mutable cell = 0\n",
+        "    let set value = cell <- value\n",
+        "    let ignored =\n",
+        "        handle Console.write \"handled\" with\n",
+        "            operation Console.Write.write(message, resume) ->\n",
+        "                set 7\n",
+        "                resume ()\n",
+        "    Console.write (Text.format \"{}\" cell)\n",
+    );
+    let fixture = fixture("handler-cell-alias.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect("checked interpreter executes aliased mutation");
+
+    let program = verified_v1_4(&fixture);
+    let mut vm_console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut vm_console);
+    execute_v1(&program, generous_limits(), &mut host).expect("VM executes aliased Cell mutation");
+    assert_eq!(interpreter_console.output(), "7\n");
+    assert_eq!(vm_console.output, "7\n");
+}
+
+#[test]
+fn vm_cell_mutation_commits_before_a_later_clause_fault() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let mutable cell = 0\n",
+        "    handle Console.write \"handled\" with\n",
+        "        operation Console.Write.write(message, resume) ->\n",
+        "            cell <- 5\n",
+        "            let ignored = 1 / 0\n",
+        "            ()\n",
+    );
+    let fixture = fixture("handler-cell-fault.ling", text);
+    let main = locate_main(fixture.snapshot.checked()).expect("fixture has main");
+    let mut interpreter_console = MemoryConsole::default();
+    let interpreter_fault = execute_main(&fixture.snapshot, &main, &mut interpreter_console)
+        .expect_err("checked interpreter preserves the clause Fault");
+
+    let program = verified_v1_4(&fixture);
+    let mut console = RecordingConsole::default();
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1(&program, generous_limits(), &mut host)
+            .expect_err("VM preserves the clause Fault after CellSet"),
+    );
+    assert!(matches!(
+        interpreter_fault.kind,
+        ling_eval::RuntimeFaultKind::DivisionByZero
+    ));
+    assert!(matches!(
+        fault.kind(),
+        RuntimeFaultKind::DivisionByZero {
+            operation: "Int.divide"
+        }
+    ));
+    assert_eq!(
+        u64::from(interpreter_fault.span.start().get()),
+        fault.span().start_byte()
+    );
+    assert_eq!(
+        u64::from(interpreter_fault.span.end().get()),
+        fault.span().end_byte()
+    );
+    assert!(fault.committed(), "CellSet commits before its Unit result");
+    assert_eq!(interpreter_console.output(), "");
+    assert_eq!(console.output, "");
+}
+
+#[test]
+fn cancellation_precedes_pending_cell_set() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let mutable cell = 0\n",
+        "    let value = 5\n",
+        "    handle Console.write \"handled\" with\n",
+        "        operation Console.Write.write(message, resume) ->\n",
+        "            Console.write \"cancel\"\n",
+        "            cell <- value\n",
+        "            resume ()\n",
+    );
+    let fixture = fixture("handler-cell-cancel.ling", text);
+    let program = verified_v1_4(&fixture);
+    let token = CancellationToken::new();
+    let mut console = CancellingConsole {
+        output: String::new(),
+        token: token.clone(),
+    };
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1_with_cancellation(&program, generous_limits(), &mut host, &token)
+            .expect_err("cancellation wins before the pending CellSet"),
+    );
+    let assignment_start = u64::try_from(text.find("cell <- value").expect("assignment span"))
+        .expect("source offset fits");
+    assert_eq!(fault.kind(), &RuntimeFaultKind::Cancelled);
+    assert_eq!(fault.span().start_byte(), assignment_start);
+    assert!(
+        fault.committed(),
+        "the preceding host write remains committed"
+    );
+    assert_eq!(console.output, "cancel\n");
+}
+
+#[test]
+fn cancellation_precedes_restoration_and_preserves_prior_cell_mutation() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let mutable cell = 0\n",
+        "    handle Console.write \"handled\" with\n",
+        "        operation Console.Write.write(message, resume) ->\n",
+        "            cell <- 5\n",
+        "            Console.write \"cancel\"\n",
+        "            resume ()\n",
+    );
+    let fixture = fixture("handler-cell-restore-cancel.ling", text);
+    let program = verified_v1_4(&fixture);
+    let token = CancellationToken::new();
+    let mut console = CancellingConsole {
+        output: String::new(),
+        token: token.clone(),
+    };
+    let mut host = HostCapabilities::with_console(&mut console);
+    let fault = runtime(
+        execute_v1_with_cancellation(&program, generous_limits(), &mut host, &token)
+            .expect_err("cancellation wins before continuation restoration"),
+    );
+    let resume_argument_start =
+        u64::try_from(text.rfind("()").expect("resume argument span")).expect("source offset fits");
+    assert_eq!(fault.kind(), &RuntimeFaultKind::Cancelled);
+    assert_eq!(fault.span().start_byte(), resume_argument_start);
+    assert!(
+        fault.committed(),
+        "CellSet and the host write remain committed"
+    );
+    assert_eq!(console.output, "cancel\n");
 }
 
 #[test]

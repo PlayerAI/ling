@@ -1,7 +1,8 @@
 use ling_bytecode::{
     LoweringSource, VerifiedProgramV1, decode_and_verify_v1, decode_and_verify_v1_1,
-    decode_and_verify_v1_2, decode_and_verify_v1_3, encode_v1, encode_v1_1, encode_v1_2,
-    encode_v1_3, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
+    decode_and_verify_v1_2, decode_and_verify_v1_3, decode_and_verify_v1_4, encode_v1, encode_v1_1,
+    encode_v1_2, encode_v1_3, encode_v1_4, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
+    lower_v1_4,
 };
 use ling_effects::locate_main;
 use ling_eval::{
@@ -119,6 +120,49 @@ const SOURCE_HANDLER_FAULT: &str = concat!(
     "            let ignored = 1 / 0\n",
     "            ()\n",
 );
+const SOURCE_HANDLER_CELL: &str = concat!(
+    "module Main\n",
+    "    requires Console.Write\n\n",
+    "let main () =\n",
+    "    let mutable cell = 0\n",
+    "    let ignored =\n",
+    "        handle Console.write \"body\" with\n",
+    "            operation Console.Write.write(message, resume) ->\n",
+    "                resume ()\n",
+    "                cell <- 3\n",
+    "    Console.write (Text.format \"{}\" cell)\n",
+);
+const SOURCE_HANDLER_CELL_ALIAS: &str = concat!(
+    "module Main\n",
+    "    requires Console.Write\n\n",
+    "let main () =\n",
+    "    let mutable cell = 0\n",
+    "    let set value = cell <- value\n",
+    "    let ignored =\n",
+    "        handle Console.write \"body\" with\n",
+    "            operation Console.Write.write(message, resume) ->\n",
+    "                set 7\n",
+    "                resume ()\n",
+    "    Console.write (Text.format \"{}\" cell)\n",
+);
+const SOURCE_HANDLER_CELL_DEEP: &str = concat!(
+    "module Main\n",
+    "    requires Console.Write\n\n",
+    "let emitBoth () =\n",
+    "    Console.write \"first\"\n",
+    "    Console.write \"second\"\n\n",
+    "let main () =\n",
+    "    let mutable cell = 0\n",
+    "    let ignored =\n",
+    "        handle emitBoth () with\n",
+    "            operation Console.Write.write(message, resume) ->\n",
+    "                if message == \"first\" then\n",
+    "                    cell <- cell + 1\n",
+    "                    resume ()\n",
+    "                else\n",
+    "                    cell <- cell + 10\n",
+    "    Console.write (Text.format \"{}\" cell)\n",
+);
 
 const MAX_FIXTURES: usize = 16;
 const MAX_SOURCE_NAME_BYTES: usize = 256;
@@ -131,6 +175,7 @@ enum Revision {
     V1_1,
     V1_2,
     V1_3,
+    V1_4,
 }
 
 struct Case {
@@ -215,6 +260,11 @@ fn verified(fixture: &Fixture, revision: Revision) -> VerifiedProgramV1 {
             let lowered = lower_v1_3(&fixture.snapshot, &source).expect("fixture lowers to v1.3");
             let bytes = encode_v1_3(&lowered).expect("fixture encodes as v1.3");
             decode_and_verify_v1_3(&bytes).expect("v1.3 artifact verifies")
+        }
+        Revision::V1_4 => {
+            let lowered = lower_v1_4(&fixture.snapshot, &source).expect("fixture lowers to v1.4");
+            let bytes = encode_v1_4(&lowered).expect("fixture encodes as v1.4");
+            decode_and_verify_v1_4(&bytes).expect("v1.4 artifact verifies")
         }
     }
 }
@@ -442,6 +492,21 @@ fn supported_bytecode_slices_match_the_checked_interpreter() {
             logical_name: "tests/bytecode/v1/handler-fault.ling",
             text: SOURCE_HANDLER_FAULT,
             revision: Revision::V1_3,
+        },
+        Case {
+            logical_name: "tests/bytecode/v1/handler-cell.ling",
+            text: SOURCE_HANDLER_CELL,
+            revision: Revision::V1_4,
+        },
+        Case {
+            logical_name: "tests/bytecode/v1/handler-cell-alias.ling",
+            text: SOURCE_HANDLER_CELL_ALIAS,
+            revision: Revision::V1_4,
+        },
+        Case {
+            logical_name: "tests/bytecode/v1/handler-cell-deep.ling",
+            text: SOURCE_HANDLER_CELL_DEEP,
+            revision: Revision::V1_4,
         },
     ];
     assert!(cases.len() <= MAX_FIXTURES);

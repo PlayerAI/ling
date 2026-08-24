@@ -543,6 +543,174 @@ fn bytecode_1_3_rejects_unrepresentable_handler_state() {
             feature: "mutable Handler capture".to_owned()
         }
     );
+
+    let lowered = lower_v1_4(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("bytecode 1.4 lowers the shared mutable Handler capture");
+    assert!(
+        lowered
+            .model()
+            .types()
+            .iter()
+            .any(|value| matches!(value, ling_bytecode::ValueType::Cell(_)))
+    );
+    assert!(lowered.model().functions().iter().any(|function| {
+        function
+            .effects
+            .iter()
+            .any(|effect| matches!(effect, ling_bytecode::Effect::State(_)))
+    }));
+    let bytes = encode_v1_4(&lowered).expect("shared mutable Handler encodes as 1.4");
+    decode_and_verify_v1_4(&bytes).expect("shared mutable Handler verifies independently");
+}
+
+#[test]
+fn bytecode_1_4_lowers_assignment_only_handler_capture_to_one_shared_cell() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let main () =\n",
+        "    let mutable cell = 0\n",
+        "    handle Console.write \"body\" with\n",
+        "        operation Console.Write.write(message, resume) -> cell <- 1\n",
+    );
+    let (source, snapshot) = checked_source("handler-cell-set.ling", text);
+    let lowered = lower_v1_4(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("assignment root alone is recognized as a mutable Handler capture");
+    let instructions = lowered
+        .model()
+        .functions()
+        .iter()
+        .flat_map(|function| &function.blocks)
+        .flat_map(|block| &block.instructions)
+        .collect::<Vec<_>>();
+    assert_eq!(
+        instructions
+            .iter()
+            .filter(|instruction| matches!(instruction, Instruction::CellNew { .. }))
+            .count(),
+        1,
+        "the lexical declaration owns exactly one Cell"
+    );
+    assert_eq!(
+        instructions
+            .iter()
+            .filter(|instruction| matches!(instruction, Instruction::CellSet { .. }))
+            .count(),
+        1,
+        "the clause assignment writes the captured Cell"
+    );
+    assert_eq!(
+        instructions
+            .iter()
+            .filter(|instruction| matches!(instruction, Instruction::CellGet { .. }))
+            .count(),
+        0,
+        "assignment does not introduce an unnecessary Cell read"
+    );
+    let bytes = encode_v1_4(&lowered).expect("CellSet Handler artifact encodes");
+    let verified =
+        decode_and_verify_v1_4(&bytes).expect("CellSet Handler artifact independently verifies");
+    assert_eq!(
+        encode_verified_v1(&verified).expect("verified CellSet artifact re-encodes"),
+        bytes
+    );
+
+    let (other_source, other_snapshot) =
+        checked_source("D:/other/root/handler-cell-set.ling", text);
+    let other = lower_v1_4(
+        &other_snapshot,
+        &[LoweringSource::new(&other_source, "src/Main.ling")],
+    )
+    .expect("physical display path does not affect Cell lowering");
+    assert_eq!(
+        encode_v1_4(&other).expect("path-independent Cell artifact encodes"),
+        bytes
+    );
+    assert_eq!(snapshot.program_id(), other_snapshot.program_id());
+}
+
+#[test]
+fn bytecode_1_4_retains_aggregate_state_without_adding_a_capability() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "type Counter = { mutable value: Int }\n\n",
+        "let main () =\n",
+        "    let mutable counter = { value = 0 }\n",
+        "    handle Console.write \"body\" with\n",
+        "        operation Console.Write.write(message, resume) -> counter.value <- 1\n",
+    );
+    let (source, snapshot) = checked_source("handler-record-cell.ling", text);
+    let lowered = lower_v1_4(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("aggregate mutable Handler capture lowers");
+    let record = lowered
+        .model()
+        .types()
+        .iter()
+        .position(|value| matches!(value, ling_bytecode::ValueType::Record { .. }))
+        .map(|index| ling_bytecode::TypeIndex::new(u32::try_from(index).expect("type index fits")))
+        .expect("Counter record type exists");
+    assert!(
+        lowered
+            .model()
+            .types()
+            .contains(&ling_bytecode::ValueType::Cell(record))
+    );
+    assert!(lowered.model().functions().iter().any(|function| {
+        function
+            .effects
+            .contains(&ling_bytecode::Effect::State(record))
+    }));
+    assert_eq!(
+        lowered
+            .model()
+            .modules()
+            .iter()
+            .flat_map(|module| module.capabilities.iter().copied())
+            .collect::<Vec<_>>(),
+        vec![ling_bytecode::Capability::ConsoleWrite],
+        "State does not introduce a host Capability"
+    );
+    let bytes = encode_v1_4(&lowered).expect("aggregate State artifact encodes");
+    decode_and_verify_v1_4(&bytes).expect("aggregate State artifact independently verifies");
+}
+
+#[test]
+fn bytecode_1_4_preserves_effect_provenance_for_function_valued_cells() {
+    let text = concat!(
+        "module Main\n",
+        "    requires Console.Write\n\n",
+        "let increment value = value + 1\n\n",
+        "let main () =\n",
+        "    let mutable callback = increment\n",
+        "    handle Console.write \"body\" with\n",
+        "        operation Console.Write.write(message, resume) ->\n",
+        "            let ignored = callback 1\n",
+        "            resume ()\n",
+    );
+    let (source, snapshot) = checked_source("handler-function-cell.ling", text);
+    let lowered = lower_v1_4(&snapshot, &[LoweringSource::new(&source, "src/Main.ling")])
+        .expect("function-valued mutable Handler capture lowers with callable Effect provenance");
+    let function_type = lowered
+        .model()
+        .types()
+        .iter()
+        .find_map(|value| match value {
+            ling_bytecode::ValueType::Cell(payload) => Some(*payload),
+            _ => None,
+        })
+        .expect("Cell payload type exists");
+    assert!(matches!(
+        lowered.model().types()[usize::try_from(function_type.get()).expect("type index fits")],
+        ling_bytecode::ValueType::Function { .. }
+    ));
+    assert!(lowered.model().functions().iter().any(|function| {
+        function
+            .effects
+            .contains(&ling_bytecode::Effect::State(function_type))
+    }));
+    let bytes = encode_v1_4(&lowered).expect("function Cell artifact encodes");
+    decode_and_verify_v1_4(&bytes).expect("function Cell artifact independently verifies");
 }
 
 #[test]

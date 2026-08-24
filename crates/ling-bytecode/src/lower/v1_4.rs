@@ -30,7 +30,7 @@ pub fn lower_v1_4(
     snapshot: &ProgramSnapshot,
     sources: &[LoweringSource<'_>],
 ) -> Result<LoweredProgramV1_4, LoweringError> {
-    Ok(LoweredProgramV1_4::new(super::v1_1::lower_v1_3_model(
+    Ok(LoweredProgramV1_4::new(super::v1_1::lower_v1_4_model(
         snapshot, sources,
     )?))
 }

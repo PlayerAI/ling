@@ -41,7 +41,14 @@ pub(crate) fn lower_v1_3_model(
     snapshot: &ProgramSnapshot,
     sources: &[LoweringSource<'_>],
 ) -> Result<UnverifiedProgram, LoweringError> {
-    ClosureLowerer::new_with_modes(snapshot, sources, true, true)?.run_model()
+    ClosureLowerer::new_with_modes(snapshot, sources, true, true, false)?.run_model()
+}
+
+pub(crate) fn lower_v1_4_model(
+    snapshot: &ProgramSnapshot,
+    sources: &[LoweringSource<'_>],
+) -> Result<UnverifiedProgram, LoweringError> {
+    ClosureLowerer::new_with_modes(snapshot, sources, true, true, true)?.run_model()
 }
 
 #[derive(Clone)]
@@ -93,7 +100,7 @@ enum TypeKey {
     Function {
         parameters: Vec<TypeKey>,
         result: Box<TypeKey>,
-        effects: Vec<Effect>,
+        effects: Vec<EffectKey>,
     },
     Tuple(Vec<TypeKey>),
     Record {
@@ -108,6 +115,13 @@ enum TypeKey {
         arguments: Vec<TypeKey>,
         cases: Vec<VariantCaseKey>,
     },
+    Cell(Box<TypeKey>),
+}
+
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+enum EffectKey {
+    ConsoleWrite,
+    State(Box<TypeKey>),
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -127,7 +141,7 @@ impl TypeKey {
     fn function(
         parameters: Vec<Self>,
         result: Self,
-        effects: Vec<Effect>,
+        effects: Vec<EffectKey>,
     ) -> Result<Self, LoweringError> {
         if parameters.is_empty() {
             return Err(invalid_without_span(
@@ -146,7 +160,7 @@ impl TypeKey {
 struct SignatureKey {
     parameters: Vec<TypeKey>,
     result: TypeKey,
-    effects: Vec<Effect>,
+    effects: Vec<EffectKey>,
 }
 
 impl SignatureKey {
@@ -174,6 +188,7 @@ impl SignatureKey {
 struct CapturePlan {
     key: BindingKey,
     self_reference: bool,
+    cell: bool,
     value_type: TypeKey,
 }
 
@@ -205,6 +220,8 @@ struct ClosureLowerer<'snapshot, 'source> {
     builtin_signatures: BTreeMap<Builtin, SignatureKey>,
     handler_signatures: BTreeMap<HandlerFunctionKey, SignatureKey>,
     handler_captures: BTreeMap<HandlerFunctionKey, Vec<CapturePlan>>,
+    cell_bindings: BTreeSet<BindingKey>,
+    cell_binding_types: BTreeMap<BindingKey, TypeKey>,
     ordered: Vec<OrderedPlan>,
     function_indices: BTreeMap<DefinitionId, FunctionIndex>,
     local_indices: BTreeMap<BindingKey, FunctionIndex>,
@@ -237,7 +254,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         sources: &'source [LoweringSource<'source>],
         aggregate_mode: bool,
     ) -> Result<Self, LoweringError> {
-        Self::new_with_modes(snapshot, sources, aggregate_mode, false)
+        Self::new_with_modes(snapshot, sources, aggregate_mode, false, false)
     }
 
     fn new_with_modes(
@@ -245,6 +262,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         sources: &'source [LoweringSource<'source>],
         aggregate_mode: bool,
         handler_mode: bool,
+        cell_mode: bool,
     ) -> Result<Self, LoweringError> {
         let limits = if aggregate_mode {
             DecodeLimits::rfc_0016()
@@ -460,8 +478,116 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             }
         }
 
-        let mut resolver =
-            SignatureResolver::new(snapshot, &named, &locals, &local_bindings, aggregate_mode);
+        let cell_bindings = if cell_mode {
+            let mut reachable = raw_handler_captures
+                .values()
+                .flatten()
+                .copied()
+                .collect::<BTreeSet<_>>();
+            let mut pending = reachable.iter().copied().collect::<Vec<_>>();
+            while let Some(key) = pending.pop() {
+                if let Some(captures) = raw_captures.get(&key) {
+                    for capture in captures {
+                        if reachable.insert(*capture) {
+                            pending.push(*capture);
+                        }
+                    }
+                }
+            }
+            reachable
+                .into_iter()
+                .filter(|key| {
+                    resolved
+                        .bindings()
+                        .get(key)
+                        .is_some_and(|binding| binding.mutable)
+                })
+                .collect()
+        } else {
+            BTreeSet::new()
+        };
+        let mut cell_binding_types = BTreeMap::new();
+        for key in &cell_bindings {
+            let info = resolved
+                .bindings()
+                .get(key)
+                .ok_or_else(|| invalid_without_span("Cell-selected binding metadata is absent"))?;
+            let module = resolved
+                .module(key.module())
+                .ok_or_else(|| invalid_without_span("Cell-selected binding module is absent"))?;
+            let value = checked
+                .typed()
+                .binding_type(*key)
+                .ok_or_else(|| invalid_module(module, info.span, "Cell value type is absent"))?;
+            if !matches!(checked.typed().arena().get(value), Type::Function { .. }) {
+                cell_binding_types.insert(
+                    *key,
+                    checked_type_key(checked.typed(), value, module, info.span)?,
+                );
+            }
+        }
+        let provisional_state_types = cell_bindings
+            .iter()
+            .filter_map(|key| {
+                let value = checked.typed().binding_type(*key)?;
+                let value_type = cell_binding_types.get(key)?.clone();
+                Some((checked.typed().arena().display(value), value_type))
+            })
+            .collect::<BTreeMap<_, _>>();
+        if cell_binding_types.len() != cell_bindings.len() {
+            let mut provisional = SignatureResolver::new(
+                snapshot,
+                &named,
+                &locals,
+                &local_bindings,
+                aggregate_mode,
+                provisional_state_types,
+                cell_binding_types.clone(),
+            );
+            for key in &cell_bindings {
+                if !cell_binding_types.contains_key(key) {
+                    cell_binding_types.insert(*key, provisional.binding_value_type(*key)?);
+                }
+            }
+        }
+        let mut state_types = BTreeMap::new();
+        for key in &cell_bindings {
+            let info = resolved
+                .bindings()
+                .get(key)
+                .ok_or_else(|| invalid_without_span("Cell-selected binding metadata is absent"))?;
+            let module = resolved
+                .module(key.module())
+                .ok_or_else(|| invalid_without_span("Cell-selected binding module is absent"))?;
+            let value = checked
+                .typed()
+                .binding_type(*key)
+                .ok_or_else(|| invalid_module(module, info.span, "Cell value type is absent"))?;
+            let identity = checked.typed().arena().display(value);
+            let value_type = cell_binding_types
+                .get(key)
+                .cloned()
+                .ok_or_else(|| invalid_module(module, info.span, "Cell value type is absent"))?;
+            if let Some(previous) = state_types.insert(identity, value_type.clone()) {
+                if previous != value_type {
+                    return Err(invalid_module(
+                        module,
+                        info.span,
+                        "Cell State identity maps to inconsistent value types",
+                    ));
+                }
+            }
+        }
+
+        let mut resolver = SignatureResolver::new(
+            snapshot,
+            &named,
+            &locals,
+            &local_bindings,
+            aggregate_mode,
+            state_types,
+            cell_binding_types.clone(),
+        );
         let mut named_signatures = BTreeMap::new();
         for id in named.keys() {
             named_signatures.insert(id.clone(), resolver.named(id)?);
@@ -506,7 +632,8 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 })?;
                 // Experimental 1.3 Handler lowering retains its historical
                 // immutable-capture boundary; DEC-0262 assigns shared Cells to 1.4.
-                if info.mutable {
+                let cell = info.mutable && cell_bindings.contains(&key);
+                if info.mutable && !cell {
                     return Err(unsupported_module(
                         owner_plan.module,
                         info.span,
@@ -529,6 +656,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 plans.push(CapturePlan {
                     key,
                     self_reference,
+                    cell,
                     value_type,
                 });
             }
@@ -550,7 +678,8 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                         "Handler capture binding metadata is absent",
                     )
                 })?;
-                if info.mutable {
+                let cell = info.mutable && cell_bindings.contains(&key);
+                if info.mutable && !cell {
                     return Err(unsupported_module(
                         plan.module,
                         info.span,
@@ -560,6 +689,7 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 plans.push(CapturePlan {
                     key,
                     self_reference: false,
+                    cell,
                     value_type: resolver.binding_value_type(key)?,
                 });
             }
@@ -735,11 +865,17 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         for plans in captures.values() {
             for capture in plans {
                 type_builder.insert(capture.value_type.clone());
+                if capture.cell {
+                    type_builder.insert(TypeKey::Cell(Box::new(capture.value_type.clone())));
+                }
             }
         }
         for plans in handler_captures.values() {
             for capture in plans {
                 type_builder.insert(capture.value_type.clone());
+                if capture.cell {
+                    type_builder.insert(TypeKey::Cell(Box::new(capture.value_type.clone())));
+                }
             }
         }
         if aggregate_mode {
@@ -802,6 +938,8 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
             builtin_signatures,
             handler_signatures,
             handler_captures,
+            cell_bindings,
+            cell_binding_types,
             ordered,
             function_indices,
             local_indices,
@@ -1891,17 +2029,20 @@ fn collect_free_bindings(
                 )?;
             }
         }
-        hir::ExpressionKind::Assignment { value, .. } => collect_free_bindings(
-            module,
-            value,
-            resolved,
-            locals,
-            binding_order,
-            memo,
-            visiting,
-            declared,
-            output,
-        )?,
+        hir::ExpressionKind::Assignment { place, value } => {
+            add_reference(place.root_reference);
+            collect_free_bindings(
+                module,
+                value,
+                resolved,
+                locals,
+                binding_order,
+                memo,
+                visiting,
+                declared,
+                output,
+            )?;
+        }
         hir::ExpressionKind::Application {
             function,
             arguments,
@@ -2060,12 +2201,128 @@ fn collect_free_bindings(
     Ok(())
 }
 
+fn collect_cell_effect_bindings(
+    module: ModuleId,
+    expression: &hir::Expression,
+    resolved: &ling_resolve::ResolvedProgram,
+    cell_bindings: &BTreeMap<BindingKey, TypeKey>,
+    output: &mut BTreeSet<BindingKey>,
+) {
+    let mut add_reference = |reference: hir::ReferenceId| {
+        if let Some(ReferenceTarget::Binding(binding)) = resolved.reference(module, reference)
+            && cell_bindings.contains_key(binding)
+        {
+            output.insert(*binding);
+        }
+    };
+    match &expression.kind {
+        hir::ExpressionKind::Sequence(elements) => {
+            for element in elements {
+                match element {
+                    hir::SequenceElement::Let(binding) => {
+                        let key = BindingKey::new(module, binding.id);
+                        if cell_bindings.contains_key(&key) {
+                            // The lexical owner emits the unique CellNew, regardless of
+                            // whether the initializer is a value or a lifted closure.
+                            output.insert(key);
+                        }
+                        if binding.parameters.is_empty() {
+                            collect_cell_effect_bindings(
+                                module,
+                                &binding.value,
+                                resolved,
+                                cell_bindings,
+                                output,
+                            );
+                        }
+                    }
+                    hir::SequenceElement::Expression(value) => {
+                        collect_cell_effect_bindings(module, value, resolved, cell_bindings, output)
+                    }
+                }
+            }
+        }
+        hir::ExpressionKind::Handle { body, clauses } => {
+            // Handle invokes its lifted body and selected clause in this function's
+            // dynamic extent. State is never masked, so retain their Cell effects in
+            // the enclosing declaration as well as their own lifted signatures.
+            collect_cell_effect_bindings(module, body, resolved, cell_bindings, output);
+            for clause in clauses {
+                collect_cell_effect_bindings(module, &clause.body, resolved, cell_bindings, output);
+            }
+        }
+        hir::ExpressionKind::If {
+            condition,
+            then_branch,
+            else_branch,
+        } => {
+            for value in [
+                condition.as_ref(),
+                then_branch.as_ref(),
+                else_branch.as_ref(),
+            ] {
+                collect_cell_effect_bindings(module, value, resolved, cell_bindings, output);
+            }
+        }
+        hir::ExpressionKind::Match { scrutinee, cases } => {
+            collect_cell_effect_bindings(module, scrutinee, resolved, cell_bindings, output);
+            for case in cases {
+                if let Some(guard) = &case.guard {
+                    collect_cell_effect_bindings(module, guard, resolved, cell_bindings, output);
+                }
+                collect_cell_effect_bindings(module, &case.body, resolved, cell_bindings, output);
+            }
+        }
+        hir::ExpressionKind::Assignment { place, value } => {
+            add_reference(place.root_reference);
+            collect_cell_effect_bindings(module, value, resolved, cell_bindings, output);
+        }
+        hir::ExpressionKind::Application {
+            function,
+            arguments,
+        } => {
+            collect_cell_effect_bindings(module, function, resolved, cell_bindings, output);
+            for argument in arguments {
+                collect_cell_effect_bindings(module, argument, resolved, cell_bindings, output);
+            }
+        }
+        hir::ExpressionKind::Projection { reference, .. }
+        | hir::ExpressionKind::Name { reference, .. } => add_reference(*reference),
+        hir::ExpressionKind::Binary { left, right, .. } => {
+            collect_cell_effect_bindings(module, left, resolved, cell_bindings, output);
+            collect_cell_effect_bindings(module, right, resolved, cell_bindings, output);
+        }
+        hir::ExpressionKind::Unary { operand, .. } => {
+            collect_cell_effect_bindings(module, operand, resolved, cell_bindings, output);
+        }
+        hir::ExpressionKind::Tuple(values) | hir::ExpressionKind::List(values) => {
+            for value in values {
+                collect_cell_effect_bindings(module, value, resolved, cell_bindings, output);
+            }
+        }
+        hir::ExpressionKind::Record(fields) => {
+            for field in fields {
+                collect_cell_effect_bindings(module, &field.value, resolved, cell_bindings, output);
+            }
+        }
+        hir::ExpressionKind::RecordUpdate { base, fields } => {
+            collect_cell_effect_bindings(module, base, resolved, cell_bindings, output);
+            for field in fields {
+                collect_cell_effect_bindings(module, &field.value, resolved, cell_bindings, output);
+            }
+        }
+        hir::ExpressionKind::Literal(_) | hir::ExpressionKind::Unit => {}
+    }
+}
+
 struct SignatureResolver<'a> {
     snapshot: &'a ProgramSnapshot,
     aggregate_mode: bool,
     named: &'a BTreeMap<DefinitionId, NamedPlan<'a>>,
     locals: &'a BTreeMap<BindingKey, LocalPlan<'a>>,
     local_bindings: &'a BTreeMap<BindingKey, &'a hir::LocalBinding>,
+    state_types: BTreeMap<String, TypeKey>,
+    cell_binding_types: BTreeMap<BindingKey, TypeKey>,
     named_cache: BTreeMap<DefinitionId, SignatureKey>,
     local_cache: BTreeMap<BindingKey, SignatureKey>,
     builtin_cache: BTreeMap<Builtin, SignatureKey>,
@@ -2080,6 +2337,8 @@ impl<'a> SignatureResolver<'a> {
         locals: &'a BTreeMap<BindingKey, LocalPlan<'a>>,
         local_bindings: &'a BTreeMap<BindingKey, &'a hir::LocalBinding>,
         aggregate_mode: bool,
+        state_types: BTreeMap<String, TypeKey>,
+        cell_binding_types: BTreeMap<BindingKey, TypeKey>,
     ) -> Self {
         Self {
             snapshot,
@@ -2087,6 +2346,8 @@ impl<'a> SignatureResolver<'a> {
             named,
             locals,
             local_bindings,
+            state_types,
+            cell_binding_types,
             named_cache: BTreeMap::new(),
             local_cache: BTreeMap::new(),
             builtin_cache: BTreeMap::new(),
@@ -2111,7 +2372,7 @@ impl<'a> SignatureResolver<'a> {
                 "recursive function-valued result type",
             ));
         }
-        let signature = if plan.definition.parameters.is_empty() {
+        let mut signature = if plan.definition.parameters.is_empty() {
             let type_id = self
                 .snapshot
                 .checked()
@@ -2127,7 +2388,7 @@ impl<'a> SignatureResolver<'a> {
             SignatureKey {
                 parameters: Vec::new(),
                 result: self.result_type(plan.module, type_id, &plan.definition.value)?,
-                effects: bytecode_effects(
+                effects: self.bytecode_effects(
                     self.snapshot
                         .checked()
                         .definition_effect(id)
@@ -2161,6 +2422,7 @@ impl<'a> SignatureResolver<'a> {
                 &checked,
             )?
         };
+        self.extend_cell_effects(plan.module, &plan.definition.value, &mut signature.effects);
         self.named_visiting.remove(id);
         self.named_cache.insert(id.clone(), signature.clone());
         Ok(signature)
@@ -2193,12 +2455,13 @@ impl<'a> SignatureResolver<'a> {
                     "local function type or Effect row is absent",
                 )
             })?;
-        let signature = self.signature_from_checked(
+        let mut signature = self.signature_from_checked(
             plan.module,
             &plan.binding.parameters,
             &plan.binding.value,
             &checked,
         )?;
+        self.extend_cell_effects(plan.module, &plan.binding.value, &mut signature.effects);
         self.local_visiting.remove(&key);
         self.local_cache.insert(key, signature.clone());
         Ok(signature)
@@ -2260,11 +2523,13 @@ impl<'a> SignatureResolver<'a> {
                     "checked Handler body Effect row is absent",
                 )
             })?;
-        Ok(SignatureKey {
+        let mut signature = SignatureKey {
             parameters: Vec::new(),
             result: self.plain_type(result, Some(plan.module), Some(plan.expression.span))?,
-            effects: bytecode_effects(effects, plan.module, plan.body.span)?,
-        })
+            effects: self.bytecode_effects(effects, plan.module, plan.body.span)?,
+        };
+        self.extend_cell_effects(plan.module, plan.body, &mut signature.effects);
+        Ok(signature)
     }
 
     fn handler_clause(
@@ -2291,7 +2556,7 @@ impl<'a> SignatureResolver<'a> {
         let result = self.plain_type(result_id, Some(plan.module), Some(plan.expression.span))?;
         let mut body_effects = checked
             .expression_effect(ExpressionKey::new(plan.module.id, plan.body.id))
-            .map(|row| bytecode_effects(row, plan.module, plan.body.span))
+            .map(|row| self.bytecode_effects(row, plan.module, plan.body.span))
             .transpose()?
             .ok_or_else(|| {
                 invalid_module(
@@ -2300,12 +2565,13 @@ impl<'a> SignatureResolver<'a> {
                     "checked Handler body Effect row is absent",
                 )
             })?;
+        self.extend_cell_effects(plan.module, plan.body, &mut body_effects);
         if plan
             .clauses
             .iter()
             .any(|value| value.operation.normalized() == "Console.Write.write")
         {
-            body_effects.retain(|effect| *effect != Effect::ConsoleWrite);
+            body_effects.retain(|effect| *effect != EffectKey::ConsoleWrite);
         }
         let mut parameters = operation
             .inputs()
@@ -2334,7 +2600,9 @@ impl<'a> SignatureResolver<'a> {
                             "checked Handler clause Effect row is absent",
                         )
                     })?;
-                let mut effects = bytecode_effects(clause_effects, plan.module, clause.body.span)?;
+                let mut effects =
+                    self.bytecode_effects(clause_effects, plan.module, clause.body.span)?;
+                self.extend_cell_effects(plan.module, &clause.body, &mut effects);
                 effects.extend(body_effects);
                 effects.sort();
                 effects.dedup();
@@ -2345,9 +2613,9 @@ impl<'a> SignatureResolver<'a> {
                 });
             }
         }
-        let effects = checked
+        let mut effects = checked
             .expression_effect(ExpressionKey::new(plan.module.id, clause.body.id))
-            .map(|row| bytecode_effects(row, plan.module, clause.body.span))
+            .map(|row| self.bytecode_effects(row, plan.module, clause.body.span))
             .transpose()?
             .ok_or_else(|| {
                 invalid_module(
@@ -2356,6 +2624,7 @@ impl<'a> SignatureResolver<'a> {
                     "checked Handler clause Effect row is absent",
                 )
             })?;
+        self.extend_cell_effects(plan.module, &clause.body, &mut effects);
         Ok(SignatureKey {
             parameters,
             result,
@@ -2385,7 +2654,7 @@ impl<'a> SignatureResolver<'a> {
         Ok(SignatureKey {
             parameters,
             result: self.result_type(module, checked.result(), body)?,
-            effects: bytecode_effects(checked.effects(), module, body.span)?,
+            effects: self.bytecode_effects(checked.effects(), module, body.span)?,
         })
     }
 
@@ -2569,7 +2838,7 @@ impl<'a> SignatureResolver<'a> {
         TypeKey::function(
             parameters,
             self.plain_type(checked.result(), Some(module), Some(span))?,
-            bytecode_effects(checked.effects(), module, span)?,
+            self.bytecode_effects(checked.effects(), module, span)?,
         )
     }
 
@@ -2699,6 +2968,52 @@ impl<'a> SignatureResolver<'a> {
                 "function value expression without stable Effect provenance",
             )),
         }
+    }
+
+    fn bytecode_effects(
+        &self,
+        row: &EffectRow,
+        _module: &ling_resolve::ResolvedModule,
+        _span: Span,
+    ) -> Result<Vec<EffectKey>, LoweringError> {
+        let mut effects = row
+            .effects()
+            .filter_map(|effect| match effect {
+                CheckedEffect::ConsoleWrite => Some(EffectKey::ConsoleWrite),
+                CheckedEffect::State { identity, .. } => self
+                    .state_types
+                    .get(identity)
+                    .cloned()
+                    .map(|value_type| EffectKey::State(Box::new(value_type))),
+            })
+            .collect::<Vec<_>>();
+        effects.sort();
+        effects.dedup();
+        Ok(effects)
+    }
+
+    fn extend_cell_effects(
+        &self,
+        module: &ling_resolve::ResolvedModule,
+        expression: &hir::Expression,
+        effects: &mut Vec<EffectKey>,
+    ) {
+        let mut bindings = BTreeSet::new();
+        collect_cell_effect_bindings(
+            module.id,
+            expression,
+            self.snapshot.checked().typed().resolved(),
+            &self.cell_binding_types,
+            &mut bindings,
+        );
+        effects.extend(bindings.into_iter().filter_map(|binding| {
+            self.cell_binding_types
+                .get(&binding)
+                .cloned()
+                .map(|value_type| EffectKey::State(Box::new(value_type)))
+        }));
+        effects.sort();
+        effects.dedup();
     }
 
     fn binding_value_type(&mut self, key: BindingKey) -> Result<TypeKey, LoweringError> {
@@ -3032,6 +3347,10 @@ impl TypeTableBuilder {
     fn insert(&mut self, value: TypeKey) {
         match &value {
             TypeKey::Unit | TypeKey::Bool | TypeKey::Int | TypeKey::Text => {}
+            TypeKey::Cell(value_type) => {
+                self.insert((**value_type).clone());
+                self.values.insert(value);
+            }
             TypeKey::Tuple(elements) => {
                 for element in elements {
                     self.insert(element.clone());
@@ -3063,12 +3382,19 @@ impl TypeTableBuilder {
                 self.values.insert(value);
             }
             TypeKey::Function {
-                parameters, result, ..
+                parameters,
+                result,
+                effects,
             } => {
                 for parameter in parameters {
                     self.insert(parameter.clone());
                 }
                 self.insert((**result).clone());
+                for effect in effects {
+                    if let EffectKey::State(value_type) = effect {
+                        self.insert((**value_type).clone());
+                    }
+                }
                 self.values.insert(value);
             }
         }
@@ -3143,7 +3469,7 @@ fn wire_type(
                 .map(|value| indices.get(value).copied())
                 .collect::<Option<Vec<_>>>()?,
             result: indices.get(result.as_ref()).copied()?,
-            effects: effects.clone(),
+            effects: wire_effects(effects, indices)?,
         }),
         TypeKey::Tuple(elements) => Some(ValueType::Tuple {
             elements: elements
@@ -3200,28 +3526,34 @@ fn wire_type(
                 })
                 .collect::<Option<Vec<_>>>()?,
         }),
+        TypeKey::Cell(value_type) => {
+            Some(ValueType::Cell(indices.get(value_type.as_ref()).copied()?))
+        }
     }
 }
 
-fn bytecode_effects(
-    row: &EffectRow,
-    _module: &ling_resolve::ResolvedModule,
-    _span: Span,
-) -> Result<Vec<Effect>, LoweringError> {
-    row.effects()
-        .filter_map(|effect| match effect {
-            CheckedEffect::ConsoleWrite => Some(Ok(Effect::ConsoleWrite)),
-            // Seed local State is represented by SSA place updates and does not
-            // require a host capability or a bytecode effect tag.
-            CheckedEffect::State { .. } => None,
+fn wire_effects(
+    effects: &[EffectKey],
+    indices: &BTreeMap<TypeKey, TypeIndex>,
+) -> Option<Vec<Effect>> {
+    let mut effects = effects
+        .iter()
+        .map(|effect| match effect {
+            EffectKey::ConsoleWrite => Some(Effect::ConsoleWrite),
+            EffectKey::State(value_type) => {
+                indices.get(value_type.as_ref()).copied().map(Effect::State)
+            }
         })
-        .collect()
+        .collect::<Option<Vec<_>>>()?;
+    effects.sort();
+    effects.dedup();
+    Some(effects)
 }
 
-fn bytecode_effects_without_source(row: &EffectRow) -> Result<Vec<Effect>, LoweringError> {
+fn bytecode_effects_without_source(row: &EffectRow) -> Result<Vec<EffectKey>, LoweringError> {
     row.effects()
         .map(|effect| match effect {
-            CheckedEffect::ConsoleWrite => Ok(Effect::ConsoleWrite),
+            CheckedEffect::ConsoleWrite => Ok(EffectKey::ConsoleWrite),
             CheckedEffect::State { .. } => Err(invalid_without_span(
                 "builtin unexpectedly has a State Effect",
             )),
@@ -3291,6 +3623,17 @@ struct BlockBuilder {
     terminator: Option<Terminator>,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum BindingStorage {
+    Direct(RegisterIndex),
+    Cell {
+        handle: RegisterIndex,
+        value_type: TypeIndex,
+    },
+}
+
+type BindingEnvironment = BTreeMap<BindingKey, BindingStorage>;
+
 impl BlockBuilder {
     fn new() -> Self {
         Self {
@@ -3348,14 +3691,29 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         let mut environment = BTreeMap::new();
         let mut parameter_types = Vec::with_capacity(captures.len() + signature.parameters.len());
         for capture in captures {
-            let value_type = self.type_index(&capture.value_type)?;
+            let source_value_type = self.type_index(&capture.value_type)?;
+            let parameter_type = if capture.cell {
+                self.type_index(&TypeKey::Cell(Box::new(capture.value_type.clone())))?
+            } else {
+                source_value_type
+            };
             let register = self.new_register(body.span)?;
             self.blocks[0].parameters.push(BlockParameter {
                 register,
-                value_type,
+                value_type: parameter_type,
             });
-            parameter_types.push(value_type);
-            environment.insert(capture.key, register);
+            parameter_types.push(parameter_type);
+            environment.insert(
+                capture.key,
+                if capture.cell {
+                    BindingStorage::Cell {
+                        handle: register,
+                        value_type: source_value_type,
+                    }
+                } else {
+                    BindingStorage::Direct(register)
+                },
+            );
         }
         for (pattern, value) in patterns.iter().zip(&signature.parameters) {
             let value_type = self.type_index(value)?;
@@ -3368,7 +3726,8 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             match &pattern.kind {
                 hir::PatternKind::Unit if value_type == TypeIndex::new(0) => {}
                 hir::PatternKind::Binding { id, .. } => {
-                    environment.insert(BindingKey::new(self.module.id, *id), register);
+                    let key = BindingKey::new(self.module.id, *id);
+                    environment.insert(key, self.bind_storage(key, register, pattern.span)?);
                 }
                 hir::PatternKind::Wildcard => {}
                 hir::PatternKind::Unit => {
@@ -3395,7 +3754,10 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 value_type,
             });
             parameter_types.push(value_type);
-            environment.insert(BindingKey::new(self.module.id, resume.id), register);
+            environment.insert(
+                BindingKey::new(self.module.id, resume.id),
+                BindingStorage::Direct(register),
+            );
         }
         let result = self.lower_expression(body, &mut environment)?;
         if self.blocks[self.current_block].terminator.is_some() {
@@ -3419,7 +3781,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             capture_count: to_u32(captures.len(), "capture count")?,
             parameter_types,
             result_type: self.type_index(&signature.result)?,
-            effects: signature.effects.clone(),
+            effects: self.effects(&signature.effects)?,
             register_count: self.next_register,
             blocks,
         };
@@ -3463,7 +3825,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             capture_count: 0,
             parameter_types,
             result_type: self.type_index(&signature.result)?,
-            effects: signature.effects.clone(),
+            effects: self.effects(&signature.effects)?,
             register_count: self.next_register,
             blocks,
         };
@@ -3473,7 +3835,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
     fn lower_expression(
         &mut self,
         expression: &hir::Expression,
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         self.ensure_expression_type(expression)?;
         match &expression.kind {
@@ -3514,7 +3876,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                                     operands.push(if capture.self_reference {
                                         CaptureOperand::SelfReference
                                     } else {
-                                        CaptureOperand::Register(
+                                        CaptureOperand::Register(Self::storage_register(
                                             *local.get(&capture.key).ok_or_else(|| {
                                                 invalid_module(
                                                     self.module,
@@ -3522,7 +3884,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                                                     "captured binding has no lexical register",
                                                 )
                                             })?,
-                                        )
+                                        ))
                                     });
                                 }
                                 self.push_instruction(
@@ -3535,7 +3897,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                                 )?;
                                 destination
                             };
-                            local.insert(key, value);
+                            local.insert(key, self.bind_storage(key, value, binding.span)?);
                             result = None;
                         }
                         hir::SequenceElement::Expression(value) => {
@@ -3692,7 +4054,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
     fn capture_operands(
         &self,
         captures: &[CapturePlan],
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &BindingEnvironment,
         span: Span,
     ) -> Result<Vec<CaptureOperand>, LoweringError> {
         captures
@@ -3704,6 +4066,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                     environment
                         .get(&capture.key)
                         .copied()
+                        .map(Self::storage_register)
                         .map(CaptureOperand::Register)
                         .ok_or_else(|| {
                             invalid_module(
@@ -3717,18 +4080,126 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             .collect()
     }
 
-    fn mutable_binding_keys(
+    const fn storage_register(storage: BindingStorage) -> RegisterIndex {
+        match storage {
+            BindingStorage::Direct(register) => register,
+            BindingStorage::Cell { handle, .. } => handle,
+        }
+    }
+
+    fn bind_storage(
+        &mut self,
+        key: BindingKey,
+        value: RegisterIndex,
+        span: Span,
+    ) -> Result<BindingStorage, LoweringError> {
+        if !self.owner.cell_bindings.contains(&key) {
+            return Ok(BindingStorage::Direct(value));
+        }
+        let value_key = self
+            .owner
+            .cell_binding_types
+            .get(&key)
+            .cloned()
+            .ok_or_else(|| {
+                invalid_module(self.module, span, "Cell-selected binding type is absent")
+            })?;
+        let value_type = self.type_index(&value_key)?;
+        self.type_index(&TypeKey::Cell(Box::new(value_key)))?;
+        let handle = self.new_register(span)?;
+        self.push_instruction(
+            Instruction::CellNew {
+                destination: handle,
+                initial: value,
+            },
+            span,
+        )?;
+        Ok(BindingStorage::Cell { handle, value_type })
+    }
+
+    fn ensure_cell_value_type(
         &self,
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
-    ) -> Vec<BindingKey> {
+        value_type: TypeIndex,
+        span: Span,
+    ) -> Result<(), LoweringError> {
+        self.owner
+            .types
+            .get(usize::try_from(value_type.get()).unwrap_or(usize::MAX))
+            .ok_or_else(|| invalid_module(self.module, span, "Cell value type is absent"))
+            .map(|_| ())
+    }
+
+    fn read_binding(
+        &mut self,
+        key: BindingKey,
+        environment: &BindingEnvironment,
+        span: Span,
+    ) -> Result<RegisterIndex, LoweringError> {
+        match environment.get(&key).copied() {
+            Some(BindingStorage::Direct(register)) => Ok(register),
+            Some(BindingStorage::Cell { handle, value_type }) => {
+                self.ensure_cell_value_type(value_type, span)?;
+                let destination = self.new_register(span)?;
+                self.push_instruction(
+                    Instruction::CellGet {
+                        destination,
+                        cell: handle,
+                    },
+                    span,
+                )?;
+                Ok(destination)
+            }
+            None => Err(invalid_module(
+                self.module,
+                span,
+                "referenced binding has no storage",
+            )),
+        }
+    }
+
+    fn write_binding(
+        &mut self,
+        key: BindingKey,
+        value: RegisterIndex,
+        environment: &mut BindingEnvironment,
+        span: Span,
+    ) -> Result<Option<RegisterIndex>, LoweringError> {
+        match environment.get(&key).copied() {
+            Some(BindingStorage::Direct(_)) => {
+                environment.insert(key, BindingStorage::Direct(value));
+                Ok(None)
+            }
+            Some(BindingStorage::Cell { handle, value_type }) => {
+                self.ensure_cell_value_type(value_type, span)?;
+                let destination = self.new_register(span)?;
+                self.push_instruction(
+                    Instruction::CellSet {
+                        destination,
+                        cell: handle,
+                        value,
+                    },
+                    span,
+                )?;
+                Ok(Some(destination))
+            }
+            None => Err(invalid_module(
+                self.module,
+                span,
+                "assigned binding has no storage",
+            )),
+        }
+    }
+
+    fn mutable_binding_keys(&self, environment: &BindingEnvironment) -> Vec<BindingKey> {
         let resolved = self.owner.snapshot.checked().typed().resolved();
         environment
             .keys()
             .filter(|key| {
-                resolved
-                    .bindings()
-                    .get(key)
-                    .is_some_and(|binding| binding.mutable)
+                matches!(environment.get(key), Some(BindingStorage::Direct(_)))
+                    && resolved
+                        .bindings()
+                        .get(key)
+                        .is_some_and(|binding| binding.mutable)
             })
             .copied()
             .collect()
@@ -3736,12 +4207,12 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
 
     fn propagate_mutable_bindings(
         &self,
-        destination: &mut BTreeMap<BindingKey, RegisterIndex>,
-        source: &BTreeMap<BindingKey, RegisterIndex>,
+        destination: &mut BindingEnvironment,
+        source: &BindingEnvironment,
     ) {
         for key in self.mutable_binding_keys(destination) {
-            if let Some(register) = source.get(&key) {
-                destination.insert(key, *register);
+            if let Some(BindingStorage::Direct(register)) = source.get(&key) {
+                destination.insert(key, BindingStorage::Direct(*register));
             }
         }
     }
@@ -3749,7 +4220,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
     fn add_mutable_merge_parameters(
         &mut self,
         merge: BlockIndex,
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &BindingEnvironment,
         span: Span,
     ) -> Result<Vec<(BindingKey, RegisterIndex)>, LoweringError> {
         let keys = self.mutable_binding_keys(environment);
@@ -3785,27 +4256,30 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
     fn mutable_merge_arguments(
         &self,
         parameters: &[(BindingKey, RegisterIndex)],
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &BindingEnvironment,
         span: Span,
     ) -> Result<Vec<RegisterIndex>, LoweringError> {
         parameters
             .iter()
-            .map(|(key, _)| {
-                environment.get(key).copied().ok_or_else(|| {
-                    invalid_module(self.module, span, "mutable binding has no branch value")
-                })
+            .map(|(key, _)| match environment.get(key).copied() {
+                Some(BindingStorage::Direct(register)) => Ok(register),
+                Some(BindingStorage::Cell { .. }) | None => Err(invalid_module(
+                    self.module,
+                    span,
+                    "mutable direct binding has no branch value",
+                )),
             })
             .collect()
     }
 
     fn environment_from_parameters(
         &self,
-        base: &BTreeMap<BindingKey, RegisterIndex>,
+        base: &BindingEnvironment,
         parameters: &[(BindingKey, RegisterIndex)],
-    ) -> BTreeMap<BindingKey, RegisterIndex> {
+    ) -> BindingEnvironment {
         let mut environment = base.clone();
         for (key, register) in parameters {
-            environment.insert(*key, *register);
+            environment.insert(*key, BindingStorage::Direct(*register));
         }
         environment
     }
@@ -3815,7 +4289,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         place: &hir::Place,
         value: &hir::Expression,
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let target = self
             .owner
@@ -3853,16 +4327,11 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         }
         let assigned = self.lower_expression(value, environment)?;
         if place.fields.is_empty() {
-            environment.insert(binding, assigned);
-            return self.emit_constant(expression, Constant::Unit);
+            return self
+                .write_binding(binding, assigned, environment, place.span)?
+                .map_or_else(|| self.emit_constant(expression, Constant::Unit), Ok);
         }
-        let root = environment.get(&binding).copied().ok_or_else(|| {
-            invalid_module(
-                self.module,
-                place.span,
-                "mutable assignment root has no register",
-            )
-        })?;
+        let root = self.read_binding(binding, environment, place.span)?;
         let typed = self.owner.snapshot.checked().typed();
         let root_type = typed
             .place_root_type(ExpressionKey::new(self.module.id, expression.id))
@@ -3955,8 +4424,8 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             )?;
             updated = destination;
         }
-        environment.insert(binding, updated);
-        self.emit_constant(expression, Constant::Unit)
+        self.write_binding(binding, updated, environment, place.span)?
+            .map_or_else(|| self.emit_constant(expression, Constant::Unit), Ok)
     }
 
     fn lower_match(
@@ -3964,7 +4433,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         scrutinee: &hir::Expression,
         cases: &[hir::MatchCase],
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         if cases.is_empty() {
             return Err(invalid_module(
@@ -4104,7 +4573,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         }
         self.set_current_block(merge)?;
         for (key, register) in mutable_parameters {
-            environment.insert(key, register);
+            environment.insert(key, BindingStorage::Direct(register));
         }
         Ok(result_register)
     }
@@ -4115,7 +4584,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         condition: &hir::Expression,
         then_branch: &hir::Expression,
         else_branch: &hir::Expression,
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let mut condition_environment = environment.clone();
         let condition_register = self.lower_expression(condition, &mut condition_environment)?;
@@ -4185,7 +4654,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         )?;
         self.set_current_block(merge)?;
         for (key, register) in mutable_parameters {
-            environment.insert(key, register);
+            environment.insert(key, BindingStorage::Direct(register));
         }
         Ok(result_register)
     }
@@ -4196,7 +4665,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         operator: hir::BinaryOperator,
         left: &hir::Expression,
         right: &hir::Expression,
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         if matches!(
             operator,
@@ -4275,7 +4744,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             )?;
             self.set_current_block(merge)?;
             for (key, register) in mutable_parameters {
-                environment.insert(key, register);
+                environment.insert(key, BindingStorage::Direct(register));
             }
             return Ok(result_register);
         }
@@ -4379,7 +4848,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         operator: hir::UnaryOperator,
         operand: &hir::Expression,
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let operand_register = self.lower_expression(operand, environment)?;
         let destination = self.new_register(expression.span)?;
@@ -4403,14 +4872,15 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         value: RegisterIndex,
         value_type: TypeId,
         pattern: &hir::Pattern,
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
         success: BlockIndex,
         failure: Option<PatternFailure<'_>>,
     ) -> Result<(), LoweringError> {
         let typed = self.owner.snapshot.checked().typed();
         match &pattern.kind {
             hir::PatternKind::Binding { id, .. } => {
-                environment.insert(BindingKey::new(self.module.id, *id), value);
+                let key = BindingKey::new(self.module.id, *id);
+                environment.insert(key, self.bind_storage(key, value, pattern.span)?);
                 self.set_terminator(
                     Terminator::Jump {
                         target: success,
@@ -4745,7 +5215,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         reference: hir::ReferenceId,
         target: &hir::Expression,
         field: &hir::Name,
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let typed = self.owner.snapshot.checked().typed();
         let target_type = typed
@@ -4786,7 +5256,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         &mut self,
         expression: &hir::Expression,
         elements: &[hir::Expression],
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let mut registers = Vec::with_capacity(elements.len());
         for element in elements {
@@ -4809,7 +5279,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         &mut self,
         expression: &hir::Expression,
         fields: &[hir::RecordField],
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let typed = self.owner.snapshot.checked().typed();
         let value_type = typed
@@ -4852,7 +5322,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         base: &hir::Expression,
         fields: &[hir::RecordField],
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let typed = self.owner.snapshot.checked().typed();
         let base_type = typed
@@ -4899,7 +5369,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         function: &hir::Expression,
         arguments: &[hir::Expression],
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         if arguments.is_empty() {
             return Err(invalid_module(
@@ -5061,7 +5531,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
     fn lower_arguments(
         &mut self,
         arguments: &[hir::Expression],
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<Vec<RegisterIndex>, LoweringError> {
         let mut output = Vec::with_capacity(arguments.len());
         for argument in arguments {
@@ -5075,7 +5545,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         expression: &hir::Expression,
         definition: &DefinitionId,
         arguments: &[hir::Expression],
-        environment: &mut BTreeMap<BindingKey, RegisterIndex>,
+        environment: &mut BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let typed = self.owner.snapshot.checked().typed();
         let (variant_definition, case_index, payload_type) = typed
@@ -5150,7 +5620,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
         &mut self,
         expression: &hir::Expression,
         reference: hir::ReferenceId,
-        environment: &BTreeMap<BindingKey, RegisterIndex>,
+        environment: &BindingEnvironment,
     ) -> Result<RegisterIndex, LoweringError> {
         let target = self
             .owner
@@ -5169,13 +5639,7 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             })?;
         match target {
             ReferenceTarget::Binding(binding) => {
-                environment.get(&binding).copied().ok_or_else(|| {
-                    invalid_module(
-                        self.module,
-                        expression.span,
-                        "referenced binding has no register",
-                    )
-                })
+                self.read_binding(binding, environment, expression.span)
             }
             ReferenceTarget::Definition(definition) => {
                 let info = self
@@ -5338,6 +5802,11 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
             .get(value)
             .copied()
             .ok_or_else(|| invalid_without_span("canonical type table omitted a referenced type"))
+    }
+
+    fn effects(&self, effects: &[EffectKey]) -> Result<Vec<Effect>, LoweringError> {
+        wire_effects(effects, &self.owner.type_indices)
+            .ok_or_else(|| invalid_without_span("canonical type table omitted an Effect type"))
     }
 
     fn new_register(&mut self, span: Span) -> Result<RegisterIndex, LoweringError> {
