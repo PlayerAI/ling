@@ -1,10 +1,11 @@
 use ling_bytecode::{
     BytecodeReason, CaptureOperand, Constant, EncodingErrorKind, FORMAT_VERSION_1_0,
-    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FunctionKind, Instruction, LoweringErrorKind,
-    LoweringSource, decode_and_verify_v1_1, decode_and_verify_v1_2, decode_and_verify_v1_3,
-    disassemble_v1, disassemble_v1_1, disassemble_v1_2, disassemble_v1_3, encode_v1, encode_v1_1,
-    encode_v1_2, encode_v1_3, encode_v1_with_limit, encode_verified_v1, lower_v1, lower_v1_1,
-    lower_v1_2, lower_v1_3,
+    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FORMAT_VERSION_1_3, FORMAT_VERSION_1_4, FunctionKind,
+    Instruction, LoweringErrorKind, LoweringSource, decode_and_verify_v1_1, decode_and_verify_v1_2,
+    decode_and_verify_v1_3, decode_and_verify_v1_4, disassemble_v1, disassemble_v1_1,
+    disassemble_v1_2, disassemble_v1_3, encode_v1, encode_v1_1, encode_v1_2, encode_v1_3,
+    encode_v1_4, encode_v1_with_limit, encode_verified_v1, lower_v1, lower_v1_1, lower_v1_2,
+    lower_v1_3, lower_v1_4,
 };
 use ling_semantic::ProgramSnapshot;
 use ling_source::{SourceFile, SourceId};
@@ -279,6 +280,47 @@ fn bytecode_1_3_reader_accepts_every_earlier_minor_revision() {
                 .expect("1.3 reader accepts earlier revision")
                 .version(),
             version
+        );
+    }
+}
+
+#[test]
+fn bytecode_1_4_reader_accepts_every_earlier_minor_revision() {
+    let (source, snapshot) = checked_source("compatibility-1.4.ling", HELLO);
+    let sources = [LoweringSource::new(&source, "src/Main.ling")];
+    let artifacts = [
+        (
+            encode_v1(&lower_v1(&snapshot, &sources).expect("v1 lowers")).expect("v1 encodes"),
+            FORMAT_VERSION_1_0,
+        ),
+        (
+            encode_v1_1(&lower_v1_1(&snapshot, &sources).expect("v1.1 lowers"))
+                .expect("v1.1 encodes"),
+            FORMAT_VERSION_1_1,
+        ),
+        (
+            encode_v1_2(&lower_v1_2(&snapshot, &sources).expect("v1.2 lowers"))
+                .expect("v1.2 encodes"),
+            FORMAT_VERSION_1_2,
+        ),
+        (
+            encode_v1_3(&lower_v1_3(&snapshot, &sources).expect("v1.3 lowers"))
+                .expect("v1.3 encodes"),
+            FORMAT_VERSION_1_3,
+        ),
+        (
+            encode_v1_4(&lower_v1_4(&snapshot, &sources).expect("v1.4 lowers"))
+                .expect("v1.4 encodes"),
+            FORMAT_VERSION_1_4,
+        ),
+    ];
+    for (bytes, version) in artifacts {
+        let verified =
+            decode_and_verify_v1_4(&bytes).expect("1.4 reader accepts every earlier revision");
+        assert_eq!(verified.version(), version);
+        assert_eq!(
+            encode_verified_v1(&verified).expect("canonical re-encoding"),
+            bytes
         );
     }
 }

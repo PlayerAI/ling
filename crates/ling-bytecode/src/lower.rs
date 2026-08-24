@@ -25,10 +25,12 @@ use crate::{
 mod v1_1;
 mod v1_2;
 mod v1_3;
+mod v1_4;
 
 pub use v1_1::{LoweredProgramV1_1, lower_v1_1};
 pub use v1_2::{LoweredProgramV1_2, lower_v1_2};
 pub use v1_3::{LoweredProgramV1_3, lower_v1_3};
+pub use v1_4::{LoweredProgramV1_4, lower_v1_4};
 
 /// Exact original source bytes and the logical name permitted in bytecode.
 ///

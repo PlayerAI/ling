@@ -8,6 +8,8 @@ pub const BYTECODE_PROTOCOL_1_1: &str = "ling.bytecode/1.1";
 pub const BYTECODE_PROTOCOL_1_2: &str = "ling.bytecode/1.2";
 /// Exact bytecode-1.3 protocol label assigned by DEC-0261.
 pub const BYTECODE_PROTOCOL_1_3: &str = "ling.bytecode/1.3";
+/// Exact bytecode-1.4 protocol label assigned by DEC-0262.
+pub const BYTECODE_PROTOCOL_1_4: &str = "ling.bytecode/1.4";
 /// Exact eight-byte bytecode magic.
 pub const BYTECODE_MAGIC: [u8; 8] = *b"LINGBC\0\0";
 /// Exact encoded header width.
@@ -52,6 +54,8 @@ pub const FORMAT_VERSION_1_1: FormatVersion = FormatVersion::new(1, 1);
 pub const FORMAT_VERSION_1_2: FormatVersion = FormatVersion::new(1, 2);
 /// Exact version-1.3 format tuple accepted by DEC-0261.
 pub const FORMAT_VERSION_1_3: FormatVersion = FormatVersion::new(1, 3);
+/// Exact version-1.4 format tuple accepted by DEC-0262.
+pub const FORMAT_VERSION_1_4: FormatVersion = FormatVersion::new(1, 4);
 /// Language compatibility version encoded by RFC-0014.
 pub const LANGUAGE_VERSION: FormatVersion = FormatVersion::new(0, 1);
 

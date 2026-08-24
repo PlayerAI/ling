@@ -99,10 +99,11 @@ impl Capability {
     }
 }
 
-/// A function Effect tag defined by bytecode version 1.0.
+/// A canonical function Effect record admitted by the selected bytecode revision.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Effect {
     ConsoleWrite,
+    State(TypeIndex),
 }
 
 impl Effect {
@@ -111,6 +112,7 @@ impl Effect {
     pub const fn tag(self) -> u8 {
         match self {
             Self::ConsoleWrite => 1,
+            Self::State(_) => 2,
         }
     }
 }
@@ -150,6 +152,7 @@ pub enum ValueType {
         arguments: Vec<TypeIndex>,
         cases: Vec<VariantCase>,
     },
+    Cell(TypeIndex),
 }
 
 impl ValueType {
@@ -165,6 +168,7 @@ impl ValueType {
             Self::Tuple { .. } => 0x11,
             Self::Record { .. } => 0x12,
             Self::Variant { .. } => 0x13,
+            Self::Cell(_) => 0x14,
         }
     }
 }
@@ -507,6 +511,19 @@ pub enum Instruction {
         variant: RegisterIndex,
         case: u32,
     },
+    CellNew {
+        destination: RegisterIndex,
+        initial: RegisterIndex,
+    },
+    CellGet {
+        destination: RegisterIndex,
+        cell: RegisterIndex,
+    },
+    CellSet {
+        destination: RegisterIndex,
+        cell: RegisterIndex,
+        value: RegisterIndex,
+    },
     Intrinsic {
         destination: RegisterIndex,
         intrinsic: Intrinsic,
@@ -519,7 +536,7 @@ pub enum Instruction {
 }
 
 impl Instruction {
-    /// Returns the explicit opcode fixed by RFC-0014.
+    /// Returns the explicit opcode fixed by the selected bytecode revision.
     #[must_use]
     pub const fn opcode(&self) -> u8 {
         match self {
@@ -540,6 +557,9 @@ impl Instruction {
             Self::MakeVariant { .. } => 0x19,
             Self::VariantIs { .. } => 0x1a,
             Self::GetVariantPayload { .. } => 0x1b,
+            Self::CellNew { .. } => 0x1d,
+            Self::CellGet { .. } => 0x1e,
+            Self::CellSet { .. } => 0x1f,
             Self::ConsoleWrite { .. } => 0x20,
         }
     }

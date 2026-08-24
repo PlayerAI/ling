@@ -13,7 +13,7 @@ use crate::fault::{
     ExecutionError, InternalExecutionError, RuntimeFault, RuntimeFaultKind, RuntimeResource,
 };
 use crate::host::{HostCapabilities, HostError, HostErrorCategory};
-use crate::value::{Allocation, BoundValue, Closure, Heap, Value};
+use crate::value::{Allocation, BoundValue, Closure, Heap, HeapCharge, Value};
 
 /// Explicit execution limits required by RFC-0014.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -125,6 +125,7 @@ struct Engine<'program, 'host_ref, 'capability, 'cancel> {
     host: &'host_ref mut HostCapabilities<'capability>,
     cancellation: Option<&'cancel CancellationToken>,
     heap: Heap,
+    cells: Vec<CellEntry>,
     frames: Vec<Frame>,
     handlers: Vec<ActiveHandler>,
     continuations: BTreeMap<u64, ContinuationState>,
@@ -149,6 +150,7 @@ impl<'program, 'host_ref, 'capability, 'cancel> Engine<'program, 'host_ref, 'cap
             host,
             cancellation,
             heap: Heap::new(limits.heap_byte_limit),
+            cells: Vec::new(),
             frames: Vec::new(),
             handlers: Vec::new(),
             continuations: BTreeMap::new(),
@@ -507,6 +509,58 @@ impl<'program, 'host_ref, 'capability, 'cancel> Engine<'program, 'host_ref, 'cap
                     .cloned()
                     .ok_or_else(|| internal("verified GetVariantPayload has no payload"))?;
                 self.write_current(*destination, payload)
+            }
+            Instruction::CellNew {
+                destination,
+                initial,
+            } => {
+                const CELL_BYTES: u64 = 24;
+                let value = self.read_current(*initial)?;
+                let charge = self
+                    .heap
+                    .charge(CELL_BYTES)
+                    .map_err(|()| self.out_of_memory("cell.new", location))?;
+                self.cells
+                    .try_reserve(1)
+                    .map_err(|_| self.out_of_memory("cell.new", location))?;
+                let id = u64::try_from(self.cells.len())
+                    .map_err(|_| internal("Cell count does not fit private CellId"))?;
+                self.cells.push(CellEntry {
+                    value,
+                    _charge: charge,
+                });
+                self.write_current(*destination, Value::Cell(id))
+            }
+            Instruction::CellGet { destination, cell } => {
+                let id = self
+                    .read_current(*cell)?
+                    .as_cell_id()
+                    .ok_or_else(|| internal("verified CellGet operand is not a Cell"))?;
+                let value = self
+                    .cells
+                    .get(to_usize_u64(id)?)
+                    .ok_or_else(|| internal("verified CellGet identity is absent"))?
+                    .value
+                    .clone();
+                self.write_current(*destination, value)
+            }
+            Instruction::CellSet {
+                destination,
+                cell,
+                value,
+            } => {
+                let id = self
+                    .read_current(*cell)?
+                    .as_cell_id()
+                    .ok_or_else(|| internal("verified CellSet operand is not a Cell"))?;
+                let replacement = self.read_current(*value)?;
+                self.check_cancellation(location)?;
+                self.cells
+                    .get_mut(to_usize_u64(id)?)
+                    .ok_or_else(|| internal("verified CellSet identity is absent"))?
+                    .value = replacement;
+                self.committed = true;
+                self.write_current(*destination, Value::Unit)
             }
             Instruction::Intrinsic {
                 destination,
@@ -1585,6 +1639,11 @@ struct ContinuationState {
     handlers: Vec<ActiveHandler>,
 }
 
+struct CellEntry {
+    value: Value,
+    _charge: HeapCharge,
+}
+
 struct ResumeReturn {
     continuation_id: u64,
     destination: RegisterIndex,
@@ -1649,6 +1708,10 @@ fn internal(invariant: &'static str) -> InternalExecutionError {
 
 fn to_usize(value: u32) -> Result<usize, InternalExecutionError> {
     usize::try_from(value).map_err(|_| internal("verified u32 index does not fit host usize"))
+}
+
+fn to_usize_u64(value: u64) -> Result<usize, InternalExecutionError> {
+    usize::try_from(value).map_err(|_| internal("verified u64 CellId does not fit host usize"))
 }
 
 fn to_u32(value: usize) -> Result<u32, InternalExecutionError> {

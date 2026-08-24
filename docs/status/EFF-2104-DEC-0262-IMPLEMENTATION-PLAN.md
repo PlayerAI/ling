@@ -43,7 +43,12 @@ Primary files:
 - `docs/ERROR-CODES.md` only if the existing schema cannot express the reason;
   no new code is otherwise permitted
 
-## Phase 2: define the isolated bytecode 1.4 data model
+## Phase 2: define the isolated bytecode 1.4 data model — Complete
+
+Implemented on 2026-08-24 with exact Cell/State tags, version-aware Effect
+records, backward-reading APIs, canonical verified re-encoding, a frozen
+599-byte Cell/State golden, exact disassembly, older-reader rejection, and
+unchanged 1.0–1.3 regression evidence.
 
 1. Add `FORMAT_VERSION_1_4` and `BYTECODE_PROTOCOL_1_4`; keep every older
    writer pinned to its exact version and make older readers reject 1.4.
@@ -65,7 +70,12 @@ Primary files:
 - `crates/ling-bytecode/src/lower/v1_4.rs`
 - `crates/ling-bytecode/tests/{model,decode_verify,lowering}.rs`
 
-## Phase 3: independently verify Cell and State invariants
+## Phase 3: independently verify Cell and State invariants — Complete
+
+The independent verifier now enforces Cell containment, typed Cell
+instructions, canonical State rows, direct/closure/Handler propagation,
+unmasked State, source-map coverage, and failure-atomic malformed records
+before `VerifiedProgramV1` publication.
 
 The verifier must establish all conditions before constructing
 `VerifiedProgramV1`:
@@ -124,7 +134,12 @@ Primary implementation concentration:
 - `crates/ling-effects/src/lib.rs` expression Effect rows as the only semantic
   source; never infer State from emitted instructions alone
 
-## Phase 5: add a non-cyclic private VM Cell store
+## Phase 5: add a non-cyclic private VM Cell store — Primitive complete
+
+The VM primitive is implemented with private monotonic IDs, an Engine-owned
+store, 24-byte logical heap charges, cancellation-before-commit CellSet, and
+shared identity under ordinary frame/closure/continuation cloning. Handler
+source lowering and the full identity/Fault/cancellation matrix remain pending.
 
 Do not represent a VM Cell as `Rc<RefCell<Value>>`: a Cell containing a closure
 that captures the Cell can create an uncollectable Rust reference cycle.
@@ -172,7 +187,7 @@ Deliver the smallest complete commits in this dependency order:
 
 1. **Complete:** Accepted authority/lifecycle/gap transition and negative
    checked-pattern evidence.
-2. Format/model/codec/disassembly plus malformed verifier evidence.
+2. **Complete:** Format/model/codec/disassembly plus malformed verifier evidence.
 3. Binding-storage refactor with unchanged 1.0–1.3 golden evidence.
 4. Cell/State lowering and VM execution with differential/resource/cancellation
    evidence.

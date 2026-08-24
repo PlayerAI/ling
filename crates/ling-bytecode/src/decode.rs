@@ -2,15 +2,15 @@ use crate::{
     BYTECODE_MAGIC, Block, BlockIndex, BlockParameter, BytecodeError, BytecodePhase,
     BytecodeReason, Capability, CaptureOperand, CompareOperator, Constant, ConstantIndex,
     DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FORMAT_VERSION_1_2,
-    FORMAT_VERSION_1_3, FormatVersion, Function, FunctionIndex, FunctionKind, HEADER_BYTES,
-    HandlerClause, HandlerOperation, Instruction, IntBinaryOperator, IntUnaryOperator, IntegerSign,
-    Intrinsic, LANGUAGE_VERSION, Module, ModuleIndex, NO_INDEX, Package, PackageContentDigest,
-    PackageIndex, PackageReference, ProgramParts, RecordField, RegisterIndex, Source, SourceDigest,
-    SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex,
-    UNICODE_VERSION, UnverifiedProgram, ValueType, VariantCase,
+    FORMAT_VERSION_1_3, FORMAT_VERSION_1_4, FormatVersion, Function, FunctionIndex, FunctionKind,
+    HEADER_BYTES, HandlerClause, HandlerOperation, Instruction, IntBinaryOperator,
+    IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module, ModuleIndex, NO_INDEX,
+    Package, PackageContentDigest, PackageIndex, PackageReference, ProgramParts, RecordField,
+    RegisterIndex, Source, SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan,
+    StringIndex, Terminator, TypeIndex, UNICODE_VERSION, UnverifiedProgram, ValueType, VariantCase,
 };
 
-/// Untrusted result of decoding one syntactically framed version-1.0 artifact.
+/// Untrusted result of decoding one syntactically framed version-1.x artifact.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DecodedProgramV1 {
     model: UnverifiedProgram,
@@ -123,6 +123,19 @@ pub fn decode_v1_3_with_limit(
     decode_with_limit(bytes, artifact_byte_limit, 3)
 }
 
+/// Decodes bytecode 1.0 through 1.4 under the DEC-0262/RFC-0016 hard limits.
+pub fn decode_v1_4(bytes: &[u8]) -> Result<DecodedProgramV1, BytecodeError> {
+    decode_v1_4_with_limit(bytes, DecodeLimits::rfc_0016().artifact_bytes())
+}
+
+/// Decodes bytecode 1.0 through 1.4 under a caller-capped hard limit.
+pub fn decode_v1_4_with_limit(
+    bytes: &[u8],
+    artifact_byte_limit: u64,
+) -> Result<DecodedProgramV1, BytecodeError> {
+    decode_with_limit(bytes, artifact_byte_limit, 4)
+}
+
 fn decode_with_limit(
     bytes: &[u8],
     artifact_byte_limit: u64,
@@ -233,7 +246,7 @@ fn decode_header(
         reader.u16(BytecodePhase::Envelope)?,
     );
     let supported_format =
-        format.major() == 1 && format.minor() <= maximum_minor && format.minor() <= 3;
+        format.major() == 1 && format.minor() <= maximum_minor && format.minor() <= 4;
     if !supported_format {
         let offset = if format.major() == 1 { 14 } else { 12 };
         return Err(BytecodeError::new(
@@ -510,7 +523,7 @@ fn decode_types(
                     limits.arguments_per_operation(),
                 )?;
                 let result = TypeIndex::new(record.u32(BytecodePhase::Type)?);
-                let effects = decode_effects(&mut record, limits)?;
+                let effects = decode_effects(&mut record, limits, version)?;
                 ValueType::Function {
                     parameters,
                     result,
@@ -634,6 +647,10 @@ fn decode_types(
                     arguments,
                     cases,
                 }
+            }
+            0x14 if version >= FORMAT_VERSION_1_4 => {
+                record.zeroes(3, BytecodePhase::Type)?;
+                ValueType::Cell(TypeIndex::new(record.u32(BytecodePhase::Type)?))
             }
             _ => {
                 return Err(BytecodeError::new(
@@ -830,7 +847,7 @@ fn decode_functions(
             limits.registers_per_function(),
         )?;
         let result_type = TypeIndex::new(record.u32(BytecodePhase::Type)?);
-        let effects = decode_effects(&mut record, limits)?;
+        let effects = decode_effects(&mut record, limits, version)?;
         let register_offset = record.offset();
         let register_count = record.u32(BytecodePhase::Register)?;
         if register_count > limits.registers_per_function() {
@@ -1188,6 +1205,19 @@ fn decode_instruction(
                 clauses,
             })
         }
+        0x1d if version >= FORMAT_VERSION_1_4 => Ok(Instruction::CellNew {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            initial: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+        }),
+        0x1e if version >= FORMAT_VERSION_1_4 => Ok(Instruction::CellGet {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            cell: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+        }),
+        0x1f if version >= FORMAT_VERSION_1_4 => Ok(Instruction::CellSet {
+            destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            cell: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+            value: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
+        }),
         0x20 => Ok(Instruction::ConsoleWrite {
             destination: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
             text: RegisterIndex::new(reader.u32(BytecodePhase::Register)?),
@@ -1325,6 +1355,7 @@ fn decode_type_indexes(
 fn decode_effects(
     reader: &mut Reader<'_>,
     limits: DecodeLimits,
+    version: FormatVersion,
 ) -> Result<Vec<Effect>, BytecodeError> {
     let count_offset = reader.offset();
     let count = reader.bounded_count(
@@ -1344,6 +1375,9 @@ fn decode_effects(
         let offset = reader.offset();
         match reader.u8(BytecodePhase::Effect)? {
             1 => effects.push(Effect::ConsoleWrite),
+            2 if version >= FORMAT_VERSION_1_4 => effects.push(Effect::State(TypeIndex::new(
+                reader.u32(BytecodePhase::Effect)?,
+            ))),
             _ => return Err(invalid_tag(BytecodePhase::Effect, offset)),
         }
     }

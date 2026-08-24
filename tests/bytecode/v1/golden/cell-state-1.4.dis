@@ -1,0 +1,33 @@
+; ling.bytecode/1.4 debug disassembly (non-contract)
+strings 3
+  @s0 "Main"
+  @s1 "main"
+  @s2 "src/Main.ling"
+packages 0
+modules 1
+  @m0 standalone @s0 "Main" capabilities=[]
+types 5
+  @t0 Unit tag=0x00
+  @t1 Bool tag=0x01
+  @t2 Int tag=0x02
+  @t3 Text tag=0x03
+  @t4 Cell<@t2> tag=0x14
+constants 1
+  @c0 Int positive 0x01
+sources 1
+  @src0 @m0 @s2 "src/Main.ling" bytes=1 sha256=1414141414141414141414141414141414141414141414141414141414141414
+functions 1
+  fn @f0 @m0 @s1 "main" (@t0) -> @t0 effects=[State<@t2>] registers=5 kind=named captures=0
+    block @b0 (%r0:@t0)
+      0: %r1 = const @c0
+      1: %r2 = cell.new %r1
+      2: %r3 = cell.get %r2
+      3: %r4 = cell.set %r2, %r3
+      4: return %r4
+entry @f0
+source-map 5
+  @f0:@b0:0 -> @src0 0..1 lowering-derived
+  @f0:@b0:1 -> @src0 0..1 lowering-derived
+  @f0:@b0:2 -> @src0 0..1 lowering-derived
+  @f0:@b0:3 -> @src0 0..1 lowering-derived
+  @f0:@b0:4 -> @src0 0..1 lowering-derived

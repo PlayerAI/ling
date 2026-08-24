@@ -8,10 +8,11 @@ use crate::path::validate_logical_name;
 use crate::{
     Block, BytecodeError, BytecodePhase, BytecodeReason, Capability, CaptureOperand, Constant,
     DecodeLimits, Effect, FORMAT_VERSION_1_0, FORMAT_VERSION_1_1, FORMAT_VERSION_1_2,
-    FORMAT_VERSION_1_3, FormatVersion, Function, FunctionKind, HandlerOperation, Instruction,
-    IntegerSign, Intrinsic, PackageReference, RegisterIndex, Terminator, TypeIndex,
-    UnverifiedProgram, ValueType, decode_v1, decode_v1_1, decode_v1_1_with_limit, decode_v1_2,
-    decode_v1_2_with_limit, decode_v1_3, decode_v1_3_with_limit, decode_v1_with_limit,
+    FORMAT_VERSION_1_3, FORMAT_VERSION_1_4, FormatVersion, Function, FunctionKind,
+    HandlerOperation, Instruction, IntegerSign, Intrinsic, PackageReference, RegisterIndex,
+    Terminator, TypeIndex, UnverifiedProgram, ValueType, decode_v1, decode_v1_1,
+    decode_v1_1_with_limit, decode_v1_2, decode_v1_2_with_limit, decode_v1_3,
+    decode_v1_3_with_limit, decode_v1_4, decode_v1_4_with_limit, decode_v1_with_limit,
 };
 
 /// Immutable bytecode state that has passed every RFC-0014 verifier phase.
@@ -54,7 +55,7 @@ pub fn verify_v1(decoded: DecodedProgramV1) -> Result<VerifiedProgramV1, Bytecod
     })
 }
 
-/// Decodes and independently verifies one version-1.0 artifact.
+/// Decodes and independently verifies one version-1.x artifact.
 pub fn decode_and_verify_v1(bytes: &[u8]) -> Result<VerifiedProgramV1, BytecodeError> {
     verify_v1(decode_v1(bytes)?)
 }
@@ -104,6 +105,19 @@ pub fn decode_and_verify_v1_3_with_limit(
     artifact_byte_limit: u64,
 ) -> Result<VerifiedProgramV1, BytecodeError> {
     verify_v1(decode_v1_3_with_limit(bytes, artifact_byte_limit)?)
+}
+
+/// Decodes and independently verifies bytecode 1.0 through 1.4.
+pub fn decode_and_verify_v1_4(bytes: &[u8]) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_4(bytes)?)
+}
+
+/// Decodes and verifies bytecode 1.0 through 1.4 under a bounded limit.
+pub fn decode_and_verify_v1_4_with_limit(
+    bytes: &[u8],
+    artifact_byte_limit: u64,
+) -> Result<VerifiedProgramV1, BytecodeError> {
+    verify_v1(decode_v1_4_with_limit(bytes, artifact_byte_limit)?)
 }
 
 struct Verifier<'a> {
@@ -311,12 +325,14 @@ impl<'a> Verifier<'a> {
                         result,
                         effects,
                     } => {
+                        self.verify_effect_row(effects, Some(index), record_offset)?;
                         if parameters.is_empty()
-                            || effects.windows(2).any(|pair| pair[0] >= pair[1])
                             || parameters
                                 .iter()
                                 .chain(std::iter::once(result))
-                                .any(|value| to_usize(value.get()) >= index)
+                                .any(|value| {
+                                    to_usize(value.get()) >= index || self.is_cell_type(*value)
+                                })
                         {
                             return Err(error(
                                 BytecodePhase::Type,
@@ -327,7 +343,9 @@ impl<'a> Verifier<'a> {
                         }
                     }
                     ValueType::Tuple { elements } if self.version >= FORMAT_VERSION_1_2 => {
-                        if elements.iter().any(|value| to_usize(value.get()) >= index) {
+                        if elements.iter().any(|value| {
+                            to_usize(value.get()) >= index || self.is_cell_type(*value)
+                        }) {
                             return Err(error(
                                 BytecodePhase::Type,
                                 BytecodeReason::InvalidTypeIndex,
@@ -352,6 +370,14 @@ impl<'a> Verifier<'a> {
                         )?;
                         self.ensure_type_name(*name, record_offset, index)?;
                         self.verify_type_references(arguments, index, record_offset)?;
+                        if arguments.iter().any(|value| self.is_cell_type(*value)) {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::InvalidTypeIndex,
+                                record_offset,
+                                [to_u32(index)],
+                            ));
+                        }
                         let mut names = BTreeSet::new();
                         for field in fields {
                             self.ensure_type_name(field.name, record_offset, index)?;
@@ -368,6 +394,14 @@ impl<'a> Verifier<'a> {
                                 index,
                                 record_offset,
                             )?;
+                            if self.is_cell_type(field.value_type) {
+                                return Err(error(
+                                    BytecodePhase::Type,
+                                    BytecodeReason::InvalidTypeIndex,
+                                    record_offset,
+                                    [to_u32(index), field.value_type.get()],
+                                ));
+                            }
                         }
                     }
                     ValueType::Variant {
@@ -386,6 +420,14 @@ impl<'a> Verifier<'a> {
                         )?;
                         self.ensure_type_name(*name, record_offset, index)?;
                         self.verify_type_references(arguments, index, record_offset)?;
+                        if arguments.iter().any(|value| self.is_cell_type(*value)) {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::InvalidTypeIndex,
+                                record_offset,
+                                [to_u32(index)],
+                            ));
+                        }
                         let mut names = BTreeSet::new();
                         for case in cases {
                             self.ensure_type_name(case.name, record_offset, index)?;
@@ -403,7 +445,25 @@ impl<'a> Verifier<'a> {
                                     index,
                                     record_offset,
                                 )?;
+                                if self.is_cell_type(payload) {
+                                    return Err(error(
+                                        BytecodePhase::Type,
+                                        BytecodeReason::InvalidTypeIndex,
+                                        record_offset,
+                                        [to_u32(index), payload.get()],
+                                    ));
+                                }
                             }
+                        }
+                    }
+                    ValueType::Cell(value) if self.version >= FORMAT_VERSION_1_4 => {
+                        if to_usize(value.get()) >= index || self.is_cell_type(*value) {
+                            return Err(error(
+                                BytecodePhase::Type,
+                                BytecodeReason::InvalidTypeIndex,
+                                record_offset,
+                                [to_u32(index), value.get()],
+                            ));
                         }
                     }
                     _ => {
@@ -473,6 +533,48 @@ impl<'a> Verifier<'a> {
             ));
         }
         Ok(())
+    }
+
+    fn verify_effect_row(
+        &self,
+        effects: &[Effect],
+        containing_type: Option<usize>,
+        record_offset: u64,
+    ) -> Result<(), BytecodeError> {
+        if effects.windows(2).any(|pair| pair[0] >= pair[1]) {
+            return Err(error(
+                BytecodePhase::Effect,
+                BytecodeReason::InvalidTableOrder,
+                record_offset,
+                [containing_type.map_or(u32::MAX, to_u32)],
+            ));
+        }
+        for effect in effects {
+            let Effect::State(value) = effect else {
+                continue;
+            };
+            let index = to_usize(value.get());
+            if self.version < FORMAT_VERSION_1_4
+                || index >= self.model.types().len()
+                || containing_type.is_some_and(|containing| index >= containing)
+                || self.is_cell_type(*value)
+            {
+                return Err(error(
+                    BytecodePhase::Effect,
+                    BytecodeReason::InvalidTypeIndex,
+                    record_offset,
+                    [value.get()],
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    fn is_cell_type(&self, value: TypeIndex) -> bool {
+        matches!(
+            self.model.types().get(to_usize(value.get())),
+            Some(ValueType::Cell(_))
+        )
     }
 
     fn ensure_type_name(
@@ -655,7 +757,7 @@ impl<'a> Verifier<'a> {
             }
             if function.kind == FunctionKind::ClosureBody
                 && self.complete_function_type(function).is_none()
-                && !(self.version == FORMAT_VERSION_1_3
+                && !(self.version >= FORMAT_VERSION_1_3
                     && to_usize(function.capture_count) == function.parameter_types.len())
             {
                 return Err(error(
@@ -665,14 +767,7 @@ impl<'a> Verifier<'a> {
                     [to_u32(function_index)],
                 ));
             }
-            if function.effects.windows(2).any(|pair| pair[0] >= pair[1]) {
-                return Err(error(
-                    BytecodePhase::Effect,
-                    BytecodeReason::InvalidTableOrder,
-                    function_offset,
-                    [to_u32(function_index)],
-                ));
-            }
+            self.verify_effect_row(&function.effects, None, function_offset)?;
             if function.blocks.is_empty() {
                 return Err(error(
                     BytecodePhase::ControlFlow,
@@ -720,7 +815,7 @@ impl<'a> Verifier<'a> {
         function_index: usize,
         function_offset: u64,
     ) -> Result<(), BytecodeError> {
-        for value_type in &function.parameter_types {
+        for (parameter_index, value_type) in function.parameter_types.iter().enumerate() {
             self.ensure_index(
                 value_type.get(),
                 self.model.types().len(),
@@ -729,6 +824,18 @@ impl<'a> Verifier<'a> {
                 function_offset,
                 [to_u32(function_index), value_type.get()],
             )?;
+            if self.is_cell_type(*value_type)
+                && !(self.version >= FORMAT_VERSION_1_4
+                    && function.kind == FunctionKind::ClosureBody
+                    && parameter_index < to_usize(function.capture_count))
+            {
+                return Err(error(
+                    BytecodePhase::Type,
+                    BytecodeReason::InvalidTypeIndex,
+                    function_offset,
+                    [to_u32(function_index), value_type.get()],
+                ));
+            }
         }
         self.ensure_index(
             function.result_type.get(),
@@ -737,7 +844,16 @@ impl<'a> Verifier<'a> {
             BytecodeReason::InvalidTypeIndex,
             function_offset,
             [to_u32(function_index), function.result_type.get()],
-        )
+        )?;
+        if self.is_cell_type(function.result_type) {
+            return Err(error(
+                BytecodePhase::Type,
+                BytecodeReason::InvalidTypeIndex,
+                function_offset,
+                [to_u32(function_index), function.result_type.get()],
+            ));
+        }
+        Ok(())
     }
 
     fn verify_entry_block_shape(
@@ -771,7 +887,7 @@ impl<'a> Verifier<'a> {
     ) -> Result<(), BytecodeError> {
         for (block_index, block) in function.blocks.iter().enumerate() {
             let block_offset = self.block_offset(function_index, block_index);
-            for parameter in &block.parameters {
+            for (parameter_index, parameter) in block.parameters.iter().enumerate() {
                 self.ensure_register(
                     function,
                     parameter.register,
@@ -791,6 +907,23 @@ impl<'a> Verifier<'a> {
                         parameter.value_type.get(),
                     ],
                 )?;
+                if self.is_cell_type(parameter.value_type)
+                    && !(self.version >= FORMAT_VERSION_1_4
+                        && block_index == 0
+                        && function.kind == FunctionKind::ClosureBody
+                        && parameter_index < to_usize(function.capture_count))
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidTypeIndex,
+                        block_offset,
+                        [
+                            to_u32(function_index),
+                            to_u32(block_index),
+                            parameter.value_type.get(),
+                        ],
+                    ));
+                }
             }
             for (instruction_index, instruction) in block.instructions.iter().enumerate() {
                 let instruction_offset =
@@ -1077,6 +1210,36 @@ impl<'a> Verifier<'a> {
                 function_index,
                 block_index,
             ),
+            Instruction::CellNew { initial, .. } => self.ensure_register(
+                function,
+                *initial,
+                instruction_offset,
+                function_index,
+                block_index,
+            ),
+            Instruction::CellGet { cell, .. } => self.ensure_register(
+                function,
+                *cell,
+                instruction_offset,
+                function_index,
+                block_index,
+            ),
+            Instruction::CellSet { cell, value, .. } => {
+                self.ensure_register(
+                    function,
+                    *cell,
+                    instruction_offset,
+                    function_index,
+                    block_index,
+                )?;
+                self.ensure_register(
+                    function,
+                    *value,
+                    instruction_offset,
+                    function_index,
+                    block_index,
+                )
+            }
             Instruction::ConsoleWrite { text, .. } => self.ensure_register(
                 function,
                 *text,
@@ -1900,7 +2063,7 @@ impl<'a> Verifier<'a> {
             } => {
                 let body = &self.model.functions()[to_usize(body_function.get())];
                 let result_type = definitions[to_usize(destination.get())].value_type;
-                if self.version != FORMAT_VERSION_1_3
+                if self.version < FORMAT_VERSION_1_3
                     || body.kind != FunctionKind::ClosureBody
                     || body.module != function.module
                     || body.capture_count != to_u32(body_captures.len())
@@ -2004,6 +2167,73 @@ impl<'a> Verifier<'a> {
                     }
                 }
                 Ok(())
+            }
+            Instruction::CellNew {
+                destination,
+                initial,
+            } => {
+                let initial_type = definitions[to_usize(initial.get())].value_type;
+                let destination_type = definitions[to_usize(destination.get())].value_type;
+                if self.version < FORMAT_VERSION_1_4
+                    || self.find_cell_type(initial_type) != Some(destination_type)
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), destination.get(), initial.get()],
+                    ));
+                }
+                check(*initial, initial_type, BytecodeReason::InvalidRegisterType)
+            }
+            Instruction::CellGet { destination, cell } => {
+                let cell_type = definitions[to_usize(cell.get())].value_type;
+                let Some(value_type) = self.cell_value_type(cell_type) else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), cell.get()],
+                    ));
+                };
+                if self.version < FORMAT_VERSION_1_4
+                    || definitions[to_usize(destination.get())].value_type != value_type
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), destination.get()],
+                    ));
+                }
+                check(*cell, cell_type, BytecodeReason::InvalidRegisterType)
+            }
+            Instruction::CellSet {
+                destination,
+                cell,
+                value,
+            } => {
+                let cell_type = definitions[to_usize(cell.get())].value_type;
+                let Some(value_type) = self.cell_value_type(cell_type) else {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), cell.get()],
+                    ));
+                };
+                if self.version < FORMAT_VERSION_1_4
+                    || definitions[to_usize(destination.get())].value_type != TypeIndex::new(0)
+                {
+                    return Err(error(
+                        BytecodePhase::Type,
+                        BytecodeReason::InvalidRegisterType,
+                        instruction_offset,
+                        [to_u32(function_index), destination.get()],
+                    ));
+                }
+                check(*cell, cell_type, BytecodeReason::InvalidRegisterType)?;
+                check(*value, value_type, BytecodeReason::InvalidRegisterType)
             }
             Instruction::ConsoleWrite { text, .. } => check(
                 *text,
@@ -2132,15 +2362,16 @@ impl<'a> Verifier<'a> {
     }
 
     fn verify_effects_capabilities_and_entry(&self) -> Result<bool, BytecodeError> {
-        let mut required = vec![false; self.model.functions().len()];
+        let mut required = vec![BTreeSet::new(); self.model.functions().len()];
         let mut capability_required = vec![false; self.model.functions().len()];
         let mut reverse_calls = vec![Vec::new(); self.model.functions().len()];
         for (caller, function) in self.model.functions().iter().enumerate() {
+            let definitions = self.collect_definitions(function, caller)?;
             for block in &function.blocks {
                 for instruction in &block.instructions {
                     match instruction {
                         Instruction::ConsoleWrite { .. } => {
-                            required[caller] = true;
+                            required[caller].insert(Effect::ConsoleWrite);
                             capability_required[caller] = true;
                         }
                         Instruction::Call {
@@ -2153,7 +2384,6 @@ impl<'a> Verifier<'a> {
                         Instruction::CallClosure {
                             callee, arguments, ..
                         } => {
-                            let definitions = self.collect_definitions(function, caller)?;
                             let callee_type = definitions[to_usize(callee.get())].value_type;
                             let Some((parameters, _, effects)) = self.function_type(callee_type)
                             else {
@@ -2164,11 +2394,10 @@ impl<'a> Verifier<'a> {
                                     [to_u32(caller), callee_type.get()],
                                 ));
                             };
-                            if arguments.len() == parameters.len()
-                                && effects.contains(&Effect::ConsoleWrite)
-                            {
-                                required[caller] = true;
-                                capability_required[caller] = true;
+                            if arguments.len() == parameters.len() {
+                                required[caller].extend(effects.iter().copied());
+                                capability_required[caller] |=
+                                    effects.contains(&Effect::ConsoleWrite);
                             }
                         }
                         Instruction::Handle {
@@ -2181,14 +2410,36 @@ impl<'a> Verifier<'a> {
                             let handles_console = clauses
                                 .iter()
                                 .any(|clause| clause.operation == HandlerOperation::ConsoleWrite);
-                            let clause_console = clauses.iter().any(|clause| {
-                                self.model.functions()[to_usize(clause.function.get())]
-                                    .effects
-                                    .contains(&Effect::ConsoleWrite)
-                            });
-                            required[caller] |=
-                                (body_console && !handles_console) || clause_console;
+                            for effect in &body.effects {
+                                if !(handles_console && *effect == Effect::ConsoleWrite) {
+                                    required[caller].insert(*effect);
+                                }
+                            }
+                            let mut clause_console = false;
+                            for clause in clauses {
+                                let effects = &self.model.functions()
+                                    [to_usize(clause.function.get())]
+                                .effects;
+                                required[caller].extend(effects.iter().copied());
+                                clause_console |= effects.contains(&Effect::ConsoleWrite);
+                            }
                             capability_required[caller] |= body_console || clause_console;
+                        }
+                        Instruction::CellNew { initial, .. } => {
+                            let value_type = definitions[to_usize(initial.get())].value_type;
+                            required[caller].insert(Effect::State(value_type));
+                        }
+                        Instruction::CellGet { cell, .. } | Instruction::CellSet { cell, .. } => {
+                            let cell_type = definitions[to_usize(cell.get())].value_type;
+                            let Some(value_type) = self.cell_value_type(cell_type) else {
+                                return Err(error(
+                                    BytecodePhase::Type,
+                                    BytecodeReason::InvalidRegisterType,
+                                    self.function_offset(caller),
+                                    [to_u32(caller), cell.get()],
+                                ));
+                            };
+                            required[caller].insert(Effect::State(value_type));
                         }
                         Instruction::Const { .. }
                         | Instruction::IntUnary { .. }
@@ -2210,14 +2461,16 @@ impl<'a> Verifier<'a> {
         }
         let mut pending = VecDeque::new();
         for (index, value) in required.iter().enumerate() {
-            if *value {
+            if !value.is_empty() {
                 pending.push_back(index);
             }
         }
         while let Some(callee) = pending.pop_front() {
+            let callee_effects = required[callee].clone();
             for caller in &reverse_calls[callee] {
-                if !required[*caller] {
-                    required[*caller] = true;
+                let previous = required[*caller].len();
+                required[*caller].extend(callee_effects.iter().copied());
+                if required[*caller].len() != previous {
                     pending.push_back(*caller);
                 }
             }
@@ -2238,11 +2491,7 @@ impl<'a> Verifier<'a> {
 
         for (index, function) in self.model.functions().iter().enumerate() {
             let declared = function.effects.as_slice();
-            let expected = if required[index] {
-                &[Effect::ConsoleWrite][..]
-            } else {
-                &[][..]
-            };
+            let expected = required[index].iter().copied().collect::<Vec<_>>();
             if declared != expected {
                 return Err(error(
                     BytecodePhase::Effect,
@@ -2509,6 +2758,18 @@ impl<'a> Verifier<'a> {
                     _ => None,
                 }
             }
+            Instruction::CellNew { initial, .. } => {
+                let initial_type = definitions
+                    .get(to_usize(initial.get()))?
+                    .as_ref()?
+                    .value_type;
+                self.find_cell_type(initial_type)
+            }
+            Instruction::CellGet { cell, .. } => {
+                let cell_type = definitions.get(to_usize(cell.get()))?.as_ref()?.value_type;
+                self.cell_value_type(cell_type)
+            }
+            Instruction::CellSet { .. } => Some(TypeIndex::new(0)),
             Instruction::ConsoleWrite { .. } => Some(TypeIndex::new(0)),
         }
     }
@@ -2526,7 +2787,23 @@ impl<'a> Verifier<'a> {
             | ValueType::Text
             | ValueType::Tuple { .. }
             | ValueType::Record { .. }
-            | ValueType::Variant { .. } => None,
+            | ValueType::Variant { .. }
+            | ValueType::Cell(_) => None,
+        }
+    }
+
+    fn find_cell_type(&self, value: TypeIndex) -> Option<TypeIndex> {
+        self.model
+            .types()
+            .iter()
+            .position(|candidate| *candidate == ValueType::Cell(value))
+            .map(|index| TypeIndex::new(to_u32(index)))
+    }
+
+    fn cell_value_type(&self, cell: TypeIndex) -> Option<TypeIndex> {
+        match self.model.types().get(to_usize(cell.get()))? {
+            ValueType::Cell(value) => Some(*value),
+            _ => None,
         }
     }
 
@@ -2944,6 +3221,7 @@ fn type_dependencies(value: &ValueType) -> Vec<usize> {
             .chain(cases.iter().filter_map(|case| case.payload.as_ref()))
             .map(|index| to_usize(index.get()))
             .collect(),
+        ValueType::Cell(value) => vec![to_usize(value.get())],
     }
 }
 
@@ -3037,7 +3315,8 @@ fn scalar_type_index(value: ValueType) -> TypeIndex {
         ValueType::Function { .. }
         | ValueType::Tuple { .. }
         | ValueType::Record { .. }
-        | ValueType::Variant { .. } => unreachable!("aggregate/function types are not scalar"),
+        | ValueType::Variant { .. }
+        | ValueType::Cell(_) => unreachable!("aggregate/function/Cell types are not scalar"),
     }
 }
 
@@ -3100,6 +3379,9 @@ fn instruction_destination(instruction: &Instruction) -> RegisterIndex {
         | Instruction::MakeVariant { destination, .. }
         | Instruction::VariantIs { destination, .. }
         | Instruction::GetVariantPayload { destination, .. }
+        | Instruction::CellNew { destination, .. }
+        | Instruction::CellGet { destination, .. }
+        | Instruction::CellSet { destination, .. }
         | Instruction::Intrinsic { destination, .. }
         | Instruction::ConsoleWrite { destination, .. } => *destination,
     }
@@ -3153,4 +3435,486 @@ fn push_fallible<T: Copy>(
     })?;
     values.push(value);
     Ok(())
+}
+
+#[cfg(test)]
+mod bytecode_1_4_tests {
+    use super::*;
+    use crate::{
+        Block, BlockIndex, BlockParameter, Constant, ConstantIndex, FunctionIndex,
+        LoweredProgramV1_4, Module, ModuleIndex, PackageReference, ProgramParts, Source,
+        SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan, StringIndex,
+        encode_v1_4, encode_verified_v1,
+    };
+    use sha2::Digest;
+
+    fn cell_parts() -> ProgramParts {
+        let instructions = vec![
+            Instruction::Const {
+                destination: RegisterIndex::new(1),
+                constant: ConstantIndex::new(0),
+            },
+            Instruction::CellNew {
+                destination: RegisterIndex::new(2),
+                initial: RegisterIndex::new(1),
+            },
+            Instruction::CellGet {
+                destination: RegisterIndex::new(3),
+                cell: RegisterIndex::new(2),
+            },
+            Instruction::CellSet {
+                destination: RegisterIndex::new(4),
+                cell: RegisterIndex::new(2),
+                value: RegisterIndex::new(3),
+            },
+        ];
+        ProgramParts {
+            strings: vec![
+                "Main".to_owned(),
+                "main".to_owned(),
+                "src/Main.ling".to_owned(),
+            ],
+            packages: Vec::new(),
+            modules: vec![Module {
+                package: PackageReference::Standalone,
+                name: StringIndex::new(0),
+                capabilities: Vec::new(),
+            }],
+            types: vec![
+                ValueType::Unit,
+                ValueType::Bool,
+                ValueType::Int,
+                ValueType::Text,
+                ValueType::Cell(TypeIndex::new(2)),
+            ],
+            constants: vec![Constant::Int {
+                sign: IntegerSign::Positive,
+                magnitude: vec![1],
+            }],
+            sources: vec![Source {
+                module: ModuleIndex::new(0),
+                logical_name: StringIndex::new(2),
+                original_byte_length: 1,
+                content_sha256: SourceDigest::new([0x14; 32]),
+            }],
+            functions: vec![Function {
+                kind: FunctionKind::Named,
+                module: ModuleIndex::new(0),
+                name: StringIndex::new(1),
+                capture_count: 0,
+                parameter_types: vec![TypeIndex::new(0)],
+                result_type: TypeIndex::new(0),
+                effects: vec![Effect::State(TypeIndex::new(2))],
+                register_count: 5,
+                blocks: vec![Block {
+                    parameters: vec![BlockParameter {
+                        register: RegisterIndex::new(0),
+                        value_type: TypeIndex::new(0),
+                    }],
+                    instructions,
+                    terminator: Terminator::Return {
+                        value: RegisterIndex::new(4),
+                    },
+                }],
+            }],
+            entry: FunctionIndex::new(0),
+            source_map: (0..=4)
+                .map(|ordinal| SourceMapEntry {
+                    function: FunctionIndex::new(0),
+                    block: BlockIndex::new(0),
+                    ordinal,
+                    source: SourceIndex::new(0),
+                    span: SourceSpan::new(0, 1),
+                    origin: SourceOrigin::LoweringDerived,
+                })
+                .collect(),
+        }
+    }
+
+    fn encode_parts(parts: ProgramParts) -> Vec<u8> {
+        crate::encode::encode_model(
+            &UnverifiedProgram::from_parts(parts),
+            FORMAT_VERSION_1_4,
+            DecodeLimits::rfc_0016().artifact_bytes(),
+        )
+        .expect("test model is encodable")
+    }
+
+    fn verify_parts(parts: ProgramParts) -> Result<VerifiedProgramV1, BytecodeError> {
+        decode_and_verify_v1_4(&encode_parts(parts))
+    }
+
+    fn unique_position(bytes: &[u8], needle: &[u8]) -> usize {
+        let positions = bytes
+            .windows(needle.len())
+            .enumerate()
+            .filter_map(|(index, window)| (window == needle).then_some(index))
+            .collect::<Vec<_>>();
+        assert_eq!(positions.len(), 1, "fixture marker is unique");
+        positions[0]
+    }
+
+    fn closure_cell_parts() -> ProgramParts {
+        let state = vec![Effect::State(TypeIndex::new(2))];
+        let functions = vec![
+            Function {
+                kind: FunctionKind::Named,
+                module: ModuleIndex::new(0),
+                name: StringIndex::new(2),
+                capture_count: 0,
+                parameter_types: vec![TypeIndex::new(0)],
+                result_type: TypeIndex::new(0),
+                effects: state.clone(),
+                register_count: 5,
+                blocks: vec![Block {
+                    parameters: vec![BlockParameter {
+                        register: RegisterIndex::new(0),
+                        value_type: TypeIndex::new(0),
+                    }],
+                    instructions: vec![
+                        Instruction::Const {
+                            destination: RegisterIndex::new(1),
+                            constant: ConstantIndex::new(0),
+                        },
+                        Instruction::CellNew {
+                            destination: RegisterIndex::new(2),
+                            initial: RegisterIndex::new(1),
+                        },
+                        Instruction::MakeClosure {
+                            destination: RegisterIndex::new(3),
+                            function: FunctionIndex::new(1),
+                            captures: vec![CaptureOperand::Register(RegisterIndex::new(2))],
+                        },
+                        Instruction::CallClosure {
+                            destination: RegisterIndex::new(4),
+                            callee: RegisterIndex::new(3),
+                            arguments: vec![RegisterIndex::new(0)],
+                        },
+                    ],
+                    terminator: Terminator::Return {
+                        value: RegisterIndex::new(4),
+                    },
+                }],
+            },
+            Function {
+                kind: FunctionKind::ClosureBody,
+                module: ModuleIndex::new(0),
+                name: StringIndex::new(1),
+                capture_count: 1,
+                parameter_types: vec![TypeIndex::new(5), TypeIndex::new(0)],
+                result_type: TypeIndex::new(0),
+                effects: state,
+                register_count: 4,
+                blocks: vec![Block {
+                    parameters: vec![
+                        BlockParameter {
+                            register: RegisterIndex::new(0),
+                            value_type: TypeIndex::new(5),
+                        },
+                        BlockParameter {
+                            register: RegisterIndex::new(1),
+                            value_type: TypeIndex::new(0),
+                        },
+                    ],
+                    instructions: vec![
+                        Instruction::CellGet {
+                            destination: RegisterIndex::new(2),
+                            cell: RegisterIndex::new(0),
+                        },
+                        Instruction::CellSet {
+                            destination: RegisterIndex::new(3),
+                            cell: RegisterIndex::new(0),
+                            value: RegisterIndex::new(2),
+                        },
+                    ],
+                    terminator: Terminator::Return {
+                        value: RegisterIndex::new(3),
+                    },
+                }],
+            },
+        ];
+        let mut source_map = Vec::new();
+        for (function, count) in [(0, 5), (1, 3)] {
+            source_map.extend((0..count).map(|ordinal| SourceMapEntry {
+                function: FunctionIndex::new(function),
+                block: BlockIndex::new(0),
+                ordinal,
+                source: SourceIndex::new(0),
+                span: SourceSpan::new(0, 1),
+                origin: SourceOrigin::LoweringDerived,
+            }));
+        }
+        ProgramParts {
+            strings: vec![
+                "Main".to_owned(),
+                "closure_0_0_0".to_owned(),
+                "main".to_owned(),
+                "src/Main.ling".to_owned(),
+            ],
+            packages: Vec::new(),
+            modules: vec![Module {
+                package: PackageReference::Standalone,
+                name: StringIndex::new(0),
+                capabilities: Vec::new(),
+            }],
+            types: vec![
+                ValueType::Unit,
+                ValueType::Bool,
+                ValueType::Int,
+                ValueType::Text,
+                ValueType::Function {
+                    parameters: vec![TypeIndex::new(0)],
+                    result: TypeIndex::new(0),
+                    effects: vec![Effect::State(TypeIndex::new(2))],
+                },
+                ValueType::Cell(TypeIndex::new(2)),
+            ],
+            constants: vec![Constant::Int {
+                sign: IntegerSign::Positive,
+                magnitude: vec![1],
+            }],
+            sources: vec![Source {
+                module: ModuleIndex::new(0),
+                logical_name: StringIndex::new(3),
+                original_byte_length: 1,
+                content_sha256: SourceDigest::new([0x24; 32]),
+            }],
+            functions,
+            entry: FunctionIndex::new(0),
+            source_map,
+        }
+    }
+
+    #[test]
+    fn cell_state_wire_round_trips_and_older_readers_reject_it() {
+        let lowered = LoweredProgramV1_4::new(UnverifiedProgram::from_parts(cell_parts()));
+        let bytes = encode_v1_4(&lowered).expect("canonical 1.4 model encodes");
+        let digest = sha2::Sha256::digest(&bytes)
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>();
+        let hexadecimal = bytes
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect::<String>();
+        assert_eq!(bytes.len(), 599);
+        assert_eq!(
+            digest,
+            "18b74871f6800165f47966ebc9b870180d887d31ab00cd76a5a0e20c7868dfab"
+        );
+        assert_eq!(
+            hexadecimal,
+            include_str!("../../../tests/bytecode/v1/golden/cell-state-1.4.lbc.hex").trim_end()
+        );
+
+        assert_eq!(&bytes[12..16], &[1, 0, 4, 0]);
+        for record in [
+            &[0x14, 0, 0, 0, 2, 0, 0, 0][..],
+            &[0x1d, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0][..],
+            &[0x1e, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0][..],
+            &[0x1f, 0, 0, 0, 4, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0][..],
+        ] {
+            assert!(bytes.windows(record.len()).any(|window| window == record));
+        }
+
+        let verified = decode_and_verify_v1_4(&bytes).expect("valid Cell/State program verifies");
+        assert_eq!(verified.version(), FORMAT_VERSION_1_4);
+        assert_eq!(
+            encode_verified_v1(&verified).expect("verified 1.4 canonical re-encoding"),
+            bytes
+        );
+        let disassembly = crate::disassemble_v1_4(&lowered);
+        assert_eq!(
+            disassembly,
+            include_str!("../../../tests/bytecode/v1/golden/cell-state-1.4.dis")
+        );
+
+        for reader in [
+            crate::decode_v1,
+            crate::decode_v1_1,
+            crate::decode_v1_2,
+            crate::decode_v1_3,
+        ] {
+            let error = reader(&bytes).expect_err("older reader rejects bytecode 1.4");
+            assert_eq!(error.reason(), BytecodeReason::UnsupportedVersion);
+        }
+    }
+
+    #[test]
+    fn cell_and_state_invariants_fail_before_verified_publication() {
+        let mut forward = cell_parts();
+        forward.types[4] = ValueType::Cell(TypeIndex::new(4));
+        assert_eq!(
+            verify_parts(forward)
+                .expect_err("Cell type cannot reference itself")
+                .reason(),
+            BytecodeReason::InvalidTypeIndex
+        );
+
+        let mut escaped = cell_parts();
+        escaped.types.push(ValueType::Tuple {
+            elements: vec![TypeIndex::new(4)],
+        });
+        assert_eq!(
+            verify_parts(escaped)
+                .expect_err("Cell cannot enter aggregate fields")
+                .reason(),
+            BytecodeReason::InvalidTypeIndex
+        );
+
+        let mut state_of_cell = cell_parts();
+        state_of_cell.functions[0].effects = vec![Effect::State(TypeIndex::new(4))];
+        assert_eq!(
+            verify_parts(state_of_cell)
+                .expect_err("State cannot carry a Cell type")
+                .reason(),
+            BytecodeReason::InvalidTypeIndex
+        );
+
+        let mut duplicate = cell_parts();
+        duplicate.functions[0]
+            .effects
+            .push(Effect::State(TypeIndex::new(2)));
+        assert_eq!(
+            verify_parts(duplicate)
+                .expect_err("State rows are duplicate-free")
+                .reason(),
+            BytecodeReason::InvalidTableOrder
+        );
+
+        let mut missing = cell_parts();
+        missing.functions[0].effects.clear();
+        assert_eq!(
+            verify_parts(missing)
+                .expect_err("Cell instructions require State")
+                .reason(),
+            BytecodeReason::EffectMismatch
+        );
+
+        let mut excess = cell_parts();
+        excess.functions[0].effects.insert(0, Effect::ConsoleWrite);
+        assert_eq!(
+            verify_parts(excess)
+                .expect_err("excess effects are rejected")
+                .reason(),
+            BytecodeReason::EffectMismatch
+        );
+
+        let mut unordered = cell_parts();
+        unordered.functions[0].effects =
+            vec![Effect::State(TypeIndex::new(2)), Effect::ConsoleWrite];
+        assert_eq!(
+            verify_parts(unordered)
+                .expect_err("State rows follow tag order")
+                .reason(),
+            BytecodeReason::InvalidTableOrder
+        );
+
+        let mut result_escape = cell_parts();
+        result_escape.functions[0].result_type = TypeIndex::new(4);
+        assert_eq!(
+            verify_parts(result_escape)
+                .expect_err("Cell cannot escape through a function result")
+                .reason(),
+            BytecodeReason::InvalidTypeIndex
+        );
+
+        let mut incomplete_map = cell_parts();
+        incomplete_map.source_map.pop();
+        assert_eq!(
+            verify_parts(incomplete_map)
+                .expect_err("every Cell instruction is source mapped")
+                .reason(),
+            BytecodeReason::IncompleteSourceMap
+        );
+
+        let mut mistyped = cell_parts();
+        let Instruction::CellSet { value, .. } =
+            &mut mistyped.functions[0].blocks[0].instructions[3]
+        else {
+            panic!("fixture has CellSet");
+        };
+        *value = RegisterIndex::new(0);
+        assert_eq!(
+            verify_parts(mistyped)
+                .expect_err("CellSet value must match Cell payload")
+                .reason(),
+            BytecodeReason::InvalidRegisterType
+        );
+    }
+
+    #[test]
+    fn malformed_cell_state_records_are_bounded_and_structured() {
+        let bytes = encode_parts(cell_parts());
+
+        let mut reserved = bytes.clone();
+        let cell_type = unique_position(&reserved, &[8, 0, 0, 0, 0x14, 0, 0, 0, 2, 0, 0, 0]);
+        reserved[cell_type + 5] = 1;
+        assert_eq!(
+            decode_v1_4(&reserved)
+                .expect_err("Cell reserved bytes are zero")
+                .reason(),
+            BytecodeReason::ReservedNonzero
+        );
+
+        let mut invalid_state_tag = bytes.clone();
+        let state = unique_position(&invalid_state_tag, &[1, 0, 0, 0, 2, 2, 0, 0, 0]);
+        invalid_state_tag[state + 4] = 3;
+        assert_eq!(
+            decode_v1_4(&invalid_state_tag)
+                .expect_err("unknown State tag is rejected")
+                .reason(),
+            BytecodeReason::InvalidTag
+        );
+
+        let mut short_instruction = bytes;
+        let cell_new = unique_position(
+            &short_instruction,
+            &[12, 0, 0, 0, 0x1d, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0],
+        );
+        short_instruction[cell_new] = 8;
+        assert_eq!(
+            decode_v1_4(&short_instruction)
+                .expect_err("short CellNew is failure-atomic")
+                .reason(),
+            BytecodeReason::InvalidInstructionLength
+        );
+    }
+
+    #[test]
+    fn cell_capture_prefix_and_closure_state_propagation_are_verified() {
+        verify_parts(closure_cell_parts())
+            .expect("Cell capture prefix and full closure call retain State<Int>");
+
+        let mut source_parameter = closure_cell_parts();
+        source_parameter.functions[1].capture_count = 0;
+        assert_eq!(
+            verify_parts(source_parameter)
+                .expect_err("Cell cannot escape into a closure source parameter")
+                .reason(),
+            BytecodeReason::InvalidTypeIndex
+        );
+
+        let mut missing_caller_state = closure_cell_parts();
+        missing_caller_state.functions[0].effects.clear();
+        assert_eq!(
+            verify_parts(missing_caller_state)
+                .expect_err("full closure calls propagate State")
+                .reason(),
+            BytecodeReason::EffectMismatch
+        );
+
+        let mut missing_callee_state = closure_cell_parts();
+        missing_callee_state.functions[1].effects.clear();
+        let ValueType::Function { effects, .. } = &mut missing_callee_state.types[4] else {
+            panic!("fixture has closure function type");
+        };
+        effects.clear();
+        assert_eq!(
+            verify_parts(missing_callee_state)
+                .expect_err("Cell instructions require the closure State row")
+                .reason(),
+            BytecodeReason::EffectMismatch
+        );
+    }
 }

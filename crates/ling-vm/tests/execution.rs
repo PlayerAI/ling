@@ -2,8 +2,8 @@ mod support;
 
 use ling_bytecode::{
     Instruction, LoweringSource, SourceMapEntry, VerifiedProgramV1, decode_and_verify_v1,
-    decode_and_verify_v1_1, decode_and_verify_v1_2, decode_and_verify_v1_3, encode_v1, encode_v1_1,
-    encode_v1_2, encode_v1_3, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
+    decode_and_verify_v1_1, decode_and_verify_v1_2, decode_and_verify_v1_3, decode_and_verify_v1_4,
+    encode_v1, encode_v1_1, encode_v1_2, encode_v1_3, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
 };
 use ling_diagnostics::codes;
 use ling_effects::locate_main;
@@ -20,6 +20,21 @@ use support::wire;
 
 const DIRECT_CALL: &str = include_str!("../../../tests/bytecode/v1/programs/direct-call.ling");
 const HELLO: &str = include_str!("../../../tests/bytecode/v1/programs/hello.ling");
+const CELL_STATE_HEX: &str =
+    include_str!("../../../tests/bytecode/v1/golden/cell-state-1.4.lbc.hex");
+
+fn decode_hex(value: &str) -> Vec<u8> {
+    let value = value.trim();
+    assert_eq!(value.len() % 2, 0, "hex fixture has complete bytes");
+    value
+        .as_bytes()
+        .chunks_exact(2)
+        .map(|pair| {
+            let text = std::str::from_utf8(pair).expect("hex fixture is ASCII");
+            u8::from_str_radix(text, 16).expect("fixture is hexadecimal")
+        })
+        .collect()
+}
 
 struct Fixture {
     source: SourceFile,
@@ -82,6 +97,37 @@ fn verified_v1_3(fixture: &Fixture) -> VerifiedProgramV1 {
 
 fn generous_limits() -> ExecutionLimits {
     ExecutionLimits::new(100_000, 1_024, 16 * 1024 * 1024)
+}
+
+#[test]
+fn executes_bytecode_1_4_cells_with_exact_heap_accounting() {
+    let program = decode_and_verify_v1_4(&decode_hex(CELL_STATE_HEX))
+        .expect("canonical Cell/State artifact verifies");
+    execute_v1(
+        &program,
+        ExecutionLimits::new(5, 1, 25),
+        &mut HostCapabilities::none(),
+    )
+    .expect("one-byte Int plus one 24-byte Cell fits exactly");
+
+    let error = execute_v1(
+        &program,
+        ExecutionLimits::new(5, 1, 24),
+        &mut HostCapabilities::none(),
+    )
+    .expect_err("one-under Cell heap budget fails before allocation");
+    let ExecutionError::Runtime(fault) = error else {
+        panic!("Cell allocation limit is a source-mapped runtime Fault");
+    };
+    assert_eq!(
+        fault.kind(),
+        &RuntimeFaultKind::OutOfMemory {
+            operation: "cell.new"
+        }
+    );
+    assert!(!fault.committed());
+    assert_eq!(fault.span().start_byte(), 0);
+    assert_eq!(fault.span().end_byte(), 1);
 }
 
 #[derive(Default)]

@@ -3,10 +3,10 @@ use std::fmt;
 
 use crate::{
     BYTECODE_MAGIC, Block, CaptureOperand, Constant, DecodeLimits, FORMAT_VERSION_1_0,
-    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FORMAT_VERSION_1_3, FormatVersion, Function,
-    FunctionKind, HEADER_BYTES, Instruction, LANGUAGE_VERSION, LoweredProgramV1,
-    LoweredProgramV1_1, LoweredProgramV1_3, NO_INDEX, PackageReference, SourceMapEntry, Terminator,
-    UNICODE_VERSION, UnverifiedProgram, ValueType, VerifiedProgramV1,
+    FORMAT_VERSION_1_1, FORMAT_VERSION_1_2, FORMAT_VERSION_1_3, FORMAT_VERSION_1_4, FormatVersion,
+    Function, FunctionKind, HEADER_BYTES, Instruction, LANGUAGE_VERSION, LoweredProgramV1,
+    LoweredProgramV1_1, LoweredProgramV1_3, LoweredProgramV1_4, NO_INDEX, PackageReference,
+    SourceMapEntry, Terminator, UNICODE_VERSION, UnverifiedProgram, ValueType, VerifiedProgramV1,
 };
 
 /// Failure categories for deterministic bytecode writing.
@@ -157,7 +157,28 @@ pub fn encode_v1_3_with_limit(
     Ok(bytes)
 }
 
-/// Re-encodes a verified program using the canonical version-1.0 writer.
+/// Encodes canonical bytecode 1.4 using the DEC-0262/RFC-0016 hard limits.
+pub fn encode_v1_4(program: &LoweredProgramV1_4) -> Result<Vec<u8>, EncodingError> {
+    encode_v1_4_with_limit(program, DecodeLimits::rfc_0016().artifact_bytes())
+}
+
+/// Encodes canonical bytecode 1.4 under a caller-supplied bounded limit.
+pub fn encode_v1_4_with_limit(
+    program: &LoweredProgramV1_4,
+    artifact_byte_limit: u64,
+) -> Result<Vec<u8>, EncodingError> {
+    let hard_limit = DecodeLimits::rfc_0016().artifact_bytes();
+    let bytes = encode_model(program.model(), FORMAT_VERSION_1_4, hard_limit)?;
+    let actual =
+        u64::try_from(bytes.len()).map_err(|_| EncodingError::resource(u64::MAX, hard_limit))?;
+    let effective_limit = artifact_byte_limit.min(hard_limit);
+    if actual > effective_limit {
+        return Err(EncodingError::resource(actual, effective_limit));
+    }
+    Ok(bytes)
+}
+
+/// Re-encodes a verified program using the canonical writer for its 1.x revision.
 pub fn encode_verified_v1(program: &VerifiedProgramV1) -> Result<Vec<u8>, EncodingError> {
     encode_verified_v1_with_limit(program, DecodeLimits::rfc_0014().artifact_bytes())
 }
@@ -194,6 +215,7 @@ pub(crate) fn encode_model(
         && version != FORMAT_VERSION_1_1
         && version != FORMAT_VERSION_1_2
         && version != FORMAT_VERSION_1_3
+        && version != FORMAT_VERSION_1_4
     {
         return Err(EncodingError::invariant(
             "unsupported bytecode writer version",
@@ -279,9 +301,7 @@ fn encode_type(
             }
             writer.u32(result.get())?;
             writer.length(effects.len(), "function type effect count")?;
-            for effect in effects {
-                writer.u8(effect.tag())?;
-            }
+            encode_effects(writer, effects, version)?;
             Ok(())
         }
         ValueType::Function { .. } => Err(EncodingError::invariant(
@@ -339,6 +359,13 @@ fn encode_type(
             }
             Ok(())
         }
+        ValueType::Cell(value) if version >= FORMAT_VERSION_1_4 => {
+            writer.bytes(&[0; 3])?;
+            writer.u32(value.get())
+        }
+        ValueType::Cell(_) => Err(EncodingError::invariant(
+            "bytecode 1.0-1.3 cannot encode Cell value types",
+        )),
         ValueType::Tuple { .. } | ValueType::Record { .. } | ValueType::Variant { .. } => Err(
             EncodingError::invariant("bytecode 1.0/1.1 cannot encode aggregate value types"),
         ),
@@ -392,9 +419,7 @@ fn encode_function(
     }
     writer.u32(function.result_type.get())?;
     writer.length(function.effects.len(), "effect count")?;
-    for effect in &function.effects {
-        writer.u8(effect.tag())?;
-    }
+    encode_effects(writer, &function.effects, version)?;
     writer.u32(function.register_count)?;
     writer.length(function.blocks.len(), "block count")?;
     for block in &function.blocks {
@@ -610,6 +635,31 @@ fn encode_instruction(
             writer.u32(variant.get())?;
             writer.u32(*case)
         }
+        Instruction::CellNew {
+            destination,
+            initial,
+        } if version >= FORMAT_VERSION_1_4 => {
+            writer.u32(destination.get())?;
+            writer.u32(initial.get())
+        }
+        Instruction::CellGet { destination, cell } if version >= FORMAT_VERSION_1_4 => {
+            writer.u32(destination.get())?;
+            writer.u32(cell.get())
+        }
+        Instruction::CellSet {
+            destination,
+            cell,
+            value,
+        } if version >= FORMAT_VERSION_1_4 => {
+            writer.u32(destination.get())?;
+            writer.u32(cell.get())?;
+            writer.u32(value.get())
+        }
+        Instruction::CellNew { .. } | Instruction::CellGet { .. } | Instruction::CellSet { .. } => {
+            Err(EncodingError::invariant(
+                "bytecode 1.0-1.3 cannot encode Cell instructions",
+            ))
+        }
         Instruction::MakeTuple { .. }
         | Instruction::GetTuple { .. }
         | Instruction::MakeRecord { .. }
@@ -625,6 +675,28 @@ fn encode_instruction(
             writer.u32(text.get())
         }
     }
+}
+
+fn encode_effects(
+    writer: &mut Writer,
+    effects: &[crate::Effect],
+    version: FormatVersion,
+) -> Result<(), EncodingError> {
+    for effect in effects {
+        writer.u8(effect.tag())?;
+        match effect {
+            crate::Effect::ConsoleWrite => {}
+            crate::Effect::State(value) if version >= FORMAT_VERSION_1_4 => {
+                writer.u32(value.get())?;
+            }
+            crate::Effect::State(_) => {
+                return Err(EncodingError::invariant(
+                    "bytecode 1.0-1.3 cannot encode State effects",
+                ));
+            }
+        }
+    }
+    Ok(())
 }
 
 fn encode_captures(writer: &mut Writer, captures: &[CaptureOperand]) -> Result<(), EncodingError> {

@@ -79,8 +79,9 @@ preserved; their readers reject 1.3 as required.
 
 ## Intentionally deferred
 
-Shared mutable Handler captures, bytecode 1.4 Cell/State implementation,
-complete committed-mutation differential evidence, Clock/Random producers,
-Many-runtime production, user operations, Task/Actor transfer,
+Shared mutable Handler capture lowering and complete committed-mutation
+differential evidence remain deferred; the isolated bytecode 1.4 Cell/State
+model is tracked by `EFF-2104-BYTECODE-1.4-MODEL-MILESTONE.md`. Clock/Random
+producers, Many-runtime production, user operations, Task/Actor transfer,
 rollback/cleanup, continuation serialization, Native/Wasm, migrations, and
-Stable claims remain deferred. EFF-2104 stays In Progress.
+Stable claims also remain deferred. EFF-2104 stays In Progress.

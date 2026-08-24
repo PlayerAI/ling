@@ -54,6 +54,11 @@ Fault catching, rollback, and Stable behavior remain outside EFF-2104.
   reason `refutable_parameter`, canonical operation facts, and original
   Unicode/BOM/CRLF spans before typed or Handler Core publication. The 1.3
   lowerer retains its historical mutable Handler-capture rejection.
+- The current implementation provides the isolated `ling.bytecode/1.4`
+  Cell/State model, version-aware writer/reader, disassembly, independent
+  verifier, canonical re-encoding, frozen bytes, older-reader rejection, and a
+  non-cyclic heap-accounted VM Cell store. Shared mutable Handler capture
+  selection/lowering and complete differential evidence remain pending.
 - The rejection-gate child covers only the negative compile boundary and
   diagnostic serialization; it has no checked snapshot, runtime, bytecode, VM,
   Fault, cancellation, or differential behavior.
@@ -79,9 +84,10 @@ Accepted DEC-0262 retains the applicable DEC-0261 rules and refines them with:
    mutable State, Unicode/CRLF/BOM spans, deterministic output, and the
    no-unchecked-AST boundary.
 
-The checked-source pattern gate is implemented. EFF-2104 cannot be marked Done
-until bytecode 1.4 is implemented, the VM preserves shared Cell identity, all
-differential evidence passes, and the completion commit is recorded.
+The checked-source pattern gate and isolated bytecode/VM Cell primitives are
+implemented. EFF-2104 cannot be marked Done until shared mutable Handler
+captures lower to one lexical Cell identity, all differential/resource/
+cancellation evidence passes, and the completion commit is recorded.
 
 ## Evidence and compatibility
 
@@ -92,10 +98,10 @@ This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and `crates/ling-eval`, `crates/ling-bytecode`, and `crates/ling-vm`.
 
-Accepted DEC-0262 plans `ling.bytecode/1.4`; the committed interpreter and
-bytecode/VM 1.3 slice provide implementation evidence without making a
+Accepted DEC-0262 fixes `ling.bytecode/1.4`; its isolated codec, verifier, and
+VM Cell primitive now provide implementation evidence without making a
 complete EFF-2104 or current-1.4 claim. Bytecode 1.0 through 1.3 remain
-unchanged, and older readers must reject 1.4.
+unchanged, and older readers reject 1.4.
 
 ## Intentionally deferred
 

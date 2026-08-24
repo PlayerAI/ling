@@ -23,6 +23,18 @@ impl Heap {
             .is_some_and(|next| next <= self.limit)
     }
 
+    pub(crate) fn charge(&self, bytes: u64) -> Result<HeapCharge, ()> {
+        let next = self.used.get().checked_add(bytes).ok_or(())?;
+        if next > self.limit {
+            return Err(());
+        }
+        self.used.set(next);
+        Ok(HeapCharge {
+            bytes,
+            used: Rc::clone(&self.used),
+        })
+    }
+
     pub(crate) fn int(&self, value: BigInt) -> Result<Value, ()> {
         let bytes = value.bits().saturating_add(7) / 8;
         self.allocate(value, bytes).map(Value::Int)
@@ -110,6 +122,17 @@ impl Heap {
             bytes,
             used: Rc::clone(&self.used),
         }))
+    }
+}
+
+pub(crate) struct HeapCharge {
+    bytes: u64,
+    used: Rc<Cell<u64>>,
+}
+
+impl Drop for HeapCharge {
+    fn drop(&mut self) {
+        self.used.set(self.used.get().saturating_sub(self.bytes));
     }
 }
 
@@ -208,6 +231,7 @@ pub(crate) enum Value {
     Tuple(Rc<Allocation<Vec<Value>>>),
     Record(Rc<Allocation<Record>>),
     Variant(Rc<Allocation<Variant>>),
+    Cell(u64),
 }
 
 impl Value {
@@ -221,7 +245,8 @@ impl Value {
             | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_)
-            | Self::Variant(_) => None,
+            | Self::Variant(_)
+            | Self::Cell(_) => None,
         }
     }
 
@@ -235,7 +260,8 @@ impl Value {
             | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_)
-            | Self::Variant(_) => None,
+            | Self::Variant(_)
+            | Self::Cell(_) => None,
         }
     }
 
@@ -249,7 +275,8 @@ impl Value {
             | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_)
-            | Self::Variant(_) => None,
+            | Self::Variant(_)
+            | Self::Cell(_) => None,
         }
     }
 
@@ -263,7 +290,8 @@ impl Value {
             | Self::Continuation(_)
             | Self::Tuple(_)
             | Self::Record(_)
-            | Self::Variant(_) => None,
+            | Self::Variant(_)
+            | Self::Cell(_) => None,
         }
     }
 
@@ -277,7 +305,8 @@ impl Value {
             | Self::Closure(_)
             | Self::Tuple(_)
             | Self::Record(_)
-            | Self::Variant(_) => None,
+            | Self::Variant(_)
+            | Self::Cell(_) => None,
         }
     }
 
@@ -291,7 +320,8 @@ impl Value {
             | Self::Closure(_)
             | Self::Continuation(_)
             | Self::Record(_)
-            | Self::Variant(_) => None,
+            | Self::Variant(_)
+            | Self::Cell(_) => None,
         }
     }
 
@@ -305,7 +335,8 @@ impl Value {
             | Self::Closure(_)
             | Self::Continuation(_)
             | Self::Tuple(_)
-            | Self::Variant(_) => None,
+            | Self::Variant(_)
+            | Self::Cell(_) => None,
         }
     }
 
@@ -319,7 +350,23 @@ impl Value {
             | Self::Closure(_)
             | Self::Continuation(_)
             | Self::Tuple(_)
-            | Self::Record(_) => None,
+            | Self::Record(_)
+            | Self::Cell(_) => None,
+        }
+    }
+
+    pub(crate) const fn as_cell_id(&self) -> Option<u64> {
+        match self {
+            Self::Cell(id) => Some(*id),
+            Self::Unit
+            | Self::Bool(_)
+            | Self::Int(_)
+            | Self::Text(_)
+            | Self::Closure(_)
+            | Self::Continuation(_)
+            | Self::Tuple(_)
+            | Self::Record(_)
+            | Self::Variant(_) => None,
         }
     }
 

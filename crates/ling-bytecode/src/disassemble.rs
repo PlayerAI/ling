@@ -2,8 +2,8 @@ use std::fmt::Write;
 
 use crate::{
     CaptureOperand, Constant, FunctionKind, Instruction, IntegerSign, LoweredProgramV1,
-    LoweredProgramV1_1, LoweredProgramV1_2, PackageReference, SourceOrigin, Terminator,
-    UnverifiedProgram, ValueType,
+    LoweredProgramV1_1, LoweredProgramV1_2, LoweredProgramV1_4, PackageReference, SourceOrigin,
+    Terminator, UnverifiedProgram, ValueType,
 };
 
 /// Renders a deterministic human-readable debug view; this text is not a wire protocol.
@@ -28,6 +28,12 @@ pub fn disassemble_v1_2(program: &LoweredProgramV1_2) -> String {
 #[must_use]
 pub fn disassemble_v1_3(program: &crate::LoweredProgramV1_3) -> String {
     disassemble_model(program.model(), "1.3", true)
+}
+
+/// Renders a deterministic version-1.4 debug view; this text is not a wire protocol.
+#[must_use]
+pub fn disassemble_v1_4(program: &LoweredProgramV1_4) -> String {
+    disassemble_model(program.model(), "1.4", true)
 }
 
 fn disassemble_model(
@@ -276,6 +282,7 @@ fn type_text(value: &ValueType) -> String {
                 .collect::<Vec<_>>()
                 .join(", ")
         ),
+        ValueType::Cell(value) => format!("Cell<@t{}>", value.get()),
     }
 }
 
@@ -294,7 +301,8 @@ fn effect_list(values: &[crate::Effect]) -> String {
     let values = values
         .iter()
         .map(|value| match value {
-            crate::Effect::ConsoleWrite => "Console.Write",
+            crate::Effect::ConsoleWrite => "Console.Write".to_owned(),
+            crate::Effect::State(value) => format!("State<@t{}>", value.get()),
         })
         .collect::<Vec<_>>()
         .join(", ");
@@ -518,6 +526,23 @@ fn instruction_text(value: &Instruction) -> String {
             destination.get(),
             variant.get(),
             case
+        ),
+        Instruction::CellNew {
+            destination,
+            initial,
+        } => format!("%r{} = cell.new %r{}", destination.get(), initial.get()),
+        Instruction::CellGet { destination, cell } => {
+            format!("%r{} = cell.get %r{}", destination.get(), cell.get())
+        }
+        Instruction::CellSet {
+            destination,
+            cell,
+            value,
+        } => format!(
+            "%r{} = cell.set %r{}, %r{}",
+            destination.get(),
+            cell.get(),
+            value.get()
         ),
         Instruction::Intrinsic {
             destination,

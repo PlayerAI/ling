@@ -1,11 +1,11 @@
 use ling_bytecode::{
-    BYTECODE_MAGIC, BYTECODE_PROTOCOL, BYTECODE_PROTOCOL_1_3, Capability, CompareOperator,
-    Constant, ConstantIndex, DecodeLimits, Effect, FORMAT_VERSION, FORMAT_VERSION_1_3, Function,
-    FunctionIndex, FunctionKind, HandlerClause, HandlerOperation, Instruction, IntBinaryOperator,
-    IntUnaryOperator, IntegerSign, Intrinsic, LANGUAGE_VERSION, Module, ModuleIndex,
-    PackageReference, ProgramParts, RegisterIndex, Source, SourceDigest, SourceIndex,
-    SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator, TypeIndex, UNICODE_VERSION,
-    UnverifiedProgram, ValueType,
+    BYTECODE_MAGIC, BYTECODE_PROTOCOL, BYTECODE_PROTOCOL_1_3, BYTECODE_PROTOCOL_1_4, Capability,
+    CompareOperator, Constant, ConstantIndex, DecodeLimits, Effect, FORMAT_VERSION,
+    FORMAT_VERSION_1_3, FORMAT_VERSION_1_4, Function, FunctionIndex, FunctionKind, HandlerClause,
+    HandlerOperation, Instruction, IntBinaryOperator, IntUnaryOperator, IntegerSign, Intrinsic,
+    LANGUAGE_VERSION, Module, ModuleIndex, PackageReference, ProgramParts, RegisterIndex, Source,
+    SourceDigest, SourceIndex, SourceMapEntry, SourceOrigin, SourceSpan, StringIndex, Terminator,
+    TypeIndex, UNICODE_VERSION, UnverifiedProgram, ValueType,
 };
 
 #[test]
@@ -17,6 +17,9 @@ fn freezes_the_version_and_resource_contract() {
     assert_eq!(BYTECODE_PROTOCOL_1_3, "ling.bytecode/1.3");
     assert_eq!(FORMAT_VERSION_1_3.major(), 1);
     assert_eq!(FORMAT_VERSION_1_3.minor(), 3);
+    assert_eq!(BYTECODE_PROTOCOL_1_4, "ling.bytecode/1.4");
+    assert_eq!(FORMAT_VERSION_1_4.major(), 1);
+    assert_eq!(FORMAT_VERSION_1_4.minor(), 4);
     assert_eq!(LANGUAGE_VERSION.major(), 0);
     assert_eq!(LANGUAGE_VERSION.minor(), 1);
     assert_eq!(UNICODE_VERSION.major(), 17);
@@ -47,6 +50,8 @@ fn freezes_explicit_tags_without_using_rust_layout() {
     assert_eq!(ValueType::Text.tag(), 0x03);
     assert_eq!(Capability::ConsoleWrite.tag(), 1);
     assert_eq!(Effect::ConsoleWrite.tag(), 1);
+    assert_eq!(Effect::State(TypeIndex::new(2)).tag(), 2);
+    assert_eq!(ValueType::Cell(TypeIndex::new(2)).tag(), 0x14);
 
     assert_eq!(IntegerSign::Zero.tag(), 0);
     assert_eq!(IntegerSign::Positive.tag(), 1);
@@ -109,6 +114,19 @@ fn freezes_explicit_tags_without_using_rust_layout() {
                 captures: Vec::new(),
             }],
         },
+        Instruction::CellNew {
+            destination: RegisterIndex::new(0),
+            initial: RegisterIndex::new(1),
+        },
+        Instruction::CellGet {
+            destination: RegisterIndex::new(0),
+            cell: RegisterIndex::new(1),
+        },
+        Instruction::CellSet {
+            destination: RegisterIndex::new(0),
+            cell: RegisterIndex::new(1),
+            value: RegisterIndex::new(2),
+        },
         Instruction::Intrinsic {
             destination: RegisterIndex::new(0),
             intrinsic: Intrinsic::MaxInt,
@@ -121,7 +139,9 @@ fn freezes_explicit_tags_without_using_rust_layout() {
     ];
     assert_eq!(
         instructions.map(|instruction| instruction.opcode()),
-        [0x01, 0x02, 0x03, 0x04, 0x10, 0x1c, 0x11, 0x20]
+        [
+            0x01, 0x02, 0x03, 0x04, 0x10, 0x1c, 0x1d, 0x1e, 0x1f, 0x11, 0x20
+        ]
     );
 
     let terminators = [
