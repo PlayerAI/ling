@@ -151,7 +151,7 @@
 | `EFF-2103-CORE` | First-order handler Typed Core projection | `G2` | `S` | `Done` | `EFF-2101`, `EFF-2102` | `e1dc5334d15e25e959fa0da6e3462a90210c6fdf` |
 | `EFF-2103-HIR` | Handler unresolved HIR projection | `G2` | `S` | `Done` | `EFF-2103-AST` | `fa988aab85a96d3e7c257c630b84acb985639064` |
 | `EFF-2103-SYNTAX` | Handler source CST projection | `G2` | `S` | `Done` | `EFF-2103-CORE` | `73807f551753620b52b685d7aca25c2032ec1a77` |
-| `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `In Progress` | `EFF-2103` | `` |
+| `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `Done` | `EFF-2103` | `1188b2472ff0a61ac3d96c4ae21bbe9b6bd7eaba` |
 | `EFF-2104-REJECTION-GATE` | Internal unresolved-handler execution rejection gate | `G2` | `S` | `Done` | `EFF-2103-HIR` | `e265b451985a2afac071da6862c4bf9451faf9a0` |
 | `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `BlockedSpec` | `EFF-2104` | `` |
 | `EFF-2105-MODEL-PROPERTIES` | Effect model deterministic property corpus | `G2` | `S` | `Done` | `EFF-2102`, `EFF-2103-CORE` | `f40c69f0311d3bd970e9613772ddf7135d17772c` |

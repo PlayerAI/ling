@@ -248,7 +248,7 @@ G6 Blocked：只在 G1～G5 完成后稳定化
 | `EFF-2103-AST` | G2 | Handler unresolved AST projection | S | Done | Accepted `DEC-0065`; see `docs/status/EFF-2103-AST-IMPLEMENTATION-REPORT.md`; integrated by `EFF-2103` |
 | `EFF-2103-HIR` | G2 | Handler unresolved HIR projection | S | Done | Accepted `DEC-0066`; see `docs/status/EFF-2103-HIR-IMPLEMENTATION-REPORT.md`; integrated by `EFF-2103` |
 | `EFF-2105-MODEL-PROPERTIES` | G2 | Effect model deterministic property corpus | S | Done | Accepted `DEC-0067`; see `docs/status/EFF-2105-MODEL-PROPERTIES-IMPLEMENTATION-REPORT.md`; full EFF-2105 runtime/differential target remains BlockedSpec |
-| `EFF-2104` | G2 | 解释器与 VM Handler 执行 | L | In Progress | Accepted `DEC-0262`; checked input gate, interpreter, historical 1.3 slice, isolated 1.4 Cell/State codec/verifier, and private VM Cell primitive are complete; shared mutable Handler lowering and full differential evidence remain; see `docs/status/EFF-2104-AUTHORITY-AUDIT.md` |
+| `EFF-2104` | G2 | 解释器与 VM Handler 执行 | L | Done | Accepted `DEC-0262`; complete checked interpreter and bytecode 1.4 Cell/State lowering, verifier, VM, differential, Fault, cancellation, resource, and compatibility evidence; implementation `1188b247`; see `docs/status/EFF-2104-IMPLEMENTATION-REPORT.md` |
 | `EFF-2104-REJECTION-GATE` | G2 | Internal unresolved-handler execution rejection gate | S | Done | Accepted `DEC-0088`; historical no-unchecked-AST gate retained while checked runtime proceeds under `DEC-0261` |
 | `EFF-2105` | G2 | Effect fuzz/property tests | — | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:143`, `docs/status/EFF-2105-AUTHORITY-AUDIT.md` |
 | `TASK-2201` | G2 | Task 语法与 Checked Core | M | BlockedSpec | `06-G2-V0.2-CONCURRENT.md:158`, `docs/status/TASK-2201-AUTHORITY-AUDIT.md` |

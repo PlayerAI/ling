@@ -99,7 +99,12 @@ The verifier must establish all conditions before constructing
 The verifier should compute and retain entry Capability facts as it does for
 1.3; it must not expose VM allocation details in the verified model.
 
-## Phase 4: refactor lowering around explicit binding storage
+## Phase 4: refactor lowering around explicit binding storage — Complete
+
+Implemented by commit `1188b247`. Lowering uses explicit Direct/Cell storage,
+selects direct and transitive mutable Handler captures, emits one lexical
+Cell, keeps Cell handles out of SSA joins, and resolves exact scalar,
+aggregate, and function-valued State rows while preserving 1.0–1.3 behavior.
 
 Perform this as a mechanical internal refactor before emitting any Cell
 instruction:
@@ -131,15 +136,17 @@ Primary implementation concentration:
 - `crates/ling-bytecode/src/lower/v1_1.rs` for the shared canonical planner and
   FunctionLowerer; isolate 1.4 switches behind an explicit lowering mode
 - `crates/ling-bytecode/src/lower/v1_4.rs` for the public 1.4 boundary
-- `crates/ling-effects/src/lib.rs` expression Effect rows as the only semantic
-  source; never infer State from emitted instructions alone
+- `crates/ling-effects/src/lib.rs` checked expression rows plus DEC-0262's
+  exact selected-Cell storage operations; never infer State from arbitrary
+  emitted instruction bytes or unchecked source spelling
 
-## Phase 5: add a non-cyclic private VM Cell store — Primitive complete
+## Phase 5: add a non-cyclic private VM Cell store — Complete
 
 The VM primitive is implemented with private monotonic IDs, an Engine-owned
 store, 24-byte logical heap charges, cancellation-before-commit CellSet, and
-shared identity under ordinary frame/closure/continuation cloning. Handler
-source lowering and the full identity/Fault/cancellation matrix remain pending.
+shared identity under ordinary frame/closure/continuation cloning. Complete
+Handler source lowering now consumes the primitive, and Phase 6 covers the
+identity/Fault/cancellation matrix.
 
 Do not represent a VM Cell as `Rc<RefCell<Value>>`: a Cell containing a closure
 that captures the Cell can create an uncollectable Rust reference cycle.
@@ -165,7 +172,11 @@ Primary files:
 - `crates/ling-vm/src/{value,execute,fault}.rs`
 - `crates/ling-vm/tests/{execution,differential}.rs`
 
-## Phase 6: evidence matrix
+## Phase 6: evidence matrix — Complete
+
+The required matrix is executable across checked Handler tests, bytecode
+lowering/verifier tests, VM execution tests, and the 16-case differential
+table. The completion report maps the concrete evidence and retained deferrals.
 
 Required vertical fixtures:
 
@@ -188,12 +199,12 @@ Deliver the smallest complete commits in this dependency order:
 1. **Complete:** Accepted authority/lifecycle/gap transition and negative
    checked-pattern evidence.
 2. **Complete:** Format/model/codec/disassembly plus malformed verifier evidence.
-3. Binding-storage refactor with unchanged 1.0–1.3 golden evidence.
-4. Cell/State lowering and VM execution with differential/resource/cancellation
-   evidence.
-5. Protocol inventory, support/status/traceability reports, complete EFF-2104
-   implementation report, full repository gates, completion commit, and push.
+3. **Complete:** Binding-storage refactor with unchanged 1.0–1.3 evidence.
+4. **Complete:** Cell/State lowering and VM execution with differential,
+   resource, Fault, and cancellation evidence (`1188b247`).
+5. **Complete:** Protocol inventory, status records, implementation report,
+   full repository gates, completion commit, and push.
 
-The gap is now Accepted at the specification level through DEC-0262. Only the
-fifth commit may mark EFF-2104 Done, publish 1.4 as the current Experimental
-revision, or make EFF-2105 dependency-ready.
+The Accepted DEC-0262 gap is implemented by `1188b247`. EFF-2104 is Done,
+bytecode 1.4 is the current Experimental library revision, and EFF-2105 is now
+dependency-ready subject to its own accepted authority and task evidence.

@@ -33,8 +33,8 @@ Fault catching, rollback, and Stable behavior remain outside EFF-2104.
 - `GAP-EFFECT-HANDLER-001` is resolved for the Experimental model by RFC-0006
   and DEC-0261. DEC-0262 resolves the narrower specification gap
   `GAP-EFFECT-HANDLER-BYTECODE-001` by selecting bytecode 1.4 Cells, explicit
-  State rows, and total binding/wildcard operation inputs. Implementation and
-  conformance evidence remain incomplete, so EFF-2104 remains In Progress.
+  State rows, and total binding/wildcard operation inputs. Commit `1188b247`
+  completes the required implementation and conformance evidence.
 - Accepted DEC-0088 remains historical rejection evidence for unchecked input;
   DEC-0261 never weakens the no-unchecked-AST execution boundary.
 
@@ -54,11 +54,11 @@ Fault catching, rollback, and Stable behavior remain outside EFF-2104.
   reason `refutable_parameter`, canonical operation facts, and original
   Unicode/BOM/CRLF spans before typed or Handler Core publication. The 1.3
   lowerer retains its historical mutable Handler-capture rejection.
-- The current implementation provides the isolated `ling.bytecode/1.4`
-  Cell/State model, version-aware writer/reader, disassembly, independent
-  verifier, canonical re-encoding, frozen bytes, older-reader rejection, and a
-  non-cyclic heap-accounted VM Cell store. Shared mutable Handler capture
-  selection/lowering and complete differential evidence remain pending.
+- The complete `ling.bytecode/1.4` path provides the Cell/State model,
+  version-aware writer/reader, disassembly, independent verifier, canonical
+  re-encoding, frozen bytes, older-reader rejection, shared mutable Handler
+  capture lowering, a non-cyclic heap-accounted VM Cell store, and the full
+  differential/Fault/cancellation/resource evidence matrix.
 - The rejection-gate child covers only the negative compile boundary and
   diagnostic serialization; it has no checked snapshot, runtime, bytecode, VM,
   Fault, cancellation, or differential behavior.
@@ -84,10 +84,10 @@ Accepted DEC-0262 retains the applicable DEC-0261 rules and refines them with:
    mutable State, Unicode/CRLF/BOM spans, deterministic output, and the
    no-unchecked-AST boundary.
 
-The checked-source pattern gate and isolated bytecode/VM Cell primitives are
-implemented. EFF-2104 cannot be marked Done until shared mutable Handler
-captures lower to one lexical Cell identity, all differential/resource/
-cancellation evidence passes, and the completion commit is recorded.
+The checked-source pattern gate and complete bytecode/VM Cell vertical slice
+are implemented. Shared mutable Handler captures lower to one lexical Cell
+identity, the differential/resource/cancellation evidence passes, and the
+completion implementation is recorded by commit `1188b247`.
 
 ## Evidence and compatibility
 
@@ -98,10 +98,10 @@ This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and `crates/ling-eval`, `crates/ling-bytecode`, and `crates/ling-vm`.
 
-Accepted DEC-0262 fixes `ling.bytecode/1.4`; its isolated codec, verifier, and
-VM Cell primitive now provide implementation evidence without making a
-complete EFF-2104 or current-1.4 claim. Bytecode 1.0 through 1.3 remain
-unchanged, and older readers reject 1.4.
+Accepted DEC-0262 fixes `ling.bytecode/1.4`; its complete codec, verifier,
+lowerer, and VM implementation now make it the current Experimental library
+revision. Bytecode 1.0 through 1.3 remain unchanged, and older readers reject
+1.4.
 
 ## Intentionally deferred
 
