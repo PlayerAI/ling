@@ -4277,3 +4277,16 @@ covers = ["Handler irrefutable operation inputs", "ling.bytecode/1.4 Cell and St
 depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "RFC-0014", "RFC-0015", "RFC-0016", "RFC-0018", "RFC-0019", "RFC-0020", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0260", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = ["DEC-0261"]
 stable_basis = true
+
+[[document]]
+id = "DEC-0263"
+title = "Effect property generator and differential oracle"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0263-effect-property-generator-and-oracle.md"
+covers = ["EFF-2105 checked-source property generator", "residual Effect Row oracle", "interpreter and VM differential projection", "deterministic shrinking and replay bounds"]
+depends_on = ["SEMANTICS", "LANGUAGE", "RFC-0006", "RFC-0014", "RFC-0020", "DEC-0010", "DEC-0013", "DEC-0067", "DEC-0262", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false

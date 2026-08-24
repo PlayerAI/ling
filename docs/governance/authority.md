@@ -350,6 +350,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `SEED-TRACEABILITY` | Evidence | `Evidence` | `0.0.1` | `Evidence` | no | [v0.0.1 unified specification traceability](../traceability/v0.0.1.md) | `stable feature IDs`, `normative clause mapping`, `Core and implementation links`, `positive and negative test evidence`, `differential state`, `release artifacts` | `TRACEABILITY-REGISTER`, `CONFORMANCE` | — |
 | `DESIGN-REVIEW` | Review | `Active` | `2026-08-17` | `Opinion` | no | [Ling design review](../design-review.html) | `non-normative design critique` | `SEMANTICS`, `LANGUAGE` | — |
 | `RUST-IMPLEMENTATION` | Implementation | `Active` | `0.0.1` | `Implementation` | no | [Ling Rust implementation](../../crates) | `compiler`, `interpreter`, `CLI` | `CONFORMANCE` | — |
+| `DEC-0263` | Decision | `Proposed` | `1` | `Draft` | no | [Effect property generator and differential oracle](../decisions/0263-effect-property-generator-and-oracle.md) | `EFF-2105 checked-source property generator`, `residual Effect Row oracle`, `interpreter and VM differential projection`, `deterministic shrinking and replay bounds` | `SEMANTICS`, `LANGUAGE`, `RFC-0006`, `RFC-0014`, `RFC-0020`, `DEC-0010`, `DEC-0013`, `DEC-0067`, `DEC-0262`, `GAP-REGISTER`, `ERROR-CODES`, `PROTOCOL-INVENTORY` | — |
 | `RFC-0001` | RFC | `Draft` | `0.0.1-draft` | `Draft` | no | [Ling foundation and v0.0.1 Seed](../RFC-0001.md) | `Seed scope`, `syntax`, `compiler architecture`, `CLI`, `governance` | `SEMANTICS`, `LANGUAGE` | — |
 
 ## Conflict and correction workflow

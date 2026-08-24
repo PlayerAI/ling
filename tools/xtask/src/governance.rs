@@ -217,6 +217,7 @@ fn validate_document(root: &Path, document: &Document, errors: &mut Vec<String>)
         "Draft",
         "Evidence",
         "Planning",
+        "Proposed",
     ];
     if !STATUSES.contains(&document.status.as_str()) {
         errors.push(format!(
@@ -467,9 +468,14 @@ fn discover_status_from_text(
     errors: &mut Vec<String>,
 ) {
     let status = text.lines().find_map(|line| {
-        line.trim()
-            .strip_prefix("> 状态：")
-            .map(|value| value.trim().trim_matches('`').to_owned())
+        line.trim().strip_prefix("> 状态：").map(|value| {
+            value
+                .trim()
+                .trim_end_matches("<br>")
+                .trim()
+                .trim_matches('`')
+                .to_owned()
+        })
     });
     match status {
         Some(status) => output.push((id.to_owned(), status, relative.to_owned())),
@@ -677,6 +683,33 @@ stable_basis = {stable}
         );
         let errors = validate(repository.path(), &parse(&manifest));
         assert!(errors.iter().any(|error| error.contains("GOV-AUTH-0003")));
+    }
+
+    #[test]
+    fn accepts_proposed_decision_as_non_stable_draft_authority() {
+        let repository = TempRepository::new();
+        repository.write(
+            "docs/decisions/0001-fixture.md",
+            "# DEC-0001\n\n> 状态：Proposed<br>\n",
+        );
+        let manifest = r#"
+schema_version = 1
+updated = "2026-08-24"
+
+[[document]]
+id = "DEC-0001"
+title = "Fixture"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0001-fixture.md"
+covers = ["fixture"]
+depends_on = []
+supersedes = []
+stable_basis = false
+"#;
+        assert!(validate(repository.path(), &parse(manifest)).is_empty());
     }
 
     #[test]

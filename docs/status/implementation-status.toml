@@ -9128,6 +9128,7 @@ spec = [
   "docs/decisions/0062-effect-row-constraint-solver.md",
   "docs/decisions/0063-first-order-handler-core.md",
   "docs/decisions/0067-effect-model-property-corpus.md",
+  "docs/decisions/0263-effect-property-generator-and-oracle.md",
   "docs/ROADMAP-1.0.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
@@ -9287,7 +9288,7 @@ completion_commit = "e265b451985a2afac071da6862c4bf9451faf9a0"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This bounded child is complete under DEC-0088; public EFF-2104 remains BlockedSpec for handler execution, continuation, Fault/State/cancellation, bytecode/VM ABI, and differential authority.",
+  "This bounded historical child is complete under DEC-0088; EFF-2104 later completed checked Handler execution, continuation, Fault/State/cancellation, bytecode/VM ABI, and differential evidence under DEC-0262.",
   "The test is negative evidence only and cannot be used to claim handler syntax or runtime support.",
 ]
 
@@ -9327,7 +9328,7 @@ artifacts = [
 acceptance = [
   "The audit records the missing checked-Core generator, Effect Row/residual-row oracle, handler/resume semantics, interpreter/VM equivalence, Fault/cancellation, bounds, canonicalization, diagnostics, and migration contracts.",
   "The bounded EFF-2105-MODEL-PROPERTIES child covers only accepted in-process model properties; it does not close the parent runtime or differential target.",
-  "The audit distinguishes the current Seed closed-row checker and fixed interpreter/VM event/Unit/Fault differential harness from the missing handler-bearing property-test authority and preserves the checked-only evaluation boundary.",
+  "The audit distinguishes the completed fixed Handler interpreter/VM differential harness from the missing generated checked-source property domain and preserves the checked-only evaluation boundary.",
   "The audit covers pure/effectful programs, single/nested handlers, propagation, resume cardinality, handler Faults, mutable State, cancellation, missing/unhandled operations, malformed bytecode, resource limits, Unicode/CRLF/BOM spans, deterministic output, reproducible seeds, and shrinking.",
   "No Core generator, handler/effect oracle, residual-row comparator, fuzz protocol, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
   "The future implementation must generate only bounded checked Core, compare stable semantic projections, retain minimized corpus evidence, and prove interpreter/VM equivalence before exposing effect property tests as a public compatibility gate.",
@@ -9337,8 +9338,9 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "EFF-2105 remains BlockedSpec by EFF-2104 and the missing residual-row observation, checked-Core generator, runtime, and interpreter/VM equivalence authority; RFC-0006 and DEC-0067 authorize only the model-property child.",
-  "The excluded fuzz workspace covers source, lexer/parser, manifests, and bytecode verification; current differential tests compare checked Seed events, Unit results, and Runtime Fault projections but do not expose handler effects or residual rows.",
+  "EFF-2104 and DEC-0262 now supply accepted Handler runtime, residual-row, bytecode 1.4, VM, Fault/State/cancellation, and differential authority; only the checked-source generator, deterministic shrink/replay, and general property-oracle boundary remains unresolved.",
+  "Proposed DEC-0263 specifies that remaining boundary but is not implementation authority until Accepted.",
+  "The excluded fuzz workspace covers source, lexer/parser, manifests, and bytecode verification; current Handler differential tests are fixed evidence rather than a generated property corpus.",
   "The bounded model-property child adds offline tests only; no compiler, interpreter, VM, bytecode, fuzz protocols, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior changes.",
 ]
 

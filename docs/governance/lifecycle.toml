@@ -7508,3 +7508,29 @@ unresolved_alternatives = [
   "Changing 1.3 in place, new capture tags, copied Cells, dynamic checked-pattern mismatch, State masking, rollback, public references, general mutable closure capture, Many producers, and Native/Wasm remain rejected or separate.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0263"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0263-effect-property-generator-and-oracle.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-24"
+proposed = "2026-08-24"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Generate only bounded source that re-enters the complete checked pipeline, with fixed seeds and deterministic shrinking.",
+  "Compare checked residual rows with verified bytecode rows and interpreter/VM values, events, resume counts, committed mutation, Fault, cancellation, and resource projections.",
+  "Cover pure/effectful, single/nested Handler, propagation, zero/one resume, shared State, Unicode/BOM/CRLF, and exact generation limits.",
+  "Keep malformed bytecode, model properties, and generated checked-program evidence as separate bounded suites with no public replay protocol.",
+]
+compatibility_impact = [
+  "Proposes internal EFF-2105 evidence only; source, runtime semantics, bytecode 1.0 through 1.4, diagnostics, schemas, IDs, CLI, LSP, packages, and Unicode 17.0.0 remain unchanged.",
+  "Fixed seeds, path-free logical names, canonical projections, and explicit bounds add no host entropy, timing, debug-string, or worktree-write contract.",
+]
+unresolved_alternatives = [
+  "Direct Typed Core fabrication, ambient randomness, automatic corpus writes, public replay formats, Many, new effect producers, Task/Actor crossing, Native/Wasm, and Stable compatibility remain rejected or separate work.",
+]
+superseded_by = ""
