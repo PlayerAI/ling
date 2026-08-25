@@ -479,29 +479,10 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
         }
 
         let cell_bindings = if cell_mode {
-            let mut reachable = raw_handler_captures
-                .values()
-                .flatten()
-                .copied()
-                .collect::<BTreeSet<_>>();
-            let mut pending = reachable.iter().copied().collect::<Vec<_>>();
-            while let Some(key) = pending.pop() {
-                if let Some(captures) = raw_captures.get(&key) {
-                    for capture in captures {
-                        if reachable.insert(*capture) {
-                            pending.push(*capture);
-                        }
-                    }
-                }
-            }
-            reachable
-                .into_iter()
-                .filter(|key| {
-                    resolved
-                        .bindings()
-                        .get(key)
-                        .is_some_and(|binding| binding.mutable)
-                })
+            resolved
+                .bindings()
+                .iter()
+                .filter_map(|(key, binding)| binding.mutable.then_some(*key))
                 .collect()
         } else {
             BTreeSet::new()
@@ -526,14 +507,34 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 );
             }
         }
-        let provisional_state_types = cell_bindings
-            .iter()
-            .filter_map(|key| {
-                let value = checked.typed().binding_type(*key)?;
-                let value_type = cell_binding_types.get(key)?.clone();
-                Some((checked.typed().arena().display(value), value_type))
-            })
-            .collect::<BTreeMap<_, _>>();
+        let mut state_types = BTreeMap::new();
+        for key in &cell_bindings {
+            let info = resolved
+                .bindings()
+                .get(key)
+                .ok_or_else(|| invalid_without_span("Cell-selected binding metadata is absent"))?;
+            let module = resolved
+                .module(key.module())
+                .ok_or_else(|| invalid_without_span("mutable binding module is absent"))?;
+            let value = checked.typed().binding_type(*key).ok_or_else(|| {
+                invalid_module(module, info.span, "mutable binding type is absent")
+            })?;
+            if matches!(checked.typed().arena().get(value), Type::Function { .. }) {
+                continue;
+            }
+            let identity = checked.typed().arena().display(value);
+            let value_type = checked_type_key(checked.typed(), value, module, info.span)?;
+            if let Some(previous) = state_types.insert(identity, value_type.clone()) {
+                if previous != value_type {
+                    return Err(invalid_module(
+                        module,
+                        info.span,
+                        "State identity maps to inconsistent value types",
+                    ));
+                }
+            }
+        }
+        let provisional_state_types = state_types.clone();
         if cell_binding_types.len() != cell_bindings.len() {
             let mut provisional = SignatureResolver::new(
                 snapshot,
@@ -550,7 +551,6 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                 }
             }
         }
-        let mut state_types = BTreeMap::new();
         for key in &cell_bindings {
             let info = resolved
                 .bindings()
@@ -877,6 +877,10 @@ impl<'snapshot, 'source> ClosureLowerer<'snapshot, 'source> {
                     type_builder.insert(TypeKey::Cell(Box::new(capture.value_type.clone())));
                 }
             }
+        }
+        for value_type in cell_binding_types.values() {
+            type_builder.insert(value_type.clone());
+            type_builder.insert(TypeKey::Cell(Box::new(value_type.clone())));
         }
         if aggregate_mode {
             for plan in named.values() {

@@ -676,6 +676,55 @@ fn bytecode_1_4_retains_aggregate_state_without_adding_a_capability() {
 }
 
 #[test]
+fn bytecode_1_4_retains_state_for_non_captured_mutable_bindings() {
+    let text = concat!(
+        "module Main\n\n",
+        "let main () =\n",
+        "    let mutable cell = 0\n",
+        "    cell <- 7\n",
+        "    ()\n",
+    );
+    let (source, snapshot) = checked_source("lexical-cell.ling", text);
+    let sources = [LoweringSource::new(&source, "src/Main.ling")];
+    let lowered = lower_v1_4(&snapshot, &sources)
+        .expect("ordinary mutable lexical binding lowers through a version-1.4 Cell");
+    let int = lowered
+        .model()
+        .types()
+        .iter()
+        .position(|value| value == &ling_bytecode::ValueType::Int)
+        .map(|index| ling_bytecode::TypeIndex::new(u32::try_from(index).expect("type index fits")))
+        .expect("Int type exists");
+    assert!(
+        lowered
+            .model()
+            .types()
+            .contains(&ling_bytecode::ValueType::Cell(int))
+    );
+    let main = lowered
+        .model()
+        .functions()
+        .iter()
+        .find(|function| lowered.model().strings()[function.name.get() as usize] == "main")
+        .expect("main function exists");
+    assert_eq!(main.effects, [ling_bytecode::Effect::State(int)]);
+    assert!(
+        main.blocks
+            .iter()
+            .flat_map(|block| &block.instructions)
+            .any(|instruction| matches!(instruction, ling_bytecode::Instruction::CellNew { .. }))
+    );
+    assert!(
+        main.blocks
+            .iter()
+            .flat_map(|block| &block.instructions)
+            .any(|instruction| matches!(instruction, ling_bytecode::Instruction::CellSet { .. }))
+    );
+    let bytes = encode_v1_4(&lowered).expect("ordinary lexical State artifact encodes");
+    decode_and_verify_v1_4(&bytes).expect("ordinary lexical State artifact independently verifies");
+}
+
+#[test]
 fn bytecode_1_4_preserves_effect_provenance_for_function_valued_cells() {
     let text = concat!(
         "module Main\n",

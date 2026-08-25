@@ -1,8 +1,13 @@
+#[path = "support/effect_property.rs"]
+mod effect_property;
+
+use std::collections::BTreeMap;
+
 use ling_bytecode::{
-    LoweringSource, VerifiedProgramV1, decode_and_verify_v1, decode_and_verify_v1_1,
-    decode_and_verify_v1_2, decode_and_verify_v1_3, decode_and_verify_v1_4, encode_v1, encode_v1_1,
-    encode_v1_2, encode_v1_3, encode_v1_4, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3,
-    lower_v1_4,
+    Effect as BytecodeEffect, FunctionKind, LoweringSource, UnverifiedProgram, ValueType,
+    VerifiedProgramV1, decode_and_verify_v1, decode_and_verify_v1_1, decode_and_verify_v1_2,
+    decode_and_verify_v1_3, decode_and_verify_v1_4, encode_v1, encode_v1_1, encode_v1_2,
+    encode_v1_3, encode_v1_4, lower_v1, lower_v1_1, lower_v1_2, lower_v1_3, lower_v1_4,
 };
 use ling_effects::locate_main;
 use ling_eval::{
@@ -14,6 +19,11 @@ use ling_source::{SourceFile, SourceId};
 use ling_vm::{
     ConsoleCapability, ExecutionError, ExecutionLimits, HostCapabilities, HostError,
     RuntimeFault as VmRuntimeFault, RuntimeFaultKind as VmFaultKind, execute_v1,
+};
+
+use effect_property::{
+    FIXED_SEEDS, GeneratedCase, MAX_OUTPUT_BYTES as PROPERTY_MAX_OUTPUT_BYTES, MAX_SHRINK_ATTEMPTS,
+    ORDINALS_PER_SEED, Scenario, generate, minimize_failure, shrink_candidates,
 };
 
 const HELLO: &str = include_str!("../../../tests/bytecode/v1/programs/hello.ling");
@@ -189,7 +199,7 @@ struct Fixture {
     snapshot: ProgramSnapshot,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct FaultProjection {
     category: String,
     operation: String,
@@ -199,7 +209,7 @@ struct FaultProjection {
     committed: bool,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct Outcome {
     events: Vec<String>,
     returned_unit: bool,
@@ -220,22 +230,36 @@ impl ConsoleCapability for EventConsole {
 }
 
 fn fixture(logical_name: &str, text: &str) -> Fixture {
+    checked_fixture(logical_name, text).expect("fixture passes the complete checked pipeline")
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum CheckStage {
+    Source,
+    Syntax,
+    Ast,
+    Hir,
+    Resolution,
+    Types,
+    Effects,
+    Snapshot,
+}
+
+fn checked_fixture(_logical_name: &str, text: &str) -> Result<Fixture, CheckStage> {
     let source =
         SourceFile::from_bytes(SourceId::new(0), "src/Main.ling", text.as_bytes().to_vec())
-            .expect("fixture is valid UTF-8 source");
+            .map_err(|_| CheckStage::Source)?;
     let parsed = ling_syntax::parse(&source);
-    assert!(
-        parsed.is_valid(),
-        "{logical_name}: {:?}",
-        parsed.parse_errors()
-    );
-    let ast = ling_ast::lower(&source, &parsed).expect("fixture has valid AST");
-    let hir = ling_hir::lower(source.name(), &ast).expect("fixture has valid HIR");
-    let resolved = ling_resolve::resolve(vec![hir], "Main").expect("fixture resolves");
-    let typed = ling_types::check(resolved).expect("fixture type-checks");
-    let checked = ling_effects::check(typed).expect("fixture passes Effect/Capability checks");
-    let snapshot = ling_semantic::build(checked).expect("fixture produces a checked snapshot");
-    Fixture { source, snapshot }
+    if !parsed.is_valid() {
+        return Err(CheckStage::Syntax);
+    }
+    let ast = ling_ast::lower(&source, &parsed).map_err(|_| CheckStage::Ast)?;
+    let hir = ling_hir::lower(source.name(), &ast).map_err(|_| CheckStage::Hir)?;
+    let resolved = ling_resolve::resolve(vec![hir], "Main").map_err(|_| CheckStage::Resolution)?;
+    let typed = ling_types::check(resolved).map_err(|_| CheckStage::Types)?;
+    let checked = ling_effects::check(typed).map_err(|_| CheckStage::Effects)?;
+    let snapshot = ling_semantic::build(checked).map_err(|_| CheckStage::Snapshot)?;
+    Ok(Fixture { source, snapshot })
 }
 
 fn verified(fixture: &Fixture, revision: Revision) -> VerifiedProgramV1 {
@@ -265,6 +289,115 @@ fn verified(fixture: &Fixture, revision: Revision) -> VerifiedProgramV1 {
             let lowered = lower_v1_4(&fixture.snapshot, &source).expect("fixture lowers to v1.4");
             let bytes = encode_v1_4(&lowered).expect("fixture encodes as v1.4");
             decode_and_verify_v1_4(&bytes).expect("v1.4 artifact verifies")
+        }
+    }
+}
+
+fn encoded_v1_4(fixture: &Fixture, logical_name: &str) -> (Vec<u8>, VerifiedProgramV1) {
+    let source = [LoweringSource::new(&fixture.source, "src/Main.ling")];
+    let lowered = lower_v1_4(&fixture.snapshot, &source)
+        .unwrap_or_else(|error| panic!("{logical_name}: property case lowers to v1.4: {error}"));
+    let bytes = encode_v1_4(&lowered).expect("property case encodes as v1.4");
+    let verified = decode_and_verify_v1_4(&bytes).expect("property artifact verifies");
+    (bytes, verified)
+}
+
+fn checked_named_rows(fixture: &Fixture) -> BTreeMap<String, Vec<String>> {
+    let checked = fixture.snapshot.checked();
+    checked
+        .typed()
+        .resolved()
+        .definitions()
+        .iter()
+        .filter_map(|(id, definition)| {
+            matches!(
+                definition.origin,
+                ling_resolve::DefinitionOrigin::User { .. }
+            )
+            .then(|| {
+                checked
+                    .definition_effect(id)
+                    .map(|row| (definition.name.clone(), row.canonical_names()))
+            })
+            .flatten()
+        })
+        .collect()
+}
+
+fn bytecode_named_rows(program: &VerifiedProgramV1) -> BTreeMap<String, Vec<String>> {
+    let model = program.model();
+    model
+        .functions()
+        .iter()
+        .filter(|function| function.kind == FunctionKind::Named)
+        .map(|function| {
+            let name = model.strings()[function.name.get() as usize].clone();
+            let mut row = function
+                .effects
+                .iter()
+                .map(|effect| bytecode_effect_name(model, effect))
+                .collect::<Vec<_>>();
+            row.sort();
+            (name, row)
+        })
+        .collect()
+}
+
+fn bytecode_effect_name(model: &UnverifiedProgram, effect: &BytecodeEffect) -> String {
+    match effect {
+        BytecodeEffect::ConsoleWrite => "Console.Write".to_owned(),
+        BytecodeEffect::State(payload) => {
+            format!(
+                "State<{}>",
+                bytecode_type_name(model, payload.get() as usize)
+            )
+        }
+    }
+}
+
+fn bytecode_type_name(model: &UnverifiedProgram, index: usize) -> String {
+    match &model.types()[index] {
+        ValueType::Unit => "Unit".to_owned(),
+        ValueType::Bool => "Bool".to_owned(),
+        ValueType::Int => "Int".to_owned(),
+        ValueType::Text => "Text".to_owned(),
+        ValueType::Cell(payload) => {
+            format!(
+                "Cell<{}>",
+                bytecode_type_name(model, payload.get() as usize)
+            )
+        }
+        ValueType::Record { name, .. } | ValueType::Variant { name, .. } => {
+            model.strings()[name.get() as usize].clone()
+        }
+        ValueType::Tuple { elements } => format!(
+            "({})",
+            elements
+                .iter()
+                .map(|element| bytecode_type_name(model, element.get() as usize))
+                .collect::<Vec<_>>()
+                .join(",")
+        ),
+        ValueType::Function {
+            parameters,
+            result,
+            effects,
+        } => {
+            let parameters = parameters
+                .iter()
+                .map(|parameter| bytecode_type_name(model, parameter.get() as usize))
+                .collect::<Vec<_>>()
+                .join(",");
+            let mut effects = effects
+                .iter()
+                .map(|effect| bytecode_effect_name(model, effect))
+                .collect::<Vec<_>>();
+            effects.sort();
+            format!(
+                "({parameters})->{}!{{{}}}",
+                bytecode_type_name(model, result.get() as usize),
+                effects.join(",")
+            )
         }
     }
 }
@@ -513,4 +646,145 @@ fn supported_bytecode_slices_match_the_checked_interpreter() {
     for case in cases {
         assert_differential(case.logical_name, case.text, case.revision);
     }
+}
+
+fn assert_property_case(case: &GeneratedCase) {
+    case.validate_bounds()
+        .expect("generated case stays bounded");
+    let rebuilt_case = generate(case.seed, case.ordinal);
+    assert_eq!(*case, rebuilt_case, "generated source must be reproducible");
+
+    let first = checked_fixture(&case.logical_name, &case.source).unwrap_or_else(|stage| {
+        panic!(
+            "{}: seed={:#018x}, ordinal={}, rejected at {stage:?}",
+            case.logical_name, case.seed, case.ordinal
+        )
+    });
+    let rebuilt = checked_fixture(&case.logical_name, &case.source)
+        .expect("the repeated generated case remains checked");
+    assert_eq!(
+        first.snapshot.program_id(),
+        rebuilt.snapshot.program_id(),
+        "{}: checked Program ID for seed={:#018x}, ordinal={}",
+        case.logical_name,
+        case.seed,
+        case.ordinal
+    );
+
+    let (first_bytes, first_program) = encoded_v1_4(&first, &case.logical_name);
+    let (rebuilt_bytes, rebuilt_program) = encoded_v1_4(&rebuilt, &case.logical_name);
+    assert_eq!(
+        first_bytes, rebuilt_bytes,
+        "{}: bytecode for seed={:#018x}, ordinal={}",
+        case.logical_name, case.seed, case.ordinal
+    );
+    assert_eq!(first_program, rebuilt_program);
+
+    let checked_rows = checked_named_rows(&first);
+    let bytecode_rows = bytecode_named_rows(&first_program);
+    for (name, expected) in checked_rows {
+        assert_eq!(
+            bytecode_rows.get(&name),
+            Some(&expected),
+            "{}: residual row for named definition {name}",
+            case.logical_name
+        );
+    }
+
+    let interpreter = run_interpreter(&first);
+    let vm = run_vm(&first_program);
+    let output_bytes = interpreter.events.iter().map(String::len).sum::<usize>();
+    assert!(
+        output_bytes <= PROPERTY_MAX_OUTPUT_BYTES,
+        "{}: generated output exceeds DEC-0263",
+        case.logical_name
+    );
+    assert_eq!(
+        interpreter, vm,
+        "{}: seed={:#018x}, ordinal={} differential observation",
+        case.logical_name, case.seed, case.ordinal
+    );
+}
+
+#[test]
+fn fixed_effect_property_seeds_replay_through_checked_source_and_bytecode() {
+    let mut covered = std::collections::BTreeSet::new();
+    for seed in FIXED_SEEDS {
+        for ordinal in 0..ORDINALS_PER_SEED {
+            let case = generate(seed, ordinal);
+            covered.insert(case.scenario);
+            assert_property_case(&case);
+        }
+    }
+    assert_eq!(covered.len(), ORDINALS_PER_SEED as usize);
+}
+
+fn injected_difference(left: &Outcome, right: &Outcome) -> Option<&'static str> {
+    if left.events != right.events {
+        Some("ordered_host_events")
+    } else if left.returned_unit != right.returned_unit {
+        Some("result_value")
+    } else if left.fault != right.fault {
+        Some("runtime_fault")
+    } else {
+        None
+    }
+}
+
+#[test]
+fn deterministic_shrinking_rechecks_candidates_and_preserves_failure_projection() {
+    let case = generate(FIXED_SEEDS[0], Scenario::UnicodeSource as u32);
+    let before = std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/Cargo.toml"))
+        .expect("crate manifest is readable");
+    let candidates = shrink_candidates(&case);
+    assert!(candidates.len() <= MAX_SHRINK_ATTEMPTS);
+    assert_eq!(candidates, shrink_candidates(&case));
+    assert!(
+        checked_fixture("generated/unchecked.ling", "module Main\nlet main () =").is_err(),
+        "unchecked candidates must be rejected before evaluation"
+    );
+
+    let reference = Outcome {
+        events: vec!["reference".to_owned()],
+        returned_unit: true,
+        fault: None,
+    };
+    let divergent = Outcome {
+        events: vec!["divergent".to_owned()],
+        returned_unit: true,
+        fault: None,
+    };
+    let projection = injected_difference(&reference, &divergent);
+    assert_eq!(projection, Some("ordered_host_events"));
+    let preserve = |source: &str| {
+        checked_fixture(&case.logical_name, source).is_ok()
+            && injected_difference(&reference, &divergent) == projection
+    };
+    let first = minimize_failure(&case, preserve);
+    let second = minimize_failure(&case, preserve);
+    assert_eq!(first, second, "shrinking must replay deterministically");
+    assert!(first.1 <= MAX_SHRINK_ATTEMPTS);
+    assert!(first.0.len() <= case.source.len());
+
+    let after = std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/Cargo.toml"))
+        .expect("crate manifest remains readable");
+    assert_eq!(
+        before, after,
+        "generation and shrinking must not write the worktree"
+    );
+}
+
+#[test]
+fn generated_shapes_enforce_every_dec_0263_bound() {
+    for ordinal in 0..ORDINALS_PER_SEED {
+        generate(FIXED_SEEDS[1], ordinal)
+            .validate_bounds()
+            .expect("repository generator templates stay within every fixed bound");
+    }
+    let mut oversized = generate(FIXED_SEEDS[1], 0);
+    oversized.shape.definitions = effect_property::MAX_DEFINITIONS + 1;
+    assert_eq!(oversized.validate_bounds(), Err("definition bound"));
+    oversized = generate(FIXED_SEEDS[1], 0);
+    oversized.source = "x".repeat(effect_property::MAX_SOURCE_BYTES + 1);
+    assert_eq!(oversized.validate_bounds(), Err("source-byte bound"));
 }
