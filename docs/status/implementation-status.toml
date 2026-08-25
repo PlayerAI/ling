@@ -9233,7 +9233,7 @@ notes = [
   "DEC-0262 Phase 1 is implemented at the resolver boundary: only true binding and wildcard operation inputs proceed, while literal, tuple, record, and constructor forms produce L-EFFECT-0005 reason refutable_parameter at the original pattern span before typed or Handler Core publication.",
   "DEC-0262 Phases 2 and 3 implement the isolated bytecode 1.4 Cell/State model, version-aware codec/disassembly, independent containment/type/effect verification, canonical re-encoding, exact golden bytes, older-reader rejection, and malformed evidence while preserving 1.0-1.3 behavior.",
   "The non-cyclic VM Cell primitive uses private monotonic IDs, an Engine-owned store, exact logical heap charging, shared identity under value/frame/continuation cloning, and commit-before-Unit CellSet behavior.",
-  "Binding storage is explicit Direct-or-Cell state; exact direct and transitive Handler capture selection emits one lexical CellNew, preserves one handle through closure and continuation aliases, and keeps branch joins restricted to Direct SSA values.",
+  "Binding storage is explicit Direct-or-Cell state; EFF-2104 initially selected direct and transitive Handler captures, and EFF-2105 commit 3517ffcc generalized existing bytecode 1.4 Cells to every mutable lexical binding so verified State rows remain exact.",
   "Lowering and independent verification cover scalar, aggregate, and function-valued State payloads, exact unmasked State rows without host Capabilities, canonical re-encoding, path-independent bytes, and unchanged historical 1.3 rejection.",
   "Interpreter/VM evidence covers zero/one resume, mutation before and after resume, nested-function aliases, a second operation during restoration, mutation followed by Fault, cancellation before CellSet and restoration, committed flags, source spans, and bounded resources.",
   "The non-normative DEC-0262 implementation plan maps the checked pattern gate, isolated 1.4 codec/verifier, binding-storage refactor, non-cyclic VM Cell store, evidence matrix, and integration order without adding public placeholder APIs.",
@@ -9295,7 +9295,7 @@ notes = [
 [[task]]
 id = "EFF-2105"
 title = "Effect fuzz and property tests"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9307,6 +9307,8 @@ spec = [
   "docs/RFC-0006.md",
   "docs/decisions/0062-effect-row-constraint-solver.md",
   "docs/decisions/0067-effect-model-property-corpus.md",
+  "docs/decisions/0262-handler-cell-state-bytecode.md",
+  "docs/decisions/0263-effect-property-generator-and-oracle.md",
   "docs/SEMANTICS.md",
   "docs/LANGUAGE.md",
   "docs/decisions/0010-state-and-capability-model.md",
@@ -9319,29 +9321,35 @@ spec = [
 ]
 artifacts = [
   "docs/status/EFF-2105-AUTHORITY-AUDIT.md",
+  "docs/status/EFF-2105-IMPLEMENTATION-REPORT.md",
   "docs/status/EFF-2105-MODEL-PROPERTIES-AUTHORITY-AUDIT.md",
   "docs/status/EFF-2105-MODEL-PROPERTIES-IMPLEMENTATION-REPORT.md",
   "crates/ling-effects/tests/model_properties.rs",
+  "crates/ling-bytecode/src/lower/v1_1.rs",
+  "crates/ling-bytecode/tests/lowering.rs",
+  "crates/ling-vm/tests/support/effect_property.rs",
+  "crates/ling-vm/tests/differential.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing checked-Core generator, Effect Row/residual-row oracle, handler/resume semantics, interpreter/VM equivalence, Fault/cancellation, bounds, canonicalization, diagnostics, and migration contracts.",
-  "The bounded EFF-2105-MODEL-PROPERTIES child covers only accepted in-process model properties; it does not close the parent runtime or differential target.",
-  "The audit distinguishes the completed fixed Handler interpreter/VM differential harness from the missing generated checked-source property domain and preserves the checked-only evaluation boundary.",
-  "The audit covers pure/effectful programs, single/nested handlers, propagation, resume cardinality, handler Faults, mutable State, cancellation, missing/unhandled operations, malformed bytecode, resource limits, Unicode/CRLF/BOM spans, deterministic output, reproducible seeds, and shrinking.",
-  "No Core generator, handler/effect oracle, residual-row comparator, fuzz protocol, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
-  "The future implementation must generate only bounded checked Core, compare stable semantic projections, retain minimized corpus evidence, and prove interpreter/VM equivalence before exposing effect property tests as a public compatibility gate.",
+  "Eight fixed 64-bit seeds and twelve bounded scenario families produce 96 deterministic UTF-8 sources without ambient entropy, filesystem ordering, network, clocks, allocation identities, or scheduling inputs.",
+  "Every generated candidate passes Source, CST, AST, HIR, resolution, type, Effect/Capability, and Semantic snapshot construction before evaluation or bytecode lowering; malformed and unchecked candidates are rejected.",
+  "Repeated reconstruction compares Program IDs, exact bytecode 1.4 bytes and verified models, canonical named-definition residual rows, ordered host events, Unit completion, Runtime Fault category/operation/commit/span projections, and observable shared mutation.",
+  "The corpus covers direct and closure calls, conditional and exhaustive match, immutable and mutable bindings, Console.write, single/nested handlers, propagation, zero/one resume, repeated-resume and clause Faults, shared State, BOM, CRLF, Chinese identifiers, combining marks, and emoji.",
+  "Deterministic shrinking follows the accepted structural order, rechecks retained candidates, preserves one stable injected failure projection, stops at 256 attempts, orders equal-size candidates by UTF-8 bytes, and writes no worktree file.",
+  "Existing VM evidence retains cancellation before and after commit, exact resource boundaries, missing capability, malformed bytecode, host panic containment, and no unchecked-AST execution; the harness adds no public fuzz, replay, shrink, corpus, diagnostic, schema, or CLI protocol.",
+  "The row oracle's discovered ordinary-mutation mismatch is fixed by selecting every mutable lexical binding as a private bytecode 1.4 Cell; exact State rows verify while bytecode 1.0 through 1.3 remain unchanged.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "planned"
-completed = ""
+verified_against_commit = "3517ffcccc8204a528c9768b0642aface4fcec29"
+completion_commit = "3517ffcccc8204a528c9768b0642aface4fcec29"
+integration_state = "committed"
+completed = "2026-08-25"
 notes = [
-  "EFF-2104 and DEC-0262 supply accepted Handler runtime, residual-row, bytecode 1.4, VM, Fault/State/cancellation, and differential authority.",
-  "Accepted DEC-0263 closes the checked-source generator, deterministic shrink/replay, and general property-oracle boundary without adding a public protocol.",
-  "The excluded fuzz workspace covers source, lexer/parser, manifests, and bytecode verification; current Handler differential tests are fixed evidence rather than a generated property corpus.",
-  "The bounded model-property child adds offline tests only; no compiler, interpreter, VM, bytecode, fuzz protocols, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior changes.",
+  "Accepted DEC-0263 and implementation commit 3517ffcccc8204a528c9768b0642aface4fcec29 complete the checked-source generator, deterministic shrink/replay, residual-row oracle, and interpreter/VM property boundary.",
+  "The EFF-2105-MODEL-PROPERTIES child remains separate bounded algebraic evidence under DEC-0067; EFF-2105 adds full checked-source and verified-runtime reconstruction.",
+  "Bytecode 1.4 canonical output for ordinary mutable lexical bindings now uses its existing Cell/State representation; this Experimental correction changes no source semantics, diagnostics, schemas, Semantic IDs, Program IDs, CLI, packages, or Unicode 17.0.0 behavior.",
+  "Task/Actor, new Effect producers, Many, Native/Wasm, public replay or corpus formats, and Stable compatibility remain deferred.",
 ]
 
 [[task]]

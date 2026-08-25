@@ -10,9 +10,11 @@ bytecode revision.
 
 The implementation retains the checked interpreter as the semantic oracle,
 keeps bytecode 1.3 as the historical immutable/irrefutable Handler slice, and
-uses bytecode 1.4 Cells only for mutable lexical bindings that cross a Handler
-body or clause boundary. No unchecked AST or unverified bytecode reaches an
-execution path.
+uses bytecode 1.4 Cells for mutable lexical bindings so accepted `State<T>`
+rows remain present in verified declarations. EFF-2105 later extended the
+initial Handler-crossing selection to all mutable lexical bindings after its
+row oracle exposed the omission. No unchecked AST or unverified bytecode
+reaches an execution path.
 
 ## Normative clauses covered
 
@@ -34,9 +36,11 @@ execution path.
 - Lowering environments now distinguish direct SSA registers from private
   Cell handles. All binding reads, writes, captures, branch joins, match joins,
   and mutable propagation use that storage abstraction.
-- Cell selection follows direct and transitive closure captures reachable from
-  Handler bodies and clauses. The lexical owner emits exactly one `CellNew`;
-  reads and writes emit `CellGet` and `CellSet` over the same handle.
+- The initial EFF-2104 Cell selection followed direct and transitive captures
+  reachable from Handler bodies and clauses. EFF-2105 commit `3517ffcc`
+  generalized that existing 1.4 representation to every mutable lexical
+  binding so checked and verified State rows agree. The lexical owner emits
+  exactly one `CellNew`; reads and writes use the same handle.
 - Handler body/clause and enclosing function signatures retain exact
   `State<T>` rows for scalar, aggregate, and function-valued Cell payloads.
   State never creates a host Capability and is never removed by Handler

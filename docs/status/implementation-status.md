@@ -153,7 +153,7 @@
 | `EFF-2103-SYNTAX` | Handler source CST projection | `G2` | `S` | `Done` | `EFF-2103-CORE` | `73807f551753620b52b685d7aca25c2032ec1a77` |
 | `EFF-2104` | Interpreter and VM handler execution | `G2` | `L` | `Done` | `EFF-2103` | `1188b2472ff0a61ac3d96c4ae21bbe9b6bd7eaba` |
 | `EFF-2104-REJECTION-GATE` | Internal unresolved-handler execution rejection gate | `G2` | `S` | `Done` | `EFF-2103-HIR` | `e265b451985a2afac071da6862c4bf9451faf9a0` |
-| `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `Ready` | `EFF-2104` | `` |
+| `EFF-2105` | Effect fuzz and property tests | `G2` | `L` | `Done` | `EFF-2104` | `3517ffcccc8204a528c9768b0642aface4fcec29` |
 | `EFF-2105-MODEL-PROPERTIES` | Effect model deterministic property corpus | `G2` | `S` | `Done` | `EFF-2102`, `EFF-2103-CORE` | `f40c69f0311d3bd970e9613772ddf7135d17772c` |
 | `EVD-5801` | Evidence Bundle Schema | `G5` | `L` | `BlockedSpec` | `TIM-5703` | `` |
 | `EVD-5801-OBSERVATION` | Internal Evidence Bundle Schema boundary evidence | `G5` | `S` | `Done` | `TIM-5703-OBSERVATION` | `2c27d97a4de390d49eba648830883bf50963f668` |

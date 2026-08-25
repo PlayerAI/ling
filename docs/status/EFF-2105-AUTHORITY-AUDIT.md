@@ -2,18 +2,19 @@
 
 ## Outcome
 
-`EFF-2105` is ready for implementation. Accepted `RFC-0006`,
+`EFF-2105` is complete in commit `3517ffcc`. Accepted `RFC-0006`,
 `DEC-0062`, and `DEC-0067` authorize the deterministic in-process model child;
-accepted `DEC-0262` and completed `EFF-2104` now provide Handler interpreter,
+Accepted `DEC-0262` and completed `EFF-2104` provide Handler interpreter,
 bytecode 1.4, VM, residual-row, Fault, State, cancellation, resource, and
 differential semantics. Accepted `DEC-0263` closes the final authority gap for
 the internal checked-source generator, replay/shrinking bounds, and
 property-oracle contract without adding a public protocol or changing language
 semantics.
 
-No Core generator, handler/effect oracle, residual-row comparator, new
-property-test protocol, fuzz corpus, diagnostic allocation, or placeholder G2
-API was added.
+The completed implementation adds only an internal checked-source generator,
+residual-row comparator, differential oracle, and bounded shrinker. It adds no
+public property-test protocol, persistent fuzz corpus, diagnostic allocation,
+or placeholder G2 API.
 
 ## Normative traceability
 
@@ -30,30 +31,27 @@ API was added.
   select a general generated-input domain or deterministic shrink/replay rule.
 - `GAP-EFFECT-HANDLER-001` is resolved for the Experimental v0.2 model by
   RFC-0006 and its accepted runtime/bytecode decisions; generated property
-  evidence remains open under EFF-2105;
+  evidence is complete under EFF-2105;
   `GAP-EFFECT-STATE-MASKING-001` is resolved by the accepted visible-State rule.
 
 ## Current implementation evidence
 
 - `ling-effects` checks Seed rows and the accepted Handler Core residual-row
   projection, deterministic call-graph propagation, and module Capability
-  closure. It has no general generated-program property oracle.
-- `ling-eval` and `ling-vm` now execute checked Handler programs and the VM
-  differential suite compares values, events, resume counts, committed Cell
-  observations, Faults, cancellation boundaries, and deterministic bytecode.
-  Those hand-built cases do not constitute a generated property domain or
-  shrinking contract.
-- The excluded fuzz workspace currently covers source, lexer/parser,
-  manifests, and bytecode decoding/verification. It has no well-typed Core
-  generator, interpreter/VM effect differential target, bounded handler
-  recursion model, or effect-specific corpus.
+  closure. EFF-2105 compares its canonical named-definition rows with exact
+  verified bytecode rows.
+- `ling-eval` and `ling-vm` execute checked Handler programs. The EFF-2105
+  suite adds 96 generated checked-source cases to the retained hand-built
+  differential, Fault, cancellation, and resource evidence.
+- The excluded fuzz workspace continues to cover malformed source,
+  lexer/parser, manifests, and bytecode decoding/verification. EFF-2105 is a
+  separate in-process well-typed source generator and writes no corpus.
 - `crates/ling-effects/tests/model_properties.rs` provides only the bounded
   DEC-0067 permutation corpus for canonical rows, solver substitutions,
   handler residuals, and path-free graph/Core bytes; it is not the full target.
-- Existing randomized or differential checks cannot be promoted to EFF-2105
-  by inference: doing so would freeze unaccepted handler semantics and could
-  make host behavior, Fault mapping, or canonical bytes part of the language
-  contract.
+- Commit `3517ffcc` implements only the generated domain and comparison rules
+  accepted by DEC-0263; it does not infer semantics from existing randomized
+  or hand-built checks.
 
 ## Accepted implementation authority
 
@@ -71,7 +69,7 @@ Accepted DEC-0263 defines:
    unhandled operations, malformed bytecode, resource limits, deterministic
    output, and no unchecked-AST execution.
 
-The implementation must follow those bounds exactly so a generator panic,
+The implementation follows those bounds exactly so a generator panic,
 unstable shrink, biased input domain, or host observation cannot become an
 accidental language guarantee.
 
@@ -86,14 +84,16 @@ the EFF-2104 implementation report, RFC-0020,
 `crates/ling-effects`, `crates/ling-eval`, `crates/ling-bytecode`,
 `crates/ling-vm`, and the excluded `fuzz` workspace.
 
-No compiler, interpreter, VM, bytecode, fuzz protocol, diagnostic, schema,
-Semantic ID, source-span, runtime, or Unicode 17.0.0 behavior changed. The
-bounded model-property child adds offline tests only.
+Source semantics, the interpreter, VM results, diagnostics, schemas, Semantic
+IDs, Program IDs, source spans, public fuzz protocols, and Unicode 17.0.0 did
+not change. The accepted row oracle corrected bytecode 1.4 lowering so ordinary
+mutable lexical bindings use existing Cells and retain `State<T>`; bytecode
+1.0–1.3 remain unchanged. The bounded model-property child remains separate.
 
 ## Intentionally deferred
 
-The full `EFF-2105` target may now begin under Accepted DEC-0263. The
-implementation must generate only checked, bounded Core,
-compare stable semantic projections, retain reproducible seeds and minimized
-corpus entries, and publish differential evidence without exposing a public
-protocol. `EFF-2105-MODEL-PROPERTIES` remains complete under DEC-0067.
+The full `EFF-2105` target is complete under Accepted DEC-0263; see
+`docs/status/EFF-2105-IMPLEMENTATION-REPORT.md`. Public replay formats,
+persistent automatic corpus writes, new Effect producers, Task/Actor crossing,
+Native/Wasm comparison, and Stable compatibility remain deferred.
+`EFF-2105-MODEL-PROPERTIES` remains complete under DEC-0067.
