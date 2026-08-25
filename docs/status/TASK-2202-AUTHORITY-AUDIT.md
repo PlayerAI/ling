@@ -2,15 +2,17 @@
 
 ## Outcome
 
-`TASK-2202` is correctly recorded as `BlockedSpec`. Accepted `DEC-0092` closes
+`TASK-2202` remains `BlockedSpec`. Accepted `DEC-0092` closes
 the bounded publish-disabled `TASK-2202-STATE-MACHINE-MODEL` identity-graph
-child only. The G2 plan requires every
+child, while Proposed DEC-0265 now defines a reviewable checked-only lowering
+candidate but is not implementation authority. The G2 plan requires every
 Task suspension point to lower into a versioned state machine carrying live
 locals, continuation state, cancellation, cleanup, Fault, and source-map
 edges, with coverage for repeated suspension, match/loop paths, resource
 cleanup, and nested scopes. `TASK-2201` now provides the Accepted checked Task
-Core input, but the executable lifecycle and state-machine ABI remain
-unspecified.
+Core input. Proposed DEC-0265 would fix a non-executable state-machine
+representation; both that lowering authority and the later executable
+lifecycle/backend ABI remain unavailable until their decisions are Accepted.
 
 No Task lowering pass, continuation layout, state-machine bytecode instruction,
 serialization/version marker, cancellation or cleanup edge, source-map rule,
@@ -38,6 +40,11 @@ records structural edge labels but does not execute them.
 - Accepted `DEC-0092` is intentionally narrower than the missing authority: it
   validates only opaque state/local/transition identities and deterministic
   checked-data bytes.
+- Proposed `DEC-0265` specifies a candidate TASK-2202 boundary: it would fix
+  `ling.task-machine/0.1`, typed suspension frames, branch-aware control-flow
+  edges, reasoned cleanup exits, validation, canonical bytes, source maps, and
+  the continuing non-executable boundary. Proposed status does not authorize
+  implementation.
 
 ## Current implementation evidence
 
@@ -62,34 +69,31 @@ records structural edge labels but does not execute them.
 
 ## Required authority before implementation
 
-An Accepted RFC or decision must define, at minimum:
+DEC-0265 proposes the required TASK-2202 contract. It must be Accepted,
+rejected, or replaced before compiler implementation:
 
 1. the accepted Task Checked Core input and suspension-point identity, live
    locals and types, continuation/frame ownership, state numbering, and
    source-span/provenance rules;
-2. deterministic state-machine lowering and versioning, including entry/resume
-   transitions, spawn/join, cancellation, cleanup, Fault, and normal-return
-   edges; bytecode encoding, verifier limits, malformed-input rejection, and
-   profile/ABI compatibility;
-3. borrow, mutable-State, Effect/Capability, resource, and aliasing rules for
-   values that cross suspension, plus allocation, recursion, frame, and output
-   limits and their failure precedence;
-4. interpreter reference semantics versus VM execution, source-map and
-   diagnostic projection, Semantic IDs, Audit Source, canonical ordering,
-   migration policy, and deterministic behavior under nested scopes; and
-5. executable positive/negative/migration/differential fixtures for multiple
-   suspension points, match branches, loops, nested scopes, cancellation
-   before/after effects, cleanup on success/cancel/Fault, child Fault
-   aggregation, malformed/oversized bytecode, Unicode/CRLF/BOM spans, and no
-   unchecked-AST execution.
+2. deterministic internal state-machine lowering and versioning, including
+   entry/continue/resume, cancellation, cleanup, Fault, and normal-return
+   edges, malformed-input rejection, and canonical compatibility;
+3. exact reuse of DEC-0264 suspension-safe typed live bindings without choosing
+   allocation, ABI offsets, runtime resource limits, or failure precedence;
+4. source-map projection, canonical ordering, nested-scope and branch behavior,
+   and preservation of existing Semantic Graph/Audit and execution rejection;
+5. positive/negative/determinism fixtures for multiple suspension points,
+   match branches, nested scopes, the synthetic loop boundary, structural
+   return/cancel/Fault cleanup, Unicode/CRLF/BOM spans, and no unchecked-AST
+   consumption or execution.
 
-Until these decisions are Accepted, a lowering could drop live state, resume
-with invalid ownership, skip cleanup, mis-map cancellation/Faults, or make
-interpreter and VM behavior diverge across a bytecode version boundary.
+Runtime lifecycle, bytecode/VM execution, propagation, cleanup code, Fault
+aggregation, precedence, scheduling, and resources remain outside TASK-2202
+and require later Accepted authority.
 
 ## Evidence and compatibility
 
-This audit was checked against `AGENTS.md`, Accepted DEC-0264,
+This audit was checked against `AGENTS.md`, Accepted DEC-0264, Proposed DEC-0265,
 `docs/status/TASK-2201-IMPLEMENTATION-REPORT.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0013, DEC-0018, RFC-0001,
 RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
@@ -103,11 +107,10 @@ public source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-The bounded `TASK-2202-STATE-MACHINE-MODEL` child is complete under
-`DEC-0092`. The TASK-2201 dependency is complete; public `TASK-2202` can begin
-only after an Accepted RFC-0008 (or replacement) resolves the relevant
-`GAP-STRUCTURED-TASK-001` decisions and defines a versioned
-state-machine/continuation ABI. The future lowering must consume checked Task
-Core only, preserve live values and source identity, make every cancellation,
-cleanup, and Fault edge explicit, and publish interpreter/VM differential
-evidence before exposing a new bytecode revision.
+The bounded `TASK-2202-STATE-MACHINE-MODEL` child is complete under DEC-0092
+and the TASK-2201 dependency is complete. Public TASK-2202 remains blocked
+until Proposed DEC-0265 is Accepted or replaced. If accepted, lowering must
+consume checked Task data only, preserve live values and source identity, make
+every cancellation, cleanup, and Fault edge explicit, and remain
+non-executable. Interpreter/VM differential evidence and any new bytecode
+revision remain later Accepted work.

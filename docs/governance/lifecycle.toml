@@ -7560,3 +7560,29 @@ unresolved_alternatives = [
   "Implicit Task calls, first-class Task values, global keywords, automatic non-Unit observation, cross-scope handles, recursion, Handler interception, detach, lowering, runtime lifecycle, Fault aggregation, schedulers, resource limits, Actor crossing, Replay, and migration remain rejected or later work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0265"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0265-task-state-machine-lowering.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-25"
+proposed = "2026-08-25"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Lower zero, one, repeated, nested-scope, conditional, and match-branch suspensions into deterministic typed state machines.",
+  "Reject unmatched checked evidence, malformed identities, frames, roles, endpoints, exits, reachability, and normal paths without return cleanup.",
+  "Freeze canonical machine bytes against insertion order, physical path, source ID, source spans, BOM/CRLF, and Chinese identifiers while retaining exact UTF-8 source maps.",
+  "Preserve L-TASK-0004 rejection before file/project/REPL/interpreter/bytecode/VM execution or artifact publication.",
+]
+compatibility_impact = [
+  "Adds internal Experimental ling.task-machine/0.1 checked data and CheckedProgram accessors without changing existing Task Core, Semantic Graph, Audit, or ordinary-program bytes.",
+  "Adds no source syntax, public diagnostic meaning, runtime behavior, scheduler order, bytecode/ABI, public protocol, package, Native/Wasm, Stable, or Unicode 17.0.0 promise.",
+]
+unresolved_alternatives = [
+  "Runtime lifecycle, propagation and precedence, cleanup bodies, Fault aggregation, detach, deadlines, schedulers, worker pools, resource limits, Task bytecode/VM/native ABI, Replay, Actor crossing, source loops, migration, and Stable compatibility remain later work.",
+]
+superseded_by = ""

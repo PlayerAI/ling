@@ -4303,3 +4303,16 @@ covers = ["TASK-2201 contextual source syntax", "Task handle static ownership an
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0091", "DEC-0260", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0265"
+title = "Checked Task state-machine lowering"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0265-task-state-machine-lowering.md"
+covers = ["TASK-2202 checked Task state-machine lowering", "typed suspension frames and control-flow edges", "reasoned return, cancellation, Fault, and cleanup exit skeleton", "non-executable ling.task-machine/0.1 boundary"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0092", "DEC-0264", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false
