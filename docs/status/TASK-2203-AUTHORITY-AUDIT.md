@@ -9,6 +9,10 @@ explicit Clock plus cancellation combination, and exits without orphan Tasks.
 The lifecycle, failure, cleanup, and scheduler contracts required to implement
 that runtime are not accepted.
 
+Proposed DEC-0266 now supplies a reviewable scheduler-neutral lifecycle-kernel
+contract, but a Proposed decision is not implementation authority. TASK-2203
+therefore remains `BlockedSpec` until that decision is Accepted.
+
 No Task runtime, scope registry, child cancellation propagation, join policy,
 Fault aggregator, timeout API, orphan detector, scheduler interface,
 diagnostic allocation, or placeholder G2 API was added.
@@ -17,6 +21,11 @@ Accepted `DEC-0093` now authorizes the bounded child
 `TASK-2203-LIFECYCLE-OBSERVATION`, which records only immutable structural
 observations and deterministic identities. It does not close any of the
 runtime authority gaps listed below.
+
+The audit also found that DEC-0264's current ban on another Task handle crossing
+a suspension prevents multiple live same-scope children. Proposed DEC-0266
+addresses that conflict explicitly: linear handles remain in the runtime scope
+registry rather than DEC-0265 value frames, preserving existing machine bytes.
 
 ## Normative traceability
 
@@ -37,6 +46,10 @@ runtime authority gaps listed below.
 - RFC-0020 defines explicit host-owned cancellation for existing VM execution
   only. It does not define source Task cancellation, child registration, join,
   timeout/Clock races, Fault aggregation, cleanup, or orphan semantics.
+- Proposed DEC-0266 defines checked runtime identities, lifecycle states,
+  same-scope handle retention, registration, join, cancellation, deterministic
+  Fault aggregation, exactly-once cleanup, explicit bounds, and a scheduler-
+  neutral ready-set/step boundary. It remains non-authoritative until Accepted.
 
 ## Current implementation evidence
 
@@ -55,9 +68,10 @@ runtime authority gaps listed below.
   races, child Fault aggregation, timeout, cleanup ordering, orphan rejection,
   resource exhaustion, or interpreter/VM lifecycle equivalence.
 
-## Required authority before implementation
+## Proposed authority contract
 
-An Accepted RFC or decision must define, at minimum:
+DEC-0266 proposes the following minimum contract; implementation still requires
+its acceptance:
 
 1. scope and child identity, registration and ownership, default join and
    scope-exit obligations, result observation, transfer/detach authority, and
@@ -78,7 +92,7 @@ An Accepted RFC or decision must define, at minimum:
    Unicode/CRLF/BOM spans, deterministic traces, and no unchecked-AST
    execution.
 
-Until these decisions are Accepted, the runtime could leak children, run after
+Until this decision is Accepted, the runtime could leak children, run after
 parent cancellation, lose or reorder Faults, race timeout against effects, or
 silently leave an orphan Task.
 
@@ -86,7 +100,8 @@ silently leave an orphan Task.
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0013, DEC-0018, RFC-0001,
-RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
+RFC-0020, Proposed DEC-0266,
+`docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and the current syntax, AST, HIR, types, effects, evaluator, bytecode, and VM
@@ -100,9 +115,9 @@ for the observation boundary; the public lifecycle runtime remains blocked.
 
 ## Intentionally deferred
 
-`TASK-2203` remains blocked only on an Accepted RFC-0008 (or replacement) that
-resolves its portion of `GAP-STRUCTURED-TASK-001`; TASK-2201 and TASK-2202 are
-complete dependencies. The future runtime must
+`TASK-2203` remains blocked on acceptance of DEC-0266 (or an Accepted
+replacement that resolves the same portion of `GAP-STRUCTURED-TASK-001`);
+TASK-2201 and TASK-2202 are complete dependencies. The future runtime must
 consume checked Task state machines only, make scope/cancellation/cleanup/Fault
 transitions explicit, separate deterministic test scheduling from production
 behavior, and publish lifecycle differential evidence before exposing Task

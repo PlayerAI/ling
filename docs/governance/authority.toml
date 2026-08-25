@@ -4316,3 +4316,16 @@ covers = ["TASK-2202 checked Task state-machine lowering", "typed suspension fra
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0092", "DEC-0264", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0266"
+title = "Scheduler-neutral Structured Task lifecycle runtime"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0266-structured-task-lifecycle-runtime.md"
+covers = ["TASK-2203 scheduler-neutral checked Task lifecycle kernel", "lexical Task registration, join, cancellation, cleanup, and deterministic Fault aggregation", "same-scope linear handle registry across suspension", "explicit ready-set driver boundary before TASK-2204 scheduling"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0093", "DEC-0264", "DEC-0265", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false

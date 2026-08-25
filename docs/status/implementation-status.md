@@ -5,7 +5,7 @@
 
 - Registry schema: `2`
 - Feature schema: `1`
-- Updated: `2026-08-25`
+- Updated: `2026-08-26`
 - Feature release: `v0.0.1`
 - Baseline release: `v0.0.1`
 - Baseline commit: `639790f4c609d137932d8432d9c5be681aa3e3c1`
