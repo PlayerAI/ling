@@ -9524,7 +9524,7 @@ notes = [
 [[task]]
 id = "TASK-2202"
 title = "Task state-machine lowering"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9566,8 +9566,8 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "TASK-2201 is complete, but Proposed DEC-0265 is not implementation authority; TASK-2202 remains BlockedSpec until it is Accepted or rejected/replaced.",
-  "GAP-STRUCTURED-TASK-001 remains open for TASK-2202 through TASK-2206 state-machine, executable lifecycle, cancellation propagation, cleanup execution, Fault aggregation, scheduler, resource, runtime, and detach decisions; RFC-0020 covers only host VM cancellation.",
+  "TASK-2201 is complete and Accepted DEC-0265 authorizes the checked-only ling.task-machine/0.1 lowering boundary; TASK-2202 is Ready.",
+  "GAP-STRUCTURED-TASK-001 remains open for TASK-2203 through TASK-2206 executable lifecycle, cancellation propagation, cleanup execution, Fault aggregation, scheduler, resource, runtime, and detach decisions; RFC-0020 covers only host VM cancellation.",
   "DEC-0092 and TASK-2202-STATE-MACHINE-MODEL cover only internal state/local/edge identity validation and do not authorize lowering or execution.",
   "ling-bytecode has versioned Seed formats and ordinary call/control-flow lowering, while ling-vm has Seed call frames; neither represents Task suspension, live locals, cleanup/Fault edges, or a Task ABI.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, scheduler, or Unicode 17.0.0 behavior.",

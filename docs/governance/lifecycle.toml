@@ -7564,13 +7564,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0265"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0265-task-state-machine-lowering.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-25"
 proposed = "2026-08-25"
-decided = ""
-stable_basis = false
+decided = "2026-08-25"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Lower zero, one, repeated, nested-scope, conditional, and match-branch suspensions into deterministic typed state machines.",

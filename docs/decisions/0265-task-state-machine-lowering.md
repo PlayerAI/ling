@@ -1,8 +1,8 @@
 # DEC-0265: Checked Task state-machine lowering / Checked Task 状态机 Lowering
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-25<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-25<br>
 > Owner role：concurrency-design<br>
 > 相关 RFC/缺口：DEC-0092 | DEC-0264 | GAP-STRUCTURED-TASK-001 | TASK-2202<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`

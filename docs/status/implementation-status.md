@@ -466,7 +466,7 @@
 | `TASK-2201` | Structured Task syntax and Checked Core | `G2` | `M` | `Done` | `EFF-2103` | `54e4cecb6ad56685f93b155ef7395a1b0a7a7e26` |
 | `TASK-2201-CORE-MODEL` | Internal Structured Task Checked-Core identity model | `G2` | `S` | `Done` | `TASK-2201-TASK-SYNTAX-REJECTION` | `6028e78ce4091e58d5df1289c59b8fd6b0f61c4e` |
 | `TASK-2201-TASK-SYNTAX-REJECTION` | Internal Task-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `b3ede69c33d72d4419775650b820f1b5797dc652` |
-| `TASK-2202` | Task state-machine lowering | `G2` | `L` | `BlockedSpec` | `TASK-2201` | `` |
+| `TASK-2202` | Task state-machine lowering | `G2` | `L` | `Ready` | `TASK-2201` | `` |
 | `TASK-2202-STATE-MACHINE-MODEL` | Internal Task state-machine identity model | `G2` | `S` | `Done` | `TASK-2201-CORE-MODEL` | `80f3a8c7b579c65bd77030de159cfefdc42a5a4b` |
 | `TASK-2203` | Structured Task lifecycle runtime | `G2` | `L` | `BlockedSpec` | `TASK-2202` | `` |
 | `TASK-2203-LIFECYCLE-OBSERVATION` | Internal Task lifecycle observation trace | `G2` | `S` | `Done` | `TASK-2202-STATE-MACHINE-MODEL` | `e0a411bbef4620cc190de34939bbcc41d8768736` |

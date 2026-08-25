@@ -2,17 +2,16 @@
 
 ## Outcome
 
-`TASK-2202` remains `BlockedSpec`. Accepted `DEC-0092` closes
+`TASK-2202` is `Ready` under Accepted DEC-0265. Accepted `DEC-0092` closes
 the bounded publish-disabled `TASK-2202-STATE-MACHINE-MODEL` identity-graph
-child, while Proposed DEC-0265 now defines a reviewable checked-only lowering
-candidate but is not implementation authority. The G2 plan requires every
+child, while DEC-0265 authorizes the checked-only lowering slice. The G2 plan requires every
 Task suspension point to lower into a versioned state machine carrying live
 locals, continuation state, cancellation, cleanup, Fault, and source-map
 edges, with coverage for repeated suspension, match/loop paths, resource
 cleanup, and nested scopes. `TASK-2201` now provides the Accepted checked Task
-Core input. Proposed DEC-0265 would fix a non-executable state-machine
-representation; both that lowering authority and the later executable
-lifecycle/backend ABI remain unavailable until their decisions are Accepted.
+Core input. DEC-0265 fixes its non-executable state-machine representation;
+the later executable lifecycle/backend ABI remain unavailable until their
+decisions are Accepted.
 
 No Task lowering pass, continuation layout, state-machine bytecode instruction,
 serialization/version marker, cancellation or cleanup edge, source-map rule,
@@ -40,11 +39,10 @@ records structural edge labels but does not execute them.
 - Accepted `DEC-0092` is intentionally narrower than the missing authority: it
   validates only opaque state/local/transition identities and deterministic
   checked-data bytes.
-- Proposed `DEC-0265` specifies a candidate TASK-2202 boundary: it would fix
+- Accepted `DEC-0265` supplies the TASK-2202 boundary: it fixes
   `ling.task-machine/0.1`, typed suspension frames, branch-aware control-flow
   edges, reasoned cleanup exits, validation, canonical bytes, source maps, and
-  the continuing non-executable boundary. Proposed status does not authorize
-  implementation.
+  the continuing non-executable boundary.
 
 ## Current implementation evidence
 
@@ -67,10 +65,9 @@ records structural edge labels but does not execute them.
   cancellation or Fault edges, cleanup ordering, Task-bytecode migration,
   malformed Task bytecode, or interpreter/VM state-machine equivalence.
 
-## Required authority before implementation
+## Accepted implementation contract
 
-DEC-0265 proposes the required TASK-2202 contract. It must be Accepted,
-rejected, or replaced before compiler implementation:
+DEC-0265 defines the required TASK-2202 contract:
 
 1. the accepted Task Checked Core input and suspension-point identity, live
    locals and types, continuation/frame ownership, state numbering, and
@@ -93,7 +90,7 @@ and require later Accepted authority.
 
 ## Evidence and compatibility
 
-This audit was checked against `AGENTS.md`, Accepted DEC-0264, Proposed DEC-0265,
+This audit was checked against `AGENTS.md`, Accepted DEC-0264 and DEC-0265,
 `docs/status/TASK-2201-IMPLEMENTATION-REPORT.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0013, DEC-0018, RFC-0001,
 RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
@@ -107,10 +104,9 @@ public source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
 
 ## Intentionally deferred
 
-The bounded `TASK-2202-STATE-MACHINE-MODEL` child is complete under DEC-0092
-and the TASK-2201 dependency is complete. Public TASK-2202 remains blocked
-until Proposed DEC-0265 is Accepted or replaced. If accepted, lowering must
-consume checked Task data only, preserve live values and source identity, make
-every cancellation, cleanup, and Fault edge explicit, and remain
-non-executable. Interpreter/VM differential evidence and any new bytecode
-revision remain later Accepted work.
+The bounded `TASK-2202-STATE-MACHINE-MODEL` child is complete under DEC-0092,
+the TASK-2201 dependency is complete, and public TASK-2202 may proceed under
+Accepted DEC-0265. Lowering must consume checked Task data only, preserve live
+values and source identity, make every cancellation, cleanup, and Fault edge
+explicit, and remain non-executable. Interpreter/VM differential evidence and
+any new bytecode revision remain later Accepted work.
