@@ -22,8 +22,9 @@ runtime authority gaps listed below.
 
 - The G2 execution package is non-normative; its runtime checklist does not
   authorize a scheduler, lifecycle state machine, or public timeout protocol.
-- `TASK-2201` and `TASK-2202` are `BlockedSpec`, so no accepted Task Core or
-  state-machine input exists. `docs/SEMANTICS.md` gives only future structured
+- `TASK-2201` and `TASK-2202` are complete under Accepted DEC-0264 and
+  DEC-0265, so checked Task Core and non-executable `ling.task-machine/0.1`
+  inputs now exist. `docs/SEMANTICS.md` still gives only future structured
   lifetime intent and explicitly excludes Task from v0.0.1 execution.
 - `docs/ROADMAP-1.0.md` makes Task cancellation, cleanup, suspension, and
   deterministic scheduling v0.2 specification gates. It does not define
@@ -39,9 +40,10 @@ runtime authority gaps listed below.
 
 ## Current implementation evidence
 
-- The syntax, AST, HIR, type, effect, and checked Core crates contain no Task
-  scope, child handle, join, cancellation propagation, or structured-runtime
-  representation.
+- The frontend, type, Effect, and Checked Core pipeline now represents Task
+  scopes, handles, suspension liveness, and validated non-executable state
+  machines. It contains no child registry, join barrier, cancellation
+  propagation, cleanup executor, Fault aggregator, or structured runtime.
 - `ling-eval` executes checked Seed `ProgramSnapshot` values synchronously;
   it has no scope tree, child registry, scheduler, join barrier, timeout
   clock, cleanup stack, or Fault aggregation.
@@ -98,8 +100,9 @@ for the observation boundary; the public lifecycle runtime remains blocked.
 
 ## Intentionally deferred
 
-`TASK-2203` can begin only after TASK-2201/TASK-2202 and an Accepted RFC-0008
-(or replacement) resolve `GAP-STRUCTURED-TASK-001`. The future runtime must
+`TASK-2203` remains blocked only on an Accepted RFC-0008 (or replacement) that
+resolves its portion of `GAP-STRUCTURED-TASK-001`; TASK-2201 and TASK-2202 are
+complete dependencies. The future runtime must
 consume checked Task state machines only, make scope/cancellation/cleanup/Fault
 transitions explicit, separate deterministic test scheduling from production
 behavior, and publish lifecycle differential evidence before exposing Task

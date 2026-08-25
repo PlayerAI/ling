@@ -2,7 +2,7 @@
 
 ## Outcome
 
-`TASK-2202` is `Ready` under Accepted DEC-0265. Accepted `DEC-0092` closes
+`TASK-2202` is `Done` under Accepted DEC-0265. Accepted `DEC-0092` closes
 the bounded publish-disabled `TASK-2202-STATE-MACHINE-MODEL` identity-graph
 child, while DEC-0265 authorizes the checked-only lowering slice. The G2 plan requires every
 Task suspension point to lower into a versioned state machine carrying live
@@ -11,12 +11,14 @@ edges, with coverage for repeated suspension, match/loop paths, resource
 cleanup, and nested scopes. `TASK-2201` now provides the Accepted checked Task
 Core input. DEC-0265 fixes its non-executable state-machine representation;
 the later executable lifecycle/backend ABI remain unavailable until their
-decisions are Accepted.
+decisions are Accepted. Implementation commit
+`450ec1bad6403a03a702713d80464fa6bbd83172` completes only that checked
+lowering boundary.
 
-No Task lowering pass, continuation layout, state-machine bytecode instruction,
-serialization/version marker, cancellation or cleanup edge, source-map rule,
-diagnostic allocation, or placeholder G2 API was added; the internal model
-records structural edge labels but does not execute them.
+No state-machine bytecode instruction, executable continuation layout, runtime
+cancellation or cleanup behavior, diagnostic allocation, public schema, or
+placeholder G2 execution API was added. The checked machine records structural
+state and edge obligations but cannot execute them.
 
 ## Normative traceability
 
@@ -46,24 +48,29 @@ records structural edge labels but does not execute them.
 
 ## Current implementation evidence
 
-- `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` now
-  publish checked Task syntax, types/effects, scope/spawn/suspension identity,
-  and suspension live sets. They deliberately publish no executable
-  continuation state, cleanup program, or Task Fault edge.
-- `ling-concurrency::StateMachineModel` is not connected to the compiler,
-  bytecode, verifier, interpreter, or VM and does not represent executable
-  suspension semantics.
+- `ling-effects` now atomically lowers successful `CheckedTaskCore` values to
+  validated immutable `ling.task-machine/0.1` machines owned by
+  `CheckedProgram`. Suspension states carry exact checked continuation, scope,
+  awaited-task, sorted typed frame, and source-span evidence.
+- Normal evaluation-order edges preserve sequences, branches, matches, and
+  nested lexical-scope returns. Every active state has explicit structural
+  cancel/Fault exits and every reasoned cleanup state has one matching terminal
+  edge.
+- `ling-concurrency::StateMachineModel` is used only as a structural projection;
+  neither representation is connected to bytecode, the verifier, interpreter,
+  VM, or a scheduler and neither defines executable suspension semantics.
 - `ling-bytecode` has versioned Seed formats and ordinary call/control-flow
   lowering, but no Task state-machine table, continuation serialization,
   suspension opcode, cancellation/cleanup edge, or Task-specific source map.
 - `ling-vm` executes verified Seed bytecode with call frames and host-control
   cancellation; those existing frames are not a source Task continuation ABI
   and do not propagate child lifecycle or cleanup obligations.
-- TASK-2201 fixtures cover nested checked scopes, multiple syntactic suspension
-  sites, handle ownership, unsafe live sets, and source identity. No fixture
-  can yet cover executable repeated suspension, match/loop frame capture,
-  cancellation or Fault edges, cleanup ordering, Task-bytecode migration,
-  malformed Task bytecode, or interpreter/VM state-machine equivalence.
+- TASK-2202 fixtures cover zero/repeated suspension, branch and match topology,
+  nested scope-local continuation, exact frames and spans, explicit structural
+  exits, malformed internal models, deterministic bytes, and a synthetic
+  checked-loop model boundary. Executable cancellation, cleanup ordering,
+  Task-bytecode migration, malformed Task bytecode, and interpreter/VM
+  equivalence remain unavailable.
 
 ## Accepted implementation contract
 
@@ -99,14 +106,13 @@ RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 and the current syntax, AST, HIR, types, effects, bytecode, evaluator, and VM
 crates.
 
-No compiler, interpreter, VM, bytecode, diagnostic, schema, Semantic ID,
-public source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
+The compiler gains only the internal checked lowering and immutable accessors.
+Interpreter, VM, bytecode, diagnostic, schema, Semantic ID, public source-span,
+runtime, scheduler, and Unicode 17.0.0 behavior did not change.
 
 ## Intentionally deferred
 
-The bounded `TASK-2202-STATE-MACHINE-MODEL` child is complete under DEC-0092,
-the TASK-2201 dependency is complete, and public TASK-2202 may proceed under
-Accepted DEC-0265. Lowering must consume checked Task data only, preserve live
-values and source identity, make every cancellation, cleanup, and Fault edge
-explicit, and remain non-executable. Interpreter/VM differential evidence and
+The bounded checked-only lowering is complete. TASK-2203 must obtain Accepted
+lifecycle authority before consuming these machines for execution. Runtime
+join/cancel/cleanup/Fault semantics, interpreter/VM differential evidence, and
 any new bytecode revision remain later Accepted work.
