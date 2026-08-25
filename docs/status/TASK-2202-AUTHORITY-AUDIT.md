@@ -8,8 +8,9 @@ child only. The G2 plan requires every
 Task suspension point to lower into a versioned state machine carrying live
 locals, continuation state, cancellation, cleanup, Fault, and source-map
 edges, with coverage for repeated suspension, match/loop paths, resource
-cleanup, and nested scopes. `TASK-2201` has no accepted Task Core input, and
-the lifecycle and state-machine ABI are not specified.
+cleanup, and nested scopes. `TASK-2201` now provides the Accepted checked Task
+Core input, but the executable lifecycle and state-machine ABI remain
+unspecified.
 
 No Task lowering pass, continuation layout, state-machine bytecode instruction,
 serialization/version marker, cancellation or cleanup edge, source-map rule,
@@ -20,10 +21,10 @@ records structural edge labels but does not execute them.
 
 - The G2 execution package is non-normative; its lowering checklist does not
   authorize a continuation representation, bytecode revision, or backend ABI.
-- `TASK-2201` is `BlockedSpec`, so no accepted Task grammar or Checked Core
-  node exists to lower. `docs/SEMANTICS.md` only states future Task
-  lifecycle intent and reserves `CreateTask`/`AwaitTask`; v0.0.1 implements
-  neither.
+- `TASK-2201` is complete under Accepted DEC-0264 and provides immutable
+  checked scope/spawn/suspension graphs plus live-set evidence. DEC-0264
+  explicitly forbids executable lowering, so it does not authorize a
+  continuation ABI, Task bytecode, or runtime lifecycle.
 - `docs/ROADMAP-1.0.md` requires Task lifecycle, cancellation, cleanup,
   suspension, and deterministic-scheduler decisions before the v0.2 exit.
   `GAP-STRUCTURED-TASK-001` leaves those behaviors open, with candidate
@@ -40,10 +41,10 @@ records structural edge labels but does not execute them.
 
 ## Current implementation evidence
 
-- `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` have
-  no Task Core or suspension representation. The current checked boundary
-  contains no live-local set, continuation state, cleanup region, or Task
-  Fault edge.
+- `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` now
+  publish checked Task syntax, types/effects, scope/spawn/suspension identity,
+  and suspension live sets. They deliberately publish no executable
+  continuation state, cleanup program, or Task Fault edge.
 - `ling-concurrency::StateMachineModel` is not connected to the compiler,
   bytecode, verifier, interpreter, or VM and does not represent executable
   suspension semantics.
@@ -53,8 +54,10 @@ records structural edge labels but does not execute them.
 - `ling-vm` executes verified Seed bytecode with call frames and host-control
   cancellation; those existing frames are not a source Task continuation ABI
   and do not propagate child lifecycle or cleanup obligations.
-- No fixture covers repeated suspension, match/loop state capture, nested Task
-  scopes, cancellation or Fault edges, cleanup ordering, source-map migration,
+- TASK-2201 fixtures cover nested checked scopes, multiple syntactic suspension
+  sites, handle ownership, unsafe live sets, and source identity. No fixture
+  can yet cover executable repeated suspension, match/loop frame capture,
+  cancellation or Fault edges, cleanup ordering, Task-bytecode migration,
   malformed Task bytecode, or interpreter/VM state-machine equivalence.
 
 ## Required authority before implementation
@@ -86,7 +89,8 @@ interpreter and VM behavior diverge across a bytecode version boundary.
 
 ## Evidence and compatibility
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This audit was checked against `AGENTS.md`, Accepted DEC-0264,
+`docs/status/TASK-2201-IMPLEMENTATION-REPORT.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0013, DEC-0018, RFC-0001,
 RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
@@ -100,8 +104,9 @@ public source-span, runtime, scheduler, or Unicode 17.0.0 behavior changed.
 ## Intentionally deferred
 
 The bounded `TASK-2202-STATE-MACHINE-MODEL` child is complete under
-`DEC-0092`. Public `TASK-2202` can begin only after TASK-2201 and an Accepted RFC-0008 (or
-replacement) resolve `GAP-STRUCTURED-TASK-001` and define a versioned
+`DEC-0092`. The TASK-2201 dependency is complete; public `TASK-2202` can begin
+only after an Accepted RFC-0008 (or replacement) resolves the relevant
+`GAP-STRUCTURED-TASK-001` decisions and defines a versioned
 state-machine/continuation ABI. The future lowering must consume checked Task
 Core only, preserve live values and source identity, make every cancellation,
 cleanup, and Fault edge explicit, and publish interpreter/VM differential

@@ -2,7 +2,7 @@
 
 ## Outcome
 
-`TASK-2201` is ready for checked-frontend implementation. Accepted `DEC-0089`
+`TASK-2201` is complete as a checked-only frontend/Core slice. Accepted `DEC-0089`
 closes the bounded `TASK-2201-TASK-SYNTAX-REJECTION` evidence child without
 adding a Task grammar, and Accepted `DEC-0091` closes the separate
 publish-disabled `TASK-2201-CORE-MODEL` identity-graph child. The G2 plan
@@ -100,19 +100,19 @@ Accepted DEC-0264, RFC-0001, RFC-0020,
 and the current syntax, AST, HIR, types, effects, evaluator, bytecode, and VM
 crates.
 
-No compiler, interpreter, VM, bytecode, diagnostic registry, schema,
-Semantic ID, public source-span contract, runtime, scheduler, or Unicode 17.0.0
-behavior changed. The two bounded children add only an offline negative
-fixture and an internal checked-data model.
+Implementation commit `54e4cecb6ad56685f93b155ef7395a1b0a7a7e26`
+adds contextual syntax through checked Task Core, Preview diagnostics, the
+Experimental `x-ling-task` Semantic Graph extension, and Preview Audit Source
+0.3. Existing non-Task protocol bytes, executable Seed behavior, bytecode
+1.0–1.4, runtime scheduling, and Unicode 17.0.0 remain unchanged. Detailed
+evidence is recorded in `docs/status/TASK-2201-IMPLEMENTATION-REPORT.md`.
 
 ## Intentionally deferred
 
 The bounded `TASK-2201-TASK-SYNTAX-REJECTION` child is complete under
-`DEC-0089`, and `TASK-2201-CORE-MODEL` is complete under `DEC-0091`. Public
-`TASK-2201` may now begin under Accepted DEC-0264; EFF-2103 is already
-complete. The broader `GAP-STRUCTURED-TASK-001` remains open for
-TASK-2202 through TASK-2206 runtime work. The implementation must lower only
-accepted Task syntax to checked Typed Core, make every suspension and cleanup
-identity explicit, and preserve source identity. Later tasks must prove
+`DEC-0089`, `TASK-2201-CORE-MODEL` is complete under `DEC-0091`, and public
+`TASK-2201` is complete under Accepted DEC-0264. The broader
+`GAP-STRUCTURED-TASK-001` remains open for TASK-2202 through TASK-2206 runtime
+work. Later tasks must prove
 interpreter/VM and cancellation/cleanup equivalence before exposing Task
 execution.
