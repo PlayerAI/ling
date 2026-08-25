@@ -660,6 +660,7 @@ impl<'source> RawLexer<'source> {
             ':' => TokenKind::Colon,
             '.' => TokenKind::Dot,
             '=' => TokenKind::Equals,
+            '!' => TokenKind::Bang,
             '<' => TokenKind::Less,
             '>' => TokenKind::Greater,
             '|' => TokenKind::Pipe,

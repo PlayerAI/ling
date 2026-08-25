@@ -53,9 +53,19 @@ pub struct Program {
     pub module: Module,
     pub imports: Vec<Import>,
     pub definitions: Vec<Definition>,
+    pub tasks: Vec<TaskDeclaration>,
     pub types: Vec<TypeDeclaration>,
     pub traits: Vec<TraitDeclaration>,
     pub impls: Vec<ImplDeclaration>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TaskDeclaration {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub name: Name,
+    pub parameters: Vec<Pattern>,
+    pub body: Expression,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -262,6 +272,22 @@ pub struct HandlerResume {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ExpressionKind {
     Sequence(Vec<SequenceElement>),
+    TaskScope {
+        keyword_span: Span,
+        body: Box<Expression>,
+    },
+    TaskSpawn {
+        keyword_span: Span,
+        call: Box<Expression>,
+    },
+    TaskAwait {
+        keyword_span: Span,
+        handle: Box<Expression>,
+    },
+    TaskReturn {
+        keyword_span: Span,
+        value: Box<Expression>,
+    },
     Handle {
         body: Box<Expression>,
         clauses: Vec<HandlerClause>,
@@ -320,7 +346,16 @@ pub enum ExpressionKind {
 #[allow(clippy::large_enum_variant)]
 pub enum SequenceElement {
     Let(LocalBinding),
+    LetAwait(TaskLetAwait),
     Expression(Expression),
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TaskLetAwait {
+    pub span: Span,
+    pub let_bang_span: Span,
+    pub pattern: Pattern,
+    pub call: Expression,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -477,6 +512,7 @@ impl Lowerer {
         let mut module = None;
         let mut imports = Vec::new();
         let mut definitions = Vec::new();
+        let mut tasks = Vec::new();
         let mut types = Vec::new();
         let mut traits = Vec::new();
         let mut impls = Vec::new();
@@ -522,6 +558,10 @@ impl Lowerer {
                     saw_declaration = true;
                     definitions.push(self.definition(declaration)?);
                 }
+                ast::Item::Task(declaration) => {
+                    saw_declaration = true;
+                    tasks.push(self.task_declaration(declaration)?);
+                }
                 ast::Item::Type(declaration) => {
                     saw_declaration = true;
                     types.push(self.type_declaration(declaration));
@@ -560,9 +600,27 @@ impl Lowerer {
             module,
             imports,
             definitions,
+            tasks,
             types,
             traits,
             impls,
+        })
+    }
+
+    fn task_declaration(
+        &mut self,
+        declaration: &ast::TaskDeclaration,
+    ) -> Result<TaskDeclaration, LowerError> {
+        Ok(TaskDeclaration {
+            span: declaration.span,
+            keyword_span: declaration.keyword_span,
+            name: name(&declaration.name),
+            parameters: declaration
+                .parameters
+                .iter()
+                .map(|pattern| self.pattern(pattern))
+                .collect::<Result<Vec<_>, _>>()?,
+            body: self.expression(&declaration.body)?,
         })
     }
 
@@ -883,6 +941,9 @@ impl Lowerer {
                         ast::SequenceElement::Let(declaration) => {
                             self.local_binding(declaration).map(SequenceElement::Let)
                         }
+                        ast::SequenceElement::LetAwait(binding) => {
+                            self.task_let_await(binding).map(SequenceElement::LetAwait)
+                        }
                         ast::SequenceElement::Expression(expression) => {
                             self.expression(expression).map(SequenceElement::Expression)
                         }
@@ -897,6 +958,28 @@ impl Lowerer {
                     ExpressionKind::Sequence(lowered)
                 }
             }
+            ast::ExpressionKind::TaskScope { keyword_span, body } => ExpressionKind::TaskScope {
+                keyword_span: *keyword_span,
+                body: Box::new(self.expression(body)?),
+            },
+            ast::ExpressionKind::TaskSpawn { keyword_span, call } => ExpressionKind::TaskSpawn {
+                keyword_span: *keyword_span,
+                call: Box::new(self.expression(call)?),
+            },
+            ast::ExpressionKind::TaskAwait {
+                keyword_span,
+                handle,
+            } => ExpressionKind::TaskAwait {
+                keyword_span: *keyword_span,
+                handle: Box::new(self.expression(handle)?),
+            },
+            ast::ExpressionKind::TaskReturn {
+                keyword_span,
+                value,
+            } => ExpressionKind::TaskReturn {
+                keyword_span: *keyword_span,
+                value: Box::new(self.expression(value)?),
+            },
             ast::ExpressionKind::Handle { body, clauses } => ExpressionKind::Handle {
                 body: Box::new(self.expression(body)?),
                 clauses: clauses
@@ -1035,6 +1118,15 @@ impl Lowerer {
             id,
             span: expression.span,
             kind,
+        })
+    }
+
+    fn task_let_await(&mut self, binding: &ast::TaskLetAwait) -> Result<TaskLetAwait, LowerError> {
+        Ok(TaskLetAwait {
+            span: binding.span,
+            let_bang_span: binding.let_bang_span,
+            pattern: self.pattern(&binding.pattern)?,
+            call: self.expression(&binding.call)?,
         })
     }
 

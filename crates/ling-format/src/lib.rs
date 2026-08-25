@@ -19,11 +19,13 @@ use std::fmt;
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_semantic::{
     AuditDefinition, AuditHandler, AuditHandlerClause, AuditModel, AuditModule, AuditNode,
-    AuditReference, SemanticImport, validate_audit_model,
+    AuditReference, AuditTask, AuditTaskLiveBinding, AuditTaskScope, AuditTaskSpawn,
+    AuditTaskSuspension, SemanticImport, validate_audit_model,
 };
 
 pub const AUDIT_SCHEMA: &str = "ling.audit/0.1";
 pub const HANDLER_AUDIT_SCHEMA: &str = "ling.audit/0.2";
+pub const TASK_AUDIT_SCHEMA: &str = "ling.audit/0.3";
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct AuditFormatError {
@@ -117,7 +119,7 @@ impl AuditFormatError {
             start,
             start.saturating_add(1),
         ))
-        .with_fact("audit_schema", HANDLER_AUDIT_SCHEMA)
+        .with_fact("audit_schema", TASK_AUDIT_SCHEMA)
     }
 }
 
@@ -132,7 +134,9 @@ pub fn render_audit(model: &AuditModel) -> Result<String, AuditFormatError> {
         byte_offset: 0,
     })?;
 
-    let schema = if model
+    let schema = if model.modules.iter().any(|module| !module.tasks.is_empty()) {
+        TASK_AUDIT_SCHEMA
+    } else if model
         .modules
         .iter()
         .any(|module| !module.handlers.is_empty())
@@ -181,10 +185,94 @@ pub fn render_audit(model: &AuditModel) -> Result<String, AuditFormatError> {
         for handler in &module.handlers {
             render_handler(&mut output, handler)?;
         }
+        for task in &module.tasks {
+            render_task(&mut output, task)?;
+        }
         push_line(&mut output, 1, "}");
     }
     push_line(&mut output, 0, "}");
     Ok(output)
+}
+
+fn render_task(output: &mut String, task: &AuditTask) -> Result<(), AuditFormatError> {
+    push_line(
+        output,
+        2,
+        &format!("task {} {{", quote(&task.definition_id)?),
+    );
+    push_assignment(output, 3, "signature", &task.signature)?;
+    push_string_list(output, 3, "effects", &task.effects)?;
+    push_line(output, 3, &format!("root_scope = {}", task.root_scope));
+    push_line(output, 3, &format!("result_body = {}", task.result_body));
+    push_line(output, 3, &format!("source_start = {}", task.source_start));
+    push_line(output, 3, &format!("source_end = {}", task.source_end));
+    for scope in &task.scopes {
+        push_line(output, 3, &format!("scope {} {{", scope.id));
+        push_line(
+            output,
+            4,
+            &format!("parent = {}", scope.parent.unwrap_or(0)),
+        );
+        push_line(output, 4, &format!("source_start = {}", scope.source_start));
+        push_line(output, 4, &format!("source_end = {}", scope.source_end));
+        push_line(output, 3, "}");
+    }
+    for spawn in &task.spawns {
+        push_line(output, 3, &format!("spawn {} {{", spawn.task));
+        push_line(output, 4, &format!("scope = {}", spawn.scope));
+        push_line(output, 4, &format!("parent = {}", spawn.parent));
+        push_assignment(output, 4, "target", &spawn.target)?;
+        push_line(output, 4, &format!("cancellation = {}", spawn.cancellation));
+        push_line(output, 4, &format!("cleanup = {}", spawn.cleanup));
+        push_assignment(output, 4, "syntax", &spawn.syntax)?;
+        push_span(
+            output,
+            4,
+            "operator",
+            spawn.operator_start,
+            spawn.operator_end,
+        );
+        push_span(
+            output,
+            4,
+            "pattern",
+            spawn.pattern_start.unwrap_or(0),
+            spawn.pattern_end.unwrap_or(0),
+        );
+        push_span(output, 4, "target", spawn.target_start, spawn.target_end);
+        push_span(output, 4, "call", spawn.call_start, spawn.call_end);
+        push_span(output, 4, "source", spawn.source_start, spawn.source_end);
+        push_line(output, 3, "}");
+    }
+    for suspension in &task.suspensions {
+        push_line(output, 3, &format!("suspension {} {{", suspension.id));
+        push_line(output, 4, &format!("scope = {}", suspension.scope));
+        push_line(
+            output,
+            4,
+            &format!("awaited_task = {}", suspension.awaited_task),
+        );
+        push_span(
+            output,
+            4,
+            "source",
+            suspension.source_start,
+            suspension.source_end,
+        );
+        for live in &suspension.live {
+            push_line(output, 4, &format!("live {} {{", live.binding));
+            push_assignment(output, 5, "type", &live.type_name)?;
+            push_line(output, 4, "}");
+        }
+        push_line(output, 3, "}");
+    }
+    push_line(output, 2, "}");
+    Ok(())
+}
+
+fn push_span(output: &mut String, indent: usize, name: &str, start: u32, end: u32) {
+    push_line(output, indent, &format!("{name}_start = {start}"));
+    push_line(output, indent, &format!("{name}_end = {end}"));
 }
 
 fn render_handler(output: &mut String, handler: &AuditHandler) -> Result<(), AuditFormatError> {
@@ -424,6 +512,19 @@ fn canonicalize(model: &mut AuditModel) {
                 .clauses
                 .sort_by(|left, right| left.label.cmp(&right.label));
         }
+        module
+            .tasks
+            .sort_by(|left, right| left.definition_id.cmp(&right.definition_id));
+        for task in &mut module.tasks {
+            task.effects.sort();
+            task.effects.dedup();
+            task.scopes.sort_by_key(|scope| scope.id);
+            task.spawns.sort_by_key(|spawn| spawn.task);
+            task.suspensions.sort_by_key(|suspension| suspension.id);
+            for suspension in &mut task.suspensions {
+                suspension.live.sort_by_key(|live| live.binding);
+            }
+        }
     }
 }
 
@@ -595,13 +696,14 @@ impl<'input> Parser<'input> {
     fn parse(mut self) -> Result<AuditModel, AuditFormatError> {
         self.expect_word("audit")?;
         let (schema, offset) = self.take_word()?;
-        if schema != AUDIT_SCHEMA && schema != HANDLER_AUDIT_SCHEMA {
+        if schema != AUDIT_SCHEMA && schema != HANDLER_AUDIT_SCHEMA && schema != TASK_AUDIT_SCHEMA {
             return Err(AuditFormatError {
                 kind: AuditFormatErrorKind::UnsupportedVersion { actual: schema },
                 byte_offset: offset,
             });
         }
-        let handlers_enabled = schema == HANDLER_AUDIT_SCHEMA;
+        let handlers_enabled = schema == HANDLER_AUDIT_SCHEMA || schema == TASK_AUDIT_SCHEMA;
+        let tasks_enabled = schema == TASK_AUDIT_SCHEMA;
         self.expect(TokenKind::LeftBrace, "`{`")?;
         let mut language_version = None;
         let mut semantic_schema = None;
@@ -632,7 +734,7 @@ impl<'input> Parser<'input> {
                     let value = self.assignment_string()?;
                     set_once(&mut entry_module, value, "entry", offset)?;
                 }
-                "module" => modules.push(self.module(handlers_enabled)?),
+                "module" => modules.push(self.module(handlers_enabled, tasks_enabled)?),
                 extension if extension.starts_with("x-") => self.extension()?,
                 field => return Err(unknown(field, offset)),
             }
@@ -657,7 +759,11 @@ impl<'input> Parser<'input> {
         Ok(model)
     }
 
-    fn module(&mut self, handlers_enabled: bool) -> Result<AuditModule, AuditFormatError> {
+    fn module(
+        &mut self,
+        handlers_enabled: bool,
+        tasks_enabled: bool,
+    ) -> Result<AuditModule, AuditFormatError> {
         let name = self.take_string()?;
         self.expect(TokenKind::LeftBrace, "`{`")?;
         let mut explicit = None;
@@ -667,6 +773,7 @@ impl<'input> Parser<'input> {
         let mut nodes = Vec::new();
         let mut references = Vec::new();
         let mut handlers = Vec::new();
+        let mut tasks = Vec::new();
         while self.current.kind != TokenKind::RightBrace {
             let (field, offset) = self.take_word()?;
             match field.as_str() {
@@ -691,6 +798,7 @@ impl<'input> Parser<'input> {
                 "node" => nodes.push(self.node()?),
                 "reference" => references.push(self.reference()?),
                 "handler" if handlers_enabled => handlers.push(self.handler()?),
+                "task" if tasks_enabled => tasks.push(self.task()?),
                 extension if extension.starts_with("x-") => self.extension()?,
                 field => return Err(unknown(field, offset)),
             }
@@ -705,6 +813,303 @@ impl<'input> Parser<'input> {
             nodes,
             references,
             handlers,
+            tasks,
+        })
+    }
+
+    fn task(&mut self) -> Result<AuditTask, AuditFormatError> {
+        let definition_id = self.take_string()?;
+        self.expect(TokenKind::LeftBrace, "`{`")?;
+        let mut signature = None;
+        let mut effects = None;
+        let mut root_scope = None;
+        let mut result_body = None;
+        let mut source_start = None;
+        let mut source_end = None;
+        let mut scopes = Vec::new();
+        let mut spawns = Vec::new();
+        let mut suspensions = Vec::new();
+        while self.current.kind != TokenKind::RightBrace {
+            let (field, offset) = self.take_word()?;
+            match field.as_str() {
+                "signature" => set_once(
+                    &mut signature,
+                    self.assignment_string()?,
+                    "signature",
+                    offset,
+                )?,
+                "effects" => set_once(
+                    &mut effects,
+                    self.assignment_string_list()?,
+                    "effects",
+                    offset,
+                )?,
+                "root_scope" => set_once(
+                    &mut root_scope,
+                    self.assignment_number()?,
+                    "root_scope",
+                    offset,
+                )?,
+                "result_body" => set_once(
+                    &mut result_body,
+                    self.assignment_number()?,
+                    "result_body",
+                    offset,
+                )?,
+                "source_start" => set_once(
+                    &mut source_start,
+                    self.assignment_number()?,
+                    "source_start",
+                    offset,
+                )?,
+                "source_end" => set_once(
+                    &mut source_end,
+                    self.assignment_number()?,
+                    "source_end",
+                    offset,
+                )?,
+                "scope" => scopes.push(self.task_scope()?),
+                "spawn" => spawns.push(self.task_spawn()?),
+                "suspension" => suspensions.push(self.task_suspension()?),
+                extension if extension.starts_with("x-") => self.extension()?,
+                field => return Err(unknown(field, offset)),
+            }
+        }
+        self.advance()?;
+        Ok(AuditTask {
+            definition_id,
+            signature: required(signature, "signature")?,
+            effects: required(effects, "effects")?,
+            root_scope: required(root_scope, "root_scope")?,
+            result_body: required(result_body, "result_body")?,
+            source_start: required(source_start, "source_start")?,
+            source_end: required(source_end, "source_end")?,
+            scopes,
+            spawns,
+            suspensions,
+        })
+    }
+
+    fn task_scope(&mut self) -> Result<AuditTaskScope, AuditFormatError> {
+        let id = self.take_number()?;
+        self.expect(TokenKind::LeftBrace, "`{`")?;
+        let mut parent = None;
+        let mut source_start = None;
+        let mut source_end = None;
+        while self.current.kind != TokenKind::RightBrace {
+            let (field, offset) = self.take_word()?;
+            match field.as_str() {
+                "parent" => set_once(&mut parent, self.assignment_number()?, "parent", offset)?,
+                "source_start" => set_once(
+                    &mut source_start,
+                    self.assignment_number()?,
+                    "source_start",
+                    offset,
+                )?,
+                "source_end" => set_once(
+                    &mut source_end,
+                    self.assignment_number()?,
+                    "source_end",
+                    offset,
+                )?,
+                extension if extension.starts_with("x-") => self.extension()?,
+                field => return Err(unknown(field, offset)),
+            }
+        }
+        self.advance()?;
+        let parent = required(parent, "parent")?;
+        Ok(AuditTaskScope {
+            id,
+            parent: (parent != 0).then_some(parent),
+            source_start: required(source_start, "source_start")?,
+            source_end: required(source_end, "source_end")?,
+        })
+    }
+
+    fn task_spawn(&mut self) -> Result<AuditTaskSpawn, AuditFormatError> {
+        let task = self.take_number()?;
+        self.expect(TokenKind::LeftBrace, "`{`")?;
+        let mut scope = None;
+        let mut parent = None;
+        let mut target = None;
+        let mut cancellation = None;
+        let mut cleanup = None;
+        let mut syntax = None;
+        let mut operator_start = None;
+        let mut operator_end = None;
+        let mut pattern_start = None;
+        let mut pattern_end = None;
+        let mut target_start = None;
+        let mut target_end = None;
+        let mut call_start = None;
+        let mut call_end = None;
+        let mut source_start = None;
+        let mut source_end = None;
+        while self.current.kind != TokenKind::RightBrace {
+            let (field, offset) = self.take_word()?;
+            match field.as_str() {
+                "scope" => set_once(&mut scope, self.assignment_number()?, "scope", offset)?,
+                "parent" => set_once(&mut parent, self.assignment_number()?, "parent", offset)?,
+                "target" => set_once(&mut target, self.assignment_string()?, "target", offset)?,
+                "cancellation" => set_once(
+                    &mut cancellation,
+                    self.assignment_number()?,
+                    "cancellation",
+                    offset,
+                )?,
+                "cleanup" => set_once(&mut cleanup, self.assignment_number()?, "cleanup", offset)?,
+                "syntax" => set_once(&mut syntax, self.assignment_string()?, "syntax", offset)?,
+                "operator_start" => set_once(
+                    &mut operator_start,
+                    self.assignment_number()?,
+                    "operator_start",
+                    offset,
+                )?,
+                "operator_end" => set_once(
+                    &mut operator_end,
+                    self.assignment_number()?,
+                    "operator_end",
+                    offset,
+                )?,
+                "pattern_start" => set_once(
+                    &mut pattern_start,
+                    self.assignment_number()?,
+                    "pattern_start",
+                    offset,
+                )?,
+                "pattern_end" => set_once(
+                    &mut pattern_end,
+                    self.assignment_number()?,
+                    "pattern_end",
+                    offset,
+                )?,
+                "target_start" => set_once(
+                    &mut target_start,
+                    self.assignment_number()?,
+                    "target_start",
+                    offset,
+                )?,
+                "target_end" => set_once(
+                    &mut target_end,
+                    self.assignment_number()?,
+                    "target_end",
+                    offset,
+                )?,
+                "call_start" => set_once(
+                    &mut call_start,
+                    self.assignment_number()?,
+                    "call_start",
+                    offset,
+                )?,
+                "call_end" => {
+                    set_once(&mut call_end, self.assignment_number()?, "call_end", offset)?
+                }
+                "source_start" => set_once(
+                    &mut source_start,
+                    self.assignment_number()?,
+                    "source_start",
+                    offset,
+                )?,
+                "source_end" => set_once(
+                    &mut source_end,
+                    self.assignment_number()?,
+                    "source_end",
+                    offset,
+                )?,
+                extension if extension.starts_with("x-") => self.extension()?,
+                field => return Err(unknown(field, offset)),
+            }
+        }
+        self.advance()?;
+        let pattern_start = required(pattern_start, "pattern_start")?;
+        let pattern_end = required(pattern_end, "pattern_end")?;
+        let pattern = match (pattern_start, pattern_end) {
+            (0, 0) => (None, None),
+            (start, end) => (Some(start), Some(end)),
+        };
+        Ok(AuditTaskSpawn {
+            task,
+            scope: required(scope, "scope")?,
+            parent: required(parent, "parent")?,
+            target: required(target, "target")?,
+            cancellation: required(cancellation, "cancellation")?,
+            cleanup: required(cleanup, "cleanup")?,
+            syntax: required(syntax, "syntax")?,
+            operator_start: required(operator_start, "operator_start")?,
+            operator_end: required(operator_end, "operator_end")?,
+            pattern_start: pattern.0,
+            pattern_end: pattern.1,
+            target_start: required(target_start, "target_start")?,
+            target_end: required(target_end, "target_end")?,
+            call_start: required(call_start, "call_start")?,
+            call_end: required(call_end, "call_end")?,
+            source_start: required(source_start, "source_start")?,
+            source_end: required(source_end, "source_end")?,
+        })
+    }
+
+    fn task_suspension(&mut self) -> Result<AuditTaskSuspension, AuditFormatError> {
+        let id = self.take_number()?;
+        self.expect(TokenKind::LeftBrace, "`{`")?;
+        let mut scope = None;
+        let mut awaited_task = None;
+        let mut source_start = None;
+        let mut source_end = None;
+        let mut live = Vec::new();
+        while self.current.kind != TokenKind::RightBrace {
+            let (field, offset) = self.take_word()?;
+            match field.as_str() {
+                "scope" => set_once(&mut scope, self.assignment_number()?, "scope", offset)?,
+                "awaited_task" => set_once(
+                    &mut awaited_task,
+                    self.assignment_number()?,
+                    "awaited_task",
+                    offset,
+                )?,
+                "source_start" => set_once(
+                    &mut source_start,
+                    self.assignment_number()?,
+                    "source_start",
+                    offset,
+                )?,
+                "source_end" => set_once(
+                    &mut source_end,
+                    self.assignment_number()?,
+                    "source_end",
+                    offset,
+                )?,
+                "live" => live.push(self.task_live_binding()?),
+                extension if extension.starts_with("x-") => self.extension()?,
+                field => return Err(unknown(field, offset)),
+            }
+        }
+        self.advance()?;
+        Ok(AuditTaskSuspension {
+            id,
+            scope: required(scope, "scope")?,
+            awaited_task: required(awaited_task, "awaited_task")?,
+            live,
+            source_start: required(source_start, "source_start")?,
+            source_end: required(source_end, "source_end")?,
+        })
+    }
+
+    fn task_live_binding(&mut self) -> Result<AuditTaskLiveBinding, AuditFormatError> {
+        let binding = self.take_number()?;
+        self.expect(TokenKind::LeftBrace, "`{`")?;
+        let mut type_name = None;
+        while self.current.kind != TokenKind::RightBrace {
+            let (field, offset) = self.take_word()?;
+            match field.as_str() {
+                "type" => set_once(&mut type_name, self.assignment_string()?, "type", offset)?,
+                extension if extension.starts_with("x-") => self.extension()?,
+                field => return Err(unknown(field, offset)),
+            }
+        }
+        self.advance()?;
+        Ok(AuditTaskLiveBinding {
+            binding,
+            type_name: required(type_name, "type")?,
         })
     }
 
@@ -1324,6 +1729,7 @@ mod tests {
                     target: id('b'),
                 }],
                 handlers: Vec::new(),
+                tasks: Vec::new(),
             }],
         }
     }
@@ -1417,6 +1823,51 @@ mod tests {
                 .kind,
             AuditFormatErrorKind::InvalidModel { .. }
         ));
+    }
+
+    #[test]
+    fn task_audit_revision_round_trips_checked_spans_and_identities() {
+        let mut model = model();
+        let module = &mut model.modules[0];
+        module.definitions.push(AuditDefinition {
+            definition_id: id('f'),
+            body_id: id('7'),
+            name: "工作".to_owned(),
+            kind: "task".to_owned(),
+            origin: "user".to_owned(),
+            type_name: "Int -> Task<Int, {}>".to_owned(),
+            effects: Vec::new(),
+            capabilities: Vec::new(),
+            unicode_source: "工作".to_owned(),
+            unicode_nfc: "工作".to_owned(),
+            unicode_skeleton: "工作".to_owned(),
+            unicode_scripts: vec!["Hani".to_owned()],
+            unicode_suspicious_mixed_script: false,
+            implementation: "implemented".to_owned(),
+        });
+        module.tasks.push(AuditTask {
+            definition_id: id('f'),
+            signature: "Int -> Task<Int, {}> ! {}".to_owned(),
+            effects: Vec::new(),
+            root_scope: 1,
+            result_body: 1,
+            source_start: 10,
+            source_end: 64,
+            scopes: vec![AuditTaskScope {
+                id: 1,
+                parent: None,
+                source_start: 30,
+                source_end: 64,
+            }],
+            spawns: Vec::new(),
+            suspensions: Vec::new(),
+        });
+        canonicalize(&mut model);
+
+        let rendered = render_audit(&model).expect("Task Audit renders");
+        assert!(rendered.starts_with("audit ling.audit/0.3 {\n"));
+        assert!(rendered.contains("task \"experimental:blake3:"));
+        assert_eq!(parse_audit(&rendered).expect("Task Audit parses"), model);
     }
 
     #[test]

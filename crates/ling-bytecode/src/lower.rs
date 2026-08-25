@@ -2,6 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 use std::fmt;
 
+use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_effects::{Effect as CheckedEffect, EntryErrorKind};
 use ling_hir as hir;
 use ling_resolve::{
@@ -77,6 +78,9 @@ pub enum LoweringErrorKind {
     UnsupportedFeature {
         feature: String,
     },
+    TaskImplementationBoundary {
+        definition: String,
+    },
     ResourceLimit {
         resource: String,
         actual: u64,
@@ -145,6 +149,10 @@ impl fmt::Display for LoweringError {
             LoweringErrorKind::UnsupportedFeature { feature } => {
                 write!(formatter, "bytecode 1.0 does not support {feature}")
             }
+            LoweringErrorKind::TaskImplementationBoundary { definition } => write!(
+                formatter,
+                "structured Task `{definition}` cannot be lowered before TASK-2202 and TASK-2203"
+            ),
             LoweringErrorKind::ResourceLimit {
                 resource,
                 actual,
@@ -164,6 +172,33 @@ impl fmt::Display for LoweringError {
 }
 
 impl Error for LoweringError {}
+
+impl LoweringError {
+    #[must_use]
+    pub fn to_diagnostic(&self) -> Diagnostic {
+        if let LoweringErrorKind::TaskImplementationBoundary { definition } = &self.kind {
+            let mut diagnostic = Diagnostic::new(
+                codes::TASK_IMPLEMENTATION_BOUNDARY,
+                Severity::Error,
+                "已检查 Task 尚不能进入 bytecode.lower 阶段",
+                "checked Task cannot enter the `bytecode.lower` stage yet",
+            )
+            .with_fact("definition", definition.clone())
+            .with_fact("stage", "bytecode.lower")
+            .with_fact("required_tasks", "TASK-2202,TASK-2203");
+            if let (Some(source_name), Some(span)) = (&self.source_name, self.span) {
+                diagnostic = diagnostic.with_primary_span(DiagnosticSpan::new(source_name, span));
+            }
+            return diagnostic;
+        }
+        Diagnostic::new(
+            codes::INVALID_BYTECODE_PROGRAM,
+            Severity::Error,
+            format!("Bytecode lowering 失败：{self}"),
+            format!("bytecode lowering failed: {self}"),
+        )
+    }
+}
 
 /// Canonically ordered bytecode model produced only from checked input.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -214,7 +249,28 @@ pub fn lower_v1(
     snapshot: &ProgramSnapshot,
     sources: &[LoweringSource<'_>],
 ) -> Result<LoweredProgramV1, LoweringError> {
+    reject_checked_tasks(snapshot)?;
     Lowerer::new(snapshot, sources)?.run()
+}
+
+pub(crate) fn reject_checked_tasks(snapshot: &ProgramSnapshot) -> Result<(), LoweringError> {
+    let Some(core) = snapshot.checked().task_cores().values().next() else {
+        return Ok(());
+    };
+    let source_name = snapshot
+        .checked()
+        .typed()
+        .resolved()
+        .definition(core.definition())
+        .and_then(|definition| definition.source_name.as_deref())
+        .unwrap_or("<task>");
+    Err(LoweringError::at(
+        source_name,
+        core.source_span(),
+        LoweringErrorKind::TaskImplementationBoundary {
+            definition: core.definition().to_string(),
+        },
+    ))
 }
 
 struct Lowerer<'snapshot, 'source> {
@@ -709,6 +765,12 @@ impl<'a> FunctionLowerer<'a> {
                             local.insert(BindingKey::new(self.plan.module.id, binding.id), value);
                             result = None;
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            return Err(self.unsupported(
+                                binding.span,
+                                "structured task execution (L-TASK-0004)",
+                            ));
+                        }
                         hir::SequenceElement::Expression(item) => {
                             result = Some(self.lower_expression(item, &mut local)?);
                         }
@@ -718,6 +780,12 @@ impl<'a> FunctionLowerer<'a> {
                     Some(result) => Ok(result),
                     None => self.emit_constant(expression, Constant::Unit),
                 }
+            }
+            hir::ExpressionKind::TaskScope { .. }
+            | hir::ExpressionKind::TaskSpawn { .. }
+            | hir::ExpressionKind::TaskAwait { .. }
+            | hir::ExpressionKind::TaskReturn { .. } => {
+                Err(self.unsupported(expression.span, "structured task execution (L-TASK-0004)"))
             }
             hir::ExpressionKind::Handle { .. } => Err(self.unsupported(expression.span, "handler")),
             hir::ExpressionKind::Application {
@@ -1084,6 +1152,11 @@ fn type_index(
         Type::Tuple(_) => Err(unsupported_at(plan, span, "tuple")),
         Type::List(_) => Err(unsupported_at(plan, span, "list")),
         Type::Function { .. } => Err(unsupported_at(plan, span, "first-class function")),
+        Type::Task { .. } | Type::TaskHandle { .. } => Err(unsupported_at(
+            plan,
+            span,
+            "structured task execution (L-TASK-0004)",
+        )),
         Type::NominalRecord { .. } => Err(unsupported_at(plan, span, "record")),
         Type::NominalVariant { .. } => Err(unsupported_at(plan, span, "variant")),
         Type::Variable(_) => Err(unsupported_at(plan, span, "polymorphic function")),
@@ -1115,6 +1188,11 @@ fn effects(
             CheckedEffect::State { .. } => {
                 Err(unsupported_at(plan, plan.definition.span, "State Effect"))
             }
+            CheckedEffect::TaskSpawn | CheckedEffect::TaskAwait => Err(unsupported_at(
+                plan,
+                plan.definition.span,
+                "structured task execution (L-TASK-0004)",
+            )),
         })
         .collect()
 }
@@ -1148,12 +1226,19 @@ fn collect_text_strings(expression: &hir::Expression, strings: &mut BTreeSet<Str
                     hir::SequenceElement::Let(binding) => {
                         collect_text_strings(&binding.value, strings);
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        collect_text_strings(&binding.call, strings);
+                    }
                     hir::SequenceElement::Expression(expression) => {
                         collect_text_strings(expression, strings);
                     }
                 }
             }
         }
+        hir::ExpressionKind::TaskScope { body, .. } => collect_text_strings(body, strings),
+        hir::ExpressionKind::TaskSpawn { call, .. } => collect_text_strings(call, strings),
+        hir::ExpressionKind::TaskAwait { handle, .. } => collect_text_strings(handle, strings),
+        hir::ExpressionKind::TaskReturn { value, .. } => collect_text_strings(value, strings),
         hir::ExpressionKind::If {
             condition,
             then_branch,
@@ -1258,6 +1343,13 @@ fn collect_constants(
                         collect_constants(typed, plan, &binding.value, strings, constants)?;
                         has_final_expression = false;
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        return Err(unsupported_at(
+                            plan,
+                            binding.span,
+                            "structured task execution (L-TASK-0004)",
+                        ));
+                    }
                     hir::SequenceElement::Expression(item) => {
                         collect_constants(typed, plan, item, strings, constants)?;
                         has_final_expression = true;
@@ -1267,6 +1359,16 @@ fn collect_constants(
             if !has_final_expression {
                 insert_constant(constants, Constant::Unit)?;
             }
+        }
+        hir::ExpressionKind::TaskScope { .. }
+        | hir::ExpressionKind::TaskSpawn { .. }
+        | hir::ExpressionKind::TaskAwait { .. }
+        | hir::ExpressionKind::TaskReturn { .. } => {
+            return Err(unsupported_at(
+                plan,
+                expression.span,
+                "structured task execution (L-TASK-0004)",
+            ));
         }
         hir::ExpressionKind::Application { arguments, .. } => {
             for argument in arguments {

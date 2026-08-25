@@ -352,6 +352,7 @@ pub fn resolve_handler_operation(name: &str) -> Option<ResolvedHandlerOperation>
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DefinitionKind {
     Value,
+    Task,
     Type,
     Constructor,
     Builtin,
@@ -1217,7 +1218,7 @@ impl Resolver {
             let kind_name = match kind {
                 DefinitionKind::Type => "type",
                 DefinitionKind::Constructor => "constructor",
-                DefinitionKind::Value | DefinitionKind::Builtin => {
+                DefinitionKind::Value | DefinitionKind::Task | DefinitionKind::Builtin => {
                     unreachable!("Prelude only contains types and constructors")
                 }
             };
@@ -1412,6 +1413,18 @@ impl Resolver {
                     &mut skeletons,
                 );
             }
+            for declaration in &module.hir.tasks {
+                self.insert_user_definition(
+                    module,
+                    &module_name,
+                    &declaration.name,
+                    DefinitionKind::Task,
+                    false,
+                    None,
+                    &mut scope,
+                    &mut skeletons,
+                );
+            }
             for declaration in &module.hir.types {
                 self.insert_user_definition(
                     module,
@@ -1579,6 +1592,7 @@ impl Resolver {
         }
         let kind_name = match kind {
             DefinitionKind::Value => "value",
+            DefinitionKind::Task => "task",
             DefinitionKind::Type => "type",
             DefinitionKind::Constructor => "constructor",
             DefinitionKind::Builtin => "builtin",
@@ -1635,6 +1649,10 @@ impl Resolver {
             for definition in &definitions {
                 self.resolve_definition_body(module_id, definition);
             }
+            let tasks = self.modules[index].hir.tasks.clone();
+            for task in &tasks {
+                self.resolve_task_body(module_id, task);
+            }
             let impls = self.modules[index].hir.impls.clone();
             for implementation in &impls {
                 for definition in &implementation.members {
@@ -1642,6 +1660,14 @@ impl Resolver {
                 }
             }
         }
+    }
+
+    fn resolve_task_body(&mut self, module: ModuleId, task: &hir::TaskDeclaration) {
+        let mut scopes = vec![Scope::default()];
+        for parameter in &task.parameters {
+            self.bind_pattern(module, parameter, true, &mut scopes);
+        }
+        self.resolve_expression(module, &task.body, &mut scopes);
     }
 
     fn resolve_definition_body(&mut self, module: ModuleId, definition: &hir::Definition) {
@@ -1677,12 +1703,30 @@ impl Resolver {
                                 self.bind_local(module, binding, scopes);
                             }
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            self.resolve_expression(module, &binding.call, scopes);
+                            self.bind_pattern(module, &binding.pattern, false, scopes);
+                        }
                         hir::SequenceElement::Expression(expression) => {
                             self.resolve_expression(module, expression, scopes);
                         }
                     }
                 }
                 scopes.pop();
+            }
+            hir::ExpressionKind::TaskScope { body, .. } => {
+                scopes.push(Scope::default());
+                self.resolve_expression(module, body, scopes);
+                scopes.pop();
+            }
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                self.resolve_expression(module, call, scopes);
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                self.resolve_expression(module, handle, scopes);
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => {
+                self.resolve_expression(module, value, scopes);
             }
             hir::ExpressionKind::If {
                 condition,
@@ -1921,11 +1965,26 @@ impl Resolver {
                     hir::SequenceElement::Let(local) => {
                         self.count_binding_references(module, &local.value, binding)
                     }
+                    hir::SequenceElement::LetAwait(local) => {
+                        self.count_binding_references(module, &local.call, binding)
+                    }
                     hir::SequenceElement::Expression(value) => {
                         self.count_binding_references(module, value, binding)
                     }
                 })
                 .fold(0usize, usize::saturating_add),
+            hir::ExpressionKind::TaskScope { body, .. } => {
+                self.count_binding_references(module, body, binding)
+            }
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                self.count_binding_references(module, call, binding)
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                self.count_binding_references(module, handle, binding)
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => {
+                self.count_binding_references(module, value, binding)
+            }
             hir::ExpressionKind::Handle { body, clauses } => clauses
                 .iter()
                 .map(|clause| self.count_binding_references(module, &clause.body, binding))

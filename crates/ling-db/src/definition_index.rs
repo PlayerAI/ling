@@ -200,7 +200,7 @@ pub(crate) fn classify_definition(
         Some(ResolvedDefinitionKind::ImplementationMember)
     } else {
         match definition.kind {
-            DefinitionKind::Value => Some(ResolvedDefinitionKind::Value),
+            DefinitionKind::Value | DefinitionKind::Task => Some(ResolvedDefinitionKind::Value),
             DefinitionKind::Type => Some(ResolvedDefinitionKind::Type),
             DefinitionKind::Constructor => Some(ResolvedDefinitionKind::Constructor),
             DefinitionKind::Builtin => None,

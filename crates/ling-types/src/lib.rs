@@ -49,6 +49,15 @@ pub enum Type {
         parameters: Vec<TypeId>,
         result: TypeId,
     },
+    /// Internal, non-first-class Structured Task signature.
+    Task {
+        parameters: Vec<TypeId>,
+        result: TypeId,
+    },
+    /// Internal linear handle; source type syntax cannot construct it.
+    TaskHandle {
+        result: TypeId,
+    },
     NominalRecord {
         definition: DefinitionId,
         arguments: Vec<TypeId>,
@@ -89,6 +98,7 @@ impl Type {
             | Self::Function { .. }
             | Self::NominalRecord { .. }
             | Self::NominalVariant { .. } => Some(SeedTypeClass::Value),
+            Self::Task { .. } | Self::TaskHandle { .. } => None,
         }
     }
 }
@@ -141,6 +151,18 @@ impl TypeArena {
                     .collect::<Vec<_>>();
                 parts.push(self.display(*result));
                 parts.join(" -> ")
+            }
+            Type::Task { parameters, result } => format!(
+                "({}) -> Task<{}>",
+                parameters
+                    .iter()
+                    .map(|parameter| self.display(*parameter))
+                    .collect::<Vec<_>>()
+                    .join(", "),
+                self.display(*result)
+            ),
+            Type::TaskHandle { result } => {
+                format!("TaskHandle<{}>", self.display(*result))
             }
             Type::NominalRecord {
                 definition,
@@ -346,6 +368,10 @@ pub enum TypeErrorKind {
     },
     UnsupportedTypeSyntax,
     UnsupportedHandler,
+    InvalidTask {
+        reason: &'static str,
+        target: Option<String>,
+    },
 }
 
 impl TypeError {
@@ -435,6 +461,11 @@ impl TypeError {
                 "Handler 尚未具备已检查语义".to_owned(),
                 "handler does not yet have checked semantics".to_owned(),
             ),
+            TypeErrorKind::InvalidTask { reason, .. } => (
+                codes::INVALID_TASK_STRUCTURE,
+                format!("Structured Task 结构无效：{reason}"),
+                format!("invalid Structured Task structure: {reason}"),
+            ),
         };
         let mut diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
             .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span));
@@ -483,6 +514,12 @@ impl TypeError {
                 diagnostic = diagnostic.with_fact("type", actual.as_str());
             }
             _ => {}
+        }
+        if let TypeErrorKind::InvalidTask { reason, target } = &self.kind {
+            diagnostic = diagnostic.with_fact("reason", *reason);
+            if let Some(target) = target {
+                diagnostic = diagnostic.with_fact("target", target.clone());
+            }
         }
         diagnostic
     }
@@ -615,6 +652,13 @@ enum InferType {
     List(Box<Self>),
     Function {
         parameters: Vec<Self>,
+        result: Box<Self>,
+    },
+    Task {
+        parameters: Vec<Self>,
+        result: Box<Self>,
+    },
+    TaskHandle {
         result: Box<Self>,
     },
     Record {
@@ -1129,7 +1173,11 @@ impl Inferencer {
                     .collect::<Vec<_>>()
                     .join(" * ")
             )),
-            InferType::Function { .. } | InferType::TraitMember(_) | InferType::Error => {
+            InferType::Function { .. }
+            | InferType::Task { .. }
+            | InferType::TaskHandle { .. }
+            | InferType::TraitMember(_)
+            | InferType::Error => {
                 constraints::ConstraintType::Named(display_infer(value, &self.resolved))
             }
         }
@@ -1646,6 +1694,24 @@ impl Inferencer {
                     .insert(id.clone(), Scheme::mono(variable.clone()));
                 self.inferred_definitions.insert(id, variable);
             }
+            for task in &module.hir.tasks {
+                let Some(id) = self
+                    .resolved
+                    .definition_id(module.id, &task.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                let parameters = task.parameters.iter().map(|_| self.fresh()).collect();
+                let result = self.fresh();
+                let signature = InferType::Task {
+                    parameters,
+                    result: Box::new(result),
+                };
+                self.definitions
+                    .insert(id.clone(), Scheme::mono(signature.clone()));
+                self.inferred_definitions.insert(id, signature);
+            }
         }
         let member_ids = self
             .resolved
@@ -1737,6 +1803,43 @@ impl Inferencer {
                 };
                 self.definitions.insert(id.clone(), scheme);
                 self.inferred_definitions.insert(id, inferred);
+                self.current_owner = previous_owner;
+            }
+            for task in &module.hir.tasks {
+                if cancelled() {
+                    return false;
+                }
+                let Some(id) = self
+                    .resolved
+                    .definition_id(module.id, &task.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                let previous_owner = self.current_owner.replace(id.clone());
+                let signature = self
+                    .definitions
+                    .get(&id)
+                    .map(|scheme| scheme.value.clone())
+                    .unwrap_or(InferType::Error);
+                let InferType::Task { parameters, result } = signature else {
+                    self.push_error(
+                        module.id,
+                        task.span,
+                        TypeErrorKind::InvalidTask {
+                            reason: "missing_task_signature",
+                            target: Some(task.name.normalized.clone()),
+                        },
+                        None,
+                    );
+                    self.current_owner = previous_owner;
+                    continue;
+                };
+                for (pattern, parameter_type) in task.parameters.iter().zip(parameters) {
+                    self.bind_pattern(module.id, pattern, parameter_type);
+                }
+                let body = self.infer_expression(module.id, &task.body);
+                self.unify(*result, body, module.id, task.body.span, None);
                 self.current_owner = previous_owner;
             }
 
@@ -1863,6 +1966,11 @@ impl Inferencer {
                             self.infer_local(module, binding);
                             result = InferType::Unit;
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            let task_result = self.infer_task_call(module, &binding.call);
+                            self.bind_pattern(module, &binding.pattern, task_result);
+                            result = InferType::Unit;
+                        }
                         hir::SequenceElement::Expression(expression) => {
                             result = self.infer_expression(module, expression);
                         }
@@ -1870,6 +1978,32 @@ impl Inferencer {
                 }
                 result
             }
+            hir::ExpressionKind::TaskScope { body, .. } => self.infer_expression(module, body),
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                let result = self.infer_task_call(module, call);
+                InferType::TaskHandle {
+                    result: Box::new(result),
+                }
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                let actual = self.infer_expression(module, handle);
+                match self.apply(actual) {
+                    InferType::TaskHandle { result } => *result,
+                    actual => {
+                        self.push_error(
+                            module,
+                            handle.span,
+                            TypeErrorKind::InvalidTask {
+                                reason: "await_requires_task_handle",
+                                target: Some(display_infer(&actual, &self.resolved)),
+                            },
+                            None,
+                        );
+                        InferType::Error
+                    }
+                }
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => self.infer_expression(module, value),
             hir::ExpressionKind::If {
                 condition,
                 then_branch,
@@ -1938,7 +2072,7 @@ impl Inferencer {
                 field,
             } => {
                 if let Some(resolved) = self.resolved.reference(module, *reference).cloned() {
-                    self.reference_type(&resolved)
+                    self.reference_type_for_expression(module, expression.span, &resolved)
                 } else {
                     let target_type = self.infer_expression(module, target);
                     self.project_field(target_type, field, module, expression.span, false)
@@ -1948,7 +2082,9 @@ impl Inferencer {
                 .resolved
                 .reference(module, *reference)
                 .cloned()
-                .map_or(InferType::Error, |target| self.reference_type(&target)),
+                .map_or(InferType::Error, |target| {
+                    self.reference_type_for_expression(module, expression.span, &target)
+                }),
             hir::ExpressionKind::Binary {
                 operator,
                 left,
@@ -2091,6 +2227,93 @@ impl Inferencer {
         }
         self.inferred_expressions.insert(key, value.clone());
         value
+    }
+
+    fn infer_task_call(&mut self, module: ModuleId, call: &hir::Expression) -> InferType {
+        let key = ExpressionKey::new(module, call.id);
+        let hir::ExpressionKind::Application {
+            function,
+            arguments,
+        } = &call.kind
+        else {
+            self.push_error(
+                module,
+                call.span,
+                TypeErrorKind::InvalidTask {
+                    reason: "spawn_target_must_be_direct_task_application",
+                    target: None,
+                },
+                None,
+            );
+            self.inferred_expressions.insert(key, InferType::Error);
+            return InferType::Error;
+        };
+        let Some(definition) = self.expression_definition(module, function).cloned() else {
+            self.push_error(
+                module,
+                function.span,
+                TypeErrorKind::InvalidTask {
+                    reason: "spawn_target_must_resolve_to_task",
+                    target: None,
+                },
+                None,
+            );
+            self.inferred_expressions.insert(key, InferType::Error);
+            return InferType::Error;
+        };
+        let Some(info) = self.resolved.definition(&definition) else {
+            self.inferred_expressions.insert(key, InferType::Error);
+            return InferType::Error;
+        };
+        if info.kind != DefinitionKind::Task {
+            let target = info.name.clone();
+            self.push_error(
+                module,
+                function.span,
+                TypeErrorKind::InvalidTask {
+                    reason: "spawn_target_is_not_task",
+                    target: Some(target),
+                },
+                None,
+            );
+            self.inferred_expressions.insert(key, InferType::Error);
+            return InferType::Error;
+        }
+        let signature = self
+            .definitions
+            .get(&definition)
+            .cloned()
+            .map_or(InferType::Error, |scheme| self.instantiate(&scheme));
+        let InferType::Task { parameters, result } = signature else {
+            self.inferred_expressions.insert(key, InferType::Error);
+            return InferType::Error;
+        };
+        if parameters.len() != arguments.len() {
+            self.push_error(
+                module,
+                call.span,
+                TypeErrorKind::Arity {
+                    expected: parameters.len(),
+                    actual: arguments.len(),
+                },
+                None,
+            );
+        }
+        let function_signature = InferType::Task {
+            parameters: parameters.clone(),
+            result: result.clone(),
+        };
+        for (argument, expected) in arguments.iter().zip(parameters) {
+            let actual = self.infer_expression(module, argument);
+            self.unify(expected, actual, module, argument.span, None);
+        }
+        self.inferred_expressions
+            .insert(ExpressionKey::new(module, function.id), function_signature);
+        let handle = InferType::TaskHandle {
+            result: result.clone(),
+        };
+        self.inferred_expressions.insert(key, handle);
+        *result
     }
 
     fn infer_trait_member_application(
@@ -3019,6 +3242,37 @@ impl Inferencer {
         }
     }
 
+    fn reference_type_for_expression(
+        &mut self,
+        module: ModuleId,
+        span: Span,
+        target: &ReferenceTarget,
+    ) -> InferType {
+        if let ReferenceTarget::Definition(definition) = target
+            && self
+                .resolved
+                .definition(definition)
+                .is_some_and(|info| info.kind == DefinitionKind::Task)
+        {
+            let target = self
+                .resolved
+                .definition(definition)
+                .map(|info| info.name.clone());
+            self.push_error(
+                module,
+                span,
+                TypeErrorKind::InvalidTask {
+                    reason: "task_declaration_is_not_first_class",
+                    target,
+                },
+                None,
+            );
+            InferType::Error
+        } else {
+            self.reference_type(target)
+        }
+    }
+
     fn type_syntax(&mut self, module: ModuleId, syntax: &hir::TypeSyntax) -> InferType {
         self.type_syntax_with_parameters(module, syntax, &BTreeMap::new())
     }
@@ -3355,6 +3609,30 @@ impl Inferencer {
                 );
             }
             (
+                InferType::Task {
+                    parameters: left,
+                    result: left_result,
+                },
+                InferType::Task {
+                    parameters: right,
+                    result: right_result,
+                },
+            ) if left.len() == right.len() => {
+                for (left, right) in left.into_iter().zip(right) {
+                    self.unify(left, right, module, span, restriction_reason);
+                }
+                self.unify(
+                    *left_result,
+                    *right_result,
+                    module,
+                    span,
+                    restriction_reason,
+                );
+            }
+            (InferType::TaskHandle { result: left }, InferType::TaskHandle { result: right }) => {
+                self.unify(*left, *right, module, span, restriction_reason)
+            }
+            (
                 InferType::Record {
                     definition: left,
                     arguments: left_arguments,
@@ -3437,6 +3715,16 @@ impl Inferencer {
                     .into_iter()
                     .map(|value| self.apply(value))
                     .collect(),
+                result: Box::new(self.apply(*result)),
+            },
+            InferType::Task { parameters, result } => InferType::Task {
+                parameters: parameters
+                    .into_iter()
+                    .map(|value| self.apply(value))
+                    .collect(),
+                result: Box::new(self.apply(*result)),
+            },
+            InferType::TaskHandle { result } => InferType::TaskHandle {
                 result: Box::new(self.apply(*result)),
             },
             InferType::Record {
@@ -3674,9 +3962,11 @@ impl Inferencer {
                     })
                 })
             }),
-            InferType::Function { .. } | InferType::TraitMember(_) | InferType::Variable(_) => {
-                false
-            }
+            InferType::Function { .. }
+            | InferType::Task { .. }
+            | InferType::TaskHandle { .. }
+            | InferType::TraitMember(_)
+            | InferType::Variable(_) => false,
         }
     }
 
@@ -3748,6 +4038,13 @@ fn collect_free_variables(value: &InferType, output: &mut BTreeSet<u32>) {
             }
             collect_free_variables(result, output);
         }
+        InferType::Task { parameters, result } => {
+            for parameter in parameters {
+                collect_free_variables(parameter, output);
+            }
+            collect_free_variables(result, output);
+        }
+        InferType::TaskHandle { result } => collect_free_variables(result, output),
         InferType::Record { arguments, .. } | InferType::Variant { arguments, .. } => {
             for argument in arguments {
                 collect_free_variables(argument, output);
@@ -3790,6 +4087,16 @@ fn replace_variables(value: &InferType, replacements: &BTreeMap<u32, InferType>)
                 .iter()
                 .map(|parameter| replace_variables(parameter, replacements))
                 .collect(),
+            result: Box::new(replace_variables(result, replacements)),
+        },
+        InferType::Task { parameters, result } => InferType::Task {
+            parameters: parameters
+                .iter()
+                .map(|parameter| replace_variables(parameter, replacements))
+                .collect(),
+            result: Box::new(replace_variables(result, replacements)),
+        },
+        InferType::TaskHandle { result } => InferType::TaskHandle {
             result: Box::new(replace_variables(result, replacements)),
         },
         InferType::Record {
@@ -3840,6 +4147,16 @@ fn intern_type(
                 .iter()
                 .map(|parameter| intern_type(parameter, arena, index))
                 .collect(),
+            result: intern_type(result, arena, index),
+        },
+        InferType::Task { parameters, result } => Type::Task {
+            parameters: parameters
+                .iter()
+                .map(|parameter| intern_type(parameter, arena, index))
+                .collect(),
+            result: intern_type(result, arena, index),
+        },
+        InferType::TaskHandle { result } => Type::TaskHandle {
             result: intern_type(result, arena, index),
         },
         InferType::Record {
@@ -3914,6 +4231,18 @@ fn display_infer(value: &InferType, resolved: &ResolvedProgram) -> String {
             parts.push(display_infer(result, resolved));
             parts.join(" -> ")
         }
+        InferType::Task { parameters, result } => format!(
+            "({}) -> Task<{}>",
+            parameters
+                .iter()
+                .map(|parameter| display_infer(parameter, resolved))
+                .collect::<Vec<_>>()
+                .join(", "),
+            display_infer(result, resolved)
+        ),
+        InferType::TaskHandle { result } => {
+            format!("TaskHandle<{}>", display_infer(result, resolved))
+        }
         InferType::Record {
             definition,
             arguments,
@@ -3974,6 +4303,19 @@ fn display_resolved_type(arena: &TypeArena, resolved: &ResolvedProgram, id: Type
             parts.push(display_resolved_type(arena, resolved, *result));
             parts.join(" -> ")
         }
+        Type::Task { parameters, result } => format!(
+            "({}) -> Task<{}>",
+            parameters
+                .iter()
+                .map(|parameter| display_resolved_type(arena, resolved, *parameter))
+                .collect::<Vec<_>>()
+                .join(", "),
+            display_resolved_type(arena, resolved, *result)
+        ),
+        Type::TaskHandle { result } => format!(
+            "TaskHandle<{}>",
+            display_resolved_type(arena, resolved, *result)
+        ),
         Type::NominalRecord {
             definition,
             arguments,
@@ -4114,6 +4456,64 @@ mod tests {
             .expect("main definition");
         let main_type = typed.definition_type(main).expect("main type");
         assert_eq!(typed.arena().display(main_type), "Unit -> Unit");
+    }
+
+    #[test]
+    fn task_targets_are_direct_non_first_class_and_type_checked() {
+        let first_class = check(resolved(concat!(
+            "module Main\n\n",
+            "task worker value =\n",
+            "    scope\n",
+            "        return value\n\n",
+            "let alias = worker\n",
+        )))
+        .expect_err("Task declaration cannot become an ordinary value");
+        assert!(first_class.iter().any(|error| matches!(
+            error.kind,
+            TypeErrorKind::InvalidTask {
+                reason: "task_declaration_is_not_first_class",
+                ..
+            }
+        )));
+
+        let ordinary_target = check(resolved(concat!(
+            "module Main\n\n",
+            "let child value = value\n\n",
+            "task parent value =\n",
+            "    scope\n",
+            "        let! result = child value\n",
+            "        return result\n",
+        )))
+        .expect_err("spawn target must resolve directly to a Task declaration");
+        assert!(ordinary_target.iter().any(|error| matches!(
+            error.kind,
+            TypeErrorKind::InvalidTask {
+                reason: "spawn_target_is_not_task",
+                ..
+            }
+        )));
+
+        let invalid_arguments = check(resolved(concat!(
+            "module Main\n\n",
+            "task child left right =\n",
+            "    scope\n",
+            "        return left + right\n\n",
+            "task parent value =\n",
+            "    scope\n",
+            "        let! result = child true\n",
+            "        return result\n",
+        )))
+        .expect_err("Task call arity and argument types are checked");
+        assert!(
+            invalid_arguments
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::Arity { .. }))
+        );
+        assert!(
+            invalid_arguments
+                .iter()
+                .any(|error| matches!(error.kind, TypeErrorKind::Mismatch { .. }))
+        );
     }
 
     #[test]

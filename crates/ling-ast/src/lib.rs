@@ -17,9 +17,19 @@ pub enum Item {
     Module(ModuleDeclaration),
     Import(ImportDeclaration),
     Let(LetDeclaration),
+    Task(TaskDeclaration),
     Type(TypeDeclaration),
     Trait(TraitDeclaration),
     Impl(ImplDeclaration),
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TaskDeclaration {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub name: Name,
+    pub parameters: Vec<Pattern>,
+    pub body: Expression,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -183,6 +193,22 @@ pub struct Expression {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ExpressionKind {
     Sequence(Vec<SequenceElement>),
+    TaskScope {
+        keyword_span: Span,
+        body: Box<Expression>,
+    },
+    TaskSpawn {
+        keyword_span: Span,
+        call: Box<Expression>,
+    },
+    TaskAwait {
+        keyword_span: Span,
+        handle: Box<Expression>,
+    },
+    TaskReturn {
+        keyword_span: Span,
+        value: Box<Expression>,
+    },
     Handle {
         body: Box<Expression>,
         clauses: Vec<HandlerClause>,
@@ -237,7 +263,16 @@ pub enum ExpressionKind {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum SequenceElement {
     Let(LetDeclaration),
+    LetAwait(TaskLetAwait),
     Expression(Expression),
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TaskLetAwait {
+    pub span: Span,
+    pub let_bang_span: Span,
+    pub pattern: Pattern,
+    pub call: Expression,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -373,11 +408,41 @@ impl<'input> Lowerer<'input> {
             NodeKind::ModuleDeclaration => self.module_declaration(node).map(Item::Module),
             NodeKind::ImportDeclaration => self.import_declaration(node).map(Item::Import),
             NodeKind::LetDeclaration => self.let_declaration(node).map(Item::Let),
+            NodeKind::TaskDeclaration => self.task_declaration(node).map(Item::Task),
             NodeKind::TypeDeclaration => self.type_declaration(node).map(Item::Type),
             NodeKind::TraitDeclaration => self.trait_declaration(node).map(Item::Trait),
             NodeKind::ImplDeclaration => self.impl_declaration(node).map(Item::Impl),
             kind => Err(self.unexpected(node, kind)),
         }
+    }
+
+    fn task_declaration(&self, node: &CstNode) -> Result<TaskDeclaration, LowerError> {
+        self.expect_kind(node, NodeKind::TaskDeclaration)?;
+        let keyword = self.contextual_token(node, "task")?;
+        let name = self
+            .significant_tokens(node)
+            .filter(|token| token.kind() == TokenKind::Identifier)
+            .nth(1)
+            .ok_or_else(|| self.missing_token(node, "Task name"))
+            .and_then(|token| self.name(token))?;
+        let body_node = node
+            .children()
+            .iter()
+            .find(|child| child.kind() == NodeKind::TaskScopeExpression)
+            .ok_or_else(|| self.missing_child(node, "Task outer scope"))?;
+        let parameters = node
+            .children()
+            .iter()
+            .filter(|child| child.kind() == NodeKind::Pattern)
+            .map(|pattern| self.pattern(pattern))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(TaskDeclaration {
+            span: self.node_span(node)?,
+            keyword_span: keyword.span(),
+            name,
+            parameters,
+            body: self.expression(body_node)?,
+        })
     }
 
     fn module_declaration(&self, node: &CstNode) -> Result<ModuleDeclaration, LowerError> {
@@ -748,10 +813,53 @@ impl<'input> Lowerer<'input> {
                         NodeKind::LetDeclaration => {
                             self.let_declaration(child).map(SequenceElement::Let)
                         }
+                        NodeKind::TaskLetAwait => {
+                            self.task_let_await(child).map(SequenceElement::LetAwait)
+                        }
                         _ => self.expression(child).map(SequenceElement::Expression),
                     })
                     .collect::<Result<Vec<_>, _>>()?,
             ),
+            NodeKind::TaskScopeExpression => {
+                let body = node
+                    .children()
+                    .first()
+                    .ok_or_else(|| self.missing_child(node, "Task scope body"))?;
+                ExpressionKind::TaskScope {
+                    keyword_span: self.contextual_token(node, "scope")?.span(),
+                    body: Box::new(self.expression(body)?),
+                }
+            }
+            NodeKind::TaskSpawnExpression => {
+                let call = node
+                    .children()
+                    .first()
+                    .ok_or_else(|| self.missing_child(node, "Task spawn call"))?;
+                ExpressionKind::TaskSpawn {
+                    keyword_span: self.contextual_token(node, "spawn")?.span(),
+                    call: Box::new(self.expression(call)?),
+                }
+            }
+            NodeKind::TaskAwaitExpression => {
+                let handle = node
+                    .children()
+                    .first()
+                    .ok_or_else(|| self.missing_child(node, "Task await handle"))?;
+                ExpressionKind::TaskAwait {
+                    keyword_span: self.contextual_token(node, "await")?.span(),
+                    handle: Box::new(self.expression(handle)?),
+                }
+            }
+            NodeKind::TaskReturnExpression => {
+                let value = node
+                    .children()
+                    .first()
+                    .ok_or_else(|| self.missing_child(node, "Task return value"))?;
+                ExpressionKind::TaskReturn {
+                    keyword_span: self.contextual_token(node, "return")?.span(),
+                    value: Box::new(self.expression(value)?),
+                }
+            }
             NodeKind::HandleExpression => {
                 let (body, clauses) = node
                     .children()
@@ -901,6 +1009,34 @@ impl<'input> Lowerer<'input> {
             kind => return Err(self.unexpected(node, kind)),
         };
         Ok(Expression { span, kind })
+    }
+
+    fn task_let_await(&self, node: &CstNode) -> Result<TaskLetAwait, LowerError> {
+        self.expect_kind(node, NodeKind::TaskLetAwait)?;
+        let [pattern, call] = self.two_children(node, "Task let-await")?;
+        let header = self.tokens_before(node, pattern.token_range().start);
+        let let_token = header
+            .iter()
+            .find(|token| token.kind() == TokenKind::Let)
+            .ok_or_else(|| self.missing_token(node, "Task let-await `let`"))?;
+        let bang = header
+            .iter()
+            .find(|token| token.kind() == TokenKind::Bang)
+            .ok_or_else(|| self.missing_token(node, "Task let-await `!`"))?;
+        let let_bang_span = Span::new(
+            let_token.span().source(),
+            let_token.span().start(),
+            bang.span().end(),
+        )
+        .map_err(|_| {
+            self.error_without_span(LowerErrorKind::MissingToken("Task let-await span"))
+        })?;
+        Ok(TaskLetAwait {
+            span: self.node_span(node)?,
+            let_bang_span,
+            pattern: self.pattern(pattern)?,
+            call: self.expression(call)?,
+        })
     }
 
     fn handler_clause(&self, node: &CstNode) -> Result<HandlerClause, LowerError> {
@@ -1146,6 +1282,23 @@ impl<'input> Lowerer<'input> {
                             if identifier.identifier().normalized() == spelling
                     )
             })
+    }
+
+    fn contextual_token(
+        &self,
+        node: &CstNode,
+        spelling: &'static str,
+    ) -> Result<&'input Token, LowerError> {
+        self.significant_tokens(node)
+            .find(|token| {
+                token.kind() == TokenKind::Identifier
+                    && matches!(
+                        token.value(),
+                        Some(TokenValue::Identifier(identifier))
+                            if identifier.identifier().normalized() == spelling
+                    )
+            })
+            .ok_or_else(|| self.missing_token(node, spelling))
     }
 
     fn two_children<'node>(

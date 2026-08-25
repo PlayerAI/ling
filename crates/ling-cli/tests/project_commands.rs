@@ -267,6 +267,49 @@ fn project_mode_is_explicit_and_rejects_incomplete_or_mixed_selection() {
     }
 }
 
+#[test]
+fn checked_task_project_allows_check_but_rejects_run_test_and_build() {
+    let root = temp_root("task-boundary");
+    copy_tree(&fixture(), &root);
+    fs::write(
+        root.join("src/Main.ling"),
+        concat!(
+            "module Main\n\n",
+            "task worker value =\n",
+            "    scope\n",
+            "        return value\n\n",
+            "let main () = ()\n",
+        ),
+    )
+    .expect("temporary Task source is writable");
+    update_lock(&root);
+
+    let checked = run(&root, "check", "json");
+    assert!(
+        checked.status.success(),
+        "{}",
+        String::from_utf8_lossy(&checked.stderr)
+    );
+    for operation in ["run", "test"] {
+        let output = run(&root, operation, "json");
+        assert_eq!(output.status.code(), Some(1), "{operation}");
+        assert!(output.stdout.is_empty(), "{operation}");
+        assert!(
+            String::from_utf8_lossy(&output.stderr).contains("L-TASK-0004"),
+            "{operation}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    let artifact = root.join("task-artifact.json");
+    let built = run_build(&root, &artifact, "json");
+    assert_eq!(built.status.code(), Some(1));
+    assert!(built.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&built.stderr).contains("L-TASK-0004"));
+    assert!(!artifact.exists());
+    cleanup(&root);
+}
+
 fn update_lock(root: &Path) {
     let manifest_path = root.join("ling.toml");
     let bytes = fs::read(&manifest_path).expect("temporary manifest is readable");

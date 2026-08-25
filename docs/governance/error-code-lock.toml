@@ -22,6 +22,7 @@ QUERY = 1
 RUNTIME = 1
 SNAPSHOT = 1
 SYNTAX = 11
+TASK = 4
 TEST = 1
 TRANSACTION = 3
 TYPE = 11
@@ -523,6 +524,30 @@ id = "L-SYNTAX-0011"
 core_sha256 = "sha256:0c7aca016bd5c5869733033b3f0dbce07d24d76adee5d906c7986cc5384016e6"
 retired = false
 facts = ["maximum_depth:integer:required"]
+
+[[code]]
+id = "L-TASK-0001"
+core_sha256 = "sha256:67f4496b0e32e3c7f8c9c7a39c50ebba8340749005ba2aae5d7638a4c0ba9523"
+retired = false
+facts = ["actual:string:optional", "expected:string:optional", "reason:string:required", "target:string:optional", "task:string:optional"]
+
+[[code]]
+id = "L-TASK-0002"
+core_sha256 = "sha256:728b9504907767a62403606dde46057ebc33e37857f4e0bdecca221e4f436691"
+retired = false
+facts = ["handle:string:optional", "reason:string:required", "scope:string:optional"]
+
+[[code]]
+id = "L-TASK-0003"
+core_sha256 = "sha256:b72c5434e95e0b441fbacc254fc9a0edc5ca5a1582822e51c8177b58e8de2e1c"
+retired = false
+facts = ["binding:string:optional", "reason:string:required", "suspension:string:optional"]
+
+[[code]]
+id = "L-TASK-0004"
+core_sha256 = "sha256:4b3b24b30456cc14815c9aeb58e0211a3aa6a3039694c17d2b836529aa3af329"
+retired = false
+facts = ["definition:string:required", "required_tasks:string:required", "stage:string:required"]
 
 [[code]]
 id = "L-TEST-0001"

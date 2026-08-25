@@ -321,7 +321,7 @@ fn definition_entry(
         CheckedHoverKind::ImplementationMember
     } else {
         match definition.kind {
-            DefinitionKind::Value => CheckedHoverKind::Value,
+            DefinitionKind::Value | DefinitionKind::Task => CheckedHoverKind::Value,
             DefinitionKind::Type => CheckedHoverKind::Type,
             DefinitionKind::Constructor => CheckedHoverKind::Constructor,
             DefinitionKind::Builtin => CheckedHoverKind::Builtin,
@@ -389,6 +389,9 @@ fn collect_program_selections(
     for definition in &program.definitions {
         collect_expression_selections(checked, module, &definition.value, output)?;
     }
+    for task in &program.tasks {
+        collect_expression_selections(checked, module, &task.body, output)?;
+    }
     for implementation in &program.impls {
         for definition in &implementation.members {
             collect_expression_selections(checked, module, &definition.value, output)?;
@@ -410,11 +413,26 @@ fn collect_expression_selections(
                     SequenceElement::Let(binding) => {
                         collect_expression_selections(checked, module, &binding.value, output)?;
                     }
+                    SequenceElement::LetAwait(binding) => {
+                        collect_expression_selections(checked, module, &binding.call, output)?;
+                    }
                     SequenceElement::Expression(expression) => {
                         collect_expression_selections(checked, module, expression, output)?;
                     }
                 }
             }
+        }
+        ExpressionKind::TaskScope { body, .. } => {
+            collect_expression_selections(checked, module, body, output)?;
+        }
+        ExpressionKind::TaskSpawn { call, .. } => {
+            collect_expression_selections(checked, module, call, output)?;
+        }
+        ExpressionKind::TaskAwait { handle, .. } => {
+            collect_expression_selections(checked, module, handle, output)?;
+        }
+        ExpressionKind::TaskReturn { value, .. } => {
+            collect_expression_selections(checked, module, value, output)?;
         }
         ExpressionKind::Handle { body, clauses } => {
             collect_expression_selections(checked, module, body, output)?;

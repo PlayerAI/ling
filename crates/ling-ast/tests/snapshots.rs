@@ -10,7 +10,12 @@ use ling_ast::{
 use ling_source::{SourceFile, SourceId, Span};
 use ling_syntax::{CstNode, ParsedSource, SyntaxTree, parse};
 
-const CASES: &[&str] = &["hello", "record-match", "pipeline-assignment"];
+const CASES: &[&str] = &[
+    "hello",
+    "record-match",
+    "pipeline-assignment",
+    "structured-task",
+];
 
 #[test]
 fn cst_and_ast_snapshots_are_stable() {
@@ -133,6 +138,19 @@ fn render_item(output: &mut String, item: &Item, depth: usize) {
             line_with(output, depth, "import", import.span, &value);
         }
         Item::Let(declaration) => render_let(output, declaration, depth),
+        Item::Task(declaration) => {
+            line_with(
+                output,
+                depth,
+                "task",
+                declaration.span,
+                &declaration.name.normalized,
+            );
+            for parameter in &declaration.parameters {
+                render_pattern(output, parameter, depth + 1, "parameter");
+            }
+            render_expression(output, &declaration.body, depth + 1);
+        }
         Item::Type(declaration) => {
             line_with(
                 output,
@@ -290,11 +308,32 @@ fn render_expression(output: &mut String, expression: &Expression, depth: usize)
             for element in elements {
                 match element {
                     SequenceElement::Let(declaration) => render_let(output, declaration, depth + 1),
+                    SequenceElement::LetAwait(binding) => {
+                        line(output, depth + 1, "let_await", binding.span);
+                        render_pattern(output, &binding.pattern, depth + 2, "binding");
+                        render_expression(output, &binding.call, depth + 2);
+                    }
                     SequenceElement::Expression(expression) => {
                         render_expression(output, expression, depth + 1);
                     }
                 }
             }
+        }
+        ExpressionKind::TaskScope { body, .. } => {
+            line(output, depth, "task_scope", expression.span);
+            render_expression(output, body, depth + 1);
+        }
+        ExpressionKind::TaskSpawn { call, .. } => {
+            line(output, depth, "task_spawn", expression.span);
+            render_expression(output, call, depth + 1);
+        }
+        ExpressionKind::TaskAwait { handle, .. } => {
+            line(output, depth, "task_await", expression.span);
+            render_expression(output, handle, depth + 1);
+        }
+        ExpressionKind::TaskReturn { value, .. } => {
+            line(output, depth, "task_return", expression.span);
+            render_expression(output, value, depth + 1);
         }
         ExpressionKind::Handle { body, clauses } => {
             line(output, depth, "handle", expression.span);

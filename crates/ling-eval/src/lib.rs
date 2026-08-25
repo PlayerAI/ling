@@ -94,11 +94,26 @@ pub enum RuntimeFaultKind {
         operation: String,
         mode: HandlerResumeMode,
     },
+    TaskImplementationBoundary {
+        definition: String,
+    },
 }
 
 impl RuntimeFault {
     #[must_use]
     pub fn to_diagnostic(&self) -> Diagnostic {
+        if let RuntimeFaultKind::TaskImplementationBoundary { definition } = &self.kind {
+            return Diagnostic::new(
+                codes::TASK_IMPLEMENTATION_BOUNDARY,
+                Severity::Error,
+                "已检查 Task 尚不能进入 interpreter.execute 阶段",
+                "checked Task cannot enter the `interpreter.execute` stage yet",
+            )
+            .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span))
+            .with_fact("definition", definition.clone())
+            .with_fact("stage", "interpreter.execute")
+            .with_fact("required_tasks", "TASK-2202,TASK-2203");
+        }
         let (zh, en, category) = match &self.kind {
             RuntimeFaultKind::HostCapability {
                 operation,
@@ -130,6 +145,9 @@ impl RuntimeFault {
                 ),
                 "handler_resume_cardinality",
             ),
+            RuntimeFaultKind::TaskImplementationBoundary { .. } => {
+                unreachable!("Task boundary returned above")
+            }
         };
         let mut diagnostic = Diagnostic::new(codes::RUNTIME_FAULT, Severity::Error, zh, en)
             .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span))
@@ -187,6 +205,7 @@ pub fn execute_main(
     main: &DefinitionId,
     console: &mut dyn Console,
 ) -> Result<(), RuntimeFault> {
+    reject_checked_tasks(snapshot.checked())?;
     Interpreter::new(snapshot.checked(), console).execute_main(main)
 }
 
@@ -197,6 +216,7 @@ pub fn execute_project_main(
     main: &DefinitionId,
     console: &mut dyn Console,
 ) -> Result<(), RuntimeFault> {
+    reject_checked_tasks(snapshot.checked())?;
     Interpreter::new(snapshot.checked(), console).execute_main(main)
 }
 
@@ -226,10 +246,30 @@ pub fn evaluate_definition(
     definition: &DefinitionId,
     console: &mut dyn Console,
 ) -> Result<EvaluatedValue, RuntimeFault> {
+    reject_checked_tasks(snapshot.checked())?;
     let value = Interpreter::new(snapshot.checked(), console).definition_value(definition)?;
     Ok(EvaluatedValue {
         rendered: render_value(&value),
         unit: matches!(value, Value::Unit),
+    })
+}
+
+fn reject_checked_tasks(checked: &CheckedProgram) -> Result<(), RuntimeFault> {
+    let Some(core) = checked.task_cores().values().next() else {
+        return Ok(());
+    };
+    let source_name = checked
+        .typed()
+        .resolved()
+        .definition(core.definition())
+        .and_then(|definition| definition.source_name.clone())
+        .unwrap_or_else(|| "<task>".to_owned());
+    Err(RuntimeFault {
+        kind: RuntimeFaultKind::TaskImplementationBoundary {
+            definition: core.definition().to_string(),
+        },
+        source_name,
+        span: core.source_span(),
     })
 }
 
@@ -348,6 +388,13 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                             self.eval_local_binding(module, binding, environment)?;
                             result = Value::Unit;
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            return Err(self.fault(
+                                module,
+                                binding.span,
+                                "checked task execution is not implemented",
+                            ));
+                        }
                         hir::SequenceElement::Expression(expression) => {
                             result = self.eval_expression(module, expression, environment)?;
                         }
@@ -355,6 +402,14 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 }
                 Ok(result)
             }
+            hir::ExpressionKind::TaskScope { .. }
+            | hir::ExpressionKind::TaskSpawn { .. }
+            | hir::ExpressionKind::TaskAwait { .. }
+            | hir::ExpressionKind::TaskReturn { .. } => Err(self.fault(
+                module,
+                expression.span,
+                "checked task execution is not implemented",
+            )),
             hir::ExpressionKind::Handle { .. } => Err(self.fault(
                 module,
                 expression.span,

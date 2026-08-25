@@ -227,6 +227,7 @@ fn nominal_result_definition(typed: &TypedProgram, mut type_id: TypeId) -> Optio
     for _ in 0..64 {
         match typed.arena().get(type_id) {
             Type::Function { result, .. } => type_id = *result,
+            Type::Task { result, .. } => type_id = *result,
             Type::NominalRecord { definition, .. } | Type::NominalVariant { definition, .. } => {
                 return Some(definition);
             }
@@ -237,6 +238,7 @@ fn nominal_result_definition(typed: &TypedProgram, mut type_id: TypeId) -> Optio
             | Type::Text
             | Type::Tuple(_)
             | Type::List(_)
+            | Type::TaskHandle { .. }
             | Type::Variable(_)
             | Type::Error => return None,
         }

@@ -1,0 +1,156 @@
+CST
+tokens
+  0: module @0..6 "module"
+  1: whitespace @6..7 " "
+  2: identifier @7..11 "Main"
+  3: newline @11..12 "\n"
+  4: newline @12..13 "\n"
+  5: identifier @13..17 "task"
+  6: whitespace @17..18 " "
+  7: identifier @18..23 "child"
+  8: whitespace @23..24 " "
+  9: identifier @24..29 "value"
+  10: whitespace @29..30 " "
+  11: equals @30..31 "="
+  12: newline @31..32 "\n"
+  13: whitespace @32..36 "    "
+  14: indent @36..36 ""
+  15: identifier @36..41 "scope"
+  16: newline @41..42 "\n"
+  17: whitespace @42..50 "        "
+  18: indent @50..50 ""
+  19: identifier @50..56 "return"
+  20: whitespace @56..57 " "
+  21: identifier @57..62 "value"
+  22: newline @62..63 "\n"
+  23: newline @63..64 "\n"
+  24: dedent @64..64 ""
+  25: dedent @64..64 ""
+  26: identifier @64..68 "task"
+  27: whitespace @68..69 " "
+  28: identifier @69..75 "parent"
+  29: whitespace @75..76 " "
+  30: identifier @76..81 "value"
+  31: whitespace @81..82 " "
+  32: equals @82..83 "="
+  33: newline @83..84 "\n"
+  34: whitespace @84..88 "    "
+  35: indent @88..88 ""
+  36: identifier @88..93 "scope"
+  37: newline @93..94 "\n"
+  38: whitespace @94..102 "        "
+  39: indent @102..102 ""
+  40: let @102..105 "let"
+  41: whitespace @105..106 " "
+  42: identifier @106..112 "handle"
+  43: whitespace @112..113 " "
+  44: equals @113..114 "="
+  45: whitespace @114..115 " "
+  46: identifier @115..120 "spawn"
+  47: whitespace @120..121 " "
+  48: identifier @121..126 "child"
+  49: whitespace @126..127 " "
+  50: identifier @127..132 "value"
+  51: newline @132..133 "\n"
+  52: whitespace @133..141 "        "
+  53: let @141..144 "let"
+  54: whitespace @144..145 " "
+  55: identifier @145..150 "first"
+  56: whitespace @150..151 " "
+  57: equals @151..152 "="
+  58: whitespace @152..153 " "
+  59: identifier @153..158 "await"
+  60: whitespace @158..159 " "
+  61: identifier @159..165 "handle"
+  62: newline @165..166 "\n"
+  63: whitespace @166..174 "        "
+  64: let @174..177 "let"
+  65: bang @177..178 "!"
+  66: whitespace @178..179 " "
+  67: identifier @179..185 "second"
+  68: whitespace @185..186 " "
+  69: equals @186..187 "="
+  70: whitespace @187..188 " "
+  71: identifier @188..193 "child"
+  72: whitespace @193..194 " "
+  73: identifier @194..199 "first"
+  74: newline @199..200 "\n"
+  75: whitespace @200..208 "        "
+  76: identifier @208..213 "scope"
+  77: newline @213..214 "\n"
+  78: whitespace @214..226 "            "
+  79: indent @226..226 ""
+  80: identifier @226..232 "return"
+  81: whitespace @232..233 " "
+  82: identifier @233..239 "second"
+  83: newline @239..240 "\n"
+  84: dedent @240..240 ""
+  85: dedent @240..240 ""
+  86: dedent @240..240 ""
+  87: eof @240..240 ""
+tree
+  program tokens=0..88
+    module_declaration tokens=0..5
+      qualified_name tokens=1..3
+    task_declaration tokens=5..26
+      pattern tokens=8..10
+      task_scope_expression tokens=15..25
+        sequence tokens=19..24
+          task_return_expression tokens=19..22
+            name_expression tokens=20..22
+    task_declaration tokens=26..87
+      pattern tokens=29..31
+      task_scope_expression tokens=36..86
+        sequence tokens=40..85
+          let_declaration tokens=40..51
+            pattern tokens=41..43
+            task_spawn_expression tokens=45..51
+              application_expression tokens=47..51
+                name_expression tokens=47..49
+                name_expression tokens=49..51
+          let_declaration tokens=52..62
+            pattern tokens=54..56
+            task_await_expression tokens=58..62
+              name_expression tokens=60..62
+          task_let_await tokens=63..74
+            pattern tokens=66..68
+            application_expression tokens=70..74
+              name_expression tokens=70..72
+              name_expression tokens=72..74
+          task_scope_expression tokens=75..85
+            sequence tokens=80..84
+              task_return_expression tokens=80..83
+                name_expression tokens=81..83
+
+AST
+program @0..239
+  module @0..11 Main
+  task @13..62 child
+    parameter @24..29 value
+    task_scope @36..62
+      sequence @50..62
+        task_return @50..62
+          name @57..62 value
+  task @64..239 parent
+    parameter @76..81 value
+    task_scope @88..239
+      sequence @102..239
+        let @102..132
+          binding @106..112 handle
+          task_spawn @115..132
+            application @121..132
+              name @121..126 child
+              name @127..132 value
+        let @141..165
+          binding @145..150 first
+          task_await @153..165
+            name @159..165 handle
+        let_await @174..199
+          binding @179..185 second
+          application @188..199
+            name @188..193 child
+            name @194..199 first
+        task_scope @208..239
+          sequence @226..239
+            task_return @226..239
+              name @233..239 second

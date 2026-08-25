@@ -260,6 +260,10 @@ fn collect_program_alias_uses(
         collect_patterns(resolved, module, &definition.parameters, keys, grouped)?;
         collect_expression(resolved, module, &definition.value, keys, grouped)?;
     }
+    for task in &program.tasks {
+        collect_patterns(resolved, module, &task.parameters, keys, grouped)?;
+        collect_expression(resolved, module, &task.body, keys, grouped)?;
+    }
     for implementation in &program.impls {
         for definition in &implementation.members {
             collect_patterns(resolved, module, &definition.parameters, keys, grouped)?;
@@ -357,11 +361,27 @@ fn collect_expression(
                     SequenceElement::Let(binding) => {
                         collect_local(resolved, module, binding, keys, grouped)?;
                     }
+                    SequenceElement::LetAwait(binding) => {
+                        collect_pattern(resolved, module, &binding.pattern, keys, grouped)?;
+                        collect_expression(resolved, module, &binding.call, keys, grouped)?;
+                    }
                     SequenceElement::Expression(expression) => {
                         collect_expression(resolved, module, expression, keys, grouped)?;
                     }
                 }
             }
+        }
+        ExpressionKind::TaskScope { body, .. } => {
+            collect_expression(resolved, module, body, keys, grouped)?;
+        }
+        ExpressionKind::TaskSpawn { call, .. } => {
+            collect_expression(resolved, module, call, keys, grouped)?;
+        }
+        ExpressionKind::TaskAwait { handle, .. } => {
+            collect_expression(resolved, module, handle, keys, grouped)?;
+        }
+        ExpressionKind::TaskReturn { value, .. } => {
+            collect_expression(resolved, module, value, keys, grouped)?;
         }
         ExpressionKind::Handle { body, clauses } => {
             collect_expression(resolved, module, body, keys, grouped)?;

@@ -23,7 +23,9 @@ use ling_cli::semantic_commands::{
     QueryError, QueryReport, TransactionError, TransactionReport, TransactionRequest,
 };
 use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
-use ling_cli::{CompileFailure, compile_path, compile_source};
+use ling_cli::{
+    CompileFailure, checked_task_implementation_boundary, compile_path, compile_source,
+};
 use ling_diagnostics::Diagnostic;
 use ling_effects::locate_main;
 use ling_eval::{Console, HostError, HostErrorCategory, MemoryConsole};
@@ -242,6 +244,11 @@ fn execute(options: Options) -> u8 {
         }
         Command::Query | Command::Patch => unreachable!("handled before compilation"),
         Command::Run => {
+            if let Some(diagnostic) =
+                checked_task_implementation_boundary(compiled.snapshot.checked(), "run")
+            {
+                return emit_compile_error(diagnostic, options.policy);
+            }
             let main = match locate_main(compiled.snapshot.checked()) {
                 Ok(main) => main,
                 Err(error) => {
@@ -478,6 +485,17 @@ fn execute_project_command(options: Options) -> u8 {
 }
 
 fn execute_project_run(project: &CheckedProject, policy: OutputPolicy) -> u8 {
+    if let Some(diagnostic) =
+        checked_task_implementation_boundary(project.snapshot().checked(), "project.run")
+    {
+        return emit_project_command_diagnostics(
+            "run",
+            &[diagnostic],
+            None,
+            policy,
+            EXIT_COMPILE_ERROR,
+        );
+    }
     let main = match locate_main(project.snapshot().checked()) {
         Ok(main) => main,
         Err(error) => {
@@ -520,6 +538,17 @@ fn execute_project_test(project: &CheckedProject, policy: OutputPolicy) -> u8 {
         project.manifest().package().name(),
         project.manifest().source().entry()
     );
+    if let Some(diagnostic) =
+        checked_task_implementation_boundary(project.snapshot().checked(), "project.test")
+    {
+        return emit_project_command_diagnostics(
+            "test",
+            &[diagnostic],
+            None,
+            policy,
+            EXIT_COMPILE_ERROR,
+        );
+    }
     let main = match locate_main(project.snapshot().checked()) {
         Ok(main) => main,
         Err(error) => {
@@ -566,6 +595,17 @@ fn execute_project_test(project: &CheckedProject, policy: OutputPolicy) -> u8 {
 }
 
 fn execute_project_build(checked: &CheckedProject, output: PathBuf, policy: OutputPolicy) -> u8 {
+    if let Some(diagnostic) =
+        checked_task_implementation_boundary(checked.snapshot().checked(), "project.build")
+    {
+        return emit_project_command_diagnostics(
+            "build",
+            &[diagnostic],
+            None,
+            policy,
+            EXIT_COMPILE_ERROR,
+        );
+    }
     let artifact = match project::build(checked, output) {
         Ok(artifact) => artifact,
         Err(failure) => return emit_project_command_failure("build", failure, policy),

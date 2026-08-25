@@ -83,3 +83,26 @@ fn test_rejects_empty_selection_with_stable_diagnostic() {
     let diagnostic: serde_json::Value = serde_json::from_slice(&output.stderr).unwrap();
     assert_eq!(diagnostic["code"], "L-TEST-0001");
 }
+
+#[test]
+fn test_reports_checked_task_as_compile_boundary_without_execution() {
+    let root = TempRoot::new();
+    fs::write(
+        root.path().join("task.ling"),
+        concat!(
+            "module Main\n\n",
+            "task worker value =\n",
+            "    scope\n",
+            "        return value\n\n",
+            "let main () = ()\n",
+        ),
+    )
+    .expect("Task test case is writable");
+    let output = run_test(root.path());
+    assert_eq!(output.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&output.stderr).contains("L-TASK-0004"));
+    let report: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("test report is JSON");
+    assert_eq!(report["tests"][0]["status"], "compile_failed");
+    assert_eq!(report["tests"][0]["stdout"], "");
+}

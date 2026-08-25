@@ -73,6 +73,35 @@ fn hello_lowering_matches_exact_bytes_and_debug_disassembly() {
 }
 
 #[test]
+fn every_bytecode_revision_rejects_checked_tasks_before_lowering() {
+    let source_text = concat!(
+        "module Main\n\n",
+        "task work value =\n",
+        "    scope\n",
+        "        return value\n",
+    );
+    let (source, snapshot) = checked_source("任务.ling", source_text);
+    let sources = [LoweringSource::new(&source, "src/Main.ling")];
+
+    for error in [
+        lower_v1(&snapshot, &sources).expect_err("1.0 rejects Task"),
+        lower_v1_1(&snapshot, &sources).expect_err("1.1 rejects Task"),
+        lower_v1_2(&snapshot, &sources).expect_err("1.2 rejects Task"),
+        lower_v1_3(&snapshot, &sources).expect_err("1.3 rejects Task"),
+        lower_v1_4(&snapshot, &sources).expect_err("1.4 rejects Task"),
+    ] {
+        assert!(matches!(
+            error.kind(),
+            LoweringErrorKind::TaskImplementationBoundary { .. }
+        ));
+        assert_eq!(
+            error.to_diagnostic().code(),
+            ling_diagnostics::codes::TASK_IMPLEMENTATION_BOUNDARY
+        );
+    }
+}
+
+#[test]
 fn lowering_ignores_physical_display_paths_and_is_byte_deterministic() {
     let (left_source, left_snapshot) = checked_source("C:/first/root/Main.ling", HELLO);
     let (right_source, right_snapshot) = checked_source("D:/other/root/Main.ling", HELLO);

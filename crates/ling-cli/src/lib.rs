@@ -10,13 +10,52 @@ use std::path::{Path, PathBuf};
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_hir::{LowerErrorKind, Program as HirProgram};
 use ling_semantic::ProgramSnapshot;
-use ling_source::{SourceError, SourceFile, SourceId};
+use ling_source::{SourceError, SourceFile, SourceId, Span};
 
 pub mod semantic_commands;
 
 #[derive(Debug)]
 pub struct Compiled {
     pub snapshot: ProgramSnapshot,
+}
+
+#[must_use]
+pub fn task_implementation_boundary_diagnostic(
+    source_name: &str,
+    span: Span,
+    definition: impl Into<String>,
+    stage: &'static str,
+) -> Diagnostic {
+    Diagnostic::new(
+        codes::TASK_IMPLEMENTATION_BOUNDARY,
+        Severity::Error,
+        format!("已检查 Task 尚不能进入 {stage} 阶段"),
+        format!("checked Task cannot enter the `{stage}` stage yet"),
+    )
+    .with_primary_span(DiagnosticSpan::new(source_name, span))
+    .with_fact("definition", definition.into())
+    .with_fact("stage", stage)
+    .with_fact("required_tasks", "TASK-2202,TASK-2203")
+}
+
+#[must_use]
+pub fn checked_task_implementation_boundary(
+    checked: &ling_effects::CheckedProgram,
+    stage: &'static str,
+) -> Option<Diagnostic> {
+    let core = checked.task_cores().values().next()?;
+    let source_name = checked
+        .typed()
+        .resolved()
+        .definition(core.definition())
+        .and_then(|definition| definition.source_name.as_deref())
+        .unwrap_or("<task>");
+    Some(task_implementation_boundary_diagnostic(
+        source_name,
+        core.source_span(),
+        core.definition().to_string(),
+        stage,
+    ))
 }
 
 #[derive(Debug)]

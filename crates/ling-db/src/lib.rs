@@ -2446,8 +2446,13 @@ fn expression_has_effect_surface(expression: &ling_hir::Expression) -> bool {
     match &expression.kind {
         ExpressionKind::Sequence(elements) => elements.iter().any(|element| match element {
             SequenceElement::Let(binding) => expression_has_effect_surface(&binding.value),
+            SequenceElement::LetAwait(_) => true,
             SequenceElement::Expression(expression) => expression_has_effect_surface(expression),
         }),
+        ExpressionKind::TaskScope { .. }
+        | ExpressionKind::TaskSpawn { .. }
+        | ExpressionKind::TaskAwait { .. }
+        | ExpressionKind::TaskReturn { .. } => true,
         ExpressionKind::Handle { .. } => true,
         ExpressionKind::If {
             condition,

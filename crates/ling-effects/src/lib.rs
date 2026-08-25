@@ -16,6 +16,7 @@ use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
 
 mod handler_core;
 mod solver;
+mod task_core;
 mod v2;
 
 pub use handler_core::{
@@ -26,6 +27,10 @@ pub use solver::{
     EffectConstraintOrigin, EffectConstraintSolver, EffectInference, EffectInstantiationError,
     EffectRowScheme, EffectSourceSpan, EffectSubstitution, GeneralizationBoundary,
     subtract_handler,
+};
+pub use task_core::{
+    CheckedTaskCore, CheckedTaskScope, CheckedTaskSignature, CheckedTaskSpawn,
+    CheckedTaskSpawnSyntax, CheckedTaskSuspension, SuspensionLiveBinding,
 };
 pub use v2::{
     EFFECT_GRAPH_EXTENSION_VERSION, EffectGraphProjection, EffectId, EffectIdError, EffectLabel,
@@ -38,6 +43,8 @@ pub use v2::{
 pub enum Effect {
     ConsoleWrite,
     State { display: String, identity: String },
+    TaskSpawn,
+    TaskAwait,
 }
 
 impl Effect {
@@ -46,6 +53,8 @@ impl Effect {
         match self {
             Self::ConsoleWrite => "Console.Write".to_owned(),
             Self::State { display, .. } => format!("State<{display}>"),
+            Self::TaskSpawn => "Task.Spawn".to_owned(),
+            Self::TaskAwait => "Task.Await".to_owned(),
         }
     }
 
@@ -54,6 +63,8 @@ impl Effect {
         match self {
             Self::ConsoleWrite => "Console.Write".to_owned(),
             Self::State { identity, .. } => format!("State<{identity}>"),
+            Self::TaskSpawn => "Task.Spawn".to_owned(),
+            Self::TaskAwait => "Task.Await".to_owned(),
         }
     }
 }
@@ -161,6 +172,7 @@ pub struct CheckedProgram {
     binding_effects: BTreeMap<BindingKey, EffectRow>,
     expression_effects: BTreeMap<ExpressionKey, EffectRow>,
     handler_cores: BTreeMap<ExpressionKey, HandlerCore>,
+    task_cores: BTreeMap<DefinitionId, CheckedTaskCore>,
     module_capabilities: BTreeMap<ModuleId, BTreeSet<Capability>>,
     warnings: Vec<Diagnostic>,
 }
@@ -250,6 +262,21 @@ impl CheckedProgram {
     }
 
     #[must_use]
+    pub fn task_core(&self, definition: &DefinitionId) -> Option<&CheckedTaskCore> {
+        self.task_cores.get(definition)
+    }
+
+    #[must_use]
+    pub fn task_cores(&self) -> &BTreeMap<DefinitionId, CheckedTaskCore> {
+        &self.task_cores
+    }
+
+    #[must_use]
+    pub fn has_tasks(&self) -> bool {
+        !self.task_cores.is_empty()
+    }
+
+    #[must_use]
     pub fn definition_function_type(
         &self,
         definition: &DefinitionId,
@@ -301,9 +328,30 @@ pub struct EffectError {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum EffectErrorKind {
-    MissingCapability { capability: &'static str },
-    UnknownCapability { capability: String },
-    InvalidHandlerContract { operation: String, reason: String },
+    MissingCapability {
+        capability: &'static str,
+    },
+    UnknownCapability {
+        capability: String,
+    },
+    InvalidHandlerContract {
+        operation: String,
+        reason: String,
+    },
+    InvalidTaskStructure {
+        reason: &'static str,
+        target: Option<String>,
+    },
+    InvalidTaskHandle {
+        reason: &'static str,
+        handle: Option<String>,
+        scope: Option<u32>,
+    },
+    UnsafeTaskSuspension {
+        reason: &'static str,
+        binding: Option<String>,
+        suspension: u32,
+    },
 }
 
 impl EffectError {
@@ -325,6 +373,21 @@ impl EffectError {
                 format!("Handler clause contract 无效：{reason}"),
                 format!("handler clause contract is invalid: {reason}"),
             ),
+            EffectErrorKind::InvalidTaskStructure { reason, .. } => (
+                codes::INVALID_TASK_STRUCTURE,
+                format!("Structured Task 结构无效：{reason}"),
+                format!("invalid Structured Task structure: {reason}"),
+            ),
+            EffectErrorKind::InvalidTaskHandle { reason, .. } => (
+                codes::INVALID_TASK_HANDLE,
+                format!("Task handle 使用无效：{reason}"),
+                format!("invalid Task handle use: {reason}"),
+            ),
+            EffectErrorKind::UnsafeTaskSuspension { reason, .. } => (
+                codes::UNSAFE_TASK_SUSPENSION,
+                format!("Task suspension 活跃集不安全：{reason}"),
+                format!("unsafe Task suspension live set: {reason}"),
+            ),
         };
         let diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
             .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span));
@@ -332,6 +395,39 @@ impl EffectError {
             EffectErrorKind::InvalidHandlerContract { operation, reason } => diagnostic
                 .with_fact("operation", operation.clone())
                 .with_fact("reason", reason.clone()),
+            EffectErrorKind::InvalidTaskStructure { reason, target } => {
+                let diagnostic = diagnostic.with_fact("reason", *reason);
+                target.as_ref().map_or(diagnostic.clone(), |target| {
+                    diagnostic.with_fact("target", target.clone())
+                })
+            }
+            EffectErrorKind::InvalidTaskHandle {
+                reason,
+                handle,
+                scope,
+            } => {
+                let mut diagnostic = diagnostic.with_fact("reason", *reason);
+                if let Some(handle) = handle {
+                    diagnostic = diagnostic.with_fact("handle", handle.clone());
+                }
+                if let Some(scope) = scope {
+                    diagnostic = diagnostic.with_fact("scope", scope.to_string());
+                }
+                diagnostic
+            }
+            EffectErrorKind::UnsafeTaskSuspension {
+                reason,
+                binding,
+                suspension,
+            } => {
+                let mut diagnostic = diagnostic
+                    .with_fact("reason", *reason)
+                    .with_fact("suspension", suspension.to_string());
+                if let Some(binding) = binding {
+                    diagnostic = diagnostic.with_fact("binding", binding.clone());
+                }
+                diagnostic
+            }
             EffectErrorKind::MissingCapability { .. }
             | EffectErrorKind::UnknownCapability { .. } => diagnostic,
         }
@@ -527,6 +623,41 @@ impl Checker {
             .collect();
         let expression_effects = self.build_expression_effect_rows(&callable_effects);
         let handler_cores = self.build_handler_cores(&callable_effects);
+        let task_cores = match task_core::build_checked_task_cores(&self.typed, &definition_effects)
+        {
+            Ok(cores) => cores,
+            Err(failures) => {
+                self.errors
+                    .extend(failures.into_iter().map(|failure| EffectError {
+                        kind: match failure.kind {
+                            task_core::TaskCheckFailureKind::Structure { reason, target } => {
+                                EffectErrorKind::InvalidTaskStructure { reason, target }
+                            }
+                            task_core::TaskCheckFailureKind::Handle {
+                                reason,
+                                handle,
+                                scope,
+                            } => EffectErrorKind::InvalidTaskHandle {
+                                reason,
+                                handle,
+                                scope,
+                            },
+                            task_core::TaskCheckFailureKind::Suspension {
+                                reason,
+                                binding,
+                                suspension,
+                            } => EffectErrorKind::UnsafeTaskSuspension {
+                                reason,
+                                binding,
+                                suspension,
+                            },
+                        },
+                        source_name: failure.source_name,
+                        span: failure.span,
+                    }));
+                BTreeMap::new()
+            }
+        };
         let capability_definition_effects = capability_effects
             .iter()
             .filter_map(|(callable, effects)| match callable {
@@ -542,6 +673,7 @@ impl Checker {
                 binding_effects,
                 expression_effects,
                 handler_cores,
+                task_cores,
                 module_capabilities,
                 warnings: self.warnings,
             })
@@ -580,6 +712,17 @@ impl Checker {
                     &definition.parameters,
                 );
             }
+            for task in &module.hir.tasks {
+                let Some(id) = self
+                    .typed
+                    .resolved()
+                    .definition_id(module.id, &task.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                self.register_parameters(Callable::Definition(id), module.id, &task.parameters);
+            }
         }
         for module in &modules {
             for definition in &module.hir.definitions {
@@ -596,6 +739,17 @@ impl Checker {
                 if definition.parameters.is_empty() {
                     self.connect_alias(callable, module.id, &definition.value);
                 }
+            }
+            for task in &module.hir.tasks {
+                let Some(id) = self
+                    .typed
+                    .resolved()
+                    .definition_id(module.id, &task.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                self.collect_callable_body(Callable::Definition(id), module.id, &task.body);
             }
             for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
                 for (member_ordinal, definition) in implementation.members.iter().enumerate() {
@@ -724,11 +878,30 @@ impl Checker {
                                 );
                             }
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            effects.insert(Effect::TaskSpawn);
+                            effects.insert(Effect::TaskAwait);
+                            self.visit_expression(module, &binding.call, handled, effects, calls);
+                        }
                         hir::SequenceElement::Expression(expression) => {
                             self.visit_expression(module, expression, handled, effects, calls);
                         }
                     }
                 }
+            }
+            hir::ExpressionKind::TaskScope { body, .. } => {
+                self.visit_expression(module, body, handled, effects, calls);
+            }
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                effects.insert(Effect::TaskSpawn);
+                self.visit_expression(module, call, handled, effects, calls);
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                effects.insert(Effect::TaskAwait);
+                self.visit_expression(module, handle, handled, effects, calls);
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => {
+                self.visit_expression(module, value, handled, effects, calls);
             }
             hir::ExpressionKind::If {
                 condition,
@@ -876,6 +1049,14 @@ impl Checker {
                     &mut output,
                 );
             }
+            for task in &module.hir.tasks {
+                self.collect_expression_effect_rows(
+                    module.id,
+                    &task.body,
+                    callable_effects,
+                    &mut output,
+                );
+            }
             for implementation in &module.hir.impls {
                 for definition in &implementation.members {
                     self.collect_expression_effect_rows(
@@ -909,10 +1090,15 @@ impl Checker {
                 for element in elements {
                     visit(match element {
                         hir::SequenceElement::Let(binding) => &binding.value,
+                        hir::SequenceElement::LetAwait(binding) => &binding.call,
                         hir::SequenceElement::Expression(value) => value,
                     });
                 }
             }
+            hir::ExpressionKind::TaskScope { body, .. } => visit(body),
+            hir::ExpressionKind::TaskSpawn { call, .. } => visit(call),
+            hir::ExpressionKind::TaskAwait { handle, .. } => visit(handle),
+            hir::ExpressionKind::TaskReturn { value, .. } => visit(value),
             hir::ExpressionKind::Handle { body, clauses } => {
                 visit(body);
                 for clause in clauses {
@@ -996,9 +1182,32 @@ impl Checker {
                         hir::SequenceElement::Expression(value) => {
                             output.extend(&self.expression_effects(module, value, callable_effects))
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            output.insert(Effect::TaskSpawn);
+                            output.insert(Effect::TaskAwait);
+                            output.extend(&self.expression_effects(
+                                module,
+                                &binding.call,
+                                callable_effects,
+                            ));
+                        }
                         hir::SequenceElement::Let(_) => {}
                     }
                 }
+            }
+            hir::ExpressionKind::TaskScope { body, .. } => {
+                output.extend(&self.expression_effects(module, body, callable_effects));
+            }
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                output.insert(Effect::TaskSpawn);
+                output.extend(&self.expression_effects(module, call, callable_effects));
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                output.insert(Effect::TaskAwait);
+                output.extend(&self.expression_effects(module, handle, callable_effects));
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => {
+                output.extend(&self.expression_effects(module, value, callable_effects));
             }
             hir::ExpressionKind::Handle { body, clauses } => {
                 let input = self.expression_effects(module, body, callable_effects);
@@ -1142,6 +1351,15 @@ impl Checker {
                     &mut output,
                 );
             }
+            for task in &module.hir.tasks {
+                self.collect_handler_cores(
+                    module.id,
+                    &module.hir.source_name,
+                    &task.body,
+                    callable_effects,
+                    &mut output,
+                );
+            }
             for implementation in &module.hir.impls {
                 for definition in &implementation.members {
                     self.collect_handler_cores(
@@ -1170,6 +1388,7 @@ impl Checker {
                 for element in elements {
                     let value = match element {
                         hir::SequenceElement::Let(binding) => &binding.value,
+                        hir::SequenceElement::LetAwait(binding) => &binding.call,
                         hir::SequenceElement::Expression(value) => value,
                     };
                     self.collect_handler_cores(
@@ -1180,6 +1399,18 @@ impl Checker {
                         output,
                     );
                 }
+            }
+            hir::ExpressionKind::TaskScope { body, .. } => {
+                self.collect_handler_cores(module, source_name, body, callable_effects, output)
+            }
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                self.collect_handler_cores(module, source_name, call, callable_effects, output)
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                self.collect_handler_cores(module, source_name, handle, callable_effects, output)
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => {
+                self.collect_handler_cores(module, source_name, value, callable_effects, output)
             }
             hir::ExpressionKind::Handle { body, clauses } => {
                 self.collect_handler_cores(module, source_name, body, callable_effects, output);
@@ -1444,7 +1675,7 @@ impl Checker {
             hir::ExpressionKind::Sequence(elements) => {
                 elements.iter().rev().find_map(|element| match element {
                     hir::SequenceElement::Expression(value) => self.value_callable(module, value),
-                    hir::SequenceElement::Let(_) => None,
+                    hir::SequenceElement::Let(_) | hir::SequenceElement::LetAwait(_) => None,
                 })
             }
             hir::ExpressionKind::Application {
@@ -1472,7 +1703,9 @@ impl Checker {
             Callable::Binding(binding) => self.typed.binding_type(*binding)?,
         };
         match self.typed.arena().get(type_id) {
-            Type::Function { parameters, .. } => Some(parameters.len()),
+            Type::Function { parameters, .. } | Type::Task { parameters, .. } => {
+                Some(parameters.len())
+            }
             _ => None,
         }
     }
@@ -1617,6 +1850,8 @@ fn effect_row_model(row: &EffectRow) -> Result<EffectRowModel, String> {
         .map(|effect| match effect {
             Effect::ConsoleWrite => Ok(EffectLabel::console_write()),
             Effect::State { identity, .. } => canonical_type_ref(identity).map(EffectLabel::state),
+            Effect::TaskSpawn => Ok(EffectLabel::task_spawn()),
+            Effect::TaskAwait => Ok(EffectLabel::task_await()),
         })
         .collect::<Result<Vec<_>, String>>()?;
     Ok(EffectRowModel::closed(labels))

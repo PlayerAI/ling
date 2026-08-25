@@ -46,14 +46,14 @@
 | `PROTO-LOCKFILE` | Public | JSON | `ling.lock/1` | `Experimental` | yes | yes | 8 |
 | `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.2` | `Experimental` | yes | yes | 6 |
 | `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 5 |
-| `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 6 |
+| `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 7 |
 | `PROTO-SEMANTIC-QUERY` | Public | JSON | `ling.semantic-query/0.1` | `Preview` | yes | no | 6 |
 | `PROTO-SEMANTIC-TRANSACTION` | Public | JSON | `ling.semantic-transaction/0.1` | `Preview` | yes | no | 6 |
 | `PROTO-SEMANTIC-TRANSACTION-RESULT` | Public | JSON | `ling.semantic-transaction-result/0.1` | `Preview` | yes | no | 6 |
 | `PROTO-CANONICAL-BYTES` | Public | Canonical identity | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | no | yes | 2 |
 | `PROTO-PACKAGE-IDENTITY` | Public | Canonical identity | `v1 domain encodings` | `Experimental` | no | yes | 9 |
 | `PROTO-SEMANTIC-ID` | Public | Canonical identity | `experimental:blake3:` | `Experimental` | no | yes | 4 |
-| `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.2` | `Preview` | yes | yes | 3 |
+| `PROTO-AUDIT-SOURCE` | Public | Text protocol | `ling.audit/0.3` | `Preview` | yes | yes | 4 |
 | `PROTO-CLI-COMPLETION` | Public | Text protocol | `ling.cli-completion/0.1` | `Preview` | yes | yes | 5 |
 | `PROTO-BUILD-METADATA` | Public | Package metadata | `ling.project.artifact/0.1` | `Experimental` | no | yes | 3 |
 | `PROTO-PACKAGE-MANIFEST` | Public | Package metadata | `ling.manifest/1` | `Experimental` | no | no | 26 |
@@ -487,13 +487,13 @@
 - Producer: ling-semantic snapshot writer; ling semantic
 - Consumer: ling-semantic isolated reader; ling audit projection; AI and editor tooling experiments
 - Reader policy: Require the exact semantic, language, and Unicode versions; validate IDs, kinds, ownership, references, Prelude invariants, and ordering-independent structure; the returned graph is data only and cannot enter evaluation.
-- Writer policy: Emit deterministic JSON from checked Typed Core with canonical ordering and no source paths, hash-map order, arena indices, allocation addresses, or Rust debug data in identity.
+- Writer policy: Emit deterministic JSON from checked Typed Core with canonical ordering and no source paths, hash-map order, arena indices, allocation addresses, or Rust debug data in identity. Checked Task programs add the DEC-0264 x-ling-task/0.1 extension with signature, source span, lexical scopes, direct spawns, suspension live sets, and cleanup/cancellation identities.
 - Unknown-field policy: Accept x-* extension fields at checked object levels and reject unknown core fields.
 - Migration tool: None; schema or identity changes require an explicit version upgrade, migration notes, and regenerated fixtures.
-- Authority: `DEC-0012`, `RFC-0022`
-- Sources: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/RFC-0022.md`](../RFC-0022.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
-- Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`schemas/semantic/0.1/valid`](../../schemas/semantic/0.1/valid), [`schemas/semantic/0.1/invalid`](../../schemas/semantic/0.1/invalid), [`schemas/semantic/0.1/canonical`](../../schemas/semantic/0.1/canonical)
-- Notes: GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.; RFC-0022 defines the optional Experimental x-ling-trait-ide witness/member projection; it does not add a core field or an LSP wire method.
+- Authority: `DEC-0012`, `RFC-0022`, `DEC-0264`
+- Sources: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/RFC-0022.md`](../RFC-0022.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0264-structured-task-frontend-core.md`](../decisions/0264-structured-task-frontend-core.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
+- Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/task_boundary.rs`](../../crates/ling-cli/tests/task_boundary.rs), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`schemas/semantic/0.1/valid`](../../schemas/semantic/0.1/valid), [`schemas/semantic/0.1/invalid`](../../schemas/semantic/0.1/invalid), [`schemas/semantic/0.1/canonical`](../../schemas/semantic/0.1/canonical)
+- Notes: GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.; RFC-0022 defines the optional Experimental x-ling-trait-ide witness/member projection; it does not add a core field or an LSP wire method.; Accepted DEC-0264 adds the optional Experimental x-ling-task/0.1 checked-only projection without changing non-Task ling.semantic/0.1 bytes or authorizing execution.
 
 ### `PROTO-SEMANTIC-QUERY` — Semantic Query response
 
@@ -577,14 +577,14 @@
 
 - Producer: ling-format Audit renderer; ling audit
 - Consumer: ling-format isolated Audit parser; independent audit tooling
-- Reader policy: Accept exact ling.audit/0.1 and ling.audit/0.2 headers; 0.1 rejects Handler fields, while 0.2 validates Handler expression identity, byte span, Core body/type, input/eliminated/residual rows, operation labels, and resume mode/use. Parse only into an isolated AuditModel and never convert it to CheckedProgram or evaluator input.
-- Writer policy: Emit one BOM-free UTF-8/LF/two-space canonical document with fixed ordering, JSON string escaping, and exactly one final LF. Models without handlers retain ling.audit/0.1 bytes; models with checked handlers emit ling.audit/0.2 Handler blocks.
+- Reader policy: Accept exact ling.audit/0.1, ling.audit/0.2, and ling.audit/0.3 headers; 0.1 rejects Handler and Task fields, 0.2 validates Handler evidence and rejects Task fields, and 0.3 additionally validates checked Task signatures, source spans, lexical scopes, direct spawn syntax/spans, suspensions, live bindings, and cancellation/cleanup identities. Parse only into an isolated AuditModel and never convert it to CheckedProgram or evaluator input.
+- Writer policy: Emit one BOM-free UTF-8/LF/two-space canonical document with fixed ordering, JSON string escaping, and exactly one final LF. Models without handlers or tasks retain ling.audit/0.1 bytes; Handler-only models emit ling.audit/0.2; models with checked Task evidence emit ling.audit/0.3 Task blocks and may also contain Handler blocks.
 - Unknown-field policy: Accept and discard x-* extension fields, accept input field reordering, and reject unknown core fields.
-- Migration tool: None; 0.1 remains accepted for handler-free models, 0.2 is selected only when checked Handler evidence is present, and future incompatible changes must upgrade ling.audit/*.
-- Authority: `DEC-0015`, `DEC-0260`
-- Sources: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0015-audit-source-format.md`](../decisions/0015-audit-source-format.md), [`docs/decisions/0260-checked-handler-lowering.md`](../decisions/0260-checked-handler-lowering.md)
-- Fixtures: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/handler_boundary.rs`](../../crates/ling-cli/tests/handler_boundary.rs)
-- Notes: Both accepted revisions are Preview and embed Experimental semantic identities; 0.2 is a bounded Handler projection, not executable Core or a package-aware Audit protocol.
+- Migration tool: Automatic writer selection preserves 0.1 for models without Handler or Task evidence and 0.2 for Handler-only models; 0.3 is selected only when checked Task evidence is present. Future incompatible changes must upgrade ling.audit/*.
+- Authority: `DEC-0015`, `DEC-0260`, `DEC-0264`
+- Sources: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0015-audit-source-format.md`](../decisions/0015-audit-source-format.md), [`docs/decisions/0260-checked-handler-lowering.md`](../decisions/0260-checked-handler-lowering.md), [`docs/decisions/0264-structured-task-frontend-core.md`](../decisions/0264-structured-task-frontend-core.md)
+- Fixtures: [`crates/ling-format/src/lib.rs`](../../crates/ling-format/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/handler_boundary.rs`](../../crates/ling-cli/tests/handler_boundary.rs), [`crates/ling-cli/tests/task_boundary.rs`](../../crates/ling-cli/tests/task_boundary.rs)
+- Notes: All three revisions are Preview and embed Experimental semantic identities; 0.2 is a bounded Handler projection, and 0.3 adds a checked-only Task projection. Neither is executable Core or a package-aware Audit protocol.
 
 ### `PROTO-CLI-COMPLETION` — Ling canonical shell completion scripts
 

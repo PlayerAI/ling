@@ -8,7 +8,10 @@ use ling_hir as hir;
 use ling_resolve::DefinitionId;
 use ling_source::SourceId;
 
-use crate::{CompileFailure, compile_programs, lower_source_with_counters};
+use crate::{
+    CompileFailure, compile_programs, lower_source_with_counters,
+    task_implementation_boundary_diagnostic,
+};
 
 const REPL_MODULE: &str = "Main";
 const RESULT_PREFIX: &str = "__ling_repl_result";
@@ -144,6 +147,18 @@ impl Session {
             map_compile_failure(submission, failure, &wrapper.mapping, &source_name)
         })?;
 
+        if let Some(task) = candidate.tasks.first() {
+            return Err(SubmissionFailure::Compile {
+                submission,
+                diagnostics: vec![task_implementation_boundary_diagnostic(
+                    &source_name,
+                    wrapper.mapping.map_span(task.span),
+                    task.name.normalized.clone(),
+                    "repl.submit",
+                )],
+            });
+        }
+
         if !candidate.imports.is_empty()
             || candidate
                 .definitions
@@ -249,6 +264,7 @@ impl Session {
             module: candidate.module,
             imports: Vec::new(),
             definitions,
+            tasks: Vec::new(),
             types,
             traits: Vec::new(),
             impls: Vec::new(),
@@ -452,11 +468,22 @@ fn classify(source: &str) -> Classified {
     let first = source.trim_start();
     if starts_keyword(first, "module") || starts_keyword(first, "import") {
         Classified::Forbidden
-    } else if starts_keyword(first, "let") || starts_keyword(first, "type") {
+    } else if starts_keyword(first, "let")
+        || starts_keyword(first, "type")
+        || looks_like_task_declaration(first)
+    {
         Classified::Declaration
     } else {
         Classified::Expression
     }
+}
+
+fn looks_like_task_declaration(source: &str) -> bool {
+    starts_keyword(source, "task")
+        && source
+            .lines()
+            .next()
+            .is_some_and(|line| line.split_whitespace().nth(1).is_some() && line.contains('='))
 }
 
 fn starts_keyword(source: &str, keyword: &str) -> bool {
@@ -672,12 +699,33 @@ fn rewrite_expression(
                                 .insert(binding.name.normalized.clone());
                         }
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        rewrite_expression(&mut binding.call, mapping, scopes);
+                        let mut bindings = BTreeSet::new();
+                        collect_pattern_bindings(&binding.pattern, &mut bindings);
+                        scopes
+                            .last_mut()
+                            .expect("sequence scope exists")
+                            .extend(bindings);
+                    }
                     hir::SequenceElement::Expression(expression) => {
                         rewrite_expression(expression, mapping, scopes);
                     }
                 }
             }
             scopes.pop();
+        }
+        hir::ExpressionKind::TaskScope { body, .. } => {
+            rewrite_expression(body, mapping, scopes);
+        }
+        hir::ExpressionKind::TaskSpawn { call, .. } => {
+            rewrite_expression(call, mapping, scopes);
+        }
+        hir::ExpressionKind::TaskAwait { handle, .. } => {
+            rewrite_expression(handle, mapping, scopes);
+        }
+        hir::ExpressionKind::TaskReturn { value, .. } => {
+            rewrite_expression(value, mapping, scopes);
         }
         hir::ExpressionKind::If {
             condition,
@@ -884,6 +932,29 @@ mod tests {
             panic!("expected duplicate diagnostic");
         };
         assert_eq!(diagnostics[0].code(), codes::DUPLICATE_DEFINITION);
+    }
+
+    #[test]
+    fn checked_task_submission_stops_at_repl_implementation_boundary() {
+        let mut session = Session::new(Vec::new());
+        let failure = session
+            .submit(
+                "task worker value =\n    scope\n        return value",
+                &mut MemoryConsole::default(),
+            )
+            .expect_err("REPL must not publish executable Task state");
+        let SubmissionFailure::Compile { diagnostics, .. } = failure else {
+            panic!("expected compile boundary failure");
+        };
+        assert_eq!(diagnostics.len(), 1);
+        assert_eq!(diagnostics[0].code(), codes::TASK_IMPLEMENTATION_BOUNDARY);
+        assert_eq!(
+            diagnostics[0]
+                .primary_span()
+                .expect("Task declaration span")
+                .start_byte(),
+            0
+        );
     }
 
     #[test]

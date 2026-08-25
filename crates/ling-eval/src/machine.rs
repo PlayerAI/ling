@@ -274,6 +274,12 @@ fn step_expression(
         hir::ExpressionKind::Sequence(elements) => {
             start_sequence(interpreter, module, elements.into(), environment, frames)
         }
+        hir::ExpressionKind::TaskScope { .. }
+        | hir::ExpressionKind::TaskSpawn { .. }
+        | hir::ExpressionKind::TaskAwait { .. }
+        | hir::ExpressionKind::TaskReturn { .. } => {
+            Err(interpreter.fault(module, span, "checked task execution is not implemented"))
+        }
         hir::ExpressionKind::Handle { body, clauses } => {
             validate_handler(interpreter, module, expression.id, &body, &clauses, span)?;
             let id = interpreter.next_handler_id;
@@ -825,7 +831,7 @@ fn continue_frame(
 }
 
 fn start_sequence(
-    _interpreter: &mut Interpreter<'_, '_>,
+    interpreter: &mut Interpreter<'_, '_>,
     module: ModuleId,
     mut elements: VecDeque<hir::SequenceElement>,
     mut environment: Environment,
@@ -836,6 +842,13 @@ fn start_sequence(
             return Ok(Control::Value(Value::Unit));
         };
         match element {
+            hir::SequenceElement::LetAwait(binding) => {
+                return Err(interpreter.fault(
+                    module,
+                    binding.span,
+                    "checked task execution is not implemented",
+                ));
+            }
             hir::SequenceElement::Expression(expression) => {
                 frames.push(Frame::Sequence {
                     module,

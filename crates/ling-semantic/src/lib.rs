@@ -18,6 +18,7 @@ pub const SEMANTIC_SCHEMA: &str = "ling.semantic/0.1";
 pub const PROJECT_SEMANTIC_SCHEMA: &str = "ling.semantic/0.2";
 pub const LANGUAGE_VERSION: &str = "0.0.1-dev";
 pub const TRAIT_IDE_EXTENSION_VERSION: &str = "0.1";
+pub const TASK_GRAPH_EXTENSION_VERSION: &str = "0.1";
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BodyId(String);
@@ -75,6 +76,71 @@ pub struct SemanticGraph {
         skip_serializing_if = "Option::is_none"
     )]
     pub trait_ide: Option<SemanticTraitIdeProjection>,
+    #[serde(
+        rename = "x-ling-task",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub task: Option<SemanticTaskProjection>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTaskProjection {
+    pub version: String,
+    pub tasks: Vec<SemanticTask>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTask {
+    pub definition_id: String,
+    pub signature: String,
+    pub effects: Vec<String>,
+    pub root_scope: u32,
+    pub result_body: u32,
+    pub span: SemanticByteSpan,
+    pub scopes: Vec<SemanticTaskScope>,
+    pub spawns: Vec<SemanticTaskSpawn>,
+    pub suspensions: Vec<SemanticTaskSuspension>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTaskScope {
+    pub id: u32,
+    pub parent: Option<u32>,
+    pub span: SemanticByteSpan,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTaskSpawn {
+    pub task: u32,
+    pub scope: u32,
+    pub parent: u32,
+    pub target: String,
+    pub cancellation: u32,
+    pub cleanup: u32,
+    pub syntax: String,
+    pub span: SemanticByteSpan,
+    pub operator_span: SemanticByteSpan,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pattern_span: Option<SemanticByteSpan>,
+    pub target_span: SemanticByteSpan,
+    pub call_span: SemanticByteSpan,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTaskSuspension {
+    pub id: u32,
+    pub scope: u32,
+    pub awaited_task: u32,
+    pub live: Vec<SemanticTaskLiveBinding>,
+    pub span: SemanticByteSpan,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SemanticTaskLiveBinding {
+    pub binding: u32,
+    #[serde(rename = "type")]
+    pub type_name: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
@@ -289,6 +355,66 @@ pub struct AuditModule {
     pub nodes: Vec<AuditNode>,
     pub references: Vec<AuditReference>,
     pub handlers: Vec<AuditHandler>,
+    pub tasks: Vec<AuditTask>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTask {
+    pub definition_id: String,
+    pub signature: String,
+    pub effects: Vec<String>,
+    pub root_scope: u32,
+    pub result_body: u32,
+    pub source_start: u32,
+    pub source_end: u32,
+    pub scopes: Vec<AuditTaskScope>,
+    pub spawns: Vec<AuditTaskSpawn>,
+    pub suspensions: Vec<AuditTaskSuspension>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTaskScope {
+    pub id: u32,
+    pub parent: Option<u32>,
+    pub source_start: u32,
+    pub source_end: u32,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTaskSpawn {
+    pub task: u32,
+    pub scope: u32,
+    pub parent: u32,
+    pub target: String,
+    pub cancellation: u32,
+    pub cleanup: u32,
+    pub syntax: String,
+    pub operator_start: u32,
+    pub operator_end: u32,
+    pub pattern_start: Option<u32>,
+    pub pattern_end: Option<u32>,
+    pub target_start: u32,
+    pub target_end: u32,
+    pub call_start: u32,
+    pub call_end: u32,
+    pub source_start: u32,
+    pub source_end: u32,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTaskSuspension {
+    pub id: u32,
+    pub scope: u32,
+    pub awaited_task: u32,
+    pub live: Vec<AuditTaskLiveBinding>,
+    pub source_start: u32,
+    pub source_end: u32,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTaskLiveBinding {
+    pub binding: u32,
+    pub type_name: String,
 }
 
 /// Canonical Audit Source projection of one checked first-order handler.
@@ -534,6 +660,7 @@ impl ProgramSnapshot {
                         nodes: Vec::new(),
                         references: Vec::new(),
                         handlers: Vec::new(),
+                        tasks: Vec::new(),
                     },
                 )
             })
@@ -555,6 +682,7 @@ impl ProgramSnapshot {
                     nodes: Vec::new(),
                     references: Vec::new(),
                     handlers: Vec::new(),
+                    tasks: Vec::new(),
                 });
             module.definitions.push(AuditDefinition {
                 definition_id: definition.definition_id.clone(),
@@ -585,6 +713,7 @@ impl ProgramSnapshot {
                     nodes: Vec::new(),
                     references: Vec::new(),
                     handlers: Vec::new(),
+                    tasks: Vec::new(),
                 })
                 .nodes
                 .push(AuditNode {
@@ -674,6 +803,84 @@ impl ProgramSnapshot {
                     clauses,
                 });
         }
+        for core in self.checked.task_cores().values() {
+            let info = resolved
+                .definition(core.definition())
+                .expect("checked Task Core references an existing definition");
+            let module = modules
+                .get_mut(&info.module_name)
+                .expect("checked Task Core module exists in Audit model");
+            module.tasks.push(AuditTask {
+                definition_id: core.definition().to_string(),
+                signature: format!(
+                    "{} ! {{{}}}",
+                    self.checked.typed().display_type(
+                        self.checked
+                            .typed()
+                            .definition_type(core.definition())
+                            .expect("checked Task type exists")
+                    ),
+                    core.signature().effects().canonical_names().join(", ")
+                ),
+                effects: core.signature().effects().canonical_names(),
+                root_scope: core.root_scope().get(),
+                result_body: core.result_body().local().get(),
+                source_start: core.source_span().start().get(),
+                source_end: core.source_span().end().get(),
+                scopes: core
+                    .scopes()
+                    .iter()
+                    .map(|scope| AuditTaskScope {
+                        id: scope.id().get(),
+                        parent: scope.parent().map(|parent| parent.get()),
+                        source_start: scope.span().start().get(),
+                        source_end: scope.span().end().get(),
+                    })
+                    .collect(),
+                spawns: core
+                    .spawns()
+                    .iter()
+                    .map(|spawn| AuditTaskSpawn {
+                        task: spawn.task().get(),
+                        scope: spawn.scope().get(),
+                        parent: spawn.parent().get(),
+                        target: spawn.target().to_string(),
+                        cancellation: spawn.cancellation().get(),
+                        cleanup: spawn.cleanup().get(),
+                        syntax: spawn.syntax().as_str().to_owned(),
+                        operator_start: spawn.operator_span().start().get(),
+                        operator_end: spawn.operator_span().end().get(),
+                        pattern_start: spawn.pattern_span().map(|span| span.start().get()),
+                        pattern_end: spawn.pattern_span().map(|span| span.end().get()),
+                        target_start: spawn.target_span().start().get(),
+                        target_end: spawn.target_span().end().get(),
+                        call_start: spawn.call_span().start().get(),
+                        call_end: spawn.call_span().end().get(),
+                        source_start: spawn.span().start().get(),
+                        source_end: spawn.span().end().get(),
+                    })
+                    .collect(),
+                suspensions: core
+                    .suspensions()
+                    .iter()
+                    .map(|suspension| AuditTaskSuspension {
+                        id: suspension.id().get(),
+                        scope: suspension.scope().get(),
+                        awaited_task: suspension.awaited_task().get(),
+                        live: suspension
+                            .live()
+                            .iter()
+                            .map(|live| AuditTaskLiveBinding {
+                                binding: live.binding().local().get(),
+                                type_name: self.checked.typed().display_type(live.value_type()),
+                            })
+                            .collect(),
+                        source_start: suspension.span().start().get(),
+                        source_end: suspension.span().end().get(),
+                    })
+                    .collect(),
+            });
+        }
         for module in modules.values_mut() {
             module.capabilities.sort();
             module.imports.sort_by(|left, right| {
@@ -702,6 +909,9 @@ impl ProgramSnapshot {
             module
                 .handlers
                 .sort_by(|left, right| left.handler_id.cmp(&right.handler_id));
+            module
+                .tasks
+                .sort_by(|left, right| left.definition_id.cmp(&right.definition_id));
         }
         AuditModel {
             language_version: self.graph.language_version.clone(),
@@ -895,6 +1105,12 @@ pub enum SemanticReadErrorKind {
     InvalidAuditHandler {
         reason: String,
     },
+    InvalidTaskProjection {
+        reason: String,
+    },
+    InvalidAuditTask {
+        reason: String,
+    },
 }
 
 impl fmt::Display for SemanticReadError {
@@ -1051,8 +1267,16 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
             })
             .collect(),
         trait_ide: None,
+        task: None,
     };
     validate_graph(&graph, IdentityMode::Seed)?;
+    let task_definitions = model
+        .modules
+        .iter()
+        .flat_map(|module| module.definitions.iter())
+        .filter(|definition| definition.kind == "task")
+        .map(|definition| definition.definition_id.as_str())
+        .collect::<BTreeSet<_>>();
     for (module_index, module) in model.modules.iter().enumerate() {
         for (definition_index, definition) in module.definitions.iter().enumerate() {
             if definition.implementation != "implemented" {
@@ -1159,8 +1383,160 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
                 ));
             }
         }
+        let mut previous_task: Option<&str> = None;
+        for (task_index, task) in module.tasks.iter().enumerate() {
+            let path = format!("$.modules[{module_index}].tasks[{task_index}]");
+            if previous_task.is_some_and(|previous| previous >= task.definition_id.as_str()) {
+                return Err(invalid_audit_task(
+                    &path,
+                    "Task definitions must be unique and strictly sorted",
+                ));
+            }
+            previous_task = Some(&task.definition_id);
+            validate_audit_task(task, &task_definitions, &path)?;
+        }
     }
     Ok(())
+}
+
+fn validate_audit_task(
+    task: &AuditTask,
+    task_definitions: &BTreeSet<&str>,
+    path: &str,
+) -> Result<(), SemanticReadError> {
+    if !task_definitions.contains(task.definition_id.as_str())
+        || task.signature.is_empty()
+        || task.root_scope == 0
+        || task.source_start > task.source_end
+        || !strictly_sorted_unique(&task.effects)
+    {
+        return Err(invalid_audit_task(
+            path,
+            "Task definition, signature, identity, span, or Effect row is invalid",
+        ));
+    }
+    let mut scope_ids = BTreeSet::new();
+    for (scope_index, scope) in task.scopes.iter().enumerate() {
+        if scope.id == 0
+            || !scope_ids.insert(scope.id)
+            || scope.source_start > scope.source_end
+            || scope.source_start < task.source_start
+            || scope.source_end > task.source_end
+            || scope
+                .parent
+                .is_some_and(|parent| !scope_ids.contains(&parent))
+        {
+            return Err(invalid_audit_task(
+                &format!("{path}.scopes[{scope_index}]"),
+                "Task scope identity, parent, order, or span is invalid",
+            ));
+        }
+    }
+    if task
+        .scopes
+        .first()
+        .is_none_or(|scope| scope.id != task.root_scope || scope.parent.is_some())
+    {
+        return Err(invalid_audit_task(
+            &format!("{path}.root_scope"),
+            "root scope must be the first parentless Task scope",
+        ));
+    }
+    let mut spawned = BTreeMap::new();
+    for (spawn_index, spawn) in task.spawns.iter().enumerate() {
+        let pattern_valid = match spawn.syntax.as_str() {
+            "explicit" => spawn.pattern_start.is_none() && spawn.pattern_end.is_none(),
+            "let!" => {
+                matches!((spawn.pattern_start, spawn.pattern_end), (Some(start), Some(end)) if start <= end)
+            }
+            _ => false,
+        };
+        if spawn.task <= 1
+            || spawned.insert(spawn.task, spawn.scope).is_some()
+            || !scope_ids.contains(&spawn.scope)
+            || spawn.parent != 1
+            || !task_definitions.contains(spawn.target.as_str())
+            || spawn.cancellation != spawn.task
+            || spawn.cleanup != spawn.task
+            || !pattern_valid
+            || !valid_nested_span(
+                task.source_start,
+                task.source_end,
+                spawn.source_start,
+                spawn.source_end,
+            )
+            || !valid_nested_span(
+                task.source_start,
+                task.source_end,
+                spawn.operator_start,
+                spawn.operator_end,
+            )
+            || !valid_nested_span(
+                task.source_start,
+                task.source_end,
+                spawn.target_start,
+                spawn.target_end,
+            )
+            || !valid_nested_span(
+                task.source_start,
+                task.source_end,
+                spawn.call_start,
+                spawn.call_end,
+            )
+        {
+            return Err(invalid_audit_task(
+                &format!("{path}.spawns[{spawn_index}]"),
+                "Task spawn identity, ownership, syntax, target, or span is invalid",
+            ));
+        }
+    }
+    let mut suspension_ids = BTreeSet::new();
+    let mut awaited = BTreeSet::new();
+    for (suspension_index, suspension) in task.suspensions.iter().enumerate() {
+        let mut previous_binding = None;
+        let live_valid = suspension.live.iter().all(|live| {
+            let ordered = previous_binding.is_none_or(|previous| previous < live.binding);
+            previous_binding = Some(live.binding);
+            ordered && live.binding != 0 && !live.type_name.is_empty()
+        });
+        if suspension.id == 0
+            || !suspension_ids.insert(suspension.id)
+            || spawned.get(&suspension.awaited_task) != Some(&suspension.scope)
+            || !valid_nested_span(
+                task.source_start,
+                task.source_end,
+                suspension.source_start,
+                suspension.source_end,
+            )
+            || !live_valid
+        {
+            return Err(invalid_audit_task(
+                &format!("{path}.suspensions[{suspension_index}]"),
+                "Task suspension identity, ownership, live set, or span is invalid",
+            ));
+        }
+        awaited.insert(suspension.awaited_task);
+    }
+    if awaited != spawned.keys().copied().collect() {
+        return Err(invalid_audit_task(
+            &format!("{path}.suspensions"),
+            "every spawned Task must have at least one statically checked suspension observation",
+        ));
+    }
+    Ok(())
+}
+
+fn valid_nested_span(outer_start: u32, outer_end: u32, start: u32, end: u32) -> bool {
+    start <= end && outer_start <= start && end <= outer_end
+}
+
+fn invalid_audit_task(path: &str, reason: &str) -> SemanticReadError {
+    SemanticReadError {
+        kind: SemanticReadErrorKind::InvalidAuditTask {
+            reason: reason.to_owned(),
+        },
+        path: path.to_owned(),
+    }
 }
 
 fn invalid_audit_handler(path: &str, reason: &str) -> SemanticReadError {
@@ -1704,7 +2080,7 @@ fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), Seman
         }
         if !matches!(
             definition.kind.as_str(),
-            "value" | "type" | "constructor" | "builtin" | "trait-member"
+            "value" | "task" | "type" | "constructor" | "builtin" | "trait-member"
         ) {
             return Err(SemanticReadError {
                 kind: SemanticReadErrorKind::InvalidDefinitionKind {
@@ -1742,6 +2118,7 @@ fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), Seman
         "variant",
         "binding",
         "function",
+        "task",
         "parameter",
         "pattern",
         "expression",
@@ -1937,7 +2314,129 @@ fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), Seman
         }
     }
     validate_trait_ide(graph)?;
+    validate_task_projection(graph)?;
     Ok(())
+}
+
+fn validate_task_projection(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
+    let Some(projection) = &graph.task else {
+        return Ok(());
+    };
+    if projection.version != TASK_GRAPH_EXTENSION_VERSION {
+        return Err(invalid_task_projection(
+            "$.x-ling-task.version",
+            "unsupported Task projection version",
+        ));
+    }
+    let task_definitions = graph
+        .definitions
+        .iter()
+        .filter(|definition| definition.kind == "task")
+        .map(|definition| definition.definition_id.as_str())
+        .collect::<BTreeSet<_>>();
+    let mut previous_definition: Option<&str> = None;
+    for (task_index, task) in projection.tasks.iter().enumerate() {
+        let path = format!("$.x-ling-task.tasks[{task_index}]");
+        if previous_definition.is_some_and(|previous| previous >= task.definition_id.as_str()) {
+            return Err(invalid_task_projection(
+                &path,
+                "Task definitions must be unique and strictly sorted",
+            ));
+        }
+        previous_definition = Some(&task.definition_id);
+        if !task_definitions.contains(task.definition_id.as_str())
+            || task.signature.is_empty()
+            || task.root_scope == 0
+            || task.span.start > task.span.end
+            || !strictly_sorted_unique(&task.effects)
+        {
+            return Err(invalid_task_projection(
+                &path,
+                "Task definition, signature, identity, span, or Effect row is invalid",
+            ));
+        }
+        let mut scope_ids = BTreeSet::new();
+        for (scope_index, scope) in task.scopes.iter().enumerate() {
+            if scope.id == 0
+                || !scope_ids.insert(scope.id)
+                || scope.span.start > scope.span.end
+                || scope
+                    .parent
+                    .is_some_and(|parent| !scope_ids.contains(&parent))
+            {
+                return Err(invalid_task_projection(
+                    &format!("{path}.scopes[{scope_index}]"),
+                    "Task scope identity, parent, order, or span is invalid",
+                ));
+            }
+        }
+        if task
+            .scopes
+            .first()
+            .is_none_or(|scope| scope.id != task.root_scope || scope.parent.is_some())
+        {
+            return Err(invalid_task_projection(
+                &format!("{path}.root_scope"),
+                "root scope must be the first parentless Task scope",
+            ));
+        }
+        let mut spawned = BTreeMap::new();
+        for (spawn_index, spawn) in task.spawns.iter().enumerate() {
+            if spawn.task <= 1
+                || spawned.insert(spawn.task, spawn.scope).is_some()
+                || !scope_ids.contains(&spawn.scope)
+                || spawn.parent != 1
+                || !task_definitions.contains(spawn.target.as_str())
+                || spawn.cancellation != spawn.task
+                || spawn.cleanup != spawn.task
+                || !matches!(spawn.syntax.as_str(), "explicit" | "let!")
+                || spawn.span.start > spawn.span.end
+                || spawn.operator_span.start > spawn.operator_span.end
+                || spawn.target_span.start > spawn.target_span.end
+                || spawn.call_span.start > spawn.call_span.end
+                || spawn
+                    .pattern_span
+                    .as_ref()
+                    .is_some_and(|span| span.start > span.end)
+                || (spawn.syntax == "let!") != spawn.pattern_span.is_some()
+            {
+                return Err(invalid_task_projection(
+                    &format!("{path}.spawns[{spawn_index}]"),
+                    "Task spawn identity, ownership, syntax, target, or span is invalid",
+                ));
+            }
+        }
+        let mut suspension_ids = BTreeSet::new();
+        for (suspension_index, suspension) in task.suspensions.iter().enumerate() {
+            let mut previous_binding = None;
+            let live_valid = suspension.live.iter().all(|live| {
+                let ordered = previous_binding.is_none_or(|previous| previous < live.binding);
+                previous_binding = Some(live.binding);
+                ordered && live.binding != 0 && !live.type_name.is_empty()
+            });
+            if suspension.id == 0
+                || !suspension_ids.insert(suspension.id)
+                || spawned.get(&suspension.awaited_task) != Some(&suspension.scope)
+                || suspension.span.start > suspension.span.end
+                || !live_valid
+            {
+                return Err(invalid_task_projection(
+                    &format!("{path}.suspensions[{suspension_index}]"),
+                    "Task suspension identity, ownership, live set, or span is invalid",
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
+fn invalid_task_projection(path: &str, reason: &str) -> SemanticReadError {
+    SemanticReadError {
+        kind: SemanticReadErrorKind::InvalidTaskProjection {
+            reason: reason.to_owned(),
+        },
+        path: path.to_owned(),
+    }
 }
 
 fn validate_trait_ide(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
@@ -2333,6 +2832,7 @@ impl SnapshotBuilder {
         let nodes = self.nodes();
         let references = self.references();
         let trait_ide = self.trait_ide();
+        let task = self.task_projection();
         let graph = SemanticGraph {
             schema: SEMANTIC_SCHEMA.to_owned(),
             language_version: LANGUAGE_VERSION.to_owned(),
@@ -2355,6 +2855,7 @@ impl SnapshotBuilder {
             nodes,
             references,
             trait_ide,
+            task,
         };
         let json = serde_json::to_string(&graph).map_err(SnapshotError::Serialization)?;
         Ok(ProgramSnapshot {
@@ -2374,6 +2875,7 @@ impl SnapshotBuilder {
         let nodes = self.nodes();
         let references = self.references();
         let trait_ide = self.trait_ide();
+        let task = self.task_projection();
         let project = self
             .checked
             .typed()
@@ -2415,6 +2917,7 @@ impl SnapshotBuilder {
             nodes,
             references,
             trait_ide,
+            task,
         };
         let json = serde_json::to_string(&graph).map_err(ProjectSnapshotError::Serialization)?;
         Ok(ProjectProgramSnapshot {
@@ -2574,6 +3077,84 @@ impl SnapshotBuilder {
         Some(SemanticTraitIdeProjection {
             version: TRAIT_IDE_EXTENSION_VERSION.to_owned(),
             witnesses,
+        })
+    }
+
+    fn task_projection(&self) -> Option<SemanticTaskProjection> {
+        if self.checked.task_cores().is_empty() {
+            return None;
+        }
+        let typed = self.checked.typed();
+        let tasks = self
+            .checked
+            .task_cores()
+            .values()
+            .map(|core| {
+                let type_id = typed
+                    .definition_type(core.definition())
+                    .expect("checked Task Core has a checked signature");
+                SemanticTask {
+                    definition_id: core.definition().to_string(),
+                    signature: format!(
+                        "{} ! {{{}}}",
+                        typed.display_type(type_id),
+                        core.signature().effects().canonical_names().join(", ")
+                    ),
+                    effects: core.signature().effects().canonical_names(),
+                    root_scope: core.root_scope().get(),
+                    result_body: core.result_body().local().get(),
+                    span: semantic_byte_span(core.source_span()),
+                    scopes: core
+                        .scopes()
+                        .iter()
+                        .map(|scope| SemanticTaskScope {
+                            id: scope.id().get(),
+                            parent: scope.parent().map(|parent| parent.get()),
+                            span: semantic_byte_span(scope.span()),
+                        })
+                        .collect(),
+                    spawns: core
+                        .spawns()
+                        .iter()
+                        .map(|spawn| SemanticTaskSpawn {
+                            task: spawn.task().get(),
+                            scope: spawn.scope().get(),
+                            parent: spawn.parent().get(),
+                            target: spawn.target().to_string(),
+                            cancellation: spawn.cancellation().get(),
+                            cleanup: spawn.cleanup().get(),
+                            syntax: spawn.syntax().as_str().to_owned(),
+                            span: semantic_byte_span(spawn.span()),
+                            operator_span: semantic_byte_span(spawn.operator_span()),
+                            pattern_span: spawn.pattern_span().map(semantic_byte_span),
+                            target_span: semantic_byte_span(spawn.target_span()),
+                            call_span: semantic_byte_span(spawn.call_span()),
+                        })
+                        .collect(),
+                    suspensions: core
+                        .suspensions()
+                        .iter()
+                        .map(|suspension| SemanticTaskSuspension {
+                            id: suspension.id().get(),
+                            scope: suspension.scope().get(),
+                            awaited_task: suspension.awaited_task().get(),
+                            live: suspension
+                                .live()
+                                .iter()
+                                .map(|live| SemanticTaskLiveBinding {
+                                    binding: live.binding().local().get(),
+                                    type_name: typed.display_type(live.value_type()),
+                                })
+                                .collect(),
+                            span: semantic_byte_span(suspension.span()),
+                        })
+                        .collect(),
+                }
+            })
+            .collect();
+        Some(SemanticTaskProjection {
+            version: TASK_GRAPH_EXTENSION_VERSION.to_owned(),
+            tasks,
         })
     }
 
@@ -2876,6 +3457,49 @@ impl SnapshotBuilder {
                     &definition.value,
                 );
             }
+            for task in &module.hir.tasks {
+                let Some(definition_id) = resolved.definition_id(module.id, &task.name.normalized)
+                else {
+                    continue;
+                };
+                let task_owner = semantic_node_id(
+                    self.mode,
+                    module.package.as_ref(),
+                    "task",
+                    &module_name,
+                    &format!("definition:{definition_id}"),
+                );
+                nodes.push(semantic_node(
+                    self.mode,
+                    module.package.as_ref(),
+                    "task",
+                    &module_name,
+                    &format!("definition:{definition_id}"),
+                    Some(&task.name.normalized),
+                    definition_id.as_str(),
+                    typed
+                        .definition_type(definition_id)
+                        .map(|type_id| typed.display_type(type_id)),
+                    None,
+                    None,
+                    self.checked
+                        .definition_effect(definition_id)
+                        .map_or_else(Vec::new, ling_effects::EffectRow::names),
+                    Vec::new(),
+                    identifier_metadata(&task.name),
+                ));
+                for (ordinal, parameter) in task.parameters.iter().enumerate() {
+                    add_parameter_and_pattern_nodes(
+                        &mut nodes,
+                        typed,
+                        context,
+                        &task_owner,
+                        ordinal,
+                        parameter,
+                    );
+                }
+                add_expression_nodes(&mut nodes, &self.checked, context, &task_owner, &task.body);
+            }
             for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
                 for (member_ordinal, member) in implementation.members.iter().enumerate() {
                     let Some(member_id) = resolved
@@ -3052,6 +3676,18 @@ impl SnapshotBuilder {
                         self.encode_pattern(module, pattern, encoder);
                     }
                     self.encode_expression(module, &value.value, encoder);
+                } else if let Some(task) = resolved_module
+                    .hir
+                    .tasks
+                    .iter()
+                    .find(|task| task.name.normalized == info.name)
+                {
+                    encoder.u8(4);
+                    encoder.u32(u32::try_from(task.parameters.len()).unwrap_or(u32::MAX));
+                    for pattern in &task.parameters {
+                        self.encode_pattern(module, pattern, encoder);
+                    }
+                    self.encode_expression(module, &task.body, encoder);
                 } else if let Some(member) = typed.resolved().impl_member(definition) {
                     let value = resolved_module
                         .hir
@@ -3124,8 +3760,29 @@ impl SnapshotBuilder {
                             encoder.u8(1);
                             self.encode_expression(module, expression, encoder);
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            encoder.u8(2);
+                            self.encode_pattern(module, &binding.pattern, encoder);
+                            self.encode_expression(module, &binding.call, encoder);
+                        }
                     }
                 }
+            }
+            hir::ExpressionKind::TaskScope { body, .. } => {
+                encoder.u8(16);
+                self.encode_expression(module, body, encoder);
+            }
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                encoder.u8(17);
+                self.encode_expression(module, call, encoder);
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                encoder.u8(18);
+                self.encode_expression(module, handle, encoder);
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => {
+                encoder.u8(19);
+                self.encode_expression(module, value, encoder);
             }
             hir::ExpressionKind::If {
                 condition,
@@ -3771,8 +4428,30 @@ fn add_expression_nodes(
                     hir::SequenceElement::Expression(expression) => {
                         add_expression_nodes(nodes, checked, context, owner, expression)
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        add_pattern_nodes(nodes, typed, context, &expression_id, &binding.pattern);
+                        add_expression_nodes(
+                            nodes,
+                            checked,
+                            context,
+                            &expression_id,
+                            &binding.call,
+                        );
+                    }
                 }
             }
+        }
+        hir::ExpressionKind::TaskScope { body, .. } => {
+            add_expression_nodes(nodes, checked, context, &expression_id, body)
+        }
+        hir::ExpressionKind::TaskSpawn { call, .. } => {
+            add_expression_nodes(nodes, checked, context, &expression_id, call)
+        }
+        hir::ExpressionKind::TaskAwait { handle, .. } => {
+            add_expression_nodes(nodes, checked, context, &expression_id, handle)
+        }
+        hir::ExpressionKind::TaskReturn { value, .. } => {
+            add_expression_nodes(nodes, checked, context, &expression_id, value)
         }
         hir::ExpressionKind::If {
             condition,
@@ -3872,6 +4551,10 @@ fn add_expression_nodes(
 fn expression_kind(expression: &hir::ExpressionKind) -> &'static str {
     match expression {
         hir::ExpressionKind::Sequence(_) => "sequence",
+        hir::ExpressionKind::TaskScope { .. } => "task_scope",
+        hir::ExpressionKind::TaskSpawn { .. } => "task_spawn",
+        hir::ExpressionKind::TaskAwait { .. } => "task_await",
+        hir::ExpressionKind::TaskReturn { .. } => "task_return",
         hir::ExpressionKind::Handle { .. } => "handler",
         hir::ExpressionKind::If { .. } => "if",
         hir::ExpressionKind::Match { .. } => "match",
@@ -3904,6 +4587,16 @@ fn reference_source_ids(
                 &module_name,
                 module.id,
                 &definition.value,
+                &mut sources,
+            );
+        }
+        for task in &module.hir.tasks {
+            collect_expression_reference_sources(
+                mode,
+                module.package.as_ref(),
+                &module_name,
+                module.id,
+                &task.body,
                 &mut sources,
             );
         }
@@ -3958,6 +4651,7 @@ fn collect_expression_reference_sources(
             for element in elements {
                 let expression = match element {
                     hir::SequenceElement::Let(binding) => &binding.value,
+                    hir::SequenceElement::LetAwait(binding) => &binding.call,
                     hir::SequenceElement::Expression(expression) => expression,
                 };
                 collect_expression_reference_sources(
@@ -3969,6 +4663,23 @@ fn collect_expression_reference_sources(
                     sources,
                 );
             }
+        }
+        hir::ExpressionKind::TaskScope { body, .. } => {
+            collect_expression_reference_sources(mode, package, module_name, module, body, sources)
+        }
+        hir::ExpressionKind::TaskSpawn { call, .. } => {
+            collect_expression_reference_sources(mode, package, module_name, module, call, sources)
+        }
+        hir::ExpressionKind::TaskAwait { handle, .. } => collect_expression_reference_sources(
+            mode,
+            package,
+            module_name,
+            module,
+            handle,
+            sources,
+        ),
+        hir::ExpressionKind::TaskReturn { value, .. } => {
+            collect_expression_reference_sources(mode, package, module_name, module, value, sources)
         }
         hir::ExpressionKind::If {
             condition,
@@ -4176,6 +4887,7 @@ fn encode_optional_package(package: Option<&PackageIdentity>, encoder: &mut Enco
 fn definition_kind(kind: DefinitionKind) -> &'static str {
     match kind {
         DefinitionKind::Value => "value",
+        DefinitionKind::Task => "task",
         DefinitionKind::Type => "type",
         DefinitionKind::Constructor => "constructor",
         DefinitionKind::Builtin => "builtin",
@@ -4421,6 +5133,79 @@ mod tests {
         assert_eq!(handler.residual_row, "{}");
         assert_eq!(handler.clauses[0].label, "Clock");
         assert!(handler.source_start < handler.source_end);
+    }
+
+    #[test]
+    fn checked_task_publishes_valid_graph_and_audit_extensions() {
+        let source = concat!(
+            "module Main\n\n",
+            "task child value =\n",
+            "    scope\n",
+            "        return value\n\n",
+            "task parent value =\n",
+            "    scope\n",
+            "        let! result = child value\n",
+            "        return result\n",
+        );
+        let snapshot = snapshot_named("任务.ling", source);
+        let projection = snapshot
+            .graph()
+            .task
+            .as_ref()
+            .expect("Task graph extension");
+        assert_eq!(projection.version, TASK_GRAPH_EXTENSION_VERSION);
+        assert_eq!(projection.tasks.len(), 2);
+        let parent = projection
+            .tasks
+            .iter()
+            .find(|task| task.spawns.len() == 1)
+            .expect("parent Task projection");
+        assert_eq!(parent.spawns[0].syntax, "let!");
+        assert!(parent.spawns[0].pattern_span.is_some());
+        assert_eq!(parent.suspensions.len(), 1);
+        assert_eq!(
+            read_json(snapshot.json()).expect("Task graph reads"),
+            *snapshot.graph()
+        );
+
+        let audit = snapshot.audit_model();
+        validate_audit_model(&audit).expect("Task Audit validates");
+        let audit_parent = audit
+            .modules
+            .iter()
+            .flat_map(|module| &module.tasks)
+            .find(|task| task.spawns.len() == 1)
+            .expect("parent Task Audit");
+        assert_eq!(audit_parent.spawns[0].syntax, "let!");
+        assert!(audit_parent.spawns[0].pattern_start.is_some());
+    }
+
+    #[test]
+    fn task_audit_accepts_path_exclusive_suspensions_for_one_spawn() {
+        let snapshot = snapshot(concat!(
+            "module Main\n\n",
+            "task child value =\n",
+            "    scope\n",
+            "        return value\n\n",
+            "task parent value =\n",
+            "    scope\n",
+            "        let handle = spawn child value\n",
+            "        let result = if true then await handle else await handle\n",
+            "        return result\n",
+        ));
+        let audit = snapshot.audit_model();
+        let parent = audit
+            .modules
+            .iter()
+            .flat_map(|module| &module.tasks)
+            .find(|task| task.spawns.len() == 1)
+            .expect("parent Task Audit projection");
+        assert_eq!(parent.suspensions.len(), 2);
+        assert_eq!(
+            parent.suspensions[0].awaited_task,
+            parent.suspensions[1].awaited_task
+        );
+        validate_audit_model(&audit).expect("path-exclusive suspensions validate");
     }
 
     #[test]

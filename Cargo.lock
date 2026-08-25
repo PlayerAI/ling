@@ -279,6 +279,7 @@ name = "ling-effects"
 version = "0.0.1-dev"
 dependencies = [
  "ling-ast",
+ "ling-concurrency",
  "ling-diagnostics",
  "ling-hir",
  "ling-resolve",

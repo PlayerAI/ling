@@ -499,7 +499,7 @@ implemented = true
 [[protocol]]
 id = "PROTO-AUDIT-SOURCE"
 visibility = "Public"
-version = "ling.audit/0.2"
+version = "ling.audit/0.3"
 stability = "Preview"
 implemented = true
 

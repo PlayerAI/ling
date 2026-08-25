@@ -93,6 +93,9 @@ pub(crate) fn collect_obligations(
             );
             collector.visit_expression(module.id, &module.hir.source_name, &definition.value);
         }
+        for task in &module.hir.tasks {
+            collector.visit_expression(module.id, &module.hir.source_name, &task.body);
+        }
 
         for implementation in &module.hir.impls {
             let trait_name = implementation.trait_name.normalized();
@@ -192,11 +195,26 @@ impl Collector {
                             );
                             self.visit_expression(module, source_name, &binding.value);
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            self.visit_expression(module, source_name, &binding.call);
+                        }
                         hir::SequenceElement::Expression(expression) => {
                             self.visit_expression(module, source_name, expression);
                         }
                     }
                 }
+            }
+            hir::ExpressionKind::TaskScope { body, .. } => {
+                self.visit_expression(module, source_name, body);
+            }
+            hir::ExpressionKind::TaskSpawn { call, .. } => {
+                self.visit_expression(module, source_name, call);
+            }
+            hir::ExpressionKind::TaskAwait { handle, .. } => {
+                self.visit_expression(module, source_name, handle);
+            }
+            hir::ExpressionKind::TaskReturn { value, .. } => {
+                self.visit_expression(module, source_name, value);
             }
             hir::ExpressionKind::If {
                 condition,

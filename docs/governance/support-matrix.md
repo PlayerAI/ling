@@ -70,7 +70,7 @@ This draft separates current evidence from candidate 1.0 scope. Empty current-pr
 | Protocol | Visibility | Version | Stability | Implemented |
 | --- | --- | --- | --- | ---: |
 | `PROTO-ABI` | `Planned public` | — | `Future` | no |
-| `PROTO-AUDIT-SOURCE` | `Public` | `ling.audit/0.2` | `Preview` | yes |
+| `PROTO-AUDIT-SOURCE` | `Public` | `ling.audit/0.3` | `Preview` | yes |
 | `PROTO-BUILD-METADATA` | `Public` | `ling.project.artifact/0.1` | `Experimental` | yes |
 | `PROTO-BYTECODE` | `Public` | `ling.bytecode/1.4` | `Experimental` | yes |
 | `PROTO-CANONICAL-BYTES` | `Public` | `file-mode v1 and package-aware v2 domain encodings` | `Experimental` | yes |

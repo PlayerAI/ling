@@ -435,6 +435,9 @@ fn eval_fault(error: &EvalRuntimeFault, committed: bool) -> FaultProjection {
         EvalFaultKind::HandlerResumeCardinality { operation, .. } => {
             ("handler_resume_cardinality", operation.as_str())
         }
+        EvalFaultKind::TaskImplementationBoundary { .. } => {
+            ("task_implementation_boundary", "execute_task")
+        }
     };
     FaultProjection {
         category: category.to_owned(),

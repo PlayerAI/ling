@@ -27,6 +27,7 @@ pub fn lower_v1_1(
     snapshot: &ProgramSnapshot,
     sources: &[LoweringSource<'_>],
 ) -> Result<LoweredProgramV1_1, LoweringError> {
+    super::reject_checked_tasks(snapshot)?;
     ClosureLowerer::new(snapshot, sources)?.run()
 }
 
@@ -34,6 +35,7 @@ pub(crate) fn lower_v1_2_model(
     snapshot: &ProgramSnapshot,
     sources: &[LoweringSource<'_>],
 ) -> Result<UnverifiedProgram, LoweringError> {
+    super::reject_checked_tasks(snapshot)?;
     ClosureLowerer::new_with_mode(snapshot, sources, true)?.run_model()
 }
 
@@ -41,6 +43,7 @@ pub(crate) fn lower_v1_3_model(
     snapshot: &ProgramSnapshot,
     sources: &[LoweringSource<'_>],
 ) -> Result<UnverifiedProgram, LoweringError> {
+    super::reject_checked_tasks(snapshot)?;
     ClosureLowerer::new_with_modes(snapshot, sources, true, true, false)?.run_model()
 }
 
@@ -48,6 +51,7 @@ pub(crate) fn lower_v1_4_model(
     snapshot: &ProgramSnapshot,
     sources: &[LoweringSource<'_>],
 ) -> Result<UnverifiedProgram, LoweringError> {
+    super::reject_checked_tasks(snapshot)?;
     ClosureLowerer::new_with_modes(snapshot, sources, true, true, true)?.run_model()
 }
 
@@ -1257,6 +1261,7 @@ fn collect_handler_plans<'a>(
                 visit(
                     match element {
                         hir::SequenceElement::Let(binding) => &binding.value,
+                        hir::SequenceElement::LetAwait(binding) => &binding.call,
                         hir::SequenceElement::Expression(value) => value,
                     },
                     output,
@@ -1264,6 +1269,10 @@ fn collect_handler_plans<'a>(
                 )?;
             }
         }
+        hir::ExpressionKind::TaskScope { body, .. } => visit(body, output, ordinal)?,
+        hir::ExpressionKind::TaskSpawn { call, .. } => visit(call, output, ordinal)?,
+        hir::ExpressionKind::TaskAwait { handle, .. } => visit(handle, output, ordinal)?,
+        hir::ExpressionKind::TaskReturn { value, .. } => visit(value, output, ordinal)?,
         hir::ExpressionKind::Handle { body, clauses } => {
             let key = ExpressionKey::new(module.id, expression.id);
             let body_label = closure_label(expression.span, *ordinal);
@@ -1413,6 +1422,13 @@ fn collect_lifted<'a>(
                             ordinal,
                         )?;
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        return Err(unsupported_module(
+                            module,
+                            binding.span,
+                            "structured task execution (L-TASK-0004)",
+                        ));
+                    }
                     hir::SequenceElement::Expression(value) => collect_lifted(
                         snapshot,
                         module,
@@ -1426,6 +1442,16 @@ fn collect_lifted<'a>(
                     )?,
                 }
             }
+        }
+        hir::ExpressionKind::TaskScope { .. }
+        | hir::ExpressionKind::TaskSpawn { .. }
+        | hir::ExpressionKind::TaskAwait { .. }
+        | hir::ExpressionKind::TaskReturn { .. } => {
+            return Err(unsupported_module(
+                module,
+                expression.span,
+                "structured task execution (L-TASK-0004)",
+            ));
         }
         hir::ExpressionKind::Handle { body, clauses } => {
             collect_lifted(
@@ -1822,11 +1848,27 @@ fn collect_declared_bindings(
                             collect_declared_bindings(module, &binding.value, output);
                         }
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        collect_pattern_bindings(module, &binding.pattern, output);
+                        collect_declared_bindings(module, &binding.call, output);
+                    }
                     hir::SequenceElement::Expression(value) => {
                         collect_declared_bindings(module, value, output);
                     }
                 }
             }
+        }
+        hir::ExpressionKind::TaskScope { body, .. } => {
+            collect_declared_bindings(module, body, output)
+        }
+        hir::ExpressionKind::TaskSpawn { call, .. } => {
+            collect_declared_bindings(module, call, output)
+        }
+        hir::ExpressionKind::TaskAwait { handle, .. } => {
+            collect_declared_bindings(module, handle, output)
+        }
+        hir::ExpressionKind::TaskReturn { value, .. } => {
+            collect_declared_bindings(module, value, output)
         }
         hir::ExpressionKind::If {
             condition,
@@ -1957,6 +1999,17 @@ fn collect_free_bindings(
                         declared,
                         output,
                     )?,
+                    hir::SequenceElement::LetAwait(binding) => {
+                        return Err(LoweringError::without_span(
+                            None,
+                            LoweringErrorKind::UnsupportedFeature {
+                                feature: format!(
+                                    "structured task execution at byte {} (L-TASK-0004)",
+                                    binding.span.start().get()
+                                ),
+                            },
+                        ));
+                    }
                     hir::SequenceElement::Expression(value) => collect_free_bindings(
                         module,
                         value,
@@ -1970,6 +2023,17 @@ fn collect_free_bindings(
                     )?,
                 }
             }
+        }
+        hir::ExpressionKind::TaskScope { .. }
+        | hir::ExpressionKind::TaskSpawn { .. }
+        | hir::ExpressionKind::TaskAwait { .. }
+        | hir::ExpressionKind::TaskReturn { .. } => {
+            return Err(LoweringError::without_span(
+                None,
+                LoweringErrorKind::UnsupportedFeature {
+                    feature: "structured task execution (L-TASK-0004)".to_owned(),
+                },
+            ));
         }
         hir::ExpressionKind::If {
             condition,
@@ -2240,11 +2304,32 @@ fn collect_cell_effect_bindings(
                             );
                         }
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        collect_cell_effect_bindings(
+                            module,
+                            &binding.call,
+                            resolved,
+                            cell_bindings,
+                            output,
+                        );
+                    }
                     hir::SequenceElement::Expression(value) => {
                         collect_cell_effect_bindings(module, value, resolved, cell_bindings, output)
                     }
                 }
             }
+        }
+        hir::ExpressionKind::TaskScope { body, .. } => {
+            collect_cell_effect_bindings(module, body, resolved, cell_bindings, output)
+        }
+        hir::ExpressionKind::TaskSpawn { call, .. } => {
+            collect_cell_effect_bindings(module, call, resolved, cell_bindings, output)
+        }
+        hir::ExpressionKind::TaskAwait { handle, .. } => {
+            collect_cell_effect_bindings(module, handle, resolved, cell_bindings, output)
+        }
+        hir::ExpressionKind::TaskReturn { value, .. } => {
+            collect_cell_effect_bindings(module, value, resolved, cell_bindings, output)
         }
         hir::ExpressionKind::Handle { body, clauses } => {
             // Handle invokes its lifted body and selected clause in this function's
@@ -2728,6 +2813,11 @@ impl<'a> SignatureResolver<'a> {
                 span,
                 "nested function type without Effect provenance",
             )),
+            Type::Task { .. } | Type::TaskHandle { .. } => Err(source_or_global_unsupported(
+                module,
+                span,
+                "structured task execution (L-TASK-0004)",
+            )),
             Type::Float64 => Err(source_or_global_unsupported(module, span, "Float64")),
             Type::Tuple(elements) if self.aggregate_mode => Ok(TypeKey::Tuple(
                 elements
@@ -2977,9 +3067,19 @@ impl<'a> SignatureResolver<'a> {
     fn bytecode_effects(
         &self,
         row: &EffectRow,
-        _module: &ling_resolve::ResolvedModule,
-        _span: Span,
+        module: &ling_resolve::ResolvedModule,
+        span: Span,
     ) -> Result<Vec<EffectKey>, LoweringError> {
+        if row
+            .effects()
+            .any(|effect| matches!(effect, CheckedEffect::TaskSpawn | CheckedEffect::TaskAwait))
+        {
+            return Err(unsupported_module(
+                module,
+                span,
+                "structured task execution (L-TASK-0004)",
+            ));
+        }
         let mut effects = row
             .effects()
             .filter_map(|effect| match effect {
@@ -2989,6 +3089,7 @@ impl<'a> SignatureResolver<'a> {
                     .get(identity)
                     .cloned()
                     .map(|value_type| EffectKey::State(Box::new(value_type))),
+                CheckedEffect::TaskSpawn | CheckedEffect::TaskAwait => None,
             })
             .collect::<Vec<_>>();
         effects.sort();
@@ -3217,6 +3318,11 @@ fn checked_type_key_with_substitution(
             module,
             span,
             "nested function type lacks Effect provenance",
+        )),
+        Type::Task { .. } | Type::TaskHandle { .. } => Err(unsupported_module(
+            module,
+            span,
+            "structured task execution (L-TASK-0004)",
         )),
         Type::Float64 => Err(unsupported_module(module, span, "Float64")),
         Type::List(_) => Err(unsupported_module(module, span, "list")),
@@ -3561,6 +3667,9 @@ fn bytecode_effects_without_source(row: &EffectRow) -> Result<Vec<EffectKey>, Lo
             CheckedEffect::State { .. } => Err(invalid_without_span(
                 "builtin unexpectedly has a State Effect",
             )),
+            CheckedEffect::TaskSpawn | CheckedEffect::TaskAwait => Err(invalid_without_span(
+                "builtin unexpectedly has a Task Effect",
+            )),
         })
         .collect()
 }
@@ -3904,6 +4013,13 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                             local.insert(key, self.bind_storage(key, value, binding.span)?);
                             result = None;
                         }
+                        hir::SequenceElement::LetAwait(binding) => {
+                            return Err(unsupported_module(
+                                self.module,
+                                binding.span,
+                                "structured task execution (L-TASK-0004)",
+                            ));
+                        }
                         hir::SequenceElement::Expression(value) => {
                             result = Some(self.lower_expression(value, &mut local)?);
                         }
@@ -3914,6 +4030,14 @@ impl<'a, 'snapshot, 'source> FunctionEmitter<'a, 'snapshot, 'source> {
                 }
                 result.map_or_else(|| self.emit_constant(expression, Constant::Unit), Ok)
             }
+            hir::ExpressionKind::TaskScope { .. }
+            | hir::ExpressionKind::TaskSpawn { .. }
+            | hir::ExpressionKind::TaskAwait { .. }
+            | hir::ExpressionKind::TaskReturn { .. } => Err(unsupported_module(
+                self.module,
+                expression.span,
+                "structured task execution (L-TASK-0004)",
+            )),
             hir::ExpressionKind::Handle { clauses, .. } => {
                 if !self.owner.handler_mode {
                     return Err(unsupported_module(self.module, expression.span, "handler"));
@@ -6033,11 +6157,28 @@ fn collect_type_shapes(
                     hir::SequenceElement::Let(binding) => {
                         collect_type_shapes(snapshot, module, &binding.value, builder)?
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        return Err(unsupported_module(
+                            module,
+                            binding.span,
+                            "structured task execution (L-TASK-0004)",
+                        ));
+                    }
                     hir::SequenceElement::Expression(value) => {
                         collect_type_shapes(snapshot, module, value, builder)?;
                     }
                 }
             }
+        }
+        hir::ExpressionKind::TaskScope { .. }
+        | hir::ExpressionKind::TaskSpawn { .. }
+        | hir::ExpressionKind::TaskAwait { .. }
+        | hir::ExpressionKind::TaskReturn { .. } => {
+            return Err(unsupported_module(
+                module,
+                expression.span,
+                "structured task execution (L-TASK-0004)",
+            ));
         }
         hir::ExpressionKind::If {
             condition,
@@ -6169,6 +6310,13 @@ fn collect_constants_v1_1(
                         )?;
                         final_expression = false;
                     }
+                    hir::SequenceElement::LetAwait(binding) => {
+                        return Err(unsupported_module(
+                            module,
+                            binding.span,
+                            "structured task execution (L-TASK-0004)",
+                        ));
+                    }
                     hir::SequenceElement::Expression(value) => {
                         collect_constants_v1_1(
                             snapshot,
@@ -6185,6 +6333,16 @@ fn collect_constants_v1_1(
             if !final_expression {
                 insert_constant(constants, Constant::Unit)?;
             }
+        }
+        hir::ExpressionKind::TaskScope { .. }
+        | hir::ExpressionKind::TaskSpawn { .. }
+        | hir::ExpressionKind::TaskAwait { .. }
+        | hir::ExpressionKind::TaskReturn { .. } => {
+            return Err(unsupported_module(
+                module,
+                expression.span,
+                "structured task execution (L-TASK-0004)",
+            ));
         }
         hir::ExpressionKind::Handle { body, clauses } => {
             collect_constants_v1_1(snapshot, module, body, strings, constants, aggregate_mode)?;
@@ -6438,6 +6596,11 @@ fn ensure_supported_shape(
             }
             ensure_supported_shape(typed, *result, module, span, aggregate_mode)
         }
+        Type::Task { .. } | Type::TaskHandle { .. } => Err(unsupported_module(
+            module,
+            span,
+            "structured task execution (L-TASK-0004)",
+        )),
         Type::Float64 => Err(unsupported_module(module, span, "Float64")),
         Type::Tuple(elements) if aggregate_mode => {
             for element in elements {

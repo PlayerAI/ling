@@ -6,8 +6,7 @@ use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_effects::locate_main;
 use ling_eval::{MemoryConsole, execute_main};
 
-use crate::CompileFailure;
-use crate::compile_path;
+use crate::{CompileFailure, checked_task_implementation_boundary, compile_path};
 
 pub(crate) const TEST_PROTOCOL: &str = "ling.test/0.1";
 
@@ -185,31 +184,44 @@ pub(crate) fn run(root: PathBuf) -> Result<Summary, Failure> {
     let mut failure = FailureClass::None;
     for file in files {
         let case = match compile_path(&file.path) {
-            Ok(compiled) => match locate_main(compiled.snapshot.checked()) {
-                Ok(main) => {
-                    let mut console = MemoryConsole::default();
-                    match execute_main(&compiled.snapshot, &main, &mut console) {
-                        Ok(()) => CaseReport {
+            Ok(compiled) => {
+                if let Some(diagnostic) =
+                    checked_task_implementation_boundary(compiled.snapshot.checked(), "test")
+                {
+                    CaseReport {
+                        name: file.name,
+                        status: CaseStatus::CompileFailed,
+                        stdout: String::new(),
+                        diagnostics: vec![diagnostic],
+                    }
+                } else {
+                    match locate_main(compiled.snapshot.checked()) {
+                        Ok(main) => {
+                            let mut console = MemoryConsole::default();
+                            match execute_main(&compiled.snapshot, &main, &mut console) {
+                                Ok(()) => CaseReport {
+                                    name: file.name,
+                                    status: CaseStatus::Passed,
+                                    stdout: console.output().to_owned(),
+                                    diagnostics: Vec::new(),
+                                },
+                                Err(fault) => CaseReport {
+                                    name: file.name,
+                                    status: CaseStatus::RuntimeFailed,
+                                    stdout: console.output().to_owned(),
+                                    diagnostics: vec![fault.to_diagnostic()],
+                                },
+                            }
+                        }
+                        Err(error) => CaseReport {
                             name: file.name,
-                            status: CaseStatus::Passed,
-                            stdout: console.output().to_owned(),
-                            diagnostics: Vec::new(),
-                        },
-                        Err(fault) => CaseReport {
-                            name: file.name,
-                            status: CaseStatus::RuntimeFailed,
-                            stdout: console.output().to_owned(),
-                            diagnostics: vec![fault.to_diagnostic()],
+                            status: CaseStatus::CompileFailed,
+                            stdout: String::new(),
+                            diagnostics: vec![error.to_diagnostic()],
                         },
                     }
                 }
-                Err(error) => CaseReport {
-                    name: file.name,
-                    status: CaseStatus::CompileFailed,
-                    stdout: String::new(),
-                    diagnostics: vec![error.to_diagnostic()],
-                },
-            },
+            }
             Err(CompileFailure::Diagnostics(diagnostics)) => CaseReport {
                 name: file.name,
                 status: CaseStatus::CompileFailed,

@@ -1,0 +1,13 @@
+module Main
+
+task child value =
+    scope
+        return value
+
+task parent value =
+    scope
+        let handle = spawn child value
+        let first = await handle
+        let! second = child first
+        scope
+            return second

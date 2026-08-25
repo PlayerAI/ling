@@ -231,6 +231,16 @@ impl EffectLabel {
     }
 
     #[must_use]
+    pub fn task_spawn() -> Self {
+        Self::new(EffectId::reserved("Task.Spawn"), [])
+    }
+
+    #[must_use]
+    pub fn task_await() -> Self {
+        Self::new(EffectId::reserved("Task.Await"), [])
+    }
+
+    #[must_use]
     pub fn task() -> Self {
         Self::new(EffectId::reserved("Task"), [])
     }

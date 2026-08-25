@@ -529,6 +529,7 @@ fn lexical_kind(kind: TokenKind) -> Option<SemanticTokenKind> {
         | TokenKind::Star
         | TokenKind::Slash
         | TokenKind::Percent
+        | TokenKind::Bang
         | TokenKind::AmpAmp
         | TokenKind::PipePipe => Some(SemanticTokenKind::Operator),
         TokenKind::Whitespace
@@ -602,6 +603,18 @@ impl<'checked, 'builder, 'source> TypedClassifier<'checked, 'builder, 'source> {
         }
         for definition in &program.definitions {
             self.definition(definition, false)?;
+        }
+        for task in &program.tasks {
+            self.structure(task.keyword_span, SemanticTokenKind::Keyword, Vec::new())?;
+            self.checked_declaration(
+                task.name.span,
+                SemanticTokenKind::Function,
+                vec![SemanticTokenModifier::Definition],
+            )?;
+            for parameter in &task.parameters {
+                self.pattern(parameter, true)?;
+            }
+            self.expression(&task.body, None)?;
         }
         for implementation in &program.impls {
             self.qualified(&implementation.trait_name, SemanticTokenKind::Interface)?;
@@ -850,9 +863,40 @@ impl<'checked, 'builder, 'source> TypedClassifier<'checked, 'builder, 'source> {
                 for element in elements {
                     match element {
                         SequenceElement::Let(binding) => self.local_binding(binding)?,
+                        SequenceElement::LetAwait(binding) => {
+                            self.structure(
+                                binding.let_bang_span,
+                                SemanticTokenKind::Keyword,
+                                Vec::new(),
+                            )?;
+                            self.pattern(&binding.pattern, false)?;
+                            self.expression(&binding.call, Some(ReferenceUse::Call))?;
+                        }
                         SequenceElement::Expression(value) => self.expression(value, None)?,
                     }
                 }
+            }
+            ExpressionKind::TaskScope { keyword_span, body } => {
+                self.structure(*keyword_span, SemanticTokenKind::Keyword, Vec::new())?;
+                self.expression(body, None)?;
+            }
+            ExpressionKind::TaskSpawn { keyword_span, call } => {
+                self.structure(*keyword_span, SemanticTokenKind::Keyword, Vec::new())?;
+                self.expression(call, Some(ReferenceUse::Call))?;
+            }
+            ExpressionKind::TaskAwait {
+                keyword_span,
+                handle,
+            } => {
+                self.structure(*keyword_span, SemanticTokenKind::Keyword, Vec::new())?;
+                self.expression(handle, None)?;
+            }
+            ExpressionKind::TaskReturn {
+                keyword_span,
+                value,
+            } => {
+                self.structure(*keyword_span, SemanticTokenKind::Keyword, Vec::new())?;
+                self.expression(value, None)?;
             }
             ExpressionKind::Handle { body, clauses } => {
                 self.expression(body, None)?;
@@ -1049,7 +1093,7 @@ impl<'checked, 'builder, 'source> TypedClassifier<'checked, 'builder, 'source> {
             DefinitionKind::Type => SemanticTokenKind::Type,
             DefinitionKind::Constructor => SemanticTokenKind::EnumMember,
             DefinitionKind::Builtin => SemanticTokenKind::Function,
-            DefinitionKind::Value => {
+            DefinitionKind::Value | DefinitionKind::Task => {
                 if relation == ReferenceUse::Call || self.definition_is_callable(definition) {
                     SemanticTokenKind::Function
                 } else {

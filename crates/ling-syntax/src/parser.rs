@@ -122,6 +122,7 @@ struct Parser<'tokens> {
     position: usize,
     errors: Vec<ParseError>,
     depth: usize,
+    task_depth: usize,
 }
 
 impl<'tokens> Parser<'tokens> {
@@ -131,6 +132,7 @@ impl<'tokens> Parser<'tokens> {
             position: 0,
             errors: Vec::new(),
             depth: 0,
+            task_depth: 0,
         }
     }
 
@@ -147,6 +149,9 @@ impl<'tokens> Parser<'tokens> {
                 TokenKind::Type => self.parse_type_declaration(),
                 TokenKind::Trait => self.parse_trait_declaration(),
                 TokenKind::Impl => self.parse_impl_declaration(),
+                TokenKind::Identifier if self.is_contextual("task") => {
+                    self.parse_task_declaration()
+                }
                 _ => {
                     self.unexpected(
                         &[
@@ -156,6 +161,7 @@ impl<'tokens> Parser<'tokens> {
                             TokenKind::Type,
                             TokenKind::Trait,
                             TokenKind::Impl,
+                            TokenKind::Identifier,
                         ],
                         "program",
                     );
@@ -174,6 +180,32 @@ impl<'tokens> Parser<'tokens> {
             CstNode::new(NodeKind::Program, start..self.position, children),
             self.errors,
         )
+    }
+
+    fn parse_task_declaration(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect_contextual("task", "Task declaration");
+        self.expect(TokenKind::Identifier, "Task name");
+        while self.starts_pattern() && !self.at(TokenKind::Equals) {
+            children.push(self.parse_pattern("Task parameter"));
+        }
+        self.expect(TokenKind::Equals, "Task declaration");
+        if !self.eat_newlines(false) {
+            self.unexpected(&[TokenKind::Newline], "Task declaration body");
+        }
+        self.expect(TokenKind::Indent, "Task declaration body");
+        self.task_depth = self.task_depth.saturating_add(1);
+        if self.is_contextual("scope") {
+            children.push(self.parse_task_scope_expression());
+        } else {
+            self.unexpected(&[TokenKind::Identifier], "Task outer scope");
+            self.recover_to(TokenKind::Dedent);
+        }
+        self.task_depth = self.task_depth.saturating_sub(1);
+        self.eat_newlines(false);
+        self.expect(TokenKind::Dedent, "Task declaration body");
+        CstNode::new(NodeKind::TaskDeclaration, start..self.position, children)
     }
 
     fn parse_module_declaration(&mut self) -> CstNode {
@@ -629,7 +661,9 @@ impl<'tokens> Parser<'tokens> {
         self.eat_newlines(false);
         while !self.at(TokenKind::Dedent) && !self.at(TokenKind::Eof) {
             let before = self.position;
-            let child = if self.at(TokenKind::Let) {
+            let child = if self.task_depth > 0 && self.at_adjacent_let_bang() {
+                self.parse_task_let_await()
+            } else if self.at(TokenKind::Let) {
                 self.parse_let_declaration()
             } else {
                 self.parse_expression()
@@ -665,13 +699,95 @@ impl<'tokens> Parser<'tokens> {
             return CstNode::new(NodeKind::Error, start..self.position, Vec::new());
         }
         self.depth += 1;
-        let expression = match self.current_kind() {
-            TokenKind::If => self.parse_if_expression(),
-            TokenKind::Match => self.parse_match_expression(),
-            _ => self.parse_assignment_expression(),
+        let expression = if self.task_depth > 0 && self.is_contextual("scope") {
+            self.parse_task_scope_expression()
+        } else if self.task_depth > 0 && self.is_contextual("spawn") {
+            self.parse_task_spawn_expression()
+        } else if self.task_depth > 0 && self.is_contextual("await") {
+            self.parse_task_await_expression()
+        } else if self.task_depth > 0 && self.is_contextual("return") {
+            self.parse_task_return_expression()
+        } else {
+            match self.current_kind() {
+                TokenKind::If => self.parse_if_expression(),
+                TokenKind::Match => self.parse_match_expression(),
+                _ => self.parse_assignment_expression(),
+            }
         };
         self.depth -= 1;
         expression
+    }
+
+    fn parse_task_scope_expression(&mut self) -> CstNode {
+        let start = self.position;
+        self.expect_contextual("scope", "Task scope");
+        if !self.eat_newlines(false) {
+            self.unexpected(&[TokenKind::Newline], "Task scope body");
+        }
+        self.expect(TokenKind::Indent, "Task scope body");
+        let body = self.parse_sequence();
+        self.expect(TokenKind::Dedent, "Task scope body");
+        CstNode::new(
+            NodeKind::TaskScopeExpression,
+            start..self.position,
+            vec![body],
+        )
+    }
+
+    fn parse_task_spawn_expression(&mut self) -> CstNode {
+        let start = self.position;
+        self.expect_contextual("spawn", "Task spawn");
+        let call = self.parse_application_expression();
+        CstNode::new(
+            NodeKind::TaskSpawnExpression,
+            start..self.position,
+            vec![call],
+        )
+    }
+
+    fn parse_task_await_expression(&mut self) -> CstNode {
+        let start = self.position;
+        self.expect_contextual("await", "Task await");
+        let handle = self.parse_postfix_expression();
+        CstNode::new(
+            NodeKind::TaskAwaitExpression,
+            start..self.position,
+            vec![handle],
+        )
+    }
+
+    fn parse_task_return_expression(&mut self) -> CstNode {
+        let start = self.position;
+        self.expect_contextual("return", "Task return");
+        let value = self.parse_expression();
+        CstNode::new(
+            NodeKind::TaskReturnExpression,
+            start..self.position,
+            vec![value],
+        )
+    }
+
+    fn parse_task_let_await(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect(TokenKind::Let, "Task let-await");
+        self.expect(TokenKind::Bang, "Task let-await");
+        children.push(self.parse_pattern("Task let-await pattern"));
+        self.expect(TokenKind::Equals, "Task let-await");
+        children.push(self.parse_application_expression());
+        CstNode::new(NodeKind::TaskLetAwait, start..self.position, children)
+    }
+
+    fn at_adjacent_let_bang(&self) -> bool {
+        if !self.at(TokenKind::Let) {
+            return false;
+        }
+        let let_index = self.next_nontrivia_index(self.position);
+        let bang_index = self.next_nontrivia_index(let_index + 1);
+        self.tokens.get(bang_index).is_some_and(|bang| {
+            bang.kind() == TokenKind::Bang
+                && self.tokens[let_index].span().end() == bang.span().start()
+        })
     }
 
     fn parse_non_assignment_expression(&mut self) -> CstNode {

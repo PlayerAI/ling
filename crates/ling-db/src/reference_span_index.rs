@@ -137,6 +137,9 @@ fn collect_program(
             spans,
         );
     }
+    for task in &program.tasks {
+        collect_expression(module, &task.body, ResolvedReferenceRelation::Read, spans);
+    }
     for implementation in &program.impls {
         for definition in &implementation.members {
             collect_expression(
@@ -167,6 +170,14 @@ fn collect_expression(
                             spans,
                         );
                     }
+                    SequenceElement::LetAwait(binding) => {
+                        collect_expression(
+                            module,
+                            &binding.call,
+                            ResolvedReferenceRelation::Call,
+                            spans,
+                        );
+                    }
                     SequenceElement::Expression(expression) => {
                         collect_expression(
                             module,
@@ -177,6 +188,18 @@ fn collect_expression(
                     }
                 }
             }
+        }
+        ExpressionKind::TaskScope { body, .. } => {
+            collect_expression(module, body, ResolvedReferenceRelation::Read, spans);
+        }
+        ExpressionKind::TaskSpawn { call, .. } => {
+            collect_expression(module, call, ResolvedReferenceRelation::Call, spans);
+        }
+        ExpressionKind::TaskAwait { handle, .. } => {
+            collect_expression(module, handle, ResolvedReferenceRelation::Read, spans);
+        }
+        ExpressionKind::TaskReturn { value, .. } => {
+            collect_expression(module, value, ResolvedReferenceRelation::Read, spans);
         }
         ExpressionKind::Handle { body, clauses } => {
             collect_expression(module, body, ResolvedReferenceRelation::Read, spans);

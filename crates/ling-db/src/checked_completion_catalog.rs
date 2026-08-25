@@ -111,7 +111,7 @@ impl CheckedCompletionCatalog {
 
         for definition in resolved.definitions().values() {
             let (kind, module_id) = match definition.kind {
-                DefinitionKind::Value => (
+                DefinitionKind::Value | DefinitionKind::Task => (
                     CheckedCompletionKind::Value,
                     user_module_id(definition.origin),
                 ),
