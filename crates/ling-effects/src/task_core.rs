@@ -180,6 +180,7 @@ pub struct CheckedTaskSuspension {
     id: SuspensionPointId,
     scope: ScopeId,
     awaited_task: TaskId,
+    continuation: ExpressionKey,
     live: Box<[SuspensionLiveBinding]>,
     span: Span,
 }
@@ -198,6 +199,11 @@ impl CheckedTaskSuspension {
     #[must_use]
     pub const fn awaited_task(&self) -> TaskId {
         self.awaited_task
+    }
+
+    #[must_use]
+    pub const fn continuation(&self) -> ExpressionKey {
+        self.continuation
     }
 
     #[must_use]
@@ -1129,6 +1135,7 @@ impl<'a> Builder<'a> {
             id: suspension,
             scope,
             awaited_task: task,
+            continuation: ExpressionKey::new(self.module, expression),
             live: live.into_boxed_slice(),
             span,
         });

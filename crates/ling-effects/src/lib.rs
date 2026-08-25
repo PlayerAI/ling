@@ -17,6 +17,7 @@ use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
 mod handler_core;
 mod solver;
 mod task_core;
+mod task_machine;
 mod v2;
 
 pub use handler_core::{
@@ -31,6 +32,10 @@ pub use solver::{
 pub use task_core::{
     CheckedTaskCore, CheckedTaskScope, CheckedTaskSignature, CheckedTaskSpawn,
     CheckedTaskSpawnSyntax, CheckedTaskSuspension, SuspensionLiveBinding,
+};
+pub use task_machine::{
+    CHECKED_TASK_MACHINE_VERSION, CheckedTaskFrameSlot, CheckedTaskMachine, CheckedTaskMachineEdge,
+    CheckedTaskMachineEdgeKind, CheckedTaskMachineState, CheckedTaskMachineStateKind,
 };
 pub use v2::{
     EFFECT_GRAPH_EXTENSION_VERSION, EffectGraphProjection, EffectId, EffectIdError, EffectLabel,
@@ -173,6 +178,7 @@ pub struct CheckedProgram {
     expression_effects: BTreeMap<ExpressionKey, EffectRow>,
     handler_cores: BTreeMap<ExpressionKey, HandlerCore>,
     task_cores: BTreeMap<DefinitionId, CheckedTaskCore>,
+    task_machines: BTreeMap<DefinitionId, CheckedTaskMachine>,
     module_capabilities: BTreeMap<ModuleId, BTreeSet<Capability>>,
     warnings: Vec<Diagnostic>,
 }
@@ -269,6 +275,16 @@ impl CheckedProgram {
     #[must_use]
     pub fn task_cores(&self) -> &BTreeMap<DefinitionId, CheckedTaskCore> {
         &self.task_cores
+    }
+
+    #[must_use]
+    pub fn task_machine(&self, definition: &DefinitionId) -> Option<&CheckedTaskMachine> {
+        self.task_machines.get(definition)
+    }
+
+    #[must_use]
+    pub fn task_machines(&self) -> &BTreeMap<DefinitionId, CheckedTaskMachine> {
+        &self.task_machines
     }
 
     #[must_use]
@@ -623,9 +639,26 @@ impl Checker {
             .collect();
         let expression_effects = self.build_expression_effect_rows(&callable_effects);
         let handler_cores = self.build_handler_cores(&callable_effects);
+        let mut task_machines = BTreeMap::new();
         let task_cores = match task_core::build_checked_task_cores(&self.typed, &definition_effects)
         {
-            Ok(cores) => cores,
+            Ok(cores) => {
+                match task_machine::build_checked_task_machines(&self.typed, &cores) {
+                    Ok(machines) => task_machines = machines,
+                    Err(failures) => {
+                        self.errors
+                            .extend(failures.into_iter().map(|failure| EffectError {
+                                kind: EffectErrorKind::InvalidTaskStructure {
+                                    reason: failure.reason,
+                                    target: Some(failure.detail),
+                                },
+                                source_name: failure.source_name,
+                                span: failure.span,
+                            }));
+                    }
+                }
+                cores
+            }
             Err(failures) => {
                 self.errors
                     .extend(failures.into_iter().map(|failure| EffectError {
@@ -674,6 +707,7 @@ impl Checker {
                 expression_effects,
                 handler_cores,
                 task_cores,
+                task_machines,
                 module_capabilities,
                 warnings: self.warnings,
             })
