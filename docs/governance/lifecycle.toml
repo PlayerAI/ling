@@ -7590,13 +7590,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0266"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0266-structured-task-lifecycle-runtime.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-26"
 proposed = "2026-08-26"
-decided = ""
-stable_basis = false
+decided = "2026-08-27"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Drive checked empty, nested, sequential, and multiple-child scopes through explicit task selections and freeze lifecycle, join, cleanup, and terminal invariants.",
@@ -7605,7 +7605,7 @@ conformance_plan = [
   "Keep public CLI, project, REPL, artifact, bytecode 1.0 through 1.4, and VM paths behind L-TASK-0004 while preserving ordinary Seed and Handler differentials.",
 ]
 compatibility_impact = [
-  "Proposes an internal scheduler-neutral Task lifecycle kernel and same-scope handle registry without changing prior program, Task Core, machine, Semantic Graph, or Audit bytes.",
+  "Authorizes an internal scheduler-neutral Task lifecycle kernel and same-scope handle registry without changing prior program, Task Core, machine, Semantic Graph, or Audit bytes.",
   "Reuses L-RUNTIME-0001 for Task resource/Fault facts and retains L-TASK-0004 for public execution; adds no diagnostic code, public protocol, scheduler policy, bytecode/ABI, CLI entry, package, Stable, or Unicode change.",
 ]
 unresolved_alternatives = [

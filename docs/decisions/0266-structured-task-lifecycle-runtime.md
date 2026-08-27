@@ -1,8 +1,8 @@
 # DEC-0266: Scheduler-neutral Structured Task lifecycle runtime / 与调度器解耦的 Structured Task 生命周期 Runtime
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-26<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-27<br>
 > Owner role：concurrency-design<br>
 > 相关 RFC/缺口：DEC-0093 | DEC-0264 | DEC-0265 | GAP-STRUCTURED-TASK-001 | TASK-2203<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`

@@ -9630,7 +9630,7 @@ notes = [
 [[task]]
 id = "TASK-2203"
 title = "Structured Task lifecycle runtime"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9679,8 +9679,8 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "TASK-2201 and TASK-2202 are complete checked-only dependencies; Proposed DEC-0266 defines a scheduler-neutral lifecycle kernel but is not implementation authority until Accepted, so TASK-2203 remains BlockedSpec.",
-  "DEC-0266 also proposes retaining same-scope linear Task handles in the runtime scope registry across suspension so multiple live children, default join, and deterministic multi-child Fault aggregation are implementable without changing DEC-0265 value-frame bytes.",
+  "TASK-2201 and TASK-2202 are complete checked-only dependencies; Accepted DEC-0266 authorizes the scheduler-neutral lifecycle kernel, so TASK-2203 is Ready.",
+  "DEC-0266 retains same-scope linear Task handles in the runtime scope registry across suspension so multiple live children, default join, and deterministic multi-child Fault aggregation are implementable without changing DEC-0265 value-frame bytes.",
   "ling-eval executes checked Seed snapshots synchronously and ling-vm provides Seed frame/resource limits and host cancellation; neither has a Task scope tree, child registry, join barrier, cleanup stack, or Fault aggregation.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, scheduler, or Unicode 17.0.0 behavior.",
 ]
