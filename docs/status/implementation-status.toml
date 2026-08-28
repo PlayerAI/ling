@@ -9630,7 +9630,7 @@ notes = [
 [[task]]
 id = "TASK-2203"
 title = "Structured Task lifecycle runtime"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9654,6 +9654,14 @@ spec = [
 artifacts = [
   "docs/status/TASK-2203-AUTHORITY-AUDIT.md",
   "docs/decisions/0266-structured-task-lifecycle-runtime.md",
+  "docs/status/TASK-2203-IMPLEMENTATION-REPORT.md",
+  "crates/ling-effects/src/task_core.rs",
+  "crates/ling-effects/tests/structured_task_frontend.rs",
+  "crates/ling-eval/src/task_runtime.rs",
+  "crates/ling-eval/src/machine.rs",
+  "crates/ling-eval/src/lib.rs",
+  "crates/ling-eval/tests/task_runtime.rs",
+  "crates/ling-vm/tests/differential.rs",
   "docs/status/TASK-2203-LIFECYCLE-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/TASK-2203-LIFECYCLE-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0093-task-lifecycle-observation-trace.md",
@@ -9667,22 +9675,22 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing scope/child lifecycle, join, cancellation topology, timeout/Clock, Fault aggregation, cleanup, orphan, scheduler, interpreter/VM, resource, diagnostic, schema, and migration contracts.",
-  "The audit distinguishes current Seed synchronous evaluation and host-only VM cancellation from the missing Structured Task runtime authority and preserves the checked-only evaluation boundary.",
-  "The audit covers nested/empty scopes, multiple children, default join, cancellation before/after effects, timeout races, child Fault combinations, cleanup on success/cancel/Fault, unobserved results, detach/orphan rejection, resource limits, Unicode/CRLF/BOM spans, deterministic traces, and lifecycle differential fixtures.",
-  "No Task runtime, scope registry, child cancellation propagation, join policy, Fault aggregator, timeout API, orphan detector, scheduler interface, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
-  "The future runtime must consume checked Task state machines only, make scope/cancellation/cleanup/Fault transitions explicit, separate deterministic test scheduling from production behavior, and publish lifecycle differential evidence before Task execution is exposed.",
-  "Accepted DEC-0093 authorizes only the publish-disabled lifecycle observation child; it does not authorize Task runtime ordering, join, cancellation, timeout, cleanup, Fault aggregation, orphan, scheduler, or public protocol behavior.",
+  "Accepted DEC-0266 authorizes the internal Experimental scheduler-neutral lifecycle kernel; no scheduling policy or public Task execution route is claimed.",
+  "TaskRuntime consumes a successful CheckedProgram plus matching DEC-0264 Core and DEC-0265 machine evidence, validates argument structure and explicit non-zero bounds, and exposes only canonical ready-set plus caller-selected step operations.",
+  "Runtime lexical identities, atomic spawn registration, same-scope linear handle retention, await/wake, structured close, cancellation propagation, children-first exactly-once cleanup, and deterministic Fault aggregation are implemented.",
+  "Twenty focused tests cover positive, negative, bounded, cancellation, cleanup, Fault, Unicode/span, invalid-driver, nominal-value, and opposite explicit-schedule differential behavior.",
+  "Public file/project run, test, build, REPL, artifact, bytecode 1.0 through 1.4, and VM routes retain L-TASK-0004 until later scheduler and entry authority is Accepted.",
+  "Workspace tests, strict Clippy, formatting, governance, status, and support gates pass against implementation commit e8765790c421f3437049562d69c9aa6d487b5464.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "e8765790c421f3437049562d69c9aa6d487b5464"
+completion_commit = "e8765790c421f3437049562d69c9aa6d487b5464"
+integration_state = "committed"
+completed = "2026-08-28"
 notes = [
-  "TASK-2201 and TASK-2202 are complete checked-only dependencies; Accepted DEC-0266 authorizes the scheduler-neutral lifecycle kernel, so TASK-2203 is Ready.",
-  "DEC-0266 retains same-scope linear Task handles in the runtime scope registry across suspension so multiple live children, default join, and deterministic multi-child Fault aggregation are implementable without changing DEC-0265 value-frame bytes.",
-  "ling-eval executes checked Seed snapshots synchronously and ling-vm provides Seed frame/resource limits and host cancellation; neither has a Task scope tree, child registry, join barrier, cleanup stack, or Fault aggregation.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, runtime, scheduler, or Unicode 17.0.0 behavior.",
+  "TASK-2203 is internal and publish-disabled: TaskRuntime never chooses among ready Tasks, reads time, starts threads, or changes public Ling entry behavior.",
+  "The same-scope handle registry amendment preserves existing canonical Task Core/machine bytes while enabling multiple live children and deterministic multi-child Fault retention.",
+  "TASK-2204 through TASK-2206 remain blocked on their own Accepted scheduling, production-runtime, resource, detach, and final conformance authority.",
+  "No public schema, protocol, Semantic ID, bytecode, artifact, CLI/LSP, or Unicode 17.0.0 contract changed.",
 ]
 
 [[task]]
