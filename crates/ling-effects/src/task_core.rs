@@ -43,6 +43,7 @@ impl CheckedTaskSignature {
 pub struct CheckedTaskScope {
     id: ScopeId,
     parent: Option<ScopeId>,
+    expression: ExpressionKey,
     span: Span,
 }
 
@@ -55,6 +56,11 @@ impl CheckedTaskScope {
     #[must_use]
     pub const fn parent(self) -> Option<ScopeId> {
         self.parent
+    }
+
+    #[must_use]
+    pub const fn expression(self) -> ExpressionKey {
+        self.expression
     }
 
     #[must_use]
@@ -85,6 +91,7 @@ pub struct CheckedTaskSpawn {
     scope: ScopeId,
     parent: TaskId,
     target: DefinitionId,
+    call: ExpressionKey,
     cancellation: CancellationTokenId,
     cleanup: CleanupRegionId,
     span: Span,
@@ -114,6 +121,11 @@ impl CheckedTaskSpawn {
     #[must_use]
     pub const fn target(&self) -> &DefinitionId {
         &self.target
+    }
+
+    #[must_use]
+    pub const fn call(&self) -> ExpressionKey {
+        self.call
     }
 
     #[must_use]
@@ -601,6 +613,7 @@ impl<'a> Builder<'a> {
                 self.scopes.push(CheckedTaskScope {
                     id: scope,
                     parent: parent_scope,
+                    expression: ExpressionKey::new(self.module, expression.id),
                     span: expression.span,
                 });
                 self.index_expression(body, Some(scope));
@@ -993,6 +1006,7 @@ impl<'a> Builder<'a> {
             scope,
             parent: TaskId::new(1),
             target,
+            call: ExpressionKey::new(self.module, call.id),
             cancellation: CancellationTokenId::new(task.get()),
             cleanup: CleanupRegionId::new(task.get()),
             span,
@@ -1106,14 +1120,16 @@ impl<'a> Builder<'a> {
                     suspension,
                 );
             }
-            if state
-                .handles
-                .get(binding)
-                .is_some_and(|handle| !handle.consumed)
-            {
+            if let Some(handle) = state.handles.get(binding).filter(|handle| !handle.consumed) {
+                if handle.scope == scope {
+                    // DEC-0266 keeps this linear handle in the runtime scope
+                    // registry. It is deliberately absent from the typed
+                    // suspension frame below.
+                    continue;
+                }
                 self.suspension_error(
                     span,
-                    "other_task_handle_crosses_suspension",
+                    "cross_scope_task_handle_crosses_suspension",
                     Some(info.name.clone()),
                     suspension,
                 );

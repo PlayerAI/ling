@@ -57,6 +57,32 @@ enum Control {
         arguments: Vec<Value>,
         span: Span,
     },
+    TaskScopeEnter {
+        module: ModuleId,
+        expression: ExpressionKey,
+        span: Span,
+        body: hir::Expression,
+        environment: Environment,
+    },
+    TaskScopeExit {
+        expression: ExpressionKey,
+        span: Span,
+        value: Value,
+    },
+    TaskSpawn {
+        call: ExpressionKey,
+        span: Span,
+        arguments: Vec<Value>,
+    },
+    TaskAwait {
+        continuation: ExpressionKey,
+        span: Span,
+        handle: Value,
+    },
+    TaskReturn {
+        span: Span,
+        value: Value,
+    },
 }
 
 #[derive(Clone, Debug)]
@@ -70,6 +96,37 @@ enum Frame {
         module: ModuleId,
         binding: hir::LocalBinding,
         cell: Cell,
+        remaining: VecDeque<hir::SequenceElement>,
+        environment: Environment,
+    },
+    TaskScope {
+        expression: ExpressionKey,
+        span: Span,
+    },
+    TaskSpawnArguments {
+        module: ModuleId,
+        call: ExpressionKey,
+        span: Span,
+        values: Vec<Value>,
+        remaining: VecDeque<hir::Expression>,
+        environment: Environment,
+    },
+    TaskAwait {
+        continuation: ExpressionKey,
+        span: Span,
+    },
+    TaskReturn {
+        span: Span,
+    },
+    TaskLetAwaitHandle {
+        module: ModuleId,
+        binding: hir::TaskLetAwait,
+        remaining: VecDeque<hir::SequenceElement>,
+        environment: Environment,
+    },
+    TaskLetAwaitBinding {
+        module: ModuleId,
+        binding: hir::TaskLetAwait,
         remaining: VecDeque<hir::SequenceElement>,
         environment: Environment,
     },
@@ -200,53 +257,238 @@ enum AggregateKind {
     List,
 }
 
+#[derive(Clone, Debug)]
+pub(super) enum TaskBoundary {
+    ScopeEnter {
+        expression: ExpressionKey,
+        span: Span,
+    },
+    ScopeExit {
+        expression: ExpressionKey,
+        span: Span,
+        value: Value,
+    },
+    Spawn {
+        call: ExpressionKey,
+        span: Span,
+        arguments: Vec<Value>,
+    },
+    Await {
+        continuation: ExpressionKey,
+        span: Span,
+        handle: Value,
+    },
+    Return {
+        span: Span,
+        value: Value,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub(super) enum EvaluationOutcome {
+    Complete(Value),
+    HostEffect,
+    Task(TaskBoundary),
+}
+
+#[derive(Clone, Debug)]
+pub(super) struct Evaluation {
+    control: Option<Control>,
+    frames: Vec<Frame>,
+}
+
+impl Evaluation {
+    pub(super) fn new(
+        module: ModuleId,
+        expression: hir::Expression,
+        environment: Environment,
+    ) -> Self {
+        Self {
+            control: Some(Control::Expression {
+                module,
+                expression,
+                environment,
+            }),
+            frames: Vec::new(),
+        }
+    }
+
+    pub(super) fn enter_scope(&mut self) -> Result<(), &'static str> {
+        let Some(Control::TaskScopeEnter {
+            module,
+            body,
+            environment,
+            ..
+        }) = self.control.take()
+        else {
+            return Err("task runtime resumed a non-scope-entry boundary");
+        };
+        self.control = Some(Control::Expression {
+            module,
+            expression: body,
+            environment,
+        });
+        Ok(())
+    }
+
+    pub(super) fn resume_value(&mut self, value: Value) -> Result<(), &'static str> {
+        if !matches!(
+            self.control,
+            Some(
+                Control::TaskScopeExit { .. }
+                    | Control::TaskSpawn { .. }
+                    | Control::TaskAwait { .. }
+            )
+        ) {
+            return Err("task runtime resumed a non-value boundary");
+        }
+        self.control = Some(Control::Value(value));
+        Ok(())
+    }
+
+    pub(super) fn run(
+        &mut self,
+        interpreter: &mut Interpreter<'_, '_>,
+    ) -> Result<EvaluationOutcome, RuntimeFault> {
+        let effect_epoch = interpreter.host_effect_epoch;
+        loop {
+            if let Some(boundary) = self.boundary() {
+                return Ok(EvaluationOutcome::Task(boundary));
+            }
+            let control = self.control.take().ok_or_else(|| {
+                interpreter.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
+                    invariant: "task evaluation resumed after completion",
+                })
+            })?;
+            self.control = Some(match control {
+                Control::Expression {
+                    module,
+                    expression,
+                    environment,
+                } => step_expression(
+                    interpreter,
+                    module,
+                    expression,
+                    environment,
+                    &mut self.frames,
+                )?,
+                Control::Definition(definition) => definition_control(interpreter, &definition)?,
+                Control::Value(value) => {
+                    let Some(frame) = self.frames.pop() else {
+                        if matches!(value, Value::Resume { .. }) {
+                            return Err(interpreter.fault_at_entry(
+                                RuntimeFaultKind::InvalidCheckedCore {
+                                    invariant: "handler continuation escaped its checked invocation",
+                                },
+                            ));
+                        }
+                        self.control = None;
+                        return Ok(EvaluationOutcome::Complete(value));
+                    };
+                    continue_frame(interpreter, frame, value, &mut self.frames)?
+                }
+                Control::Apply {
+                    module,
+                    callable,
+                    arguments,
+                    span,
+                } => apply(
+                    interpreter,
+                    module,
+                    callable,
+                    arguments,
+                    span,
+                    &mut self.frames,
+                )?,
+                Control::Operation {
+                    module,
+                    operation,
+                    arguments,
+                    span,
+                } => dispatch_operation(
+                    interpreter,
+                    module,
+                    operation,
+                    arguments,
+                    span,
+                    &mut self.frames,
+                )?,
+                Control::TaskScopeEnter { .. }
+                | Control::TaskScopeExit { .. }
+                | Control::TaskSpawn { .. }
+                | Control::TaskAwait { .. }
+                | Control::TaskReturn { .. } => unreachable!("returned by boundary above"),
+            });
+            if interpreter.host_effect_epoch != effect_epoch {
+                return Ok(EvaluationOutcome::HostEffect);
+            }
+        }
+    }
+
+    fn boundary(&self) -> Option<TaskBoundary> {
+        match self.control.as_ref()? {
+            Control::TaskScopeEnter {
+                expression, span, ..
+            } => Some(TaskBoundary::ScopeEnter {
+                expression: *expression,
+                span: *span,
+            }),
+            Control::TaskScopeExit {
+                expression,
+                span,
+                value,
+            } => Some(TaskBoundary::ScopeExit {
+                expression: *expression,
+                span: *span,
+                value: value.clone(),
+            }),
+            Control::TaskSpawn {
+                call,
+                span,
+                arguments,
+            } => Some(TaskBoundary::Spawn {
+                call: *call,
+                span: *span,
+                arguments: arguments.clone(),
+            }),
+            Control::TaskAwait {
+                continuation,
+                span,
+                handle,
+            } => Some(TaskBoundary::Await {
+                continuation: *continuation,
+                span: *span,
+                handle: handle.clone(),
+            }),
+            Control::TaskReturn { span, value } => Some(TaskBoundary::Return {
+                span: *span,
+                value: value.clone(),
+            }),
+            _ => None,
+        }
+    }
+}
+
 pub(super) fn evaluate(
     interpreter: &mut Interpreter<'_, '_>,
     module: ModuleId,
     expression: hir::Expression,
     environment: Environment,
 ) -> Result<Value, RuntimeFault> {
-    let mut control = Control::Expression {
-        module,
-        expression,
-        environment,
-    };
-    let mut frames = Vec::new();
-
+    let mut evaluation = Evaluation::new(module, expression, environment);
     loop {
-        control = match control {
-            Control::Expression {
-                module,
-                expression,
-                environment,
-            } => step_expression(interpreter, module, expression, environment, &mut frames)?,
-            Control::Definition(definition) => definition_control(interpreter, &definition)?,
-            Control::Value(value) => {
-                let Some(frame) = frames.pop() else {
-                    if matches!(value, Value::Resume { .. }) {
-                        return Err(interpreter.fault_at_entry(
-                            RuntimeFaultKind::InvalidCheckedCore {
-                                invariant: "handler continuation escaped its checked invocation",
-                            },
-                        ));
-                    }
-                    return Ok(value);
-                };
-                continue_frame(interpreter, frame, value, &mut frames)?
+        match evaluation.run(interpreter)? {
+            EvaluationOutcome::Complete(value) => return Ok(value),
+            EvaluationOutcome::HostEffect => {}
+            EvaluationOutcome::Task(boundary) => {
+                let _ = boundary;
+                return Err(
+                    interpreter.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
+                        invariant: "checked task execution reached the ordinary evaluator",
+                    }),
+                );
             }
-            Control::Apply {
-                module,
-                callable,
-                arguments,
-                span,
-            } => apply(interpreter, module, callable, arguments, span, &mut frames)?,
-            Control::Operation {
-                module,
-                operation,
-                arguments,
-                span,
-            } => dispatch_operation(interpreter, module, operation, arguments, span, &mut frames)?,
-        };
+        }
     }
 }
 
@@ -274,11 +516,30 @@ fn step_expression(
         hir::ExpressionKind::Sequence(elements) => {
             start_sequence(interpreter, module, elements.into(), environment, frames)
         }
-        hir::ExpressionKind::TaskScope { .. }
-        | hir::ExpressionKind::TaskSpawn { .. }
-        | hir::ExpressionKind::TaskAwait { .. }
-        | hir::ExpressionKind::TaskReturn { .. } => {
-            Err(interpreter.fault(module, span, "checked task execution is not implemented"))
+        hir::ExpressionKind::TaskScope { body, .. } => {
+            let expression = ExpressionKey::new(module, expression.id);
+            frames.push(Frame::TaskScope { expression, span });
+            Ok(Control::TaskScopeEnter {
+                module,
+                expression,
+                span,
+                body: *body,
+                environment,
+            })
+        }
+        hir::ExpressionKind::TaskSpawn { call, .. } => {
+            start_task_spawn(interpreter, module, *call, span, environment, frames)
+        }
+        hir::ExpressionKind::TaskAwait { handle, .. } => {
+            frames.push(Frame::TaskAwait {
+                continuation: ExpressionKey::new(module, expression.id),
+                span,
+            });
+            Ok(expression_control(module, *handle, environment))
+        }
+        hir::ExpressionKind::TaskReturn { value, .. } => {
+            frames.push(Frame::TaskReturn { span });
+            Ok(expression_control(module, *value, environment))
         }
         hir::ExpressionKind::Handle { body, clauses } => {
             validate_handler(interpreter, module, expression.id, &body, &clauses, span)?;
@@ -491,6 +752,77 @@ fn continue_frame(
         } => {
             *cell.borrow_mut() = value;
             environment.insert(BindingKey::new(module, binding.id), cell);
+            start_sequence(interpreter, module, remaining, environment, frames)
+        }
+        Frame::TaskScope { expression, span } => Ok(Control::TaskScopeExit {
+            expression,
+            span,
+            value,
+        }),
+        Frame::TaskSpawnArguments {
+            module,
+            call,
+            span,
+            mut values,
+            mut remaining,
+            environment,
+        } => {
+            values.push(value);
+            if let Some(argument) = remaining.pop_front() {
+                frames.push(Frame::TaskSpawnArguments {
+                    module,
+                    call,
+                    span,
+                    values,
+                    remaining,
+                    environment: environment.clone(),
+                });
+                Ok(expression_control(module, argument, environment))
+            } else {
+                Ok(Control::TaskSpawn {
+                    call,
+                    span,
+                    arguments: values,
+                })
+            }
+        }
+        Frame::TaskAwait { continuation, span } => Ok(Control::TaskAwait {
+            continuation,
+            span,
+            handle: value,
+        }),
+        Frame::TaskReturn { span } => Ok(Control::TaskReturn { span, value }),
+        Frame::TaskLetAwaitHandle {
+            module,
+            binding,
+            remaining,
+            environment,
+        } => {
+            frames.push(Frame::TaskLetAwaitBinding {
+                module,
+                binding: binding.clone(),
+                remaining,
+                environment,
+            });
+            Ok(Control::TaskAwait {
+                continuation: ExpressionKey::new(module, binding.call.id),
+                span: binding.span,
+                handle: value,
+            })
+        }
+        Frame::TaskLetAwaitBinding {
+            module,
+            binding,
+            remaining,
+            mut environment,
+        } => {
+            if !interpreter.match_pattern(module, &binding.pattern, &value, &mut environment)? {
+                return Err(interpreter.fault(
+                    module,
+                    binding.pattern.span,
+                    "checked let! result did not match",
+                ));
+            }
             start_sequence(interpreter, module, remaining, environment, frames)
         }
         Frame::If {
@@ -830,6 +1162,41 @@ fn continue_frame(
     }
 }
 
+fn start_task_spawn(
+    interpreter: &Interpreter<'_, '_>,
+    module: ModuleId,
+    call: hir::Expression,
+    span: Span,
+    environment: Environment,
+    frames: &mut Vec<Frame>,
+) -> Result<Control, RuntimeFault> {
+    let call_key = ExpressionKey::new(module, call.id);
+    let hir::ExpressionKind::Application { arguments, .. } = call.kind else {
+        return Err(interpreter.fault(
+            module,
+            call.span,
+            "checked Task spawn is not a direct application",
+        ));
+    };
+    let mut remaining = VecDeque::from(arguments);
+    let Some(argument) = remaining.pop_front() else {
+        return Ok(Control::TaskSpawn {
+            call: call_key,
+            span,
+            arguments: Vec::new(),
+        });
+    };
+    frames.push(Frame::TaskSpawnArguments {
+        module,
+        call: call_key,
+        span,
+        values: Vec::new(),
+        remaining,
+        environment: environment.clone(),
+    });
+    Ok(expression_control(module, argument, environment))
+}
+
 fn start_sequence(
     interpreter: &mut Interpreter<'_, '_>,
     module: ModuleId,
@@ -843,11 +1210,20 @@ fn start_sequence(
         };
         match element {
             hir::SequenceElement::LetAwait(binding) => {
-                return Err(interpreter.fault(
+                frames.push(Frame::TaskLetAwaitHandle {
                     module,
+                    binding: binding.clone(),
+                    remaining: elements,
+                    environment: environment.clone(),
+                });
+                return start_task_spawn(
+                    interpreter,
+                    module,
+                    binding.call,
                     binding.span,
-                    "checked task execution is not implemented",
-                ));
+                    environment,
+                    frames,
+                );
             }
             hir::SequenceElement::Expression(expression) => {
                 frames.push(Frame::Sequence {
@@ -1326,6 +1702,7 @@ fn dispatch_operation(
                     source_name: interpreter.module_source(module),
                     span,
                 })?;
+            interpreter.record_host_effect(module, span)?;
             return Ok(Control::Value(Value::Unit));
         }
         return Err(interpreter.fault(module, span, "unhandled checked Effect operation"));

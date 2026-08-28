@@ -153,7 +153,7 @@ fn task_handle_observation_is_checked_on_each_control_flow_path() {
 }
 
 #[test]
-fn task_suspension_rejects_mutable_and_other_handle_live_values() {
+fn task_suspension_rejects_mutable_but_retains_same_scope_handles_in_registry() {
     let mutable = check_errors(concat!(
         "module Main\n\n",
         "task child value =\n",
@@ -177,29 +177,29 @@ fn task_suspension_rejects_mutable_and_other_handle_live_values() {
         "{mutable:?}"
     );
 
-    let other_handle = check_errors(concat!(
-        "module Main\n\n",
-        "task child value =\n",
-        "    scope\n",
-        "        return value\n\n",
-        "task parent value =\n",
-        "    scope\n",
-        "        let first = spawn child value\n",
-        "        let second = spawn child value\n",
-        "        let left = await first\n",
-        "        let right = await second\n",
-        "        return right\n",
-    ));
-    assert!(
-        other_handle.iter().any(|error| matches!(
-            error.kind,
-            EffectErrorKind::UnsafeTaskSuspension {
-                reason: "other_task_handle_crosses_suspension",
-                ..
-            }
-        )),
-        "{other_handle:?}"
+    let multiple = check_source(
+        "multiple-live-handles.ling",
+        concat!(
+            "module Main\n\n",
+            "task child value =\n",
+            "    scope\n",
+            "        return value\n\n",
+            "task parent value =\n",
+            "    scope\n",
+            "        let first = spawn child value\n",
+            "        let second = spawn child value\n",
+            "        let left = await first\n",
+            "        let right = await second\n",
+            "        return right\n",
+        ),
     );
+    let parent = multiple
+        .task_cores()
+        .values()
+        .find(|core| core.spawns().len() == 2)
+        .expect("parent Task Core");
+    assert_eq!(parent.suspensions().len(), 2);
+    assert!(parent.suspensions()[0].live().is_empty());
 }
 
 #[test]

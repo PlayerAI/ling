@@ -295,6 +295,7 @@ name = "ling-eval"
 version = "0.0.1-dev"
 dependencies = [
  "ling-ast",
+ "ling-concurrency",
  "ling-diagnostics",
  "ling-effects",
  "ling-hir",

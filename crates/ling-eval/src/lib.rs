@@ -19,6 +19,12 @@ use ling_types::Type;
 use num_bigint::BigInt;
 
 mod machine;
+mod task_runtime;
+
+pub use task_runtime::{
+    TaskCancellationCause, TaskPath, TaskRuntime, TaskRuntimeLimits, TaskRuntimeState, TaskStep,
+    TaskStepKind, TaskValue,
+};
 
 /// Host console capability. `text` already contains Ling's canonical LF.
 pub trait Console {
@@ -97,6 +103,19 @@ pub enum RuntimeFaultKind {
     TaskImplementationBoundary {
         definition: String,
     },
+    TaskResourceLimit {
+        resource: &'static str,
+        limit: usize,
+    },
+    TaskDriver {
+        reason: &'static str,
+        task: String,
+    },
+    TaskFaultAggregate {
+        primary_task: String,
+        fault_count: usize,
+        related_tasks: Vec<String>,
+    },
 }
 
 impl RuntimeFault {
@@ -145,6 +164,27 @@ impl RuntimeFault {
                 ),
                 "handler_resume_cardinality",
             ),
+            RuntimeFaultKind::TaskResourceLimit { resource, limit } => (
+                format!("Structured Task 资源上限已耗尽：{resource}={limit}"),
+                format!("Structured Task resource limit exhausted: {resource}={limit}"),
+                "resource_limit",
+            ),
+            RuntimeFaultKind::TaskDriver { reason, task } => (
+                format!("Structured Task 驱动请求无效：{reason}（{task}）"),
+                format!("invalid Structured Task driver request: {reason} ({task})"),
+                "task_driver",
+            ),
+            RuntimeFaultKind::TaskFaultAggregate {
+                primary_task,
+                fault_count,
+                ..
+            } => (
+                format!("Structured Task 失败：主 Task {primary_task}，共 {fault_count} 个 Fault"),
+                format!(
+                    "Structured Task failed: primary Task {primary_task}, {fault_count} Fault(s)"
+                ),
+                "task_fault_aggregate",
+            ),
             RuntimeFaultKind::TaskImplementationBoundary { .. } => {
                 unreachable!("Task boundary returned above")
             }
@@ -154,6 +194,29 @@ impl RuntimeFault {
             .with_fact("category", category);
         if let RuntimeFaultKind::HandlerResumeCardinality { operation, .. } = &self.kind {
             diagnostic = diagnostic.with_fact("operation", operation.clone());
+        }
+        match &self.kind {
+            RuntimeFaultKind::TaskResourceLimit { resource, limit } => {
+                diagnostic = diagnostic
+                    .with_fact("resource", *resource)
+                    .with_fact("limit", limit.to_string());
+            }
+            RuntimeFaultKind::TaskDriver { reason, task } => {
+                diagnostic = diagnostic
+                    .with_fact("reason", *reason)
+                    .with_fact("task", task.clone());
+            }
+            RuntimeFaultKind::TaskFaultAggregate {
+                primary_task,
+                fault_count,
+                related_tasks,
+            } => {
+                diagnostic = diagnostic
+                    .with_fact("primary_task", primary_task.clone())
+                    .with_fact("fault_count", fault_count.to_string())
+                    .with_fact("related_tasks", related_tasks.join(","));
+            }
+            _ => {}
         }
         diagnostic
     }
@@ -307,6 +370,7 @@ enum Value {
         continuation: Rc<machine::ContinuationValue>,
         source_span: Span,
     },
+    TaskHandle(TaskPath),
 }
 
 #[derive(Clone, Debug)]
@@ -321,6 +385,7 @@ struct Interpreter<'snapshot, 'console> {
     checked: &'snapshot CheckedProgram,
     console: &'console mut dyn Console,
     next_handler_id: u64,
+    host_effect_epoch: u64,
 }
 
 impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
@@ -329,6 +394,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
             checked,
             console,
             next_handler_id: 0,
+            host_effect_epoch: 0,
         }
     }
 
@@ -903,6 +969,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                     source_name: self.module_source(module),
                     span,
                 })?;
+                self.record_host_effect(module, span)?;
                 Ok(Value::Unit)
             }
             Builtin::TextFormat => {
@@ -1132,6 +1199,14 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
         }
     }
 
+    fn record_host_effect(&mut self, module: ModuleId, span: Span) -> Result<(), RuntimeFault> {
+        self.host_effect_epoch = self
+            .host_effect_epoch
+            .checked_add(1)
+            .ok_or_else(|| self.fault(module, span, "host Effect observation identity overflow"))?;
+        Ok(())
+    }
+
     fn fault_at_entry(&self, kind: RuntimeFaultKind) -> RuntimeFault {
         let module = self.checked.typed().resolved().entry_module();
         RuntimeFault {
@@ -1287,6 +1362,7 @@ fn render_value(value: &Value) -> String {
         }
         Value::Constructor { case, .. } => format!("<constructor:{case}>"),
         Value::Resume { .. } => "<continuation>".to_owned(),
+        Value::TaskHandle(path) => format!("<task:{}>", path),
     }
 }
 

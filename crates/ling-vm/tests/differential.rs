@@ -438,6 +438,9 @@ fn eval_fault(error: &EvalRuntimeFault, committed: bool) -> FaultProjection {
         EvalFaultKind::TaskImplementationBoundary { .. } => {
             ("task_implementation_boundary", "execute_task")
         }
+        EvalFaultKind::TaskResourceLimit { resource, .. } => ("resource_limit", *resource),
+        EvalFaultKind::TaskDriver { reason, .. } => ("task_driver", *reason),
+        EvalFaultKind::TaskFaultAggregate { .. } => ("task_fault_aggregate", "task"),
     };
     FaultProjection {
         category: category.to_owned(),
