@@ -4329,3 +4329,16 @@ covers = ["TASK-2203 scheduler-neutral checked Task lifecycle kernel", "lexical 
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0093", "DEC-0264", "DEC-0265", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0267"
+title = "Deterministic Task test scheduler and virtual time"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0267-deterministic-task-test-scheduler.md"
+covers = ["TASK-2204 deterministic test-only Task scheduling", "exact SplitMix64 selection over canonical ready sets", "logical tick and explicit Deadline cancellation", "typed trace replay and bounded breadth-first interleaving exploration"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0094", "DEC-0264", "DEC-0265", "DEC-0266", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false
