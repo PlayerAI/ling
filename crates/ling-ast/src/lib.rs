@@ -18,7 +18,7 @@ pub enum Item {
     Import(ImportDeclaration),
     Let(LetDeclaration),
     Task(TaskDeclaration),
-    Actor(ActorDeclaration),
+    Actor(Box<ActorDeclaration>),
     Type(TypeDeclaration),
     Trait(TraitDeclaration),
     Impl(ImplDeclaration),
@@ -437,7 +437,9 @@ impl<'input> Lowerer<'input> {
             NodeKind::ImportDeclaration => self.import_declaration(node).map(Item::Import),
             NodeKind::LetDeclaration => self.let_declaration(node).map(Item::Let),
             NodeKind::TaskDeclaration => self.task_declaration(node).map(Item::Task),
-            NodeKind::ActorDeclaration => self.actor_declaration(node).map(Item::Actor),
+            NodeKind::ActorDeclaration => {
+                self.actor_declaration(node).map(Box::new).map(Item::Actor)
+            }
             NodeKind::TypeDeclaration => self.type_declaration(node).map(Item::Type),
             NodeKind::TraitDeclaration => self.trait_declaration(node).map(Item::Trait),
             NodeKind::ImplDeclaration => self.impl_declaration(node).map(Item::Impl),
