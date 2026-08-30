@@ -4355,3 +4355,16 @@ covers = ["TASK-2205 checked interpreter Task entry", "fixed local worker pool w
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0264", "DEC-0265", "DEC-0266", "DEC-0267", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0269"
+title = "Task conformance and stress evidence"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0269-task-conformance-and-stress-evidence.md"
+covers = ["TASK-2206 conformance outcome projection", "logical deadline, Fault-race, structured cleanup, and shutdown evidence", "exact one-million production Task-count ceiling", "bounded generated real-runtime stress without timing promises"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0264", "DEC-0265", "DEC-0266", "DEC-0267", "DEC-0268", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false

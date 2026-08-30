@@ -3030,6 +3030,12 @@ spec = [
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0264-structured-task-frontend-core.md",
+  "docs/decisions/0265-task-state-machine-lowering.md",
+  "docs/decisions/0266-structured-task-lifecycle-runtime.md",
+  "docs/decisions/0267-deterministic-task-test-scheduler.md",
+  "docs/decisions/0268-production-local-task-scheduler.md",
+  "docs/decisions/0269-task-conformance-and-stress-evidence.md",
   "docs/governance/gap-register.toml",
   "crates/ling-db/Cargo.toml",
   "crates/ling-db/src/lib.rs",
@@ -9941,24 +9947,26 @@ spec = [
 ]
 artifacts = [
   "docs/status/TASK-2206-AUTHORITY-AUDIT.md",
+  "docs/decisions/0269-task-conformance-and-stress-evidence.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing Task conformance oracle, lifecycle race precedence, Resource cleanup, timeout/Fault/detach, scheduler shutdown, million-task limits, stress reproducibility, traces, diagnostics, schemas, and migration contracts.",
-  "The audit distinguishes existing Seed conformance/VM limits and host cancellation from the missing Task runtime/stress authority and preserves the checked-only evaluation boundary.",
-  "The audit covers parent early exit, child cancellation Resource release, simultaneous child Faults, timeout versus normal completion, nested scopes, invalid detach, one million bounded short tasks, scheduler shutdown cleanup, Unicode/CRLF/BOM spans, deterministic traces, and interpreter/VM differential fixtures.",
-  "No Task conformance corpus, stress harness, Resource-release oracle, Fault or timeout precedence rule, detach diagnostic, million-task benchmark, scheduler-shutdown fixture, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
-  "The future tests must exercise checked Task Core only, use bounded reproducible resources and traces, distinguish test from production scheduling, retain minimized failures, and publish interpreter/VM and cleanup/resource evidence before claiming Task compatibility.",
+  "The refreshed audit records DEC-0264 through DEC-0268 and TASK-2201 through TASK-2205 as complete authority/implementation rather than repeating the obsolete pre-Task baseline.",
+  "The audit maps every TASK-2206 plan bullet to the current accepted profile, records the G2 user-Resource and valid-detach drift, and preserves checked-only execution, logical time, canonical Fault, and runtime-owned cleanup boundaries.",
+  "Proposed DEC-0269 defines the exact outcome projection, one-million Task-count ceiling, bounded generated stress, shutdown evidence, invalid-detach rejection, determinism, Unicode/span, diagnostics, schema, and deferred-work rules required before implementation.",
+  "The audit inventories existing Task frontend, runtime, deterministic-scheduler, production-scheduler, and CLI evidence and lists only the executable gaps remaining after DEC-0269 acceptance.",
+  "No ceiling, new oracle, Task conformance corpus, stress behavior, diagnostic, public schema, Semantic ID, bytecode/VM behavior, or placeholder API is implemented while DEC-0269 remains Proposed.",
 ]
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "TASK-2206 is BlockedSpec by TASK-2201/TASK-2202/TASK-2203/TASK-2204/TASK-2205, GAP-STRUCTURED-TASK-001, absent RFC-C202/RFC-0008, and missing Task conformance, stress, cleanup, Fault, timeout, detach, scheduler-shutdown, and resource oracle authority; DEC-0019/DEC-0021 apply only to internal compiler queries.",
-  "Current conformance/fuzz suites cover Seed syntax, projects, diagnostics, bytecode, and VM differential slices; no Task source/Core/runtime, lifecycle stress harness, or versioned stress-result/trace schema exists.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, stress corpus, traces, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "TASK-2206 now depends only on accepting or replacing Proposed DEC-0269; Accepted DEC-0264 through DEC-0268 and completed TASK-2201 through TASK-2205 supply the checked Task profile and scheduler implementations.",
+  "Existing Task suites already cover most lifecycle, Fault, logical-deadline, deterministic trace, production worker, cancellation, shutdown, cleanup, limit, and Unicode evidence; the refreshed audit identifies the focused missing integration and ceiling/stress cases.",
+  "ROADMAP-1.0 assigns user Resource finalizers to G3, while the accepted G2 Task profile has no valid detach operation; TASK-2206 cannot fabricate either feature from the lower-authority execution plan.",
+  "The audit and Proposed DEC-0269 preserve current compiler, interpreter, VM, bytecode, scheduler, diagnostics, schemas, Semantic IDs, source spans, and Unicode 17.0.0 behavior until acceptance authorizes implementation.",
 ]
 
 [[task]]

@@ -7664,3 +7664,29 @@ unresolved_alternatives = [
   "Work stealing, public fairness/metrics/tree protocols, Task test/build/REPL/artifact/VM execution, wall-clock APIs, detach, user Resource quotas, Actor crossing, stress, and Stable compatibility remain later work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0269"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0269-task-conformance-and-stress-evidence.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-30"
+proposed = "2026-08-30"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Cover early parent exit, runtime-owned cleanup, sibling Fault races, logical deadline races, nested scopes, invalid detach, and shutdown over checked Task inputs.",
+  "Accept exactly one million as the production Task-count ceiling, reject larger values before execution, and run bounded generated real-runtime stress without timing thresholds.",
+  "Compare deterministic reconstructions and production worker counts using terminal, canonical Fault, Task-path, cleanup, host-event, diagnostic, and UTF-8 source projections only.",
+  "Retain user Resource finalizers, valid detach, wall-clock APIs, Task bytecode/VM/native execution, public stress schemas, performance SLOs, and Stable compatibility for later authority.",
+]
+compatibility_impact = [
+  "Freezes executable conformance/stress evidence for the existing Experimental Structured Task profile and caps the production Task limit at one million.",
+  "Adds no source syntax, diagnostic allocation, public schema, Semantic ID, CLI contract, bytecode/VM ABI, replay format, Stable scheduling order, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "User Resource finalizers, valid capability-gated detach, source Clock/sleep, Task VM/native execution, public benchmark/replay protocols, work stealing, and performance or Stable claims remain later work.",
+]
+superseded_by = ""

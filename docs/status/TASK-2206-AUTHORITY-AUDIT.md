@@ -2,98 +2,122 @@
 
 ## Outcome
 
-`TASK-2206` is correctly recorded as `BlockedSpec`. The G2 plan requires
-conformance and stress evidence for parent early exit, Resource release during
-child cancellation, simultaneous child Faults, timeout versus normal
-completion, nested scopes, invalid detach rejection, one million short tasks
-under resource limits, and scheduler shutdown without lost cleanup. The Task
-syntax/Core, state-machine, lifecycle, deterministic scheduler, and production
-scheduler contracts needed to define expected outcomes are not accepted.
+`TASK-2206` remains `BlockedSpec`, but its former audit is obsolete. Accepted
+DEC-0264 through DEC-0268 and completed TASK-2201 through TASK-2205 now provide
+the checked Task frontend, machine, structured lifecycle runtime, deterministic
+test scheduler, and production local scheduler. The only remaining semantic
+gate is the final conformance/stress oracle proposed by DEC-0269.
 
-No Task conformance corpus, stress harness, resource-release oracle, Fault or
-timeout precedence rule, detach diagnostic, million-task benchmark, scheduler
-shutdown fixture, diagnostic allocation, or placeholder G2 API was added.
+DEC-0269 is `Proposed`, not implementation authority. No TASK-2206 runtime,
+scheduler, diagnostic, schema, or public API change has been made under it.
 
 ## Normative traceability
 
-- The G2 execution package is non-normative; its test list does not authorize
-  Task semantics, a stress-test resource budget, or a public conformance
-  protocol.
-- TASK-2201 through TASK-2205 are `BlockedSpec`, and
-  `GAP-STRUCTURED-TASK-001` leaves parent/child lifetime, cancellation,
-  Fault aggregation, detach, suspension, cleanup, and deterministic scheduler
-  behavior open. RFC-0008/RFC-C202 is not Accepted.
-- `docs/SEMANTICS.md` provides only future Task intent and does not settle
-  timeout races, simultaneous Fault ordering, Resource cleanup visibility,
-  invalid detach behavior, or shutdown guarantees. v0.0.1 excludes Task.
-- `docs/ROADMAP-1.0.md` requires concurrency conformance, stress, and no
-  unclassified host panic/deadlock at the v0.2 exit, but is an engineering
-  gate, not a semantic oracle.
-- DEC-0019/DEC-0021 cover internal compiler-query equivalence and bounded
-  scheduling only; RFC-0020 covers host VM cancellation only. None defines
-  Task conformance outcomes or stress protocol/versioning.
+- DEC-0264 accepts the exact Task surface and Checked Task Core. It rejects
+  `detach` from the source and checked runtime profile.
+- DEC-0265 accepts the checked Task state machine and reason-preserving cleanup
+  edges without defining scheduling.
+- DEC-0266 accepts lexical parent/child ownership, mandatory join, monotonic
+  cancellation, canonical Fault aggregation, exactly-once runtime-owned
+  cleanup, and explicit limits.
+- DEC-0267 accepts deterministic test-only scheduling, logical ticks,
+  `TaskDeadline`, typed internal traces, strict replay, and bounded exploration.
+- DEC-0268 accepts the exact file/project interpreter `task main ()` entry,
+  fixed local worker pool, bounded queue, wake/park, cancellation, structured
+  shutdown/join, internal snapshots, and nonsemantic metrics.
+- `docs/ROADMAP-1.0.md` requires G2 concurrency conformance, stress, modeled
+  interleavings, and no unclassified panic/deadlock. It assigns user
+  `Resource`, ownership/drop, finalizers, and allocator semantics to G3.
+- The G2 execution package is non-normative. Its user-`Resource` and valid
+  `detach` examples cannot override the accepted first Task profile or pull G3
+  semantics into TASK-2206.
 
-## Current implementation evidence
+## Plan drift resolved by DEC-0269 proposal
 
-- The repository's conformance suites cover the accepted Seed syntax,
-  project/diagnostic behavior, bytecode, and VM differential slices; no Task
-  source, checked Task Core, runtime, scheduler, or Task fixture exists.
-- `ling-eval` and `ling-vm` expose no Task parent/child tree, Resource
-  lifecycle, timeout/Clock, detach, scheduler shutdown, or aggregated child
-  Fault semantics against which a stress test could compare.
-- Existing VM step/frame/heap limits and host cancellation are Seed execution
-  controls. They cannot establish the one-million-task bound, cleanup order,
-  cancellation race precedence, or production scheduler shutdown behavior.
-- No stable trace, corpus schema, stress-result schema, or diagnostic contract
-  defines how minimized failures, host panics/deadlocks, resource exhaustion,
-  or deterministic replay would be reported.
+| G2 plan item | Current accepted meaning | DEC-0269 proposal |
+| --- | --- | --- |
+| Parent exits early | Parent cancellation/Fault drains children; normal return cannot bypass checked handle observation and join | Compare terminal tree, committed Effects, and cleanup count one |
+| Child cancellation releases Resource | Only runtime-owned handle/frame/scope-registry cleanup exists in G2 | Test accepted cleanup identities; do not fabricate a user finalizer |
+| Two children Fault together | DEC-0266 canonical aggregate, independent of occurrence order | Drive opposite ready orders and production sibling Faults |
+| Timeout races completion | DEC-0267 logical `TaskDeadline`; no wall clock | Test applied-before-terminal and unapplied-after-terminal cases |
+| Nested scopes | Inner scopes drain before outer scopes | Exercise at least two lexical levels and descendants |
+| Reject invalid detach | No accepted syntax, Capability, checked command, or runtime transition | Require registered frontend rejection before Checked Core publication |
+| One million short Tasks | No recursive spawn or performance SLO is accepted | Make `1_000_000` the exact local Task-limit ceiling and reject larger values before execution |
+| Shutdown loses no cleanup | DEC-0268 publishes success only after structured terminal state and worker join | Cover normal, cancellation, Fault, quota, and contained failure paths |
+
+The one-million rule is a capacity boundary, not evidence that every host can
+materialize one million simultaneous Tasks and not a throughput, latency, or
+memory promise. Normal CI still needs a generated, bounded workload through the
+real checked frontend/runtime/local scheduler.
+
+## Existing executable evidence
+
+- `crates/ling-effects` tests cover Task syntax, linear handles, scope
+  ownership, Checked Task Core identities, and negative checked-publication
+  boundaries.
+- `crates/ling-eval/tests/task_runtime.rs` covers explicit ready driving,
+  cancellation before start and suspension, committed host Effects, nested
+  scopes, opposite-order sibling Fault aggregation, Fault/cancellation
+  precedence, quotas, transitive Faults, cleanup counts, and invalid driver
+  input.
+- `crates/ling-eval/tests/task_scheduler.rs` covers repeated/reconstructed
+  canonical traces, logical deadlines, equal-tick ordering, host failures,
+  replay mismatch, bounded exploration, scheduler limits, and Unicode/BOM/CRLF
+  source reconstruction.
+- `crates/ling-eval/tests/task_local_scheduler.rs` covers one/multiple workers,
+  queue and direct-child bounds, wake/park, host cancellation, worker/host panic
+  containment, Fault source evidence, final snapshots, cleanup, and
+  Unicode/BOM/CRLF execution.
+- File/project CLI tests retain all non-interpreter Task rejections while
+  allowing only the exact accepted interpreter Task entry.
+
+## Missing executable evidence after acceptance
+
+1. A production local-scheduler configuration ceiling accepting `1_000_000`
+   and rejecting `1_000_001` before workers or host Effects.
+2. One focused TASK-2206 integration suite tying together early parent Fault,
+   sibling Fault aggregation, nested-scope drain, shutdown snapshots, and
+   worker-count differential outcomes.
+3. A bounded generated short-Task stress case with explicit workload size,
+   repetitions, worker counts, runtime/scheduler limits, no time threshold, and
+   exactly-once cleanup assertions.
+4. An explicit source attempt to use `detach` that fails with the existing
+   registered frontend diagnostic before Checked Task publication.
+5. A final implementation report mapping every plan bullet to accepted clauses,
+   executable tests, actual commands, compatibility, determinism, Unicode, and
+   deferred G3/VM/public-protocol work.
 
 ## Required authority before implementation
 
-An Accepted RFC or decision must define, at minimum:
+DEC-0269 must move from `Proposed` to `Accepted` (or be replaced by another
+Accepted decision). Its acceptance freezes:
 
-1. the checked Task Core/runtime input and conformance oracle for values,
-   Effects, Faults, cancellation, scope close, cleanup, detach, and resource
-   ownership;
-2. precedence and deterministic projections for parent exit, child
-   cancellation, simultaneous child Faults, timeout/Clock versus normal
-   completion, nested scopes, invalid detach, and scheduler shutdown;
-3. Resource semantics and limits, including what the one-million-task test
-   measures, allocation/step/worker quotas, cleanup guarantees, failure
-   precedence, host panic/deadlock containment, and benchmark reproducibility;
-4. deterministic test-scheduler and production-scheduler boundaries, seed and
-   trace identity, interpreter/VM equivalence, diagnostics, source spans,
-   Semantic IDs, Audit Source, schema/version migration, and privacy policy;
-   and
-5. executable positive/negative/migration/differential fixtures for every
-   listed lifecycle race, nested scopes, valid/invalid detach, cleanup after
-   cancellation/Fault/shutdown, one-million bounded tasks, repeated seeds,
-   malformed traces, Unicode/CRLF/BOM spans, canonical output, and no
-   unchecked-AST execution.
+- the observable comparison projection;
+- logical deadline and Fault-race precedence;
+- the G2 runtime-owned cleanup interpretation and G3 user-Resource deferral;
+- invalid-detach rejection scope;
+- the exact million-Task configuration ceiling and representative stress rule;
+- shutdown/panic containment evidence;
+- test-corpus retention, Unicode/span, determinism, diagnostics, schema, and
+  compatibility boundaries.
 
-Until these decisions are Accepted, tests could bless the wrong Fault order or
-cleanup behavior, mistake host exhaustion for a language result, or make a
-non-reproducible stress failure part of compatibility claims.
+Until then, implementing the ceiling or blessing a stress oracle would turn a
+proposal into behavior through code, contrary to repository authority rules.
 
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0013, DEC-0019, DEC-0021,
-DEC-0018, RFC-0001, RFC-0020,
-`docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
-`docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
-`docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
-and the current conformance, evaluator, bytecode, VM, and fuzz test suites.
+`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0264 through DEC-0268,
+Proposed DEC-0269, `GAP-STRUCTURED-TASK-001`, the G2 execution plan, and the
+current Task frontend/runtime/scheduler/local-scheduler/CLI tests.
 
-No compiler, interpreter, VM, bytecode, scheduler, stress corpus, trace
-protocol, diagnostic, schema, Semantic ID, source-span, runtime, or Unicode
-17.0.0 behavior changed.
+The audit changes documentation only. It does not change diagnostics, public
+schemas, Semantic IDs, source spans, interpreter/VM behavior, scheduler order,
+runtime limits, or Unicode 17.0.0 behavior.
 
 ## Intentionally deferred
 
-`TASK-2206` can begin only after TASK-2201 through TASK-2205 and an Accepted
-RFC-0008 (or replacement) resolve `GAP-STRUCTURED-TASK-001` and define the
-conformance/stress oracle. The future tests must exercise checked Task Core
-only, use bounded reproducible resources and traces, distinguish test from
-production scheduling, retain minimized failures, and publish interpreter/VM
-and cleanup/resource evidence before claiming Task compatibility.
+User Resource finalizers and allocator quotas, valid capability-gated detach,
+source Clock/sleep and wall-clock time, recursive spawn, Task bytecode/VM/native
+execution, public trace/replay/stress/benchmark protocols, work stealing,
+performance SLOs, and Stable Task compatibility remain separately governed.
