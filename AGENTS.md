@@ -1,5 +1,10 @@
 # Ling repository instructions
 
+## Response language
+
+- Use Simplified Chinese for responses by default, unless the user explicitly requests another language.
+- Necessary English may be retained for key technical terms, code identifiers, API names, commands, file paths, diagnostic codes, and exact quoted text; explain the surrounding content in Simplified Chinese.
+
 ## Authority
 
 For language behavior, use this order and stop when higher-priority documents conflict:
