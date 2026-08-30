@@ -9977,7 +9977,7 @@ notes = [
 [[task]]
 id = "ACT-2301"
 title = "Actor identity and state isolation"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "M"
 owner = "Codex"
@@ -10008,6 +10008,16 @@ artifacts = [
   "docs/status/ACT-2301-IDENTITY-MODEL-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0095-actor-identity-reference-model.md",
   "docs/decisions/0270-checked-actor-identity-and-state-isolation.md",
+  "docs/status/ACT-2301-IMPLEMENTATION-REPORT.md",
+  "crates/ling-syntax/src/parser.rs",
+  "crates/ling-ast/src/lib.rs",
+  "crates/ling-hir/src/lib.rs",
+  "crates/ling-resolve/src/lib.rs",
+  "crates/ling-types/src/lib.rs",
+  "crates/ling-effects/src/actor_core.rs",
+  "crates/ling-cli/tests/actor_boundary.rs",
+  "docs/ERROR-CODES.md",
+  "docs/governance/error-code-lock.toml",
   "crates/ling-concurrency/src/actor.rs",
   "crates/ling-concurrency/src/lib.rs",
   "docs/governance/authority.toml",
@@ -10018,21 +10028,21 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing Actor grammar/Core, ActorTypeId/ActorId, ActorRef, turn/state isolation, borrow/aliasing, await reentry, message ownership, local/remote identity, scheduler, diagnostics, schemas, and migration contracts.",
-  "The audit distinguishes current Seed local State/PlaceAssign and host-only VM cancellation from the missing Actor authority and preserves the checked-only evaluation boundary.",
-  "The audit covers identity stability/reuse, multiple turns, nested/recursive sends, state isolation, mutable-borrow escape, await reentry, cancellation/Fault cleanup, message ownership, local/remote separation, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM differential fixtures.",
-  "No Actor syntax, ActorTypeId/ActorId model, ActorRef type, state-isolation checker, turn runtime, borrow rule, serialization schema, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
-  "The future implementation must lower only accepted Actor syntax to checked Core, enforce turn-local state and Sendable messages, keep local/remote identity distinct, and publish interpreter/VM and isolation evidence before Actor execution is exposed.",
-  "Accepted DEC-0095 authorizes only the publish-disabled identity/reference child; it does not authorize Actor syntax, turns, state isolation, borrow/sendability, mailbox, serialization, scheduler, or runtime behavior.",
+  "Accepted DEC-0270 exact contextual Actor syntax lowers only through CST, AST, HIR, resolution, type/effect checking, and immutable Checked Actor Core.",
+  "Checked Core records deterministic ActorTypeId, the explicit unallocated runtime-scoped ActorId contract, an invariant local typed reference descriptor, checked types and expression/binding identities, a closed empty Effect row, and complete original source spans.",
+  "Message and state types are closed monomorphic ordinary Values; initializer and transition result match state, state/message patterns are transition-local bindings, and Actor declarations are not first-class source values.",
+  "Focused tests cover positive Core publication, contextual words, negative type/effect/value use, path/source/CRLF reconstruction, BOM/Unicode byte spans, formatting, bilingual diagnostics, and explicit no-execution behavior.",
+  "File/project run, test, build, interpreter, bytecode, VM, Actor runtime, mailbox, send, scheduler, serialization, supervision, and remote paths remain unavailable; L-ACTOR-0002 names ACT-2305 as the required runtime task.",
+  "Workspace tests, strict Clippy, formatting, 174 xtask tests, and aggregate governance gates pass through implementation commit abb31810ffa8a96e637b83f14659cff1662e0527.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "abb31810ffa8a96e637b83f14659cff1662e0527"
+completion_commit = "abb31810ffa8a96e637b83f14659cff1662e0527"
+integration_state = "committed"
+completed = "2026-08-30"
 notes = [
-  "Accepted DEC-0270 authorizes only the checked-only, pure non-suspending Actor declaration/Core boundary; ACT-2302 through ACT-2305 retain message, mailbox, turn, runtime, and remote work.",
-  "Current syntax/AST/HIR/types/effects/evaluator/bytecode/VM have no Actor declaration, ActorRef/RemoteRef, identity table, turn context, message schema, mailbox, or state-isolation check; Seed State is local-function semantics only.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Actor runtime, diagnostics, schemas, Semantic IDs, source spans, scheduler, or Unicode 17.0.0 behavior.",
+  "ACT-2301 is checked-only and publish-disabled; it allocates no ActorId and creates no runtime ActorRef value.",
+  "ACT-2302 through ACT-2305 retain Sendable/message schema, mailbox/backpressure, executable turn/reentry, runtime/lifecycle, serialization, and remote work under their accepted dependencies and open gaps.",
+  "No public schema, Semantic Graph version, bytecode format, VM ABI, CLI exit contract, protocol, or Unicode 17.0.0 contract changed.",
 ]
 
 [[task]]

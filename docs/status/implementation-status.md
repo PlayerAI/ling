@@ -33,7 +33,7 @@
 | `ACC-4701-OBSERVATION` | Internal accelerator-plugin interface boundary evidence | `G4` | `S` | `Done` | `GPU-4605-OBSERVATION` | `c62cfabb7b17cf46ca85c78c803b30b04fe6bf91` |
 | `ACC-4702` | Experimental Accelerator Adapter | `G4` | `M` | `BlockedSpec` | `ACC-4701` | `` |
 | `ACC-4702-OBSERVATION` | Internal Experimental accelerator-adapter boundary evidence | `G4` | `S` | `Done` | `ACC-4701-OBSERVATION` | `faaf0c084ae6cb0a9eec08daceaa9e9f06e1928b` |
-| `ACT-2301` | Actor identity and state isolation | `G2` | `M` | `Ready` | `TASK-2203` | `` |
+| `ACT-2301` | Actor identity and state isolation | `G2` | `M` | `Done` | `TASK-2203` | `abb31810ffa8a96e637b83f14659cff1662e0527` |
 | `ACT-2301-ACTOR-SYNTAX-REJECTION` | Internal Actor-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `44bb344db86ad8c1039d8a974f5d608c7c1eff9a` |
 | `ACT-2301-IDENTITY-MODEL` | Internal Actor identity/reference model | `G2` | `S` | `Done` | `ACT-2301-ACTOR-SYNTAX-REJECTION` | `4209c9b444b72501731b96fdad2f8832269b406a` |
 | `ACT-2302` | Actor message sendability checking | `G2` | `L` | `BlockedSpec` | `ACT-2301` | `` |
