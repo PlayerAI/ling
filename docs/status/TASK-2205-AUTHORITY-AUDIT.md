@@ -2,10 +2,10 @@
 
 ## Outcome
 
-`TASK-2205` remains `BlockedSpec` pending acceptance of Proposed DEC-0268.
+`TASK-2205` is `Ready` under Accepted DEC-0268.
 TASK-2201 through TASK-2204 are Done under Accepted DEC-0264 through DEC-0267,
 so checked Task Core, state machines, the scheduler-neutral lifecycle runtime,
-and deterministic test scheduling are complete dependencies. Proposed DEC-0268
+and deterministic test scheduling are complete dependencies. Accepted DEC-0268
 isolates the remaining correctness-first local production boundary: an exact
 checked `task main ()` interpreter entry, fixed worker pool, bounded central
 queue, wake/park, cancellation and shutdown, internal Task-tree snapshots,
@@ -55,10 +55,9 @@ threading dependency, or placeholder G2 API was added.
   cancellation during shutdown, scope quota precedence, orphan cleanup,
   metrics noninterference, or interpreter/VM scheduler equivalence.
 
-## Proposed authority before implementation
+## Accepted implementation contract
 
-Proposed DEC-0268 defines the following boundary, but it is not implementation
-authority until Accepted:
+Accepted DEC-0268 authorizes the following implementation boundary:
 
 1. checked-only runtime input; an exact `task main ()` file/project interpreter
    entry; explicit bounded worker configuration; a central mutex/condition-
@@ -87,8 +86,7 @@ the wrong order, or shutdown could leave an orphan Task or resource leak.
 
 This refreshed audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0013, DEC-0019, DEC-0021,
-DEC-0018, RFC-0001, RFC-0020, Accepted DEC-0264 through DEC-0267, Proposed
-DEC-0268,
+DEC-0018, RFC-0001, RFC-0020, and Accepted DEC-0264 through DEC-0268,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
@@ -101,7 +99,7 @@ behavior changed.
 
 ## Intentionally deferred
 
-`TASK-2205` can begin when DEC-0268 is Accepted. The proposal deliberately
+`TASK-2205` may now proceed under Accepted DEC-0268. The decision deliberately
 retains work stealing, public worker/metrics/Task-tree protocols, Task
 test/build/REPL/artifact execution, Task bytecode/VM/native ABI, wall-clock
 Clock/sleep, I/O wake injection, detach, user Resource finalizers, recoverable

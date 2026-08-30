@@ -1,8 +1,8 @@
 # DEC-0268: Production local Task scheduler / 生产本地 Task 调度器
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-30<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-30<br>
 > Owner role：concurrency-design<br>
 > 相关 RFC/缺口：DEC-0266 | DEC-0267 | GAP-STRUCTURED-TASK-001 | TASK-2205<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`

@@ -9862,7 +9862,7 @@ notes = [
 [[task]]
 id = "TASK-2205"
 title = "Production local Task scheduler"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9893,20 +9893,20 @@ artifacts = [
 ]
 acceptance = [
   "The refreshed audit confirms TASK-2201 through TASK-2204 are Done and isolates the production Task entry, worker ownership, queue/wake/park, cancellation, shutdown, Task-tree observation, quota, metrics, and nondeterminism boundary.",
-  "Proposed DEC-0268 defines exact checked task main file/project interpreter execution, explicit bounded worker configuration, a central mutex/condition-variable FIFO, serialized TaskRuntime steps, and no CPU-count-derived semantics.",
-  "The proposal defines host cancellation, structured shutdown/join, Fault/cancellation precedence, per-scope direct-child preflight, bounded snapshots, nonsemantic metrics, panic containment, and admitted cross-Task Effect-order nondeterminism.",
-  "No production scheduler implementation, public Task success path, worker/queue API, Task-tree or metrics protocol, diagnostic allocation, bytecode/VM route, or placeholder later feature is added before acceptance.",
+  "Accepted DEC-0268 defines exact checked task main file/project interpreter execution, explicit bounded worker configuration, a central mutex/condition-variable FIFO, serialized TaskRuntime steps, and no CPU-count-derived semantics.",
+  "The accepted decision defines host cancellation, structured shutdown/join, Fault/cancellation precedence, per-scope direct-child preflight, bounded snapshots, nonsemantic metrics, panic containment, and admitted cross-Task Effect-order nondeterminism.",
+  "No public worker/queue API, Task-tree or metrics protocol, diagnostic allocation, bytecode/VM route, or placeholder later feature is authorized.",
   "The conformance plan covers one/multiple/invalid pools, queue and wake/park, nested scopes, cancellation/Fault/cleanup/shutdown, every bound, panic containment, snapshots/metrics noninterference, Unicode/BOM/CRLF spans, worker-count differentials, and retained non-interpreter L-TASK-0004 rejection.",
-  "TASK-2205 remains BlockedSpec until DEC-0268 is Accepted.",
+  "TASK-2205 is Ready under Accepted DEC-0268.",
 ]
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "TASK-2204 completed the deterministic test-scheduler dependency in e550f4fd8d5f348bcb8415f5cbac23b9f852a719; Proposed DEC-0268 now isolates the remaining production scheduler choices.",
+  "TASK-2204 completed the deterministic test-scheduler dependency in e550f4fd8d5f348bcb8415f5cbac23b9f852a719; Accepted DEC-0268 authorizes the remaining production scheduler choices.",
   "DEC-0019/DEC-0021 remain compiler-query-only authorities, and RFC-0020 remains host-owned VM cancellation; neither supplies production Ling Task scheduling behavior.",
-  "The refreshed audit and proposal preserve current public L-TASK-0004 behavior and change no compiler, interpreter, VM, bytecode, scheduler, dependency, diagnostic, schema, Semantic ID, source span, runtime, or Unicode 17.0.0 behavior before acceptance.",
+  "The accepted decision preserves all non-interpreter L-TASK-0004 routes and changes no bytecode, VM, diagnostic allocation, public schema, Semantic ID, source span, or Unicode 17.0.0 contract.",
 ]
 
 [[task]]
