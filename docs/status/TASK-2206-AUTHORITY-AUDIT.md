@@ -2,7 +2,7 @@
 
 ## Outcome
 
-`TASK-2206` remains `BlockedSpec`, but its former audit is obsolete. Accepted
+`TASK-2206` is complete under Accepted DEC-0269. Its former pre-Task audit was obsolete. Accepted
 DEC-0264 through DEC-0268 and completed TASK-2201 through TASK-2205 now provide
 the checked Task frontend, machine, structured lifecycle runtime, deterministic
 test scheduler, and production local scheduler. The only remaining semantic
@@ -71,19 +71,19 @@ real checked frontend/runtime/local scheduler.
 - File/project CLI tests retain all non-interpreter Task rejections while
   allowing only the exact accepted interpreter Task entry.
 
-## Missing executable evidence
+## Implemented executable evidence
 
-1. A production local-scheduler configuration ceiling accepting `1_000_000`
+1. The production local-scheduler configuration ceiling accepts `1_000_000`
    and rejecting `1_000_001` before workers or host Effects.
-2. One focused TASK-2206 integration suite tying together early parent Fault,
+2. Focused TASK-2206 integration evidence ties together early parent Fault,
    sibling Fault aggregation, nested-scope drain, shutdown snapshots, and
    worker-count differential outcomes.
-3. A bounded generated short-Task stress case with explicit workload size,
+3. A bounded generated short-Task stress case has explicit workload size,
    repetitions, worker counts, runtime/scheduler limits, no time threshold, and
    exactly-once cleanup assertions.
-4. An explicit source attempt to use `detach` that fails with the existing
+4. An explicit source attempt to use `detach` fails with the existing
    registered frontend diagnostic before Checked Task publication.
-5. A final implementation report mapping every plan bullet to accepted clauses,
+5. The implementation report maps every plan bullet to accepted clauses,
    executable tests, actual commands, compatibility, determinism, Unicode, and
    deferred G3/VM/public-protocol work.
 

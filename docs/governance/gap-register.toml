@@ -476,11 +476,11 @@ observed_markers = []
 [[gap]]
 id = "GAP-STRUCTURED-TASK-001"
 title = "Structured Task lifecycle, cancellation, detach, and suspension"
-status = "Open"
+status = "Accepted"
 priority = "P1"
 blocked_releases = ["v0.2"]
 blocked_tasks = ["TASK-2206"]
-observable_behavior = "Valid detach and user Resource cleanup composition remain unaccepted; final conformance and bounded stress for the existing Experimental Task profile are accepted."
+observable_behavior = "The Experimental v0.2 Task profile is resolved as lexical structured concurrency with no detach operation; runtime-owned cleanup and final conformance/stress behavior are accepted, while user Resource semantics are tracked by GAP-OWNERSHIP-MODEL-001."
 authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0264", "DEC-0265", "DEC-0266", "DEC-0267", "DEC-0268", "DEC-0269"]
 candidate_rfcs = ["RFC-0008"]
 source_items = ["RFC-0001-22:RFC-0008", "ROADMAP-6.2:structured-task"]
@@ -491,8 +491,8 @@ options = [
 irreversible_consequences = ["Task lifecycle semantics determine leaks, cancellation safety, resource cleanup, and replay behavior."]
 required_evidence = ["positive", "negative", "migration", "cancellation", "resource-cleanup", "deterministic-scheduler"]
 owner_role = "concurrency-design"
-next_action = "Implement DEC-0269 evidence in TASK-2206; keep valid detach and user Resource finalizers blocked for their separately governed language slices."
-resolution = []
+next_action = "No TASK-2206 action remains; any future capability-gated detach must reopen authority through a new Accepted RFC, and user Resource work remains under GAP-OWNERSHIP-MODEL-001."
+resolution = ["DEC-0264", "DEC-0265", "DEC-0266", "DEC-0267", "DEC-0268", "DEC-0269"]
 superseded_by = ""
 observed_markers = []
 

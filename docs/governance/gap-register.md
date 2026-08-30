@@ -7,9 +7,9 @@
 ## Summary
 
 - Total gaps: 29
-- Open: 18
+- Open: 17
 - Proposed: 0
-- Accepted: 11
+- Accepted: 12
 - Rejected: 0
 - Superseded: 0
 
@@ -54,10 +54,10 @@
 | `GAP-ACTOR-MAILBOX-SUPERVISOR-001` | `P1` | `Open` | Bounded mailbox, backpressure, ordering, and supervision | `ACT-2303`, `SUP-2401`, `SUP-2402`, `SUP-2403` | `RFC-0009` |
 | `GAP-ACTOR-REMOTE-DELIVERY-001` | `P1` | `Open` | Remote Actor identity, transport, and delivery strategy | `REM-2601`, `REM-2602`, `REM-2603`, `REM-2604`, `REM-2605` | `RFC-0009` |
 | `GAP-DETERMINISTIC-REPLAY-001` | `P1` | `Open` | Determinism classes and Replay protocol | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504`, `REP-2505`, `REP-2506` | `RFC-0010` |
-| `GAP-STRUCTURED-TASK-001` | `P1` | `Open` | Structured Task lifecycle, cancellation, detach, and suspension | `TASK-2206` | `RFC-0008` |
 | `GAP-EFFECT-HANDLER-001` | `P1` | `Accepted` | Effect Row polymorphism and Handler semantics | `EFF-2101`, `EFF-2102`, `EFF-2103`, `EFF-2104`, `EFF-2105` | `RFC-0006` |
 | `GAP-EFFECT-HANDLER-BYTECODE-001` | `P1` | `Accepted` | Handler bytecode Cell identity, State rows, and refutable clause parameters | `EFF-2104`, `EFF-2105` | — |
 | `GAP-EFFECT-STATE-MASKING-001` | `P1` | `Accepted` | State effect visibility and masking | `EFF-2101`, `EFF-2102`, `EFF-2103` | `RFC-0006` |
+| `GAP-STRUCTURED-TASK-001` | `P1` | `Accepted` | Structured Task lifecycle, cancellation, detach, and suspension | `TASK-2206` | `RFC-0008` |
 
 ### v0.3
 

@@ -3030,12 +3030,6 @@ spec = [
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
-  "docs/decisions/0264-structured-task-frontend-core.md",
-  "docs/decisions/0265-task-state-machine-lowering.md",
-  "docs/decisions/0266-structured-task-lifecycle-runtime.md",
-  "docs/decisions/0267-deterministic-task-test-scheduler.md",
-  "docs/decisions/0268-production-local-task-scheduler.md",
-  "docs/decisions/0269-task-conformance-and-stress-evidence.md",
   "docs/governance/gap-register.toml",
   "crates/ling-db/Cargo.toml",
   "crates/ling-db/src/lib.rs",
@@ -9417,7 +9411,7 @@ integration_state = "committed"
 completed = "2026-08-25"
 notes = [
   "TASK-2201 is complete under Accepted DEC-0264 as a checked-only Structured Task frontend and Core boundary.",
-  "The broader GAP-STRUCTURED-TASK-001 remains open for TASK-2203 through TASK-2206 lifecycle, cancellation, cleanup, Fault aggregation, scheduler, runtime, and detach authority; RFC-0020 covers only host VM cancellation.",
+  "At TASK-2201 completion, GAP-STRUCTURED-TASK-001 remained open for later lifecycle and scheduler work; TASK-2203 through TASK-2206 subsequently completed under DEC-0266 through DEC-0269, while valid detach remains open.",
   "Task execution, state-machine lowering, runtime lifecycle, scheduling, detach, and new Task bytecode remain intentionally unavailable; no placeholder executable API was added.",
   "The implementation preserves original UTF-8 byte spans, Unicode 17.0.0, path-independent identities, and existing non-Task protocol bytes.",
 ]
@@ -9576,7 +9570,7 @@ integration_state = "committed"
 completed = "2026-08-25"
 notes = [
   "Implementation commit 450ec1bad6403a03a702713d80464fa6bbd83172 completes the checked-only TASK-2202 lowering boundary under Accepted DEC-0265.",
-  "GAP-STRUCTURED-TASK-001 remains open for TASK-2203 through TASK-2206 executable lifecycle, cancellation propagation, cleanup execution, Fault aggregation, scheduler, resource, runtime, and detach decisions; RFC-0020 covers only host VM cancellation.",
+  "At TASK-2202 completion, GAP-STRUCTURED-TASK-001 remained open for later runtime work; TASK-2203 through TASK-2206 subsequently completed under DEC-0266 through DEC-0269, while valid detach and user Resource composition remain open.",
   "The machine reuses DEC-0092 only as a structural projection and remains disconnected from ling-bytecode, the interpreter, ling-vm, and all scheduler/runtime paths.",
   "No diagnostic allocation, schema, Semantic ID, public protocol, bytecode revision, runtime value, scheduler behavior, or Unicode 17.0.0 behavior changed.",
 ]
@@ -9695,7 +9689,7 @@ completed = "2026-08-28"
 notes = [
   "TASK-2203 is internal and publish-disabled: TaskRuntime never chooses among ready Tasks, reads time, starts threads, or changes public Ling entry behavior.",
   "The same-scope handle registry amendment preserves existing canonical Task Core/machine bytes while enabling multiple live children and deterministic multi-child Fault retention.",
-  "TASK-2204 through TASK-2206 remain blocked on their own Accepted scheduling, production-runtime, resource, detach, and final conformance authority.",
+  "TASK-2204 through TASK-2206 subsequently completed under Accepted DEC-0267 through DEC-0269; valid detach, user Resource composition, and Stable compatibility remain separately governed.",
   "No public schema, protocol, Semantic ID, bytecode, artifact, CLI/LSP, or Unicode 17.0.0 contract changed.",
 ]
 
@@ -9810,7 +9804,7 @@ completed = "2026-08-30"
 notes = [
   "TASK-2204 is complete in e550f4fd8d5f348bcb8415f5cbac23b9f852a719 under Accepted DEC-0267; DEC-0019/DEC-0021 remain compiler-query-only authorities.",
   "The driver is publish-disabled test evidence and makes no production fairness, wake, wall-clock, scheduling-order, or compatibility promise.",
-  "TASK-2205 and TASK-2206 remain BlockedSpec for production scheduling, public integration, resources, detach, stress, shutdown, and final conformance authority.",
+  "TASK-2205 and TASK-2206 subsequently completed under Accepted DEC-0268 and DEC-0269; valid detach, user Resource finalizers, and Stable compatibility remain separately governed.",
 ]
 
 [[task]]
@@ -9917,13 +9911,13 @@ completed = "2026-08-30"
 notes = [
   "Implementation commit 330e1b2c18ffbb7e59a07297abf59e92d6954fa5 contains the scheduler, Send-safe serialized evaluator ownership, exact run-entry selection, CLI integration, tests, help, and bilingual README update.",
   "The full workspace suite passes with only installed_shells_accept_the_committed_fixtures skipped because this Windows host's WSL path conversion removed separators; its two platform-independent completion tests pass.",
-  "TASK-2206 remains BlockedSpec for stress, detach/resources, extended race/shutdown matrices, final conformance, and Stable evidence.",
+  "TASK-2206 subsequently completed under Accepted DEC-0269; valid detach, user Resource finalizers, Task VM/native execution, and Stable compatibility remain separately governed.",
 ]
 
 [[task]]
 id = "TASK-2206"
 title = "Task conformance and stress tests"
-state = "BlockedSpec"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9938,6 +9932,12 @@ spec = [
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/decisions/0019-incremental-query-boundary.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0264-structured-task-frontend-core.md",
+  "docs/decisions/0265-task-state-machine-lowering.md",
+  "docs/decisions/0266-structured-task-lifecycle-runtime.md",
+  "docs/decisions/0267-deterministic-task-test-scheduler.md",
+  "docs/decisions/0268-production-local-task-scheduler.md",
+  "docs/decisions/0269-task-conformance-and-stress-evidence.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
@@ -9947,26 +9947,31 @@ spec = [
 ]
 artifacts = [
   "docs/status/TASK-2206-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2206-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0269-task-conformance-and-stress-evidence.md",
+  "crates/ling-effects/tests/structured_task_frontend.rs",
+  "crates/ling-eval/src/task_local_scheduler.rs",
+  "crates/ling-eval/tests/task_local_scheduler.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The refreshed audit records DEC-0264 through DEC-0268 and TASK-2201 through TASK-2205 as complete authority/implementation rather than repeating the obsolete pre-Task baseline.",
-  "The audit maps every TASK-2206 plan bullet to the current accepted profile, records the G2 user-Resource and valid-detach drift, and preserves checked-only execution, logical time, canonical Fault, and runtime-owned cleanup boundaries.",
-  "Accepted DEC-0269 defines the exact outcome projection, one-million Task-count ceiling, bounded generated stress, shutdown evidence, invalid-detach rejection, determinism, Unicode/span, diagnostics, schema, and deferred-work rules required for implementation.",
-  "The audit inventories existing Task frontend, runtime, deterministic-scheduler, production-scheduler, and CLI evidence and lists only the executable gaps remaining after DEC-0269 acceptance.",
-  "No ceiling, new oracle, Task conformance corpus, stress behavior, diagnostic, public schema, Semantic ID, bytecode/VM behavior, or placeholder API was implemented before DEC-0269 became Accepted.",
+  "Accepted DEC-0269 maps every TASK-2206 plan bullet to the checked-only G2 profile, logical time, canonical Faults, runtime-owned cleanup, exact one-million Task-count ceiling, bounded stress, shutdown, determinism, Unicode/span, and compatibility boundaries.",
+  "Production local configuration accepts exactly 1000000 as the maximum run-wide Task bound and rejects 1000001 and usize::MAX before runtime construction, worker creation, allocation, or host Effects.",
+  "Executable evidence covers early parent Fault and cancellation drain, runtime-owned cleanup, simultaneous sibling Fault aggregation, logical deadline versus completion, nested scopes, invalid detach rejection, one/four-worker differential outcomes, and scheduler shutdown with no nonterminal retained Tasks.",
+  "A generated 64-child checked program runs eight repetitions with one worker and eight with four workers under explicit bounds and no timing threshold; all 1040 Task instances publish terminal snapshots with cleanup count one.",
+  "Invalid detach fails before Checked Task publication through registered bilingual L-NAME-0001 with original UTF-8 span; no user Resource, valid detach, wall clock, Task VM/native execution, public schema, Semantic ID, or Stable performance behavior is fabricated.",
+  "Targeted 57 tests, workspace Clippy, workspace tests with the independently documented WSL shell-path fixture skipped, formatting, governance, status, and docs gates pass for implementation commit d0c542d3b7caa8d8300ab2bb3021d35235773e91.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "d0c542d3b7caa8d8300ab2bb3021d35235773e91"
+completion_commit = "d0c542d3b7caa8d8300ab2bb3021d35235773e91"
+integration_state = "committed"
+completed = "2026-08-30"
 notes = [
-  "Accepted DEC-0264 through DEC-0269 and completed TASK-2201 through TASK-2205 now supply the checked Task profile, scheduler implementations, and final conformance/stress oracle for TASK-2206.",
-  "Existing Task suites already cover most lifecycle, Fault, logical-deadline, deterministic trace, production worker, cancellation, shutdown, cleanup, limit, and Unicode evidence; the refreshed audit identifies the focused missing integration and ceiling/stress cases.",
-  "ROADMAP-1.0 assigns user Resource finalizers to G3, while the accepted G2 Task profile has no valid detach operation; TASK-2206 cannot fabricate either feature from the lower-authority execution plan.",
-  "The acceptance milestone preserves current compiler, interpreter, VM, bytecode, scheduler, diagnostics, schemas, Semantic IDs, source spans, and Unicode 17.0.0 behavior; implementation remains a separate milestone.",
+  "Implementation commit d0c542d3b7caa8d8300ab2bb3021d35235773e91 adds the private one-million capacity ceiling and focused frontend/local-scheduler conformance/stress evidence.",
+  "The targeted runtime and deterministic-scheduler suites supply cancellation, opposite-order Fault, deadline, exploration, limit, trace, Unicode/BOM/CRLF, and host-failure evidence without duplicating semantics.",
+  "DEC-0264 through DEC-0269 resolve GAP-STRUCTURED-TASK-001 for the v0.2 profile by rejecting detach; ROADMAP-1.0 assigns user Resource finalizers to G3 under GAP-OWNERSHIP-MODEL-001.",
+  "The unfiltered installed_shells_accept_the_committed_fixtures test was attempted and failed only because this Windows host's WSL bash stripped separators from the fixture path; the platform-independent completion fixture test and every Task/workspace test passed.",
 ]
 
 [[task]]

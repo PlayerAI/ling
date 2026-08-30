@@ -473,7 +473,7 @@
 | `TASK-2204` | Deterministic Task test scheduler | `G2` | `L` | `Done` | `TASK-2203` | `e550f4fd8d5f348bcb8415f5cbac23b9f852a719` |
 | `TASK-2204-SCHEDULER-OBSERVATION` | Internal Task scheduler observation trace | `G2` | `S` | `Done` | `TASK-2203-LIFECYCLE-OBSERVATION` | `078e106fff68a0f28e2f05fd8c8c6bda83637e61` |
 | `TASK-2205` | Production local Task scheduler | `G2` | `L` | `Done` | `TASK-2204` | `330e1b2c18ffbb7e59a07297abf59e92d6954fa5` |
-| `TASK-2206` | Task conformance and stress tests | `G2` | `L` | `BlockedSpec` | `TASK-2205` | `` |
+| `TASK-2206` | Task conformance and stress tests | `G2` | `L` | `Done` | `TASK-2205` | `d0c542d3b7caa8d8300ab2bb3021d35235773e91` |
 | `TEST-VM-0001` | VM failing-first corpus and differential harness baseline | `G1` | `M` | `Done` | `GOV-0104`, `GOV-0105` | `5bd49583c9160cd2067a7124bc014ebc3b4bcf95` |
 | `TIM-5701` | Timing IR and Path | `G5` | `L` | `BlockedSpec` | `MC-5604` | `` |
 | `TIM-5701-OBSERVATION` | Internal Timing IR and Path boundary evidence | `G5` | `S` | `Done` | `MC-5604-OBSERVATION` | `d6c3d6315c04a3e85db518341b8002cac1076e14` |
