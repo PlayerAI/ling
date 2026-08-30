@@ -1,4 +1,4 @@
-use std::sync::mpsc;
+use std::{fmt::Write as _, sync::mpsc};
 
 use ling_ast::lower as lower_ast;
 use ling_effects::{CheckedProgram, RunEntry, check, locate_run_entry};
@@ -59,6 +59,43 @@ const NESTED_MAIN: &str = concat!(
     "        return value\n",
 );
 
+const STRESS_SHORT_TASKS: usize = 64;
+const STRESS_REPETITIONS: usize = 8;
+
+fn generated_short_task_program(task_count: usize) -> String {
+    let mut source = String::from(concat!(
+        "module Main\n\n",
+        "task child value =\n",
+        "    scope\n",
+        "        return value\n\n",
+        "task main () =\n",
+        "    scope\n",
+    ));
+    for index in 0..task_count {
+        writeln!(source, "        let handle{index} = spawn child {index}")
+            .expect("write to String");
+    }
+    for index in 0..task_count {
+        writeln!(source, "        let value{index} = await handle{index}")
+            .expect("write to String");
+    }
+    source.push_str("        return ()\n");
+    source
+}
+
+fn assert_terminal_cleanup(run: &ling_eval::LocalTaskRun, expected_tasks: usize) {
+    assert_eq!(run.snapshot().records().len(), expected_tasks);
+    assert!(run.snapshot().records().iter().all(|record| {
+        record.cleanup_count() == 1
+            && matches!(
+                record.state(),
+                TaskRuntimeState::Completed(_)
+                    | TaskRuntimeState::Cancelled
+                    | TaskRuntimeState::Faulted { .. }
+            )
+    }));
+}
+
 #[test]
 fn fixed_worker_counts_preserve_terminal_tree_and_cleanup() {
     let checked = checked(NESTED_MAIN);
@@ -115,6 +152,169 @@ fn fixed_worker_counts_preserve_terminal_tree_and_cleanup() {
 }
 
 #[test]
+fn early_parent_fault_drains_every_registered_child_before_shutdown() {
+    let checked = checked(concat!(
+        "module Main\n\n",
+        "task child () =\n",
+        "    scope\n",
+        "        return ()\n\n",
+        "task main () =\n",
+        "    scope\n",
+        "        let handle = spawn child ()\n",
+        "        let failed = 1 / 0\n",
+        "        let value = await handle\n",
+        "        return value\n",
+    ));
+    let main = task_main(&checked);
+    for workers in [1, 4] {
+        let mut console = MemoryConsole::default();
+        let run = run_local_task(
+            &checked,
+            &main,
+            vec![TaskValue::Unit],
+            &mut console,
+            config(workers),
+            &LocalTaskControl::new(),
+        )
+        .expect("parent Fault remains a structured terminal outcome");
+        assert!(matches!(
+            run.terminal(),
+            LocalTaskTerminal::Faulted(ling_eval::RuntimeFault {
+                kind: RuntimeFaultKind::TaskFaultAggregate { fault_count: 1, .. },
+                ..
+            })
+        ));
+        assert_terminal_cleanup(&run, 2);
+        assert_eq!(run.metrics().worker_exits(), workers as u64);
+        assert!(console.output().is_empty());
+    }
+}
+
+#[test]
+fn nested_scopes_and_descendants_close_before_root_publication() {
+    let checked = checked(concat!(
+        "module Main\n\n",
+        "task child () =\n",
+        "    scope\n",
+        "        scope\n",
+        "            return ()\n",
+        "        return ()\n\n",
+        "task main () =\n",
+        "    scope\n",
+        "        scope\n",
+        "            let handle = spawn child ()\n",
+        "            let value = await handle\n",
+        "            return value\n",
+        "        return ()\n",
+    ));
+    let main = task_main(&checked);
+    for workers in [1, 4] {
+        let mut console = MemoryConsole::default();
+        let run = run_local_task(
+            &checked,
+            &main,
+            vec![TaskValue::Unit],
+            &mut console,
+            config(workers),
+            &LocalTaskControl::new(),
+        )
+        .expect("nested scopes complete");
+        assert_eq!(
+            run.terminal(),
+            &LocalTaskTerminal::Completed(TaskValue::Unit)
+        );
+        assert_terminal_cleanup(&run, 2);
+        assert_eq!(run.metrics().worker_exits(), workers as u64);
+    }
+}
+
+#[test]
+fn independently_faulting_siblings_publish_one_canonical_aggregate() {
+    let checked = checked(concat!(
+        "module Main\n    requires Console.Write\n\n",
+        "task bad value =\n",
+        "    scope\n",
+        "        let ignored = Console.write \"boundary\"\n",
+        "        return value / 0\n\n",
+        "task main () =\n",
+        "    scope\n",
+        "        let first = spawn bad 1\n",
+        "        let second = spawn bad 2\n",
+        "        let left = await first\n",
+        "        let right = await second\n",
+        "        return ()\n",
+    ));
+    let main = task_main(&checked);
+    let mut projections = Vec::new();
+    for workers in [1, 4] {
+        let mut console = MemoryConsole::default();
+        let run = run_local_task(
+            &checked,
+            &main,
+            vec![TaskValue::Unit],
+            &mut console,
+            config(workers),
+            &LocalTaskControl::new(),
+        )
+        .expect("sibling Faults remain a structured terminal outcome");
+        let LocalTaskTerminal::Faulted(fault) = run.terminal() else {
+            panic!("expected sibling Fault aggregate")
+        };
+        assert!(matches!(
+            fault.kind,
+            RuntimeFaultKind::TaskFaultAggregate { fault_count: 2, .. }
+        ));
+        assert_terminal_cleanup(&run, 3);
+        assert_eq!(console.output(), "boundary\nboundary\n");
+        projections.push((fault.clone(), run.snapshot().records().to_vec()));
+    }
+    assert_eq!(projections[0], projections[1]);
+}
+
+#[test]
+fn bounded_generated_short_task_stress_is_worker_count_independent() {
+    let source = generated_short_task_program(STRESS_SHORT_TASKS);
+    let checked = checked_at("generated-task-stress.ling", source.into_bytes());
+    let main = task_main(&checked);
+    let mut baseline = None;
+    for workers in [1, 4] {
+        for _ in 0..STRESS_REPETITIONS {
+            let mut console = MemoryConsole::default();
+            let run = run_local_task(
+                &checked,
+                &main,
+                vec![TaskValue::Unit],
+                &mut console,
+                LocalTaskSchedulerConfig::new(
+                    workers,
+                    128,
+                    STRESS_SHORT_TASKS,
+                    4_096,
+                    4_096,
+                    128,
+                    TaskRuntimeLimits::new(128, 128, 4_096, 128),
+                ),
+                &LocalTaskControl::new(),
+            )
+            .expect("bounded generated stress run");
+            assert_eq!(
+                run.terminal(),
+                &LocalTaskTerminal::Completed(TaskValue::Unit)
+            );
+            assert_terminal_cleanup(&run, STRESS_SHORT_TASKS + 1);
+            assert_eq!(run.metrics().worker_exits(), workers as u64);
+            assert!(console.output().is_empty());
+            let projection = run.snapshot().records().to_vec();
+            if let Some(expected) = &baseline {
+                assert_eq!(&projection, expected);
+            } else {
+                baseline = Some(projection);
+            }
+        }
+    }
+}
+
+#[test]
 fn invalid_configuration_fails_before_host_effects_or_workers() {
     let checked = checked(NESTED_MAIN);
     let main = task_main(&checked);
@@ -135,6 +335,76 @@ fn invalid_configuration_fails_before_host_effects_or_workers() {
         }
     );
     assert!(console.output().is_empty());
+}
+
+#[test]
+fn exact_million_task_ceiling_is_accepted_and_larger_limit_is_rejected_atomically() {
+    let accepted = checked(NESTED_MAIN);
+    let accepted_main = task_main(&accepted);
+    let mut accepted_console = MemoryConsole::default();
+    let run = run_local_task(
+        &accepted,
+        &accepted_main,
+        vec![TaskValue::Unit],
+        &mut accepted_console,
+        LocalTaskSchedulerConfig::new(
+            2,
+            16,
+            8,
+            128,
+            128,
+            64,
+            TaskRuntimeLimits::new(1_000_000, 16, 128, 16),
+        ),
+        &LocalTaskControl::new(),
+    )
+    .expect("the exact one-million Task ceiling is a valid capacity bound");
+    assert_eq!(
+        run.terminal(),
+        &LocalTaskTerminal::Completed(TaskValue::Unit)
+    );
+    assert!(
+        run.snapshot()
+            .records()
+            .iter()
+            .all(|record| record.cleanup_count() == 1)
+    );
+
+    let rejected = checked(concat!(
+        "module Main\n    requires Console.Write\n\n",
+        "task main () =\n",
+        "    scope\n",
+        "        let ignored = Console.write \"must not run\"\n",
+        "        return ()\n",
+    ));
+    let rejected_main = task_main(&rejected);
+    for task_limit in [1_000_001, usize::MAX] {
+        let mut rejected_console = MemoryConsole::default();
+        let error = run_local_task(
+            &rejected,
+            &rejected_main,
+            vec![TaskValue::Unit],
+            &mut rejected_console,
+            LocalTaskSchedulerConfig::new(
+                2,
+                16,
+                8,
+                128,
+                128,
+                64,
+                TaskRuntimeLimits::new(task_limit, 16, 128, 16),
+            ),
+            &LocalTaskControl::new(),
+        )
+        .expect_err("a capacity above one million must fail before execution");
+        assert_eq!(
+            error,
+            LocalTaskSchedulerError::InvalidConfiguration {
+                reason: "runtime_task_limit_exceeds_1000000"
+            }
+        );
+        assert!(rejected_console.output().is_empty());
+    }
 }
 
 #[test]

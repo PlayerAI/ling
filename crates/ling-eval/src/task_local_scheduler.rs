@@ -14,6 +14,8 @@ use crate::{Console, RuntimeFault, RuntimeFaultKind};
 use super::task_runtime::{TaskPath, TaskRuntime, TaskRuntimeLimits, TaskRuntimeState, TaskValue};
 
 const MAX_WORKERS: usize = 64;
+// DEC-0269 capacity boundary; this is not a performance or allocation claim.
+const MAX_LOCAL_TASKS: usize = 1_000_000;
 
 /// Explicit, host-independent bounds for one production local Task run.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -714,6 +716,8 @@ fn validate_config(config: LocalTaskSchedulerConfig) -> Result<(), LocalTaskSche
         Some("worker_count_zero")
     } else if config.worker_count > MAX_WORKERS {
         Some("worker_count_exceeds_64")
+    } else if config.runtime_limits.max_tasks() > MAX_LOCAL_TASKS {
+        Some("runtime_task_limit_exceeds_1000000")
     } else if config.queue_capacity == 0 {
         Some("queue_capacity_zero")
     } else if config.queue_capacity > config.runtime_limits.max_tasks() {

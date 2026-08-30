@@ -1,7 +1,8 @@
 use ling_ast::lower as lower_ast;
+use ling_diagnostics::codes;
 use ling_effects::{Effect, EffectErrorKind, check};
 use ling_hir::lower as lower_hir;
-use ling_resolve::resolve;
+use ling_resolve::{ResolveErrorKind, resolve};
 use ling_source::{SourceFile, SourceId};
 use ling_syntax::parse;
 use ling_types::check as check_types;
@@ -27,6 +28,48 @@ fn typed_source(source_name: &str, text: &str) -> ling_types::TypedProgram {
 
 fn check_errors(text: &str) -> Vec<ling_effects::EffectError> {
     check(typed_source("invalid-task.ling", text)).expect_err("Task program must be rejected")
+}
+
+#[test]
+fn detach_attempt_is_rejected_before_checked_task_publication() {
+    let text = concat!(
+        "module Main\n\n",
+        "task child value =\n",
+        "    scope\n",
+        "        return value\n\n",
+        "task parent value =\n",
+        "    scope\n",
+        "        let handle = spawn child value\n",
+        "        let ignored = detach handle\n",
+        "        let result = await handle\n",
+        "        return result\n",
+    );
+    let source = SourceFile::from_bytes(
+        SourceId::new(0),
+        "invalid-detach.ling",
+        text.as_bytes().to_vec(),
+    )
+    .expect("valid UTF-8 source");
+    let parsed = parse(&source);
+    assert!(parsed.is_valid(), "{:?}", parsed.parse_errors());
+    let ast = lower_ast(&source, &parsed).expect("valid AST");
+    let hir = lower_hir(source.name(), &ast).expect("valid HIR");
+    let errors = resolve(vec![hir], "Main").expect_err("detach has no accepted binding");
+    let error = errors
+        .iter()
+        .find(|error| {
+            matches!(
+                &error.kind,
+                ResolveErrorKind::UndefinedName { name } if name == "detach"
+            )
+        })
+        .expect("undefined detach error");
+    assert_eq!(error.to_diagnostic().code(), codes::UNDEFINED_NAME);
+    assert_eq!(error.source_name, "invalid-detach.ling");
+    assert_eq!(
+        usize::try_from(error.span.start().get()).expect("span fits usize"),
+        text.find("detach").expect("detach spelling")
+    );
 }
 
 #[test]
