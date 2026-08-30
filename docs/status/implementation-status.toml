@@ -10151,7 +10151,7 @@ notes = [
 [[task]]
 id = "ACT-2302"
 title = "Actor message sendability checking"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10179,35 +10179,35 @@ spec = [
 artifacts = [
   "docs/decisions/0271-checked-actor-message-sendability-and-schema.md",
   "docs/status/ACT-2302-AUTHORITY-AUDIT.md",
-  "docs/status/ACT-2302-MESSAGE-SCHEMA-MODEL-AUTHORITY-AUDIT.md",
-  "docs/status/ACT-2302-MESSAGE-SCHEMA-MODEL-IMPLEMENTATION-REPORT.md",
-  "docs/decisions/0096-actor-message-schema-identity.md",
-  "crates/ling-concurrency/src/message.rs",
-  "crates/ling-concurrency/src/lib.rs",
-  "docs/governance/authority.toml",
-  "docs/governance/authority.md",
-  "docs/governance/lifecycle.toml",
-  "docs/governance/lifecycle.md",
+  "docs/status/ACT-2302-IMPLEMENTATION-REPORT.md",
+  "crates/ling-types/src/actor_message.rs",
+  "crates/ling-types/src/lib.rs",
+  "crates/ling-effects/src/actor_core.rs",
+  "crates/ling-semantic/src/lib.rs",
+  "crates/ling-cli/tests/actor_boundary.rs",
+  "tests/fixtures/actor-message-schema.ling",
+  "schemas/semantic/0.1/schema.json",
+  "schemas/registry.toml",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/support-matrix.toml",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "Accepted DEC-0271 authorizes only the bounded checked-only SendableLocal judgment, canonical local message schema, and optional Experimental x-ling-actor/0.1 Semantic Graph projection.",
-  "The implementation must consume checked types and CheckedActorCore, default-deny unsupported and future categories, and preserve original UTF-8 message-type spans.",
-  "Resource, Managed, Borrow, Capability transfer, mailbox/runtime, serialization, remote delivery, and executable Actor behavior remain rejected and intentionally deferred.",
-  "Completion requires positive, negative, recursive, deterministic, reader-corruption, Unicode/BOM/CRLF, schema-collision, and no-execution evidence plus current protocol and status traceability.",
-  "Acceptance changes governance authority and task readiness only; it does not claim that SendableLocal, message schemas, or x-ling-actor/0.1 are already implemented.",
-  "Accepted DEC-0096 authorizes only the publish-disabled message-schema identity child; it does not authorize Sendable, ownership, Resource/Managed, Capability, payload typing, serialization, mailbox, or runtime behavior.",
+  "Accepted DEC-0271 clauses 1 through 14 are implemented as a checked-only SendableLocal judgment, canonical local message schema, immutable CheckedActorMessageContract, and optional Experimental x-ling-actor/0.1 Semantic Graph projection.",
+  "The implementation consumes checked types and CheckedActorCore, structurally admits only the closed local Value closure, default-denies unsupported and future categories, preserves original UTF-8 message-type spans, and rejects schema digest collisions atomically.",
+  "Positive, negative, generic-recursive, deterministic, reader-corruption, Unicode/BOM/CRLF, schema-collision, and no-execution evidence passes; the protocol inventory, embedded semantic schema, support matrix, gap markers, and status traceability are current.",
+  "Resource, Managed, Borrow, Capability transfer, mailbox/runtime, serialization, remote delivery, Audit Actor projection, and executable Actor behavior remain unavailable and intentionally deferred.",
+  "cargo test --workspace --all-targets --locked --offline, targeted clippy, cargo xtask governance check-all, cargo xtask support verify, cargo xtask schema validate-all, and cargo xtask status verify pass for the implementation commit and completion update.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "4e925c7ab8bc91f5724a5700d7abd7c3f6623955"
+completion_commit = "4e925c7ab8bc91f5724a5700d7abd7c3f6623955"
+integration_state = "committed"
+completed = "2026-08-30"
 notes = [
-  "ACT-2301 is Done under Accepted DEC-0270, and Accepted DEC-0271 now authorizes the bounded checked-only SendableLocal and message-schema implementation; ACT-2302 is Ready.",
-  "Accepted DEC-0271 selects a checked-only local Value Sendable judgment and x-ling-actor/0.1 schema projection while default-denying Borrow, Resource, Managed, Capability transfer, runtime, and remote categories.",
-  "Current checked Actor Core carries DEC-0270's message TypeId and conservative closed-Value admission, but there is no named Sendable judgment, Borrow/Move/Resource/Managed type surface, source ActorRef, canonical message schema projection, send operation, or local/remote serialization; the private predicate is not a cross-turn proof.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, ownership checker, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "SendableLocal and x-ling-actor/0.1 are checked/data-only contracts; they do not authorize or imply a send operation, mailbox, runtime ActorRef value, serialization, wire compatibility, delivery, or ownership transfer.",
+  "Actor-bearing checked Core uses ling.checked-actor-core/1 and includes the canonical message schema in Actor Body/Program identity; non-Actor identities and JSON bytes remain unchanged.",
+  "No new diagnostic code or Unicode behavior was added; L-ACTOR-0001 retains the source rejection category with more precise stable reasons, and L-ACTOR-0002 preserves the execution boundary.",
 ]
 
 [[task]]

@@ -18,7 +18,7 @@ evidence exist.
 
 | RC0 criterion | Current evidence | State | Required exit evidence |
 | --- | --- | --- | --- |
-| Feature freeze | The status registry has 499 tasks and 342 `Done` tasks; seven tracked features still have stabilization blockers, and G1-G5 release work is not closed. | BlockedSpec | Accepted 1.0 support scope, change-control policy, candidate commit identity, and a reviewed freeze record. |
+| Feature freeze | The status registry has 499 tasks and 343 `Done` tasks; seven tracked features still have stabilization blockers, and G1-G5 release work is not closed. | BlockedSpec | Accepted 1.0 support scope, change-control policy, candidate commit identity, and a reviewed freeze record. |
 | Protocol-freeze candidate | The protocol inventory has 50 records: 0 Stable, 17 Experimental, 29 Preview, 1 Internal, and 3 Future. | BlockedSpec | Accepted versions, reader/unknown-field/migration rules, golden and corrupt-input fixtures, and an inventory revision tied to the candidate. |
 | Support-matrix draft final | `docs/governance/support-matrix.md` is explicitly `1.0-draft`; all three hosts are Tier2 with no release artifacts, profiles are unavailable, and no Tier1 target is claimed. | BlockedSpec | Accepted feature/profile/target matrix, Tier1 artifact evidence, limitations, and support-matrix review record. |
 | P0/P1 triage | No repository-authoritative P0/P1 issue and disposition registry proves that correctness, security, and data-loss blockers are closed; unresolved G6 tasks remain in the ledger. | BlockedSpec | Complete issue inventory, severity/owner/disposition, regression links, and an independently reviewed no-open-blocker decision. |

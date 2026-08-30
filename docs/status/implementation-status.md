@@ -36,7 +36,7 @@
 | `ACT-2301` | Actor identity and state isolation | `G2` | `M` | `Done` | `TASK-2203` | `abb31810ffa8a96e637b83f14659cff1662e0527` |
 | `ACT-2301-ACTOR-SYNTAX-REJECTION` | Internal Actor-shaped syntax rejection gate | `G2` | `S` | `Done` | `GOV-0105` | `44bb344db86ad8c1039d8a974f5d608c7c1eff9a` |
 | `ACT-2301-IDENTITY-MODEL` | Internal Actor identity/reference model | `G2` | `S` | `Done` | `ACT-2301-ACTOR-SYNTAX-REJECTION` | `4209c9b444b72501731b96fdad2f8832269b406a` |
-| `ACT-2302` | Actor message sendability checking | `G2` | `L` | `Ready` | `ACT-2301` | `` |
+| `ACT-2302` | Actor message sendability checking | `G2` | `L` | `Done` | `ACT-2301` | `4e925c7ab8bc91f5724a5700d7abd7c3f6623955` |
 | `ACT-2302-MESSAGE-SCHEMA-MODEL` | Internal Actor message-schema identity model | `G2` | `S` | `Done` | `ACT-2301-IDENTITY-MODEL` | `dfc5577c80ecf3811014495080aca758df2cf3e9` |
 | `ACT-2303` | Bounded mailbox and backpressure | `G2` | `L` | `BlockedSpec` | `ACT-2302` | `` |
 | `ACT-2303-MAILBOX-OBSERVATION` | Internal Actor mailbox observation | `G2` | `S` | `Done` | `ACT-2302-MESSAGE-SCHEMA-MODEL` | `fb42fb580dde35d09594392f16e5798621fd3785` |

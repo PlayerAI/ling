@@ -1,13 +1,13 @@
 # ACT-2302 实施报告：Actor 消息可发送性检查
 
-> 状态：Review  
+> 状态：Done<br>
 > 日期：2026-08-30  
 > 授权：Accepted `DEC-0271`  
 > 范围：checked-only `SendableLocal`、本地消息 schema、Experimental `x-ling-actor/0.1`
 
 ## 结论
 
-ACT-2302 已实现 `DEC-0271` 第 1—14 条规定的最小完整纵向切片，当前进入仓库级门禁与提交复核。实现只扩展已检查 Actor Core 与 file-mode `ling.semantic/0.1` 数据投影；它没有增加 `send` 语法、Actor runtime、mailbox、serialization、bytecode/VM/native 执行或远程交付能力。
+ACT-2302 已实现 `DEC-0271` 第 1—14 条规定的最小完整纵向切片，并通过仓库级门禁。实现只扩展已检查 Actor Core 与 file-mode `ling.semantic/0.1` 数据投影；它没有增加 `send` 语法、Actor runtime、mailbox、serialization、bytecode/VM/native 执行或远程交付能力。
 
 ## 规范覆盖
 
@@ -45,7 +45,9 @@ ACT-2302 已实现 `DEC-0271` 第 1—14 条规定的最小完整纵向切片，
 - `cargo xtask support verify`：通过。
 - `cargo xtask schema validate-all`：通过。
 
-仓库级 `governance check-all`、`status verify` 与 workspace tests 在提交前门禁阶段执行，只有实际通过后才会写入完成状态。
+- `cargo test --workspace --all-targets --locked --offline`：通过（1 个既有 bless test ignored）。
+- `cargo xtask governance check-all`：通过。
+- `cargo xtask status verify`：通过。
 
 ## 明确延期
 
