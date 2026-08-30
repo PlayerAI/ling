@@ -1534,6 +1534,14 @@ impl<'checked, 'console> TaskRuntime<'checked, 'console> {
         }
     }
 
+    pub(super) fn scheduler_resource_fault(
+        &self,
+        resource: &'static str,
+        limit: usize,
+    ) -> RuntimeFault {
+        self.resource_fault(&TaskPath::root(), resource, limit)
+    }
+
     fn core_span(&self, task: &TaskInstance) -> Span {
         self.interpreter
             .checked

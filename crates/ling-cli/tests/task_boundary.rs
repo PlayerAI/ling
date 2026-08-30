@@ -11,6 +11,14 @@ const CHECKED_TASK: &str = concat!(
     "let main () = ()\n",
 );
 
+const TASK_MAIN: &str = concat!(
+    "module Main\n    requires Console.Write\n\n",
+    "task main () =\n",
+    "    scope\n",
+    "        let ignored = Console.write \"task-main\"\n",
+    "        return ()\n",
+);
+
 #[test]
 fn task_declaration_reaches_checked_snapshot_but_not_execution() {
     let compiled = compile_source("task.ling", CHECKED_TASK.as_bytes().to_vec())
@@ -94,6 +102,47 @@ fn file_check_succeeds_while_file_run_stops_before_execution() {
     assert_eq!(run.status.code(), Some(1));
     assert!(run.stdout.is_empty());
     assert!(String::from_utf8_lossy(&run.stderr).contains("L-TASK-0004"));
+}
+
+#[test]
+fn exact_task_main_runs_only_through_file_interpreter_run() {
+    let path = std::env::temp_dir().join(format!("ling-task-main-run-{}.ling", std::process::id()));
+    let temporary = TemporaryFile(path);
+    fs::write(&temporary.0, TASK_MAIN).expect("temporary Task main is writable");
+
+    let check = Command::new(env!("CARGO_BIN_EXE_ling"))
+        .args(["check", "--format", "json"])
+        .arg(&temporary.0)
+        .output()
+        .expect("ling check runs");
+    assert!(check.status.success());
+    assert!(check.stdout.is_empty());
+    assert!(check.stderr.is_empty());
+
+    let run = Command::new(env!("CARGO_BIN_EXE_ling"))
+        .args(["run", "--format", "json"])
+        .arg(&temporary.0)
+        .output()
+        .expect("ling run executes Task main");
+    assert!(
+        run.status.success(),
+        "{}",
+        String::from_utf8_lossy(&run.stderr)
+    );
+    assert_eq!(run.stdout, b"task-main\n");
+    assert!(run.stderr.is_empty());
+
+    let test = Command::new(env!("CARGO_BIN_EXE_ling"))
+        .args(["test", "--format", "json"])
+        .arg(&temporary.0)
+        .output()
+        .expect("ling test retains the Task boundary");
+    assert_eq!(test.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&test.stderr).contains("L-TASK-0004"));
+    let report: serde_json::Value =
+        serde_json::from_slice(&test.stdout).expect("test rejection report is JSON");
+    assert_eq!(report["tests"][0]["status"], "compile_failed");
+    assert_eq!(report["tests"][0]["stdout"], "");
 }
 
 struct TemporaryFile(PathBuf);

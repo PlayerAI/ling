@@ -1,17 +1,16 @@
-use std::cell::Cell as ScalarCell;
 use std::collections::VecDeque;
-use std::rc::Rc;
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use super::*;
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub(super) struct ContinuationValue {
     handler_id: u64,
     operation: String,
     mode: HandlerResumeMode,
     frames: Vec<Frame>,
-    uses: ScalarCell<usize>,
-    active: Rc<ScalarCell<bool>>,
+    uses: AtomicUsize,
+    active: Arc<AtomicBool>,
 }
 
 #[derive(Clone, Debug)]
@@ -243,7 +242,7 @@ enum Frame {
     HandlerBoundary(ActiveHandler),
     ClauseBoundary {
         handler_id: u64,
-        active: Rc<ScalarCell<bool>>,
+        active: Arc<AtomicBool>,
     },
     ResumeReturn {
         clause_boundary: Box<Frame>,
@@ -750,7 +749,7 @@ fn continue_frame(
             remaining,
             mut environment,
         } => {
-            *cell.borrow_mut() = value;
+            *lock_cell(&cell) = value;
             environment.insert(BindingKey::new(module, binding.id), cell);
             start_sequence(interpreter, module, remaining, environment, frames)
         }
@@ -880,9 +879,9 @@ fn continue_frame(
                 return Err(interpreter.fault(module, place.span, "assignment cell is absent"));
             };
             if place.fields.is_empty() {
-                *cell.borrow_mut() = value;
+                *lock_cell(cell) = value;
             } else {
-                let mut root = cell.borrow_mut();
+                let mut root = lock_cell(cell);
                 assign_fields(&mut root, &place.fields, value)
                     .map_err(|invariant| interpreter.fault(module, place.span, invariant))?;
             }
@@ -1148,7 +1147,7 @@ fn continue_frame(
         }
         Frame::HandlerBoundary(_) => Ok(Control::Value(value)),
         Frame::ClauseBoundary { active, .. } => {
-            active.set(false);
+            active.store(false, Ordering::Release);
             Ok(Control::Value(value))
         }
         Frame::ResumeReturn {
@@ -1235,9 +1234,9 @@ fn start_sequence(
             }
             hir::SequenceElement::Let(binding) if binding.parameters.is_empty() => {
                 let key = BindingKey::new(module, binding.id);
-                let cell = Rc::new(RefCell::new(Value::Unit));
+                let cell = Arc::new(Mutex::new(Value::Unit));
                 if binding.recursive {
-                    environment.insert(key, Rc::clone(&cell));
+                    environment.insert(key, Arc::clone(&cell));
                 }
                 frames.push(Frame::LocalBinding {
                     module,
@@ -1250,9 +1249,9 @@ fn start_sequence(
             }
             hir::SequenceElement::Let(binding) => {
                 let key = BindingKey::new(module, binding.id);
-                let cell = Rc::new(RefCell::new(Value::Unit));
+                let cell = Arc::new(Mutex::new(Value::Unit));
                 if binding.recursive {
-                    environment.insert(key, Rc::clone(&cell));
+                    environment.insert(key, Arc::clone(&cell));
                 }
                 let value = Value::Closure(Box::new(Closure {
                     module,
@@ -1260,7 +1259,7 @@ fn start_sequence(
                     body: binding.value,
                     environment: environment.clone(),
                 }));
-                *cell.borrow_mut() = value;
+                *lock_cell(&cell) = value;
                 environment.insert(key, cell);
             }
         }
@@ -1371,7 +1370,7 @@ fn reference_control(
                 ))
             },
             |cell| {
-                let value = match cell.borrow().clone() {
+                let value = match lock_cell(cell).clone() {
                     Value::Resume { continuation, .. } => Value::Resume {
                         continuation,
                         source_span,
@@ -1621,14 +1620,14 @@ fn apply(
                     }),
                 );
             }
-            if !continuation.active.get() {
+            if !continuation.active.load(Ordering::Acquire) {
                 return Err(
                     interpreter.fault_at_entry(RuntimeFaultKind::InvalidCheckedCore {
                         invariant: "handler continuation escaped its owning invocation",
                     }),
                 );
             }
-            let uses = continuation.uses.get();
+            let uses = continuation.uses.load(Ordering::Acquire);
             if continuation.mode == HandlerResumeMode::Once && uses >= 1 {
                 return Err(RuntimeFault {
                     kind: RuntimeFaultKind::HandlerResumeCardinality {
@@ -1639,7 +1638,9 @@ fn apply(
                     span: source_span,
                 });
             }
-            continuation.uses.set(uses.saturating_add(1));
+            continuation
+                .uses
+                .store(uses.saturating_add(1), Ordering::Release);
             let boundary_index = frames
                 .iter()
                 .rposition(|frame| {
@@ -1742,7 +1743,7 @@ fn dispatch_operation(
         }
     }
 
-    let active = Rc::new(ScalarCell::new(true));
+    let active = Arc::new(AtomicBool::new(true));
     if let Some(resume) = &clause.resume {
         let continuation = ContinuationValue {
             handler_id: handler.id,
@@ -1751,13 +1752,13 @@ fn dispatch_operation(
             frames: std::iter::once(Frame::HandlerBoundary(handler.clone()))
                 .chain(captured)
                 .collect(),
-            uses: ScalarCell::new(0),
-            active: Rc::clone(&active),
+            uses: AtomicUsize::new(0),
+            active: Arc::clone(&active),
         };
         environment.insert(
             BindingKey::new(handler.module, resume.id),
-            Rc::new(RefCell::new(Value::Resume {
-                continuation: Rc::new(continuation),
+            Arc::new(Mutex::new(Value::Resume {
+                continuation: Arc::new(continuation),
                 source_span: resume.name.span,
             })),
         );

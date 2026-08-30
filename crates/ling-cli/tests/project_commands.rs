@@ -310,6 +310,53 @@ fn checked_task_project_allows_check_but_rejects_run_test_and_build() {
     cleanup(&root);
 }
 
+#[test]
+fn exact_task_main_project_runs_but_test_and_build_remain_rejected() {
+    let root = temp_root("task-main-run");
+    copy_tree(&fixture(), &root);
+    fs::write(
+        root.join("src/Main.ling"),
+        concat!(
+            "module Main\n    requires Console.Write\n\n",
+            "task main () =\n",
+            "    scope\n",
+            "        let ignored = Console.write \"project-task-main\"\n",
+            "        return ()\n",
+        ),
+    )
+    .expect("temporary Task main source is writable");
+    update_lock(&root);
+
+    let checked = run(&root, "check", "json");
+    assert!(checked.status.success());
+    assert!(checked.stderr.is_empty());
+
+    let executed = run(&root, "run", "json");
+    assert!(
+        executed.status.success(),
+        "{}",
+        String::from_utf8_lossy(&executed.stderr)
+    );
+    assert!(executed.stderr.is_empty());
+    let report: serde_json::Value =
+        serde_json::from_slice(&executed.stdout).expect("project run report is JSON");
+    assert_eq!(report["operation"], "run");
+    assert_eq!(report["stdout"], "project-task-main\n");
+
+    let tested = run(&root, "test", "json");
+    assert_eq!(tested.status.code(), Some(1));
+    assert!(tested.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&tested.stderr).contains("L-TASK-0004"));
+
+    let artifact = root.join("task-main-artifact.json");
+    let built = run_build(&root, &artifact, "json");
+    assert_eq!(built.status.code(), Some(1));
+    assert!(built.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&built.stderr).contains("L-TASK-0004"));
+    assert!(!artifact.exists());
+    cleanup(&root);
+}
+
 fn update_lock(root: &Path) {
     let manifest_path = root.join("ling.toml");
     let bytes = fs::read(&manifest_path).expect("temporary manifest is readable");

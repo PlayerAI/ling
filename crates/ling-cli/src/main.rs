@@ -27,7 +27,7 @@ use ling_cli::{
     CompileFailure, checked_task_implementation_boundary, compile_path, compile_source,
 };
 use ling_diagnostics::Diagnostic;
-use ling_effects::locate_main;
+use ling_effects::{RunEntry, locate_main, locate_run_entry};
 use ling_eval::{Console, HostError, HostErrorCategory, MemoryConsole};
 use ling_format::{FormatDisposition, build_format_ir, format_core_with_disposition};
 use ling_project::{
@@ -244,19 +244,27 @@ fn execute(options: Options) -> u8 {
         }
         Command::Query | Command::Patch => unreachable!("handled before compilation"),
         Command::Run => {
-            if let Some(diagnostic) =
-                checked_task_implementation_boundary(compiled.snapshot.checked(), "run")
-            {
-                return emit_compile_error(diagnostic, options.policy);
-            }
-            let main = match locate_main(compiled.snapshot.checked()) {
-                Ok(main) => main,
+            let entry = match locate_run_entry(compiled.snapshot.checked()) {
+                Ok(entry) => entry,
                 Err(error) => {
                     return emit_compile_error(error.to_diagnostic(), options.policy);
                 }
             };
             let mut console = StdoutConsole;
-            match ling_eval::execute_main(&compiled.snapshot, &main, &mut console) {
+            let result = match entry {
+                RunEntry::Value(main) => {
+                    if let Some(diagnostic) =
+                        checked_task_implementation_boundary(compiled.snapshot.checked(), "run")
+                    {
+                        return emit_compile_error(diagnostic, options.policy);
+                    }
+                    ling_eval::execute_main(&compiled.snapshot, &main, &mut console)
+                }
+                RunEntry::Task(main) => {
+                    ling_eval::execute_task_main(&compiled.snapshot, &main, &mut console)
+                }
+            };
+            match result {
                 Ok(()) => EXIT_SUCCESS,
                 Err(fault) => {
                     emit_diagnostics(&[fault.to_diagnostic()], options.policy, EXIT_RUNTIME_FAULT)
@@ -485,19 +493,8 @@ fn execute_project_command(options: Options) -> u8 {
 }
 
 fn execute_project_run(project: &CheckedProject, policy: OutputPolicy) -> u8 {
-    if let Some(diagnostic) =
-        checked_task_implementation_boundary(project.snapshot().checked(), "project.run")
-    {
-        return emit_project_command_diagnostics(
-            "run",
-            &[diagnostic],
-            None,
-            policy,
-            EXIT_COMPILE_ERROR,
-        );
-    }
-    let main = match locate_main(project.snapshot().checked()) {
-        Ok(main) => main,
+    let entry = match locate_run_entry(project.snapshot().checked()) {
+        Ok(entry) => entry,
         Err(error) => {
             return emit_project_command_diagnostics(
                 "run",
@@ -509,7 +506,26 @@ fn execute_project_run(project: &CheckedProject, policy: OutputPolicy) -> u8 {
         }
     };
     let mut console = MemoryConsole::default();
-    match ling_eval::execute_project_main(project.snapshot(), &main, &mut console) {
+    let result = match entry {
+        RunEntry::Value(main) => {
+            if let Some(diagnostic) =
+                checked_task_implementation_boundary(project.snapshot().checked(), "project.run")
+            {
+                return emit_project_command_diagnostics(
+                    "run",
+                    &[diagnostic],
+                    None,
+                    policy,
+                    EXIT_COMPILE_ERROR,
+                );
+            }
+            ling_eval::execute_project_main(project.snapshot(), &main, &mut console)
+        }
+        RunEntry::Task(main) => {
+            ling_eval::execute_project_task_main(project.snapshot(), &main, &mut console)
+        }
+    };
+    match result {
         Ok(()) => match policy.format() {
             OutputFormat::Human => match write_stdout(console.output().as_bytes()) {
                 Ok(()) => EXIT_SUCCESS,
@@ -2022,7 +2038,7 @@ fn invalid_usage(message: &str) -> u8 {
 
 fn usage() -> String {
     format!(
-        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [OUTPUT] <file>\n  {CLI_NAME} query --symbol name [OUTPUT] <file>\n  {CLI_NAME} patch [OUTPUT] <transaction.json> <file>\n  {CLI_NAME} test [OUTPUT] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [OUTPUT]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [OUTPUT]\n  {CLI_NAME} fmt [--check] [--stdin-name name] [OUTPUT] <file|->\n  {CLI_NAME} init [--name package] [--display-name text] [OUTPUT] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [OUTPUT]\n  {CLI_NAME} repl [--capability Console.Write] [OUTPUT]\n  {CLI_NAME} lsp --stdio\n  {CLI_NAME} completion <bash|zsh|fish|powershell>\n\nOUTPUT:\n  [--format human|json] [--language bilingual|zh-CN|en]\n  [--color auto|always|never] [--quiet|--verbose]"
+        "Usage:\n  {CLI_NAME} --version\n  {CLI_NAME} <run|check|semantic|audit> [OUTPUT] <file>\n  {CLI_NAME} query --symbol name [OUTPUT] <file>\n  {CLI_NAME} patch [OUTPUT] <transaction.json> <file>\n  {CLI_NAME} test [OUTPUT] <file-or-directory>\n  {CLI_NAME} <run|check|test> --manifest-path path --locked --offline [OUTPUT]\n  {CLI_NAME} build --manifest-path path --locked --offline --profile explore --target semantic --output path [OUTPUT]\n  {CLI_NAME} fmt [--check] [--stdin-name name] [OUTPUT] <file|->\n  {CLI_NAME} init [--name package] [--display-name text] [OUTPUT] <directory>\n  {CLI_NAME} project check --manifest-path path --locked [OUTPUT]\n  {CLI_NAME} repl [--capability Console.Write] [OUTPUT]\n  {CLI_NAME} lsp --stdio\n  {CLI_NAME} completion <bash|zsh|fish|powershell>\n\nRUN:\n  The exact checked `task main ()` entry is supported only by file/project interpreter run.\n  Task test, build, REPL, artifacts, bytecode, VM, Native, and Wasm remain unavailable.\n\nOUTPUT:\n  [--format human|json] [--language bilingual|zh-CN|en]\n  [--color auto|always|never] [--quiet|--verbose]"
     )
 }
 

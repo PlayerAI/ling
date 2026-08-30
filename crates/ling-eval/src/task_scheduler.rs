@@ -1,9 +1,8 @@
-use std::cell::RefCell;
 use std::collections::{BTreeSet, VecDeque};
 use std::error::Error;
 use std::fmt;
 use std::panic::{AssertUnwindSafe, catch_unwind};
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 use ling_effects::CheckedProgram;
 use ling_resolve::{DefinitionId, HandlerResumeMode};
@@ -1214,11 +1213,14 @@ fn drive(
 }
 
 #[derive(Clone)]
-struct HostEventHandle(Rc<RefCell<Vec<HostRecord>>>);
+struct HostEventHandle(Arc<Mutex<Vec<HostRecord>>>);
 
 impl HostEventHandle {
     fn since(&self, index: usize) -> Vec<HostRecord> {
-        self.0.borrow()[index..].to_vec()
+        self.0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)[index..]
+            .to_vec()
     }
 }
 
@@ -1236,7 +1238,7 @@ struct DeterministicConsole {
 
 impl DeterministicConsole {
     fn new(script: TaskHostScript) -> (Self, HostEventHandle) {
-        let events = HostEventHandle(Rc::new(RefCell::new(Vec::new())));
+        let events = HostEventHandle(Arc::new(Mutex::new(Vec::new())));
         (
             Self {
                 script,
@@ -1266,17 +1268,25 @@ impl Console for DeterministicConsole {
         }));
         match outcome {
             Ok(Ok(outcome)) => {
-                self.events.0.borrow_mut().push(HostRecord {
-                    text: text.to_owned(),
-                    outcome,
-                });
+                self.events
+                    .0
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .push(HostRecord {
+                        text: text.to_owned(),
+                        outcome,
+                    });
                 Ok(())
             }
             Ok(Err((outcome, error))) => {
-                self.events.0.borrow_mut().push(HostRecord {
-                    text: text.to_owned(),
-                    outcome,
-                });
+                self.events
+                    .0
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .push(HostRecord {
+                        text: text.to_owned(),
+                        outcome,
+                    });
                 Err(error)
             }
             Err(_) => Err(HostError::new(HostErrorCategory::Other)),

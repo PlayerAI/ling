@@ -45,6 +45,9 @@ fn help_aliases_have_the_same_truthful_surface() {
             "help advertises stale command `{stale}`"
         );
     }
+    assert!(help.contains("exact checked `task main ()`"));
+    assert!(help.contains("only by file/project interpreter run"));
+    assert!(help.contains("Task test, build, REPL, artifacts, bytecode, VM, Native, and Wasm"));
 }
 
 #[test]

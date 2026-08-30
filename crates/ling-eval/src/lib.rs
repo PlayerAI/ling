@@ -1,10 +1,9 @@
 //! Strict checked-core interpreter with injected host capabilities.
 
-use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex, MutexGuard};
 
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_effects::{CheckedProgram, ResumeMode, ResumeUse};
@@ -19,8 +18,15 @@ use ling_types::Type;
 use num_bigint::BigInt;
 
 mod machine;
+mod task_local_scheduler;
 mod task_runtime;
 mod task_scheduler;
+
+pub use task_local_scheduler::{
+    LocalTaskControl, LocalTaskMetrics, LocalTaskRun, LocalTaskSchedulerConfig,
+    LocalTaskSchedulerError, LocalTaskSnapshot, LocalTaskSnapshotRecord, LocalTaskTerminal,
+    run_local_task,
+};
 
 pub use task_runtime::{
     TaskCancellationCause, TaskPath, TaskRuntime, TaskRuntimeLimits, TaskRuntimeState, TaskStep,
@@ -35,7 +41,7 @@ pub use task_scheduler::{
 };
 
 /// Host console capability. `text` already contains Ling's canonical LF.
-pub trait Console {
+pub trait Console: Send {
     fn write(&mut self, text: &str) -> Result<(), HostError>;
 }
 
@@ -291,6 +297,76 @@ pub fn execute_project_main(
     Interpreter::new(snapshot.checked(), console).execute_main(main)
 }
 
+/// Executes the exact checked `task main ()` entry through the fixed local
+/// production scheduler. This remains an interpreter-only boundary.
+pub fn execute_task_main(
+    snapshot: &ProgramSnapshot,
+    main: &DefinitionId,
+    console: &mut dyn Console,
+) -> Result<(), RuntimeFault> {
+    execute_checked_task_main(snapshot.checked(), main, console)
+}
+
+/// Project-aware form of [`execute_task_main`].
+pub fn execute_project_task_main(
+    snapshot: &ProjectProgramSnapshot,
+    main: &DefinitionId,
+    console: &mut dyn Console,
+) -> Result<(), RuntimeFault> {
+    execute_checked_task_main(snapshot.checked(), main, console)
+}
+
+fn execute_checked_task_main(
+    checked: &CheckedProgram,
+    main: &DefinitionId,
+    console: &mut dyn Console,
+) -> Result<(), RuntimeFault> {
+    let control = LocalTaskControl::new();
+    let run = run_local_task(
+        checked,
+        main,
+        vec![TaskValue::Unit],
+        console,
+        LocalTaskSchedulerConfig::cli(),
+        &control,
+    )
+    .map_err(|error| error.into_runtime_fault(checked, main))?;
+    match run.terminal().clone() {
+        LocalTaskTerminal::Completed(TaskValue::Unit) => Ok(()),
+        LocalTaskTerminal::Completed(_) => Err(RuntimeFault {
+            kind: RuntimeFaultKind::InvalidCheckedCore {
+                invariant: "validated Task main returned a non-Unit value",
+            },
+            source_name: checked
+                .typed()
+                .resolved()
+                .definition(main)
+                .and_then(|definition| definition.source_name.clone())
+                .unwrap_or_else(|| "<task>".to_owned()),
+            span: checked.task_core(main).map_or_else(
+                || checked.typed().resolved().entry_module().hir.span,
+                ling_effects::CheckedTaskCore::source_span,
+            ),
+        }),
+        LocalTaskTerminal::Cancelled => Err(RuntimeFault {
+            kind: RuntimeFaultKind::InvalidCheckedCore {
+                invariant: "Task main was cancelled by its host control",
+            },
+            source_name: checked
+                .typed()
+                .resolved()
+                .definition(main)
+                .and_then(|definition| definition.source_name.clone())
+                .unwrap_or_else(|| "<task>".to_owned()),
+            span: checked.task_core(main).map_or_else(
+                || checked.typed().resolved().entry_module().hir.span,
+                ling_effects::CheckedTaskCore::source_span,
+            ),
+        }),
+        LocalTaskTerminal::Faulted(fault) => Err(fault),
+    }
+}
+
 /// Canonical, host-independent result of evaluating one checked definition.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct EvaluatedValue {
@@ -344,8 +420,13 @@ fn reject_checked_tasks(checked: &CheckedProgram) -> Result<(), RuntimeFault> {
     })
 }
 
-type Cell = Rc<RefCell<Value>>;
+type Cell = Arc<Mutex<Value>>;
 type Environment = BTreeMap<BindingKey, Cell>;
+
+fn lock_cell(cell: &Cell) -> MutexGuard<'_, Value> {
+    cell.lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
 
 #[derive(Clone, Debug)]
 enum Value {
@@ -375,7 +456,7 @@ enum Value {
         case: String,
     },
     Resume {
-        continuation: Rc<machine::ContinuationValue>,
+        continuation: Arc<machine::ContinuationValue>,
         source_span: Span,
     },
     TaskHandle(TaskPath),
@@ -534,9 +615,9 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                     return Err(self.fault(module, place.span, "assignment cell is absent"));
                 };
                 if place.fields.is_empty() {
-                    *cell.borrow_mut() = value;
+                    *lock_cell(cell) = value;
                 } else {
-                    let mut root = cell.borrow_mut();
+                    let mut root = lock_cell(cell);
                     assign_fields(&mut root, &place.fields, value)
                         .map_err(|invariant| self.fault(module, place.span, invariant))?;
                 }
@@ -708,9 +789,9 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
         environment: &mut Environment,
     ) -> Result<(), RuntimeFault> {
         let key = BindingKey::new(module, binding.id);
-        let cell = Rc::new(RefCell::new(Value::Unit));
+        let cell = Arc::new(Mutex::new(Value::Unit));
         if binding.recursive {
-            environment.insert(key, Rc::clone(&cell));
+            environment.insert(key, Arc::clone(&cell));
         }
         let value = if binding.parameters.is_empty() {
             self.eval_expression(module, &binding.value, environment)?
@@ -722,7 +803,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 environment: environment.clone(),
             }))
         };
-        *cell.borrow_mut() = value;
+        *lock_cell(&cell) = value;
         environment.insert(key, cell);
         Ok(())
     }
@@ -737,7 +818,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
             ReferenceTarget::Definition(definition) => self.definition_value(&definition),
             ReferenceTarget::Binding(binding) => environment
                 .get(&binding)
-                .map(|cell| cell.borrow().clone())
+                .map(|cell| lock_cell(cell).clone())
                 .ok_or_else(|| {
                     self.fault(module, self.module_span(module), "binding cell is absent")
                 }),
@@ -1056,7 +1137,7 @@ impl<'snapshot, 'console> Interpreter<'snapshot, 'console> {
                 }
                 environment.insert(
                     BindingKey::new(module, *id),
-                    Rc::new(RefCell::new(value.clone())),
+                    Arc::new(Mutex::new(value.clone())),
                 );
                 Ok(true)
             }

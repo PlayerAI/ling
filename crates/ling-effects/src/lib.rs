@@ -7,8 +7,8 @@ use std::fmt;
 use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_hir as hir;
 use ling_resolve::{
-    BindingKey, Builtin, DefinitionId, DefinitionOrigin, ExpressionKey, HandlerResumeMode,
-    HandlerValueType, ModuleId, ReferenceTarget, ResolvedHandlerOperation,
+    BindingKey, Builtin, DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey,
+    HandlerResumeMode, HandlerValueType, ModuleId, ReferenceTarget, ResolvedHandlerOperation,
     resolve_handler_operation,
 };
 use ling_source::Span;
@@ -473,6 +473,21 @@ pub enum EntryErrorKind {
     MainMustHaveUnitPattern,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum RunEntry {
+    Value(DefinitionId),
+    Task(DefinitionId),
+}
+
+impl RunEntry {
+    #[must_use]
+    pub const fn definition(&self) -> &DefinitionId {
+        match self {
+            Self::Value(definition) | Self::Task(definition) => definition,
+        }
+    }
+}
+
 impl EntryError {
     #[must_use]
     pub fn to_diagnostic(&self) -> Diagnostic {
@@ -581,6 +596,113 @@ pub fn locate_main(checked: &CheckedProgram) -> Result<DefinitionId, EntryError>
         });
     }
     Ok(main_id)
+}
+
+/// Locates the file/project interpreter entry, preferring an ordinary `let
+/// main ()` and accepting the exact checked `task main ()` form when no value
+/// entry occupies that name.
+pub fn locate_run_entry(checked: &CheckedProgram) -> Result<RunEntry, EntryError> {
+    let resolved = checked.typed.resolved();
+    let module = resolved.entry_module();
+    let module_name = module.hir.module.name.normalized();
+    if module_name != "Main" {
+        return Err(EntryError {
+            kind: EntryErrorKind::EntryModuleMustBeMain {
+                actual: module_name,
+            },
+            source_name: module.hir.source_name.clone(),
+            span: module.hir.module.span,
+        });
+    }
+    let Some(main_id) = resolved.definition_id(module.id, "main").cloned() else {
+        return Err(EntryError {
+            kind: EntryErrorKind::MissingMain,
+            source_name: module.hir.source_name.clone(),
+            span: module.hir.module.span,
+        });
+    };
+    let Some(info) = resolved.definition(&main_id) else {
+        return Err(EntryError {
+            kind: EntryErrorKind::MissingMain,
+            source_name: module.hir.source_name.clone(),
+            span: module.hir.module.span,
+        });
+    };
+    if info.kind != DefinitionKind::Task {
+        return locate_main(checked).map(RunEntry::Value);
+    }
+    locate_task_main(checked, &main_id).map(RunEntry::Task)
+}
+
+fn locate_task_main(
+    checked: &CheckedProgram,
+    main_id: &DefinitionId,
+) -> Result<DefinitionId, EntryError> {
+    let module = checked.typed.resolved().entry_module();
+    let Some(main) = module
+        .hir
+        .tasks
+        .iter()
+        .find(|declaration| declaration.name.normalized == "main")
+    else {
+        return Err(EntryError {
+            kind: EntryErrorKind::MissingMain,
+            source_name: module.hir.source_name.clone(),
+            span: module.hir.module.span,
+        });
+    };
+    if !matches!(
+        main.parameters.as_slice(),
+        [hir::Pattern {
+            kind: hir::PatternKind::Unit,
+            ..
+        }]
+    ) {
+        return Err(EntryError {
+            kind: EntryErrorKind::MainMustHaveUnitPattern,
+            source_name: module.hir.source_name.clone(),
+            span: main.span,
+        });
+    }
+    let Some(core) = checked.task_core(main_id) else {
+        return Err(EntryError {
+            kind: EntryErrorKind::InvalidMainSignature {
+                actual: "missing checked Task Core".to_owned(),
+            },
+            source_name: module.hir.source_name.clone(),
+            span: main.span,
+        });
+    };
+    let signature = core.signature();
+    let valid = signature.parameters().len() == 1
+        && matches!(
+            checked.typed.arena().get(signature.parameters()[0]),
+            Type::Unit
+        )
+        && matches!(checked.typed.arena().get(signature.result()), Type::Unit);
+    if !valid {
+        let parameters = signature
+            .parameters()
+            .iter()
+            .map(|parameter| checked.typed.display_type(*parameter))
+            .collect::<Vec<_>>()
+            .join(" -> ");
+        let actual = format!(
+            "{} -> {}",
+            if parameters.is_empty() {
+                "<none>".to_owned()
+            } else {
+                parameters
+            },
+            checked.typed.display_type(signature.result())
+        );
+        return Err(EntryError {
+            kind: EntryErrorKind::InvalidMainSignature { actual },
+            source_name: module.hir.source_name.clone(),
+            span: main.span,
+        });
+    }
+    Ok(main_id.clone())
 }
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -2019,6 +2141,56 @@ mod tests {
         assert!(matches!(
             locate_main(&invalid)
                 .expect_err("main must be Unit -> Unit")
+                .kind,
+            EntryErrorKind::InvalidMainSignature { .. }
+        ));
+    }
+
+    #[test]
+    fn selects_only_the_exact_checked_task_main_for_run() {
+        let task = check(typed(concat!(
+            "module Main\n\n",
+            "task main () =\n",
+            "    scope\n",
+            "        return ()\n",
+        )))
+        .expect("Task main checks");
+        assert!(matches!(
+            locate_run_entry(&task).expect("exact Task main is executable"),
+            RunEntry::Task(_)
+        ));
+
+        let value =
+            check(typed("module Main\n\nlet main () = ()\n")).expect("ordinary main checks");
+        assert!(matches!(
+            locate_run_entry(&value).expect("ordinary main remains executable"),
+            RunEntry::Value(_)
+        ));
+
+        let wrong_pattern = check(typed(concat!(
+            "module Main\n\n",
+            "task main value =\n",
+            "    scope\n",
+            "        return ()\n",
+        )))
+        .expect("non-entry Task remains a checked declaration");
+        assert!(matches!(
+            locate_run_entry(&wrong_pattern)
+                .expect_err("Task main requires an explicit Unit pattern")
+                .kind,
+            EntryErrorKind::MainMustHaveUnitPattern
+        ));
+
+        let wrong_result = check(typed(concat!(
+            "module Main\n\n",
+            "task main () =\n",
+            "    scope\n",
+            "        return 1\n",
+        )))
+        .expect("non-entry result remains a checked Task");
+        assert!(matches!(
+            locate_run_entry(&wrong_result)
+                .expect_err("Task main result must be Unit")
                 .kind,
             EntryErrorKind::InvalidMainSignature { .. }
         ));

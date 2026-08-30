@@ -124,8 +124,9 @@ Profile 的详细语义和跨 Profile 可移植性仍需后续 RFC 与实现验�
 - Accepted `ling.manifest/1` reader、显式工程根下的确定性 module discovery、离线递归解析 vendored path dependency 的内容/graph identity、canonical `ling.lock/1` reader/writer 与 Update/Locked 策略，以及库级跨包 import/export visibility 与 package-aware `ling.semantic/0.2`（尚未接入 CLI 工程选择）；
 - Accepted RFC-0014、`ling.bytecode/1.0` 未验证模型、显式 opcode/tag 和资源上限，以及支持版本 1.0 scalar opcode、直接调用、控制流、`Console.write` 与 return 的 Checked Core 最小 lowering、确定性 encoder、bounded decoder、独立 verifier、`VerifiedProgramV1` 边界、非契约 debug disassembler 和 verifier-gated 库级 VM；VM 具有显式 value representation、host Capability adapter、step/frame/heap hooks、source-mapped Runtime Fault 和解释器 differential 证据，但 CLI backend 选择尚未实现；
 - Semantic Graph、稳定 Diagnostic JSON、解释器、REPL、`run`、`check`、`semantic`、`audit`。
+- Accepted DEC-0264 至 DEC-0268 下的 Experimental Structured Task 前端、Checked Core、状态机、生命周期 Runtime、确定性测试调度器，以及仅供文件/工程 `ling run` 解释器执行的精确 `task main ()` 本地固定 worker pool；`test`、`build`、REPL、artifact、bytecode、VM、Native 与 Wasm 仍以 `L-TASK-0004` 拒绝 Task。
 
-第一阶段明确后置：GC Runtime、Native Backend、Ownership/Borrow Checker、Trait、Effect Handler、Task、Actor、Node、Kernel、分布式、GPU、形式证明和包管理器。设计中预留的能力不得以静默占位的方式运行。
+v0.0.1 Seed 的稳定范围仍明确后置 GC Runtime、Native Backend、Ownership/Borrow Checker、Trait、Effect Handler、Task、Actor、Node、Kernel、分布式、GPU、形式证明和包管理器；上述 Structured Task 能力属于 post-Seed Experimental 切片，不提升 Seed 或 1.0 稳定性。设计中预留的能力不得以静默占位的方式运行。
 
 ### 文档结构
 
@@ -362,8 +363,9 @@ The current Seed implementation covers:
 - an Accepted `ling.manifest/1` reader, deterministic module discovery under an explicit project root, offline recursive resolution of content-identified vendored path dependencies, a canonical `ling.lock/1` reader/writer with Update/Locked policy, library-level cross-package import/export visibility, and package-aware `ling.semantic/0.2` (not yet integrated with CLI project selection);
 - Accepted RFC-0014, an unverified `ling.bytecode/1.0` model with explicit opcode/tag and resource limits, minimal Checked Core lowering, a deterministic encoder, bounded decoder, independent verifier, `VerifiedProgramV1` boundary, non-contract debug disassembler, and a verifier-gated library VM for every version-1.0 scalar opcode, direct calls, control flow, `Console.write`, and return; the VM has an explicit value representation, injected host-Capability adapter, step/frame/heap hooks, source-mapped Runtime Faults, and interpreter differential evidence, while CLI backend selection remains unavailable;
 - Semantic Graph, stable Diagnostic JSON, an interpreter, a REPL, `run`, `check`, `semantic`, and `audit`.
+- Experimental Structured Task frontend, Checked Core, state machines, lifecycle runtime, deterministic test scheduler, and the exact `task main ()` file/project interpreter `ling run` boundary under Accepted DEC-0264 through DEC-0268. The local scheduler uses a fixed worker pool; Task execution in `test`, `build`, REPL, artifacts, bytecode, VM, Native, and Wasm remains rejected with `L-TASK-0004`.
 
-The first milestone explicitly postpones the GC runtime, native backend, Ownership/Borrow checker, Traits, Effect Handlers, Task, Actor, Node, Kernel, distribution, GPU support, formal proofs, and package management. Reserved features must not silently execute as placeholders.
+The Stable v0.0.1 Seed scope still postpones the GC runtime, native backend, Ownership/Borrow checker, Traits, Effect Handlers, Task, Actor, Node, Kernel, distribution, GPU support, formal proofs, and package management. The Structured Task capabilities above are post-Seed Experimental slices and do not promote Seed or 1.0 stability. Reserved features must not silently execute as placeholders.
 
 ### Documentation layout
 
