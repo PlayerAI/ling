@@ -9748,7 +9748,7 @@ notes = [
 [[task]]
 id = "TASK-2204"
 title = "Deterministic Task test scheduler"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9788,19 +9788,19 @@ artifacts = [
 ]
 acceptance = [
   "The refreshed audit confirms TASK-2201 through TASK-2203 are Done and identifies deterministic test scheduling, virtual time, trace/replay, and bounded exploration as the remaining TASK-2204 authority boundary.",
-  "Proposed DEC-0267 defines exact SplitMix64 selection, canonical ready snapshots, logical ticks, Deadline cancellation, deterministic test-host events, typed traces, replay equivalence, breadth-first exploration, and explicit bounds.",
-  "The proposal distinguishes DEC-0266 lifecycle execution and DEC-0094 observation data from TASK-2204 scheduling behavior and makes no production fairness, wake, wall-clock, or ordering promise.",
-  "No scheduler implementation, virtual clock, deadline adapter, replay/exploration engine, public trace schema, diagnostic code, CLI/LSP surface, bytecode/VM route, or placeholder production API is added before acceptance.",
+  "Accepted DEC-0267 defines exact SplitMix64 selection, canonical ready snapshots, logical ticks, Deadline cancellation, deterministic test-host events, typed traces, replay equivalence, breadth-first exploration, and explicit bounds.",
+  "The accepted decision distinguishes DEC-0266 lifecycle execution and DEC-0094 observation data from TASK-2204 scheduling behavior and makes no production fairness, wake, wall-clock, or ordering promise.",
+  "No public trace schema, diagnostic code, CLI/LSP surface, bytecode/VM route, or placeholder production API is authorized.",
   "The conformance plan covers repeated seeds, reconstruction, deadlines, cancellation/cleanup/Fault races, host events, malformed traces, replay mismatch, exploration exhaustion, Unicode/BOM/CRLF spans, and retained public L-TASK-0004 rejection.",
-  "TASK-2204 remains BlockedSpec until DEC-0267 is Accepted.",
+  "TASK-2204 is Ready under Accepted DEC-0267.",
 ]
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "TASK-2203 completed the scheduler-neutral TaskRuntime dependency in e8765790c421f3437049562d69c9aa6d487b5464; Proposed DEC-0267 now isolates the remaining test-only scheduler choices.",
-  "DEC-0019/DEC-0021 remain compiler-query-only authorities; proposed DEC-0267 does not reuse their ordering as Ling Task behavior.",
+  "TASK-2203 completed the scheduler-neutral TaskRuntime dependency in e8765790c421f3437049562d69c9aa6d487b5464; Accepted DEC-0267 authorizes the remaining test-only scheduler choices.",
+  "DEC-0019/DEC-0021 remain compiler-query-only authorities; Accepted DEC-0267 does not reuse their ordering as Ling Task behavior.",
   "The audit and proposal preserve public L-TASK-0004 and change no compiler, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, production runtime, or Unicode 17.0.0 behavior.",
 ]
 

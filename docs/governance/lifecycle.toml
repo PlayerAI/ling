@@ -7616,13 +7616,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0267"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0267-deterministic-task-test-scheduler.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-28"
 proposed = "2026-08-28"
-decided = ""
-stable_basis = false
+decided = "2026-08-30"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Freeze exact SplitMix64 vectors, canonical ready-set choice, logical ticks, and deadline ordering across repeated and reconstructed checked programs.",
@@ -7631,7 +7631,7 @@ conformance_plan = [
   "Retain L-TASK-0004 on all public execution and bytecode/VM routes and make no TASK-2205 production-order promise.",
 ]
 compatibility_impact = [
-  "Proposes only an internal Experimental test scheduler, logical clock, typed trace, replay checker, and bounded explorer over DEC-0266.",
+  "Authorizes only an internal Experimental test scheduler, logical clock, typed trace, replay checker, and bounded explorer over DEC-0266.",
   "Adds no source, public diagnostic, schema, Semantic ID, CLI/LSP, artifact, bytecode/VM ABI, production scheduler, Stable, or Unicode 17.0.0 change.",
 ]
 unresolved_alternatives = [

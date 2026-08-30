@@ -2,18 +2,18 @@
 
 ## Outcome
 
-`TASK-2204` remains `BlockedSpec`, now solely pending acceptance of proposed
-DEC-0267. TASK-2201 through TASK-2203 are Done: Accepted DEC-0266 and
+`TASK-2204` is `Ready` under Accepted DEC-0267. TASK-2201 through TASK-2203
+are Done: Accepted DEC-0266 and
 implementation commit `e8765790c421f3437049562d69c9aa6d487b5464` provide the
 checked, scheduler-neutral `TaskRuntime`, canonical ready set, explicit
 `step(id)`, lifecycle cancellation, cleanup, bounds, and Fault aggregation that
 TASK-2204 requires.
 
-Proposed DEC-0267 defines the remaining test-only scheduler choices: exact seed
+Accepted DEC-0267 defines the remaining test-only scheduler choices: exact seed
 mapping, logical ticks, deadline cancellation, deterministic host events,
 typed trace validation, replay equivalence, and bounded interleaving
-exploration. It is Draft authority and does not authorize implementation until
-Accepted.
+exploration. It authorizes only the internal Experimental test boundary and
+makes no production scheduler or public execution promise.
 
 No scheduler, virtual clock, deadline adapter, seeded selector, replay engine,
 interleaving explorer, public trace schema, scheduler diagnostic, production
@@ -33,9 +33,9 @@ API, or placeholder G2 surface is added by this audit.
 - RFC-0020 governs host-owned VM cancellation only. DEC-0266 governs source
   Task cancellation, but its `Deadline` cause requires a future explicit
   logical Clock adapter and it assigns no scheduler policy.
-- `docs/ROADMAP-1.0.md` requires deterministic scheduling evidence for v0.2,
-  while `GAP-STRUCTURED-TASK-001` remains open for TASK-2204 through TASK-2206.
-  Proposed DEC-0267 closes only the TASK-2204 portion if Accepted.
+- `docs/ROADMAP-1.0.md` requires deterministic scheduling evidence for v0.2.
+  Accepted DEC-0267 closes the TASK-2204 portion of
+  `GAP-STRUCTURED-TASK-001`; the gap remains open for TASK-2205 and TASK-2206.
 
 ## Current implementation evidence
 
@@ -53,9 +53,9 @@ API, or placeholder G2 surface is added by this audit.
   routes remain separate. No Task scheduler, Clock, trace replay, or public
   Task execution path exists.
 
-## Proposed implementation contract
+## Accepted implementation contract
 
-If DEC-0267 is Accepted, TASK-2204 must implement:
+Under Accepted DEC-0267, TASK-2204 must implement:
 
 1. an internal publish-disabled scheduler over DEC-0266 only, with exact
    SplitMix64 selection from canonical ready snapshots and explicit non-zero
@@ -75,7 +75,7 @@ If DEC-0267 is Accepted, TASK-2204 must implement:
 
 The refreshed audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, RFC-0020, Accepted DEC-0019,
-DEC-0021, DEC-0094, DEC-0264 through DEC-0266, proposed DEC-0267,
+DEC-0021, DEC-0094, and Accepted DEC-0264 through DEC-0267,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`, the backlog, gap and
 protocol registries, the current Task runtime, and public Task rejection tests.
 
@@ -86,10 +86,10 @@ not a public protocol or compatibility promise.
 
 ## Intentionally deferred
 
-Implementation waits for DEC-0267 acceptance. TASK-2205 retains production
-workers, queues, wakes, fairness, metrics, shutdown, and public execution
-integration. TASK-2206 retains stress, million-short-task, race, shutdown, and
-final conformance evidence. Public trace/replay, source Clock/sleep, I/O wake
+TASK-2204 may now proceed under Accepted DEC-0267. TASK-2205 retains
+production workers, queues, wakes, fairness, metrics, shutdown, and public
+execution integration. TASK-2206 retains stress, million-short-task, race,
+shutdown, and final conformance evidence. Public trace/replay, source Clock/sleep, I/O wake
 injection, Task bytecode/VM/native ABI, detach, Resource finalizers, Replay,
 Actor crossing, migration, and Stable compatibility remain separately
 governed.

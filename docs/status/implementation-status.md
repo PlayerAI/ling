@@ -470,7 +470,7 @@
 | `TASK-2202-STATE-MACHINE-MODEL` | Internal Task state-machine identity model | `G2` | `S` | `Done` | `TASK-2201-CORE-MODEL` | `80f3a8c7b579c65bd77030de159cfefdc42a5a4b` |
 | `TASK-2203` | Structured Task lifecycle runtime | `G2` | `L` | `Done` | `TASK-2202` | `e8765790c421f3437049562d69c9aa6d487b5464` |
 | `TASK-2203-LIFECYCLE-OBSERVATION` | Internal Task lifecycle observation trace | `G2` | `S` | `Done` | `TASK-2202-STATE-MACHINE-MODEL` | `e0a411bbef4620cc190de34939bbcc41d8768736` |
-| `TASK-2204` | Deterministic Task test scheduler | `G2` | `L` | `BlockedSpec` | `TASK-2203` | `` |
+| `TASK-2204` | Deterministic Task test scheduler | `G2` | `L` | `Ready` | `TASK-2203` | `` |
 | `TASK-2204-SCHEDULER-OBSERVATION` | Internal Task scheduler observation trace | `G2` | `S` | `Done` | `TASK-2203-LIFECYCLE-OBSERVATION` | `078e106fff68a0f28e2f05fd8c8c6bda83637e61` |
 | `TASK-2205` | Production local Task scheduler | `G2` | `L` | `BlockedSpec` | `TASK-2204` | `` |
 | `TASK-2206` | Task conformance and stress tests | `G2` | `L` | `BlockedSpec` | `TASK-2205` | `` |

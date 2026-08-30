@@ -1,8 +1,8 @@
 # DEC-0267: Deterministic Task test scheduler and virtual time / 确定性 Task 测试调度器与虚拟时间
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-28<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-30<br>
 > Owner role：concurrency-design<br>
 > 相关 RFC/缺口：DEC-0094 | DEC-0266 | GAP-STRUCTURED-TASK-001 | TASK-2204<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`

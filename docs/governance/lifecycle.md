@@ -324,7 +324,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0264` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-25` | [DEC-0264](../decisions/0264-structured-task-frontend-core.md) |
 | `DEC-0265` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-25` | [DEC-0265](../decisions/0265-task-state-machine-lowering.md) |
 | `DEC-0266` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-27` | [DEC-0266](../decisions/0266-structured-task-lifecycle-runtime.md) |
-| `DEC-0267` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0267](../decisions/0267-deterministic-task-test-scheduler.md) |
+| `DEC-0267` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-30` | [DEC-0267](../decisions/0267-deterministic-task-test-scheduler.md) |
 
 ## Migration boundary
 
