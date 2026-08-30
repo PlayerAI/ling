@@ -10167,6 +10167,8 @@ spec = [
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0270-checked-actor-identity-and-state-isolation.md",
+  "docs/decisions/0271-checked-actor-message-sendability-and-schema.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
@@ -10175,6 +10177,7 @@ spec = [
   "docs/governance/protocol-inventory.toml",
 ]
 artifacts = [
+  "docs/decisions/0271-checked-actor-message-sendability-and-schema.md",
   "docs/status/ACT-2302-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2302-MESSAGE-SCHEMA-MODEL-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2302-MESSAGE-SCHEMA-MODEL-IMPLEMENTATION-REPORT.md",
@@ -10201,8 +10204,9 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "ACT-2302 is BlockedSpec by ACT-2301, absent RFC-C203/RFC-0009, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved Sendable/borrow/move/Managed/Capability/schema contracts.",
-  "Current Seed type/effect checking intentionally has no Actor messages, Sendable judgment, Borrow/Move/Resource/Managed type surface, ActorRef, message schema, or local/remote serialization; Seed value restrictions are not a cross-turn proof.",
+  "ACT-2301 is Done under Accepted DEC-0270, so the dependency is satisfied; ACT-2302 remains BlockedSpec because DEC-0270 explicitly defers Sendable/schema semantics and DEC-0271 is only Proposed.",
+  "Proposed DEC-0271 selects a checked-only local Value Sendable judgment and x-ling-actor/0.1 schema projection while default-denying Borrow, Resource, Managed, Capability transfer, runtime, and remote categories; it cannot authorize implementation before acceptance.",
+  "Current checked Actor Core carries DEC-0270's message TypeId and conservative closed-Value admission, but there is no named Sendable judgment, Borrow/Move/Resource/Managed type surface, source ActorRef, canonical message schema projection, send operation, or local/remote serialization; the private predicate is not a cross-turn proof.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, ownership checker, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 

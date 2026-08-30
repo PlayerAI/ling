@@ -684,6 +684,28 @@ authority = ["DEC-0012", "RFC-0022", "DEC-0264"]
 notes = ["GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.", "RFC-0022 defines the optional Experimental x-ling-trait-ide witness/member projection; it does not add a core field or an LSP wire method.", "Accepted DEC-0264 adds the optional Experimental x-ling-task/0.1 checked-only projection without changing non-Task ling.semantic/0.1 bytes or authorizing execution."]
 
 [[protocol]]
+id = "PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION"
+title = "Planned checked Actor Semantic Graph extension"
+category = "JSON"
+visibility = "Planned public"
+current_version = ""
+stability = "Future"
+implemented = false
+public_schema = false
+canonical = false
+producer = ["Future ling-semantic checked Actor snapshot writer"]
+consumer = ["Future ling-semantic isolated Actor extension reader", "Future AI and editor tooling experiments"]
+reader_policy = "Planned DEC-0271 reader requires exact x-ling-actor/0.1, validates Actor definitions, SendableLocal closure, schema identities, canonical graph order, edge targets, original byte spans, and recomputed digests, and remains data-only. No reader is implemented while DEC-0271 is Proposed."
+writer_policy = "Planned DEC-0271 writer emits the extension only from CheckedActorCore and its validated closed local message schema, preserves non-Actor ling.semantic/0.1 bytes, and excludes paths, arena IDs, allocation, runtime, mailbox, wire, remote, and host-representation facts. No writer is implemented while DEC-0271 is Proposed."
+unknown_field_policy = "Planned exact extension objects reject unknown core fields; the enclosing ling.semantic/0.1 reader continues to accept unrelated x-* namespaces."
+migration_tool = "None; the extension is not implemented or published, and any incompatible future change requires Accepted authority, a new version, and migration evidence."
+fixtures = []
+sources = ["docs/decisions/0271-checked-actor-message-sendability-and-schema.md", "docs/decisions/0270-checked-actor-identity-and-state-isolation.md", "docs/governance/protocol-inventory.toml"]
+version_markers = []
+authority = ["DEC-0271"]
+notes = ["DEC-0271 proposes x-ling-actor/0.1 and ling.actor-message-schema-id/v1 but cannot authorize implementation; no current Semantic Graph writer emits the extension, no schema fixture exists, and no Actor message is executable or serializable."]
+
+[[protocol]]
 id = "PROTO-PACKAGE-SEMANTIC-GRAPH-JSON"
 title = "Package-aware Semantic Graph JSON"
 category = "JSON"

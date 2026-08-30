@@ -6,7 +6,7 @@
 
 ## Summary
 
-- 49 records: 45 current public, 1 internal, 3 Future.
+- 50 records: 45 current public, 1 internal, 4 Future.
 - Current public stability: 16 Experimental, 29 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
@@ -60,6 +60,7 @@
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.4` | `Experimental` | no | no | 9 |
 | `PROTO-VM-CONTROL` | Public | Runtime control | `ling.vm.control/0.1` | `Experimental` | no | no | 4 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
+| `PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION` | Planned public | JSON | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
 | `PROTO-ABI` | Planned public | ABI | — | `Future` | no | no | 0 |
 | `PROTO-EVIDENCE` | Planned public | Evidence | — | `Future` | no | no | 0 |
@@ -663,6 +664,19 @@
 - Sources: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Fixtures: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Notes: This record prevents a versioned implementation artifact from being mistaken for a public 1.x commitment; it is not the Future evidence-bundle protocol.
+
+### `PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION` — Planned checked Actor Semantic Graph extension
+
+- Producer: Future ling-semantic checked Actor snapshot writer
+- Consumer: Future ling-semantic isolated Actor extension reader; Future AI and editor tooling experiments
+- Reader policy: Planned DEC-0271 reader requires exact x-ling-actor/0.1, validates Actor definitions, SendableLocal closure, schema identities, canonical graph order, edge targets, original byte spans, and recomputed digests, and remains data-only. No reader is implemented while DEC-0271 is Proposed.
+- Writer policy: Planned DEC-0271 writer emits the extension only from CheckedActorCore and its validated closed local message schema, preserves non-Actor ling.semantic/0.1 bytes, and excludes paths, arena IDs, allocation, runtime, mailbox, wire, remote, and host-representation facts. No writer is implemented while DEC-0271 is Proposed.
+- Unknown-field policy: Planned exact extension objects reject unknown core fields; the enclosing ling.semantic/0.1 reader continues to accept unrelated x-* namespaces.
+- Migration tool: None; the extension is not implemented or published, and any incompatible future change requires Accepted authority, a new version, and migration evidence.
+- Authority: `DEC-0271`
+- Sources: [`docs/decisions/0271-checked-actor-message-sendability-and-schema.md`](../decisions/0271-checked-actor-message-sendability-and-schema.md), [`docs/decisions/0270-checked-actor-identity-and-state-isolation.md`](../decisions/0270-checked-actor-identity-and-state-isolation.md), [`docs/governance/protocol-inventory.toml`](../governance/protocol-inventory.toml)
+- Fixtures: —
+- Notes: DEC-0271 proposes x-ling-actor/0.1 and ling.actor-message-schema-id/v1 but cannot authorize implementation; no current Semantic Graph writer emits the extension, no schema fixture exists, and no Actor message is executable or serializable.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

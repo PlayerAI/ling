@@ -4381,3 +4381,16 @@ covers = ["ACT-2301 checked-only Actor source and Core", "ActorTypeId and runtim
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0013", "DEC-0090", "DEC-0095", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0271"
+title = "Checked Actor message sendability and schema"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0271-checked-actor-message-sendability-and-schema.md"
+covers = ["ACT-2302 checked-only local Sendable judgment", "default-deny Borrow Resource Managed Capability and future types", "canonical local Actor message schema identity", "Experimental x-ling-actor Semantic Graph extension"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0008", "DEC-0009", "DEC-0010", "DEC-0012", "DEC-0096", "DEC-0270", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false

@@ -7717,3 +7717,31 @@ unresolved_alternatives = [
   "Richer Actor declarations and public ActorRef values require later Accepted authority and are not reserved by this proposal.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0271"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0271-checked-actor-message-sendability-and-schema.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-30"
+proposed = "2026-08-30"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Accept the exact closed local Value type graph and reject every unsupported, open, ownership-bearing, capability-bearing, Task, Actor-reference, and future type category before checked publication.",
+  "Freeze canonical local message-schema identities and the x-ling-actor/0.1 Semantic Graph extension across recursive types, reconstruction, ordering, Unicode, BOM, and newline evidence.",
+  "Reject corrupted extension versions, identities, ownership, type closure, graph order, edge targets, digests, and spans in the isolated reader without producing executable Core.",
+  "Prove non-Actor semantic bytes remain unchanged and Actor-bearing programs remain rejected by runtime, mailbox, serialization, remote, interpreter, bytecode, VM, and native paths.",
+]
+compatibility_impact = [
+  "Would name and publish checked evidence for DEC-0270's existing conservative local message Value set without admitting Resource, Managed, Borrow, Capability, Task, or Actor-reference payloads.",
+  "Would add only an Experimental optional x-ling-actor/0.1 extension and Actor-bearing identity inputs; non-Actor semantic bytes and identities remain unchanged.",
+  "Would add no send syntax, runtime, mailbox, serializer, remote protocol, ABI, Stable claim, package behavior, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Resource transfer, Managed sharing, Borrow lifetimes, Capability transfer, public ActorRef, mailbox/runtime ownership, Audit projection, remote serialization, schema evolution, and migration remain later Accepted work.",
+  "A user-implementable Sendable Trait, Rust auto trait, implicit serializer, wire-layout schema, or remote-capable default is excluded from this bounded proposal.",
+]
+superseded_by = ""

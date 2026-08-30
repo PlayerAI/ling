@@ -588,6 +588,13 @@ stability = "Experimental"
 implemented = true
 
 [[protocol]]
+id = "PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION"
+visibility = "Planned public"
+version = ""
+stability = "Future"
+implemented = false
+
+[[protocol]]
 id = "PROTO-REPLAY"
 visibility = "Planned public"
 version = ""

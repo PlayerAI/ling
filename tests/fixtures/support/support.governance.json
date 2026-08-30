@@ -370,6 +370,13 @@
       "implemented": false
     },
     {
+      "id": "PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION",
+      "visibility": "Planned public",
+      "version": "",
+      "stability": "Future",
+      "implemented": false
+    },
+    {
       "id": "PROTO-AUDIT-SOURCE",
       "visibility": "Public",
       "version": "ling.audit/0.3",
