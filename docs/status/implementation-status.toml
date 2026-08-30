@@ -9954,19 +9954,19 @@ artifacts = [
 acceptance = [
   "The refreshed audit records DEC-0264 through DEC-0268 and TASK-2201 through TASK-2205 as complete authority/implementation rather than repeating the obsolete pre-Task baseline.",
   "The audit maps every TASK-2206 plan bullet to the current accepted profile, records the G2 user-Resource and valid-detach drift, and preserves checked-only execution, logical time, canonical Fault, and runtime-owned cleanup boundaries.",
-  "Proposed DEC-0269 defines the exact outcome projection, one-million Task-count ceiling, bounded generated stress, shutdown evidence, invalid-detach rejection, determinism, Unicode/span, diagnostics, schema, and deferred-work rules required before implementation.",
+  "Accepted DEC-0269 defines the exact outcome projection, one-million Task-count ceiling, bounded generated stress, shutdown evidence, invalid-detach rejection, determinism, Unicode/span, diagnostics, schema, and deferred-work rules required for implementation.",
   "The audit inventories existing Task frontend, runtime, deterministic-scheduler, production-scheduler, and CLI evidence and lists only the executable gaps remaining after DEC-0269 acceptance.",
-  "No ceiling, new oracle, Task conformance corpus, stress behavior, diagnostic, public schema, Semantic ID, bytecode/VM behavior, or placeholder API is implemented while DEC-0269 remains Proposed.",
+  "No ceiling, new oracle, Task conformance corpus, stress behavior, diagnostic, public schema, Semantic ID, bytecode/VM behavior, or placeholder API was implemented before DEC-0269 became Accepted.",
 ]
 verified_against_commit = ""
 completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "TASK-2206 now depends only on accepting or replacing Proposed DEC-0269; Accepted DEC-0264 through DEC-0268 and completed TASK-2201 through TASK-2205 supply the checked Task profile and scheduler implementations.",
+  "Accepted DEC-0264 through DEC-0269 and completed TASK-2201 through TASK-2205 now supply the checked Task profile, scheduler implementations, and final conformance/stress oracle for TASK-2206.",
   "Existing Task suites already cover most lifecycle, Fault, logical-deadline, deterministic trace, production worker, cancellation, shutdown, cleanup, limit, and Unicode evidence; the refreshed audit identifies the focused missing integration and ceiling/stress cases.",
   "ROADMAP-1.0 assigns user Resource finalizers to G3, while the accepted G2 Task profile has no valid detach operation; TASK-2206 cannot fabricate either feature from the lower-authority execution plan.",
-  "The audit and Proposed DEC-0269 preserve current compiler, interpreter, VM, bytecode, scheduler, diagnostics, schemas, Semantic IDs, source spans, and Unicode 17.0.0 behavior until acceptance authorizes implementation.",
+  "The acceptance milestone preserves current compiler, interpreter, VM, bytecode, scheduler, diagnostics, schemas, Semantic IDs, source spans, and Unicode 17.0.0 behavior; implementation remains a separate milestone.",
 ]
 
 [[task]]

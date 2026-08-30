@@ -6,10 +6,10 @@
 DEC-0264 through DEC-0268 and completed TASK-2201 through TASK-2205 now provide
 the checked Task frontend, machine, structured lifecycle runtime, deterministic
 test scheduler, and production local scheduler. The only remaining semantic
-gate is the final conformance/stress oracle proposed by DEC-0269.
+gate is the final conformance/stress oracle accepted by DEC-0269.
 
-DEC-0269 is `Proposed`, not implementation authority. No TASK-2206 runtime,
-scheduler, diagnostic, schema, or public API change has been made under it.
+DEC-0269 is now `Accepted` implementation authority. No TASK-2206 runtime,
+scheduler, diagnostic, schema, or public API change was made before acceptance.
 
 ## Normative traceability
 
@@ -32,9 +32,9 @@ scheduler, diagnostic, schema, or public API change has been made under it.
   `detach` examples cannot override the accepted first Task profile or pull G3
   semantics into TASK-2206.
 
-## Plan drift resolved by DEC-0269 proposal
+## Plan drift resolved by DEC-0269
 
-| G2 plan item | Current accepted meaning | DEC-0269 proposal |
+| G2 plan item | Current accepted meaning | DEC-0269 decision |
 | --- | --- | --- |
 | Parent exits early | Parent cancellation/Fault drains children; normal return cannot bypass checked handle observation and join | Compare terminal tree, committed Effects, and cleanup count one |
 | Child cancellation releases Resource | Only runtime-owned handle/frame/scope-registry cleanup exists in G2 | Test accepted cleanup identities; do not fabricate a user finalizer |
@@ -71,7 +71,7 @@ real checked frontend/runtime/local scheduler.
 - File/project CLI tests retain all non-interpreter Task rejections while
   allowing only the exact accepted interpreter Task entry.
 
-## Missing executable evidence after acceptance
+## Missing executable evidence
 
 1. A production local-scheduler configuration ceiling accepting `1_000_000`
    and rejecting `1_000_001` before workers or host Effects.
@@ -87,10 +87,9 @@ real checked frontend/runtime/local scheduler.
    executable tests, actual commands, compatibility, determinism, Unicode, and
    deferred G3/VM/public-protocol work.
 
-## Required authority before implementation
+## Accepted implementation authority
 
-DEC-0269 must move from `Proposed` to `Accepted` (or be replaced by another
-Accepted decision). Its acceptance freezes:
+Accepted DEC-0269 freezes:
 
 - the observable comparison projection;
 - logical deadline and Fault-race precedence;
@@ -101,17 +100,18 @@ Accepted decision). Its acceptance freezes:
 - test-corpus retention, Unicode/span, determinism, diagnostics, schema, and
   compatibility boundaries.
 
-Until then, implementing the ceiling or blessing a stress oracle would turn a
-proposal into behavior through code, contrary to repository authority rules.
+TASK-2206 may now implement only this bounded evidence. Any user Resource,
+valid detach, wall-clock, Task VM/native, or public protocol behavior remains
+outside the decision and requires separate Accepted authority.
 
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0264 through DEC-0268,
-Proposed DEC-0269, `GAP-STRUCTURED-TASK-001`, the G2 execution plan, and the
+Accepted DEC-0269, `GAP-STRUCTURED-TASK-001`, the G2 execution plan, and the
 current Task frontend/runtime/scheduler/local-scheduler/CLI tests.
 
-The audit changes documentation only. It does not change diagnostics, public
+Acceptance changes documentation authority only. It does not change diagnostics, public
 schemas, Semantic IDs, source spans, interpreter/VM behavior, scheduler order,
 runtime limits, or Unicode 17.0.0 behavior.
 

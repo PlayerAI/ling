@@ -1,8 +1,8 @@
 # DEC-0269: Task conformance and stress evidence / Task 一致性与压力证据
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-30<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-30<br>
 > Owner role：concurrency-design<br>
 > 相关 RFC/缺口：DEC-0264 | DEC-0265 | DEC-0266 | DEC-0267 | DEC-0268 | GAP-STRUCTURED-TASK-001 | TASK-2206<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`

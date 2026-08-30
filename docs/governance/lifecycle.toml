@@ -7668,13 +7668,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0269"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0269-task-conformance-and-stress-evidence.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-30"
 proposed = "2026-08-30"
-decided = ""
-stable_basis = false
+decided = "2026-08-30"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Cover early parent exit, runtime-owned cleanup, sibling Fault races, logical deadline races, nested scopes, invalid detach, and shutdown over checked Task inputs.",
