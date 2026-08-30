@@ -9748,7 +9748,7 @@ notes = [
 [[task]]
 id = "TASK-2204"
 title = "Deterministic Task test scheduler"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9773,12 +9773,16 @@ spec = [
 ]
 artifacts = [
   "docs/status/TASK-2204-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2204-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0267-deterministic-task-test-scheduler.md",
   "docs/status/TASK-2204-SCHEDULER-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/TASK-2204-SCHEDULER-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0094-task-scheduler-observation-trace.md",
   "crates/ling-concurrency/src/scheduler.rs",
   "crates/ling-concurrency/src/lib.rs",
+  "crates/ling-eval/src/task_runtime.rs",
+  "crates/ling-eval/src/task_scheduler.rs",
+  "crates/ling-eval/tests/task_scheduler.rs",
   "docs/governance/authority.toml",
   "docs/governance/authority.md",
   "docs/governance/lifecycle.toml",
@@ -9787,21 +9791,20 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The refreshed audit confirms TASK-2201 through TASK-2203 are Done and identifies deterministic test scheduling, virtual time, trace/replay, and bounded exploration as the remaining TASK-2204 authority boundary.",
-  "Accepted DEC-0267 defines exact SplitMix64 selection, canonical ready snapshots, logical ticks, Deadline cancellation, deterministic test-host events, typed traces, replay equivalence, breadth-first exploration, and explicit bounds.",
-  "The accepted decision distinguishes DEC-0266 lifecycle execution and DEC-0094 observation data from TASK-2204 scheduling behavior and makes no production fairness, wake, wall-clock, or ordering promise.",
-  "No public trace schema, diagnostic code, CLI/LSP surface, bytecode/VM route, or placeholder production API is authorized.",
-  "The conformance plan covers repeated seeds, reconstruction, deadlines, cancellation/cleanup/Fault races, host events, malformed traces, replay mismatch, exploration exhaustion, Unicode/BOM/CRLF spans, and retained public L-TASK-0004 rejection.",
-  "TASK-2204 is Ready under Accepted DEC-0267.",
+  "Accepted DEC-0267 exact SplitMix64 selection, canonical ready snapshots, logical ticks, ordered Deadline cancellation, deterministic test-host behavior, typed traces, strict replay, breadth-first exploration, and explicit bounds are implemented over DEC-0266 checked TaskRuntime only.",
+  "Trace validation and canonical fixture bytes cover version, limits, consecutive events, ready membership/order, deadline order, monotonic time, one closure, cleanup, and canonical Faults while excluding paths, source IDs/spans, allocation/debug data, and host timing.",
+  "Focused scheduler tests cover repeated seeds and reconstruction, Unicode/BOM/CRLF and span sidecars, deadlines, host success/failure/panic, replay mismatch, exploration completion/exhaustion, malformed traces, and every explicit scheduler limit.",
+  "cargo test -p ling-eval --all-targets --quiet, cargo test -p ling-cli --test task_boundary --quiet, cargo clippy --workspace --all-targets -- -D warnings, and cargo test --workspace --all-targets --quiet pass.",
+  "No public trace schema, diagnostic code, CLI/LSP surface, bytecode/VM route, production scheduler, or placeholder production API is added; public Task execution remains L-TASK-0004.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "e550f4fd8d5f348bcb8415f5cbac23b9f852a719"
+completion_commit = "e550f4fd8d5f348bcb8415f5cbac23b9f852a719"
+integration_state = "committed"
+completed = "2026-08-30"
 notes = [
-  "TASK-2203 completed the scheduler-neutral TaskRuntime dependency in e8765790c421f3437049562d69c9aa6d487b5464; Accepted DEC-0267 authorizes the remaining test-only scheduler choices.",
-  "DEC-0019/DEC-0021 remain compiler-query-only authorities; Accepted DEC-0267 does not reuse their ordering as Ling Task behavior.",
-  "The audit and proposal preserve public L-TASK-0004 and change no compiler, VM, bytecode, diagnostics, schemas, Semantic IDs, source spans, production runtime, or Unicode 17.0.0 behavior.",
+  "TASK-2204 is complete in e550f4fd8d5f348bcb8415f5cbac23b9f852a719 under Accepted DEC-0267; DEC-0019/DEC-0021 remain compiler-query-only authorities.",
+  "The driver is publish-disabled test evidence and makes no production fairness, wake, wall-clock, scheduling-order, or compatibility promise.",
+  "TASK-2205 and TASK-2206 remain BlockedSpec for production scheduling, public integration, resources, detach, stress, shutdown, and final conformance authority.",
 ]
 
 [[task]]
