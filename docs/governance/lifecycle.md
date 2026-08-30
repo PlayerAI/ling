@@ -327,6 +327,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0267` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-30` | [DEC-0267](../decisions/0267-deterministic-task-test-scheduler.md) |
 | `DEC-0268` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-30` | [DEC-0268](../decisions/0268-production-local-task-scheduler.md) |
 | `DEC-0269` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-30` | [DEC-0269](../decisions/0269-task-conformance-and-stress-evidence.md) |
+| `DEC-0270` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0270](../decisions/0270-checked-actor-identity-and-state-isolation.md) |
 
 ## Migration boundary
 

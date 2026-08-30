@@ -9993,6 +9993,7 @@ spec = [
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
+  "docs/decisions/0270-checked-actor-identity-and-state-isolation.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/governance/gap-register.toml",
@@ -10006,6 +10007,7 @@ artifacts = [
   "docs/status/ACT-2301-IDENTITY-MODEL-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2301-IDENTITY-MODEL-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0095-actor-identity-reference-model.md",
+  "docs/decisions/0270-checked-actor-identity-and-state-isolation.md",
   "crates/ling-concurrency/src/actor.rs",
   "crates/ling-concurrency/src/lib.rs",
   "docs/governance/authority.toml",
@@ -10029,6 +10031,7 @@ integration_state = "blocked"
 completed = ""
 notes = [
   "ACT-2301 is BlockedSpec by TASK-2203, absent RFC-C203/RFC-0009, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved Actor identity/state/turn/message ownership contracts.",
+  "DEC-0270 is Proposed as a checked-only, pure non-suspending Actor declaration/Core boundary; it is not implementation authority until explicitly Accepted.",
   "Current syntax/AST/HIR/types/effects/evaluator/bytecode/VM have no Actor declaration, ActorRef/RemoteRef, identity table, turn context, message schema, mailbox, or state-isolation check; Seed State is local-function semantics only.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Actor runtime, diagnostics, schemas, Semantic IDs, source spans, scheduler, or Unicode 17.0.0 behavior.",
 ]

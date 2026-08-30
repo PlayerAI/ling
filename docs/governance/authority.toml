@@ -4368,3 +4368,16 @@ covers = ["TASK-2206 conformance outcome projection", "logical deadline, Fault-r
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0264", "DEC-0265", "DEC-0266", "DEC-0267", "DEC-0268", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0270"
+title = "Checked Actor identity and state isolation"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0270-checked-actor-identity-and-state-isolation.md"
+covers = ["ACT-2301 checked-only Actor source and Core", "ActorTypeId and runtime-scoped ActorId contract", "typed local ActorRef message descriptor", "pure non-suspending state transition and isolation-by-construction"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0013", "DEC-0090", "DEC-0095", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false

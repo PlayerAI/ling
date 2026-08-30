@@ -7690,3 +7690,30 @@ unresolved_alternatives = [
   "User Resource finalizers, valid capability-gated detach, source Clock/sleep, Task VM/native execution, public benchmark/replay protocols, work stealing, and performance or Stable claims remain later work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0270"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0270-checked-actor-identity-and-state-isolation.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-30"
+proposed = "2026-08-30"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Cover the exact contextual Actor source form through CST, AST, unresolved HIR, resolution, types, effects, and immutable Checked Actor Core with original UTF-8 spans.",
+  "Check stable ActorTypeId inputs, runtime-scoped ActorId contract, typed local-reference descriptor, pure state transition typing, lexical isolation, and conservative closed-Value bounds.",
+  "Compare deterministic reconstructed Core projections and reject malformed identity, cross-reference, type, Effect, and escape cases before publication.",
+  "Prove Actor-bearing checked programs cannot enter runtime, mailbox, send, serialization, remote, interpreter, bytecode, VM, or native paths.",
+]
+compatibility_impact = [
+  "Would add an Experimental checked-only Actor declaration and internal Core while keeping all Actor execution unavailable.",
+  "Would add no public serialization/schema, Semantic Graph version, CLI command, bytecode/VM ABI, scheduler-order promise, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Message Sendable/schema rules, mailbox/backpressure/order, construction/send/stop, Effectful and suspending turns, await/reentry, supervision, runtime, replay, remote delivery, and Resource/Managed ownership remain later work.",
+  "Richer Actor declarations and public ActorRef values require later Accepted authority and are not reserved by this proposal.",
+]
+superseded_by = ""

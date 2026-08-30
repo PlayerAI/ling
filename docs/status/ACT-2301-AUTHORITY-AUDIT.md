@@ -94,6 +94,20 @@ Until these decisions are Accepted, an Actor could expose private state,
 resume with an invalid borrow, process messages during an unsafe suspension,
 confuse local and remote identities, or make replay and VM behavior diverge.
 
+## Proposed resolution
+
+`DEC-0270` is Proposed as the smallest complete checked-only ACT-2301 boundary.
+It specifies one contextual Actor declaration, semantic `ActorTypeId`, an opaque
+runtime-scoped `ActorId` contract without allocation, an internal typed local
+`ActorRef<Message>` descriptor, and a pure non-suspending state transition whose
+shape prevents state escape. It deliberately leaves Sendable/schema rules,
+mailbox/backpressure, Effectful turns, await/reentry, runtime, serialization,
+supervision, and remote delivery to ACT-2302 through ACT-2305 and their gaps.
+
+Until DEC-0270 is Accepted, ACT-2301 remains `BlockedSpec`, the current negative
+syntax gate remains authoritative, and no positive Actor frontend or Core may be
+implemented.
+
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
