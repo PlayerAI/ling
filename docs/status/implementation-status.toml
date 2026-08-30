@@ -9862,7 +9862,7 @@ notes = [
 [[task]]
 id = "TASK-2205"
 title = "Production local Task scheduler"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -9887,26 +9887,31 @@ spec = [
 ]
 artifacts = [
   "docs/status/TASK-2205-AUTHORITY-AUDIT.md",
+  "docs/status/TASK-2205-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0268-production-local-task-scheduler.md",
+  "crates/ling-eval/src/task_local_scheduler.rs",
+  "crates/ling-eval/tests/task_local_scheduler.rs",
+  "crates/ling-cli/tests/task_boundary.rs",
+  "crates/ling-cli/tests/project_commands.rs",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The refreshed audit confirms TASK-2201 through TASK-2204 are Done and isolates the production Task entry, worker ownership, queue/wake/park, cancellation, shutdown, Task-tree observation, quota, metrics, and nondeterminism boundary.",
-  "Accepted DEC-0268 defines exact checked task main file/project interpreter execution, explicit bounded worker configuration, a central mutex/condition-variable FIFO, serialized TaskRuntime steps, and no CPU-count-derived semantics.",
-  "The accepted decision defines host cancellation, structured shutdown/join, Fault/cancellation precedence, per-scope direct-child preflight, bounded snapshots, nonsemantic metrics, panic containment, and admitted cross-Task Effect-order nondeterminism.",
-  "No public worker/queue API, Task-tree or metrics protocol, diagnostic allocation, bytecode/VM route, or placeholder later feature is authorized.",
-  "The conformance plan covers one/multiple/invalid pools, queue and wake/park, nested scopes, cancellation/Fault/cleanup/shutdown, every bound, panic containment, snapshots/metrics noninterference, Unicode/BOM/CRLF spans, worker-count differentials, and retained non-interpreter L-TASK-0004 rejection.",
-  "TASK-2205 is Ready under Accepted DEC-0268.",
+  "A fixed scoped local worker pool drives only checked TaskRuntime through a bounded canonical FIFO, unique queue membership, one serialized runtime step per lease, condition-variable park/wake, and structured shutdown/join.",
+  "Exact checked task main file/project interpreter run succeeds with a fixed four-worker configuration independent of CPU count; test, build, REPL, artifact, bytecode, VM, Native, Wasm, LSP, and editor Task routes retain L-TASK-0004.",
+  "Configuration and lexical direct-child preflight reject invalid worker, queue, runtime, transition, park/wake, shutdown, and scope relations before workers or host Effects.",
+  "Clonable host cancellation, DEC-0266 Fault precedence and cleanup, host/worker panic containment, mutex poison/join failure handling, bounded canonical snapshots, and nonsemantic monotonic metrics are implemented.",
+  "Repeated one/four-worker, cancellation, Fault, panic, queue/transition, snapshot/metrics, Unicode/BOM/CRLF, file/project CLI, help, and retained rejection tests pass without adding a public protocol, diagnostic allocation, artifact, bytecode/VM ABI, or Stable scheduling promise.",
+  "TASK-2205 is Done under Accepted DEC-0268 at implementation commit 330e1b2c18ffbb7e59a07297abf59e92d6954fa5.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "330e1b2c18ffbb7e59a07297abf59e92d6954fa5"
+completion_commit = "330e1b2c18ffbb7e59a07297abf59e92d6954fa5"
+integration_state = "committed"
+completed = "2026-08-30"
 notes = [
-  "TASK-2204 completed the deterministic test-scheduler dependency in e550f4fd8d5f348bcb8415f5cbac23b9f852a719; Accepted DEC-0268 authorizes the remaining production scheduler choices.",
-  "DEC-0019/DEC-0021 remain compiler-query-only authorities, and RFC-0020 remains host-owned VM cancellation; neither supplies production Ling Task scheduling behavior.",
-  "The accepted decision preserves all non-interpreter L-TASK-0004 routes and changes no bytecode, VM, diagnostic allocation, public schema, Semantic ID, source span, or Unicode 17.0.0 contract.",
+  "Implementation commit 330e1b2c18ffbb7e59a07297abf59e92d6954fa5 contains the scheduler, Send-safe serialized evaluator ownership, exact run-entry selection, CLI integration, tests, help, and bilingual README update.",
+  "The full workspace suite passes with only installed_shells_accept_the_committed_fixtures skipped because this Windows host's WSL path conversion removed separators; its two platform-independent completion tests pass.",
+  "TASK-2206 remains BlockedSpec for stress, detach/resources, extended race/shutdown matrices, final conformance, and Stable evidence.",
 ]
 
 [[task]]
