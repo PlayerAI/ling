@@ -265,6 +265,7 @@ impl Session {
             imports: Vec::new(),
             definitions,
             tasks: Vec::new(),
+            actors: Vec::new(),
             types,
             traits: Vec::new(),
             impls: Vec::new(),

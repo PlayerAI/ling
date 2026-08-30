@@ -2818,6 +2818,11 @@ impl<'a> SignatureResolver<'a> {
                 span,
                 "structured task execution (L-TASK-0004)",
             )),
+            Type::Actor { .. } => Err(source_or_global_unsupported(
+                module,
+                span,
+                "actor execution (L-ACTOR-0002)",
+            )),
             Type::Float64 => Err(source_or_global_unsupported(module, span, "Float64")),
             Type::Tuple(elements) if self.aggregate_mode => Ok(TypeKey::Tuple(
                 elements
@@ -3323,6 +3328,11 @@ fn checked_type_key_with_substitution(
             module,
             span,
             "structured task execution (L-TASK-0004)",
+        )),
+        Type::Actor { .. } => Err(unsupported_module(
+            module,
+            span,
+            "actor execution (L-ACTOR-0002)",
         )),
         Type::Float64 => Err(unsupported_module(module, span, "Float64")),
         Type::List(_) => Err(unsupported_module(module, span, "list")),
@@ -6600,6 +6610,11 @@ fn ensure_supported_shape(
             module,
             span,
             "structured task execution (L-TASK-0004)",
+        )),
+        Type::Actor { .. } => Err(unsupported_module(
+            module,
+            span,
+            "actor execution (L-ACTOR-0002)",
         )),
         Type::Float64 => Err(unsupported_module(module, span, "Float64")),
         Type::Tuple(elements) if aggregate_mode => {

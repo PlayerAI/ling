@@ -1157,6 +1157,7 @@ fn type_index(
             span,
             "structured task execution (L-TASK-0004)",
         )),
+        Type::Actor { .. } => Err(unsupported_at(plan, span, "actor execution (L-ACTOR-0002)")),
         Type::NominalRecord { .. } => Err(unsupported_at(plan, span, "record")),
         Type::NominalVariant { .. } => Err(unsupported_at(plan, span, "variant")),
         Type::Variable(_) => Err(unsupported_at(plan, span, "polymorphic function")),

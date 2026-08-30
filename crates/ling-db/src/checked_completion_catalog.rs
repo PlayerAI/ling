@@ -115,7 +115,7 @@ impl CheckedCompletionCatalog {
                     CheckedCompletionKind::Value,
                     user_module_id(definition.origin),
                 ),
-                DefinitionKind::Type => (
+                DefinitionKind::Type | DefinitionKind::Actor => (
                     CheckedCompletionKind::Type,
                     user_module_id(definition.origin),
                 ),

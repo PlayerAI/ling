@@ -54,6 +54,7 @@ pub struct Program {
     pub imports: Vec<Import>,
     pub definitions: Vec<Definition>,
     pub tasks: Vec<TaskDeclaration>,
+    pub actors: Vec<ActorDeclaration>,
     pub types: Vec<TypeDeclaration>,
     pub traits: Vec<TraitDeclaration>,
     pub impls: Vec<ImplDeclaration>,
@@ -65,6 +66,33 @@ pub struct TaskDeclaration {
     pub keyword_span: Span,
     pub name: Name,
     pub parameters: Vec<Pattern>,
+    pub body: Expression,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorDeclaration {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub name: Name,
+    pub message_type: TypeSyntax,
+    pub state: ActorStateClause,
+    pub receive: ActorReceiveClause,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorStateClause {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub state_type: TypeSyntax,
+    pub initializer: Expression,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorReceiveClause {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub state_pattern: Pattern,
+    pub message_pattern: Pattern,
     pub body: Expression,
 }
 
@@ -513,6 +541,7 @@ impl Lowerer {
         let mut imports = Vec::new();
         let mut definitions = Vec::new();
         let mut tasks = Vec::new();
+        let mut actors = Vec::new();
         let mut types = Vec::new();
         let mut traits = Vec::new();
         let mut impls = Vec::new();
@@ -562,6 +591,10 @@ impl Lowerer {
                     saw_declaration = true;
                     tasks.push(self.task_declaration(declaration)?);
                 }
+                ast::Item::Actor(declaration) => {
+                    saw_declaration = true;
+                    actors.push(self.actor_declaration(declaration)?);
+                }
                 ast::Item::Type(declaration) => {
                     saw_declaration = true;
                     types.push(self.type_declaration(declaration));
@@ -601,6 +634,7 @@ impl Lowerer {
             imports,
             definitions,
             tasks,
+            actors,
             types,
             traits,
             impls,
@@ -621,6 +655,31 @@ impl Lowerer {
                 .map(|pattern| self.pattern(pattern))
                 .collect::<Result<Vec<_>, _>>()?,
             body: self.expression(&declaration.body)?,
+        })
+    }
+
+    fn actor_declaration(
+        &mut self,
+        declaration: &ast::ActorDeclaration,
+    ) -> Result<ActorDeclaration, LowerError> {
+        Ok(ActorDeclaration {
+            span: declaration.span,
+            keyword_span: declaration.keyword_span,
+            name: name(&declaration.name),
+            message_type: type_syntax(&declaration.message_type),
+            state: ActorStateClause {
+                span: declaration.state.span,
+                keyword_span: declaration.state.keyword_span,
+                state_type: type_syntax(&declaration.state.state_type),
+                initializer: self.expression(&declaration.state.initializer)?,
+            },
+            receive: ActorReceiveClause {
+                span: declaration.receive.span,
+                keyword_span: declaration.receive.keyword_span,
+                state_pattern: self.pattern(&declaration.receive.state_pattern)?,
+                message_pattern: self.pattern(&declaration.receive.message_pattern)?,
+                body: self.expression(&declaration.receive.body)?,
+            },
         })
     }
 

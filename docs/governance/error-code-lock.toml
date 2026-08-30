@@ -5,6 +5,7 @@ source = "docs/ERROR-CODES.md"
 registry_schema = "ling.diagnostic-registry/0.1"
 
 [high_water]
+ACTOR = 2
 AUDIT = 4
 BYTECODE = 6
 CAP = 3
@@ -26,6 +27,18 @@ TASK = 4
 TEST = 1
 TRANSACTION = 3
 TYPE = 11
+
+[[code]]
+id = "L-ACTOR-0001"
+core_sha256 = "sha256:e0f394d3730ff246cdade34df816836b31c423ecfb168467c516061ad1c94181"
+retired = false
+facts = ["actor:string:optional", "actual:string:optional", "expected:string:optional", "reason:string:required"]
+
+[[code]]
+id = "L-ACTOR-0002"
+core_sha256 = "sha256:9ddf1d08f6c2bc83df47d67d99f328ffe3f0932f4b475d154e22fbef53092883"
+retired = false
+facts = ["definition:string:required", "required_tasks:string:required", "stage:string:required"]
 
 [[code]]
 id = "L-AUDIT-0001"

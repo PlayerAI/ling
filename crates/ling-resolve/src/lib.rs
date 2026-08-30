@@ -353,6 +353,7 @@ pub fn resolve_handler_operation(name: &str) -> Option<ResolvedHandlerOperation>
 pub enum DefinitionKind {
     Value,
     Task,
+    Actor,
     Type,
     Constructor,
     Builtin,
@@ -1218,7 +1219,10 @@ impl Resolver {
             let kind_name = match kind {
                 DefinitionKind::Type => "type",
                 DefinitionKind::Constructor => "constructor",
-                DefinitionKind::Value | DefinitionKind::Task | DefinitionKind::Builtin => {
+                DefinitionKind::Value
+                | DefinitionKind::Task
+                | DefinitionKind::Actor
+                | DefinitionKind::Builtin => {
                     unreachable!("Prelude only contains types and constructors")
                 }
             };
@@ -1425,6 +1429,18 @@ impl Resolver {
                     &mut skeletons,
                 );
             }
+            for declaration in &module.hir.actors {
+                self.insert_user_definition(
+                    module,
+                    &module_name,
+                    &declaration.name,
+                    DefinitionKind::Actor,
+                    false,
+                    None,
+                    &mut scope,
+                    &mut skeletons,
+                );
+            }
             for declaration in &module.hir.types {
                 self.insert_user_definition(
                     module,
@@ -1593,6 +1609,7 @@ impl Resolver {
         let kind_name = match kind {
             DefinitionKind::Value => "value",
             DefinitionKind::Task => "task",
+            DefinitionKind::Actor => "actor",
             DefinitionKind::Type => "type",
             DefinitionKind::Constructor => "constructor",
             DefinitionKind::Builtin => "builtin",
@@ -1653,6 +1670,10 @@ impl Resolver {
             for task in &tasks {
                 self.resolve_task_body(module_id, task);
             }
+            let actors = self.modules[index].hir.actors.clone();
+            for actor in &actors {
+                self.resolve_actor_body(module_id, actor);
+            }
             let impls = self.modules[index].hir.impls.clone();
             for implementation in &impls {
                 for definition in &implementation.members {
@@ -1668,6 +1689,26 @@ impl Resolver {
             self.bind_pattern(module, parameter, true, &mut scopes);
         }
         self.resolve_expression(module, &task.body, &mut scopes);
+    }
+
+    fn resolve_actor_body(&mut self, module: ModuleId, actor: &hir::ActorDeclaration) {
+        let mut initializer_scopes = vec![Scope::default()];
+        self.resolve_expression(module, &actor.state.initializer, &mut initializer_scopes);
+
+        let mut receive_scopes = vec![Scope::default()];
+        self.bind_pattern(
+            module,
+            &actor.receive.state_pattern,
+            true,
+            &mut receive_scopes,
+        );
+        self.bind_pattern(
+            module,
+            &actor.receive.message_pattern,
+            true,
+            &mut receive_scopes,
+        );
+        self.resolve_expression(module, &actor.receive.body, &mut receive_scopes);
     }
 
     fn resolve_definition_body(&mut self, module: ModuleId, definition: &hir::Definition) {

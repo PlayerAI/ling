@@ -24,7 +24,7 @@ use ling_cli::semantic_commands::{
 };
 use ling_cli::session::{Session, SubmissionFailure, SubmissionKind, SubmissionSuccess};
 use ling_cli::{
-    CompileFailure, checked_task_implementation_boundary, compile_path, compile_source,
+    CompileFailure, checked_execution_implementation_boundary, compile_path, compile_source,
 };
 use ling_diagnostics::Diagnostic;
 use ling_effects::{RunEntry, locate_main, locate_run_entry};
@@ -253,9 +253,10 @@ fn execute(options: Options) -> u8 {
             let mut console = StdoutConsole;
             let result = match entry {
                 RunEntry::Value(main) => {
-                    if let Some(diagnostic) =
-                        checked_task_implementation_boundary(compiled.snapshot.checked(), "run")
-                    {
+                    if let Some(diagnostic) = checked_execution_implementation_boundary(
+                        compiled.snapshot.checked(),
+                        "run",
+                    ) {
                         return emit_compile_error(diagnostic, options.policy);
                     }
                     ling_eval::execute_main(&compiled.snapshot, &main, &mut console)
@@ -508,9 +509,10 @@ fn execute_project_run(project: &CheckedProject, policy: OutputPolicy) -> u8 {
     let mut console = MemoryConsole::default();
     let result = match entry {
         RunEntry::Value(main) => {
-            if let Some(diagnostic) =
-                checked_task_implementation_boundary(project.snapshot().checked(), "project.run")
-            {
+            if let Some(diagnostic) = checked_execution_implementation_boundary(
+                project.snapshot().checked(),
+                "project.run",
+            ) {
                 return emit_project_command_diagnostics(
                     "run",
                     &[diagnostic],
@@ -555,7 +557,7 @@ fn execute_project_test(project: &CheckedProject, policy: OutputPolicy) -> u8 {
         project.manifest().source().entry()
     );
     if let Some(diagnostic) =
-        checked_task_implementation_boundary(project.snapshot().checked(), "project.test")
+        checked_execution_implementation_boundary(project.snapshot().checked(), "project.test")
     {
         return emit_project_command_diagnostics(
             "test",
@@ -612,7 +614,7 @@ fn execute_project_test(project: &CheckedProject, policy: OutputPolicy) -> u8 {
 
 fn execute_project_build(checked: &CheckedProject, output: PathBuf, policy: OutputPolicy) -> u8 {
     if let Some(diagnostic) =
-        checked_task_implementation_boundary(checked.snapshot().checked(), "project.build")
+        checked_execution_implementation_boundary(checked.snapshot().checked(), "project.build")
     {
         return emit_project_command_diagnostics(
             "build",

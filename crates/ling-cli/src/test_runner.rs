@@ -6,7 +6,7 @@ use ling_diagnostics::{Diagnostic, DiagnosticSpan, Severity, codes};
 use ling_effects::locate_main;
 use ling_eval::{MemoryConsole, execute_main};
 
-use crate::{CompileFailure, checked_task_implementation_boundary, compile_path};
+use crate::{CompileFailure, checked_execution_implementation_boundary, compile_path};
 
 pub(crate) const TEST_PROTOCOL: &str = "ling.test/0.1";
 
@@ -186,7 +186,7 @@ pub(crate) fn run(root: PathBuf) -> Result<Summary, Failure> {
         let case = match compile_path(&file.path) {
             Ok(compiled) => {
                 if let Some(diagnostic) =
-                    checked_task_implementation_boundary(compiled.snapshot.checked(), "test")
+                    checked_execution_implementation_boundary(compiled.snapshot.checked(), "test")
                 {
                     CaseReport {
                         name: file.name,

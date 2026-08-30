@@ -322,7 +322,7 @@ fn definition_entry(
     } else {
         match definition.kind {
             DefinitionKind::Value | DefinitionKind::Task => CheckedHoverKind::Value,
-            DefinitionKind::Type => CheckedHoverKind::Type,
+            DefinitionKind::Type | DefinitionKind::Actor => CheckedHoverKind::Type,
             DefinitionKind::Constructor => CheckedHoverKind::Constructor,
             DefinitionKind::Builtin => CheckedHoverKind::Builtin,
         }

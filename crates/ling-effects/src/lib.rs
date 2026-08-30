@@ -14,12 +14,17 @@ use ling_resolve::{
 use ling_source::Span;
 use ling_types::{DictionaryTable, TraitMemberCall, Type, TypeId, TypedProgram};
 
+mod actor_core;
 mod handler_core;
 mod solver;
 mod task_core;
 mod task_machine;
 mod v2;
 
+pub use actor_core::{
+    CHECKED_ACTOR_CORE_VERSION, CheckedActorCore, CheckedActorIdContract, CheckedActorRefType,
+    CheckedActorSourceSpans,
+};
 pub use handler_core::{
     HandlerCore, HandlerCoreClause, HandlerCoreError, HandlerCoreNodeId, ResumeUse,
 };
@@ -177,6 +182,7 @@ pub struct CheckedProgram {
     binding_effects: BTreeMap<BindingKey, EffectRow>,
     expression_effects: BTreeMap<ExpressionKey, EffectRow>,
     handler_cores: BTreeMap<ExpressionKey, HandlerCore>,
+    actor_cores: BTreeMap<DefinitionId, CheckedActorCore>,
     task_cores: BTreeMap<DefinitionId, CheckedTaskCore>,
     task_machines: BTreeMap<DefinitionId, CheckedTaskMachine>,
     module_capabilities: BTreeMap<ModuleId, BTreeSet<Capability>>,
@@ -265,6 +271,21 @@ impl CheckedProgram {
     #[must_use]
     pub fn handler_cores(&self) -> &BTreeMap<ExpressionKey, HandlerCore> {
         &self.handler_cores
+    }
+
+    #[must_use]
+    pub fn actor_core(&self, definition: &DefinitionId) -> Option<&CheckedActorCore> {
+        self.actor_cores.get(definition)
+    }
+
+    #[must_use]
+    pub fn actor_cores(&self) -> &BTreeMap<DefinitionId, CheckedActorCore> {
+        &self.actor_cores
+    }
+
+    #[must_use]
+    pub fn has_actors(&self) -> bool {
+        !self.actor_cores.is_empty()
     }
 
     #[must_use]
@@ -368,6 +389,10 @@ pub enum EffectErrorKind {
         binding: Option<String>,
         suspension: u32,
     },
+    InvalidActor {
+        reason: &'static str,
+        actor: Option<String>,
+    },
 }
 
 impl EffectError {
@@ -403,6 +428,11 @@ impl EffectError {
                 codes::UNSAFE_TASK_SUSPENSION,
                 format!("Task suspension 活跃集不安全：{reason}"),
                 format!("unsafe Task suspension live set: {reason}"),
+            ),
+            EffectErrorKind::InvalidActor { reason, .. } => (
+                codes::INVALID_ACTOR_DECLARATION,
+                format!("Actor 声明无效：{reason}"),
+                format!("invalid Actor declaration: {reason}"),
             ),
         };
         let diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
@@ -443,6 +473,12 @@ impl EffectError {
                     diagnostic = diagnostic.with_fact("binding", binding.clone());
                 }
                 diagnostic
+            }
+            EffectErrorKind::InvalidActor { reason, actor } => {
+                let diagnostic = diagnostic.with_fact("reason", *reason);
+                actor.as_ref().map_or(diagnostic.clone(), |actor| {
+                    diagnostic.with_fact("actor", actor.clone())
+                })
             }
             EffectErrorKind::MissingCapability { .. }
             | EffectErrorKind::UnknownCapability { .. } => diagnostic,
@@ -761,6 +797,25 @@ impl Checker {
             .collect();
         let expression_effects = self.build_expression_effect_rows(&callable_effects);
         let handler_cores = self.build_handler_cores(&callable_effects);
+        let actor_cores = match actor_core::build_checked_actor_cores(
+            &self.typed,
+            &definition_effects,
+            &expression_effects,
+        ) {
+            Ok(cores) => cores,
+            Err(failures) => {
+                self.errors
+                    .extend(failures.into_iter().map(|failure| EffectError {
+                        kind: EffectErrorKind::InvalidActor {
+                            reason: failure.reason,
+                            actor: failure.actor,
+                        },
+                        source_name: failure.source_name,
+                        span: failure.span,
+                    }));
+                BTreeMap::new()
+            }
+        };
         let mut task_machines = BTreeMap::new();
         let task_cores = match task_core::build_checked_task_cores(&self.typed, &definition_effects)
         {
@@ -828,6 +883,7 @@ impl Checker {
                 binding_effects,
                 expression_effects,
                 handler_cores,
+                actor_cores,
                 task_cores,
                 task_machines,
                 module_capabilities,
@@ -907,6 +963,19 @@ impl Checker {
                 };
                 self.collect_callable_body(Callable::Definition(id), module.id, &task.body);
             }
+            for actor in &module.hir.actors {
+                let Some(id) = self
+                    .typed
+                    .resolved()
+                    .definition_id(module.id, &actor.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                let callable = Callable::Definition(id);
+                self.collect_callable_body(callable.clone(), module.id, &actor.state.initializer);
+                self.collect_callable_body(callable, module.id, &actor.receive.body);
+            }
             for (impl_ordinal, implementation) in module.hir.impls.iter().enumerate() {
                 for (member_ordinal, definition) in implementation.members.iter().enumerate() {
                     let Some(id) = self
@@ -962,7 +1031,10 @@ impl Checker {
             &mut effects,
             &mut calls,
         );
-        self.direct_effects.insert(callable.clone(), effects);
+        self.direct_effects
+            .entry(callable.clone())
+            .or_default()
+            .extend(&effects);
         self.calls
             .entry(callable.clone())
             .or_default()
@@ -1212,6 +1284,16 @@ impl Checker {
                     callable_effects,
                     &mut output,
                 );
+            }
+            for actor in &module.hir.actors {
+                for expression in [&actor.state.initializer, &actor.receive.body] {
+                    self.collect_expression_effect_rows(
+                        module.id,
+                        expression,
+                        callable_effects,
+                        &mut output,
+                    );
+                }
             }
             for implementation in &module.hir.impls {
                 for definition in &implementation.members {
@@ -1515,6 +1597,17 @@ impl Checker {
                     callable_effects,
                     &mut output,
                 );
+            }
+            for actor in &module.hir.actors {
+                for expression in [&actor.state.initializer, &actor.receive.body] {
+                    self.collect_handler_cores(
+                        module.id,
+                        &module.hir.source_name,
+                        expression,
+                        callable_effects,
+                        &mut output,
+                    );
+                }
             }
             for implementation in &module.hir.impls {
                 for definition in &implementation.members {

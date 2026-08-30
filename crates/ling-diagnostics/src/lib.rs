@@ -76,6 +76,8 @@ pub mod codes {
     pub const INVALID_TASK_HANDLE: DiagnosticCode = DiagnosticCode::new("L-TASK-0002");
     pub const UNSAFE_TASK_SUSPENSION: DiagnosticCode = DiagnosticCode::new("L-TASK-0003");
     pub const TASK_IMPLEMENTATION_BOUNDARY: DiagnosticCode = DiagnosticCode::new("L-TASK-0004");
+    pub const INVALID_ACTOR_DECLARATION: DiagnosticCode = DiagnosticCode::new("L-ACTOR-0001");
+    pub const ACTOR_IMPLEMENTATION_BOUNDARY: DiagnosticCode = DiagnosticCode::new("L-ACTOR-0002");
     pub const INVALID_ENTRY_MODULE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0001");
     pub const MISSING_MAIN: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0002");
     pub const INVALID_MAIN_SIGNATURE: DiagnosticCode = DiagnosticCode::new("L-ENTRY-0003");

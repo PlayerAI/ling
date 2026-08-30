@@ -18,6 +18,7 @@ pub enum Item {
     Import(ImportDeclaration),
     Let(LetDeclaration),
     Task(TaskDeclaration),
+    Actor(ActorDeclaration),
     Type(TypeDeclaration),
     Trait(TraitDeclaration),
     Impl(ImplDeclaration),
@@ -29,6 +30,33 @@ pub struct TaskDeclaration {
     pub keyword_span: Span,
     pub name: Name,
     pub parameters: Vec<Pattern>,
+    pub body: Expression,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorDeclaration {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub name: Name,
+    pub message_type: TypeExpression,
+    pub state: ActorStateClause,
+    pub receive: ActorReceiveClause,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorStateClause {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub state_type: TypeExpression,
+    pub initializer: Expression,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorReceiveClause {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub state_pattern: Pattern,
+    pub message_pattern: Pattern,
     pub body: Expression,
 }
 
@@ -409,6 +437,7 @@ impl<'input> Lowerer<'input> {
             NodeKind::ImportDeclaration => self.import_declaration(node).map(Item::Import),
             NodeKind::LetDeclaration => self.let_declaration(node).map(Item::Let),
             NodeKind::TaskDeclaration => self.task_declaration(node).map(Item::Task),
+            NodeKind::ActorDeclaration => self.actor_declaration(node).map(Item::Actor),
             NodeKind::TypeDeclaration => self.type_declaration(node).map(Item::Type),
             NodeKind::TraitDeclaration => self.trait_declaration(node).map(Item::Trait),
             NodeKind::ImplDeclaration => self.impl_declaration(node).map(Item::Impl),
@@ -442,6 +471,66 @@ impl<'input> Lowerer<'input> {
             name,
             parameters,
             body: self.expression(body_node)?,
+        })
+    }
+
+    fn actor_declaration(&self, node: &CstNode) -> Result<ActorDeclaration, LowerError> {
+        self.expect_kind(node, NodeKind::ActorDeclaration)?;
+        let keyword = self.contextual_token(node, "actor")?;
+        let name = self
+            .significant_tokens(node)
+            .filter(|token| token.kind() == TokenKind::Identifier)
+            .nth(1)
+            .ok_or_else(|| self.missing_token(node, "Actor name"))
+            .and_then(|token| self.name(token))?;
+        let mut children = node.children().iter();
+        let message_type =
+            self.type_expression(self.child(&mut children, node, "Actor message type")?)?;
+        let state =
+            self.actor_state_clause(self.child(&mut children, node, "Actor state clause")?)?;
+        let receive =
+            self.actor_receive_clause(self.child(&mut children, node, "Actor receive clause")?)?;
+        Ok(ActorDeclaration {
+            span: self.node_span(node)?,
+            keyword_span: keyword.span(),
+            name,
+            message_type,
+            state,
+            receive,
+        })
+    }
+
+    fn actor_state_clause(&self, node: &CstNode) -> Result<ActorStateClause, LowerError> {
+        self.expect_kind(node, NodeKind::ActorStateClause)?;
+        let keyword = self.contextual_token(node, "state")?;
+        let mut children = node.children().iter();
+        let state_type =
+            self.type_expression(self.child(&mut children, node, "Actor state type")?)?;
+        let initializer =
+            self.expression(self.child(&mut children, node, "Actor state initializer")?)?;
+        Ok(ActorStateClause {
+            span: self.node_span(node)?,
+            keyword_span: keyword.span(),
+            state_type,
+            initializer,
+        })
+    }
+
+    fn actor_receive_clause(&self, node: &CstNode) -> Result<ActorReceiveClause, LowerError> {
+        self.expect_kind(node, NodeKind::ActorReceiveClause)?;
+        let keyword = self.contextual_token(node, "receive")?;
+        let mut children = node.children().iter();
+        let state_pattern =
+            self.pattern(self.child(&mut children, node, "Actor state pattern")?)?;
+        let message_pattern =
+            self.pattern(self.child(&mut children, node, "Actor message pattern")?)?;
+        let body = self.expression(self.child(&mut children, node, "Actor receive body")?)?;
+        Ok(ActorReceiveClause {
+            span: self.node_span(node)?,
+            keyword_span: keyword.span(),
+            state_pattern,
+            message_pattern,
+            body,
         })
     }
 

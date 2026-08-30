@@ -231,6 +231,7 @@ fn nominal_result_definition(typed: &TypedProgram, mut type_id: TypeId) -> Optio
             Type::NominalRecord { definition, .. } | Type::NominalVariant { definition, .. } => {
                 return Some(definition);
             }
+            Type::Actor { definition, .. } => return Some(definition),
             Type::Unit
             | Type::Bool
             | Type::Int

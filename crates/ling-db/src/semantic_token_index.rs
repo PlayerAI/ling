@@ -1090,7 +1090,7 @@ impl<'checked, 'builder, 'source> TypedClassifier<'checked, 'builder, 'source> {
             return SemanticTokenKind::Method;
         }
         match definition.kind {
-            DefinitionKind::Type => SemanticTokenKind::Type,
+            DefinitionKind::Type | DefinitionKind::Actor => SemanticTokenKind::Type,
             DefinitionKind::Constructor => SemanticTokenKind::EnumMember,
             DefinitionKind::Builtin => SemanticTokenKind::Function,
             DefinitionKind::Value | DefinitionKind::Task => {

@@ -58,6 +58,54 @@ pub fn checked_task_implementation_boundary(
     ))
 }
 
+#[must_use]
+pub fn actor_implementation_boundary_diagnostic(
+    source_name: &str,
+    span: Span,
+    definition: impl Into<String>,
+    stage: &'static str,
+) -> Diagnostic {
+    Diagnostic::new(
+        codes::ACTOR_IMPLEMENTATION_BOUNDARY,
+        Severity::Error,
+        format!("已检查 Actor 尚不能进入 {stage} 阶段"),
+        format!("checked Actor cannot enter the `{stage}` stage yet"),
+    )
+    .with_primary_span(DiagnosticSpan::new(source_name, span))
+    .with_fact("definition", definition.into())
+    .with_fact("stage", stage)
+    .with_fact("required_tasks", "ACT-2305")
+}
+
+#[must_use]
+pub fn checked_actor_implementation_boundary(
+    checked: &ling_effects::CheckedProgram,
+    stage: &'static str,
+) -> Option<Diagnostic> {
+    let core = checked.actor_cores().values().next()?;
+    let source_name = checked
+        .typed()
+        .resolved()
+        .definition(core.definition())
+        .and_then(|definition| definition.source_name.as_deref())
+        .unwrap_or("<actor>");
+    Some(actor_implementation_boundary_diagnostic(
+        source_name,
+        core.source_span(),
+        core.definition().to_string(),
+        stage,
+    ))
+}
+
+#[must_use]
+pub fn checked_execution_implementation_boundary(
+    checked: &ling_effects::CheckedProgram,
+    stage: &'static str,
+) -> Option<Diagnostic> {
+    checked_actor_implementation_boundary(checked, stage)
+        .or_else(|| checked_task_implementation_boundary(checked, stage))
+}
+
 #[derive(Debug)]
 pub enum CompileFailure {
     Diagnostics(Vec<Diagnostic>),

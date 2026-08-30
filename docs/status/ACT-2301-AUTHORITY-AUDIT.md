@@ -8,15 +8,17 @@ Accepted `DEC-0270`. Accepted `DEC-0090` previously closed the bounded
 adding Actor grammar. The G2 plan proposes
 `ActorTypeId`, runtime `ActorId`, typed `ActorRef<Message>`, turn-local state
 mutation, prohibition of borrowing `&mut state` to outside code, and a strict
-separation between local ActorRef serialization and RemoteRef. The Actor
-identity, turn, state, message-ownership, reentry, and remote-boundary
-contracts are not accepted.
+separation between local ActorRef serialization and RemoteRef. DEC-0270 accepts
+only the checked identity and pure state-transition subset; runtime identity
+allocation, executable turns, message ownership, reentry, and remote-boundary
+contracts remain unaccepted.
 
-The rejection child proves only that an Actor-shaped top-level declaration is
-rejected by the existing bilingual syntax diagnostic before checked snapshot
-publication. No Actor syntax, ActorTypeId/ActorId model, ActorRef type, state-isolation
-checker, turn runtime, borrow rule, serialization schema, diagnostic
-allocation, or placeholder G2 API was added.
+At its historical milestone, the rejection child proved only that an
+Actor-shaped top-level declaration was rejected by the bilingual syntax
+diagnostic before checked snapshot publication. It added no Actor syntax,
+ActorTypeId/ActorId model, ActorRef type, state-isolation checker, turn runtime,
+borrow rule, serialization schema, diagnostic allocation, or placeholder G2
+API.
 
 Accepted `DEC-0095` now authorizes the bounded child
 `ACT-2301-IDENTITY-MODEL`, which records only immutable structural identities
@@ -50,25 +52,24 @@ listed below.
 
 ## Current implementation evidence
 
-- `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` have
-  no Actor declaration, ActorRef/RemoteRef type, ActorTypeId/ActorId, turn
-  context, message schema, or state-isolation check.
-- The current interpreter supports only checked Seed local mutable bindings;
-  it has no Actor state store, turn scheduler, mailbox, or cross-turn borrow
-  boundary. The VM has no Actor runtime or Actor identity table.
-- Existing `State<T>` effect and local `PlaceAssign` semantics cannot be used
-  as Actor state: they intentionally describe current-function Seed locals and
-  do not prevent aliasing or turn reentry across a future Actor boundary.
-- No fixture or public schema covers Actor identity stability/reuse, typed
-  references, state mutation outside a turn, `&mut` escape, await reentry,
-  message ownership, local/remote serialization separation, or differential
-  Actor execution.
-- `crates/ling-cli/tests/actor_boundary.rs` is the bounded negative fixture;
-  it asserts the original `actor` byte span and no checked snapshot.
+- The accepted declaration now lowers through CST, AST, HIR, resolver, types,
+  and effects into publish-disabled Checked Actor Core.
+- Checked Core records deterministic Actor type identity, the unallocated
+  runtime ActorId contract, a typed local reference descriptor, pure
+  state-transition identities, and original UTF-8 source spans.
+- The interpreter and VM still have no Actor state store, turn scheduler,
+  mailbox, runtime identity table, send operation, or remote boundary.
+- `crates/ling-cli/tests/actor_boundary.rs` covers checked publication,
+  deterministic reconstruction, Unicode/BOM/CRLF spans, invalid declarations,
+  non-first-class use, and explicit no-execution diagnostics.
+- The prior syntax-rejection and identity-model child reports remain historical
+  evidence; `docs/status/ACT-2301-IMPLEMENTATION-REPORT.md` records the completed
+  DEC-0270 slice.
 
-## Required authority before implementation
+## Required authority before expanding implementation
 
-An Accepted RFC or decision must define, at minimum:
+Beyond DEC-0270's checked-only subset, an Accepted RFC or decision must define,
+at minimum:
 
 1. Actor declaration and Checked Core representation, `ActorTypeId` and
    `ActorId` identity scope/lifetime/reuse, typed `ActorRef<Message>` creation,
@@ -119,8 +120,9 @@ RFC-0001, RFC-0020, `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 and the current syntax, AST, HIR, types, effects, evaluator, bytecode, VM,
 diagnostic, and schema crates.
 
-No compiler, interpreter, VM, bytecode, Actor runtime, diagnostic registry, schema,
-Semantic ID, source-span, scheduler, or Unicode 17.0.0 behavior changed.
+The compiler and diagnostic registry now implement DEC-0270. Interpreter, VM,
+bytecode format, Actor runtime, public schemas, existing Semantic IDs,
+scheduler, and Unicode 17.0.0 behavior remain unchanged.
 
 The child implementation report and authority audit provide focused historical
 evidence for the identity boundary; DEC-0270 now authorizes the bounded

@@ -152,6 +152,9 @@ impl<'tokens> Parser<'tokens> {
                 TokenKind::Identifier if self.is_contextual("task") => {
                     self.parse_task_declaration()
                 }
+                TokenKind::Identifier if self.is_contextual("actor") => {
+                    self.parse_actor_declaration()
+                }
                 _ => {
                     self.unexpected(
                         &[
@@ -206,6 +209,54 @@ impl<'tokens> Parser<'tokens> {
         self.eat_newlines(false);
         self.expect(TokenKind::Dedent, "Task declaration body");
         CstNode::new(NodeKind::TaskDeclaration, start..self.position, children)
+    }
+
+    fn parse_actor_declaration(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect_contextual("actor", "Actor declaration");
+        self.expect(TokenKind::Identifier, "Actor name");
+        self.expect(TokenKind::Colon, "Actor message type");
+        children.push(self.parse_type_expression(&[TokenKind::Equals]));
+        self.expect(TokenKind::Equals, "Actor declaration");
+        if !self.eat_newlines(false) {
+            self.unexpected(&[TokenKind::Newline], "Actor declaration body");
+        }
+        self.expect(TokenKind::Indent, "Actor declaration body");
+        children.push(self.parse_actor_state_clause());
+        self.eat_newlines(false);
+        children.push(self.parse_actor_receive_clause());
+        self.eat_newlines(false);
+        if !self.at(TokenKind::Dedent) {
+            self.unexpected(&[TokenKind::Dedent], "Actor declaration body");
+            self.recover_to(TokenKind::Dedent);
+        }
+        self.expect(TokenKind::Dedent, "Actor declaration body");
+        CstNode::new(NodeKind::ActorDeclaration, start..self.position, children)
+    }
+
+    fn parse_actor_state_clause(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect_contextual("state", "Actor state clause");
+        children.push(self.parse_type_expression(&[TokenKind::Equals]));
+        self.expect(TokenKind::Equals, "Actor state clause");
+        children.push(self.parse_expression());
+        CstNode::new(NodeKind::ActorStateClause, start..self.position, children)
+    }
+
+    fn parse_actor_receive_clause(&mut self) -> CstNode {
+        let start = self.position;
+        let mut children = Vec::new();
+        self.expect_contextual("receive", "Actor receive clause");
+        children.push(self.parse_pattern("Actor state pattern"));
+        children.push(self.parse_pattern("Actor message pattern"));
+        self.expect(TokenKind::Equals, "Actor receive clause");
+        if !self.at(TokenKind::Newline) {
+            self.unexpected(&[TokenKind::Newline], "Actor receive body");
+        }
+        children.push(self.parse_body_expression("Actor receive body"));
+        CstNode::new(NodeKind::ActorReceiveClause, start..self.position, children)
     }
 
     fn parse_module_declaration(&mut self) -> CstNode {

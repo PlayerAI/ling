@@ -1206,7 +1206,12 @@ fn validate_program(
                     span: span_range(import.span),
                 });
             }
-            Item::Let(_) | Item::Task(_) | Item::Type(_) | Item::Trait(_) | Item::Impl(_) => {
+            Item::Let(_)
+            | Item::Task(_)
+            | Item::Actor(_)
+            | Item::Type(_)
+            | Item::Trait(_)
+            | Item::Impl(_) => {
                 body_started = true;
             }
         }

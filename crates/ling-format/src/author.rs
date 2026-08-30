@@ -535,6 +535,24 @@ mod tests {
     }
 
     #[test]
+    fn formats_checked_actor_declarations_without_changing_their_shape() {
+        assert_eq!(
+            format(concat!(
+                "actor Counter:Int=\n",
+                "  state Int=0\n",
+                "  receive state message=\n",
+                "    state+message\n",
+            )),
+            concat!(
+                "actor Counter: Int =\n",
+                "    state Int = 0\n",
+                "    receive state message =\n",
+                "        state + message\n",
+            )
+        );
+    }
+
+    #[test]
     fn property_corpus_is_idempotent_parse_equivalent_and_semantically_equivalent() {
         for original in property_corpus() {
             let formatted = format(original);

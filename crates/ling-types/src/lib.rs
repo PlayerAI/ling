@@ -58,6 +58,12 @@ pub enum Type {
     TaskHandle {
         result: TypeId,
     },
+    /// Internal, non-first-class checked Actor declaration signature.
+    Actor {
+        definition: DefinitionId,
+        message: TypeId,
+        state: TypeId,
+    },
     NominalRecord {
         definition: DefinitionId,
         arguments: Vec<TypeId>,
@@ -98,7 +104,7 @@ impl Type {
             | Self::Function { .. }
             | Self::NominalRecord { .. }
             | Self::NominalVariant { .. } => Some(SeedTypeClass::Value),
-            Self::Task { .. } | Self::TaskHandle { .. } => None,
+            Self::Task { .. } | Self::TaskHandle { .. } | Self::Actor { .. } => None,
         }
     }
 }
@@ -164,6 +170,16 @@ impl TypeArena {
             Type::TaskHandle { result } => {
                 format!("TaskHandle<{}>", self.display(*result))
             }
+            Type::Actor {
+                definition,
+                message,
+                state,
+            } => format!(
+                "Actor<{}, {}, {}>",
+                definition.as_str(),
+                self.display(*message),
+                self.display(*state)
+            ),
             Type::NominalRecord {
                 definition,
                 arguments,
@@ -372,6 +388,10 @@ pub enum TypeErrorKind {
         reason: &'static str,
         target: Option<String>,
     },
+    InvalidActor {
+        reason: &'static str,
+        actor: Option<String>,
+    },
 }
 
 impl TypeError {
@@ -466,6 +486,11 @@ impl TypeError {
                 format!("Structured Task 结构无效：{reason}"),
                 format!("invalid Structured Task structure: {reason}"),
             ),
+            TypeErrorKind::InvalidActor { reason, .. } => (
+                codes::INVALID_ACTOR_DECLARATION,
+                format!("Actor 声明无效：{reason}"),
+                format!("invalid Actor declaration: {reason}"),
+            ),
         };
         let mut diagnostic = Diagnostic::new(code, Severity::Error, zh, en)
             .with_primary_span(DiagnosticSpan::new(&self.source_name, self.span));
@@ -519,6 +544,12 @@ impl TypeError {
             diagnostic = diagnostic.with_fact("reason", *reason);
             if let Some(target) = target {
                 diagnostic = diagnostic.with_fact("target", target.clone());
+            }
+        }
+        if let TypeErrorKind::InvalidActor { reason, actor } = &self.kind {
+            diagnostic = diagnostic.with_fact("reason", *reason);
+            if let Some(actor) = actor {
+                diagnostic = diagnostic.with_fact("actor", actor.clone());
             }
         }
         diagnostic
@@ -660,6 +691,11 @@ enum InferType {
     },
     TaskHandle {
         result: Box<Self>,
+    },
+    Actor {
+        definition: DefinitionId,
+        message: Box<Self>,
+        state: Box<Self>,
     },
     Record {
         definition: DefinitionId,
@@ -1176,6 +1212,7 @@ impl Inferencer {
             InferType::Function { .. }
             | InferType::Task { .. }
             | InferType::TaskHandle { .. }
+            | InferType::Actor { .. }
             | InferType::TraitMember(_)
             | InferType::Error => {
                 constraints::ConstraintType::Named(display_infer(value, &self.resolved))
@@ -1712,6 +1749,23 @@ impl Inferencer {
                     .insert(id.clone(), Scheme::mono(signature.clone()));
                 self.inferred_definitions.insert(id, signature);
             }
+            for actor in &module.hir.actors {
+                let Some(id) = self
+                    .resolved
+                    .definition_id(module.id, &actor.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                let signature = InferType::Actor {
+                    definition: id.clone(),
+                    message: Box::new(self.fresh()),
+                    state: Box::new(self.fresh()),
+                };
+                self.definitions
+                    .insert(id.clone(), Scheme::mono(signature.clone()));
+                self.inferred_definitions.insert(id, signature);
+            }
         }
         let member_ids = self
             .resolved
@@ -1840,6 +1894,140 @@ impl Inferencer {
                 }
                 let body = self.infer_expression(module.id, &task.body);
                 self.unify(*result, body, module.id, task.body.span, None);
+                self.current_owner = previous_owner;
+            }
+            for actor in &module.hir.actors {
+                if cancelled() {
+                    return false;
+                }
+                let Some(id) = self
+                    .resolved
+                    .definition_id(module.id, &actor.name.normalized)
+                    .cloned()
+                else {
+                    continue;
+                };
+                let previous_owner = self.current_owner.replace(id.clone());
+                let declared = self
+                    .definitions
+                    .get(&id)
+                    .map(|scheme| scheme.value.clone())
+                    .unwrap_or(InferType::Error);
+                let InferType::Actor {
+                    message: declared_message,
+                    state: declared_state,
+                    ..
+                } = declared
+                else {
+                    self.push_error(
+                        module.id,
+                        actor.span,
+                        TypeErrorKind::InvalidActor {
+                            reason: "missing_actor_signature",
+                            actor: Some(actor.name.normalized.clone()),
+                        },
+                        None,
+                    );
+                    self.current_owner = previous_owner;
+                    continue;
+                };
+
+                let message = self.type_syntax(module.id, &actor.message_type);
+                let state = self.type_syntax(module.id, &actor.state.state_type);
+                self.unify(
+                    *declared_message,
+                    message.clone(),
+                    module.id,
+                    actor.message_type.span,
+                    None,
+                );
+                self.unify(
+                    *declared_state,
+                    state.clone(),
+                    module.id,
+                    actor.state.state_type.span,
+                    None,
+                );
+
+                if !self.supports_actor_value(&message, &mut BTreeSet::new()) {
+                    self.push_error(
+                        module.id,
+                        actor.message_type.span,
+                        TypeErrorKind::InvalidActor {
+                            reason: "message_type_must_be_closed_value",
+                            actor: Some(actor.name.normalized.clone()),
+                        },
+                        None,
+                    );
+                }
+                if !self.supports_actor_value(&state, &mut BTreeSet::new()) {
+                    self.push_error(
+                        module.id,
+                        actor.state.state_type.span,
+                        TypeErrorKind::InvalidActor {
+                            reason: "state_type_must_be_closed_value",
+                            actor: Some(actor.name.normalized.clone()),
+                        },
+                        None,
+                    );
+                }
+
+                let initializer = self.infer_expression(module.id, &actor.state.initializer);
+                self.unify(
+                    state.clone(),
+                    initializer,
+                    module.id,
+                    actor.state.initializer.span,
+                    None,
+                );
+
+                if !matches!(
+                    actor.receive.state_pattern.kind,
+                    hir::PatternKind::Binding { .. }
+                ) {
+                    self.push_error(
+                        module.id,
+                        actor.receive.state_pattern.span,
+                        TypeErrorKind::InvalidActor {
+                            reason: "state_pattern_must_bind_one_name",
+                            actor: Some(actor.name.normalized.clone()),
+                        },
+                        None,
+                    );
+                }
+                if !matches!(
+                    actor.receive.message_pattern.kind,
+                    hir::PatternKind::Binding { .. }
+                ) {
+                    self.push_error(
+                        module.id,
+                        actor.receive.message_pattern.span,
+                        TypeErrorKind::InvalidActor {
+                            reason: "message_pattern_must_bind_one_name",
+                            actor: Some(actor.name.normalized.clone()),
+                        },
+                        None,
+                    );
+                }
+                self.bind_pattern(module.id, &actor.receive.state_pattern, state.clone());
+                self.bind_pattern(module.id, &actor.receive.message_pattern, message.clone());
+                let body = self.infer_expression(module.id, &actor.receive.body);
+                self.unify(
+                    state.clone(),
+                    body,
+                    module.id,
+                    actor.receive.body.span,
+                    None,
+                );
+
+                let signature = InferType::Actor {
+                    definition: id.clone(),
+                    message: Box::new(self.apply(message)),
+                    state: Box::new(self.apply(state)),
+                };
+                self.definitions
+                    .insert(id.clone(), Scheme::mono(signature.clone()));
+                self.inferred_definitions.insert(id, signature);
                 self.current_owner = previous_owner;
             }
 
@@ -3249,28 +3437,37 @@ impl Inferencer {
         target: &ReferenceTarget,
     ) -> InferType {
         if let ReferenceTarget::Definition(definition) = target
-            && self
-                .resolved
-                .definition(definition)
-                .is_some_and(|info| info.kind == DefinitionKind::Task)
+            && let Some(info) = self.resolved.definition(definition)
         {
-            let target = self
-                .resolved
-                .definition(definition)
-                .map(|info| info.name.clone());
-            self.push_error(
-                module,
-                span,
-                TypeErrorKind::InvalidTask {
-                    reason: "task_declaration_is_not_first_class",
-                    target,
-                },
-                None,
-            );
-            InferType::Error
-        } else {
-            self.reference_type(target)
+            match info.kind {
+                DefinitionKind::Task => {
+                    self.push_error(
+                        module,
+                        span,
+                        TypeErrorKind::InvalidTask {
+                            reason: "task_declaration_is_not_first_class",
+                            target: Some(info.name.clone()),
+                        },
+                        None,
+                    );
+                    return InferType::Error;
+                }
+                DefinitionKind::Actor => {
+                    self.push_error(
+                        module,
+                        span,
+                        TypeErrorKind::InvalidActor {
+                            reason: "actor_declaration_is_not_first_class",
+                            actor: Some(info.name.clone()),
+                        },
+                        None,
+                    );
+                    return InferType::Error;
+                }
+                _ => {}
+            }
         }
+        self.reference_type(target)
     }
 
     fn type_syntax(&mut self, module: ModuleId, syntax: &hir::TypeSyntax) -> InferType {
@@ -3633,6 +3830,27 @@ impl Inferencer {
                 self.unify(*left, *right, module, span, restriction_reason)
             }
             (
+                InferType::Actor {
+                    definition: left,
+                    message: left_message,
+                    state: left_state,
+                },
+                InferType::Actor {
+                    definition: right,
+                    message: right_message,
+                    state: right_state,
+                },
+            ) if left == right => {
+                self.unify(
+                    *left_message,
+                    *right_message,
+                    module,
+                    span,
+                    restriction_reason,
+                );
+                self.unify(*left_state, *right_state, module, span, restriction_reason);
+            }
+            (
                 InferType::Record {
                     definition: left,
                     arguments: left_arguments,
@@ -3726,6 +3944,15 @@ impl Inferencer {
             },
             InferType::TaskHandle { result } => InferType::TaskHandle {
                 result: Box::new(self.apply(*result)),
+            },
+            InferType::Actor {
+                definition,
+                message,
+                state,
+            } => InferType::Actor {
+                definition,
+                message: Box::new(self.apply(*message)),
+                state: Box::new(self.apply(*state)),
             },
             InferType::Record {
                 definition,
@@ -3965,8 +4192,67 @@ impl Inferencer {
             InferType::Function { .. }
             | InferType::Task { .. }
             | InferType::TaskHandle { .. }
+            | InferType::Actor { .. }
             | InferType::TraitMember(_)
             | InferType::Variable(_) => false,
+        }
+    }
+
+    fn supports_actor_value(&self, value: &InferType, visited: &mut BTreeSet<InferType>) -> bool {
+        let value = self.apply(value.clone());
+        if !visited.insert(value.clone()) {
+            return true;
+        }
+        match value {
+            InferType::Unit
+            | InferType::Bool
+            | InferType::Int
+            | InferType::Float64
+            | InferType::Text => true,
+            InferType::Tuple(elements) => elements
+                .iter()
+                .all(|element| self.supports_actor_value(element, visited)),
+            InferType::List(element) => self.supports_actor_value(&element, visited),
+            InferType::Record {
+                definition,
+                arguments,
+            } => self.records.get(&definition).is_some_and(|record| {
+                let replacements = record
+                    .parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .zip(arguments)
+                    .collect::<BTreeMap<_, _>>();
+                record.fields.values().all(|(_, field)| {
+                    self.supports_actor_value(&replace_variables(field, &replacements), visited)
+                })
+            }),
+            InferType::Variant {
+                definition,
+                arguments,
+            } => self.variants.get(&definition).is_some_and(|variant| {
+                let replacements = variant
+                    .parameters
+                    .iter()
+                    .map(|(_, variable)| *variable)
+                    .zip(arguments)
+                    .collect::<BTreeMap<_, _>>();
+                variant.cases.values().all(|payload| {
+                    payload.as_ref().is_none_or(|payload| {
+                        self.supports_actor_value(
+                            &replace_variables(payload, &replacements),
+                            visited,
+                        )
+                    })
+                })
+            }),
+            InferType::Function { .. }
+            | InferType::Task { .. }
+            | InferType::TaskHandle { .. }
+            | InferType::Actor { .. }
+            | InferType::TraitMember(_)
+            | InferType::Variable(_)
+            | InferType::Error => false,
         }
     }
 
@@ -4045,6 +4331,10 @@ fn collect_free_variables(value: &InferType, output: &mut BTreeSet<u32>) {
             collect_free_variables(result, output);
         }
         InferType::TaskHandle { result } => collect_free_variables(result, output),
+        InferType::Actor { message, state, .. } => {
+            collect_free_variables(message, output);
+            collect_free_variables(state, output);
+        }
         InferType::Record { arguments, .. } | InferType::Variant { arguments, .. } => {
             for argument in arguments {
                 collect_free_variables(argument, output);
@@ -4098,6 +4388,15 @@ fn replace_variables(value: &InferType, replacements: &BTreeMap<u32, InferType>)
         },
         InferType::TaskHandle { result } => InferType::TaskHandle {
             result: Box::new(replace_variables(result, replacements)),
+        },
+        InferType::Actor {
+            definition,
+            message,
+            state,
+        } => InferType::Actor {
+            definition: definition.clone(),
+            message: Box::new(replace_variables(message, replacements)),
+            state: Box::new(replace_variables(state, replacements)),
         },
         InferType::Record {
             definition,
@@ -4158,6 +4457,15 @@ fn intern_type(
         },
         InferType::TaskHandle { result } => Type::TaskHandle {
             result: intern_type(result, arena, index),
+        },
+        InferType::Actor {
+            definition,
+            message,
+            state,
+        } => Type::Actor {
+            definition: definition.clone(),
+            message: intern_type(message, arena, index),
+            state: intern_type(state, arena, index),
         },
         InferType::Record {
             definition,
@@ -4243,6 +4551,16 @@ fn display_infer(value: &InferType, resolved: &ResolvedProgram) -> String {
         InferType::TaskHandle { result } => {
             format!("TaskHandle<{}>", display_infer(result, resolved))
         }
+        InferType::Actor {
+            definition,
+            message,
+            state,
+        } => format!(
+            "Actor<{}, {}, {}>",
+            nominal_display_name(resolved, definition),
+            display_infer(message, resolved),
+            display_infer(state, resolved)
+        ),
         InferType::Record {
             definition,
             arguments,
@@ -4316,6 +4634,16 @@ fn display_resolved_type(arena: &TypeArena, resolved: &ResolvedProgram, id: Type
             "TaskHandle<{}>",
             display_resolved_type(arena, resolved, *result)
         ),
+        Type::Actor {
+            definition,
+            message,
+            state,
+        } => format!(
+            "Actor<{}, {}, {}>",
+            nominal_display_name(resolved, definition),
+            display_resolved_type(arena, resolved, *message),
+            display_resolved_type(arena, resolved, *state)
+        ),
         Type::NominalRecord {
             definition,
             arguments,
@@ -4351,7 +4679,10 @@ fn nominal_display_name(resolved: &ResolvedProgram, definition: &DefinitionId) -
     let ambiguous = resolved
         .definitions()
         .values()
-        .filter(|candidate| candidate.kind == DefinitionKind::Type && candidate.name == info.name)
+        .filter(|candidate| {
+            matches!(candidate.kind, DefinitionKind::Type | DefinitionKind::Actor)
+                && candidate.name == info.name
+        })
         .nth(1)
         .is_some();
     if ambiguous {

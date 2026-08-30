@@ -151,6 +151,33 @@ fn render_item(output: &mut String, item: &Item, depth: usize) {
             }
             render_expression(output, &declaration.body, depth + 1);
         }
+        Item::Actor(declaration) => {
+            line_with(
+                output,
+                depth,
+                "actor",
+                declaration.span,
+                &declaration.name.normalized,
+            );
+            render_type_expression(output, &declaration.message_type, depth + 1);
+            line(output, depth + 1, "state", declaration.state.span);
+            render_type_expression(output, &declaration.state.state_type, depth + 2);
+            render_expression(output, &declaration.state.initializer, depth + 2);
+            line(output, depth + 1, "receive", declaration.receive.span);
+            render_pattern(
+                output,
+                &declaration.receive.state_pattern,
+                depth + 2,
+                "state_pattern",
+            );
+            render_pattern(
+                output,
+                &declaration.receive.message_pattern,
+                depth + 2,
+                "message_pattern",
+            );
+            render_expression(output, &declaration.receive.body, depth + 2);
+        }
         Item::Type(declaration) => {
             line_with(
                 output,

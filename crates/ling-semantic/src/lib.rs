@@ -2934,8 +2934,9 @@ impl SnapshotBuilder {
             .typed()
             .resolved()
             .definitions()
-            .keys()
-            .map(|definition| {
+            .iter()
+            .filter(|(_, info)| info.kind != DefinitionKind::Actor)
+            .map(|(definition, _)| {
                 let mut encoder = Encoder::new(self.mode.body_domain());
                 encoder.string(LANGUAGE_VERSION);
                 encoder.string(self.mode.schema());
@@ -3210,6 +3211,7 @@ impl SnapshotBuilder {
             .resolved()
             .definitions()
             .iter()
+            .filter(|(_, definition)| definition.kind != DefinitionKind::Actor)
             .map(|(id, definition)| {
                 let effects = self
                     .checked
@@ -3552,6 +3554,7 @@ impl SnapshotBuilder {
         let mut references = resolved
             .references()
             .iter()
+            .filter(|(key, _)| source_ids.contains_key(&(key.module(), key.local())))
             .filter_map(|(key, target)| {
                 resolved.module(key.module()).map(|module| {
                     let (target_kind, target) = match target {
@@ -4888,6 +4891,7 @@ fn definition_kind(kind: DefinitionKind) -> &'static str {
     match kind {
         DefinitionKind::Value => "value",
         DefinitionKind::Task => "task",
+        DefinitionKind::Actor => "type",
         DefinitionKind::Type => "type",
         DefinitionKind::Constructor => "constructor",
         DefinitionKind::Builtin => "builtin",
