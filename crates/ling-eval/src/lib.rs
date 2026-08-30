@@ -20,10 +20,18 @@ use num_bigint::BigInt;
 
 mod machine;
 mod task_runtime;
+mod task_scheduler;
 
 pub use task_runtime::{
     TaskCancellationCause, TaskPath, TaskRuntime, TaskRuntimeLimits, TaskRuntimeState, TaskStep,
     TaskStepKind, TaskValue,
+};
+pub use task_scheduler::{
+    TASK_SCHEDULE_TRACE_VERSION, TaskDeadline, TaskExplorationLimit, TaskExplorationResult,
+    TaskFaultSummary, TaskHostOutcome, TaskHostResponse, TaskHostScript, TaskReplayError,
+    TaskScheduleConfig, TaskScheduleEvent, TaskScheduleEventKind, TaskScheduleTerminal,
+    TaskScheduleTrace, TaskSchedulerError, TaskSchedulerLimits, explore_task_schedules,
+    replay_task_schedule, run_task_schedule, task_schedule_splitmix64,
 };
 
 /// Host console capability. `text` already contains Ling's canonical LF.

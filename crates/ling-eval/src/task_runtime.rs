@@ -31,6 +31,17 @@ impl TaskPath {
         &self.0
     }
 
+    /// Constructs a canonical runtime path. Zero is never a valid lexical
+    /// Task identity; the empty sequence denotes the root.
+    #[must_use]
+    pub fn from_segments(segments: impl IntoIterator<Item = u32>) -> Option<Self> {
+        let segments = segments.into_iter().collect::<Vec<_>>();
+        segments
+            .iter()
+            .all(|segment| *segment > 0)
+            .then(|| Self(segments.into_boxed_slice()))
+    }
+
     fn child(&self, task: TaskId) -> Option<Self> {
         if !task.is_valid() {
             return None;
@@ -458,6 +469,11 @@ impl<'checked, 'console> TaskRuntime<'checked, 'console> {
     }
 
     #[must_use]
+    pub fn task_paths(&self) -> Vec<TaskPath> {
+        self.tasks.keys().cloned().collect()
+    }
+
+    #[must_use]
     pub fn state(&self, path: &TaskPath) -> Option<TaskRuntimeState> {
         self.tasks
             .get(path)
@@ -510,10 +526,18 @@ impl<'checked, 'console> TaskRuntime<'checked, 'console> {
     }
 
     pub fn request_cancel(&mut self, path: &TaskPath) -> Result<(), RuntimeFault> {
+        self.request_cancel_with_cause(path, TaskCancellationCause::Requested)
+    }
+
+    pub(crate) fn request_cancel_with_cause(
+        &mut self,
+        path: &TaskPath,
+        cause: TaskCancellationCause,
+    ) -> Result<(), RuntimeFault> {
         if !self.tasks.contains_key(path) {
             return Err(self.driver_fault(path, "unknown_task"));
         }
-        self.mark_cancel(path, TaskCancellationCause::Requested);
+        self.mark_cancel(path, cause);
         Ok(())
     }
 
