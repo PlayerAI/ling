@@ -41,6 +41,64 @@ Each change must state:
 - determinism and Unicode-version impact;
 - intentionally deferred work.
 
+## Kimi delegation
+
+Kimi is an advisory secondary agent. The primary agent remains accountable for
+specification authority, repository changes, verification, status evidence,
+and the final result.
+
+### Appropriate tasks
+
+- Use `kimi -p "<one bounded instruction>"` when an independent analysis can
+  materially improve the work, especially for design-risk review, alternative
+  comparison, documentation consistency, test-matrix generation, or a focused
+  read-only code review.
+- A small implementation task may be delegated only when its governing
+  semantics are already Accepted, its dependencies are satisfied, the target
+  files and acceptance criteria are explicit, and it can be reviewed and
+  verified independently.
+- Prefer one self-contained task per invocation. State the applicable authority,
+  allowed files, required output language, no-go boundaries, and expected tests
+  in the prompt.
+
+### Prohibited delegation
+
+- Do not treat Kimi output as normative authority or allow it to resolve a
+  specification gap, accept an RFC/decision, change governance lifecycle state,
+  or broaden a task beyond its Accepted contract.
+- Do not delegate credentials, private keys, tokens, personal data, unpublished
+  sensitive material, destructive operations, dependency installation, or
+  production/external mutations.
+- Kimi must not commit, push, rewrite Git history, delete files, or publish a
+  task as Done. Those operations remain with the primary agent and retain their
+  normal confirmation requirements.
+
+### Invocation safety
+
+- A Kimi prompt is an external network request and must follow the dangerous
+  operation confirmation mechanism before invocation.
+- Before calling Kimi, tell the user the bounded task and what repository data,
+  if any, will be exposed. Send the minimum necessary context and prefer
+  repository-relative identifiers over host paths.
+- Ensure the prompt reaches `kimi -p` as one argument. On Windows, verify shell
+  quoting when the prompt contains ASCII spaces or punctuation; a parsing
+  failure is not a model result.
+- Default to read-only analysis. If an explicitly authorized implementation
+  task may write files, record `git status` first, name the allowed paths, and
+  do not edit the same files concurrently from another agent.
+
+### Review and verification
+
+- Treat every Kimi response and file change as untrusted review input. Inspect
+  it against the authority order, current implementation, and tests before use.
+- Re-run task-specific checks and applicable repository gates locally; never
+  claim that Kimi executed or passed a command without direct evidence.
+- Inspect the final diff for scope drift, accidental generated files, secrets,
+  host paths, unsupported public APIs, and changes outside the declared files.
+- Summarize material Kimi involvement in the final change evidence, including
+  what was delegated, what was independently verified, and what was rejected
+  or revised.
+
 ## Execution-plan governance
 
 - The post-Seed engineering package currently lives under `docs/ling_execution_plan/`. It is non-normative and ranks below accepted RFCs, `docs/SEMANTICS.md`, `docs/LANGUAGE.md`, conformance tests, and `docs/ROADMAP-1.0.md`.
