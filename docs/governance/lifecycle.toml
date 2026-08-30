@@ -7638,3 +7638,29 @@ unresolved_alternatives = [
   "Public trace/replay, source Clock/sleep, I/O wakes, production workers, work stealing, metrics, shutdown, Task bytecode/VM/native ABI, detach, Resource finalizers, Actor crossing, and Stable compatibility remain later work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0268"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0268-production-local-task-scheduler.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-30"
+proposed = "2026-08-30"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Exercise exact checked task main file/project interpreter entry with one and multiple workers while retaining all non-interpreter Task rejection routes.",
+  "Cover bounded queue, wake/park, cancellation, Fault, cleanup, shutdown, panic containment, quotas, snapshots, and metrics noninterference.",
+  "Compare repeated and reconstructed runs across worker counts, source evidence, Unicode/BOM/CRLF, and explicitly admitted Effect-order races.",
+  "Retain work stealing, public scheduler protocols, Task bytecode/VM/native ABI, detach, Resource finalizers, Replay, and stress claims for later authority.",
+]
+compatibility_impact = [
+  "Would authorize an Experimental production local scheduler and exact checked task main interpreter run boundary without adding source syntax.",
+  "Would add no new diagnostic allocation, public schema, Semantic ID, bytecode/VM ABI, Replay format, Stable scheduling order, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Work stealing, public fairness/metrics/tree protocols, Task test/build/REPL/artifact/VM execution, wall-clock APIs, detach, user Resource quotas, Actor crossing, stress, and Stable compatibility remain later work.",
+]
+superseded_by = ""

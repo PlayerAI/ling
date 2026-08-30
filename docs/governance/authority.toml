@@ -4342,3 +4342,16 @@ covers = ["TASK-2204 deterministic test-only Task scheduling", "exact SplitMix64
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0094", "DEC-0264", "DEC-0265", "DEC-0266", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0268"
+title = "Production local Task scheduler"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0268-production-local-task-scheduler.md"
+covers = ["TASK-2205 checked interpreter Task entry", "fixed local worker pool with bounded central queue and wake/park", "production cancellation, shutdown, Task-tree snapshots, and nonsemantic metrics", "serialized checked TaskRuntime transitions without scheduling-order semantics"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0002", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0264", "DEC-0265", "DEC-0266", "DEC-0267", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false

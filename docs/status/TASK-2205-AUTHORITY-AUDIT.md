@@ -2,12 +2,15 @@
 
 ## Outcome
 
-`TASK-2205` is correctly recorded as `BlockedSpec`. The G2 plan proposes a
-correctness-first local scheduler with a fixed worker pool, work queue,
-wake/park, cancellation, queryable Task trees, per-scope task/resource limits,
-and metrics that do not affect program semantics; work stealing is explicitly
-deferred. No accepted Task runtime or scheduler contract defines these
-behaviors.
+`TASK-2205` remains `BlockedSpec` pending acceptance of Proposed DEC-0268.
+TASK-2201 through TASK-2204 are Done under Accepted DEC-0264 through DEC-0267,
+so checked Task Core, state machines, the scheduler-neutral lifecycle runtime,
+and deterministic test scheduling are complete dependencies. Proposed DEC-0268
+isolates the remaining correctness-first local production boundary: an exact
+checked `task main ()` interpreter entry, fixed worker pool, bounded central
+queue, wake/park, cancellation and shutdown, internal Task-tree snapshots,
+per-scope child preflight, and nonsemantic metrics. Work stealing is explicitly
+deferred.
 
 No worker-pool runtime, queue, wake/park primitive, production cancellation
 path, Task-tree query, per-scope quota, metrics surface, scheduler diagnostic,
@@ -18,10 +21,12 @@ threading dependency, or placeholder G2 API was added.
 - The G2 execution package is non-normative; its scheduler checklist does not
   authorize worker behavior, a runtime thread ABI, or an observable Task-tree
   protocol.
-- TASK-2201 through TASK-2204 are `BlockedSpec`, and
-  `GAP-STRUCTURED-TASK-001` leaves parent/child lifetime, suspension,
-  cancellation, cleanup, Fault, and deterministic-scheduler behavior open.
-  RFC-0008/RFC-C202 is not Accepted.
+- TASK-2201 through TASK-2204 are Done. Accepted DEC-0264 through DEC-0267
+  define checked Task source/Core, machines, scheduler-neutral lifecycle,
+  cancellation/cleanup/Fault precedence, logical test deadlines, typed traces,
+  strict replay, and bounded test exploration. They deliberately leave the
+  production worker/queue/wake, shutdown, metrics, and public entry boundary to
+  TASK-2205. RFC-0008/RFC-C202 is not Accepted.
 - Accepted DEC-0019/DEC-0021 authorize only internal compiler query scheduling
   over immutable data. They do not authorize Ling Task workers, wake/park,
   production cancellation, quotas, metrics, or runtime observability.
@@ -35,9 +40,11 @@ threading dependency, or placeholder G2 API was added.
 
 ## Current implementation evidence
 
-- `ling-eval` is a synchronous checked-Seed interpreter with no worker pool,
-  queue, parked task, Task tree, or scope quota. `ling-vm` executes verified
-  Seed bytecode with bounded frames/steps and host capabilities, not Task work.
+- `ling-eval` now contains the checked DEC-0266 `TaskRuntime` and DEC-0267
+  deterministic test driver, but no production worker pool, central work queue,
+  condition-variable park/wake, host cancellation control, shutdown/join,
+  production Task-tree snapshot, or metrics boundary. `ling-vm` still executes
+  verified Seed/Handler bytecode, not Task work.
 - The repository's accepted query scheduling decisions are internal compiler
   boundaries and explicitly exclude runtime scheduling and structured Task
   cancellation. Reusing them would conflate compiler jobs with source Tasks.
@@ -48,24 +55,24 @@ threading dependency, or placeholder G2 API was added.
   cancellation during shutdown, scope quota precedence, orphan cleanup,
   metrics noninterference, or interpreter/VM scheduler equivalence.
 
-## Required authority before implementation
+## Proposed authority before implementation
 
-An Accepted RFC or decision must define, at minimum:
+Proposed DEC-0268 defines the following boundary, but it is not implementation
+authority until Accepted:
 
-1. the Task runtime input and worker ownership model, queue and wake/park
-   semantics, fairness and starvation class, worker-pool sizing, shutdown and
-   restart behavior, and distinction between production nondeterminism and
-   language-observable Effects;
+1. checked-only runtime input; an exact `task main ()` file/project interpreter
+   entry; explicit bounded worker configuration; a central mutex/condition-
+   variable FIFO; serialized one-step runtime transitions; wake/park and
+   shutdown/join rules; and an explicit production nondeterminism class;
 2. cancellation topology and checkpoints, scope/task-tree identity and query
    boundary, join/cleanup/orphan behavior, and race precedence among normal
    completion, Fault, cancellation, timeout, and shutdown;
-3. per-scope task and resource quotas, allocation/step/worker limits, failure
-   precedence, backpressure, host-panic/deadlock containment, and whether
-   metrics are test-only, internal, or a versioned public protocol;
-4. interpreter reference semantics and VM/runtime ABI, scheduler/host
-   capability boundaries, diagnostics, source/provenance and Semantic IDs,
-   Audit Source, schema/version migration, security and offline dependency
-   policy; and
+3. per-scope direct-child preflight plus runtime/worker/queue/transition/wake
+   limits, failure precedence, host/worker-panic containment, internal bounded
+   snapshots, and metrics that cannot affect scheduling or program results;
+4. interpreter-only execution while test/build/REPL/artifact/bytecode/VM and
+   editor routes retain `L-TASK-0004`, existing diagnostic reuse, unchanged
+   Semantic IDs/Audit/schema bytes, and an offline `std` threading policy; and
 5. executable positive/negative/migration/differential fixtures for fixed and
    empty pools, queue/wake/park, nested scopes, cancellation and shutdown,
    quota exhaustion, child Fault/cleanup, orphan rejection, metrics
@@ -78,9 +85,10 @@ the wrong order, or shutdown could leave an orphan Task or resource leak.
 
 ## Evidence and compatibility
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This refreshed audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0013, DEC-0019, DEC-0021,
-DEC-0018, RFC-0001, RFC-0020,
+DEC-0018, RFC-0001, RFC-0020, Accepted DEC-0264 through DEC-0267, Proposed
+DEC-0268,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
@@ -93,9 +101,9 @@ behavior changed.
 
 ## Intentionally deferred
 
-`TASK-2205` can begin only after TASK-2201 through TASK-2204 and an Accepted
-RFC-0008 (or replacement) resolve `GAP-STRUCTURED-TASK-001` and define the
-production scheduler boundary. The future implementation must consume checked
-Task state machines only, keep metrics nonsemantic, enforce explicit scope
-limits and cleanup, and publish worker-pool/VM differential evidence without
-promising a production scheduling order as language behavior.
+`TASK-2205` can begin when DEC-0268 is Accepted. The proposal deliberately
+retains work stealing, public worker/metrics/Task-tree protocols, Task
+test/build/REPL/artifact execution, Task bytecode/VM/native ABI, wall-clock
+Clock/sleep, I/O wake injection, detach, user Resource finalizers, recoverable
+allocation quotas, Replay, Actor crossing, migration, million-short-task
+stress, and Stable scheduling compatibility for TASK-2206 or later authority.
