@@ -6,11 +6,47 @@ use ling_concurrency::ActorTypeId;
 use ling_hir as hir;
 use ling_resolve::{BindingKey, DefinitionId, ExpressionKey};
 use ling_source::Span;
-use ling_types::{Type, TypeId, TypedProgram};
+use ling_types::{ActorMessageSchema, SendableLocal, Type, TypeId, TypedProgram};
 
 use crate::EffectRow;
 
-pub const CHECKED_ACTOR_CORE_VERSION: &str = "ling.checked-actor-core/0";
+pub const CHECKED_ACTOR_CORE_VERSION: &str = "ling.checked-actor-core/1";
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CheckedActorMessageContract {
+    actor: DefinitionId,
+    message_type: TypeId,
+    sendability: SendableLocal,
+    schema: ActorMessageSchema,
+    source_span: Span,
+}
+
+impl CheckedActorMessageContract {
+    #[must_use]
+    pub fn actor(&self) -> &DefinitionId {
+        &self.actor
+    }
+
+    #[must_use]
+    pub const fn message_type(&self) -> TypeId {
+        self.message_type
+    }
+
+    #[must_use]
+    pub const fn sendability(&self) -> SendableLocal {
+        self.sendability
+    }
+
+    #[must_use]
+    pub const fn schema(&self) -> &ActorMessageSchema {
+        &self.schema
+    }
+
+    #[must_use]
+    pub const fn source_span(&self) -> Span {
+        self.source_span
+    }
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct CheckedActorIdContract;
@@ -76,6 +112,7 @@ pub struct CheckedActorCore {
     definition: DefinitionId,
     actor_type: ActorTypeId,
     message_type: TypeId,
+    message_contract: CheckedActorMessageContract,
     state_type: TypeId,
     reference_type: CheckedActorRefType,
     actor_id_contract: CheckedActorIdContract,
@@ -102,6 +139,11 @@ impl CheckedActorCore {
     #[must_use]
     pub const fn message_type(&self) -> TypeId {
         self.message_type
+    }
+
+    #[must_use]
+    pub const fn message_contract(&self) -> &CheckedActorMessageContract {
+        &self.message_contract
     }
 
     #[must_use]
@@ -176,6 +218,7 @@ pub(crate) fn build_checked_actor_cores(
 ) -> Result<BTreeMap<DefinitionId, CheckedActorCore>, Vec<ActorCheckFailure>> {
     let mut output = BTreeMap::new();
     let mut identities = BTreeMap::<ActorTypeId, DefinitionId>::new();
+    let mut message_schemas = BTreeMap::<String, Vec<u8>>::new();
     let mut failures = Vec::new();
 
     for module in typed.resolved().modules() {
@@ -217,6 +260,20 @@ pub(crate) fn build_checked_actor_cores(
                 actor_type,
             ) {
                 Ok(core) => {
+                    let schema = core.message_contract().schema();
+                    if !register_message_schema(
+                        &mut message_schemas,
+                        schema.id().as_str(),
+                        schema.canonical_bytes(),
+                    ) {
+                        failures.push(failure(
+                            module,
+                            declaration.message_type.span,
+                            "message_schema_identity_collision",
+                            actor_name,
+                        ));
+                        continue;
+                    }
                     output.insert(definition, core);
                 }
                 Err(error) => failures.push(error),
@@ -236,6 +293,18 @@ pub(crate) fn build_checked_actor_cores(
         });
         Err(failures)
     }
+}
+
+fn register_message_schema(
+    schemas: &mut BTreeMap<String, Vec<u8>>,
+    schema_id: &str,
+    canonical_bytes: &[u8],
+) -> bool {
+    if let Some(existing) = schemas.get(schema_id) {
+        return existing == canonical_bytes;
+    }
+    schemas.insert(schema_id.to_owned(), canonical_bytes.to_vec());
+    true
 }
 
 fn build_one(
@@ -351,6 +420,22 @@ fn build_one(
         ));
     }
 
+    let message_schema = ActorMessageSchema::build(typed, *message).map_err(|error| {
+        failure(
+            module,
+            declaration.message_type.span,
+            error.reason(),
+            Some(declaration.name.normalized.clone()),
+        )
+    })?;
+    let message_contract = CheckedActorMessageContract {
+        actor: definition.clone(),
+        message_type: *message,
+        sendability: SendableLocal::Value,
+        schema: message_schema,
+        source_span: declaration.message_type.span,
+    };
+
     let canonical_bytes = canonical_bytes(
         typed,
         &definition,
@@ -361,11 +446,13 @@ fn build_one(
         transition_body,
         state_binding,
         message_binding,
+        &message_contract,
     );
     Ok(CheckedActorCore {
         definition,
         actor_type,
         message_type: *message,
+        message_contract,
         state_type: *state,
         reference_type: CheckedActorRefType {
             actor_type,
@@ -436,6 +523,7 @@ fn canonical_bytes(
     transition_body: ExpressionKey,
     state_binding: BindingKey,
     message_binding: BindingKey,
+    message_contract: &CheckedActorMessageContract,
 ) -> Vec<u8> {
     let mut bytes = Vec::new();
     push_text(&mut bytes, CHECKED_ACTOR_CORE_VERSION);
@@ -446,6 +534,9 @@ fn canonical_bytes(
     );
     bytes.extend_from_slice(&actor_type.get().to_le_bytes());
     push_text(&mut bytes, &typed.arena().display(message));
+    push_text(&mut bytes, message_contract.sendability().as_str());
+    push_text(&mut bytes, message_contract.schema().id().as_str());
+    push_bytes(&mut bytes, message_contract.schema().canonical_bytes());
     push_text(&mut bytes, &typed.arena().display(state));
     for value in [
         initializer.local().get(),
@@ -462,4 +553,29 @@ fn push_text(output: &mut Vec<u8>, value: &str) {
     let length = u32::try_from(value.len()).unwrap_or(u32::MAX);
     output.extend_from_slice(&length.to_le_bytes());
     output.extend_from_slice(value.as_bytes());
+}
+
+fn push_bytes(output: &mut Vec<u8>, value: &[u8]) {
+    let length = u32::try_from(value.len()).unwrap_or(u32::MAX);
+    output.extend_from_slice(&length.to_le_bytes());
+    output.extend_from_slice(value);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::register_message_schema;
+    use std::collections::BTreeMap;
+
+    #[test]
+    fn message_schema_registry_accepts_reuse_and_rejects_collisions() {
+        let mut schemas = BTreeMap::new();
+
+        assert!(register_message_schema(&mut schemas, "schema-id", b"one"));
+        assert!(register_message_schema(&mut schemas, "schema-id", b"one"));
+        assert!(!register_message_schema(&mut schemas, "schema-id", b"two"));
+        assert_eq!(
+            schemas.get("schema-id").map(Vec::as_slice),
+            Some(&b"one"[..])
+        );
+    }
 }

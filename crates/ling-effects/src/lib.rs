@@ -22,8 +22,8 @@ mod task_machine;
 mod v2;
 
 pub use actor_core::{
-    CHECKED_ACTOR_CORE_VERSION, CheckedActorCore, CheckedActorIdContract, CheckedActorRefType,
-    CheckedActorSourceSpans,
+    CHECKED_ACTOR_CORE_VERSION, CheckedActorCore, CheckedActorIdContract,
+    CheckedActorMessageContract, CheckedActorRefType, CheckedActorSourceSpans,
 };
 pub use handler_core::{
     HandlerCore, HandlerCoreClause, HandlerCoreError, HandlerCoreNodeId, ResumeUse,

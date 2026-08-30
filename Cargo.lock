@@ -410,6 +410,7 @@ dependencies = [
 name = "ling-types"
 version = "0.0.1-dev"
 dependencies = [
+ "blake3",
  "ling-ast",
  "ling-diagnostics",
  "ling-hir",

@@ -13,6 +13,7 @@ use ling_resolve::{
 use ling_source::Span;
 use num_bigint::BigInt;
 
+mod actor_message;
 mod coherence;
 mod constraints;
 // Solver evidence remains crate-private until dictionary lowering integrates it.
@@ -24,6 +25,11 @@ pub use solver::MAX_NESTED_TRAIT_OBLIGATIONS;
 #[allow(dead_code)]
 mod checked_core;
 
+pub use actor_message::{
+    ACTOR_MESSAGE_SCHEMA_DOMAIN, ActorMessageCase, ActorMessageField, ActorMessageSchema,
+    ActorMessageSchemaError, ActorMessageSchemaId, ActorMessageSchemaNode,
+    ActorMessageSchemaNodeKind, SendableLocal,
+};
 pub use checked_core::{DictionaryMember, DictionaryTable, DictionaryWitness, TraitMemberCall};
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -216,6 +222,7 @@ pub struct RecordInfo {
     pub definition: DefinitionId,
     pub name: String,
     pub parameters: Vec<String>,
+    parameter_variables: Vec<u32>,
     pub fields: Vec<RecordFieldInfo>,
 }
 
@@ -231,6 +238,7 @@ pub struct VariantInfo {
     pub definition: DefinitionId,
     pub name: String,
     pub parameters: Vec<String>,
+    parameter_variables: Vec<u32>,
     pub cases: Vec<VariantCaseInfo>,
 }
 
@@ -943,6 +951,11 @@ impl Inferencer {
                             .iter()
                             .map(|(name, _)| name.clone())
                             .collect(),
+                        parameter_variables: record
+                            .parameters
+                            .iter()
+                            .map(|(_, variable)| *variable)
+                            .collect(),
                         fields,
                     },
                 )
@@ -972,6 +985,11 @@ impl Inferencer {
                             .parameters
                             .iter()
                             .map(|(name, _)| name.clone())
+                            .collect(),
+                        parameter_variables: variant
+                            .parameters
+                            .iter()
+                            .map(|(_, variable)| *variable)
                             .collect(),
                         cases,
                     },
@@ -1949,12 +1967,14 @@ impl Inferencer {
                     None,
                 );
 
-                if !self.supports_actor_value(&message, &mut BTreeSet::new()) {
+                if let Some(reason) =
+                    self.actor_message_sendability_failure(&message, &mut BTreeSet::new())
+                {
                     self.push_error(
                         module.id,
                         actor.message_type.span,
                         TypeErrorKind::InvalidActor {
-                            reason: "message_type_must_be_closed_value",
+                            reason,
                             actor: Some(actor.name.normalized.clone()),
                         },
                         None,
@@ -4199,60 +4219,78 @@ impl Inferencer {
     }
 
     fn supports_actor_value(&self, value: &InferType, visited: &mut BTreeSet<InferType>) -> bool {
+        self.actor_message_sendability_failure(value, visited)
+            .is_none()
+    }
+
+    fn actor_message_sendability_failure(
+        &self,
+        value: &InferType,
+        visited: &mut BTreeSet<InferType>,
+    ) -> Option<&'static str> {
         let value = self.apply(value.clone());
         if !visited.insert(value.clone()) {
-            return true;
+            return None;
         }
         match value {
             InferType::Unit
             | InferType::Bool
             | InferType::Int
             | InferType::Float64
-            | InferType::Text => true,
+            | InferType::Text => None,
             InferType::Tuple(elements) => elements
                 .iter()
-                .all(|element| self.supports_actor_value(element, visited)),
-            InferType::List(element) => self.supports_actor_value(&element, visited),
+                .find_map(|element| self.actor_message_sendability_failure(element, visited)),
+            InferType::List(element) => self.actor_message_sendability_failure(&element, visited),
             InferType::Record {
                 definition,
                 arguments,
-            } => self.records.get(&definition).is_some_and(|record| {
-                let replacements = record
-                    .parameters
-                    .iter()
-                    .map(|(_, variable)| *variable)
-                    .zip(arguments)
-                    .collect::<BTreeMap<_, _>>();
-                record.fields.values().all(|(_, field)| {
-                    self.supports_actor_value(&replace_variables(field, &replacements), visited)
-                })
-            }),
-            InferType::Variant {
-                definition,
-                arguments,
-            } => self.variants.get(&definition).is_some_and(|variant| {
-                let replacements = variant
-                    .parameters
-                    .iter()
-                    .map(|(_, variable)| *variable)
-                    .zip(arguments)
-                    .collect::<BTreeMap<_, _>>();
-                variant.cases.values().all(|payload| {
-                    payload.as_ref().is_none_or(|payload| {
-                        self.supports_actor_value(
-                            &replace_variables(payload, &replacements),
+            } => self.records.get(&definition).map_or(
+                Some("message_type_unknown_record"),
+                |record| {
+                    let replacements = record
+                        .parameters
+                        .iter()
+                        .map(|(_, variable)| *variable)
+                        .zip(arguments)
+                        .collect::<BTreeMap<_, _>>();
+                    record.fields.values().find_map(|(_, field)| {
+                        self.actor_message_sendability_failure(
+                            &replace_variables(field, &replacements),
                             visited,
                         )
                     })
-                })
-            }),
-            InferType::Function { .. }
-            | InferType::Task { .. }
-            | InferType::TaskHandle { .. }
-            | InferType::Actor { .. }
-            | InferType::TraitMember(_)
-            | InferType::Variable(_)
-            | InferType::Error => false,
+                },
+            ),
+            InferType::Variant {
+                definition,
+                arguments,
+            } => self.variants.get(&definition).map_or(
+                Some("message_type_unknown_variant"),
+                |variant| {
+                    let replacements = variant
+                        .parameters
+                        .iter()
+                        .map(|(_, variable)| *variable)
+                        .zip(arguments)
+                        .collect::<BTreeMap<_, _>>();
+                    variant.cases.values().find_map(|payload| {
+                        payload.as_ref().and_then(|payload| {
+                            self.actor_message_sendability_failure(
+                                &replace_variables(payload, &replacements),
+                                visited,
+                            )
+                        })
+                    })
+                },
+            ),
+            InferType::Function { .. } => Some("message_type_function_not_sendable_local"),
+            InferType::Task { .. } => Some("message_type_task_not_sendable_local"),
+            InferType::TaskHandle { .. } => Some("message_type_task_handle_not_sendable_local"),
+            InferType::Actor { .. } => Some("message_type_actor_not_sendable_local"),
+            InferType::TraitMember(_) => Some("message_type_trait_member_not_sendable_local"),
+            InferType::Variable(_) => Some("message_type_open_variable_not_sendable_local"),
+            InferType::Error => Some("message_type_error_not_sendable_local"),
         }
     }
 

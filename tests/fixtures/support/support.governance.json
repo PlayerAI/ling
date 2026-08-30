@@ -371,10 +371,10 @@
     },
     {
       "id": "PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION",
-      "visibility": "Planned public",
-      "version": "",
-      "stability": "Future",
-      "implemented": false
+      "visibility": "Public",
+      "version": "x-ling-actor/0.1",
+      "stability": "Experimental",
+      "implemented": true
     },
     {
       "id": "PROTO-AUDIT-SOURCE",

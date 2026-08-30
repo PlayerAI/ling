@@ -66,6 +66,7 @@ canonical_encoding = "CompactJsonLf"
 hash_scheme_ids = [
   "experimental:blake3:",
   "ling.body-id/v1",
+  "ling.actor-message-schema-id/v1",
   "ling.definition-id/v1",
   "ling.program-id/v1",
   "ling.semantic-node-id/v1",
@@ -75,7 +76,7 @@ valid_dir = "schemas/semantic/0.1/valid"
 invalid_dir = "schemas/semantic/0.1/invalid"
 canonical_dir = "schemas/semantic/0.1/canonical"
 reader_adapter = "SemanticGraphV0_1"
-writer_evidence = ["crates/ling-resolve/src/lib.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs"]
+writer_evidence = ["crates/ling-resolve/src/lib.rs", "crates/ling-types/src/actor_message.rs", "crates/ling-semantic/src/lib.rs", "crates/ling-cli/tests/conformance.rs", "crates/ling-cli/tests/actor_boundary.rs"]
 
 [[schema]]
 id = "SCHEMA-PACKAGE-SEMANTIC-GRAPH-JSON"

@@ -1,0 +1,8 @@
+module Main
+
+type Message = { values: List<Int> }
+
+actor Inbox : Message =
+    state Int = 0
+    receive state message =
+        state

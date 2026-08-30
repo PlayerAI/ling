@@ -1766,6 +1766,7 @@ mod tests {
                 &[
                     "experimental:blake3:",
                     "ling.body-id/v1",
+                    "ling.actor-message-schema-id/v1",
                     "ling.definition-id/v1",
                     "ling.program-id/v1",
                     "ling.semantic-node-id/v1",

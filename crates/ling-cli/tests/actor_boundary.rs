@@ -25,6 +25,20 @@ fn actor_declaration_reaches_checked_core_but_execution_is_rejected() {
     assert_eq!(core.reference_type().actor_type(), core.actor_type());
     assert_eq!(core.reference_type().message(), core.message_type());
     assert!(core.reference_type().is_local_and_invariant());
+    let contract = core.message_contract();
+    assert_eq!(contract.actor(), core.definition());
+    assert_eq!(contract.message_type(), core.message_type());
+    assert_eq!(contract.sendability().as_str(), "SendableLocal(Value)");
+    assert!(
+        contract
+            .schema()
+            .id()
+            .as_str()
+            .starts_with("experimental:blake3:")
+    );
+    assert_eq!(contract.schema().root(), 0);
+    assert!(!contract.schema().nodes().is_empty());
+    assert_eq!(contract.source_span(), core.source_spans().message_type);
     assert!(core.effects().is_pure());
     assert!(core.actor_id_contract().is_runtime_scoped());
     assert!(
@@ -67,6 +81,57 @@ fn actor_core_identity_ignores_source_name_and_line_endings() {
         .expect("second core");
     assert_eq!(first_core.actor_type(), second_core.actor_type());
     assert_eq!(first_core.canonical_bytes(), second_core.canonical_bytes());
+    assert_eq!(
+        first_core.message_contract().schema().id(),
+        second_core.message_contract().schema().id()
+    );
+}
+
+#[test]
+fn actor_message_schema_closes_generic_recursive_nominal_graphs() {
+    let source = concat!(
+        "module Main\n\n",
+        "type Envelope<'a> = { payload: 'a }\n",
+        "type Tree<'a> =\n",
+        "    | Branch of List<Tree<'a>>\n",
+        "    | Leaf of 'a\n\n",
+        "actor Inbox : Envelope<Tree<Int>> =\n",
+        "    state Int = 0\n",
+        "    receive state message =\n",
+        "        state\n",
+    );
+    let first = compile_source("tree.ling", source.as_bytes().to_vec())
+        .expect("closed recursive message graph compiles");
+    let second = compile_source(
+        "renamed.ling",
+        source.replace('\n', "\r\n").as_bytes().to_vec(),
+    )
+    .expect("source evidence does not change schema identity");
+    let first_schema = first
+        .snapshot
+        .checked()
+        .actor_cores()
+        .values()
+        .next()
+        .expect("first Actor")
+        .message_contract()
+        .schema();
+    let second_schema = second
+        .snapshot
+        .checked()
+        .actor_cores()
+        .values()
+        .next()
+        .expect("second Actor")
+        .message_contract()
+        .schema();
+    assert_eq!(first_schema.id(), second_schema.id());
+    assert_eq!(
+        first_schema.canonical_bytes(),
+        second_schema.canonical_bytes()
+    );
+    assert!(first_schema.nodes().len() >= 4);
+    ling_semantic::read_json(first.snapshot.json()).expect("Actor graph reader accepts output");
 }
 
 #[test]
@@ -130,6 +195,14 @@ fn actor_rejects_effectful_transition_and_non_value_message_type() {
                 .any(|diagnostic| diagnostic.code() == codes::INVALID_ACTOR_DECLARATION),
             "{diagnostics:?}"
         );
+        if source.contains("Callback") {
+            assert!(
+                diagnostics.iter().any(|diagnostic| diagnostic
+                    .render_json()
+                    .is_ok_and(|json| json.contains("message_type_function_not_sendable_local"))),
+                "{diagnostics:?}"
+            );
+        }
     }
 }
 

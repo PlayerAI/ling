@@ -6,8 +6,8 @@
 
 ## Summary
 
-- 50 records: 45 current public, 1 internal, 4 Future.
-- Current public stability: 16 Experimental, 29 Preview, 0 Stable.
+- 50 records: 46 current public, 1 internal, 3 Future.
+- Current public stability: 17 Experimental, 29 Preview, 0 Stable.
 - `Stable` means the ROADMAP-1.0 1.x commitment. No current Seed protocol has passed that gate; stable diagnostic codes remain a documented compatibility subset inside the Preview Diagnostic protocol.
 
 ## Inventory
@@ -39,6 +39,7 @@
 | `PROTO-LSP-WORKSPACE` | Public | LSP | `ling.lsp.workspace/0.1` | `Experimental` | no | no | 3 |
 | `PROTO-LSP-WORKSPACE-SYMBOL` | Public | LSP | `ling.lsp.workspace-symbol/0.1` | `Preview` | no | no | 3 |
 | `PROTO-HUMAN-OUTPUT` | Public | Human output | `0.0.1-dev` | `Preview` | no | no | 4 |
+| `PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION` | Public | JSON | `x-ling-actor/0.1` | `Experimental` | no | yes | 4 |
 | `PROTO-CLI-INIT` | Public | JSON | `ling.init/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-CLI-TEST` | Public | JSON | `ling.test/0.1` | `Preview` | yes | no | 5 |
 | `PROTO-DIAGNOSTIC-JSON` | Public | JSON | `ling.diagnostic/0.1` | `Preview` | yes | no | 8 |
@@ -46,7 +47,7 @@
 | `PROTO-LOCKFILE` | Public | JSON | `ling.lock/1` | `Experimental` | yes | yes | 8 |
 | `PROTO-PACKAGE-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.2` | `Experimental` | yes | yes | 6 |
 | `PROTO-REPL-JSON` | Public | JSON | `ling.repl/0.1` | `Preview` | yes | no | 5 |
-| `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 7 |
+| `PROTO-SEMANTIC-GRAPH-JSON` | Public | JSON | `ling.semantic/0.1` | `Experimental` | yes | yes | 9 |
 | `PROTO-SEMANTIC-QUERY` | Public | JSON | `ling.semantic-query/0.1` | `Preview` | yes | no | 6 |
 | `PROTO-SEMANTIC-TRANSACTION` | Public | JSON | `ling.semantic-transaction/0.1` | `Preview` | yes | no | 6 |
 | `PROTO-SEMANTIC-TRANSACTION-RESULT` | Public | JSON | `ling.semantic-transaction-result/0.1` | `Preview` | yes | no | 6 |
@@ -60,7 +61,6 @@
 | `PROTO-BYTECODE` | Public | Bytecode | `ling.bytecode/1.4` | `Experimental` | no | no | 9 |
 | `PROTO-VM-CONTROL` | Public | Runtime control | `ling.vm.control/0.1` | `Experimental` | no | no | 4 |
 | `PROTO-INTERNAL-INCIDENT` | Internal | Incident | `ling.internal-incident/0.1` | `Internal` | no | no | 1 |
-| `PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION` | Planned public | JSON | — | `Future` | no | no | 0 |
 | `PROTO-REPLAY` | Planned public | Replay | — | `Future` | no | no | 0 |
 | `PROTO-ABI` | Planned public | ABI | — | `Future` | no | no | 0 |
 | `PROTO-EVIDENCE` | Planned public | Evidence | — | `Future` | no | no | 0 |
@@ -392,6 +392,19 @@
 - Fixtures: [`crates/ling-diagnostics/src/lib.rs`](../../crates/ling-diagnostics/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/output_policy.rs`](../../crates/ling-cli/tests/output_policy.rs), [`tests/protocols/cli-output-policy/README.md`](../../tests/protocols/cli-output-policy/README.md)
 - Notes: Stable diagnostic code meanings are a compatibility subset; the surrounding human bytes, message order, and ANSI decoration are Preview, non-canonical human presentation.
 
+### `PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION` — Checked Actor Semantic Graph extension
+
+- Producer: ling-semantic checked Actor snapshot writer
+- Consumer: ling-semantic isolated Actor extension reader; AI and editor tooling experiments
+- Reader policy: Require exact x-ling-actor/0.1; validate Actor definition ownership, SendableLocal class, canonical contiguous node order, normalized field/case order, edge targets, original byte spans, and recomputed ling.actor-message-schema-id/v1 digest; return data only and never executable Core.
+- Writer policy: Emit only from CheckedActorCore and its validated closed local message schema; preserve non-Actor ling.semantic/0.1 bytes and exclude paths, arena IDs, allocation, runtime, mailbox, wire, remote, and host-representation facts.
+- Unknown-field policy: Reject unknown fields inside exact Actor extension objects; the enclosing ling.semantic/0.1 reader continues to accept unrelated x-* namespaces.
+- Migration tool: None; any incompatible change requires Accepted authority, a new extension version, migration notes, and regenerated fixtures.
+- Authority: `DEC-0271`
+- Sources: [`crates/ling-types/src/actor_message.rs`](../../crates/ling-types/src/actor_message.rs), [`crates/ling-effects/src/actor_core.rs`](../../crates/ling-effects/src/actor_core.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/decisions/0271-checked-actor-message-sendability-and-schema.md`](../decisions/0271-checked-actor-message-sendability-and-schema.md), [`docs/decisions/0270-checked-actor-identity-and-state-isolation.md`](../decisions/0270-checked-actor-identity-and-state-isolation.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`docs/governance/protocol-inventory.toml`](../governance/protocol-inventory.toml)
+- Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/actor_boundary.rs`](../../crates/ling-cli/tests/actor_boundary.rs), [`tests/fixtures/actor-message-schema.ling`](../../tests/fixtures/actor-message-schema.ling), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json)
+- Notes: The extension is checked-only and Experimental. No Actor message is executable or serializable; mailbox, turn, runtime, remote delivery, Resource, Managed, Borrow, and Capability transfer remain deferred.
+
 ### `PROTO-CLI-INIT` — Ling project initialization report
 
 - Producer: ling init
@@ -488,13 +501,13 @@
 - Producer: ling-semantic snapshot writer; ling semantic
 - Consumer: ling-semantic isolated reader; ling audit projection; AI and editor tooling experiments
 - Reader policy: Require the exact semantic, language, and Unicode versions; validate IDs, kinds, ownership, references, Prelude invariants, and ordering-independent structure; the returned graph is data only and cannot enter evaluation.
-- Writer policy: Emit deterministic JSON from checked Typed Core with canonical ordering and no source paths, hash-map order, arena indices, allocation addresses, or Rust debug data in identity. Checked Task programs add the DEC-0264 x-ling-task/0.1 extension with signature, source span, lexical scopes, direct spawns, suspension live sets, and cleanup/cancellation identities.
+- Writer policy: Emit deterministic JSON from checked Typed Core with canonical ordering and no source paths, hash-map order, arena indices, allocation addresses, or Rust debug data in identity. Checked Task programs add the DEC-0264 x-ling-task/0.1 extension; checked Actor programs add the DEC-0271 x-ling-actor/0.1 extension with SendableLocal evidence, canonical message schema identity/graph, and original message-type span.
 - Unknown-field policy: Accept x-* extension fields at checked object levels and reject unknown core fields.
 - Migration tool: None; schema or identity changes require an explicit version upgrade, migration notes, and regenerated fixtures.
-- Authority: `DEC-0012`, `RFC-0022`, `DEC-0264`
-- Sources: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/RFC-0022.md`](../RFC-0022.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0264-structured-task-frontend-core.md`](../decisions/0264-structured-task-frontend-core.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
-- Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/task_boundary.rs`](../../crates/ling-cli/tests/task_boundary.rs), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`schemas/semantic/0.1/valid`](../../schemas/semantic/0.1/valid), [`schemas/semantic/0.1/invalid`](../../schemas/semantic/0.1/invalid), [`schemas/semantic/0.1/canonical`](../../schemas/semantic/0.1/canonical)
-- Notes: GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.; RFC-0022 defines the optional Experimental x-ling-trait-ide witness/member projection; it does not add a core field or an LSP wire method.; Accepted DEC-0264 adds the optional Experimental x-ling-task/0.1 checked-only projection without changing non-Task ling.semantic/0.1 bytes or authorizing execution.
+- Authority: `DEC-0012`, `RFC-0022`, `DEC-0264`, `DEC-0271`
+- Sources: [`crates/ling-types/src/actor_message.rs`](../../crates/ling-types/src/actor_message.rs), [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`docs/RFC-0022.md`](../RFC-0022.md), [`docs/decisions/0012-semantic-identity-and-canonical-bytes.md`](../decisions/0012-semantic-identity-and-canonical-bytes.md), [`docs/decisions/0264-structured-task-frontend-core.md`](../decisions/0264-structured-task-frontend-core.md), [`docs/decisions/0271-checked-actor-message-sendability-and-schema.md`](../decisions/0271-checked-actor-message-sendability-and-schema.md), [`schemas/registry.toml`](../../schemas/registry.toml), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`tools/xtask/src/schema.rs`](../../tools/xtask/src/schema.rs)
+- Fixtures: [`crates/ling-semantic/src/lib.rs`](../../crates/ling-semantic/src/lib.rs), [`crates/ling-cli/tests/conformance.rs`](../../crates/ling-cli/tests/conformance.rs), [`crates/ling-cli/tests/task_boundary.rs`](../../crates/ling-cli/tests/task_boundary.rs), [`crates/ling-cli/tests/actor_boundary.rs`](../../crates/ling-cli/tests/actor_boundary.rs), [`tests/fixtures/actor-message-schema.ling`](../../tests/fixtures/actor-message-schema.ling), [`schemas/semantic/0.1/schema.json`](../../schemas/semantic/0.1/schema.json), [`schemas/semantic/0.1/valid`](../../schemas/semantic/0.1/valid), [`schemas/semantic/0.1/invalid`](../../schemas/semantic/0.1/invalid), [`schemas/semantic/0.1/canonical`](../../schemas/semantic/0.1/canonical)
+- Notes: GAP-SEMANTIC-PROTOCOL-LIFECYCLE-001 keeps Stable versus Experimental fields and cross-version migration open.; RFC-0022 defines the optional Experimental x-ling-trait-ide witness/member projection; it does not add a core field or an LSP wire method.; Accepted DEC-0264 adds the optional Experimental x-ling-task/0.1 checked-only projection without changing non-Task ling.semantic/0.1 bytes or authorizing execution.; Accepted DEC-0271 adds the optional Experimental x-ling-actor/0.1 checked-only projection; non-Actor bytes remain unchanged and Actor execution, mailbox, serialization, and remote delivery remain unavailable.
 
 ### `PROTO-SEMANTIC-QUERY` — Semantic Query response
 
@@ -664,19 +677,6 @@
 - Sources: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Fixtures: [`crates/ling-cli/src/incident.rs`](../../crates/ling-cli/src/incident.rs)
 - Notes: This record prevents a versioned implementation artifact from being mistaken for a public 1.x commitment; it is not the Future evidence-bundle protocol.
-
-### `PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION` — Planned checked Actor Semantic Graph extension
-
-- Producer: Future ling-semantic checked Actor snapshot writer
-- Consumer: Future ling-semantic isolated Actor extension reader; Future AI and editor tooling experiments
-- Reader policy: Accepted DEC-0271 requires the future reader to require exact x-ling-actor/0.1, validate Actor definitions, SendableLocal closure, schema identities, canonical graph order, edge targets, original byte spans, and recomputed digests, and remain data-only. No reader is implemented yet.
-- Writer policy: Accepted DEC-0271 requires the future writer to emit the extension only from CheckedActorCore and its validated closed local message schema, preserve non-Actor ling.semantic/0.1 bytes, and exclude paths, arena IDs, allocation, runtime, mailbox, wire, remote, and host-representation facts. No writer is implemented yet.
-- Unknown-field policy: Planned exact extension objects reject unknown core fields; the enclosing ling.semantic/0.1 reader continues to accept unrelated x-* namespaces.
-- Migration tool: None; the extension is not implemented or published, and any incompatible future change requires Accepted authority, a new version, and migration evidence.
-- Authority: `DEC-0271`
-- Sources: [`docs/decisions/0271-checked-actor-message-sendability-and-schema.md`](../decisions/0271-checked-actor-message-sendability-and-schema.md), [`docs/decisions/0270-checked-actor-identity-and-state-isolation.md`](../decisions/0270-checked-actor-identity-and-state-isolation.md), [`docs/governance/protocol-inventory.toml`](../governance/protocol-inventory.toml)
-- Fixtures: —
-- Notes: Accepted DEC-0271 authorizes implementation of x-ling-actor/0.1 and ling.actor-message-schema-id/v1; the protocol remains Future and unimplemented until its writer, isolated reader, schema fixtures, and conformance evidence pass. No Actor message is executable or serializable.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

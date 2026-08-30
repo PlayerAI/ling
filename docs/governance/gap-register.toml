@@ -285,8 +285,10 @@ next_action = "Retain RFC-0027 for the bounded CLI proposal and RFC-0041 for che
 resolution = []
 superseded_by = ""
 observed_markers = [
+  "experimental:crates/ling-cli/tests/actor_boundary.rs",
   "experimental:crates/ling-cli/src/semantic_commands.rs",
   "experimental:crates/ling-cli/tests/semantic_commands.rs",
+  "experimental:crates/ling-types/src/actor_message.rs",
 ]
 
 [[gap]]

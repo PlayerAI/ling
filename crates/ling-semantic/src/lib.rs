@@ -19,6 +19,7 @@ pub const PROJECT_SEMANTIC_SCHEMA: &str = "ling.semantic/0.2";
 pub const LANGUAGE_VERSION: &str = "0.0.1-dev";
 pub const TRAIT_IDE_EXTENSION_VERSION: &str = "0.1";
 pub const TASK_GRAPH_EXTENSION_VERSION: &str = "0.1";
+pub const ACTOR_GRAPH_EXTENSION_VERSION: &str = "0.1";
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BodyId(String);
@@ -82,6 +83,67 @@ pub struct SemanticGraph {
         skip_serializing_if = "Option::is_none"
     )]
     pub task: Option<SemanticTaskProjection>,
+    #[serde(
+        rename = "x-ling-actor",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub actor: Option<SemanticActorProjection>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SemanticActorProjection {
+    pub version: String,
+    pub actors: Vec<SemanticActor>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SemanticActor {
+    pub definition_id: String,
+    pub message_type: String,
+    pub sendability: String,
+    pub schema_id: String,
+    pub root: u32,
+    pub span: SemanticByteSpan,
+    pub nodes: Vec<SemanticActorSchemaNode>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SemanticActorSchemaNode {
+    pub id: u32,
+    pub kind: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub definition: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub arguments: Vec<u32>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub elements: Vec<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub element: Option<u32>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub fields: Vec<SemanticActorField>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub cases: Vec<SemanticActorCase>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SemanticActorField {
+    pub name: String,
+    pub value: u32,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SemanticActorCase {
+    pub definition: String,
+    pub name: String,
+    pub payload: Option<u32>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -666,6 +728,9 @@ impl ProgramSnapshot {
             })
             .collect::<BTreeMap<_, _>>();
         for definition in &self.graph.definitions {
+            if definition.kind == "actor" {
+                continue;
+            }
             let info = resolved
                 .definitions()
                 .values()
@@ -1108,6 +1173,9 @@ pub enum SemanticReadErrorKind {
     InvalidTaskProjection {
         reason: String,
     },
+    InvalidActorProjection {
+        reason: String,
+    },
     InvalidAuditTask {
         reason: String,
     },
@@ -1268,6 +1336,7 @@ pub fn validate_audit_model(model: &AuditModel) -> Result<(), SemanticReadError>
             .collect(),
         trait_ide: None,
         task: None,
+        actor: None,
     };
     validate_graph(&graph, IdentityMode::Seed)?;
     let task_definitions = model
@@ -2080,7 +2149,7 @@ fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), Seman
         }
         if !matches!(
             definition.kind.as_str(),
-            "value" | "task" | "type" | "constructor" | "builtin" | "trait-member"
+            "value" | "task" | "actor" | "type" | "constructor" | "builtin" | "trait-member"
         ) {
             return Err(SemanticReadError {
                 kind: SemanticReadErrorKind::InvalidDefinitionKind {
@@ -2315,6 +2384,7 @@ fn validate_graph(graph: &SemanticGraph, mode: IdentityMode) -> Result<(), Seman
     }
     validate_trait_ide(graph)?;
     validate_task_projection(graph)?;
+    validate_actor_projection(graph)?;
     Ok(())
 }
 
@@ -2437,6 +2507,267 @@ fn invalid_task_projection(path: &str, reason: &str) -> SemanticReadError {
         },
         path: path.to_owned(),
     }
+}
+
+fn validate_actor_projection(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
+    let actor_definitions = graph
+        .definitions
+        .iter()
+        .filter(|definition| definition.kind == "actor")
+        .map(|definition| (definition.definition_id.as_str(), definition))
+        .collect::<BTreeMap<_, _>>();
+    let Some(projection) = &graph.actor else {
+        return if actor_definitions.is_empty() {
+            Ok(())
+        } else {
+            Err(invalid_actor_projection(
+                "$.x-ling-actor",
+                "checked Actor definitions require the Actor projection",
+            ))
+        };
+    };
+    if projection.version != ACTOR_GRAPH_EXTENSION_VERSION {
+        return Err(invalid_actor_projection(
+            "$.x-ling-actor.version",
+            "unsupported Actor projection version",
+        ));
+    }
+    if projection.actors.len() != actor_definitions.len() {
+        return Err(invalid_actor_projection(
+            "$.x-ling-actor.actors",
+            "Actor projection must cover every checked Actor definition exactly once",
+        ));
+    }
+    let mut previous_definition: Option<&str> = None;
+    for (actor_index, actor) in projection.actors.iter().enumerate() {
+        let path = format!("$.x-ling-actor.actors[{actor_index}]");
+        if previous_definition.is_some_and(|previous| previous >= actor.definition_id.as_str()) {
+            return Err(invalid_actor_projection(
+                &path,
+                "Actor definitions must be unique and strictly sorted",
+            ));
+        }
+        previous_definition = Some(&actor.definition_id);
+        let Some(definition) = actor_definitions.get(actor.definition_id.as_str()) else {
+            return Err(invalid_actor_projection(
+                &path,
+                "Actor projection owner is not a checked Actor definition",
+            ));
+        };
+        validate_id(&actor.definition_id, &format!("{path}.definition_id"))?;
+        validate_id(&actor.schema_id, &format!("{path}.schema_id"))?;
+        if actor.message_type.is_empty()
+            || !definition.type_name.contains(&actor.message_type)
+            || actor.sendability != "SendableLocal(Value)"
+            || actor.span.start > actor.span.end
+            || actor.nodes.is_empty()
+            || usize::try_from(actor.root)
+                .ok()
+                .is_none_or(|root| root >= actor.nodes.len())
+        {
+            return Err(invalid_actor_projection(
+                &path,
+                "Actor message type, SendableLocal class, root, owner, or span is invalid",
+            ));
+        }
+        validate_actor_nodes(actor, &path)?;
+        let expected = format!(
+            "experimental:blake3:{}",
+            blake3::hash(&actor_schema_bytes(actor.root, &actor.nodes)).to_hex()
+        );
+        if actor.schema_id != expected {
+            return Err(invalid_actor_projection(
+                &format!("{path}.schema_id"),
+                "Actor message schema digest does not match its canonical graph",
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn validate_actor_nodes(actor: &SemanticActor, path: &str) -> Result<(), SemanticReadError> {
+    let node_count = u32::try_from(actor.nodes.len()).unwrap_or(u32::MAX);
+    for (node_index, node) in actor.nodes.iter().enumerate() {
+        let node_path = format!("{path}.nodes[{node_index}]");
+        if node.id != u32::try_from(node_index).unwrap_or(u32::MAX) {
+            return Err(invalid_actor_projection(
+                &node_path,
+                "Actor message schema nodes must use contiguous canonical IDs",
+            ));
+        }
+        let targets_valid = |targets: &[u32]| targets.iter().all(|target| *target < node_count);
+        let shape_valid = match node.kind.as_str() {
+            "primitive" => {
+                matches!(
+                    node.name.as_deref(),
+                    Some("Unit" | "Bool" | "Int" | "Float64" | "Text")
+                ) && node.definition.is_none()
+                    && node.arguments.is_empty()
+                    && node.elements.is_empty()
+                    && node.element.is_none()
+                    && node.fields.is_empty()
+                    && node.cases.is_empty()
+            }
+            "tuple" => {
+                node.name.is_none()
+                    && node.definition.is_none()
+                    && node.arguments.is_empty()
+                    && !node.elements.is_empty()
+                    && targets_valid(&node.elements)
+                    && node.element.is_none()
+                    && node.fields.is_empty()
+                    && node.cases.is_empty()
+            }
+            "list" => {
+                node.name.is_none()
+                    && node.definition.is_none()
+                    && node.arguments.is_empty()
+                    && node.elements.is_empty()
+                    && node.element.is_some_and(|element| element < node_count)
+                    && node.fields.is_empty()
+                    && node.cases.is_empty()
+            }
+            "record" => {
+                node.name.is_none()
+                    && node.definition.is_some()
+                    && targets_valid(&node.arguments)
+                    && node.elements.is_empty()
+                    && node.element.is_none()
+                    && node.cases.is_empty()
+                    && strictly_sorted_actor_fields(&node.fields, node_count)
+            }
+            "variant" => {
+                node.name.is_none()
+                    && node.definition.is_some()
+                    && targets_valid(&node.arguments)
+                    && node.elements.is_empty()
+                    && node.element.is_none()
+                    && node.fields.is_empty()
+                    && !node.cases.is_empty()
+                    && strictly_sorted_actor_cases(&node.cases, node_count)
+            }
+            _ => false,
+        };
+        if !shape_valid {
+            return Err(invalid_actor_projection(
+                &node_path,
+                "Actor message schema node kind, shape, order, or edge target is invalid",
+            ));
+        }
+        if let Some(definition) = &node.definition {
+            validate_id(definition, &format!("{node_path}.definition"))?;
+        }
+        for (case_index, case) in node.cases.iter().enumerate() {
+            validate_id(
+                &case.definition,
+                &format!("{node_path}.cases[{case_index}].definition"),
+            )?;
+        }
+    }
+    Ok(())
+}
+
+fn strictly_sorted_actor_fields(fields: &[SemanticActorField], node_count: u32) -> bool {
+    let mut previous: Option<&str> = None;
+    fields.iter().all(|field| {
+        let ordered = previous.is_none_or(|value| value < field.name.as_str());
+        previous = Some(&field.name);
+        ordered && !field.name.is_empty() && field.value < node_count
+    })
+}
+
+fn strictly_sorted_actor_cases(cases: &[SemanticActorCase], node_count: u32) -> bool {
+    let mut previous: Option<&str> = None;
+    cases.iter().all(|case| {
+        let ordered = previous.is_none_or(|value| value < case.name.as_str());
+        previous = Some(&case.name);
+        ordered && !case.name.is_empty() && case.payload.is_none_or(|payload| payload < node_count)
+    })
+}
+
+fn invalid_actor_projection(path: &str, reason: &str) -> SemanticReadError {
+    SemanticReadError {
+        kind: SemanticReadErrorKind::InvalidActorProjection {
+            reason: reason.to_owned(),
+        },
+        path: path.to_owned(),
+    }
+}
+
+fn actor_schema_bytes(root: u32, nodes: &[SemanticActorSchemaNode]) -> Vec<u8> {
+    let mut output = Vec::new();
+    actor_push_text(&mut output, ling_types::ACTOR_MESSAGE_SCHEMA_DOMAIN);
+    actor_push_text(&mut output, LANGUAGE_VERSION);
+    actor_push_u32(&mut output, root);
+    actor_push_u32(&mut output, u32::try_from(nodes.len()).unwrap_or(u32::MAX));
+    for node in nodes {
+        actor_push_u32(&mut output, node.id);
+        match node.kind.as_str() {
+            "primitive" => {
+                output.push(0);
+                actor_push_text(&mut output, node.name.as_deref().unwrap_or_default());
+            }
+            "tuple" => {
+                output.push(1);
+                actor_push_ids(&mut output, &node.elements);
+            }
+            "list" => {
+                output.push(2);
+                actor_push_u32(&mut output, node.element.unwrap_or(u32::MAX));
+            }
+            "record" => {
+                output.push(3);
+                actor_push_text(&mut output, node.definition.as_deref().unwrap_or_default());
+                actor_push_ids(&mut output, &node.arguments);
+                actor_push_u32(
+                    &mut output,
+                    u32::try_from(node.fields.len()).unwrap_or(u32::MAX),
+                );
+                for field in &node.fields {
+                    actor_push_text(&mut output, &field.name);
+                    actor_push_u32(&mut output, field.value);
+                }
+            }
+            "variant" => {
+                output.push(4);
+                actor_push_text(&mut output, node.definition.as_deref().unwrap_or_default());
+                actor_push_ids(&mut output, &node.arguments);
+                actor_push_u32(
+                    &mut output,
+                    u32::try_from(node.cases.len()).unwrap_or(u32::MAX),
+                );
+                for case in &node.cases {
+                    actor_push_text(&mut output, &case.definition);
+                    actor_push_text(&mut output, &case.name);
+                    match case.payload {
+                        Some(payload) => {
+                            output.push(1);
+                            actor_push_u32(&mut output, payload);
+                        }
+                        None => output.push(0),
+                    }
+                }
+            }
+            _ => output.push(u8::MAX),
+        }
+    }
+    output
+}
+
+fn actor_push_ids(output: &mut Vec<u8>, values: &[u32]) {
+    actor_push_u32(output, u32::try_from(values.len()).unwrap_or(u32::MAX));
+    for value in values {
+        actor_push_u32(output, *value);
+    }
+}
+
+fn actor_push_text(output: &mut Vec<u8>, value: &str) {
+    actor_push_u32(output, u32::try_from(value.len()).unwrap_or(u32::MAX));
+    output.extend_from_slice(value.as_bytes());
+}
+
+fn actor_push_u32(output: &mut Vec<u8>, value: u32) {
+    output.extend_from_slice(&value.to_le_bytes());
 }
 
 fn validate_trait_ide(graph: &SemanticGraph) -> Result<(), SemanticReadError> {
@@ -2833,6 +3164,7 @@ impl SnapshotBuilder {
         let references = self.references();
         let trait_ide = self.trait_ide();
         let task = self.task_projection();
+        let actor = self.actor_projection();
         let graph = SemanticGraph {
             schema: SEMANTIC_SCHEMA.to_owned(),
             language_version: LANGUAGE_VERSION.to_owned(),
@@ -2856,6 +3188,7 @@ impl SnapshotBuilder {
             references,
             trait_ide,
             task,
+            actor,
         };
         let json = serde_json::to_string(&graph).map_err(SnapshotError::Serialization)?;
         Ok(ProgramSnapshot {
@@ -2876,6 +3209,7 @@ impl SnapshotBuilder {
         let references = self.references();
         let trait_ide = self.trait_ide();
         let task = self.task_projection();
+        let actor = self.actor_projection();
         let project = self
             .checked
             .typed()
@@ -2918,6 +3252,7 @@ impl SnapshotBuilder {
             references,
             trait_ide,
             task,
+            actor,
         };
         let json = serde_json::to_string(&graph).map_err(ProjectSnapshotError::Serialization)?;
         Ok(ProjectProgramSnapshot {
@@ -2935,7 +3270,9 @@ impl SnapshotBuilder {
             .resolved()
             .definitions()
             .iter()
-            .filter(|(_, info)| info.kind != DefinitionKind::Actor)
+            .filter(|(_, info)| {
+                self.mode == IdentityMode::Seed || info.kind != DefinitionKind::Actor
+            })
             .map(|(definition, _)| {
                 let mut encoder = Encoder::new(self.mode.body_domain());
                 encoder.string(LANGUAGE_VERSION);
@@ -3159,6 +3496,100 @@ impl SnapshotBuilder {
         })
     }
 
+    fn actor_projection(&self) -> Option<SemanticActorProjection> {
+        if self.mode != IdentityMode::Seed || self.checked.actor_cores().is_empty() {
+            return None;
+        }
+        let typed = self.checked.typed();
+        let actors = self
+            .checked
+            .actor_cores()
+            .values()
+            .map(|core| {
+                let contract = core.message_contract();
+                let nodes = contract
+                    .schema()
+                    .nodes()
+                    .iter()
+                    .map(|node| {
+                        let mut semantic = SemanticActorSchemaNode {
+                            id: node.id,
+                            kind: String::new(),
+                            name: None,
+                            definition: None,
+                            arguments: Vec::new(),
+                            elements: Vec::new(),
+                            element: None,
+                            fields: Vec::new(),
+                            cases: Vec::new(),
+                        };
+                        match &node.kind {
+                            ling_types::ActorMessageSchemaNodeKind::Primitive { name } => {
+                                semantic.kind = "primitive".to_owned();
+                                semantic.name = Some((*name).to_owned());
+                            }
+                            ling_types::ActorMessageSchemaNodeKind::Tuple { elements } => {
+                                semantic.kind = "tuple".to_owned();
+                                semantic.elements.clone_from(elements);
+                            }
+                            ling_types::ActorMessageSchemaNodeKind::List { element } => {
+                                semantic.kind = "list".to_owned();
+                                semantic.element = Some(*element);
+                            }
+                            ling_types::ActorMessageSchemaNodeKind::Record {
+                                definition,
+                                arguments,
+                                fields,
+                            } => {
+                                semantic.kind = "record".to_owned();
+                                semantic.definition = Some(definition.to_string());
+                                semantic.arguments.clone_from(arguments);
+                                semantic.fields = fields
+                                    .iter()
+                                    .map(|field| SemanticActorField {
+                                        name: field.name.clone(),
+                                        value: field.value,
+                                    })
+                                    .collect();
+                            }
+                            ling_types::ActorMessageSchemaNodeKind::Variant {
+                                definition,
+                                arguments,
+                                cases,
+                            } => {
+                                semantic.kind = "variant".to_owned();
+                                semantic.definition = Some(definition.to_string());
+                                semantic.arguments.clone_from(arguments);
+                                semantic.cases = cases
+                                    .iter()
+                                    .map(|case| SemanticActorCase {
+                                        definition: case.definition.to_string(),
+                                        name: case.name.clone(),
+                                        payload: case.payload,
+                                    })
+                                    .collect();
+                            }
+                        }
+                        semantic
+                    })
+                    .collect();
+                SemanticActor {
+                    definition_id: core.definition().to_string(),
+                    message_type: typed.display_type(core.message_type()),
+                    sendability: contract.sendability().as_str().to_owned(),
+                    schema_id: contract.schema().id().as_str().to_owned(),
+                    root: contract.schema().root(),
+                    span: semantic_byte_span(contract.source_span()),
+                    nodes,
+                }
+            })
+            .collect();
+        Some(SemanticActorProjection {
+            version: ACTOR_GRAPH_EXTENSION_VERSION.to_owned(),
+            actors,
+        })
+    }
+
     fn modules(&self) -> Vec<SemanticModule> {
         let resolved = self.checked.typed().resolved();
         let mut modules = resolved
@@ -3211,7 +3642,9 @@ impl SnapshotBuilder {
             .resolved()
             .definitions()
             .iter()
-            .filter(|(_, definition)| definition.kind != DefinitionKind::Actor)
+            .filter(|(_, definition)| {
+                self.mode == IdentityMode::Seed || definition.kind != DefinitionKind::Actor
+            })
             .map(|(id, definition)| {
                 let effects = self
                     .checked
@@ -3691,6 +4124,9 @@ impl SnapshotBuilder {
                         self.encode_pattern(module, pattern, encoder);
                     }
                     self.encode_expression(module, &task.body, encoder);
+                } else if let Some(actor) = self.checked.actor_core(definition) {
+                    encoder.u8(5);
+                    encoder.bytes(actor.canonical_bytes());
                 } else if let Some(member) = typed.resolved().impl_member(definition) {
                     let value = resolved_module
                         .hir
@@ -4891,7 +5327,7 @@ fn definition_kind(kind: DefinitionKind) -> &'static str {
     match kind {
         DefinitionKind::Value => "value",
         DefinitionKind::Task => "task",
-        DefinitionKind::Actor => "type",
+        DefinitionKind::Actor => "actor",
         DefinitionKind::Type => "type",
         DefinitionKind::Constructor => "constructor",
         DefinitionKind::Builtin => "builtin",
@@ -5109,6 +5545,103 @@ mod tests {
         assert_eq!(first.json(), second.json());
         assert_eq!(first.program_id(), second.program_id());
         assert!(first.json().contains("\"schema\":\"ling.semantic/0.1\""));
+        assert!(first.graph().actor.is_none());
+        assert!(!first.json().contains("x-ling-actor"));
+    }
+
+    #[test]
+    fn checked_actor_publishes_canonical_message_projection() {
+        let source = concat!(
+            "module Main\n\n",
+            "type Envelope<'a> = { payload: 'a }\n",
+            "type Tree<'a> =\n",
+            "    | Branch of List<Tree<'a>>\n",
+            "    | Leaf of 'a\n\n",
+            "actor Inbox : Envelope<Tree<Int>> =\n",
+            "    state Int = 0\n",
+            "    receive state message =\n",
+            "        state\n",
+        );
+        let first = snapshot_named("actor-a.ling", source);
+        let second = snapshot_named("actor-b.ling", &source.replace('\n', "\r\n"));
+        let projection = first.graph().actor.as_ref().expect("Actor extension");
+        assert_eq!(projection.version, ACTOR_GRAPH_EXTENSION_VERSION);
+        assert_eq!(projection.actors.len(), 1);
+        let actor = &projection.actors[0];
+        assert_eq!(actor.sendability, "SendableLocal(Value)");
+        assert!(actor.schema_id.starts_with("experimental:blake3:"));
+        assert!(actor.nodes.iter().any(|node| node.kind == "record"));
+        assert!(actor.nodes.iter().any(|node| node.kind == "variant"));
+        assert!(actor.nodes.iter().any(|node| node.kind == "list"));
+        assert_eq!(first.program_id(), second.program_id());
+        assert_eq!(
+            actor.schema_id,
+            second
+                .graph()
+                .actor
+                .as_ref()
+                .expect("Actor extension")
+                .actors[0]
+                .schema_id
+        );
+        read_json(first.json()).expect("isolated reader validates the emitted extension");
+        validate_audit_model(&first.audit_model())
+            .expect("Actor extension does not imply an Audit Source Actor projection");
+
+        let changed = snapshot(&source.replace("Envelope<Tree<Int>>", "Envelope<Tree<Text>>"));
+        assert_ne!(first.program_id(), changed.program_id());
+        assert_ne!(
+            actor.schema_id,
+            changed
+                .graph()
+                .actor
+                .as_ref()
+                .expect("Actor extension")
+                .actors[0]
+                .schema_id
+        );
+    }
+
+    #[test]
+    fn actor_projection_reader_rejects_independent_corruptions() {
+        let snapshot = snapshot(concat!(
+            "module Main\n\n",
+            "type Message = { values: List<Int> }\n\n",
+            "actor Inbox : Message =\n",
+            "    state Int = 0\n",
+            "    receive state message =\n",
+            "        state\n",
+        ));
+        let value = serde_json::from_str::<serde_json::Value>(snapshot.json())
+            .expect("valid semantic JSON");
+
+        let mut bad_version = value.clone();
+        bad_version["x-ling-actor"]["version"] = serde_json::json!("9.9");
+        assert!(read_json(&bad_version.to_string()).is_err());
+
+        let mut bad_digest = value.clone();
+        bad_digest["x-ling-actor"]["actors"][0]["schema_id"] =
+            serde_json::json!(format!("experimental:blake3:{}", "0".repeat(64)));
+        assert!(read_json(&bad_digest.to_string()).is_err());
+
+        let mut bad_span = value.clone();
+        bad_span["x-ling-actor"]["actors"][0]["span"]["start"] = serde_json::json!(u32::MAX);
+        assert!(read_json(&bad_span.to_string()).is_err());
+
+        let mut bad_edge = value.clone();
+        let nodes = bad_edge["x-ling-actor"]["actors"][0]["nodes"]
+            .as_array_mut()
+            .expect("schema nodes");
+        let list = nodes
+            .iter_mut()
+            .find(|node| node["kind"] == "list")
+            .expect("List node");
+        list["element"] = serde_json::json!(u32::MAX);
+        assert!(read_json(&bad_edge.to_string()).is_err());
+
+        let mut unknown_field = value;
+        unknown_field["x-ling-actor"]["actors"][0]["runtime_mailbox"] = serde_json::json!(true);
+        assert!(read_json(&unknown_field.to_string()).is_err());
     }
 
     #[test]

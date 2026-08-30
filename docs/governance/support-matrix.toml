@@ -589,10 +589,10 @@ implemented = true
 
 [[protocol]]
 id = "PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION"
-visibility = "Planned public"
-version = ""
-stability = "Future"
-implemented = false
+visibility = "Public"
+version = "x-ling-actor/0.1"
+stability = "Experimental"
+implemented = true
 
 [[protocol]]
 id = "PROTO-REPLAY"
