@@ -10151,7 +10151,7 @@ notes = [
 [[task]]
 id = "ACT-2302"
 title = "Actor message sendability checking"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10192,20 +10192,20 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing Sendable judgment, cross-turn borrow, Resource move/copy/drop, Managed sharing, Capability non-forgery, message schema, local/remote, runtime, diagnostics, schemas, and migration contracts.",
-  "The audit distinguishes current Seed value/borrow restrictions and local State/Capability behavior from the missing Actor message authority and preserves the checked-only evaluation boundary.",
-  "The audit covers active-borrow rejection, Resource move/copy/drop, profile-dependent Managed sharing, Capability forgery, nested/recursive messages, schema/version mismatch, local/remote serialization, cancellation/Fault cleanup, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM differential fixtures.",
-  "No Sendable trait/judgment, message type checker, cross-turn borrow rule, Resource move/copy pass, Managed sharing rule, Capability filter, message schema, diagnostic allocation, or placeholder G2 API is added while the authority is absent.",
-  "The future checker must consume accepted types and checked Core only, reject cross-turn borrows and forged Capabilities, enforce Resource/Managed rules, register canonical message schemas, and publish interpreter/VM sendability evidence before exposing Actor messages.",
+  "Accepted DEC-0271 authorizes only the bounded checked-only SendableLocal judgment, canonical local message schema, and optional Experimental x-ling-actor/0.1 Semantic Graph projection.",
+  "The implementation must consume checked types and CheckedActorCore, default-deny unsupported and future categories, and preserve original UTF-8 message-type spans.",
+  "Resource, Managed, Borrow, Capability transfer, mailbox/runtime, serialization, remote delivery, and executable Actor behavior remain rejected and intentionally deferred.",
+  "Completion requires positive, negative, recursive, deterministic, reader-corruption, Unicode/BOM/CRLF, schema-collision, and no-execution evidence plus current protocol and status traceability.",
+  "Acceptance changes governance authority and task readiness only; it does not claim that SendableLocal, message schemas, or x-ling-actor/0.1 are already implemented.",
   "Accepted DEC-0096 authorizes only the publish-disabled message-schema identity child; it does not authorize Sendable, ownership, Resource/Managed, Capability, payload typing, serialization, mailbox, or runtime behavior.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "ACT-2301 is Done under Accepted DEC-0270, so the dependency is satisfied; ACT-2302 remains BlockedSpec because DEC-0270 explicitly defers Sendable/schema semantics and DEC-0271 is only Proposed.",
-  "Proposed DEC-0271 selects a checked-only local Value Sendable judgment and x-ling-actor/0.1 schema projection while default-denying Borrow, Resource, Managed, Capability transfer, runtime, and remote categories; it cannot authorize implementation before acceptance.",
+  "ACT-2301 is Done under Accepted DEC-0270, and Accepted DEC-0271 now authorizes the bounded checked-only SendableLocal and message-schema implementation; ACT-2302 is Ready.",
+  "Accepted DEC-0271 selects a checked-only local Value Sendable judgment and x-ling-actor/0.1 schema projection while default-denying Borrow, Resource, Managed, Capability transfer, runtime, and remote categories.",
   "Current checked Actor Core carries DEC-0270's message TypeId and conservative closed-Value admission, but there is no named Sendable judgment, Borrow/Move/Resource/Managed type surface, source ActorRef, canonical message schema projection, send operation, or local/remote serialization; the private predicate is not a cross-turn proof.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, ownership checker, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]

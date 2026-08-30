@@ -669,14 +669,14 @@
 
 - Producer: Future ling-semantic checked Actor snapshot writer
 - Consumer: Future ling-semantic isolated Actor extension reader; Future AI and editor tooling experiments
-- Reader policy: Planned DEC-0271 reader requires exact x-ling-actor/0.1, validates Actor definitions, SendableLocal closure, schema identities, canonical graph order, edge targets, original byte spans, and recomputed digests, and remains data-only. No reader is implemented while DEC-0271 is Proposed.
-- Writer policy: Planned DEC-0271 writer emits the extension only from CheckedActorCore and its validated closed local message schema, preserves non-Actor ling.semantic/0.1 bytes, and excludes paths, arena IDs, allocation, runtime, mailbox, wire, remote, and host-representation facts. No writer is implemented while DEC-0271 is Proposed.
+- Reader policy: Accepted DEC-0271 requires the future reader to require exact x-ling-actor/0.1, validate Actor definitions, SendableLocal closure, schema identities, canonical graph order, edge targets, original byte spans, and recomputed digests, and remain data-only. No reader is implemented yet.
+- Writer policy: Accepted DEC-0271 requires the future writer to emit the extension only from CheckedActorCore and its validated closed local message schema, preserve non-Actor ling.semantic/0.1 bytes, and exclude paths, arena IDs, allocation, runtime, mailbox, wire, remote, and host-representation facts. No writer is implemented yet.
 - Unknown-field policy: Planned exact extension objects reject unknown core fields; the enclosing ling.semantic/0.1 reader continues to accept unrelated x-* namespaces.
 - Migration tool: None; the extension is not implemented or published, and any incompatible future change requires Accepted authority, a new version, and migration evidence.
 - Authority: `DEC-0271`
 - Sources: [`docs/decisions/0271-checked-actor-message-sendability-and-schema.md`](../decisions/0271-checked-actor-message-sendability-and-schema.md), [`docs/decisions/0270-checked-actor-identity-and-state-isolation.md`](../decisions/0270-checked-actor-identity-and-state-isolation.md), [`docs/governance/protocol-inventory.toml`](../governance/protocol-inventory.toml)
 - Fixtures: —
-- Notes: DEC-0271 proposes x-ling-actor/0.1 and ling.actor-message-schema-id/v1 but cannot authorize implementation; no current Semantic Graph writer emits the extension, no schema fixture exists, and no Actor message is executable or serializable.
+- Notes: Accepted DEC-0271 authorizes implementation of x-ling-actor/0.1 and ling.actor-message-schema-id/v1; the protocol remains Future and unimplemented until its writer, isolated reader, schema fixtures, and conformance evidence pass. No Actor message is executable or serializable.
 
 ### `PROTO-REPLAY` — Deterministic replay log
 

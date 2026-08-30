@@ -971,7 +971,7 @@ superseded_by = ""
                 .iter()
                 .filter(|record| record.status == "Accepted")
                 .count(),
-            311
+            312
         );
         assert_eq!(
             registry

@@ -2,19 +2,15 @@
 
 ## Outcome
 
-`ACT-2302` remains correctly recorded as `BlockedSpec`. Its dependency
-`ACT-2301` is now `Done` under Accepted `DEC-0270`, but that decision explicitly
-defers Sendable and message-schema semantics. The G2 plan requires the
-checker to reject messages carrying active cross-turn borrows, define
-Resource move/copy behavior, use profile-specific Managed sharing rules,
-prevent Capability forgery through ordinary messages, and place message
-schemas in the Semantic Graph. Proposed `DEC-0271` selects a bounded checked-only
-local Value profile and an Experimental graph extension, but it is not
-implementation authority until Accepted.
+`ACT-2302` is correctly recorded as `Ready`. Its dependency `ACT-2301` is
+`Done` under Accepted `DEC-0270`, and Accepted `DEC-0271` now authorizes the
+bounded checked-only local Value profile, canonical local message schema, and
+Experimental Semantic Graph extension needed by this task.
 
-No Sendable trait/judgment, message type checker, cross-turn borrow rule,
-Resource move/copy pass, Managed sharing rule, Capability filter, message
-schema, diagnostic allocation, or placeholder G2 API was added.
+Acceptance changes authority only. No Sendable judgment, message schema,
+Semantic Graph extension, diagnostic behavior, or placeholder G2 API has yet
+been implemented; those changes remain ACT-2302 work and must satisfy the
+Accepted decision's completion boundary before the task can become `Done`.
 
 Accepted `DEC-0096` authorizes the bounded child
 `ACT-2302-MESSAGE-SCHEMA-MODEL`, which records only immutable schema/field
@@ -26,10 +22,10 @@ serialization, mailbox, or runtime gap listed below.
 - The G2 execution package is non-normative; its sendability checklist does
   not authorize a new type judgment, ownership model, schema, or Capability
   boundary.
-- ACT-2301 is `Done` under Accepted DEC-0270. Clause 10 deliberately limits
-  ACT-2301 to closed ordinary Value message types and states that this is not
-  the ACT-2302 Sendable rule. No Accepted RFC-0009/C203 or replacement message
-  decision exists; RFC-0001 remains a Draft baseline under DEC-0018.
+- ACT-2301 is `Done` under Accepted DEC-0270. Accepted DEC-0271 replaces the
+  previously missing ACT-2302 authority with a deliberately bounded
+  `SendableLocal(T)` judgment; RFC-0001 remains a Draft baseline under
+  DEC-0018 and does not broaden that judgment.
 - `docs/SEMANTICS.md` describes future Borrow/Move/Resource, Managed,
   ActorRef, message Sendability, and Capability isolation, but v0.0.1 Seed
   explicitly does not implement Ownership/Borrow Checker, Resource, Task, or
@@ -62,59 +58,54 @@ serialization, mailbox, or runtime gap listed below.
   nested message values, local/remote serialization, or interpreter/VM
   sendability equivalence.
 
-## Required authority before implementation
+## Authorized implementation boundary
 
-Proposed `DEC-0271` must be reviewed and moved to `Accepted` (or replaced by an
-Accepted RFC/decision) before implementation. The Accepted authority must
-define, at minimum:
+Accepted `DEC-0271` authorizes only the following complete vertical slice:
 
-1. the Sendable judgment and closed set of message types, recursive/nominal
-   rules, type variables and variance, ActorRef handling, diagnostics, source
-   spans, and Checked Core representation;
-2. borrow and aliasing lifetimes across a turn/await, prohibition of active
-   mutable borrows, Resource move/copy/drop/duplication behavior, Managed
-   sharing and profile constraints, and interaction with Task/Effect;
-3. Capability non-forgery, capability-bearing message restrictions, authority
-   transfer, local versus remote message boundaries, schema identity,
-   canonical bytes, versioning, migration, and privacy/security rules;
-4. interpreter and VM message ABI/verifier, mailbox/backpressure/order
-   interactions, Fault/cleanup behavior for rejected or failed sends,
-   Semantic Graph/Audit Source projection, resource limits, and deterministic
-   behavior; and
-5. executable positive/negative/migration/differential fixtures for active
-   borrow rejection, move/copy/drop, Managed profiles, Capability forgery,
-   nested/recursive messages, schema/version mismatch, local/remote
-   serialization, cancellation/Fault cleanup, Unicode/CRLF/BOM spans,
-   deterministic output, and no unchecked-AST execution.
+1. publish `SendableLocal(T)` for the closed local Value types enumerated in
+   clauses 2 through 6 and reject every unsupported or future category by
+   default;
+2. attach an immutable, canonical local message contract to
+   `CheckedActorCore`, preserving the original UTF-8 message-type span;
+3. derive `ling.actor-message-schema-id/v1` from the normalized checked type
+   graph without host layout, path, allocation, arena, or runtime facts;
+4. publish and strictly validate the optional Experimental
+   `x-ling-actor/0.1` Semantic Graph extension while preserving byte-identical
+   non-Actor graph output; and
+5. preserve `L-ACTOR-0002` at every execution boundary and provide the
+   positive, negative, recursive, determinism, corruption, Unicode/BOM/CRLF,
+   collision, and no-execution evidence required by clause 15.
 
-Until these decisions are Accepted, a message could leak mutable state or
-Capability authority, double-move a Resource, use profile-incompatible
-sharing, or become an unstable wire/schema contract.
+Resource transfer, Managed sharing, Borrow lifetimes, Capability transfer,
+mailbox/backpressure, turn/reentry, runtime execution, serialization, and
+remote delivery remain explicitly unauthorized. Their absence is part of the
+ACT-2302 acceptance criteria, not a missing placeholder to fill.
 
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0008, DEC-0009, DEC-0010,
-DEC-0013, DEC-0018, DEC-0096, DEC-0270, Proposed DEC-0271, RFC-0001, RFC-0020,
+DEC-0013, DEC-0018, DEC-0096, DEC-0270, Accepted DEC-0271, RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`, `docs/governance/protocol-inventory.toml`,
 and the current syntax, AST, HIR, types, effects, semantic, evaluator,
 bytecode, VM, and schema crates.
 
-No compiler, interpreter, VM, bytecode, ownership checker, Actor protocol,
-diagnostic, schema, Semantic ID, source-span, runtime, or Unicode 17.0.0
-behavior changed.
+This acceptance transition changes governance authority and task readiness
+only. No compiler, interpreter, VM, bytecode, ownership checker, Actor
+protocol, diagnostic, schema, Semantic ID, source-span, runtime, or Unicode
+17.0.0 behavior changed.
 
-The child implementation report and authority audit provide focused evidence
-for the identity boundary; public Actor message checking remains blocked.
+The DEC-0096 child implementation report remains focused evidence for its
+publish-disabled identity boundary; it is not a substitute for ACT-2302.
 
 ## Intentionally deferred
 
-`ACT-2302` can begin after Proposed DEC-0271 is Accepted or replaced. The
-bounded proposal keeps Resource, Managed, Borrow, Capability transfer,
-mailbox/runtime and remote delivery rejected, so those broader contracts remain
-under their later tasks and registered gaps. The future checker must consume
-accepted types and Checked Actor Core only, default-deny unsupported categories,
-register canonical local message schemas, publish validated Semantic Graph
-evidence, and preserve the explicit no-execution boundary.
+Accepted DEC-0271 permits ACT-2302 to begin now. It keeps Resource, Managed,
+Borrow, Capability transfer, mailbox/runtime, and remote delivery rejected, so
+those broader contracts remain under later tasks and registered gaps. The
+implementation must consume checked types and Checked Actor Core only,
+default-deny unsupported categories, register canonical local message schemas,
+publish validated Semantic Graph evidence, and preserve the explicit
+no-execution boundary.

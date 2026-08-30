@@ -7721,13 +7721,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0271"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0271-checked-actor-message-sendability-and-schema.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-30"
 proposed = "2026-08-30"
-decided = ""
-stable_basis = false
+decided = "2026-08-30"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Accept the exact closed local Value type graph and reject every unsupported, open, ownership-bearing, capability-bearing, Task, Actor-reference, and future type category before checked publication.",

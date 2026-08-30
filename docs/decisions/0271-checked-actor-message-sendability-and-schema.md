@@ -1,17 +1,17 @@
 # DEC-0271: Checked Actor message sendability and schema / 已检查 Actor 消息可发送性与 schema
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-30<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-30<br>
 > Owner role：actor-semantics<br>
 > 相关 RFC/缺口：DEC-0008 | DEC-0009 | DEC-0010 | DEC-0012 | DEC-0096 | DEC-0270 | GAP-OWNERSHIP-MODEL-001 | GAP-ACTOR-REMOTE-DELIVERY-001 | ACT-2302<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This proposal defines the smallest checked-only, local Actor message profile
+This decision defines the smallest checked-only, local Actor message profile
 that can complete ACT-2302 without inventing Resource, Managed, Capability
 transfer, mailbox, runtime, or remote-delivery behavior.
 
-本提案定义可完成 ACT-2302 的最小已检查、本地 Actor 消息 profile；它不虚构
+本决定定义可完成 ACT-2302 的最小已检查、本地 Actor 消息 profile；它不虚构
 Resource、Managed、Capability transfer、mailbox、runtime 或远程交付行为。
 
 ## Question
