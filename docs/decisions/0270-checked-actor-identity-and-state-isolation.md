@@ -1,18 +1,19 @@
 # DEC-0270: Checked Actor identity and state isolation / 已检查 Actor 身份与状态隔离
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-30<br>
+> 决定日期：2026-08-30<br>
 > Owner role：actor-semantics<br>
 > 相关 RFC/缺口：DEC-0090 | DEC-0095 | GAP-ACTOR-AWAIT-REENTRY-001 | GAP-ACTOR-MAILBOX-SUPERVISOR-001 | GAP-ACTOR-REMOTE-DELIVERY-001 | ACT-2301<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This proposal defines only the checked, non-executable ACT-2301 Actor slice:
+This decision defines only the checked, non-executable ACT-2301 Actor slice:
 source declarations, semantic type identity, a typed local-reference descriptor,
 and an isolated pure state transition. It does not authorize Actor construction,
 send, mailbox, scheduling, suspension, reentry, supervision, remote delivery,
 serialization, interpreter execution, bytecode, VM execution, or native ABI.
 
-本提案仅定义 ACT-2301 的已检查、不可执行 Actor 切片：源码声明、语义类型身份、
+本决定仅定义 ACT-2301 的已检查、不可执行 Actor 切片：源码声明、语义类型身份、
 类型化本地引用描述，以及隔离的纯状态转移。它不授权 Actor 构造、send、mailbox、
 调度、挂起、重入、监督、远程交付、序列化、解释器执行、bytecode、VM 执行或
 native ABI。

@@ -9977,7 +9977,7 @@ notes = [
 [[task]]
 id = "ACT-2301"
 title = "Actor identity and state isolation"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "M"
 owner = "Codex"
@@ -10027,11 +10027,10 @@ acceptance = [
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "ACT-2301 is BlockedSpec by TASK-2203, absent RFC-C203/RFC-0009, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved Actor identity/state/turn/message ownership contracts.",
-  "DEC-0270 is Proposed as a checked-only, pure non-suspending Actor declaration/Core boundary; it is not implementation authority until explicitly Accepted.",
+  "Accepted DEC-0270 authorizes only the checked-only, pure non-suspending Actor declaration/Core boundary; ACT-2302 through ACT-2305 retain message, mailbox, turn, runtime, and remote work.",
   "Current syntax/AST/HIR/types/effects/evaluator/bytecode/VM have no Actor declaration, ActorRef/RemoteRef, identity table, turn context, message schema, mailbox, or state-isolation check; Seed State is local-function semantics only.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, Actor runtime, diagnostics, schemas, Semantic IDs, source spans, scheduler, or Unicode 17.0.0 behavior.",
 ]

@@ -2,8 +2,9 @@
 
 ## Outcome
 
-`ACT-2301` is correctly recorded as `BlockedSpec`. Accepted `DEC-0090` now
-closes the bounded `ACT-2301-ACTOR-SYNTAX-REJECTION` evidence child without
+`ACT-2301` is ready for the bounded checked-only implementation authorized by
+Accepted `DEC-0270`. Accepted `DEC-0090` previously closed the bounded
+`ACT-2301-ACTOR-SYNTAX-REJECTION` evidence child without
 adding Actor grammar. The G2 plan proposes
 `ActorTypeId`, runtime `ActorId`, typed `ActorRef<Message>`, turn-local state
 mutation, prohibition of borrowing `&mut state` to outside code, and a strict
@@ -104,9 +105,9 @@ shape prevents state escape. It deliberately leaves Sendable/schema rules,
 mailbox/backpressure, Effectful turns, await/reentry, runtime, serialization,
 supervision, and remote delivery to ACT-2302 through ACT-2305 and their gaps.
 
-Until DEC-0270 is Accepted, ACT-2301 remains `BlockedSpec`, the current negative
-syntax gate remains authoritative, and no positive Actor frontend or Core may be
-implemented.
+DEC-0270 was Accepted on 2026-08-30. ACT-2301 may now implement only that
+checked-only boundary; the current negative syntax gate remains authoritative
+for malformed and out-of-profile Actor forms.
 
 ## Evidence and compatibility
 
@@ -121,16 +122,16 @@ diagnostic, and schema crates.
 No compiler, interpreter, VM, bytecode, Actor runtime, diagnostic registry, schema,
 Semantic ID, source-span, scheduler, or Unicode 17.0.0 behavior changed.
 
-The child implementation report and authority audit provide focused evidence
-for the identity boundary; public Actor identity and state-isolation semantics
-remain blocked.
+The child implementation report and authority audit provide focused historical
+evidence for the identity boundary; DEC-0270 now authorizes the bounded
+checked-only Actor identity and state-isolation implementation.
 
 ## Intentionally deferred
 
 The bounded `ACT-2301-ACTOR-SYNTAX-REJECTION` child is complete under
-`DEC-0090`. Public `ACT-2301` can begin only after Accepted RFC-C203/RFC-0009 (or replacement),
-resolution of the Actor reentry, mailbox/supervision, and remote-delivery gaps,
-and the required Task/Effect boundaries. The future implementation must lower
-only accepted Actor syntax to checked Core, enforce turn-local state and
-Sendable messages, keep local/remote identity distinct, and publish
-interpreter/VM and isolation evidence before exposing Actor execution.
+`DEC-0090`. Public `ACT-2301` may implement the checked-only DEC-0270 slice.
+Effectful or suspending turns, Sendable expansion, mailbox/supervision, runtime,
+and remote delivery remain blocked by their separate open gaps and later tasks.
+The implementation must lower only the accepted Actor syntax to Checked Core,
+keep local/remote identity distinct, and prove Actor execution remains
+unavailable.

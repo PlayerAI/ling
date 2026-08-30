@@ -7694,13 +7694,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0270"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0270-checked-actor-identity-and-state-isolation.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-30"
 proposed = "2026-08-30"
-decided = ""
-stable_basis = false
+decided = "2026-08-30"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Cover the exact contextual Actor source form through CST, AST, unresolved HIR, resolution, types, effects, and immutable Checked Actor Core with original UTF-8 spans.",
