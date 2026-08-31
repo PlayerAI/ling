@@ -7773,3 +7773,31 @@ unresolved_alternatives = [
   "Critical bounded memory is not implied by a bounded message count because admitted payloads may have dynamic size.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0273"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0273-checked-nonsuspending-actor-turn.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-31"
+proposed = "2026-08-31"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Construct and validate the exact checked one-message non-suspending turn contract from DEC-0270 through DEC-0272 without runtime state, queues, continuations, timers, or Actor instances.",
+  "Freeze turn canonical bytes, Actor identities, and proposed x-ling-actor/0.3 across reconstruction, ordering, Unicode, BOM, newline, comments, and source-name evidence.",
+  "Reject inconsistent owner, type, Effect row, expression, binding, mode, commit, reentry, canonical bytes, order, and spans before checked or reader publication.",
+  "Prove Actor-bearing execution and every self-send, cancellation, watchdog, scheduler, supervisor, Replay, serializer, and remote path remain unavailable.",
+]
+compatibility_impact = [
+  "Would make the existing pure receive transition an explicit one-message non-suspending no-reentry checked turn contract without adding source syntax or diagnostics.",
+  "Would advance only the Experimental Actor extension to x-ling-actor/0.3 and checked Actor Core identity; non-Actor bytes and identities would remain unchanged.",
+  "Would add no runtime dequeue, state storage, send, scheduler, watchdog, interpreter, bytecode/VM/native ABI, supervisor, Replay, remote, Stable, or Unicode 17.0.0 behavior.",
+]
+unresolved_alternatives = [
+  "Suspending turns, guarded reentry, state versions, continuation ownership, cancellation, Fault cleanup, retry/restart, self-send outcomes, scheduler fairness, watchdog thresholds/events, supervision, Replay, serialization, and remote delivery remain later Accepted work.",
+  "A future suspending Actor profile requires an explicit source, Core, identity, and protocol migration and cannot silently reinterpret the proposed no-reentry profile.",
+]
+superseded_by = ""

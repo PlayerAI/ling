@@ -10167,6 +10167,7 @@ spec = [
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0273-checked-nonsuspending-actor-turn.md",
   "docs/decisions/0270-checked-actor-identity-and-state-isolation.md",
   "docs/decisions/0271-checked-actor-message-sendability-and-schema.md",
   "docs/RFC-0001.md",
@@ -10419,6 +10420,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/ACT-2304-AUTHORITY-AUDIT.md",
+  "docs/decisions/0273-checked-nonsuspending-actor-turn.md",
   "docs/status/ACT-2304-TURN-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2304-TURN-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0098-actor-turn-observation.md",
@@ -10432,6 +10434,7 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
+  "Proposed DEC-0273 selects a checked-only one-message, non-suspending, no-reentry, publish-on-normal-return profile, but it is not implementation authority until explicitly Accepted.",
   "The audit records the missing turn lifecycle/atomic boundary, await suspend/reentry choice, state-version/guard, borrow, self-send, recursion, cancellation/Fault, watchdog, scheduler/replay, local/remote, diagnostics, schema, and migration contracts.",
   "The audit distinguishes SEMANTICS/LANGUAGE/ROADMAP high-level turn constraints and their explicit future-RFC reentry gap from the absent Accepted RFC-C203/C204 authority, and preserves the checked-only evaluation boundary.",
   "The audit covers no-await atomic turns, each reentry alternative, nested/recursive self-send through the mailbox, concurrent interleavings, state-version conflicts, active-borrow rejection, cancellation/Fault cleanup, watchdog observation, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM differential fixtures.",
@@ -10444,7 +10447,7 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "ACT-2304 is BlockedSpec by ACT-2301/ACT-2302/ACT-2303, absent RFC-C203/C204/RFC-0009, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved turn/reentry/state/watchdog contracts.",
+  "ACT-2301 through ACT-2303 are Done; ACT-2304 remains BlockedSpec because DEC-0273 is only Proposed and GAP-ACTOR-AWAIT-REENTRY-001 remains Open for acceptance and later suspending/runtime profiles.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Actor/Task await, turn context, state-version guard, reentry judgment, self-send operation, watchdog, scheduler, or Actor protocol; ordinary recursive calls do not define Actor recursion.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
