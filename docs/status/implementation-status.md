@@ -42,7 +42,7 @@
 | `ACT-2303-MAILBOX-OBSERVATION` | Internal Actor mailbox observation | `G2` | `S` | `Done` | `ACT-2302-MESSAGE-SCHEMA-MODEL` | `fb42fb580dde35d09594392f16e5798621fd3785` |
 | `ACT-2304` | Actor turn and reentry rules | `G2` | `L` | `Done` | `ACT-2303` | `79081e2754954d2427d4bee5972a1d851178402a` |
 | `ACT-2304-TURN-OBSERVATION` | Internal Actor turn observation | `G2` | `S` | `Done` | `ACT-2303-MAILBOX-OBSERVATION` | `ec279c46f14acb2634fa7783f8e195d457178041` |
-| `ACT-2305` | Actor runtime | `G2` | `L` | `Ready` | `ACT-2304` | `` |
+| `ACT-2305` | Actor runtime | `G2` | `L` | `Done` | `ACT-2304` | `1839afb85bac00761f28921d5be00515c6c45a8e` |
 | `ACT-2305-RUNTIME-OBSERVATION` | Internal Actor runtime observation | `G2` | `S` | `Done` | `ACT-2304-TURN-OBSERVATION` | `c8df61e4e0ad01c2f3bd7b30555aca00ab2fd696` |
 | `ACT-2306` | Actor properties and stress tests | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
 | `ACT-2306-PROPERTY-OBSERVATION` | Internal Actor property observation | `G2` | `S` | `Done` | `ACT-2305-RUNTIME-OBSERVATION` | `09f33d3b1563db59a5e9ad4fb66c556e8725b583` |

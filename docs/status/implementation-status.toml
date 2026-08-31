@@ -10522,7 +10522,7 @@ notes = [
 [[task]]
 id = "ACT-2305"
 title = "Actor runtime"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10552,7 +10552,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/ACT-2305-AUTHORITY-AUDIT.md",
+  "docs/status/ACT-2305-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0274-minimal-local-actor-runtime.md",
+  "crates/ling-eval/src/actor_runtime.rs",
+  "crates/ling-eval/tests/actor_runtime.rs",
   "docs/status/ACT-2305-RUNTIME-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2305-RUNTIME-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0099-actor-runtime-observation.md",
@@ -10566,22 +10569,20 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "Accepted DEC-0274 selects a checked-Core-only bounded local runtime with failure-atomic spawn/send/dispatch/stop, explicit ready-set scheduling, Task-owned lifetime, and no public Actor execution, and supplies implementation authority for ACT-2305.",
-  "The audit records the missing runtime identity/ownership, Typed Core/ABI, spawn/stop/send/receive, typed envelope, mailbox, turn/reentry, Task/scheduler, lifecycle, Fault, registry, local/remote, protocol, diagnostics, resource, and migration contracts.",
-  "The audit distinguishes the future Actor constraints in SEMANTICS/LANGUAGE/ROADMAP and host-only VM cancellation from the absent Accepted RFC-C202/C203/C204 authority, and preserves the checked-only evaluation boundary.",
-  "The audit covers identity stability/reuse, spawn/stop races, typed envelopes, full/closed mailboxes, turn/await behavior, cancellation/Fault cleanup, registry lifetime, resource limits, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM/runtime differential fixtures.",
-  "Accepted DEC-0099 authorizes only the publish-disabled runtime-observation child; it does not close spawn, stop, dispatch, Fault, registry, scheduler, ABI, or runtime gaps.",
-  "No Actor runtime crate, spawn/stop API, mailbox implementation, envelope schema, dispatcher, lifecycle event, registry, scheduler integration, diagnostic allocation, public protocol, or placeholder G2 API is added while the authority is absent.",
-  "The future runtime must consume accepted types and checked Core only, expose the accepted versioned ABI and lifecycle state machine, keep registry ownership explicit, and publish bounded resource, cleanup, ordering, and interpreter/VM evidence before Actor execution.",
+  "Accepted DEC-0274 clauses 1-18 authorize the checked-Core-only bounded local Actor runtime implemented in ling-eval; the runtime revalidates checked Actor owner/type/schema/mailbox/turn/expression/binding evidence before execution.",
+  "ActorRuntime implements monotonic nonreused run-scoped identities, failure-atomic spawn, typed FIFO send with payload return on rejection, explicit sorted ready/step dispatch, publish-on-normal-return state, bounded lifecycle/Fault provenance, canonical shutdown and exactly-once cleanup.",
+  "Actor Faults are contained, request LocalTaskControl root cancellation, discard owned queues and terminal-clean every live Actor in Actor-ID order; command/event/resource exhaustion is detected before the bounded runtime mutation.",
+  "The Actor runtime integration suite covers positive, negative, ordering, Full/Closed, failure-atomicity, cancellation, Fault, cleanup, cross-run, Unicode/BOM/CRLF and deterministic reconstruction evidence.",
+  "cargo test -p ling-eval --all-targets --locked --offline, cargo clippy -p ling-eval --all-targets --locked --offline -- -D warnings, cargo test -p ling-cli --test actor_boundary --locked --offline, and cargo test --workspace --all-targets --locked --offline pass.",
+  "No source Actor operation, public Actor execution, diagnostic allocation, Semantic Graph/schema/protocol, Semantic ID, bytecode/VM/native ABI, or Unicode 17.0.0 behavior is added; public Actor-bearing execution remains L-ACTOR-0002.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "1839afb85bac00761f28921d5be00515c6c45a8e"
+completion_commit = "1839afb85bac00761f28921d5be00515c6c45a8e"
+integration_state = "committed"
+completed = "2026-08-31"
 notes = [
-  "ACT-2301 through ACT-2304 and TASK-2201 through TASK-2206 are Done; Accepted DEC-0274 makes ACT-2305 Ready while public source execution, supervision, Replay, remote delivery, and backend Actor ABIs remain separately governed.",
-  "Current evaluator/bytecode/VM have no executable Actor runtime, spawn/stop, typed envelope, queue, dispatcher, lifecycle event, run-owned registry, scheduler integration, supervision state, or public Actor protocol; Actor-bearing execution remains L-ACTOR-0002.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "ACT-2305 closes only the DEC-0274 internal local runtime slice. ACT-2306 properties/stress, supervision, Replay, remote delivery and backend Actor ABIs remain separately governed.",
+  "The runtime is an Experimental Rust embedding surface, not a public language API. Actor-bearing public execution still stops at L-ACTOR-0002.",
 ]
 
 [[task]]
