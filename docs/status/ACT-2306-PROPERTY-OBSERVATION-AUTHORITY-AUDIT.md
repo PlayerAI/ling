@@ -5,9 +5,9 @@
 The bounded child `ACT-2306-PROPERTY-OBSERVATION` is authorized by Accepted
 `DEC-0100`. It records immutable, publish-disabled property observation
 identities, optional opaque Actor instances, and structural property labels for
-future evidence. Public `ACT-2306` is now `Ready`: Accepted DEC-0274 supplies
-its local runtime and Accepted DEC-0275 authorizes its bounded internal
-property/stress evidence. This child still does not define property results,
+future evidence. Public `ACT-2306` is now `Done`: Accepted DEC-0274 supplies
+its local runtime and Accepted DEC-0275 authorizes its completed bounded
+internal property/stress evidence. This child still does not define property results,
 stress thresholds, scheduling, replay, or runtime behavior.
 
 ## Normative traceability
@@ -41,7 +41,7 @@ or migration behavior was added.
 
 Focused tests cover identity validation, deterministic ordering, canonical-byte
 independence from source evidence and insertion order, duplicate rejection, and
-invalid Actor rejection. The parent is Ready under Accepted DEC-0275 to add
+invalid Actor rejection. The parent is Done under Accepted DEC-0275 with
 property relations, interleavings, resource/shutdown budgets, and executable
-stress evidence. Replay remains a separate unresolved authority rather than a
-prerequisite for this internal local-runtime decision.
+stress evidence in ling-eval. Replay remains a separate unresolved authority
+rather than a prerequisite for this internal local-runtime decision.

@@ -2,18 +2,19 @@
 
 ## Outcome
 
-ACT-2306 is Ready. Accepted DEC-0274 provides a real internal,
+ACT-2306 is Done. Accepted DEC-0274 provides a real internal,
 checked-Core-only local Actor runtime in ling-eval; its integration suite already
 establishes a bounded set of FIFO, Full, Fault, cancellation, cleanup,
 Unicode/BOM/CRLF, and public-boundary facts.
 
-Accepted DEC-0275 now defines the property, generated-interleaving,
+Accepted DEC-0275 defines the property, generated-interleaving,
 parallel-turn, slow-consumer, host-unwind, and bounded-stress evidence contract
-for that runtime. It authorizes the internal ACT-2306 implementation only; it
-does not make the resulting host execution model public Ling behavior.
+for that runtime. The completed internal ACT-2306 implementation realizes this
+test-only contract without making the resulting host execution model public Ling
+behavior.
 
-No new runtime behavior, scheduler, stress protocol, property schema, Replay
-format, diagnostic, or public Actor API is added by this audit or the proposal.
+No new normal-build runtime behavior, scheduler, stress protocol, property
+schema, Replay format, diagnostic, or public Actor API is added.
 
 ## Normative traceability
 
@@ -58,17 +59,20 @@ format, diagnostic, or public Actor API is added by this audit or the proposal.
   type/cross-run rejection, canonical ready order, turn/initializer Fault,
   cancellation, explicit stop, resource-exhaustion atomicity, and
   Unicode/BOM/CRLF reconstruction.
-- The implementation intentionally owns ActorRuntime through mutable exclusive
-  access and does not yet reserve/evaluate/commit distinct Actor turns on
-  multiple host workers. It has no generated command corpus, overlap probe,
-  test-only panic injection seam, parallel commit rule, or bounded local Actor
-  stress driver.
+- crates/ling-eval/src/actor_runtime_properties.rs is a cfg(test)-only
+  ACT-2306 driver. It preflights and reserves at most one FIFO envelope per
+  distinct Actor, evaluates pure candidates on one to four scoped workers,
+  restores reservations on test-driver failure, and commits only successful
+  candidates in Actor-ID order after all workers complete.
+- The property suite uses a barrier probe rather than timing, deterministic
+  SplitMix64 command schedules, one/two-worker projection comparison, bounded
+  backpressure, cleanup, resource, panic, and Unicode reconstruction cases.
 - There is no public Actor execution, source spawn/send/stop, public scheduler,
   Replay trace, serialization, supervisor, remote delivery, bytecode/VM/native
   Actor path, or runtime differential contract. The CLI Actor boundary remains
   L-ACTOR-0002.
 
-## Accepted implementation authority
+## Accepted authority and completion evidence
 
 An Accepted decision must define, at minimum:
 
@@ -87,10 +91,9 @@ An Accepted decision must define, at minimum:
    order, Replay, supervision, production worker scheduling, and public
    protocols.
 
-Accepted DEC-0275 is the governing authority. ACT-2306 may now add the
-generated stress harness, bounded parallel-turn driver, and test-only panic
-injection seam, while retaining its explicit public-boundary and deferred-work
-limits.
+Accepted DEC-0275 is the governing authority. ACT-2306 has added the generated
+stress harness, bounded parallel-turn driver, and test-only panic injection
+seam, while retaining its explicit public-boundary and deferred-work limits.
 
 ## Evidence and compatibility
 
@@ -100,16 +103,17 @@ DEC-0021, DEC-0266, DEC-0268, DEC-0270 through DEC-0274,
 docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md,
 docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md,
 docs/governance/gap-register.toml, docs/governance/protocol-inventory.toml,
-the current Actor runtime, and its integration tests.
+the current Actor runtime, its integration tests, and the ACT-2306 property
+suite.
 
-The audit/proposal changes no compiler, evaluator, bytecode, VM, scheduler,
-mailbox, Actor protocol, diagnostic, schema, Semantic ID, source-span, public
-CLI, or Unicode 17.0.0 behavior. Any later ACT-2306 implementation must retain
-original UTF-8 byte spans and must cite Accepted DEC-0275 clauses.
+The completed implementation changes no compiler, evaluator public entry,
+bytecode, VM, public scheduler, mailbox protocol, diagnostic, schema, Semantic
+ID, source-span unit, public CLI, or Unicode 17.0.0 behavior. Its test evidence
+retains original UTF-8 byte spans and cites Accepted DEC-0275 clauses.
 
 ## Intentionally deferred
 
-ACT-2306 must not use this proposal to imply source Actor execution, fair or
+ACT-2306 does not use this decision to imply source Actor execution, fair or
 live scheduling, cross-sender global ordering, concurrent Fault resolution,
 watchdogs, graceful drain, supervision, Replay, serialization, remote delivery,
 or bytecode/VM/native execution. Those remain separately governed work. The

@@ -10644,7 +10644,7 @@ notes = [
 [[task]]
 id = "ACT-2306"
 title = "Actor properties and stress tests"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10670,12 +10670,12 @@ spec = [
 ]
 artifacts = [
   "docs/status/ACT-2306-AUTHORITY-AUDIT.md",
+  "docs/status/ACT-2306-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0275-local-actor-property-and-stress-evidence.md",
-  "docs/status/ACT-2306-PROPERTY-OBSERVATION-AUTHORITY-AUDIT.md",
-  "docs/status/ACT-2306-PROPERTY-OBSERVATION-IMPLEMENTATION-REPORT.md",
-  "docs/decisions/0100-actor-property-observation.md",
-  "crates/ling-concurrency/src/property.rs",
-  "crates/ling-concurrency/src/lib.rs",
+  "crates/ling-eval/src/actor_runtime.rs",
+  "crates/ling-eval/src/actor_runtime_properties.rs",
+  "crates/ling-eval/tests/actor_runtime.rs",
+  "crates/ling-cli/tests/actor_boundary.rs",
   "docs/governance/authority.toml",
   "docs/governance/authority.md",
   "docs/governance/lifecycle.toml",
@@ -10684,20 +10684,20 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "Accepted DEC-0274 and its ACT-2305 implementation now supply a checked-Core-only local Actor runtime; the audit accurately distinguishes its current serial coordinator from missing ACT-2306 property and parallel-turn evidence.",
-  "The audit maps same-Actor serialization, independent-Actor parallel turns, bounded Full/slow-consumer backpressure, post-stop behavior, Fault/panic containment, shutdown, deterministic generated commands, resource limits, Unicode/BOM/CRLF, and L-ACTOR-0002 boundaries to the required decision clauses.",
-  "Accepted DEC-0275 clauses 1-13 authorize the ACT-2306 checked-Core-only generator, bounded parallel-turn driver, panic-injection seam, and evidence suite; it does not authorize a public scheduler, Replay, protocol, source feature, or completion claim before executable evidence is delivered.",
-  "Accepted DEC-0100 remains only the publish-disabled property-observation child; it does not close property, stress, scheduler, replay, or cross-backend gaps.",
-  "Any future suite must consume checked Core and real runtime traces only, distinguish language results from host timing/performance, preserve original UTF-8 spans, and publish bounded cleanup and ordering evidence before claiming Actor support.",
+  "Accepted DEC-0275 clauses 1-13 authorize the implemented checked-Core-only generator, bounded test-only parallel-turn driver, panic-injection seam, and evidence suite; no public scheduler, Replay, protocol, or source feature is added.",
+  "The test-only driver reserves at most one envelope per distinct Actor, evaluates pure normal-return turns with at most four host workers, and commits all candidates in ascending ActorId order after worker completion; its two-Actor barrier probe is not a timing oracle.",
+  "The suite proves serial same-Actor FIFO state progress, Full/slow-consumer/retry behavior, command/event preflight atomicity, stop/cancellation/shutdown cleanup, contained evaluator panic Fault, deterministic SplitMix64 stress for four seeds with one and two workers, and Unicode/BOM/CRLF/source-order reconstruction.",
+  "cargo test -p ling-eval --all-targets --locked --offline, cargo clippy -p ling-eval --all-targets --locked --offline -- -D warnings, and cargo test -p ling-cli --test actor_boundary --locked --offline pass; public Actor execution remains L-ACTOR-0002.",
+  "GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open for parallel Fault/restart semantics and Supervisor authority; DEC-0100 remains only its historical publish-disabled observation child.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "3885ca9d74dcb6a05afe1c3fccc9abe578e843db"
+completion_commit = "3885ca9d74dcb6a05afe1c3fccc9abe578e843db"
+integration_state = "committed"
+completed = "2026-08-31"
 notes = [
-  "ACT-2305 is Done. Accepted DEC-0275 removes the sole authority blocker, so ACT-2306 is Ready; GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open for parallel Fault/restart semantics and supervisor authority outside this bounded evidence task.",
-  "The current runtime already covers selected serial state, mailbox, Fault, cancellation, cleanup, resource, and Unicode facts but has no generated command corpus or bounded parallel-turn driver; GAP-DETERMINISTIC-REPLAY-001 remains outside this task's proposed internal evidence boundary.",
-  "The audit/proposal preserves Seed behavior and changes no compiler, interpreter, VM, bytecode, public scheduler, mailbox protocol, diagnostics, schemas, Semantic IDs, source spans, runtime contract, or Unicode 17.0.0 behavior.",
+  "ACT-2306 completes only DEC-0275's bounded internal Experimental evidence profile. The test driver is cfg(test)-only and normal library builds retain the ACT-2305 serial coordinator surface.",
+  "GAP-DETERMINISTIC-REPLAY-001, source-level Actor execution, fair/liveness scheduling, cross-sender global ordering, production workers, concurrent Fault/cancellation/restart, Supervisor, Replay, remote delivery, serialization, and backend Actor ABI remain outside this task.",
+  "No compiler, interpreter public entry, VM, bytecode, public scheduler, mailbox protocol, diagnostic, schema, Semantic ID, source-span unit, or Unicode 17.0.0 behavior changed.",
 ]
 
 [[task]]
@@ -10753,7 +10753,7 @@ completion_commit = "09f33d3b1563db59a5e9ad4fb66c556e8725b583"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This child is a data-only boundary under DEC-0100; ACT-2305 now supplies an internal runtime, while ACT-2306 remains BlockedSpec for Accepted property/stress and parallel-turn authority under Proposed DEC-0275.",
+  "This child is a data-only boundary under DEC-0100; ACT-2306 is now Done under Accepted DEC-0275, while this child remains historical publish-disabled observation evidence rather than its executable property/stress suite.",
   "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, or Unicode behavior was added.",
 ]
 
