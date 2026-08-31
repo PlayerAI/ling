@@ -44,7 +44,7 @@
 | `ACT-2304-TURN-OBSERVATION` | Internal Actor turn observation | `G2` | `S` | `Done` | `ACT-2303-MAILBOX-OBSERVATION` | `ec279c46f14acb2634fa7783f8e195d457178041` |
 | `ACT-2305` | Actor runtime | `G2` | `L` | `Done` | `ACT-2304` | `1839afb85bac00761f28921d5be00515c6c45a8e` |
 | `ACT-2305-RUNTIME-OBSERVATION` | Internal Actor runtime observation | `G2` | `S` | `Done` | `ACT-2304-TURN-OBSERVATION` | `c8df61e4e0ad01c2f3bd7b30555aca00ab2fd696` |
-| `ACT-2306` | Actor properties and stress tests | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
+| `ACT-2306` | Actor properties and stress tests | `G2` | `L` | `Ready` | `ACT-2305` | `` |
 | `ACT-2306-PROPERTY-OBSERVATION` | Internal Actor property observation | `G2` | `S` | `Done` | `ACT-2305-RUNTIME-OBSERVATION` | `09f33d3b1563db59a5e9ad4fb66c556e8725b583` |
 | `BACK-3501` | Native backend selection spike | `G3` | `M` | `BlockedSpec` | `NIR-3403` | `` |
 | `BACK-3501-OBSERVATION` | Internal Native backend selection boundary evidence | `G3` | `S` | `Done` | `NIR-3403-OBSERVATION` | `1330d19d967d48bbbc95ee3640d75344add66fd7` |

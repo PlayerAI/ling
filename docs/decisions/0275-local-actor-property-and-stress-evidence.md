@@ -1,20 +1,20 @@
 # DEC-0275: Local Actor property and bounded stress evidence / 本地 Actor 性质与有界压力证据
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-31<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-31<br>
 > Owner role：actor-runtime<br>
 > 相关 RFC/缺口：DEC-0010 | DEC-0013 | DEC-0021 | DEC-0266 | DEC-0268 | DEC-0270 | DEC-0271 | DEC-0272 | DEC-0273 | DEC-0274 | GAP-ACTOR-MAILBOX-SUPERVISOR-001 | ACT-2306<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This proposal defines the executable property and bounded-stress evidence needed
+This decision defines the executable property and bounded-stress evidence needed
 for ACT-2306 over the internal Experimental local Actor runtime accepted by
 DEC-0274. It deliberately distinguishes independent Actor turn execution from
 observable Ling scheduling: it does not add source Actor operations, a public
 scheduler, fairness, Replay, supervision, remote delivery, bytecode, VM, Native,
 or a performance guarantee.
 
-本提案为 DEC-0274 已接受的内部 Experimental 本地 Actor Runtime 定义完成
+本决定为 DEC-0274 已接受的内部 Experimental 本地 Actor Runtime 定义完成
 ACT-2306 所需的可执行性质与有界压力证据。它严格区分独立 Actor turn 的执行与
 可观察的 Ling 调度语义：不新增 Actor 源码操作、公开调度器、公平性、Replay、监督、
 远程交付、bytecode、VM、Native 或性能保证。

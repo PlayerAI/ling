@@ -7833,13 +7833,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0275"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0275-local-actor-property-and-stress-evidence.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-31"
 proposed = "2026-08-31"
-decided = ""
-stable_basis = false
+decided = "2026-08-31"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Add real checked Actor runtime property cases for serial state, bounded Reject mailboxes, slow-consumer backpressure, stop, Fault, cancellation, shutdown, and resource boundaries.",

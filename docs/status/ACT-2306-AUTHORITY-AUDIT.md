@@ -2,18 +2,15 @@
 
 ## Outcome
 
-ACT-2306 remains correctly recorded as BlockedSpec, but its previous audit was
-stale after ACT-2305. Accepted DEC-0274 now provides a real internal,
+ACT-2306 is Ready. Accepted DEC-0274 provides a real internal,
 checked-Core-only local Actor runtime in ling-eval; its integration suite already
 establishes a bounded set of FIFO, Full, Fault, cancellation, cleanup,
 Unicode/BOM/CRLF, and public-boundary facts.
 
-The remaining blocker is no longer the absence of an Actor runtime. It is the
-absence of Accepted authority for what counts as property, generated
-interleaving, parallel-turn, slow-consumer, host-unwind, and bounded-stress
-evidence for that runtime. DEC-0275 has been recorded as a Proposed decision to
-resolve that bounded test-contract question. It is not implementation authority
-until Accepted.
+Accepted DEC-0275 now defines the property, generated-interleaving,
+parallel-turn, slow-consumer, host-unwind, and bounded-stress evidence contract
+for that runtime. It authorizes the internal ACT-2306 implementation only; it
+does not make the resulting host execution model public Ling behavior.
 
 No new runtime behavior, scheduler, stress protocol, property schema, Replay
 format, diagnostic, or public Actor API is added by this audit or the proposal.
@@ -71,7 +68,7 @@ format, diagnostic, or public Actor API is added by this audit or the proposal.
   Actor path, or runtime differential contract. The CLI Actor boundary remains
   L-ACTOR-0002.
 
-## Required authority before implementation
+## Accepted implementation authority
 
 An Accepted decision must define, at minimum:
 
@@ -90,9 +87,10 @@ An Accepted decision must define, at minimum:
    order, Replay, supervision, production worker scheduling, and public
    protocols.
 
-DEC-0275 is the proposed answer. Until it is Accepted, ACT-2306 must not add
-the generated stress harness, a parallel turn driver, test-only panic injection,
-or a new claim that distinct Actors execute in parallel.
+Accepted DEC-0275 is the governing authority. ACT-2306 may now add the
+generated stress harness, bounded parallel-turn driver, and test-only panic
+injection seam, while retaining its explicit public-boundary and deferred-work
+limits.
 
 ## Evidence and compatibility
 
@@ -115,6 +113,6 @@ ACT-2306 must not use this proposal to imply source Actor execution, fair or
 live scheduling, cross-sender global ordering, concurrent Fault resolution,
 watchdogs, graceful drain, supervision, Replay, serialization, remote delivery,
 or bytecode/VM/native execution. Those remain separately governed work. The
-proposed parallel-turn evidence is only for the local pure, non-suspending,
+accepted parallel-turn evidence is only for the local pure, non-suspending,
 normal-return profile; it cannot settle later cancellation, restart, or replay
 semantics.

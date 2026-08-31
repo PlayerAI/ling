@@ -10644,7 +10644,7 @@ notes = [
 [[task]]
 id = "ACT-2306"
 title = "Actor properties and stress tests"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10686,16 +10686,16 @@ artifacts = [
 acceptance = [
   "Accepted DEC-0274 and its ACT-2305 implementation now supply a checked-Core-only local Actor runtime; the audit accurately distinguishes its current serial coordinator from missing ACT-2306 property and parallel-turn evidence.",
   "The audit maps same-Actor serialization, independent-Actor parallel turns, bounded Full/slow-consumer backpressure, post-stop behavior, Fault/panic containment, shutdown, deterministic generated commands, resource limits, Unicode/BOM/CRLF, and L-ACTOR-0002 boundaries to the required decision clauses.",
-  "DEC-0275 is Proposed only. It cannot authorize the ACT-2306 generator, parallel-turn driver, panic-injection seam, new runtime behavior, public scheduler, Replay, protocol, or completion claim until Accepted.",
+  "Accepted DEC-0275 clauses 1-13 authorize the ACT-2306 checked-Core-only generator, bounded parallel-turn driver, panic-injection seam, and evidence suite; it does not authorize a public scheduler, Replay, protocol, source feature, or completion claim before executable evidence is delivered.",
   "Accepted DEC-0100 remains only the publish-disabled property-observation child; it does not close property, stress, scheduler, replay, or cross-backend gaps.",
   "Any future suite must consume checked Core and real runtime traces only, distinguish language results from host timing/performance, preserve original UTF-8 spans, and publish bounded cleanup and ordering evidence before claiming Actor support.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "ACT-2305 is Done. ACT-2306 remains BlockedSpec solely for Accepted ACT-2306 property/stress authority; DEC-0275 is the current Proposed resolution and GAP-ACTOR-MAILBOX-SUPERVISOR-001 now explicitly records the task.",
+  "ACT-2305 is Done. Accepted DEC-0275 removes the sole authority blocker, so ACT-2306 is Ready; GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open for parallel Fault/restart semantics and supervisor authority outside this bounded evidence task.",
   "The current runtime already covers selected serial state, mailbox, Fault, cancellation, cleanup, resource, and Unicode facts but has no generated command corpus or bounded parallel-turn driver; GAP-DETERMINISTIC-REPLAY-001 remains outside this task's proposed internal evidence boundary.",
   "The audit/proposal preserves Seed behavior and changes no compiler, interpreter, VM, bytecode, public scheduler, mailbox protocol, diagnostics, schemas, Semantic IDs, source spans, runtime contract, or Unicode 17.0.0 behavior.",
 ]

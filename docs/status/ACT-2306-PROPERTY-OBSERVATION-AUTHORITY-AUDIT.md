@@ -5,10 +5,10 @@
 The bounded child `ACT-2306-PROPERTY-OBSERVATION` is authorized by Accepted
 `DEC-0100`. It records immutable, publish-disabled property observation
 identities, optional opaque Actor instances, and structural property labels for
-future evidence. Public `ACT-2306` remains `BlockedSpec`: Accepted DEC-0274
-now supplies its local runtime, but this child does not define property results,
-stress thresholds, scheduling, replay, or runtime behavior. Proposed DEC-0275
-is not implementation authority until Accepted.
+future evidence. Public `ACT-2306` is now `Ready`: Accepted DEC-0274 supplies
+its local runtime and Accepted DEC-0275 authorizes its bounded internal
+property/stress evidence. This child still does not define property results,
+stress thresholds, scheduling, replay, or runtime behavior.
 
 ## Normative traceability
 
@@ -20,8 +20,8 @@ is not implementation authority until Accepted.
 - `DEC-0095` through `DEC-0100` provide the preceding opaque Actor, message,
   mailbox, turn, runtime, and property observation boundaries.
 - Accepted DEC-0274 provides the checked-Core-only local runtime that this
-  observation child intentionally does not execute. Proposed DEC-0275 defines
-  the still-unaccepted property/stress test contract.
+  observation child intentionally does not execute. Accepted DEC-0275 defines
+  the parent task's bounded property/stress test contract.
 - `DEC-0100` authorizes this child only and leaves the Actor/replay gaps open.
 
 ## Current implementation boundary
@@ -41,8 +41,7 @@ or migration behavior was added.
 
 Focused tests cover identity validation, deterministic ordering, canonical-byte
 independence from source evidence and insertion order, duplicate rejection, and
-invalid Actor rejection. The parent remains blocked until DEC-0275 (or a
-replacement) is Accepted and defines property relations, interleavings,
-resource/shutdown budgets, and executable stress evidence. Replay remains a
-separate unresolved authority rather than a prerequisite for this internal
-local-runtime proposal.
+invalid Actor rejection. The parent is Ready under Accepted DEC-0275 to add
+property relations, interleavings, resource/shutdown budgets, and executable
+stress evidence. Replay remains a separate unresolved authority rather than a
+prerequisite for this internal local-runtime decision.
