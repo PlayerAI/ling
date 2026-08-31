@@ -1,8 +1,8 @@
 # DEC-0273: Checked non-suspending Actor turn / 已检查的不可挂起 Actor turn
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-08-31<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-08-31<br>
 > Owner role：actor-semantics<br>
 > 相关 RFC/缺口：DEC-0008 | DEC-0009 | DEC-0010 | DEC-0013 | DEC-0098 | DEC-0270 | DEC-0271 | DEC-0272 | GAP-ACTOR-AWAIT-REENTRY-001 | ACT-2304<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`

@@ -40,7 +40,7 @@
 | `ACT-2302-MESSAGE-SCHEMA-MODEL` | Internal Actor message-schema identity model | `G2` | `S` | `Done` | `ACT-2301-IDENTITY-MODEL` | `dfc5577c80ecf3811014495080aca758df2cf3e9` |
 | `ACT-2303` | Bounded mailbox and backpressure | `G2` | `L` | `Done` | `ACT-2302` | `c0c5f8b24a6bdddc29c48973df75ef6fb6675195` |
 | `ACT-2303-MAILBOX-OBSERVATION` | Internal Actor mailbox observation | `G2` | `S` | `Done` | `ACT-2302-MESSAGE-SCHEMA-MODEL` | `fb42fb580dde35d09594392f16e5798621fd3785` |
-| `ACT-2304` | Actor turn and reentry rules | `G2` | `L` | `BlockedSpec` | `ACT-2303` | `` |
+| `ACT-2304` | Actor turn and reentry rules | `G2` | `L` | `Ready` | `ACT-2303` | `` |
 | `ACT-2304-TURN-OBSERVATION` | Internal Actor turn observation | `G2` | `S` | `Done` | `ACT-2303-MAILBOX-OBSERVATION` | `ec279c46f14acb2634fa7783f8e195d457178041` |
 | `ACT-2305` | Actor runtime | `G2` | `L` | `BlockedSpec` | `ACT-2304` | `` |
 | `ACT-2305-RUNTIME-OBSERVATION` | Internal Actor runtime observation | `G2` | `S` | `Done` | `ACT-2304-TURN-OBSERVATION` | `c8df61e4e0ad01c2f3bd7b30555aca00ab2fd696` |

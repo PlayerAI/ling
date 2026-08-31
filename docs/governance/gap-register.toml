@@ -501,23 +501,23 @@ observed_markers = []
 [[gap]]
 id = "GAP-ACTOR-AWAIT-REENTRY-001"
 title = "Actor turn await and reentry semantics"
-status = "Open"
+status = "Accepted"
 priority = "P1"
 blocked_releases = ["v0.2"]
 blocked_tasks = ["ACT-2304", "ACT-2305", "ACT-2306"]
-observable_behavior = "It is undecided whether an actor may process another message while a turn is suspended at await and what state invariants span suspension."
-authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0270"]
-candidate_rfcs = ["RFC-0009"]
+observable_behavior = "Accepted DEC-0273 selects a non-suspending no-reentry v0.2 Actor profile: await is unavailable in a turn, at most one turn is active, and state publishes atomically only on normal return."
+authority = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0270", "DEC-0273"]
+candidate_rfcs = []
 source_items = ["SEMANTICS-31.5", "RFC-0001-22:RFC-0009", "ROADMAP-6.2:actor-reentry"]
 options = [
-  "Forbid reentry until the current turn completes.",
-  "Permit explicit reentry points with accepted invariant and ordering rules.",
+  "Accepted for the v0.2 profile: forbid suspension and reentry until the current turn completes.",
+  "A future explicit suspending profile requires new Accepted state-version, ordering, ownership, cancellation, and migration authority.",
 ]
 irreversible_consequences = ["Reentry changes state invariants, message ordering, race behavior, replay, and source-level reasoning."]
 required_evidence = ["positive", "negative", "migration", "interleaving", "state-invariant", "replay"]
 owner_role = "actor-semantics"
-next_action = "Review proposed DEC-0273; only after explicit acceptance may ACT-2304 implement the checked non-suspending no-reentry profile, while later suspending/runtime work remains in RFC-0009."
-resolution = []
+next_action = "Implement ACT-2304 against DEC-0273; register a new gap and compatibility version before proposing any suspending or reentrant Actor profile."
+resolution = ["DEC-0273"]
 superseded_by = ""
 observed_markers = []
 

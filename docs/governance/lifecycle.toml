@@ -7777,13 +7777,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0273"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0273-checked-nonsuspending-actor-turn.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-08-31"
 proposed = "2026-08-31"
-decided = ""
-stable_basis = false
+decided = "2026-08-31"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Construct and validate the exact checked one-message non-suspending turn contract from DEC-0270 through DEC-0272 without runtime state, queues, continuations, timers, or Actor instances.",
@@ -7792,9 +7792,9 @@ conformance_plan = [
   "Prove Actor-bearing execution and every self-send, cancellation, watchdog, scheduler, supervisor, Replay, serializer, and remote path remain unavailable.",
 ]
 compatibility_impact = [
-  "Would make the existing pure receive transition an explicit one-message non-suspending no-reentry checked turn contract without adding source syntax or diagnostics.",
-  "Would advance only the Experimental Actor extension to x-ling-actor/0.3 and checked Actor Core identity; non-Actor bytes and identities would remain unchanged.",
-  "Would add no runtime dequeue, state storage, send, scheduler, watchdog, interpreter, bytecode/VM/native ABI, supervisor, Replay, remote, Stable, or Unicode 17.0.0 behavior.",
+  "Makes the existing pure receive transition an explicit one-message non-suspending no-reentry checked turn contract without adding source syntax or diagnostics.",
+  "Advances only the Experimental Actor extension to x-ling-actor/0.3 and checked Actor Core identity; non-Actor bytes and identities remain unchanged.",
+  "Adds no runtime dequeue, state storage, send, scheduler, watchdog, interpreter, bytecode/VM/native ABI, supervisor, Replay, remote, Stable, or Unicode 17.0.0 behavior.",
 ]
 unresolved_alternatives = [
   "Suspending turns, guarded reentry, state versions, continuation ownership, cancellation, Fault cleanup, retry/restart, self-send outcomes, scheduler fairness, watchdog thresholds/events, supervision, Replay, serialization, and remote delivery remain later Accepted work.",

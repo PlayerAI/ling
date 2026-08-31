@@ -10395,7 +10395,7 @@ notes = [
 [[task]]
 id = "ACT-2304"
 title = "Actor turn and reentry rules"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10434,7 +10434,7 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "Proposed DEC-0273 selects a checked-only one-message, non-suspending, no-reentry, publish-on-normal-return profile, but it is not implementation authority until explicitly Accepted.",
+  "Accepted DEC-0273 selects a checked-only one-message, non-suspending, no-reentry, publish-on-normal-return profile and supplies implementation authority for ACT-2304.",
   "The audit records the missing turn lifecycle/atomic boundary, await suspend/reentry choice, state-version/guard, borrow, self-send, recursion, cancellation/Fault, watchdog, scheduler/replay, local/remote, diagnostics, schema, and migration contracts.",
   "The audit distinguishes SEMANTICS/LANGUAGE/ROADMAP high-level turn constraints and their explicit future-RFC reentry gap from the absent Accepted RFC-C203/C204 authority, and preserves the checked-only evaluation boundary.",
   "The audit covers no-await atomic turns, each reentry alternative, nested/recursive self-send through the mailbox, concurrent interleavings, state-version conflicts, active-borrow rejection, cancellation/Fault cleanup, watchdog observation, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM differential fixtures.",
@@ -10444,10 +10444,10 @@ acceptance = [
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "ACT-2301 through ACT-2303 are Done; ACT-2304 remains BlockedSpec because DEC-0273 is only Proposed and GAP-ACTOR-AWAIT-REENTRY-001 remains Open for acceptance and later suspending/runtime profiles.",
+  "ACT-2301 through ACT-2303 are Done; Accepted DEC-0273 resolves the v0.2 no-await/no-reentry choice and makes ACT-2304 Ready while later suspending profiles require a new gap and compatibility version.",
   "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Actor/Task await, turn context, state-version guard, reentry judgment, self-send operation, watchdog, scheduler, or Actor protocol; ordinary recursive calls do not define Actor recursion.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
