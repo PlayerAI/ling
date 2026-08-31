@@ -1058,6 +1058,8 @@ impl<'checked> ActorRuntime<'checked> {
         });
 
         let value = catch_unwind(AssertUnwindSafe(|| {
+            #[cfg(test)]
+            property_tests::panic_turn_evaluation_if_requested();
             let mut environment = Environment::new();
             environment.insert(
                 core.state_binding(),
@@ -1573,3 +1575,7 @@ fn actor_invariant_fault(
         span,
     }
 }
+
+#[cfg(test)]
+#[path = "actor_runtime_properties.rs"]
+mod property_tests;
