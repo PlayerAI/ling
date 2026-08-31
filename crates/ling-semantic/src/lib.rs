@@ -4,14 +4,17 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 use std::fmt;
 
-use ling_effects::{CheckedProgram, LocalMailboxContract, MailboxCapacity, MailboxOverflowPolicy};
+use ling_effects::{
+    ActorTurnContract, ActorTurnSpec, ActorTypeId, CheckedProgram, LocalMailboxContract,
+    MailboxCapacity, MailboxOverflowPolicy,
+};
 use ling_hir as hir;
 use ling_project::PackageIdentity;
 use ling_resolve::{
     DefinitionId, DefinitionKind, DefinitionOrigin, ExpressionKey, ModuleId, PRELUDE_MODULE,
     ReferenceTarget,
 };
-use ling_source::Span;
+use ling_source::{ByteOffset, SourceId, Span};
 use serde::{Deserialize, Serialize};
 
 pub const SEMANTIC_SCHEMA: &str = "ling.semantic/0.1";
@@ -19,7 +22,7 @@ pub const PROJECT_SEMANTIC_SCHEMA: &str = "ling.semantic/0.2";
 pub const LANGUAGE_VERSION: &str = "0.0.1-dev";
 pub const TRAIT_IDE_EXTENSION_VERSION: &str = "0.1";
 pub const TASK_GRAPH_EXTENSION_VERSION: &str = "0.1";
-pub const ACTOR_GRAPH_EXTENSION_VERSION: &str = "0.2";
+pub const ACTOR_GRAPH_EXTENSION_VERSION: &str = "0.3";
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BodyId(String);
@@ -108,6 +111,7 @@ pub struct SemanticActor {
     pub root: u32,
     pub span: SemanticByteSpan,
     pub mailbox: SemanticActorMailbox,
+    pub turn: SemanticActorTurn,
     pub nodes: Vec<SemanticActorSchemaNode>,
 }
 
@@ -120,6 +124,23 @@ pub struct SemanticActorMailbox {
     pub span: SemanticByteSpan,
     pub capacity_span: SemanticByteSpan,
     pub policy_span: SemanticByteSpan,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SemanticActorTurn {
+    pub actor_type: u32,
+    pub dispatch: String,
+    pub suspension: String,
+    pub reentry: String,
+    pub state_commit: String,
+    pub self_send: String,
+    pub transition: u32,
+    pub state_binding: u32,
+    pub message_binding: u32,
+    pub canonical_bytes: Vec<u8>,
+    pub span: SemanticByteSpan,
+    pub body_span: SemanticByteSpan,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -2589,6 +2610,15 @@ fn validate_actor_projection(graph: &SemanticGraph) -> Result<(), SemanticReadEr
             ));
         }
         validate_actor_mailbox(&actor.mailbox, &format!("{path}.mailbox"))?;
+        if actor.turn.span.source != actor.span.source
+            || actor.turn.span.source != actor.mailbox.span.source
+        {
+            return Err(invalid_actor_projection(
+                &format!("{path}.turn.span.source"),
+                "Actor message, mailbox, and turn evidence must use the same source",
+            ));
+        }
+        validate_actor_turn(actor, &format!("{path}.turn"))?;
         validate_actor_nodes(actor, &path)?;
         let expected = format!(
             "experimental:blake3:{}",
@@ -2602,6 +2632,51 @@ fn validate_actor_projection(graph: &SemanticGraph) -> Result<(), SemanticReadEr
         }
     }
     Ok(())
+}
+
+fn validate_actor_turn(actor: &SemanticActor, path: &str) -> Result<(), SemanticReadError> {
+    let turn = &actor.turn;
+    let receive_span = actor_turn_span(&turn.span)
+        .ok_or_else(|| invalid_actor_projection(path, "Actor turn receive span is invalid"))?;
+    let body_span = actor_turn_span(&turn.body_span)
+        .ok_or_else(|| invalid_actor_projection(path, "Actor turn body span is invalid"))?;
+    let expected = ActorTurnContract::new_checked_profile(ActorTurnSpec {
+        actor: actor.definition_id.as_str().into(),
+        actor_type: ActorTypeId::new(turn.actor_type),
+        transition: turn.transition,
+        state_binding: turn.state_binding,
+        message_binding: turn.message_binding,
+        receive_span,
+        body_span,
+    })
+    .map_err(|error| invalid_actor_projection(path, &error.to_string()))?;
+    if turn.dispatch != expected.dispatch().as_str()
+        || turn.suspension != expected.suspension().as_str()
+        || turn.reentry != expected.reentry().as_str()
+        || turn.state_commit != expected.state_commit().as_str()
+        || turn.self_send != expected.self_send().as_str()
+    {
+        return Err(invalid_actor_projection(
+            path,
+            "Actor turn modes do not match the accepted checked profile",
+        ));
+    }
+    if turn.canonical_bytes != expected.canonical_bytes() {
+        return Err(invalid_actor_projection(
+            &format!("{path}.canonical_bytes"),
+            "Actor turn canonical bytes do not match its owner, modes, or checked identities",
+        ));
+    }
+    Ok(())
+}
+
+fn actor_turn_span(span: &SemanticByteSpan) -> Option<Span> {
+    Span::new(
+        SourceId::new(span.source),
+        ByteOffset::new(span.start),
+        ByteOffset::new(span.end),
+    )
+    .ok()
 }
 
 fn validate_actor_mailbox(
@@ -3650,6 +3725,23 @@ impl SnapshotBuilder {
                             span: semantic_byte_span(mailbox.source_span()),
                             capacity_span: semantic_byte_span(mailbox.capacity_span()),
                             policy_span: semantic_byte_span(mailbox.policy_span()),
+                        }
+                    },
+                    turn: {
+                        let turn = core.turn_contract();
+                        SemanticActorTurn {
+                            actor_type: turn.actor_type().get(),
+                            dispatch: turn.dispatch().as_str().to_owned(),
+                            suspension: turn.suspension().as_str().to_owned(),
+                            reentry: turn.reentry().as_str().to_owned(),
+                            state_commit: turn.state_commit().as_str().to_owned(),
+                            self_send: turn.self_send().as_str().to_owned(),
+                            transition: turn.transition(),
+                            state_binding: turn.state_binding(),
+                            message_binding: turn.message_binding(),
+                            canonical_bytes: turn.canonical_bytes().to_vec(),
+                            span: semantic_byte_span(turn.receive_span()),
+                            body_span: semantic_byte_span(turn.body_span()),
                         }
                     },
                     nodes,
@@ -5629,7 +5721,7 @@ mod tests {
             "type Tree<'a> =\n",
             "    | Branch of List<Tree<'a>>\n",
             "    | Leaf of 'a\n\n",
-            "actor Inbox : Envelope<Tree<Int>> =\n",
+            "actor 收件箱 : Envelope<Tree<Int>> =\n",
             "    mailbox capacity 64 overflow Reject\n",
             "    state Int = 0\n",
             "    receive state message =\n",
@@ -5637,6 +5729,7 @@ mod tests {
         );
         let first = snapshot_named("actor-a.ling", source);
         let second = snapshot_named("actor-b.ling", &source.replace('\n', "\r\n"));
+        let with_bom = snapshot_named("actor-bom.ling", &format!("\u{feff}{source}"));
         let projection = first.graph().actor.as_ref().expect("Actor extension");
         assert_eq!(projection.version, ACTOR_GRAPH_EXTENSION_VERSION);
         assert_eq!(projection.actors.len(), 1);
@@ -5647,11 +5740,34 @@ mod tests {
         assert!(!actor.mailbox.canonical_bytes.is_empty());
         assert!(actor.mailbox.span.start < actor.mailbox.capacity_span.start);
         assert!(actor.mailbox.capacity_span.end < actor.mailbox.policy_span.start);
+        assert_eq!(actor.turn.dispatch, "OneMessage");
+        assert_eq!(actor.turn.suspension, "Forbidden");
+        assert_eq!(actor.turn.reentry, "Forbidden");
+        assert_eq!(actor.turn.state_commit, "PublishOnNormalReturn");
+        assert_eq!(actor.turn.self_send, "MailboxOnly");
+        assert_ne!(actor.turn.actor_type, 0);
+        assert_ne!(actor.turn.state_binding, actor.turn.message_binding);
+        assert!(!actor.turn.canonical_bytes.is_empty());
+        assert_eq!(actor.turn.span.source, actor.span.source);
+        assert!(actor.turn.span.start < actor.turn.body_span.start);
+        assert!(actor.turn.body_span.end <= actor.turn.span.end);
         assert!(actor.schema_id.starts_with("experimental:blake3:"));
         assert!(actor.nodes.iter().any(|node| node.kind == "record"));
         assert!(actor.nodes.iter().any(|node| node.kind == "variant"));
         assert!(actor.nodes.iter().any(|node| node.kind == "list"));
         assert_eq!(first.program_id(), second.program_id());
+        assert_eq!(first.program_id(), with_bom.program_id());
+        assert_eq!(
+            actor.turn.canonical_bytes,
+            second
+                .graph()
+                .actor
+                .as_ref()
+                .expect("Actor extension")
+                .actors[0]
+                .turn
+                .canonical_bytes
+        );
         assert_eq!(
             actor.schema_id,
             second
@@ -5738,6 +5854,50 @@ mod tests {
         bad_mailbox_span["x-ling-actor"]["actors"][0]["mailbox"]["capacity_span"]["start"] =
             serde_json::json!(u32::MAX);
         assert!(read_json(&bad_mailbox_span.to_string()).is_err());
+
+        for (field, invalid) in [
+            ("dispatch", serde_json::json!("Batch")),
+            ("suspension", serde_json::json!("Allowed")),
+            ("reentry", serde_json::json!("Allowed")),
+            ("state_commit", serde_json::json!("Incremental")),
+            ("self_send", serde_json::json!("Recursive")),
+        ] {
+            let mut bad_mode = value.clone();
+            bad_mode["x-ling-actor"]["actors"][0]["turn"][field] = invalid;
+            assert!(read_json(&bad_mode.to_string()).is_err());
+        }
+
+        let mut bad_actor_type = value.clone();
+        bad_actor_type["x-ling-actor"]["actors"][0]["turn"]["actor_type"] = serde_json::json!(0);
+        assert!(read_json(&bad_actor_type.to_string()).is_err());
+
+        let mut bad_transition = value.clone();
+        let transition = bad_transition["x-ling-actor"]["actors"][0]["turn"]["transition"]
+            .as_u64()
+            .expect("transition identity");
+        bad_transition["x-ling-actor"]["actors"][0]["turn"]["transition"] =
+            serde_json::json!(transition + 1);
+        assert!(read_json(&bad_transition.to_string()).is_err());
+
+        let mut bad_bindings = value.clone();
+        bad_bindings["x-ling-actor"]["actors"][0]["turn"]["message_binding"] =
+            bad_bindings["x-ling-actor"]["actors"][0]["turn"]["state_binding"].clone();
+        assert!(read_json(&bad_bindings.to_string()).is_err());
+
+        let mut bad_turn_bytes = value.clone();
+        bad_turn_bytes["x-ling-actor"]["actors"][0]["turn"]["canonical_bytes"] =
+            serde_json::json!([0]);
+        assert!(read_json(&bad_turn_bytes.to_string()).is_err());
+
+        let mut bad_turn_source = value.clone();
+        bad_turn_source["x-ling-actor"]["actors"][0]["turn"]["body_span"]["source"] =
+            serde_json::json!(1);
+        assert!(read_json(&bad_turn_source.to_string()).is_err());
+
+        let mut bad_turn_order = value.clone();
+        bad_turn_order["x-ling-actor"]["actors"][0]["turn"]["body_span"]["start"] =
+            serde_json::json!(0);
+        assert!(read_json(&bad_turn_order.to_string()).is_err());
 
         let mut bad_owner = value.clone();
         bad_owner["x-ling-actor"]["actors"][0]["definition_id"] =

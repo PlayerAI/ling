@@ -30,6 +30,9 @@ pub use handler_core::{
     HandlerCore, HandlerCoreClause, HandlerCoreError, HandlerCoreNodeId, ResumeUse,
 };
 pub use ling_concurrency::{
+    ActorTurnCompletion, ActorTurnContract, ActorTurnContractError, ActorTurnDispatch,
+    ActorTurnReentry, ActorTurnSelfSend, ActorTurnSpec, ActorTurnStateCommit,
+    ActorTurnStatePublication, ActorTurnSuspension, ActorTypeId, CHECKED_ACTOR_TURN_VERSION,
     CHECKED_LOCAL_MAILBOX_VERSION, LocalMailboxContract, MAX_LOCAL_MAILBOX_CAPACITY,
     MailboxAdmission, MailboxCapacity, MailboxContractError, MailboxOverflowPolicy,
 };

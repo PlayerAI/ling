@@ -590,7 +590,7 @@ implemented = true
 [[protocol]]
 id = "PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION"
 visibility = "Public"
-version = "x-ling-actor/0.2"
+version = "x-ling-actor/0.3"
 stability = "Experimental"
 implemented = true
 

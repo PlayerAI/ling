@@ -2,7 +2,10 @@
 
 use std::collections::BTreeMap;
 
-use ling_concurrency::{ActorTypeId, LocalMailboxContract, MailboxCapacity, MailboxOverflowPolicy};
+use ling_concurrency::{
+    ActorTurnContract, ActorTurnSpec, ActorTypeId, LocalMailboxContract, MailboxCapacity,
+    MailboxOverflowPolicy,
+};
 use ling_hir as hir;
 use ling_resolve::{BindingKey, DefinitionId, ExpressionKey};
 use ling_source::Span;
@@ -10,7 +13,7 @@ use ling_types::{ActorMessageSchema, SendableLocal, Type, TypeId, TypedProgram};
 
 use crate::EffectRow;
 
-pub const CHECKED_ACTOR_CORE_VERSION: &str = "ling.checked-actor-core/2";
+pub const CHECKED_ACTOR_CORE_VERSION: &str = "ling.checked-actor-core/3";
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct CheckedActorMailboxContract {
@@ -162,6 +165,7 @@ pub struct CheckedActorCore {
     message_type: TypeId,
     message_contract: CheckedActorMessageContract,
     mailbox_contract: CheckedActorMailboxContract,
+    turn_contract: ActorTurnContract,
     state_type: TypeId,
     reference_type: CheckedActorRefType,
     actor_id_contract: CheckedActorIdContract,
@@ -198,6 +202,11 @@ impl CheckedActorCore {
     #[must_use]
     pub const fn mailbox_contract(&self) -> &CheckedActorMailboxContract {
         &self.mailbox_contract
+    }
+
+    #[must_use]
+    pub const fn turn_contract(&self) -> &ActorTurnContract {
+        &self.turn_contract
     }
 
     #[must_use]
@@ -520,6 +529,37 @@ fn build_one(
         policy_span: declaration.mailbox.policy.span,
     };
 
+    let source_spans = CheckedActorSourceSpans {
+        declaration: declaration.span,
+        actor_keyword: declaration.keyword_span,
+        message_type: declaration.message_type.span,
+        mailbox_clause: declaration.mailbox.span,
+        mailbox_keyword: declaration.mailbox.keyword_span,
+        capacity_keyword: declaration.mailbox.capacity_keyword_span,
+        capacity: declaration.mailbox.capacity_span,
+        overflow_keyword: declaration.mailbox.overflow_keyword_span,
+        overflow_policy: declaration.mailbox.policy.span,
+        state_clause: declaration.state.span,
+        state_keyword: declaration.state.keyword_span,
+        state_type: declaration.state.state_type.span,
+        initializer: declaration.state.initializer.span,
+        receive_clause: declaration.receive.span,
+        receive_keyword: declaration.receive.keyword_span,
+        state_pattern: declaration.receive.state_pattern.span,
+        message_pattern: declaration.receive.message_pattern.span,
+        transition_body: declaration.receive.body.span,
+    };
+    let turn_contract = ActorTurnContract::new_checked_profile(ActorTurnSpec {
+        actor: definition.as_str().into(),
+        actor_type,
+        transition: transition_body.local().get(),
+        state_binding: state_binding.local().get(),
+        message_binding: message_binding.local().get(),
+        receive_span: source_spans.receive_clause,
+        body_span: source_spans.transition_body,
+    })
+    .expect("checked Actor owner, identities, bindings, and receive spans are consistent");
+
     let canonical_bytes = canonical_bytes(
         typed,
         &definition,
@@ -527,11 +567,9 @@ fn build_one(
         *message,
         *state,
         initializer,
-        transition_body,
-        state_binding,
-        message_binding,
         &message_contract,
         &mailbox_contract,
+        &turn_contract,
     );
     Ok(CheckedActorCore {
         definition,
@@ -539,6 +577,7 @@ fn build_one(
         message_type: *message,
         message_contract,
         mailbox_contract,
+        turn_contract,
         state_type: *state,
         reference_type: CheckedActorRefType {
             actor_type,
@@ -550,26 +589,7 @@ fn build_one(
         state_binding,
         message_binding,
         effects: EffectRow::default(),
-        source_spans: CheckedActorSourceSpans {
-            declaration: declaration.span,
-            actor_keyword: declaration.keyword_span,
-            message_type: declaration.message_type.span,
-            mailbox_clause: declaration.mailbox.span,
-            mailbox_keyword: declaration.mailbox.keyword_span,
-            capacity_keyword: declaration.mailbox.capacity_keyword_span,
-            capacity: declaration.mailbox.capacity_span,
-            overflow_keyword: declaration.mailbox.overflow_keyword_span,
-            overflow_policy: declaration.mailbox.policy.span,
-            state_clause: declaration.state.span,
-            state_keyword: declaration.state.keyword_span,
-            state_type: declaration.state.state_type.span,
-            initializer: declaration.state.initializer.span,
-            receive_clause: declaration.receive.span,
-            receive_keyword: declaration.receive.keyword_span,
-            state_pattern: declaration.receive.state_pattern.span,
-            message_pattern: declaration.receive.message_pattern.span,
-            transition_body: declaration.receive.body.span,
-        },
+        source_spans,
         canonical_bytes: canonical_bytes.into_boxed_slice(),
     })
 }
@@ -612,11 +632,9 @@ fn canonical_bytes(
     message: TypeId,
     state: TypeId,
     initializer: ExpressionKey,
-    transition_body: ExpressionKey,
-    state_binding: BindingKey,
-    message_binding: BindingKey,
     message_contract: &CheckedActorMessageContract,
     mailbox_contract: &CheckedActorMailboxContract,
+    turn_contract: &ActorTurnContract,
 ) -> Vec<u8> {
     let mut bytes = Vec::new();
     push_text(&mut bytes, CHECKED_ACTOR_CORE_VERSION);
@@ -632,14 +650,8 @@ fn canonical_bytes(
     push_bytes(&mut bytes, message_contract.schema().canonical_bytes());
     push_bytes(&mut bytes, mailbox_contract.mailbox().canonical_bytes());
     push_text(&mut bytes, &typed.arena().display(state));
-    for value in [
-        initializer.local().get(),
-        transition_body.local().get(),
-        state_binding.local().get(),
-        message_binding.local().get(),
-    ] {
-        bytes.extend_from_slice(&value.to_le_bytes());
-    }
+    bytes.extend_from_slice(&initializer.local().get().to_le_bytes());
+    push_bytes(&mut bytes, turn_contract.canonical_bytes());
     bytes
 }
 

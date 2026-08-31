@@ -23,6 +23,7 @@ mod scheduler;
 mod state_machine;
 mod supervisor;
 mod turn;
+mod turn_contract;
 
 pub use actor::{
     ActorId, ActorIdentityError, ActorIdentityKind, ActorIdentityModel, ActorInstance,
@@ -73,6 +74,11 @@ pub use supervisor::{
 pub use turn::{
     TurnId, TurnIdentityKind, TurnObservation, TurnObservationError, TurnObservationKind,
     TurnObservationModel, TurnObservationSpec,
+};
+pub use turn_contract::{
+    ActorTurnCompletion, ActorTurnContract, ActorTurnContractError, ActorTurnDispatch,
+    ActorTurnReentry, ActorTurnSelfSend, ActorTurnSpec, ActorTurnStateCommit,
+    ActorTurnStatePublication, ActorTurnSuspension, CHECKED_ACTOR_TURN_VERSION,
 };
 
 macro_rules! id_type {

@@ -2,124 +2,74 @@
 
 ## Outcome
 
-`ACT-2304` is correctly recorded as `BlockedSpec`. The G2 plan requires one
-Actor turn at a time, then leaves the central `await` choice open: suspend and
-release the turn, forbid reentry, or permit explicitly guarded reentry. It also
-requires self-send and recursive processing to go through the mailbox and a
-non-destructive watchdog for long turns. No accepted RFC fixes these choices or
-their interaction with state ownership, Task suspension, cancellation, mailbox
-ordering, supervision, or replay.
+`ACT-2304` is authorized by Accepted `DEC-0273` for one bounded checked-only
+profile: exactly one message per turn, no suspension, no reentry, atomic state
+publication only on normal return, and mailbox-only routing for any future
+self-send. ACT-2301 through ACT-2303 are Done, so ACT-2304 may consume their
+immutable Actor identity, message-schema, and bounded-mailbox contracts.
 
-No turn state machine, reentry guard, state-version token, await lowering,
-self-send path, watchdog, scheduler hook, diagnostic, or placeholder G2 API
-was added.
-
-Accepted `DEC-0098` now authorizes the bounded child
-`ACT-2304-TURN-OBSERVATION`, which records only immutable turn identities and
-structural vocabulary labels. It does not close the await, reentry, state
-guard, self-send, watchdog, scheduler, supervision, or runtime gaps described
-below.
+This authority does not permit Actor execution. It permits an immutable checked
+turn contract, Actor identity participation, and a data-only
+`x-ling-actor/0.3` Semantic Graph projection. ACT-2305 remains responsible for
+runtime dequeue, transition invocation, state storage/publication, lifecycle,
+and executable failure behavior.
 
 ## Normative traceability
 
-- The G2 execution package is non-normative. Its alternatives and high-risk
-  checklist cannot authorize `await` syntax, a turn ABI, or a runtime reentry
-  policy.
-- The plan requires RFC-C203 for Actor identity/state isolation/turn and
-  await-reentry semantics, and RFC-C204 for mailbox ordering and supervision.
-  No Accepted RFC-C203/C204 or replacement RFC-0009 exists; RFC-0001 remains a
-  Draft baseline under DEC-0018. ACT-2301, ACT-2302, and ACT-2303 are already
-  `BlockedSpec`, so turn behavior cannot be implemented independently of their
-  identity, message, and mailbox contracts.
-- `docs/SEMANTICS.md` establishes the high-level constraints that an Actor
-  processes one turn at a time, that an Actor-state mutable Borrow cannot leave
-  the turn, that a no-`await` turn is an atomic observation boundary, and that
-  `await` is a suspension point. It explicitly leaves the exact reentry rule to
-  a future RFC and v0.0.1 implements neither `AwaitTask` nor Actor Core forms.
-- `docs/LANGUAGE.md` and `docs/ROADMAP-1.0.md` describe structured concurrency,
-  turn isolation, and the need for observable long-turn behavior, but do not
-  define whether suspension releases the turn, how state versions/guards are
-  represented, or how watchdog events affect program semantics.
-- Accepted DEC-0008/DEC-0009 define only Seed value parameters and local borrow
-  restrictions; DEC-0010 defines local Seed State/Capability behavior; DEC-0013
-  defines main/runtime failures; and DEC-0018 defines RFC lifecycle. RFC-0020
-  explicitly excludes Ling Task/Actor cancellation, scheduling, and replay.
-  None authorizes Actor turn suspension, reentry, or self-send behavior.
-- `GAP-ACTOR-AWAIT-REENTRY-001` remains Open, blocks ACT-2301, ACT-2304,
-  ACT-2305, and ACT-2306, and requires positive/negative/migration,
-  interleaving, state-invariant, and replay evidence before resolution.
+- Accepted `DEC-0270` fixes checked Actor identity, invariant local references,
+  isolated ordinary-Value state, pure typed initialization/transition, and the
+  pre-execution implementation boundary.
+- Accepted `DEC-0271` fixes `SendableLocal(Value)` message admission and the
+  closed canonical local message schema.
+- Accepted `DEC-0272` fixes explicit capacity `1..=65535`, `Reject`, pure
+  `Accepted`/`Full` admission classification, and the checked local mailbox
+  canonical domain.
+- Accepted `DEC-0273` clauses 1–17 fix the first turn profile, its canonical
+  identity, `x-ling-actor/0.3`, diagnostics compatibility, and the exact
+  completion/deferred-work boundary.
+- `docs/SEMANTICS.md`, `docs/LANGUAGE.md`, and `docs/ROADMAP-1.0.md` remain the
+  higher-level constraints. The execution package describes engineering order
+  but creates no additional semantics.
 
-## Current implementation evidence
+## Authorized implementation surface
 
-- The workspace has no Actor or Task runtime, turn context, suspension
-  lowering, mailbox dispatch, reentry guard, watchdog, or supervisor runtime.
-  `ling-eval` and `ling-vm` execute only the Seed checked subset; VM cancellation
-  is a host control boundary and is not an Actor await/reentry mechanism.
-- `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` have
-  no accepted Actor/Task `await` form, turn token, state-version fact,
-  reentrancy judgment, self-send operation, or watchdog effect.
-- Existing recursive function support is ordinary call-stack behavior and does
-  not imply recursive Actor message processing. Compiler-query deterministic
-  scheduling decisions do not define a runtime Actor scheduler or source-level
-  interleaving semantics.
-- No Semantic Graph node, schema, diagnostic, replay record, or conformance
-  fixture captures turn suspension, state guards, reentry interleavings,
-  self-send mailbox ordering, long-turn observation, cancellation cleanup, or
-  interpreter/VM equivalence.
+The implementation may add:
 
-## Required authority before implementation
+1. a checked, immutable, path-free `ling.checked-actor-turn/1` contract covering
+   owner/type, one-message dispatch, forbidden suspension/reentry,
+   publish-on-normal-return, mailbox-only future self-send, transition and
+   binding identities, and receive/body source evidence;
+2. checked Actor Core version `/3`, with the turn canonical bytes participating
+   in Actor Body/Program identity while source evidence remains excluded;
+3. exact Experimental `x-ling-actor/0.3` writer/schema/isolated-reader support;
+4. pure normal/unsuccessful completion classification as checked evidence; and
+5. positive, corruption, determinism, Unicode/BOM/CRLF, effect rejection, and
+   no-execution tests.
 
-An Accepted RFC or decision must define, at minimum:
+Construction must remain after parsing, resolution, typing, and Effect
+checking. The isolated reader returns data only and cannot create checked or
+executable Core.
 
-1. the turn lifecycle and atomic observation boundary, including when a turn
-   starts/ends, whether a turn may process one or many messages, and how state
-   visibility relates to mailbox dequeue and commit;
-2. `await` suspension behavior: forbid, freeze-and-release, or explicit guarded
-   reentry, with the Typed Core representation, state-version/guard rules,
-   active-borrow restrictions, and Task/Effect interaction for each case;
-3. self-send and recursive sends, including the required mailbox route,
-   ordering relative to the current turn, queue capacity/backpressure result,
-   and prevention of unbounded reentrant recursion;
-4. cancellation, Fault, shutdown, and supervisor behavior at every suspension
-   and reentry boundary, including resource cleanup and whether a suspended
-   turn can be resumed, abandoned, or retried;
-5. long-turn watchdog observability, limits, metrics/events, diagnostic and
-   Semantic Graph/Audit Source projection, and a prohibition on force-killing
-   a turn in a way that violates Resource or state semantics;
-6. local/remote and replay boundaries, ordering/determinism classes, migration
-   rules, and compatibility with mailbox/supervision and message schemas; and
-7. executable positive/negative/interleaving/migration fixtures covering no
-   `await`, each reentry choice, nested/recursive self-send, concurrent
-   senders, state-version conflicts, active-borrow rejection, cancellation,
-   Fault cleanup, watchdog observation, Unicode/CRLF/BOM spans, deterministic
-   output, and interpreter/VM differential behavior without unchecked-AST
-   execution.
+## Compatibility and diagnostics
 
-Until these decisions are Accepted, a turn implementation would silently fix
-state invariants, race/order behavior, liveness, replay meaning, and cleanup
-semantics that the language authority intentionally leaves open.
-
-## Evidence and compatibility
-
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0008, DEC-0009, DEC-0010,
-DEC-0013, DEC-0018, RFC-0001, RFC-0020,
-`docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
-`docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
-`docs/governance/gap-register.toml`,
-`docs/governance/protocol-inventory.toml`, and the current syntax, AST, HIR,
-types, effects, evaluator, bytecode, VM, diagnostic, and schema crates.
-
-No compiler, interpreter, VM, bytecode, scheduler, Actor protocol, diagnostic,
-schema, Semantic ID, source-span, runtime, or Unicode 17.0.0 behavior changed.
+- Actor source syntax does not change.
+- `x-ling-actor/0.2` consumers must explicitly migrate to `0.3`; no adapter may
+  infer a turn contract absent from `0.2`.
+- Non-Actor `ling.semantic/0.1` bytes and IDs, package-aware
+  `ling.semantic/0.2`, bytecode/VM formats, and Unicode 17.0.0 remain unchanged.
+- Existing syntax diagnostics and bilingual `L-ACTOR-0001` retain authority for
+  malformed/effectful transitions. No new public diagnostic code is authorized.
+- Actor-bearing execution continues to stop at bilingual `L-ACTOR-0002`.
 
 ## Intentionally deferred
 
-`ACT-2304` can begin only after ACT-2301/ACT-2302/ACT-2303 and Accepted
-RFC-C203/C204 (or replacement RFC-0009) resolve Actor identity, message
-sendability, mailbox/backpressure, turn lifetime, await reentry, supervision,
-and local/remote boundaries. The future implementation must consume accepted
-types and checked Core only, enforce turn-local state and borrow invariants,
-route self-send through the accepted mailbox, expose only an accepted
-watchdog, and publish interleaving, cleanup, replay, and interpreter/VM
-evidence before exposing Actor execution.
+No Actor instance, queue, dequeue, state cell, runtime commit, `spawn`, `send`,
+`stop`, `await`, continuation, suspending/reentrant profile, state-version
+guard, cancellation, timeout, retry, restart, Fault outcome, scheduler,
+watchdog clock/event, supervisor, serializer, remote endpoint, Replay event,
+interpreter path, bytecode instruction, VM instruction, native ABI, Resource,
+Managed, Borrow, or Capability transfer is authorized by ACT-2304.
+
+Any suspending/reentrant profile requires a new Accepted decision and explicit
+compatibility version; it cannot reinterpret `ling.checked-actor-turn/1` or
+`x-ling-actor/0.3`.

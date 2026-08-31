@@ -1,6 +1,9 @@
 use ling_cli::{CompileFailure, checked_actor_implementation_boundary, compile_source};
 use ling_diagnostics::codes;
-use ling_effects::{MailboxAdmission, MailboxContractError, MailboxOverflowPolicy};
+use ling_effects::{
+    ActorTurnCompletion, ActorTurnStatePublication, MailboxAdmission, MailboxContractError,
+    MailboxOverflowPolicy,
+};
 
 const ACTOR_PROGRAM: &str = concat!(
     "module Main\n\n",
@@ -65,6 +68,27 @@ fn actor_declaration_reaches_checked_core_but_execution_is_rejected() {
     assert_eq!(mailbox.source_span(), core.source_spans().mailbox_clause);
     assert_eq!(mailbox.capacity_span(), core.source_spans().capacity);
     assert_eq!(mailbox.policy_span(), core.source_spans().overflow_policy);
+    let turn = core.turn_contract();
+    assert_eq!(turn.actor(), core.definition().as_str());
+    assert_eq!(turn.actor_type(), core.actor_type());
+    assert_eq!(turn.dispatch().as_str(), "OneMessage");
+    assert_eq!(turn.suspension().as_str(), "Forbidden");
+    assert_eq!(turn.reentry().as_str(), "Forbidden");
+    assert_eq!(turn.state_commit().as_str(), "PublishOnNormalReturn");
+    assert_eq!(turn.self_send().as_str(), "MailboxOnly");
+    assert_eq!(turn.transition(), core.transition_body().local().get());
+    assert_eq!(turn.state_binding(), core.state_binding().local().get());
+    assert_eq!(turn.message_binding(), core.message_binding().local().get());
+    assert_eq!(turn.receive_span(), core.source_spans().receive_clause);
+    assert_eq!(turn.body_span(), core.source_spans().transition_body);
+    assert_eq!(
+        turn.classify_completion(ActorTurnCompletion::NormalReturn),
+        ActorTurnStatePublication::PublishCandidate
+    );
+    assert_eq!(
+        turn.classify_completion(ActorTurnCompletion::Unsuccessful),
+        ActorTurnStatePublication::PreservePrevious
+    );
     assert!(core.effects().is_pure());
     assert!(core.actor_id_contract().is_runtime_scoped());
     assert!(
@@ -114,6 +138,10 @@ fn actor_core_identity_ignores_source_name_and_line_endings() {
     assert_eq!(
         first_core.mailbox_contract().mailbox().canonical_bytes(),
         second_core.mailbox_contract().mailbox().canonical_bytes()
+    );
+    assert_eq!(
+        first_core.turn_contract().canonical_bytes(),
+        second_core.turn_contract().canonical_bytes()
     );
 
     let changed = compile_source(
@@ -216,6 +244,8 @@ fn actor_core_preserves_original_bom_crlf_unicode_spans() {
     assert_eq!(text(spans.message_pattern), "消息");
     assert_eq!(text(spans.receive_keyword), "receive");
     assert_eq!(text(spans.transition_body), "状态 + 消息");
+    assert_eq!(core.turn_contract().receive_span(), spans.receive_clause);
+    assert_eq!(core.turn_contract().body_span(), spans.transition_body);
 }
 
 #[test]
@@ -259,6 +289,17 @@ fn actor_rejects_effectful_transition_and_non_value_message_type() {
                 "{diagnostics:?}"
             );
         }
+    }
+}
+
+#[test]
+fn actor_turn_exposes_no_await_or_self_send_source_operation() {
+    for expression in ["await message", "send message"] {
+        let source = ACTOR_PROGRAM.replace("state + message", expression);
+        assert!(
+            compile_source("unsupported-turn.ling", source.into_bytes()).is_err(),
+            "unsupported Actor turn operation must not reach checked Core: {expression}"
+        );
     }
 }
 

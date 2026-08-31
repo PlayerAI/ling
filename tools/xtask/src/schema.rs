@@ -1768,6 +1768,7 @@ mod tests {
                     "ling.body-id/v1",
                     "ling.actor-message-schema-id/v1",
                     "ling.checked-local-mailbox/1",
+                    "ling.checked-actor-turn/1",
                     "ling.definition-id/v1",
                     "ling.program-id/v1",
                     "ling.semantic-node-id/v1",

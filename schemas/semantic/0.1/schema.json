@@ -93,14 +93,14 @@
       "type": "object",
       "required": ["version", "actors"],
       "properties": {
-        "version": { "const": "0.2" },
+        "version": { "const": "0.3" },
         "actors": { "type": "array", "items": { "$ref": "#/$defs/actor" } }
       },
       "additionalProperties": false
     },
     "actor": {
       "type": "object",
-      "required": ["definition_id", "message_type", "sendability", "schema_id", "root", "span", "mailbox", "nodes"],
+      "required": ["definition_id", "message_type", "sendability", "schema_id", "root", "span", "mailbox", "turn", "nodes"],
       "properties": {
         "definition_id": { "type": "string" },
         "message_type": { "type": "string", "minLength": 1 },
@@ -109,6 +109,7 @@
         "root": { "type": "integer", "minimum": 0 },
         "span": { "$ref": "#/$defs/byteSpan" },
         "mailbox": { "$ref": "#/$defs/actorMailbox" },
+        "turn": { "$ref": "#/$defs/actorTurn" },
         "nodes": { "type": "array", "items": { "$ref": "#/$defs/actorNode" } }
       },
       "additionalProperties": false
@@ -123,6 +124,25 @@
         "span": { "$ref": "#/$defs/byteSpan" },
         "capacity_span": { "$ref": "#/$defs/byteSpan" },
         "policy_span": { "$ref": "#/$defs/byteSpan" }
+      },
+      "additionalProperties": false
+    },
+    "actorTurn": {
+      "type": "object",
+      "required": ["actor_type", "dispatch", "suspension", "reentry", "state_commit", "self_send", "transition", "state_binding", "message_binding", "canonical_bytes", "span", "body_span"],
+      "properties": {
+        "actor_type": { "type": "integer", "minimum": 1 },
+        "dispatch": { "const": "OneMessage" },
+        "suspension": { "const": "Forbidden" },
+        "reentry": { "const": "Forbidden" },
+        "state_commit": { "const": "PublishOnNormalReturn" },
+        "self_send": { "const": "MailboxOnly" },
+        "transition": { "type": "integer", "minimum": 0 },
+        "state_binding": { "type": "integer", "minimum": 0 },
+        "message_binding": { "type": "integer", "minimum": 0 },
+        "canonical_bytes": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+        "span": { "$ref": "#/$defs/byteSpan" },
+        "body_span": { "$ref": "#/$defs/byteSpan" }
       },
       "additionalProperties": false
     },
