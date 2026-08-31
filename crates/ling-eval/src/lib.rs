@@ -17,11 +17,19 @@ use ling_source::Span;
 use ling_types::Type;
 use num_bigint::BigInt;
 
+mod actor_runtime;
 mod machine;
 mod task_local_scheduler;
 mod task_runtime;
 mod task_scheduler;
 
+pub use actor_runtime::{
+    ActorFault, ActorFaultPhase, ActorInstanceSnapshot, ActorInstanceState, ActorRuntime,
+    ActorRuntimeError, ActorRuntimeEvent, ActorRuntimeEventKind, ActorRuntimeId,
+    ActorRuntimeLimits, ActorRuntimeMetrics, ActorRuntimeState, ActorSendError, ActorSendErrorKind,
+    ActorSenderId, ActorShutdownReason, ActorShutdownResult, ActorSpawnError, ActorStopResult,
+    ActorTurnResult, ActorValue, LocalActorRef,
+};
 pub use task_local_scheduler::{
     LocalTaskControl, LocalTaskMetrics, LocalTaskRun, LocalTaskSchedulerConfig,
     LocalTaskSchedulerError, LocalTaskSnapshot, LocalTaskSnapshotRecord, LocalTaskTerminal,

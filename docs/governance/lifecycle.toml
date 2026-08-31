@@ -7801,3 +7801,31 @@ unresolved_alternatives = [
   "A future suspending Actor profile requires an explicit source, Core, identity, and protocol migration and cannot silently reinterpret the proposed no-reentry profile.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0274"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0274-minimal-local-actor-runtime.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-31"
+proposed = "2026-08-31"
+decided = "2026-08-31"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Reject malformed or mismatched checked Actor owner, type, schema, mailbox, turn, expression, binding, and program evidence before runtime construction or evaluation.",
+  "Exercise bounded spawn, typed send, FIFO admission, explicit one-message dispatch, atomic state publication, stop, Fault containment, Task cancellation, shutdown, and exactly-once cleanup.",
+  "Freeze path-free outcomes relative to explicit command schedules across reconstruction, insertion order, Unicode names, BOM, newline, and source-name evidence.",
+  "Prove every public CLI, interpreter, bytecode, VM, native, Supervisor, Replay, serialization, remote, and Stable Actor surface remains unavailable.",
+]
+compatibility_impact = [
+  "Adds an internal Experimental checked-Core-only local Actor runtime without adding source Actor operations or public execution.",
+  "Keeps x-ling-actor/0.3, checked Actor identity, Semantic Graph, Audit, diagnostics, bytecode/VM/native ABI, CLI behavior, and Unicode 17.0.0 unchanged.",
+  "Integrates Actor lifetime with one structured local Task runtime while leaving Supervisor, Replay, remote delivery, and public protocols unresolved.",
+]
+unresolved_alternatives = [
+  "Source spawn/send/stop, ActorRef values, suspension/reentry, concurrent dispatch, graceful drain, watchdogs, supervision, Replay, serialization, remote delivery, backend ABIs, and Stable compatibility remain later Accepted work.",
+  "The first implementation may serialize runtime commands but cannot claim that serialization or FIFO across concurrent senders as Stable Ling semantics.",
+]
+superseded_by = ""

@@ -4420,3 +4420,16 @@ covers = ["ACT-2304 checked-only one-message turn contract", "non-suspending no-
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0008", "DEC-0009", "DEC-0010", "DEC-0013", "DEC-0098", "DEC-0270", "DEC-0271", "DEC-0272", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0274"
+title = "Minimal local Actor runtime"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0274-minimal-local-actor-runtime.md"
+covers = ["ACT-2305 checked-Core-only local Actor runtime", "bounded spawn send dispatch stop and lifecycle", "failure-atomic state publication and Actor Fault provenance", "structured Task-owned registry and shutdown"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0010", "DEC-0013", "DEC-0099", "DEC-0266", "DEC-0268", "DEC-0270", "DEC-0271", "DEC-0272", "DEC-0273", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = true

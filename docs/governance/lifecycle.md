@@ -331,6 +331,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0271` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-30` | [DEC-0271](../decisions/0271-checked-actor-message-sendability-and-schema.md) |
 | `DEC-0272` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0272](../decisions/0272-checked-bounded-local-actor-mailbox.md) |
 | `DEC-0273` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0273](../decisions/0273-checked-nonsuspending-actor-turn.md) |
+| `DEC-0274` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0274](../decisions/0274-minimal-local-actor-runtime.md) |
 
 ## Migration boundary
 

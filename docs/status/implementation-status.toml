@@ -10522,7 +10522,7 @@ notes = [
 [[task]]
 id = "ACT-2305"
 title = "Actor runtime"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10536,6 +10536,13 @@ spec = [
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0266-structured-task-lifecycle-runtime.md",
+  "docs/decisions/0268-production-local-task-scheduler.md",
+  "docs/decisions/0270-checked-actor-identity-and-state-isolation.md",
+  "docs/decisions/0271-checked-actor-message-sendability-and-schema.md",
+  "docs/decisions/0272-checked-bounded-local-actor-mailbox.md",
+  "docs/decisions/0273-checked-nonsuspending-actor-turn.md",
+  "docs/decisions/0274-minimal-local-actor-runtime.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
@@ -10545,6 +10552,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/ACT-2305-AUTHORITY-AUDIT.md",
+  "docs/decisions/0274-minimal-local-actor-runtime.md",
   "docs/status/ACT-2305-RUNTIME-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2305-RUNTIME-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0099-actor-runtime-observation.md",
@@ -10558,6 +10566,7 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
+  "Accepted DEC-0274 selects a checked-Core-only bounded local runtime with failure-atomic spawn/send/dispatch/stop, explicit ready-set scheduling, Task-owned lifetime, and no public Actor execution, and supplies implementation authority for ACT-2305.",
   "The audit records the missing runtime identity/ownership, Typed Core/ABI, spawn/stop/send/receive, typed envelope, mailbox, turn/reentry, Task/scheduler, lifecycle, Fault, registry, local/remote, protocol, diagnostics, resource, and migration contracts.",
   "The audit distinguishes the future Actor constraints in SEMANTICS/LANGUAGE/ROADMAP and host-only VM cancellation from the absent Accepted RFC-C202/C203/C204 authority, and preserves the checked-only evaluation boundary.",
   "The audit covers identity stability/reuse, spawn/stop races, typed envelopes, full/closed mailboxes, turn/await behavior, cancellation/Fault cleanup, registry lifetime, resource limits, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM/runtime differential fixtures.",
@@ -10567,11 +10576,11 @@ acceptance = [
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "ACT-2305 is BlockedSpec by ACT-2301 through ACT-2304, TASK-2203, absent RFC-C202/C203/C204/RFC-0008/RFC-0009, GAP-STRUCTURED-TASK-001, GAP-ACTOR-AWAIT-REENTRY-001, GAP-ACTOR-MAILBOX-SUPERVISOR-001, GAP-ACTOR-REMOTE-DELIVERY-001, and unresolved runtime/ABI/lifecycle contracts.",
-  "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Actor runtime, spawn/stop, typed envelope, mailbox, dispatcher, lifecycle event, registry, scheduler, supervision state, or public Actor protocol; VM cancellation remains host-only.",
+  "ACT-2301 through ACT-2304 and TASK-2201 through TASK-2206 are Done; Accepted DEC-0274 makes ACT-2305 Ready while public source execution, supervision, Replay, remote delivery, and backend Actor ABIs remain separately governed.",
+  "Current evaluator/bytecode/VM have no executable Actor runtime, spawn/stop, typed envelope, queue, dispatcher, lifecycle event, run-owned registry, scheduler integration, supervision state, or public Actor protocol; Actor-bearing execution remains L-ACTOR-0002.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 

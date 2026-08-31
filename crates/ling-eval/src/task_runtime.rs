@@ -1663,6 +1663,14 @@ fn value_matches_type(
     value_matches_type_with_substitution(value, expected, checked, bindings, &BTreeMap::new())
 }
 
+pub(super) fn closed_value_matches_type(
+    value: &TaskValue,
+    expected: TypeId,
+    checked: &CheckedProgram,
+) -> bool {
+    value_matches_type(value, expected, checked, &mut BTreeMap::new())
+}
+
 fn value_matches_type_with_substitution(
     value: &TaskValue,
     expected: TypeId,
