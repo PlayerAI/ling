@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-24"
+updated = "2026-08-31"
 
 # RFC-0001 and DEC-0001 through DEC-0016 predate the checked section
 # templates. This is a closed migration set; the checker rejects any new
@@ -7827,5 +7827,31 @@ compatibility_impact = [
 unresolved_alternatives = [
   "Source spawn/send/stop, ActorRef values, suspension/reentry, concurrent dispatch, graceful drain, watchdogs, supervision, Replay, serialization, remote delivery, backend ABIs, and Stable compatibility remain later Accepted work.",
   "The first implementation may serialize runtime commands but cannot claim that serialization or FIFO across concurrent senders as Stable Ling semantics.",
+]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0275"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0275-local-actor-property-and-stress-evidence.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-08-31"
+proposed = "2026-08-31"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Add real checked Actor runtime property cases for serial state, bounded Reject mailboxes, slow-consumer backpressure, stop, Fault, cancellation, shutdown, and resource boundaries.",
+  "Add one- and two-worker internal parallel-turn cases with a synchronization probe and canonical actor-ID commit projection.",
+  "Use retained deterministic seed/command fixtures across Unicode, BOM, LF/CRLF, source-name, and insertion-order reconstruction while preserving L-ACTOR-0002 publicly.",
+]
+compatibility_impact = [
+  "Proposes internal Experimental test evidence only; it adds no Ling source operation, public protocol, scheduler guarantee, diagnostic, schema, Semantic ID, or backend ABI.",
+  "Proposes explicit bounded test constants and a worker-independent result projection while excluding host timing, worker identity, and queue acquisition from Ling semantics.",
+]
+unresolved_alternatives = [
+  "Production Actor worker scheduling, fairness, liveness, cross-sender global order, concurrent Fault handling, supervision, Replay, remote delivery, serialization, backend ABI, and Stable compatibility remain later Accepted work.",
+  "Any larger stress bounds or performance claim need separate portable resource evidence and Accepted authority.",
 ]
 superseded_by = ""

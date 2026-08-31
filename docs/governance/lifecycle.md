@@ -1,7 +1,7 @@
 # RFC 与 Decision 生命周期 / Lifecycle Registry
 
 > 状态：由 `lifecycle.toml` 确定性生成
-> 更新日期：2026-08-24
+> 更新日期：2026-08-31
 > 本文件定义治理状态和证据要求，不新增语言语义。
 
 ## State machine
@@ -332,6 +332,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0272` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0272](../decisions/0272-checked-bounded-local-actor-mailbox.md) |
 | `DEC-0273` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0273](../decisions/0273-checked-nonsuspending-actor-turn.md) |
 | `DEC-0274` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0274](../decisions/0274-minimal-local-actor-runtime.md) |
+| `DEC-0275` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0275](../decisions/0275-local-actor-property-and-stress-evidence.md) |
 
 ## Migration boundary
 

@@ -1,7 +1,7 @@
 # Ling 规范权威索引 / Specification Authority Index
 
 > 状态：由 `authority.toml` 确定性生成
-> 更新日期：2026-08-24
+> 更新日期：2026-08-31
 > 本索引描述现有权威关系，不新增语言语义。
 
 ## Authority order
@@ -362,6 +362,7 @@ Accepted decisions are scoped normative records for the questions they close; th
 | `SEED-TRACEABILITY` | Evidence | `Evidence` | `0.0.1` | `Evidence` | no | [v0.0.1 unified specification traceability](../traceability/v0.0.1.md) | `stable feature IDs`, `normative clause mapping`, `Core and implementation links`, `positive and negative test evidence`, `differential state`, `release artifacts` | `TRACEABILITY-REGISTER`, `CONFORMANCE` | — |
 | `DESIGN-REVIEW` | Review | `Active` | `2026-08-17` | `Opinion` | no | [Ling design review](../design-review.html) | `non-normative design critique` | `SEMANTICS`, `LANGUAGE` | — |
 | `RUST-IMPLEMENTATION` | Implementation | `Active` | `0.0.1` | `Implementation` | no | [Ling Rust implementation](../../crates) | `compiler`, `interpreter`, `CLI` | `CONFORMANCE` | — |
+| `DEC-0275` | Decision | `Proposed` | `1` | `Draft` | no | [Local Actor property and bounded stress evidence](../decisions/0275-local-actor-property-and-stress-evidence.md) | `proposed ACT-2306 local Actor property outcome projection`, `proposed bounded generated interleaving and slow-consumer evidence`, `proposed internal parallel-turn test-driver boundary`, `proposed Fault cleanup and Unicode stress evidence` | `SEMANTICS`, `LANGUAGE`, `ROADMAP-1.0`, `DEC-0010`, `DEC-0013`, `DEC-0021`, `DEC-0266`, `DEC-0268`, `DEC-0270`, `DEC-0271`, `DEC-0272`, `DEC-0273`, `DEC-0274`, `GAP-REGISTER`, `ERROR-CODES`, `PROTOCOL-INVENTORY` | — |
 | `RFC-0001` | RFC | `Draft` | `0.0.1-draft` | `Draft` | no | [Ling foundation and v0.0.1 Seed](../RFC-0001.md) | `Seed scope`, `syntax`, `compiler architecture`, `CLI`, `governance` | `SEMANTICS`, `LANGUAGE` | — |
 
 ## Conflict and correction workflow

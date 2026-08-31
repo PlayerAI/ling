@@ -2,118 +2,119 @@
 
 ## Outcome
 
-`ACT-2306` is correctly recorded as `BlockedSpec`. The G2 plan asks for
-property and stress evidence for serialized state mutation, actor parallelism,
-bounded full mailboxes, slow-consumer backpressure, post-stop sends, Fault
-cleanup, declared message ordering, and process-shutdown cleanup. These are
-acceptance properties of the still-unresolved Actor runtime; they cannot be
-made meaningful by adding an independent test harness or by treating host
-thread behavior as Ling semantics.
+ACT-2306 remains correctly recorded as BlockedSpec, but its previous audit was
+stale after ACT-2305. Accepted DEC-0274 now provides a real internal,
+checked-Core-only local Actor runtime in ling-eval; its integration suite already
+establishes a bounded set of FIFO, Full, Fault, cancellation, cleanup,
+Unicode/BOM/CRLF, and public-boundary facts.
 
-No Actor runtime, scheduler, stress protocol, property schema, replay format,
-fixture corpus, diagnostic, or placeholder G2 API was added.
+The remaining blocker is no longer the absence of an Actor runtime. It is the
+absence of Accepted authority for what counts as property, generated
+interleaving, parallel-turn, slow-consumer, host-unwind, and bounded-stress
+evidence for that runtime. DEC-0275 has been recorded as a Proposed decision to
+resolve that bounded test-contract question. It is not implementation authority
+until Accepted.
 
-Accepted `DEC-0100` now authorizes the bounded child
-`ACT-2306-PROPERTY-OBSERVATION`, which records only immutable property
-observation identities and structural labels. It does not close the property,
-stress, scheduler, replay, runtime, or cross-backend gaps described below.
+No new runtime behavior, scheduler, stress protocol, property schema, Replay
+format, diagnostic, or public Actor API is added by this audit or the proposal.
 
 ## Normative traceability
 
-- The G2 execution package is non-normative. Its property list does not
-  authorize runtime behavior, a determinism class, a stress-result schema, or
-  cross-backend equivalence claims.
-- ACT-2306 depends on ACT-2305 and therefore on the missing RFC-C203/C204
-  Actor identity, mailbox, turn, and supervision contracts. The interleaving
-  and replay claims also require RFC-C205/RFC-0010. None of RFC-C203/C204/C205
-  or replacement RFC-0009/RFC-0010 is Accepted; RFC-0001 remains a Draft
-  baseline under DEC-0018.
-- `docs/SEMANTICS.md` states high-level Actor constraints (one turn at a time,
-  bounded mailbox, same-sender ordering, and cleanup/Fault obligations), but
-  v0.0.1 implements no Actor/Task Core forms or runtime. It does not define
-  the scheduler model, allowed interleaving equivalence, resource budgets,
-  shutdown marker, or replay comparison relation needed to interpret these
-  properties.
-- `docs/LANGUAGE.md` and `docs/ROADMAP-1.0.md` require concurrency stress,
-  deterministic observable behavior, and cleanup evidence, but do not define
-  the executable fixture schema, platform scope, random-seed contract, or
-  migration rules.
-- Accepted DEC-0021 defines deterministic scheduling only for independent
-  internal compiler queries. It explicitly does not define Actor scheduling,
-  message order, runtime parallelism, or replay. Accepted DEC-0010/DEC-0013
-  cover current Seed State/Capability and main/runtime Fault boundaries only;
-  RFC-0020 covers host-VM cancellation and excludes Task/Actor scheduling.
-- `GAP-ACTOR-AWAIT-REENTRY-001`, `GAP-ACTOR-MAILBOX-SUPERVISOR-001`, and
-  `GAP-DETERMINISTIC-REPLAY-001` remain Open and leave the tested semantics
-  unresolved.
+- docs/SEMANTICS.md §§19.2--19.5 requires Actor state isolation, a bounded
+  mailbox, same-sender order, one active turn, and atomic observation when a
+  turn has no await. It does not define a host worker model, a property
+  generator, a parallel-commit boundary, stress thresholds, or a public trace.
+- Accepted DEC-0270 through DEC-0273 establish the checked-only identity,
+  sendability/schema, Reject mailbox, and non-suspending one-message turn
+  profile. GAP-ACTOR-AWAIT-REENTRY-001 is Accepted for that profile and is not
+  an ACT-2306 blocker.
+- Accepted DEC-0274 clauses 4, 7--16 establish explicit runtime bounds,
+  failure-atomic admission, FIFO messages, explicit ready/step dispatch,
+  publish-on-normal-return state, contained Fault, stop/shutdown cleanup, and
+  deterministic internal observations. Its first runtime serializes command
+  admission and does not define independent host-parallel turn execution,
+  fairness, worker visibility, Replay, or a stress oracle.
+- docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md:313--322 is
+  non-normative. Its requested serial-state, independent-Actor, bounded
+  mailbox, slow-consumer, post-stop, Fault, interleaving, and shutdown evidence
+  needs a concrete Accepted interpretation before it can mark a language task
+  Done.
+- Accepted DEC-0021 defines deterministic scheduling only for compiler queries;
+  it cannot supply Actor worker, message, or Replay semantics. DEC-0267/0268
+  govern Structured Task scheduling, not Actor dispatch.
+- GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open for supervisor-visible failure,
+  restart, escalation, and alternative mailbox policies. Those unresolved
+  surfaces must stay outside the proposed local Reject-only test contract.
+  GAP-DETERMINISTIC-REPLAY-001 remains Open; ACT-2306 may use internal
+  deterministic test inputs but cannot create a Replay contract.
 
 ## Current implementation evidence
 
-- The workspace has no Actor, Task, scheduler, mailbox, supervision, or replay
-  runtime. `ling-eval` and `ling-vm` execute the Seed checked subset only;
-  existing VM resource/cancellation tests cannot establish Actor properties.
-- There is no accepted Actor source/Core form, typed envelope, queue policy,
-  turn state, scheduler seed, interleaving model, process-shutdown event,
-  Fault provenance schema, or runtime resource counter for a property harness
-  to observe.
-- Existing compiler-query scheduling tests are deliberately internal and
-  deterministic. They cannot be reused as evidence that different Actors may
-  run in parallel or that mailbox order is preserved under random runtime
-  interleavings.
-- No conformance/property corpus covers serialized state, actor parallelism,
-  full/slow mailboxes, post-stop sends, turn Fault cleanup, declared ordering,
-  shutdown cleanup, Unicode/CRLF/BOM source spans, or interpreter/VM/runtime
-  differential equivalence.
+- crates/ling-eval/src/actor_runtime.rs implements the DEC-0274 run-owned
+  ActorRuntime: it revalidates checked Actor Core, allocates non-reused
+  identities, admits typed FIFO envelopes into bounded Reject mailboxes,
+  performs an explicit selected step, commits state only after normal return,
+  contains evaluator panics, and cleans up through Task-owned cancellation or
+  explicit shutdown.
+- crates/ling-eval/tests/actor_runtime.rs has twelve integration cases. They
+  already cover serial FIFO state progress, mailbox Full with original payload,
+  type/cross-run rejection, canonical ready order, turn/initializer Fault,
+  cancellation, explicit stop, resource-exhaustion atomicity, and
+  Unicode/BOM/CRLF reconstruction.
+- The implementation intentionally owns ActorRuntime through mutable exclusive
+  access and does not yet reserve/evaluate/commit distinct Actor turns on
+  multiple host workers. It has no generated command corpus, overlap probe,
+  test-only panic injection seam, parallel commit rule, or bounded local Actor
+  stress driver.
+- There is no public Actor execution, source spawn/send/stop, public scheduler,
+  Replay trace, serialization, supervisor, remote delivery, bytecode/VM/native
+  Actor path, or runtime differential contract. The CLI Actor boundary remains
+  L-ACTOR-0002.
 
 ## Required authority before implementation
 
-An Accepted RFC or decision must define, at minimum:
+An Accepted decision must define, at minimum:
 
-1. the semantic property relation: what counts as serial state isolation,
-   allowed Actor parallelism, declared per-sender/global ordering, and
-   equivalent versus divergent interleavings;
-2. mailbox capacity/backpressure and post-stop send outcomes, resource limits,
-   slow-consumer progress, fairness, starvation, drop/coalesce observability,
-   and shutdown/drain/discard behavior;
-3. turn/await/reentry, cancellation, Fault, supervision, and cleanup
-   invariants, including host-unwind containment and process termination
-   markers;
-4. deterministic scheduler/replay inputs, random-seed and logical-time
-   handling, platform scope, trace/event schema, privacy, version migration,
-   and comparison tolerances for Interpreter/VM/runtime backends;
-5. evidence status and acceptance thresholds for stress bounds, memory/resource
-   accounting, liveness/watchdog limits, and failure recovery; and
-6. executable positive/negative/interleaving/stress fixtures covering serial
-   state updates, independent Actor parallelism, full and slow mailboxes,
-   post-stop sends, Fault and cancellation cleanup, random ordering, process
-   shutdown, resource exhaustion, Unicode/CRLF/BOM spans, deterministic
-   reruns, and cross-backend equivalence without unchecked-AST execution.
+1. the result projection for generated and parallel-turn cases, including
+   exactly which lifecycle, state, ordering, Fault, cleanup, and source facts
+   compare and which host facts are excluded;
+2. same-Actor reservation/serialization and a bounded independent-Actor
+   parallel-turn model, including commit ordering and the scope of any
+   test-only synchronization probe;
+3. deterministic generator inputs, seed retention, command/actor/message/worker
+   bounds, slow-consumer modeling without wall time, and failure shrinking;
+4. Full, post-stop, cancellation, Fault, panic containment, shutdown,
+   cleanup, resource-exhaustion, Unicode/BOM/CRLF, and public-boundary
+   expectations; and
+5. an explicit non-goal boundary for fairness, liveness, cross-sender global
+   order, Replay, supervision, production worker scheduling, and public
+   protocols.
 
-Until these decisions are Accepted, a property test could certify an
-implementation-defined schedule or silently turn host timing, dropped data,
-or cleanup behavior into language semantics.
+DEC-0275 is the proposed answer. Until it is Accepted, ACT-2306 must not add
+the generated stress harness, a parallel turn driver, test-only panic injection,
+or a new claim that distinct Actors execute in parallel.
 
 ## Evidence and compatibility
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
-`docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
-DEC-0021, RFC-0001, RFC-0020,
-`docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
-`docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
-`docs/governance/gap-register.toml`,
-`docs/governance/protocol-inventory.toml`, and the current syntax, AST, HIR,
-types, effects, evaluator, bytecode, VM, diagnostic, and schema crates.
+This audit was checked against AGENTS.md, docs/SEMANTICS.md §§19.2--19.5,
+docs/LANGUAGE.md, docs/ROADMAP-1.0.md, DEC-0010, DEC-0013, DEC-0018,
+DEC-0021, DEC-0266, DEC-0268, DEC-0270 through DEC-0274,
+docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md,
+docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md,
+docs/governance/gap-register.toml, docs/governance/protocol-inventory.toml,
+the current Actor runtime, and its integration tests.
 
-No compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol,
-diagnostic, schema, Semantic ID, source-span, runtime, or Unicode 17.0.0
-behavior changed.
+The audit/proposal changes no compiler, evaluator, bytecode, VM, scheduler,
+mailbox, Actor protocol, diagnostic, schema, Semantic ID, source-span, public
+CLI, or Unicode 17.0.0 behavior. Any later ACT-2306 implementation must retain
+original UTF-8 byte spans and must cite Accepted DEC-0275 clauses.
 
 ## Intentionally deferred
 
-`ACT-2306` can begin only after ACT-2301 through ACT-2305 and Accepted
-RFC-C203/C204/C205 (or replacement RFC-0009/RFC-0010) resolve Actor identity,
-message ownership, mailbox/backpressure, turn/reentry, supervision, runtime
-ABI, and determinism/replay boundaries. The future test suite must consume
-accepted fixtures and checked Core/runtime traces only, distinguish language
-properties from implementation performance, and publish bounded stress,
-cleanup, ordering, and cross-backend evidence before claiming Actor support.
+ACT-2306 must not use this proposal to imply source Actor execution, fair or
+live scheduling, cross-sender global ordering, concurrent Fault resolution,
+watchdogs, graceful drain, supervision, Replay, serialization, remote delivery,
+or bytecode/VM/native execution. Those remain separately governed work. The
+proposed parallel-turn evidence is only for the local pure, non-suspending,
+normal-return profile; it cannot settle later cancellation, restart, or replay
+semantics.
