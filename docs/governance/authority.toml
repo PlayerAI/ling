@@ -4394,3 +4394,16 @@ covers = ["ACT-2302 checked-only local Sendable judgment", "default-deny Borrow 
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0020", "DEC-0008", "DEC-0009", "DEC-0010", "DEC-0012", "DEC-0096", "DEC-0270", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0272"
+title = "Checked bounded local Actor mailbox"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0272-checked-bounded-local-actor-mailbox.md"
+covers = ["ACT-2303 explicit checked mailbox capacity", "local Reject admission and Full backpressure classification", "checked mailbox canonical identity", "Experimental x-ling-actor/0.2 Semantic Graph migration"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0097", "DEC-0270", "DEC-0271", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = true

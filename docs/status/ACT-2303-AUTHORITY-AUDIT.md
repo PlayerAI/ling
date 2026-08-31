@@ -1,5 +1,35 @@
 # ACT-2303 Authority Audit: Bounded Mailbox and Backpressure
 
+> Current update: 2026-08-31 — `Ready` under Accepted `DEC-0272`.
+
+## Current authority update
+
+ACT-2303 is now `Ready`. ACT-2302 is Done, and Accepted DEC-0272 fixes the
+smallest checked-only local mailbox slice: one explicit slot capacity in
+`1..=65_535`, the sole `Reject` overflow policy, pure `Accepted`/`Full`
+admission classification, canonical mailbox identity, and
+`x-ling-actor/0.2` projection.
+
+The implementation must consume DEC-0270/0271 checked Actor and message Core,
+preserve original UTF-8 spans, publish atomically, include mailbox bytes only
+in Actor-bearing identity, and leave non-Actor semantic bytes unchanged. It
+must not add a queue, Actor instance, send expression, suspension, scheduler,
+turn execution, lifecycle, supervision, serialization, or remote delivery;
+Actor-bearing executable entries continue to stop at `L-ACTOR-0002`.
+
+`GAP-ACTOR-MAILBOX-SUPERVISOR-001` remains Open for Wait/drop/coalescing,
+runtime queue lifecycle, and Supervisor behavior, but no longer blocks this
+checked-only task. The exact source migration is to insert
+`mailbox capacity 1 overflow Reject` (or another accepted capacity) before
+`state`; Actor extension consumers must advance from `x-ling-actor/0.1` to
+`x-ling-actor/0.2`.
+
+The remainder of this document is the historical pre-DEC-0272 blocked audit.
+It is retained as discovery evidence for the alternatives that DEC-0272 keeps
+deferred.
+
+## Historical blocked audit
+
 ## Outcome
 
 `ACT-2303` is correctly recorded as `BlockedSpec`. The G2 plan requires each

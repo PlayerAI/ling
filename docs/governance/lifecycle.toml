@@ -7745,3 +7745,31 @@ unresolved_alternatives = [
   "A user-implementable Sendable Trait, Rust auto trait, implicit serializer, wire-layout schema, or remote-capable default is excluded from this bounded proposal.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0272"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0272-checked-bounded-local-actor-mailbox.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-31"
+proposed = "2026-08-31"
+decided = "2026-08-31"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Accept the exact mandatory mailbox capacity/Reject clause, including capacities 1 and 65535, and reject missing, malformed, reordered, duplicate, zero, overflowing, and unsupported-policy forms at original spans.",
+  "Validate Accepted/Full admission classification at every boundary and under deterministic bounded stress without allocating a runtime queue or payloads.",
+  "Freeze checked mailbox bytes, Actor identities, and x-ling-actor/0.2 across reconstruction, Unicode, BOM, newline, source-name, and insertion evidence; independently reject corrupted reader fields.",
+  "Prove non-Actor semantic bytes remain unchanged and Actor-bearing programs remain unavailable to send, queue, scheduler, runtime, interpreter, bytecode, VM, native, serializer, supervisor, and remote paths.",
+]
+compatibility_impact = [
+  "Adds one mandatory mailbox capacity/Reject clause to the Experimental checked Actor source form with an explicit manual migration from DEC-0270 syntax.",
+  "Advances only the exact Experimental Actor extension to x-ling-actor/0.2 and adds mailbox inputs to Actor-bearing identity; non-Actor bytes and identities remain unchanged.",
+  "Adds no queue, send operation, suspension, lifecycle, supervisor, serializer, remote protocol, ABI, Stable claim, package behavior, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Wait, drop, coalescing, byte quotas, dynamic capacities, queue execution, closed/stopped/Fault outcomes, scheduling, cancellation, turn reentry, supervision, Replay, serialization, and remote delivery remain later Accepted work.",
+  "Critical bounded memory is not implied by a bounded message count because admitted payloads may have dynamic size.",
+]
+superseded_by = ""
