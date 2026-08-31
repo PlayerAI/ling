@@ -10267,7 +10267,7 @@ notes = [
 [[task]]
 id = "ACT-2303"
 title = "Bounded mailbox and backpressure"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10292,33 +10292,50 @@ spec = [
 artifacts = [
   "docs/status/ACT-2303-AUTHORITY-AUDIT.md",
   "docs/decisions/0272-checked-bounded-local-actor-mailbox.md",
+  "docs/status/ACT-2303-IMPLEMENTATION-REPORT.md",
   "docs/status/ACT-2303-MAILBOX-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/ACT-2303-MAILBOX-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0097-actor-mailbox-observation.md",
   "crates/ling-concurrency/src/mailbox.rs",
+  "crates/ling-concurrency/src/mailbox_contract.rs",
   "crates/ling-concurrency/src/lib.rs",
+  "crates/ling-syntax/src/cst.rs",
+  "crates/ling-syntax/src/parser.rs",
+  "crates/ling-ast/src/lib.rs",
+  "crates/ling-hir/src/lib.rs",
+  "crates/ling-effects/src/actor_core.rs",
+  "crates/ling-semantic/src/lib.rs",
+  "crates/ling-cli/tests/actor_boundary.rs",
+  "schemas/semantic/0.1/schema.json",
+  "schemas/registry.toml",
   "docs/governance/authority.toml",
   "docs/governance/authority.md",
   "docs/governance/lifecycle.toml",
   "docs/governance/lifecycle.md",
+  "docs/governance/protocol-inventory.toml",
+  "docs/governance/protocol-inventory.md",
+  "docs/governance/support-matrix.toml",
+  "docs/governance/support-matrix.md",
   "docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md",
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "Accepted DEC-0272 authorizes exactly the checked-only mandatory local mailbox clause, slot capacity 1 through 65535, Reject overflow policy, Accepted/Full admission classification, canonical mailbox identity, and x-ling-actor/0.2 projection.",
-  "The implementation must consume DEC-0270/0271 checked Actor and message Core, preserve original UTF-8 spans, publish atomically, and leave non-Actor semantic bytes unchanged.",
-  "Completion requires positive, zero/max/overflow, unsupported-policy, migration, deterministic reconstruction, reader-corruption, Unicode/BOM/CRLF, admission-boundary, bounded-stress, and no-execution evidence.",
+  "Accepted DEC-0272 clauses 1 through 15 are implemented as a checked-only mandatory local mailbox clause, slot capacity 1 through 65535, Reject overflow policy, Accepted/Full admission classification, canonical mailbox identity, and x-ling-actor/0.2 projection.",
+  "CST through checked Actor Core preserve original UTF-8 spans; invalid capacity and policy values use bilingual L-ACTOR-0001 diagnostics with stable machine reasons; CheckedActorCore publication remains atomic.",
+  "The pure mailbox contract validates queue-length invariants, classifies the capacity boundary without queue allocation, and has bounded maximum-capacity stress evidence.",
+  "Canonical mailbox bytes participate in checked Actor identity; the isolated x-ling-actor/0.2 reader validates version, ownership, bounds, Reject policy, canonical bytes, span ordering, actor ordering, and message correspondence without reconstructing executable Core.",
+  "Positive, zero/max/overflow, unsupported-policy, explicit migration, deterministic reconstruction, reader-corruption, Unicode/BOM/CRLF, admission-boundary, bounded-stress, no-execution, workspace, Clippy, schema, support, governance, formatting, and xtask evidence passes.",
   "Queue storage, actual send/ownership transfer, Wait/drop/coalesce, byte quotas, scheduler/runtime, lifecycle, supervision, serialization, remote delivery, and executable Actor behavior remain unavailable and intentionally deferred.",
-  "Acceptance changes governance authority and task readiness only; it does not claim that the DEC-0272 compiler or Semantic Graph behavior is already implemented.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "c0c5f8b24a6bdddc29c48973df75ef6fb6675195"
+completion_commit = "c0c5f8b24a6bdddc29c48973df75ef6fb6675195"
+integration_state = "committed"
+completed = "2026-08-31"
 notes = [
-  "ACT-2302 is Done and Accepted DEC-0272 now supplies the bounded checked-only mailbox authority required to make ACT-2303 Ready.",
-  "GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open for runtime queue lifecycle, Wait/drop/coalesce, and Supervisor semantics, but no longer blocks this checked-only task.",
-  "The acceptance migration is explicit: existing Experimental Actor source must add a mailbox clause and Actor extension consumers must advance from x-ling-actor/0.1 to 0.2.",
+  "ACT-2303 completes only the bounded checked-only mailbox contract authorized by DEC-0272; it does not implement runtime queue storage, send, scheduling, lifecycle, supervision, or Actor execution.",
+  "GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open for runtime queue lifecycle, Wait/drop/coalesce, and Supervisor semantics, but no longer blocks this completed checked-only slice.",
+  "The migration is explicit: existing Experimental Actor source must add a mailbox clause and Actor extension consumers must advance from x-ling-actor/0.1 to 0.2; non-Actor Semantic Graph bytes remain unchanged.",
+  "Canonical behavior is path-free and deterministic, and Unicode behavior remains fixed at Unicode 17.0.0.",
 ]
 
 [[task]]
