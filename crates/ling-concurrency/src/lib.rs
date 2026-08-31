@@ -15,6 +15,7 @@ mod actor;
 mod budget;
 mod lifecycle;
 mod mailbox;
+mod mailbox_contract;
 mod message;
 mod property;
 mod runtime;
@@ -39,6 +40,10 @@ pub use lifecycle::{
 pub use mailbox::{
     MailboxId, MailboxIdentityKind, MailboxObservation, MailboxObservationError,
     MailboxObservationKind, MailboxObservationModel, MailboxObservationSpec,
+};
+pub use mailbox_contract::{
+    CHECKED_LOCAL_MAILBOX_VERSION, LocalMailboxContract, MAX_LOCAL_MAILBOX_CAPACITY,
+    MailboxAdmission, MailboxCapacity, MailboxContractError, MailboxOverflowPolicy,
 };
 pub use message::{
     MessageFieldId, MessageIdentityKind, MessageSchema, MessageSchemaError, MessageSchemaId,

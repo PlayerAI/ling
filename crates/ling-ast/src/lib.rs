@@ -39,8 +39,20 @@ pub struct ActorDeclaration {
     pub keyword_span: Span,
     pub name: Name,
     pub message_type: TypeExpression,
+    pub mailbox: ActorMailboxClause,
     pub state: ActorStateClause,
     pub receive: ActorReceiveClause,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorMailboxClause {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub capacity_keyword_span: Span,
+    pub capacity_span: Span,
+    pub capacity: Literal,
+    pub overflow_keyword_span: Span,
+    pub policy: Name,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -488,6 +500,8 @@ impl<'input> Lowerer<'input> {
         let mut children = node.children().iter();
         let message_type =
             self.type_expression(self.child(&mut children, node, "Actor message type")?)?;
+        let mailbox =
+            self.actor_mailbox_clause(self.child(&mut children, node, "Actor mailbox clause")?)?;
         let state =
             self.actor_state_clause(self.child(&mut children, node, "Actor state clause")?)?;
         let receive =
@@ -497,8 +511,34 @@ impl<'input> Lowerer<'input> {
             keyword_span: keyword.span(),
             name,
             message_type,
+            mailbox,
             state,
             receive,
+        })
+    }
+
+    fn actor_mailbox_clause(&self, node: &CstNode) -> Result<ActorMailboxClause, LowerError> {
+        self.expect_kind(node, NodeKind::ActorMailboxClause)?;
+        let keyword = self.contextual_token(node, "mailbox")?;
+        let capacity_keyword = self.contextual_token(node, "capacity")?;
+        let overflow_keyword = self.contextual_token(node, "overflow")?;
+        let capacity = self
+            .significant_tokens(node)
+            .find(|token| token.kind() == TokenKind::Integer)
+            .ok_or_else(|| self.missing_token(node, "Actor mailbox capacity"))?;
+        let policy = self
+            .significant_tokens(node)
+            .filter(|token| token.kind() == TokenKind::Identifier)
+            .last()
+            .ok_or_else(|| self.missing_token(node, "Actor mailbox overflow policy"))?;
+        Ok(ActorMailboxClause {
+            span: self.node_span(node)?,
+            keyword_span: keyword.span(),
+            capacity_keyword_span: capacity_keyword.span(),
+            capacity_span: capacity.span(),
+            capacity: self.literal(capacity)?,
+            overflow_keyword_span: overflow_keyword.span(),
+            policy: self.name(policy)?,
         })
     }
 

@@ -372,7 +372,7 @@
     {
       "id": "PROTO-ACTOR-SEMANTIC-GRAPH-EXTENSION",
       "visibility": "Public",
-      "version": "x-ling-actor/0.1",
+      "version": "x-ling-actor/0.2",
       "stability": "Experimental",
       "implemented": true
     },

@@ -93,14 +93,14 @@
       "type": "object",
       "required": ["version", "actors"],
       "properties": {
-        "version": { "const": "0.1" },
+        "version": { "const": "0.2" },
         "actors": { "type": "array", "items": { "$ref": "#/$defs/actor" } }
       },
       "additionalProperties": false
     },
     "actor": {
       "type": "object",
-      "required": ["definition_id", "message_type", "sendability", "schema_id", "root", "span", "nodes"],
+      "required": ["definition_id", "message_type", "sendability", "schema_id", "root", "span", "mailbox", "nodes"],
       "properties": {
         "definition_id": { "type": "string" },
         "message_type": { "type": "string", "minLength": 1 },
@@ -108,7 +108,21 @@
         "schema_id": { "type": "string" },
         "root": { "type": "integer", "minimum": 0 },
         "span": { "$ref": "#/$defs/byteSpan" },
+        "mailbox": { "$ref": "#/$defs/actorMailbox" },
         "nodes": { "type": "array", "items": { "$ref": "#/$defs/actorNode" } }
+      },
+      "additionalProperties": false
+    },
+    "actorMailbox": {
+      "type": "object",
+      "required": ["capacity", "overflow", "canonical_bytes", "span", "capacity_span", "policy_span"],
+      "properties": {
+        "capacity": { "type": "integer", "minimum": 1 },
+        "overflow": { "const": "Reject" },
+        "canonical_bytes": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+        "span": { "$ref": "#/$defs/byteSpan" },
+        "capacity_span": { "$ref": "#/$defs/byteSpan" },
+        "policy_span": { "$ref": "#/$defs/byteSpan" }
       },
       "additionalProperties": false
     },

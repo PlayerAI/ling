@@ -160,6 +160,16 @@ fn render_item(output: &mut String, item: &Item, depth: usize) {
                 &declaration.name.normalized,
             );
             render_type_expression(output, &declaration.message_type, depth + 1);
+            line_with(
+                output,
+                depth + 1,
+                "mailbox",
+                declaration.mailbox.span,
+                &format!(
+                    "capacity {:?} overflow {}",
+                    declaration.mailbox.capacity, declaration.mailbox.policy.normalized
+                ),
+            );
             line(output, depth + 1, "state", declaration.state.span);
             render_type_expression(output, &declaration.state.state_type, depth + 2);
             render_expression(output, &declaration.state.initializer, depth + 2);

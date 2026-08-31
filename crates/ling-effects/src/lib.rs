@@ -23,10 +23,15 @@ mod v2;
 
 pub use actor_core::{
     CHECKED_ACTOR_CORE_VERSION, CheckedActorCore, CheckedActorIdContract,
-    CheckedActorMessageContract, CheckedActorRefType, CheckedActorSourceSpans,
+    CheckedActorMailboxContract, CheckedActorMessageContract, CheckedActorRefType,
+    CheckedActorSourceSpans,
 };
 pub use handler_core::{
     HandlerCore, HandlerCoreClause, HandlerCoreError, HandlerCoreNodeId, ResumeUse,
+};
+pub use ling_concurrency::{
+    CHECKED_LOCAL_MAILBOX_VERSION, LocalMailboxContract, MAX_LOCAL_MAILBOX_CAPACITY,
+    MailboxAdmission, MailboxCapacity, MailboxContractError, MailboxOverflowPolicy,
 };
 pub use solver::{
     EffectConflictKind, EffectConstraint, EffectConstraintConflict, EffectConstraintError,

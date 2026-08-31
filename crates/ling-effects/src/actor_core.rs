@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use ling_concurrency::ActorTypeId;
+use ling_concurrency::{ActorTypeId, LocalMailboxContract, MailboxCapacity, MailboxOverflowPolicy};
 use ling_hir as hir;
 use ling_resolve::{BindingKey, DefinitionId, ExpressionKey};
 use ling_source::Span;
@@ -10,7 +10,49 @@ use ling_types::{ActorMessageSchema, SendableLocal, Type, TypeId, TypedProgram};
 
 use crate::EffectRow;
 
-pub const CHECKED_ACTOR_CORE_VERSION: &str = "ling.checked-actor-core/1";
+pub const CHECKED_ACTOR_CORE_VERSION: &str = "ling.checked-actor-core/2";
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CheckedActorMailboxContract {
+    actor: DefinitionId,
+    actor_type: ActorTypeId,
+    mailbox: LocalMailboxContract,
+    source_span: Span,
+    capacity_span: Span,
+    policy_span: Span,
+}
+
+impl CheckedActorMailboxContract {
+    #[must_use]
+    pub fn actor(&self) -> &DefinitionId {
+        &self.actor
+    }
+
+    #[must_use]
+    pub const fn actor_type(&self) -> ActorTypeId {
+        self.actor_type
+    }
+
+    #[must_use]
+    pub const fn mailbox(&self) -> &LocalMailboxContract {
+        &self.mailbox
+    }
+
+    #[must_use]
+    pub const fn source_span(&self) -> Span {
+        self.source_span
+    }
+
+    #[must_use]
+    pub const fn capacity_span(&self) -> Span {
+        self.capacity_span
+    }
+
+    #[must_use]
+    pub const fn policy_span(&self) -> Span {
+        self.policy_span
+    }
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct CheckedActorMessageContract {
@@ -73,6 +115,12 @@ pub struct CheckedActorSourceSpans {
     pub declaration: Span,
     pub actor_keyword: Span,
     pub message_type: Span,
+    pub mailbox_clause: Span,
+    pub mailbox_keyword: Span,
+    pub capacity_keyword: Span,
+    pub capacity: Span,
+    pub overflow_keyword: Span,
+    pub overflow_policy: Span,
     pub state_clause: Span,
     pub state_keyword: Span,
     pub state_type: Span,
@@ -113,6 +161,7 @@ pub struct CheckedActorCore {
     actor_type: ActorTypeId,
     message_type: TypeId,
     message_contract: CheckedActorMessageContract,
+    mailbox_contract: CheckedActorMailboxContract,
     state_type: TypeId,
     reference_type: CheckedActorRefType,
     actor_id_contract: CheckedActorIdContract,
@@ -144,6 +193,11 @@ impl CheckedActorCore {
     #[must_use]
     pub const fn message_contract(&self) -> &CheckedActorMessageContract {
         &self.message_contract
+    }
+
+    #[must_use]
+    pub const fn mailbox_contract(&self) -> &CheckedActorMailboxContract {
+        &self.mailbox_contract
     }
 
     #[must_use]
@@ -436,6 +490,36 @@ fn build_one(
         source_span: declaration.message_type.span,
     };
 
+    let capacity = match &declaration.mailbox.capacity {
+        hir::Literal::Integer { radix: 10, digits } => digits.parse::<u32>().ok(),
+        _ => None,
+    }
+    .and_then(|value| MailboxCapacity::new(value).ok())
+    .ok_or_else(|| {
+        failure(
+            module,
+            declaration.mailbox.capacity_span,
+            "mailbox_capacity_out_of_range",
+            Some(declaration.name.normalized.clone()),
+        )
+    })?;
+    if declaration.mailbox.policy.normalized != "Reject" {
+        return Err(failure(
+            module,
+            declaration.mailbox.policy.span,
+            "mailbox_overflow_policy_unsupported",
+            Some(declaration.name.normalized.clone()),
+        ));
+    }
+    let mailbox_contract = CheckedActorMailboxContract {
+        actor: definition.clone(),
+        actor_type,
+        mailbox: LocalMailboxContract::new(capacity, MailboxOverflowPolicy::Reject),
+        source_span: declaration.mailbox.span,
+        capacity_span: declaration.mailbox.capacity_span,
+        policy_span: declaration.mailbox.policy.span,
+    };
+
     let canonical_bytes = canonical_bytes(
         typed,
         &definition,
@@ -447,12 +531,14 @@ fn build_one(
         state_binding,
         message_binding,
         &message_contract,
+        &mailbox_contract,
     );
     Ok(CheckedActorCore {
         definition,
         actor_type,
         message_type: *message,
         message_contract,
+        mailbox_contract,
         state_type: *state,
         reference_type: CheckedActorRefType {
             actor_type,
@@ -468,6 +554,12 @@ fn build_one(
             declaration: declaration.span,
             actor_keyword: declaration.keyword_span,
             message_type: declaration.message_type.span,
+            mailbox_clause: declaration.mailbox.span,
+            mailbox_keyword: declaration.mailbox.keyword_span,
+            capacity_keyword: declaration.mailbox.capacity_keyword_span,
+            capacity: declaration.mailbox.capacity_span,
+            overflow_keyword: declaration.mailbox.overflow_keyword_span,
+            overflow_policy: declaration.mailbox.policy.span,
             state_clause: declaration.state.span,
             state_keyword: declaration.state.keyword_span,
             state_type: declaration.state.state_type.span,
@@ -524,6 +616,7 @@ fn canonical_bytes(
     state_binding: BindingKey,
     message_binding: BindingKey,
     message_contract: &CheckedActorMessageContract,
+    mailbox_contract: &CheckedActorMailboxContract,
 ) -> Vec<u8> {
     let mut bytes = Vec::new();
     push_text(&mut bytes, CHECKED_ACTOR_CORE_VERSION);
@@ -537,6 +630,7 @@ fn canonical_bytes(
     push_text(&mut bytes, message_contract.sendability().as_str());
     push_text(&mut bytes, message_contract.schema().id().as_str());
     push_bytes(&mut bytes, message_contract.schema().canonical_bytes());
+    push_bytes(&mut bytes, mailbox_contract.mailbox().canonical_bytes());
     push_text(&mut bytes, &typed.arena().display(state));
     for value in [
         initializer.local().get(),

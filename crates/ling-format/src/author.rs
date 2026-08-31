@@ -539,12 +539,14 @@ mod tests {
         assert_eq!(
             format(concat!(
                 "actor Counter:Int=\n",
+                "  mailbox capacity 16 overflow Reject\n",
                 "  state Int=0\n",
                 "  receive state message=\n",
                 "    state+message\n",
             )),
             concat!(
                 "actor Counter: Int =\n",
+                "    mailbox capacity 16 overflow Reject\n",
                 "    state Int = 0\n",
                 "    receive state message =\n",
                 "        state + message\n",

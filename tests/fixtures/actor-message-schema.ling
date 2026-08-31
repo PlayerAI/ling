@@ -3,6 +3,7 @@ module Main
 type Message = { values: List<Int> }
 
 actor Inbox : Message =
+    mailbox capacity 16 overflow Reject
     state Int = 0
     receive state message =
         state

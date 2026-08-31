@@ -75,8 +75,20 @@ pub struct ActorDeclaration {
     pub keyword_span: Span,
     pub name: Name,
     pub message_type: TypeSyntax,
+    pub mailbox: ActorMailboxClause,
     pub state: ActorStateClause,
     pub receive: ActorReceiveClause,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ActorMailboxClause {
+    pub span: Span,
+    pub keyword_span: Span,
+    pub capacity_keyword_span: Span,
+    pub capacity_span: Span,
+    pub capacity: Literal,
+    pub overflow_keyword_span: Span,
+    pub policy: Name,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -667,6 +679,15 @@ impl Lowerer {
             keyword_span: declaration.keyword_span,
             name: name(&declaration.name),
             message_type: type_syntax(&declaration.message_type),
+            mailbox: ActorMailboxClause {
+                span: declaration.mailbox.span,
+                keyword_span: declaration.mailbox.keyword_span,
+                capacity_keyword_span: declaration.mailbox.capacity_keyword_span,
+                capacity_span: declaration.mailbox.capacity_span,
+                capacity: literal_value(&declaration.mailbox.capacity),
+                overflow_keyword_span: declaration.mailbox.overflow_keyword_span,
+                policy: name(&declaration.mailbox.policy),
+            },
             state: ActorStateClause {
                 span: declaration.state.span,
                 keyword_span: declaration.state.keyword_span,

@@ -223,6 +223,8 @@ impl<'tokens> Parser<'tokens> {
             self.unexpected(&[TokenKind::Newline], "Actor declaration body");
         }
         self.expect(TokenKind::Indent, "Actor declaration body");
+        children.push(self.parse_actor_mailbox_clause());
+        self.eat_newlines(false);
         children.push(self.parse_actor_state_clause());
         self.eat_newlines(false);
         children.push(self.parse_actor_receive_clause());
@@ -233,6 +235,20 @@ impl<'tokens> Parser<'tokens> {
         }
         self.expect(TokenKind::Dedent, "Actor declaration body");
         CstNode::new(NodeKind::ActorDeclaration, start..self.position, children)
+    }
+
+    fn parse_actor_mailbox_clause(&mut self) -> CstNode {
+        let start = self.position;
+        self.expect_contextual("mailbox", "Actor mailbox clause");
+        self.expect_contextual("capacity", "Actor mailbox capacity");
+        self.expect(TokenKind::Integer, "Actor mailbox capacity");
+        self.expect_contextual("overflow", "Actor mailbox overflow policy");
+        self.expect(TokenKind::Identifier, "Actor mailbox overflow policy");
+        CstNode::new(
+            NodeKind::ActorMailboxClause,
+            start..self.position,
+            Vec::new(),
+        )
     }
 
     fn parse_actor_state_clause(&mut self) -> CstNode {

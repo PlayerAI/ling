@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 use std::fmt;
 
-use ling_effects::CheckedProgram;
+use ling_effects::{CheckedProgram, LocalMailboxContract, MailboxCapacity, MailboxOverflowPolicy};
 use ling_hir as hir;
 use ling_project::PackageIdentity;
 use ling_resolve::{
@@ -19,7 +19,7 @@ pub const PROJECT_SEMANTIC_SCHEMA: &str = "ling.semantic/0.2";
 pub const LANGUAGE_VERSION: &str = "0.0.1-dev";
 pub const TRAIT_IDE_EXTENSION_VERSION: &str = "0.1";
 pub const TASK_GRAPH_EXTENSION_VERSION: &str = "0.1";
-pub const ACTOR_GRAPH_EXTENSION_VERSION: &str = "0.1";
+pub const ACTOR_GRAPH_EXTENSION_VERSION: &str = "0.2";
 
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct BodyId(String);
@@ -107,7 +107,19 @@ pub struct SemanticActor {
     pub schema_id: String,
     pub root: u32,
     pub span: SemanticByteSpan,
+    pub mailbox: SemanticActorMailbox,
     pub nodes: Vec<SemanticActorSchemaNode>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SemanticActorMailbox {
+    pub capacity: u32,
+    pub overflow: String,
+    pub canonical_bytes: Vec<u8>,
+    pub span: SemanticByteSpan,
+    pub capacity_span: SemanticByteSpan,
+    pub policy_span: SemanticByteSpan,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -2570,6 +2582,13 @@ fn validate_actor_projection(graph: &SemanticGraph) -> Result<(), SemanticReadEr
                 "Actor message type, SendableLocal class, root, owner, or span is invalid",
             ));
         }
+        if actor.mailbox.span.source != actor.span.source {
+            return Err(invalid_actor_projection(
+                &format!("{path}.mailbox.span.source"),
+                "Actor message and mailbox evidence must use the same source",
+            ));
+        }
+        validate_actor_mailbox(&actor.mailbox, &format!("{path}.mailbox"))?;
         validate_actor_nodes(actor, &path)?;
         let expected = format!(
             "experimental:blake3:{}",
@@ -2581,6 +2600,48 @@ fn validate_actor_projection(graph: &SemanticGraph) -> Result<(), SemanticReadEr
                 "Actor message schema digest does not match its canonical graph",
             ));
         }
+    }
+    Ok(())
+}
+
+fn validate_actor_mailbox(
+    mailbox: &SemanticActorMailbox,
+    path: &str,
+) -> Result<(), SemanticReadError> {
+    let capacity = MailboxCapacity::new(mailbox.capacity).map_err(|_| {
+        invalid_actor_projection(
+            &format!("{path}.capacity"),
+            "Actor mailbox capacity is outside the accepted range",
+        )
+    })?;
+    if mailbox.overflow != MailboxOverflowPolicy::Reject.as_str() {
+        return Err(invalid_actor_projection(
+            &format!("{path}.overflow"),
+            "Actor mailbox overflow policy is unsupported",
+        ));
+    }
+    if mailbox.span.start >= mailbox.span.end
+        || mailbox.capacity_span.start >= mailbox.capacity_span.end
+        || mailbox.policy_span.start >= mailbox.policy_span.end
+        || mailbox.span.source != mailbox.capacity_span.source
+        || mailbox.span.source != mailbox.policy_span.source
+        || mailbox.capacity_span.start <= mailbox.span.start
+        || mailbox.capacity_span.end > mailbox.span.end
+        || mailbox.policy_span.start <= mailbox.span.start
+        || mailbox.policy_span.end > mailbox.span.end
+        || mailbox.capacity_span.end >= mailbox.policy_span.start
+    {
+        return Err(invalid_actor_projection(
+            path,
+            "Actor mailbox source spans are invalid or inconsistent",
+        ));
+    }
+    let expected = LocalMailboxContract::new(capacity, MailboxOverflowPolicy::Reject);
+    if mailbox.canonical_bytes != expected.canonical_bytes() {
+        return Err(invalid_actor_projection(
+            &format!("{path}.canonical_bytes"),
+            "Actor mailbox canonical bytes do not match capacity and policy",
+        ));
     }
     Ok(())
 }
@@ -3580,6 +3641,17 @@ impl SnapshotBuilder {
                     schema_id: contract.schema().id().as_str().to_owned(),
                     root: contract.schema().root(),
                     span: semantic_byte_span(contract.source_span()),
+                    mailbox: {
+                        let mailbox = core.mailbox_contract();
+                        SemanticActorMailbox {
+                            capacity: mailbox.mailbox().capacity().get(),
+                            overflow: mailbox.mailbox().overflow().as_str().to_owned(),
+                            canonical_bytes: mailbox.mailbox().canonical_bytes().to_vec(),
+                            span: semantic_byte_span(mailbox.source_span()),
+                            capacity_span: semantic_byte_span(mailbox.capacity_span()),
+                            policy_span: semantic_byte_span(mailbox.policy_span()),
+                        }
+                    },
                     nodes,
                 }
             })
@@ -5558,6 +5630,7 @@ mod tests {
             "    | Branch of List<Tree<'a>>\n",
             "    | Leaf of 'a\n\n",
             "actor Inbox : Envelope<Tree<Int>> =\n",
+            "    mailbox capacity 64 overflow Reject\n",
             "    state Int = 0\n",
             "    receive state message =\n",
             "        state\n",
@@ -5569,6 +5642,11 @@ mod tests {
         assert_eq!(projection.actors.len(), 1);
         let actor = &projection.actors[0];
         assert_eq!(actor.sendability, "SendableLocal(Value)");
+        assert_eq!(actor.mailbox.capacity, 64);
+        assert_eq!(actor.mailbox.overflow, "Reject");
+        assert!(!actor.mailbox.canonical_bytes.is_empty());
+        assert!(actor.mailbox.span.start < actor.mailbox.capacity_span.start);
+        assert!(actor.mailbox.capacity_span.end < actor.mailbox.policy_span.start);
         assert!(actor.schema_id.starts_with("experimental:blake3:"));
         assert!(actor.nodes.iter().any(|node| node.kind == "record"));
         assert!(actor.nodes.iter().any(|node| node.kind == "variant"));
@@ -5600,6 +5678,20 @@ mod tests {
                 .actors[0]
                 .schema_id
         );
+
+        let changed_capacity = snapshot(&source.replace("capacity 64", "capacity 65"));
+        assert_ne!(first.program_id(), changed_capacity.program_id());
+        assert_ne!(
+            actor.mailbox.canonical_bytes,
+            changed_capacity
+                .graph()
+                .actor
+                .as_ref()
+                .expect("Actor extension")
+                .actors[0]
+                .mailbox
+                .canonical_bytes
+        );
     }
 
     #[test]
@@ -5608,6 +5700,7 @@ mod tests {
             "module Main\n\n",
             "type Message = { values: List<Int> }\n\n",
             "actor Inbox : Message =\n",
+            "    mailbox capacity 16 overflow Reject\n",
             "    state Int = 0\n",
             "    receive state message =\n",
             "        state\n",
@@ -5628,6 +5721,29 @@ mod tests {
         bad_span["x-ling-actor"]["actors"][0]["span"]["start"] = serde_json::json!(u32::MAX);
         assert!(read_json(&bad_span.to_string()).is_err());
 
+        let mut bad_capacity = value.clone();
+        bad_capacity["x-ling-actor"]["actors"][0]["mailbox"]["capacity"] = serde_json::json!(0);
+        assert!(read_json(&bad_capacity.to_string()).is_err());
+
+        let mut bad_policy = value.clone();
+        bad_policy["x-ling-actor"]["actors"][0]["mailbox"]["overflow"] = serde_json::json!("Wait");
+        assert!(read_json(&bad_policy.to_string()).is_err());
+
+        let mut bad_mailbox_bytes = value.clone();
+        bad_mailbox_bytes["x-ling-actor"]["actors"][0]["mailbox"]["canonical_bytes"] =
+            serde_json::json!([0]);
+        assert!(read_json(&bad_mailbox_bytes.to_string()).is_err());
+
+        let mut bad_mailbox_span = value.clone();
+        bad_mailbox_span["x-ling-actor"]["actors"][0]["mailbox"]["capacity_span"]["start"] =
+            serde_json::json!(u32::MAX);
+        assert!(read_json(&bad_mailbox_span.to_string()).is_err());
+
+        let mut bad_owner = value.clone();
+        bad_owner["x-ling-actor"]["actors"][0]["definition_id"] =
+            serde_json::json!(format!("experimental:blake3:{}", "0".repeat(64)));
+        assert!(read_json(&bad_owner.to_string()).is_err());
+
         let mut bad_edge = value.clone();
         let nodes = bad_edge["x-ling-actor"]["actors"][0]["nodes"]
             .as_array_mut()
@@ -5642,6 +5758,31 @@ mod tests {
         let mut unknown_field = value;
         unknown_field["x-ling-actor"]["actors"][0]["runtime_mailbox"] = serde_json::json!(true);
         assert!(read_json(&unknown_field.to_string()).is_err());
+    }
+
+    #[test]
+    fn actor_projection_reader_rejects_noncanonical_actor_order() {
+        let snapshot = snapshot(concat!(
+            "module Main\n\n",
+            "actor First : Int =\n",
+            "    mailbox capacity 1 overflow Reject\n",
+            "    state Int = 0\n",
+            "    receive state message =\n",
+            "        state\n\n",
+            "actor Second : Int =\n",
+            "    mailbox capacity 2 overflow Reject\n",
+            "    state Int = 1\n",
+            "    receive state message =\n",
+            "        state + message\n",
+        ));
+        let mut value = serde_json::from_str::<serde_json::Value>(snapshot.json())
+            .expect("valid semantic JSON");
+        value["x-ling-actor"]["actors"]
+            .as_array_mut()
+            .expect("Actor list")
+            .reverse();
+
+        assert!(read_json(&value.to_string()).is_err());
     }
 
     #[test]
