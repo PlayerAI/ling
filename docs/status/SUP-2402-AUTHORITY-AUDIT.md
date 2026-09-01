@@ -2,19 +2,17 @@
 
 ## Outcome
 
-`SUP-2402` is Ready for one bounded private implementation slice. SUP-2401 is
-Done under Accepted DEC-0276, the real checked-Core local Supervisor can contain
-a child Fault, and Accepted DEC-0277 now fixes replacement identity, restart
-attempts, logical windows, backoff, circuit transitions, initializer Faults,
-and bounded provenance for the scoped `RestartOneBudgeted` profile.
+`SUP-2402` is Done. SUP-2401 is complete under Accepted DEC-0276, Accepted
+DEC-0277 fixes the scoped `RestartOneBudgeted` contract, and implementation
+commit `be9b8dd842815cff100267a645b9bef88b13c369` supplies the required private
+checked-Core recovery path and executable evidence.
 
 Accepted DEC-0277 supplies the minimal design: an opt-in private
 `RestartOneBudgeted` profile with explicit logical ticks, an independent
 per-child sliding attempt budget, fixed backoff, Closed/Open/HalfOpen circuit
 states, fresh Actor identities, initializer-only state, and bounded last-Fault
-provenance. No restart counter, scheduler, circuit, runtime query, diagnostic,
-protocol, or placeholder public API has been added yet; implementation and
-executable evidence remain pending.
+provenance. No public restart counter, scheduler, circuit, runtime query,
+diagnostic, protocol, or placeholder API was added.
 
 Accepted DEC-0102 authorizes the bounded child `SUP-2402-OBSERVATION`,
 which records only immutable budget/circuit observation identities and
@@ -55,12 +53,17 @@ provenance, query, runtime, or replay gaps described below.
   checked-Core Actor registry, fresh monotonically allocated runtime Actor IDs,
   bounded spawn/send/step/stop, retained Actor Faults, and structured Task-root
   cancellation under Accepted DEC-0274.
-- `crates/ling-eval/src/actor_supervisor.rs` now supplies one private fixed-child
-  DEC-0276 Supervisor. It synchronously validates a turn-Fault report, seals
-  only the faulting slot under `ContainOne`, preserves siblings, and performs
-  bounded deterministic stop/cleanup. It deliberately has no restart path,
-  replacement spawn, logical clock, budget, backoff, circuit state, or restart
-  provenance history.
+- `crates/ling-eval/src/actor_supervisor.rs` supplies the private fixed-child
+  DEC-0276 Supervisor and the opt-in DEC-0277 `RestartOneBudgeted` profile. It
+  retains `ContainOne`, validates canonical Fault evidence, owns an explicit
+  logical clock and per-slot bounded attempt history, performs fixed-backoff and
+  Closed/Open/HalfOpen transitions, and publishes only fresh checked
+  incarnations in canonical Actor-type order.
+- `crates/ling-eval/src/actor_runtime.rs` keeps ordinary spawn behavior
+  unchanged and adds one crate-private restart-spawn path that returns an
+  initializer Fault to the Supervisor without publishing an Actor or
+  cancelling the root solely for that accepted recovery outcome. Aggregate
+  restart preflight preserves Actor, command, Fault, shutdown, and event bounds.
 - `ling-syntax`, `ling-ast`, `ling-hir`, `ling-types`, and `ling-effects` have
   no restart/budget/circuit judgments or state. `ling-semantic` has no
   accepted Semantic Graph node for restart counters, windows, provenance, or
@@ -97,7 +100,7 @@ their existing gaps.
 
 ## Evidence and compatibility
 
-This audit and Accepted DEC-0277 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This audit, Accepted DEC-0277, and the completed implementation were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
 DEC-0021, DEC-0102, DEC-0274, DEC-0275, DEC-0276, RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
@@ -106,15 +109,17 @@ DEC-0021, DEC-0102, DEC-0274, DEC-0275, DEC-0276, RFC-0001, RFC-0020,
 `docs/governance/protocol-inventory.toml`, and the current syntax, AST, HIR,
 types, effects, evaluator, bytecode, VM, diagnostic, and schema crates.
 
-No compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol,
-Supervisor, diagnostic, schema, Semantic ID, source-span, runtime, or Unicode
-17.0.0 behavior changed.
+Focused `ling-eval` tests and Clippy, the CLI Actor boundary suite, the complete
+workspace all-target test gate, formatting, and diff checks passed. The public
+compiler, interpreter, VM, bytecode, scheduler, Actor/Supervisor protocol,
+diagnostic, schema, Semantic ID, source-span, and Unicode 17.0.0 boundaries did
+not change; public Actor execution remains `L-ACTOR-0002`.
 
 ## Intentionally deferred
 
-SUP-2402 implementation may now begin only within DEC-0277's scoped private
-profile. Wall-clock or jitter scheduling, mutable or
-persisted configuration, state snapshot/restore, mailbox transfer, stable
+SUP-2402 completes only DEC-0277's scoped private profile. SUP-2403, wall-clock
+or jitter scheduling, mutable or persisted configuration, state
+snapshot/restore, mailbox transfer, stable
 references, dynamic/nested trees, lifetime classes, group restart, escalation,
 parallel recovery, public query/metrics/Fault protocols, Replay, remote
 delivery, backend Actor execution, migration, fairness/liveness/performance,

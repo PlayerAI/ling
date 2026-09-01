@@ -459,7 +459,7 @@
 | `STD-6303-OBSERVATION` | Internal Unicode and Chinese-programming stability boundary evidence | `G6` | `S` | `Done` | `STD-6302-OBSERVATION` | `e4d1aa815a6f9da69dfe6036d73e7fa9a1a8ef47` |
 | `SUP-2401` | Supervisor model | `G2` | `L` | `Done` | `ACT-2305` | `10f8e0c1d09177c97adbfcef283b2ed6c314649d` |
 | `SUP-2401-OBSERVATION` | Internal Supervisor observation | `G2` | `S` | `Done` | `ACT-2306-PROPERTY-OBSERVATION` | `c29d95c7bc7b926c92757b2c32fccf960500e421` |
-| `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `Ready` | `SUP-2401` | `` |
+| `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `Done` | `SUP-2401` | `be9b8dd842815cff100267a645b9bef88b13c369` |
 | `SUP-2402-OBSERVATION` | Internal restart-budget observation | `G2` | `S` | `Done` | `SUP-2401-OBSERVATION` | `7ee0cf0bf90971bb6844c8bf467f5506e5e5e796` |
 | `SUP-2403` | Supervision tests | `G2` | `L` | `BlockedSpec` | `SUP-2402` | `` |
 | `SUP-2403-OBSERVATION` | Internal supervision test evidence | `G2` | `S` | `Done` | `SUP-2402-OBSERVATION` | `73046c5049324455ec87d0011e62482de97c07aa` |

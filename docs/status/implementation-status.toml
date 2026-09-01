@@ -10803,7 +10803,7 @@ acceptance = [
   "The implementation canonically creates one child per ActorTypeId, fails construction atomically, seals only a valid faulting child, preserves siblings, and turns stale, duplicate, cross-run, wrong-identity, inconsistent, or unrecordable reports into Supervisor/runtime failure plus root cancellation.",
   "Tests cover successive containment through all children, closed post-Fault admission, explicit stop, owner cancellation, exactly-once cleanup, command/event/shutdown reserve preflight, Unicode/BOM/CRLF source spans, and deterministic child ordering without restart or restore.",
   "cargo test -p ling-eval --all-targets --locked --offline, strict ling-eval Clippy, the ling-cli actor boundary, and cargo test --workspace --all-targets --locked --offline pass; every public Actor route retains L-ACTOR-0002.",
-  "GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open and SUP-2402/SUP-2403 remain BlockedSpec for restart budgets, circuit breaking, escalation, parallel recovery, and public Supervisor behavior.",
+  "At SUP-2401 completion, GAP-ACTOR-MAILBOX-SUPERVISOR-001 remained Open for SUP-2402/SUP-2403 restart, escalation, parallel-recovery, and public Supervisor work; SUP-2402 has since completed under Accepted DEC-0277 without broadening SUP-2401.",
 ]
 verified_against_commit = "10f8e0c1d09177c97adbfcef283b2ed6c314649d"
 completion_commit = "10f8e0c1d09177c97adbfcef283b2ed6c314649d"
@@ -10811,7 +10811,7 @@ integration_state = "committed"
 completed = "2026-09-01"
 notes = [
   "SUP-2401 completes only DEC-0276's internal Experimental ContainOne profile. The Supervisor module is not re-exported, accepts no dynamic or nested children, and exposes no source, CLI, schema, protocol, backend, or Stable surface.",
-  "Automatic restart, replacement identity, budget/window/backoff/circuit behavior, snapshot/restore, mailbox transfer, lifetime classes, escalation, parallel recovery, and public Fault channels remain SUP-2402/SUP-2403 or later Accepted work.",
+  "Automatic restart and bounded circuit behavior were intentionally outside SUP-2401 and later completed privately by SUP-2402; snapshot/restore, mailbox transfer, lifetime classes, escalation, parallel recovery, public Fault channels, and broader supervision remain SUP-2403 or later Accepted work.",
   "No compiler frontend, public interpreter entry, VM, bytecode, public scheduler, mailbox protocol, diagnostic, schema, Semantic ID, source-span unit, migration, or Unicode 17.0.0 behavior changed.",
 ]
 
@@ -10876,7 +10876,7 @@ notes = [
 [[task]]
 id = "SUP-2402"
 title = "Restart budgets and circuit breakers"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10905,12 +10905,15 @@ spec = [
 ]
 artifacts = [
   "docs/status/SUP-2402-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2402-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0277-bounded-deterministic-local-supervisor-restart.md",
   "docs/status/SUP-2402-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/SUP-2402-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0102-restart-budget-observation.md",
   "crates/ling-concurrency/src/budget.rs",
   "crates/ling-concurrency/src/lib.rs",
+  "crates/ling-eval/src/actor_runtime.rs",
+  "crates/ling-eval/src/actor_supervisor.rs",
   "docs/governance/authority.toml",
   "docs/governance/authority.md",
   "docs/governance/lifecycle.toml",
@@ -10919,21 +10922,22 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "ACT-2301 through ACT-2306 and SUP-2401 are Done, and Accepted DEC-0277 closes the scoped private authority blocker for restart replacement identity, attempts, logical windows, fixed backoff, circuit transitions, initializer Faults, and bounded provenance.",
-  "Accepted DEC-0277 clauses 1-18 specify one checked-Core-only private RestartOneBudgeted profile with explicit logical ticks, independent per-slot half-open windows, fixed backoff, Closed/Open/HalfOpen transitions, fresh Actor identities, initializer-only state, and bounded last-Fault provenance.",
-  "Required evidence covers exact window/attempt/overflow boundaries, successful and initializer-Fault restart, backoff, circuit reopening, cancellation, cleanup, Unicode/CRLF/BOM, resource limits, determinism, and unchanged L-ACTOR-0002 public behavior.",
-  "Accepted DEC-0102 authorizes only the publish-disabled restart-budget observation child; it does not close clock, budget, backoff, circuit, provenance, query, runtime, or replay gaps.",
-  "Implementation must modify the real DEC-0276 Supervisor/Actor runtime path rather than the DEC-0102 observation model, while preserving ContainOne and L-ACTOR-0002.",
-  "SUP-2402 becomes Done only after executable recovery, resource, cleanup, determinism, and repository gates pass; public query/Replay, state restore, remote/backend, group strategies, and Stable behavior remain deferred.",
+  "Accepted DEC-0277 clauses 1-18 are implemented as one crate-private checked-Core RestartOneBudgeted policy over the real DEC-0276 Supervisor and DEC-0274 Actor runtime; existing ContainOne behavior remains available and unchanged.",
+  "The implementation uses an explicit checked u64 logical clock, immutable nonzero Supervisor-wide configuration, independent per-slot exact half-open attempt windows, fixed backoff, and Closed/Open/HalfOpen circuit transitions without wall time, jitter, or host scheduling input.",
+  "Successful and initializer-Fault attempts consume budget, fresh incarnations receive monotonically allocated Actor IDs, empty mailboxes, and initializer-only state, while old references/state/messages are never restored or transferred.",
+  "Executable evidence covers exact window, backoff, overflow and regression boundaries; successful and initializer-Fault recovery; circuit reopen/close; canonical simultaneous recovery; cancellation and cleanup; resource fallback; and Unicode/BOM/CRLF source-span preservation.",
+  "cargo test -p ling-eval --all-targets --locked --offline, cargo clippy -p ling-eval --all-targets --locked --offline -- -D warnings, cargo test -p ling-cli --test actor_boundary --locked --offline, and cargo test --workspace --all-targets --locked --offline passed.",
+  "The implementation adds no public Rust API, Ling syntax/value/Effect/Capability, diagnostic, schema, Semantic ID, protocol, CLI/LSP route, bytecode/VM/backend behavior, or Replay surface; public Actor execution remains L-ACTOR-0002.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "be9b8dd842815cff100267a645b9bef88b13c369"
+completion_commit = "be9b8dd842815cff100267a645b9bef88b13c369"
+integration_state = "committed"
+completed = "2026-09-01"
 notes = [
-  "Accepted DEC-0277 removes SUP-2402's scoped private authority blocker; GAP-ACTOR-MAILBOX-SUPERVISOR-001 and GAP-DETERMINISTIC-REPLAY-001 stay Open for broader and public behavior.",
-  "The existing private Supervisor implements ContainOne only. Current source/types/effects/public evaluator/bytecode/VM have no restart loop, logical clock, public budget/circuit state, runtime query, or public supervision protocol.",
-  "The accepted decision changes governance only until implementation lands; it changes no compiler, interpreter, VM, bytecode, runtime execution, diagnostic, schema, Semantic ID, source span, public protocol, or Unicode 17.0.0 behavior by itself.",
+  "Implementation commit be9b8dd842815cff100267a645b9bef88b13c369 completes only DEC-0277's private Experimental SUP-2402 slice; DEC-0102 remains an independent data-only observation boundary.",
+  "GAP-ACTOR-MAILBOX-SUPERVISOR-001 and GAP-DETERMINISTIC-REPLAY-001 remain Open for SUP-2403, broader/public supervision, escalation, parallel recovery, Replay, ordering, backpressure, and public resource evidence.",
+  "Unicode remains 17.0.0 and original UTF-8 byte spans remain authoritative; no diagnostic, schema, Semantic ID, or compatibility version changes.",
+  "State restore, mailbox transfer, stable references, dynamic/nested trees, group strategies, public queries/metrics/Fault protocols, remote/backend execution, fairness, liveness, performance, migration, and Stable compatibility are intentionally deferred.",
 ]
 
 [[task]]
@@ -10991,7 +10995,7 @@ completion_commit = "7ee0cf0bf90971bb6844c8bf467f5506e5e5e796"
 integration_state = "committed"
 completed = "2026-08-22"
 notes = [
-  "This child is a data-only boundary under DEC-0102; SUP-2402 remains BlockedSpec for clocks, budgets, backoff, circuit transitions, Fault provenance, query protocols, runtime, and interpreter/VM behavior.",
+  "This child remains a data-only boundary under DEC-0102. SUP-2402 later completed a separate private runtime slice under DEC-0277; DEC-0102 itself still grants no clock, budget, circuit, provenance-query, runtime, or interpreter/VM authority.",
   "No parser, AST/HIR/Typed Core node, diagnostic, Semantic Graph projection, schema protocol, Semantic ID, CLI/LSP command, public protocol, runtime, scheduler, or Unicode behavior was added.",
 ]
 
@@ -11013,6 +11017,10 @@ spec = [
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
   "docs/decisions/0021-deterministic-parallel-scheduling.md",
+  "docs/decisions/0274-minimal-local-actor-runtime.md",
+  "docs/decisions/0275-local-actor-property-and-stress-evidence.md",
+  "docs/decisions/0276-minimal-local-supervisor-containment.md",
+  "docs/decisions/0277-bounded-deterministic-local-supervisor-restart.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
@@ -11046,8 +11054,8 @@ completion_commit = ""
 integration_state = "blocked"
 completed = ""
 notes = [
-  "SUP-2403 is BlockedSpec by SUP-2401/SUP-2402, ACT-2301 through ACT-2306, absent RFC-C204/RFC-0009, GAP-ACTOR-MAILBOX-SUPERVISOR-001, and unresolved supervision/restart/Fault/test contracts.",
-  "Current Seed tests and VM differential/resource/cancellation evidence cover no Actor supervision, restart budget, state restore, escalation, mailbox cleanup, deterministic recovery trace, or runtime differential relation; compiler-query scheduling is not runtime evidence.",
+  "ACT-2301 through ACT-2306 and SUP-2401/SUP-2402 are Done under scoped Accepted decisions. SUP-2403 remains BlockedSpec because no Accepted authority yet fixes the exact executable corpus, comparison projection, required recovery scenarios, and completion boundary for this distinct evidence task.",
+  "Current private Actor/Supervisor tests cover DEC-0274 through DEC-0277 behavior, but they do not by themselves authorize SUP-2403's broader state-restore, escalation, public fixture, Replay, cross-backend, or conformance claims; compiler-query scheduling is not runtime evidence.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Supervisor, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
