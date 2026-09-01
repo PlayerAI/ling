@@ -4,7 +4,7 @@
 //! runtime. It deliberately has no public re-export, source operation,
 //! restart path, serialized protocol, or backend execution surface.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 use std::error::Error;
 use std::fmt;
 
@@ -36,8 +36,42 @@ pub(super) enum SupervisorState {
 pub(super) enum SupervisorChildState {
     Starting,
     Running,
+    Backoff,
+    Restarting,
+    CircuitOpen,
     Contained,
     Stopped,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(super) enum SupervisorCircuitState {
+    Closed,
+    Open,
+    HalfOpen,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(super) struct RestartBudget {
+    max_restarts: usize,
+    window_ticks: u64,
+    backoff_ticks: u64,
+}
+
+impl RestartBudget {
+    #[must_use]
+    pub(super) const fn new(max_restarts: usize, window_ticks: u64, backoff_ticks: u64) -> Self {
+        Self {
+            max_restarts,
+            window_ticks,
+            backoff_ticks,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum SupervisorPolicy {
+    ContainOne,
+    RestartOneBudgeted(RestartBudget),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -65,6 +99,25 @@ pub(super) enum SupervisorTurnResult {
         actor: ActorId,
         report: ChildFaultReport,
     },
+    RestartScheduled {
+        actor: ActorId,
+        report: ChildFaultReport,
+        eligible_tick: u64,
+    },
+    CircuitOpened {
+        actor: ActorId,
+        report: ChildFaultReport,
+        open_until: u64,
+    },
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(super) struct SupervisorAdvanceResult {
+    tick: u64,
+    attempts: usize,
+    restarted: usize,
+    initializer_faults: usize,
+    half_open_probes: usize,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -86,6 +139,9 @@ pub(super) enum SupervisorStartErrorKind {
     },
     DuplicateActorType {
         actor_type: ActorTypeId,
+    },
+    InvalidRestartBudget {
+        reason: &'static str,
     },
     ResourceExhausted {
         resource: &'static str,
@@ -154,8 +210,10 @@ impl Error for SupervisorStartError {}
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub(super) enum SupervisorError {
     NotRunning { state: SupervisorState },
+    ClockRegression { current: u64, requested: u64 },
     Runtime(ActorRuntimeError),
     InvalidChildFaultReport { reason: &'static str },
+    InvalidRestartTransition { reason: &'static str },
 }
 
 impl fmt::Display for SupervisorError {
@@ -164,9 +222,16 @@ impl fmt::Display for SupervisorError {
             Self::NotRunning { state } => {
                 write!(formatter, "local Supervisor is not running: {state:?}")
             }
+            Self::ClockRegression { current, requested } => write!(
+                formatter,
+                "local Supervisor logical clock regressed: {requested} < {current}"
+            ),
             Self::Runtime(error) => error.fmt(formatter),
             Self::InvalidChildFaultReport { reason } => {
                 write!(formatter, "invalid child Fault report: {reason}")
+            }
+            Self::InvalidRestartTransition { reason } => {
+                write!(formatter, "invalid Supervisor restart transition: {reason}")
             }
         }
     }
@@ -185,22 +250,39 @@ struct SupervisorChildSlot {
     definition: DefinitionId,
     reference: Option<LocalActorRef>,
     state: SupervisorChildState,
+    restart: Option<RestartSlot>,
+}
+
+#[derive(Clone, Debug)]
+struct RestartSlot {
+    attempts: VecDeque<u64>,
+    circuit: SupervisorCircuitState,
+    eligible_tick: Option<u64>,
+    open_until: Option<u64>,
+    last_fault: Option<ChildFaultReport>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub(super) struct SupervisorChildSnapshot {
     actor_type: ActorTypeId,
     definition: DefinitionId,
-    actor: ActorId,
+    actor: Option<ActorId>,
     state: SupervisorChildState,
-    actor_state: ActorInstanceState,
+    actor_state: Option<ActorInstanceState>,
     queued_messages: usize,
     cleanup_count: usize,
+    circuit: Option<SupervisorCircuitState>,
+    restart_attempts: Vec<u64>,
+    eligible_tick: Option<u64>,
+    open_until: Option<u64>,
+    last_fault: Option<ChildFaultReport>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub(super) struct SupervisorSnapshot {
     state: SupervisorState,
+    tick: u64,
+    budget: Option<RestartBudget>,
     children: Vec<SupervisorChildSnapshot>,
 }
 
@@ -210,6 +292,8 @@ pub(super) struct LocalActorSupervisor<'checked> {
     runtime: ActorRuntime<'checked>,
     owner_control: LocalTaskControl,
     slots: BTreeMap<ActorTypeId, SupervisorChildSlot>,
+    policy: SupervisorPolicy,
+    tick: u64,
 }
 
 impl<'checked> LocalActorSupervisor<'checked> {
@@ -219,6 +303,47 @@ impl<'checked> LocalActorSupervisor<'checked> {
         limits: ActorRuntimeLimits,
         owner_control: &LocalTaskControl,
         definitions: &[DefinitionId],
+        console: &mut dyn Console,
+    ) -> Result<Self, SupervisorStartError> {
+        Self::start_with_policy(
+            checked,
+            runtime_id,
+            limits,
+            owner_control,
+            definitions,
+            SupervisorPolicy::ContainOne,
+            console,
+        )
+    }
+
+    pub(super) fn start_restarting(
+        checked: &'checked CheckedProgram,
+        runtime_id: ActorRuntimeId,
+        limits: ActorRuntimeLimits,
+        owner_control: &LocalTaskControl,
+        definitions: &[DefinitionId],
+        budget: RestartBudget,
+        console: &mut dyn Console,
+    ) -> Result<Self, SupervisorStartError> {
+        Self::start_with_policy(
+            checked,
+            runtime_id,
+            limits,
+            owner_control,
+            definitions,
+            SupervisorPolicy::RestartOneBudgeted(budget),
+            console,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn start_with_policy(
+        checked: &'checked CheckedProgram,
+        runtime_id: ActorRuntimeId,
+        limits: ActorRuntimeLimits,
+        owner_control: &LocalTaskControl,
+        definitions: &[DefinitionId],
+        policy: SupervisorPolicy,
         console: &mut dyn Console,
     ) -> Result<Self, SupervisorStartError> {
         if definitions.is_empty() {
@@ -261,7 +386,7 @@ impl<'checked> LocalActorSupervisor<'checked> {
                 )
             })?;
 
-        if let Some(kind) = construction_limit_error(limits, ordered.len()) {
+        if let Some(kind) = construction_limit_error(limits, ordered.len(), policy) {
             return Err(abort_construction(
                 kind,
                 &mut runtime,
@@ -279,6 +404,16 @@ impl<'checked> LocalActorSupervisor<'checked> {
                         definition: definition.clone(),
                         reference: None,
                         state: SupervisorChildState::Starting,
+                        restart: match policy {
+                            SupervisorPolicy::ContainOne => None,
+                            SupervisorPolicy::RestartOneBudgeted(_) => Some(RestartSlot {
+                                attempts: VecDeque::new(),
+                                circuit: SupervisorCircuitState::Closed,
+                                eligible_tick: None,
+                                open_until: None,
+                                last_fault: None,
+                            }),
+                        },
                     },
                 )
             })
@@ -309,6 +444,8 @@ impl<'checked> LocalActorSupervisor<'checked> {
             runtime,
             owner_control: owner_control.clone(),
             slots,
+            policy,
+            tick: 0,
         };
         supervisor.state = SupervisorState::Running;
         Ok(supervisor)
@@ -332,6 +469,7 @@ impl<'checked> LocalActorSupervisor<'checked> {
     pub(super) fn child_reference(&self, actor_type: ActorTypeId) -> Option<&LocalActorRef> {
         self.slots
             .get(&actor_type)
+            .filter(|slot| slot.state == SupervisorChildState::Running)
             .and_then(|slot| slot.reference.as_ref())
     }
 
@@ -373,10 +511,192 @@ impl<'checked> LocalActorSupervisor<'checked> {
                     Ok(report) => report,
                     Err(reason) => return Err(self.reject_fault_report(reason)),
                 };
-                self.acknowledge_fault(&report)?;
-                Ok(SupervisorTurnResult::Contained { actor, report })
+                match self.policy {
+                    SupervisorPolicy::ContainOne => {
+                        self.acknowledge_fault(&report)?;
+                        Ok(SupervisorTurnResult::Contained { actor, report })
+                    }
+                    SupervisorPolicy::RestartOneBudgeted(budget) => {
+                        self.acknowledge_restart_fault(report, budget)
+                    }
+                }
             }
         }
+    }
+
+    pub(super) fn advance_to(
+        &mut self,
+        tick: u64,
+        console: &mut dyn Console,
+    ) -> Result<SupervisorAdvanceResult, SupervisorError> {
+        self.observe_owner_cancellation()?;
+        self.ensure_running()?;
+        let SupervisorPolicy::RestartOneBudgeted(budget) = self.policy else {
+            return Err(SupervisorError::InvalidRestartTransition {
+                reason: "ContainOne Supervisor has no logical restart clock",
+            });
+        };
+        if tick < self.tick {
+            return Err(SupervisorError::ClockRegression {
+                current: self.tick,
+                requested: tick,
+            });
+        }
+
+        let mut due = Vec::new();
+        let mut invalid = None;
+        for (actor_type, slot) in &self.slots {
+            let restart = slot
+                .restart
+                .as_ref()
+                .expect("restarting policy preallocates restart state");
+            match slot.state {
+                SupervisorChildState::Backoff => match restart.eligible_tick {
+                    Some(eligible_tick) if eligible_tick <= tick => {
+                        let mut attempts = restart.attempts.clone();
+                        if let Err(reason) =
+                            prune_attempts(&mut attempts, tick, budget.window_ticks)
+                        {
+                            invalid = Some(reason);
+                        } else if attempts.len() >= budget.max_restarts {
+                            invalid = Some("Backoff restart has no budget capacity");
+                        } else {
+                            due.push((*actor_type, false));
+                        }
+                    }
+                    Some(_) => {}
+                    None => invalid = Some("Backoff slot has no eligible tick"),
+                },
+                SupervisorChildState::CircuitOpen => match restart.open_until {
+                    Some(open_until) if open_until <= tick => {
+                        let mut attempts = restart.attempts.clone();
+                        if let Err(reason) =
+                            prune_attempts(&mut attempts, tick, budget.window_ticks)
+                        {
+                            invalid = Some(reason);
+                        } else if attempts.len() >= budget.max_restarts {
+                            invalid = Some("Open circuit reached expiry without budget capacity");
+                        } else {
+                            due.push((*actor_type, true));
+                        }
+                    }
+                    Some(_) => {}
+                    None => invalid = Some("Open circuit has no expiry tick"),
+                },
+                SupervisorChildState::Starting
+                | SupervisorChildState::Running
+                | SupervisorChildState::Contained
+                | SupervisorChildState::Stopped => {}
+                SupervisorChildState::Restarting => {
+                    invalid = Some("Restarting slot escaped a coordinator boundary");
+                }
+            }
+            if invalid.is_some() {
+                break;
+            }
+        }
+        if let Some(reason) = invalid {
+            return Err(self.reject_restart_transition(reason));
+        }
+        if !due.is_empty() {
+            if tick.checked_add(budget.window_ticks).is_none()
+                || tick.checked_add(budget.backoff_ticks).is_none()
+            {
+                return Err(
+                    self.reject_restart_transition("restart deadline arithmetic overflowed")
+                );
+            }
+            if let Err(error) = self.runtime.preflight_supervised_restarts(due.len()) {
+                return Err(self.reject_restart_runtime(error));
+            }
+        }
+
+        self.tick = tick;
+        let mut result = SupervisorAdvanceResult {
+            tick,
+            attempts: 0,
+            restarted: 0,
+            initializer_faults: 0,
+            half_open_probes: 0,
+        };
+        for (actor_type, half_open) in due {
+            let definition = self
+                .slots
+                .get(&actor_type)
+                .expect("due child slot remains registered")
+                .definition
+                .clone();
+            let transition_error = {
+                let slot = self
+                    .slots
+                    .get_mut(&actor_type)
+                    .expect("due child slot remains registered");
+                let restart = slot
+                    .restart
+                    .as_mut()
+                    .expect("restarting policy preallocates restart state");
+                if let Err(reason) =
+                    prune_attempts(&mut restart.attempts, tick, budget.window_ticks)
+                {
+                    Some(reason)
+                } else if restart.attempts.len() >= budget.max_restarts {
+                    Some("due restart has no budget capacity")
+                } else {
+                    restart.attempts.push_back(tick);
+                    restart.eligible_tick = None;
+                    restart.open_until = None;
+                    restart.circuit = if half_open {
+                        SupervisorCircuitState::HalfOpen
+                    } else {
+                        SupervisorCircuitState::Closed
+                    };
+                    slot.state = SupervisorChildState::Restarting;
+                    None
+                }
+            };
+            if let Some(reason) = transition_error {
+                return Err(self.reject_restart_transition(reason));
+            }
+            result.attempts += 1;
+            if half_open {
+                result.half_open_probes += 1;
+            }
+
+            match self.runtime.spawn_for_restart(&definition, console) {
+                Ok(reference) => {
+                    let slot = self
+                        .slots
+                        .get_mut(&actor_type)
+                        .expect("restarted child slot remains registered");
+                    let restart = slot
+                        .restart
+                        .as_mut()
+                        .expect("restarting policy preallocates restart state");
+                    slot.reference = Some(reference);
+                    slot.state = SupervisorChildState::Running;
+                    restart.circuit = SupervisorCircuitState::Closed;
+                    restart.eligible_tick = None;
+                    restart.open_until = None;
+                    result.restarted += 1;
+                }
+                Err(ActorSpawnError::Fault(fault)) => {
+                    let report = match self.report_from_initializer_fault(&fault) {
+                        Ok(report) => report,
+                        Err(reason) => return Err(self.reject_restart_transition(reason)),
+                    };
+                    if let Err(reason) =
+                        self.finish_initializer_fault(actor_type, report, budget, half_open)
+                    {
+                        return Err(self.reject_restart_transition(reason));
+                    }
+                    result.initializer_faults += 1;
+                }
+                Err(ActorSpawnError::Runtime(error)) => {
+                    return Err(self.reject_restart_runtime(error));
+                }
+            }
+        }
+        Ok(result)
     }
 
     pub(super) fn stop(&mut self) -> Result<SupervisorStopResult, SupervisorError> {
@@ -424,27 +744,45 @@ impl<'checked> LocalActorSupervisor<'checked> {
             .slots
             .iter()
             .map(|(actor_type, slot)| {
-                let reference = slot
+                let actor = slot
                     .reference
                     .as_ref()
-                    .expect("published Supervisor child has a local reference");
-                let actor = self
-                    .runtime
-                    .snapshot(reference.actor())
-                    .expect("published Supervisor child has a terminal or live Actor record");
+                    .and_then(|reference| self.runtime.snapshot(reference.actor()));
                 SupervisorChildSnapshot {
                     actor_type: *actor_type,
                     definition: slot.definition.clone(),
-                    actor: reference.actor(),
+                    actor: actor.as_ref().map(|actor| actor.reference().actor()),
                     state: slot.state,
-                    actor_state: actor.lifecycle(),
-                    queued_messages: actor.queued_messages(),
-                    cleanup_count: actor.cleanup_count(),
+                    actor_state: actor.as_ref().map(ActorInstanceSnapshot::lifecycle),
+                    queued_messages: actor
+                        .as_ref()
+                        .map_or(0, ActorInstanceSnapshot::queued_messages),
+                    cleanup_count: actor
+                        .as_ref()
+                        .map_or(0, ActorInstanceSnapshot::cleanup_count),
+                    circuit: slot.restart.as_ref().map(|restart| restart.circuit),
+                    restart_attempts: slot.restart.as_ref().map_or_else(Vec::new, |restart| {
+                        restart.attempts.iter().copied().collect()
+                    }),
+                    eligible_tick: slot
+                        .restart
+                        .as_ref()
+                        .and_then(|restart| restart.eligible_tick),
+                    open_until: slot.restart.as_ref().and_then(|restart| restart.open_until),
+                    last_fault: slot
+                        .restart
+                        .as_ref()
+                        .and_then(|restart| restart.last_fault.clone()),
                 }
             })
             .collect();
         SupervisorSnapshot {
             state: self.state,
+            tick: self.tick,
+            budget: match self.policy {
+                SupervisorPolicy::ContainOne => None,
+                SupervisorPolicy::RestartOneBudgeted(budget) => Some(budget),
+            },
             children,
         }
     }
@@ -488,6 +826,178 @@ impl<'checked> LocalActorSupervisor<'checked> {
             .get_mut(&report.actor_type)
             .expect("validated child slot remains registered")
             .state = SupervisorChildState::Contained;
+        Ok(())
+    }
+
+    fn acknowledge_restart_fault(
+        &mut self,
+        report: ChildFaultReport,
+        budget: RestartBudget,
+    ) -> Result<SupervisorTurnResult, SupervisorError> {
+        if let Err(reason) = self.validate_fault_report(&report) {
+            return Err(self.reject_fault_report(reason));
+        }
+        let mut attempts = self
+            .slots
+            .get(&report.actor_type)
+            .and_then(|slot| slot.restart.as_ref())
+            .expect("restarting policy preallocates restart state")
+            .attempts
+            .clone();
+        if let Err(reason) = prune_attempts(&mut attempts, self.tick, budget.window_ticks) {
+            return Err(self.reject_restart_transition(reason));
+        }
+        let actor = report.actor;
+        if attempts.len() < budget.max_restarts {
+            let Some(eligible_tick) = self.tick.checked_add(budget.backoff_ticks) else {
+                return Err(self.reject_restart_transition("restart backoff tick overflowed"));
+            };
+            let slot = self
+                .slots
+                .get_mut(&report.actor_type)
+                .expect("validated child slot remains registered");
+            let restart = slot
+                .restart
+                .as_mut()
+                .expect("restarting policy preallocates restart state");
+            restart.attempts = attempts;
+            restart.circuit = SupervisorCircuitState::Closed;
+            restart.eligible_tick = Some(eligible_tick);
+            restart.open_until = None;
+            restart.last_fault = Some(report.clone());
+            slot.state = SupervisorChildState::Backoff;
+            Ok(SupervisorTurnResult::RestartScheduled {
+                actor,
+                report,
+                eligible_tick,
+            })
+        } else {
+            let Some(open_until) = attempts
+                .front()
+                .copied()
+                .and_then(|attempt| attempt.checked_add(budget.window_ticks))
+            else {
+                return Err(self
+                    .reject_restart_transition("restart circuit expiry could not be represented"));
+            };
+            let slot = self
+                .slots
+                .get_mut(&report.actor_type)
+                .expect("validated child slot remains registered");
+            let restart = slot
+                .restart
+                .as_mut()
+                .expect("restarting policy preallocates restart state");
+            restart.attempts = attempts;
+            restart.circuit = SupervisorCircuitState::Open;
+            restart.eligible_tick = None;
+            restart.open_until = Some(open_until);
+            restart.last_fault = Some(report.clone());
+            slot.state = SupervisorChildState::CircuitOpen;
+            Ok(SupervisorTurnResult::CircuitOpened {
+                actor,
+                report,
+                open_until,
+            })
+        }
+    }
+
+    fn report_from_initializer_fault(
+        &self,
+        fault: &ActorFault,
+    ) -> Result<ChildFaultReport, &'static str> {
+        if fault.runtime() != self.runtime.id() {
+            return Err("restart initializer Fault has the wrong runtime identity");
+        }
+        if fault.phase() != ActorFaultPhase::Initializer {
+            return Err("restart spawn returned a non-initializer Fault");
+        }
+        let slot = self
+            .slots
+            .get(&fault.actor_type())
+            .ok_or("restart initializer Fault has no child slot")?;
+        if slot.state != SupervisorChildState::Restarting || &slot.definition != fault.definition()
+        {
+            return Err("restart initializer Fault disagrees with its child slot");
+        }
+        if self.runtime.reference(fault.actor()).is_some()
+            || self.runtime.snapshot(fault.actor()).is_some()
+        {
+            return Err("failed restart initializer published an Actor record");
+        }
+        let mut events = self.runtime.events().into_iter().filter(|event| {
+            matches!(
+                event.kind(),
+                ActorRuntimeEventKind::ActorSpawnFaulted { actor }
+                    if *actor == fault.actor()
+            )
+        });
+        if events.next().is_none() || events.next().is_some() {
+            return Err("restart initializer Fault event count is inconsistent");
+        }
+        Ok(ChildFaultReport {
+            runtime: fault.runtime(),
+            actor: fault.actor(),
+            actor_type: fault.actor_type(),
+            definition: fault.definition().clone(),
+            expression: fault.expression(),
+            phase: fault.phase(),
+            span: fault.cause().span,
+            category: runtime_fault_category(&fault.cause().kind),
+            discarded_messages: 0,
+            cleanup_count: 0,
+        })
+    }
+
+    fn finish_initializer_fault(
+        &mut self,
+        actor_type: ActorTypeId,
+        report: ChildFaultReport,
+        budget: RestartBudget,
+        half_open: bool,
+    ) -> Result<(), &'static str> {
+        if report.actor_type != actor_type || report.phase != ActorFaultPhase::Initializer {
+            return Err("initializer Fault report targets the wrong restart slot");
+        }
+        let attempts = &self
+            .slots
+            .get(&actor_type)
+            .and_then(|slot| slot.restart.as_ref())
+            .ok_or("restart slot state is absent")?
+            .attempts;
+        let opens = half_open || attempts.len() >= budget.max_restarts;
+        let deadline = if opens {
+            attempts
+                .front()
+                .copied()
+                .and_then(|attempt| attempt.checked_add(budget.window_ticks))
+                .ok_or("initializer Fault circuit expiry overflowed")?
+        } else {
+            self.tick
+                .checked_add(budget.backoff_ticks)
+                .ok_or("initializer Fault backoff tick overflowed")?
+        };
+        let slot = self
+            .slots
+            .get_mut(&actor_type)
+            .ok_or("restart child slot disappeared")?;
+        let restart = slot
+            .restart
+            .as_mut()
+            .ok_or("restart slot state is absent")?;
+        slot.reference = None;
+        restart.last_fault = Some(report);
+        if opens {
+            slot.state = SupervisorChildState::CircuitOpen;
+            restart.circuit = SupervisorCircuitState::Open;
+            restart.eligible_tick = None;
+            restart.open_until = Some(deadline);
+        } else {
+            slot.state = SupervisorChildState::Backoff;
+            restart.circuit = SupervisorCircuitState::Closed;
+            restart.eligible_tick = Some(deadline);
+            restart.open_until = None;
+        }
         Ok(())
     }
 
@@ -571,10 +1081,40 @@ impl<'checked> LocalActorSupervisor<'checked> {
         SupervisorError::InvalidChildFaultReport { reason }
     }
 
+    fn reject_restart_transition(&mut self, reason: &'static str) -> SupervisorError {
+        self.state = SupervisorState::Failed;
+        self.owner_control.cancel();
+        if self.runtime.state() == ActorRuntimeState::Running {
+            self.runtime.fail_unacknowledged_supervised_fault();
+        }
+        self.mark_running_slots_stopped();
+        SupervisorError::InvalidRestartTransition { reason }
+    }
+
+    fn reject_restart_runtime(&mut self, error: ActorRuntimeError) -> SupervisorError {
+        self.state = SupervisorState::Failed;
+        self.owner_control.cancel();
+        if self.runtime.state() == ActorRuntimeState::Running {
+            self.runtime.fail_unacknowledged_supervised_fault();
+        }
+        self.mark_running_slots_stopped();
+        SupervisorError::Runtime(error)
+    }
+
     fn mark_running_slots_stopped(&mut self) {
         for slot in self.slots.values_mut() {
-            if slot.state == SupervisorChildState::Running {
+            if matches!(
+                slot.state,
+                SupervisorChildState::Running
+                    | SupervisorChildState::Backoff
+                    | SupervisorChildState::Restarting
+                    | SupervisorChildState::CircuitOpen
+            ) {
                 slot.state = SupervisorChildState::Stopped;
+                if let Some(restart) = &mut slot.restart {
+                    restart.eligible_tick = None;
+                    restart.open_until = None;
+                }
             }
         }
     }
@@ -598,6 +1138,7 @@ impl<'checked> LocalActorSupervisor<'checked> {
 fn construction_limit_error(
     limits: ActorRuntimeLimits,
     children: usize,
+    policy: SupervisorPolicy,
 ) -> Option<SupervisorStartErrorKind> {
     let checks = [
         ("created_actors", children, limits.max_created_actors()),
@@ -614,7 +1155,13 @@ fn construction_limit_error(
             });
         }
     }
-    let required_commands = children.checked_add(1)?;
+    let Some(required_commands) = children.checked_add(1) else {
+        return Some(SupervisorStartErrorKind::ResourceExhausted {
+            resource: "commands",
+            required: usize::MAX,
+            limit: limits.max_commands(),
+        });
+    };
     if required_commands > limits.max_commands() {
         return Some(SupervisorStartErrorKind::ResourceExhausted {
             resource: "commands",
@@ -622,7 +1169,16 @@ fn construction_limit_error(
             limit: limits.max_commands(),
         });
     }
-    let required_events = children.checked_mul(2)?.checked_add(1)?;
+    let Some(required_events) = children
+        .checked_mul(2)
+        .and_then(|events| events.checked_add(1))
+    else {
+        return Some(SupervisorStartErrorKind::ResourceExhausted {
+            resource: "events",
+            required: usize::MAX,
+            limit: limits.max_events(),
+        });
+    };
     if required_events > limits.max_events() {
         return Some(SupervisorStartErrorKind::ResourceExhausted {
             resource: "events",
@@ -630,7 +1186,69 @@ fn construction_limit_error(
             limit: limits.max_events(),
         });
     }
+    if let SupervisorPolicy::RestartOneBudgeted(budget) = policy {
+        if budget.max_restarts == 0 {
+            return Some(SupervisorStartErrorKind::InvalidRestartBudget {
+                reason: "max_restarts must be nonzero",
+            });
+        }
+        if budget.window_ticks == 0 {
+            return Some(SupervisorStartErrorKind::InvalidRestartBudget {
+                reason: "window_ticks must be nonzero",
+            });
+        }
+        if budget.backoff_ticks == 0 {
+            return Some(SupervisorStartErrorKind::InvalidRestartBudget {
+                reason: "backoff_ticks must be nonzero",
+            });
+        }
+        let Some(history_entries) = children.checked_mul(budget.max_restarts) else {
+            return Some(SupervisorStartErrorKind::ResourceExhausted {
+                resource: "restart_history",
+                required: usize::MAX,
+                limit: limits.max_faults(),
+            });
+        };
+        if history_entries > limits.max_faults() {
+            return Some(SupervisorStartErrorKind::ResourceExhausted {
+                resource: "restart_history",
+                required: history_entries,
+                limit: limits.max_faults(),
+            });
+        }
+        let Some(created_with_one_full_window) = children.checked_add(history_entries) else {
+            return Some(SupervisorStartErrorKind::ResourceExhausted {
+                resource: "created_actors",
+                required: usize::MAX,
+                limit: limits.max_created_actors(),
+            });
+        };
+        if created_with_one_full_window > limits.max_created_actors() {
+            return Some(SupervisorStartErrorKind::ResourceExhausted {
+                resource: "created_actors",
+                required: created_with_one_full_window,
+                limit: limits.max_created_actors(),
+            });
+        }
+    }
     None
+}
+
+fn prune_attempts(
+    attempts: &mut VecDeque<u64>,
+    tick: u64,
+    window_ticks: u64,
+) -> Result<(), &'static str> {
+    while let Some(attempt) = attempts.front().copied() {
+        let expiry = attempt
+            .checked_add(window_ticks)
+            .ok_or("restart window expiry overflowed")?;
+        if expiry > tick {
+            break;
+        }
+        attempts.pop_front();
+    }
+    Ok(())
 }
 
 fn abort_construction(
@@ -708,6 +1326,21 @@ mod tests {
         "let main () = ()\n",
     );
 
+    const TWO_FAULTING_ACTORS: &str = concat!(
+        "module Main\n\n",
+        "actor First : Int =\n",
+        "    mailbox capacity 2 overflow Reject\n",
+        "    state Int = 12\n",
+        "    receive state message =\n",
+        "        state / message\n\n",
+        "actor Second : Int =\n",
+        "    mailbox capacity 2 overflow Reject\n",
+        "    state Int = 18\n",
+        "    receive state message =\n",
+        "        state / message\n\n",
+        "let main () = ()\n",
+    );
+
     fn checked(source_name: &str, bytes: Vec<u8>) -> CheckedProgram {
         let source = SourceFile::from_bytes(SourceId::new(0), source_name, bytes)
             .expect("valid test source");
@@ -769,6 +1402,573 @@ mod tests {
         )
         .expect("fixed child Supervisor starts");
         (supervisor, counter_type, divider_type)
+    }
+
+    fn start_two_restarting<'checked>(
+        checked: &'checked CheckedProgram,
+        control: &LocalTaskControl,
+        console: &mut MemoryConsole,
+        budget: RestartBudget,
+    ) -> (LocalActorSupervisor<'checked>, ActorTypeId, ActorTypeId) {
+        let counter = actor(checked, "Counter");
+        let divider = actor(checked, "Divider");
+        let counter_type = actor_type(checked, &counter);
+        let divider_type = actor_type(checked, &divider);
+        let supervisor = LocalActorSupervisor::start_restarting(
+            checked,
+            ActorRuntimeId::new(72),
+            limits(),
+            control,
+            &[divider, counter],
+            budget,
+            console,
+        )
+        .expect("fixed child restarting Supervisor starts");
+        (supervisor, counter_type, divider_type)
+    }
+
+    #[test]
+    fn budgeted_restart_waits_for_backoff_and_publishes_fresh_initializer_state() {
+        let checked = checked("restart.ling", TWO_ACTORS.as_bytes().to_vec());
+        let control = LocalTaskControl::new();
+        let mut console = MemoryConsole::default();
+        let (mut supervisor, counter_type, divider_type) = start_two_restarting(
+            &checked,
+            &control,
+            &mut console,
+            RestartBudget::new(2, 10, 2),
+        );
+        let counter = supervisor
+            .child_reference(counter_type)
+            .expect("Counter child")
+            .clone();
+        let divider = supervisor
+            .child_reference(divider_type)
+            .expect("Divider child")
+            .clone();
+        supervisor
+            .send(&counter, ActorSenderId::new(1), integer(4))
+            .expect("sibling message");
+        supervisor
+            .send(&divider, ActorSenderId::new(2), integer(0))
+            .expect("faulting message");
+        let SupervisorTurnResult::RestartScheduled {
+            actor,
+            report,
+            eligible_tick,
+        } = supervisor
+            .step(divider.actor(), &mut console)
+            .expect("Fault schedules a restart")
+        else {
+            panic!("budgeted policy must schedule the first restart");
+        };
+        assert_eq!(actor, divider.actor());
+        assert_eq!(report.phase, ActorFaultPhase::Turn);
+        assert_eq!(eligible_tick, 2);
+        assert!(!control.is_cancelled());
+        assert!(supervisor.child_reference(divider_type).is_none());
+        let closed = supervisor
+            .send(&divider, ActorSenderId::new(2), integer(9))
+            .expect_err("old incarnation remains closed");
+        assert_eq!(closed.kind(), &ActorSendErrorKind::Closed);
+
+        assert_eq!(
+            supervisor
+                .advance_to(1, &mut console)
+                .expect("clock advances before eligibility"),
+            SupervisorAdvanceResult {
+                tick: 1,
+                attempts: 0,
+                restarted: 0,
+                initializer_faults: 0,
+                half_open_probes: 0,
+            }
+        );
+        let advanced = supervisor
+            .advance_to(2, &mut console)
+            .expect("eligible restart succeeds");
+        assert_eq!(advanced.attempts, 1);
+        assert_eq!(advanced.restarted, 1);
+        let replacement = supervisor
+            .child_reference(divider_type)
+            .expect("replacement child")
+            .clone();
+        assert!(replacement.actor() > divider.actor());
+        let replacement_state = supervisor
+            .runtime
+            .snapshot(replacement.actor())
+            .expect("replacement snapshot");
+        assert_eq!(replacement_state.state(), Some(&integer(20)));
+        assert_eq!(replacement_state.queued_messages(), 0);
+        assert_eq!(supervisor.ready(), [counter.actor()]);
+        assert_eq!(
+            supervisor
+                .step(counter.actor(), &mut console)
+                .expect("unaffected sibling continues"),
+            SupervisorTurnResult::Completed {
+                actor: counter.actor(),
+                state: integer(5),
+                remaining_messages: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn exact_window_boundary_opens_and_half_open_probe_closes_the_circuit() {
+        let checked = checked("circuit.ling", TWO_ACTORS.as_bytes().to_vec());
+        let control = LocalTaskControl::new();
+        let mut console = MemoryConsole::default();
+        let (mut supervisor, _, divider_type) = start_two_restarting(
+            &checked,
+            &control,
+            &mut console,
+            RestartBudget::new(2, 5, 1),
+        );
+
+        for tick in [0_u64, 1] {
+            let divider = supervisor
+                .child_reference(divider_type)
+                .expect("running Divider")
+                .clone();
+            supervisor
+                .send(&divider, ActorSenderId::new(2), integer(0))
+                .expect("faulting message");
+            let SupervisorTurnResult::RestartScheduled { eligible_tick, .. } = supervisor
+                .step(divider.actor(), &mut console)
+                .expect("restart remains inside budget")
+            else {
+                panic!("first two Faults must schedule restart attempts");
+            };
+            assert_eq!(eligible_tick, tick + 1);
+            let advanced = supervisor
+                .advance_to(tick + 1, &mut console)
+                .expect("budgeted replacement succeeds");
+            assert_eq!(advanced.restarted, 1);
+        }
+
+        let divider = supervisor
+            .child_reference(divider_type)
+            .expect("second replacement")
+            .clone();
+        supervisor
+            .send(&divider, ActorSenderId::new(2), integer(0))
+            .expect("third Fault message");
+        let SupervisorTurnResult::CircuitOpened { open_until, .. } = supervisor
+            .step(divider.actor(), &mut console)
+            .expect("exhausted budget opens the circuit")
+        else {
+            panic!("third Fault must open the circuit");
+        };
+        assert_eq!(open_until, 6);
+        assert!(supervisor.child_reference(divider_type).is_none());
+        assert_eq!(
+            supervisor
+                .advance_to(5, &mut console)
+                .expect("Open circuit does not probe early")
+                .attempts,
+            0
+        );
+        let open = supervisor.snapshot();
+        let divider_slot = open
+            .children
+            .iter()
+            .find(|child| child.actor_type == divider_type)
+            .expect("Divider slot");
+        assert_eq!(divider_slot.state, SupervisorChildState::CircuitOpen);
+        assert_eq!(divider_slot.circuit, Some(SupervisorCircuitState::Open));
+        assert_eq!(divider_slot.restart_attempts, [1, 2]);
+        assert_eq!(divider_slot.open_until, Some(6));
+
+        let probe = supervisor
+            .advance_to(6, &mut console)
+            .expect("exact expiry permits one probe");
+        assert_eq!(probe.attempts, 1);
+        assert_eq!(probe.restarted, 1);
+        assert_eq!(probe.half_open_probes, 1);
+        let closed = supervisor.snapshot();
+        let divider_slot = closed
+            .children
+            .iter()
+            .find(|child| child.actor_type == divider_type)
+            .expect("Divider slot");
+        assert_eq!(divider_slot.state, SupervisorChildState::Running);
+        assert_eq!(divider_slot.circuit, Some(SupervisorCircuitState::Closed));
+        assert_eq!(divider_slot.restart_attempts, [2, 6]);
+        assert_eq!(divider_slot.open_until, None);
+        assert!(!control.is_cancelled());
+    }
+
+    #[test]
+    fn initializer_fault_consumes_attempt_and_half_open_failure_reopens_once() {
+        let checked = checked("initializer-retry.ling", TWO_ACTORS.as_bytes().to_vec());
+        let divider = actor(&checked, "Divider");
+        let divider_type = actor_type(&checked, &divider);
+        let control = LocalTaskControl::new();
+        let mut console = MemoryConsole::default();
+        let mut supervisor = LocalActorSupervisor::start_restarting(
+            &checked,
+            ActorRuntimeId::new(73),
+            limits(),
+            &control,
+            &[divider],
+            RestartBudget::new(1, 5, 1),
+            &mut console,
+        )
+        .expect("single-child restarting Supervisor");
+        let original = supervisor
+            .child_reference(divider_type)
+            .expect("initial Divider")
+            .clone();
+        supervisor
+            .send(&original, ActorSenderId::new(1), integer(0))
+            .expect("faulting message");
+        assert!(matches!(
+            supervisor.step(original.actor(), &mut console),
+            Ok(SupervisorTurnResult::RestartScheduled {
+                eligible_tick: 1,
+                ..
+            })
+        ));
+
+        ActorRuntime::request_initializer_panic();
+        let first = supervisor
+            .advance_to(1, &mut console)
+            .expect("initializer Fault is contained by the restart policy");
+        assert_eq!(first.initializer_faults, 1);
+        assert_eq!(first.restarted, 0);
+        let snapshot = supervisor.snapshot();
+        let slot = &snapshot.children[0];
+        assert_eq!(slot.state, SupervisorChildState::CircuitOpen);
+        assert_eq!(slot.restart_attempts, [1]);
+        assert_eq!(slot.open_until, Some(6));
+        assert_eq!(
+            slot.last_fault.as_ref().map(|fault| fault.phase),
+            Some(ActorFaultPhase::Initializer)
+        );
+        assert_eq!(
+            slot.last_fault.as_ref().map(|fault| fault.cleanup_count),
+            Some(0)
+        );
+        assert!(supervisor.child_reference(divider_type).is_none());
+        assert_eq!(supervisor.runtime.state(), ActorRuntimeState::Running);
+        assert!(!control.is_cancelled());
+
+        ActorRuntime::request_initializer_panic();
+        let probe = supervisor
+            .advance_to(6, &mut console)
+            .expect("HalfOpen initializer Fault reopens the circuit");
+        assert_eq!(probe.half_open_probes, 1);
+        assert_eq!(probe.initializer_faults, 1);
+        let reopened = supervisor.snapshot();
+        assert_eq!(reopened.children[0].restart_attempts, [6]);
+        assert_eq!(reopened.children[0].open_until, Some(11));
+        assert_eq!(
+            supervisor
+                .advance_to(6, &mut console)
+                .expect("same tick cannot run a second probe")
+                .attempts,
+            0
+        );
+        let recovered = supervisor
+            .advance_to(11, &mut console)
+            .expect("next exact expiry permits one successful probe");
+        assert_eq!(recovered.restarted, 1);
+        assert_eq!(recovered.half_open_probes, 1);
+        let replacement = supervisor
+            .child_reference(divider_type)
+            .expect("eventual replacement");
+        assert_eq!(replacement.actor().get(), 4);
+        assert!(!control.is_cancelled());
+    }
+
+    #[test]
+    fn restart_configuration_clock_and_overflow_fail_at_the_defined_boundaries() {
+        let checked = checked("restart-boundaries.ling", TWO_ACTORS.as_bytes().to_vec());
+        let divider = actor(&checked, "Divider");
+        let mut console = MemoryConsole::default();
+
+        for (budget, reason) in [
+            (RestartBudget::new(0, 1, 1), "max_restarts"),
+            (RestartBudget::new(1, 0, 1), "window_ticks"),
+            (RestartBudget::new(1, 1, 0), "backoff_ticks"),
+        ] {
+            let control = LocalTaskControl::new();
+            let error = match LocalActorSupervisor::start_restarting(
+                &checked,
+                ActorRuntimeId::new(74),
+                limits(),
+                &control,
+                std::slice::from_ref(&divider),
+                budget,
+                &mut console,
+            ) {
+                Ok(_) => panic!("zero restart configuration must be rejected"),
+                Err(error) => error,
+            };
+            assert!(matches!(
+                error.kind(),
+                SupervisorStartErrorKind::InvalidRestartBudget { reason: actual }
+                    if actual.contains(reason)
+            ));
+            assert!(control.is_cancelled());
+        }
+
+        let counter = actor(&checked, "Counter");
+        let bounded_control = LocalTaskControl::new();
+        let bounded = match LocalActorSupervisor::start_restarting(
+            &checked,
+            ActorRuntimeId::new(74),
+            limits(),
+            &bounded_control,
+            &[divider.clone(), counter],
+            RestartBudget::new(4, 5, 1),
+            &mut console,
+        ) {
+            Ok(_) => panic!("one full restart-history window must fit created Actor bounds"),
+            Err(error) => error,
+        };
+        assert!(matches!(
+            bounded.kind(),
+            SupervisorStartErrorKind::ResourceExhausted {
+                resource: "created_actors",
+                required: 10,
+                limit: 8,
+            }
+        ));
+        assert!(bounded_control.is_cancelled());
+
+        let control = LocalTaskControl::new();
+        let mut supervisor = LocalActorSupervisor::start_restarting(
+            &checked,
+            ActorRuntimeId::new(75),
+            limits(),
+            &control,
+            std::slice::from_ref(&divider),
+            RestartBudget::new(1, 2, 2),
+            &mut console,
+        )
+        .expect("valid restart configuration");
+        assert_eq!(
+            supervisor
+                .advance_to(5, &mut console)
+                .expect("forward clock advance")
+                .tick,
+            5
+        );
+        assert_eq!(
+            supervisor.advance_to(4, &mut console),
+            Err(SupervisorError::ClockRegression {
+                current: 5,
+                requested: 4,
+            })
+        );
+        assert_eq!(supervisor.snapshot().tick, 5);
+        assert!(!control.is_cancelled());
+
+        supervisor
+            .advance_to(u64::MAX, &mut console)
+            .expect("clock can reach the maximum while no restart is pending");
+        let reference = supervisor
+            .child_reference(actor_type(&checked, &divider))
+            .expect("running child")
+            .clone();
+        supervisor
+            .send(&reference, ActorSenderId::new(1), integer(0))
+            .expect("faulting message");
+        assert!(matches!(
+            supervisor.step(reference.actor(), &mut console),
+            Err(SupervisorError::InvalidRestartTransition { .. })
+        ));
+        assert_eq!(supervisor.state(), SupervisorState::Failed);
+        assert!(control.is_cancelled());
+    }
+
+    #[test]
+    fn simultaneous_due_slots_restart_in_canonical_actor_type_order() {
+        let checked = checked(
+            "canonical-restarts.ling",
+            TWO_FAULTING_ACTORS.as_bytes().to_vec(),
+        );
+        let first = actor(&checked, "First");
+        let second = actor(&checked, "Second");
+        let first_type = actor_type(&checked, &first);
+        let second_type = actor_type(&checked, &second);
+        let control = LocalTaskControl::new();
+        let mut console = MemoryConsole::default();
+        let mut supervisor = LocalActorSupervisor::start_restarting(
+            &checked,
+            ActorRuntimeId::new(76),
+            limits(),
+            &control,
+            &[second, first],
+            RestartBudget::new(1, 5, 1),
+            &mut console,
+        )
+        .expect("two restarting children start in canonical order");
+        for actor_type in [second_type, first_type] {
+            let reference = supervisor
+                .child_reference(actor_type)
+                .expect("faulting child")
+                .clone();
+            supervisor
+                .send(&reference, ActorSenderId::new(1), integer(0))
+                .expect("faulting message");
+            assert!(matches!(
+                supervisor.step(reference.actor(), &mut console),
+                Ok(SupervisorTurnResult::RestartScheduled {
+                    eligible_tick: 1,
+                    ..
+                })
+            ));
+        }
+        let advanced = supervisor
+            .advance_to(1, &mut console)
+            .expect("both due slots restart atomically");
+        assert_eq!(advanced.attempts, 2);
+        assert_eq!(advanced.restarted, 2);
+        let mut replacements = [first_type, second_type]
+            .into_iter()
+            .map(|actor_type| {
+                (
+                    actor_type,
+                    supervisor
+                        .child_reference(actor_type)
+                        .expect("replacement")
+                        .actor(),
+                )
+            })
+            .collect::<Vec<_>>();
+        replacements.sort_by_key(|(actor_type, _)| *actor_type);
+        assert_eq!(
+            replacements
+                .iter()
+                .map(|(_, actor)| actor.get())
+                .collect::<Vec<_>>(),
+            [3, 4]
+        );
+        assert!(!control.is_cancelled());
+    }
+
+    #[test]
+    fn pending_restart_is_cancelled_without_new_actor_or_double_cleanup() {
+        let checked = checked("cancel-restart.ling", TWO_ACTORS.as_bytes().to_vec());
+        let control = LocalTaskControl::new();
+        let mut console = MemoryConsole::default();
+        let (mut supervisor, counter_type, divider_type) = start_two_restarting(
+            &checked,
+            &control,
+            &mut console,
+            RestartBudget::new(2, 10, 2),
+        );
+        let counter = supervisor
+            .child_reference(counter_type)
+            .expect("Counter child")
+            .clone();
+        let divider = supervisor
+            .child_reference(divider_type)
+            .expect("Divider child")
+            .clone();
+        supervisor
+            .send(&counter, ActorSenderId::new(1), integer(4))
+            .expect("queued sibling message");
+        supervisor
+            .send(&divider, ActorSenderId::new(2), integer(0))
+            .expect("faulting message");
+        assert!(matches!(
+            supervisor.step(divider.actor(), &mut console),
+            Ok(SupervisorTurnResult::RestartScheduled {
+                eligible_tick: 2,
+                ..
+            })
+        ));
+        let created_before_cancel = supervisor.runtime.metrics().created_actors();
+        control.cancel();
+        assert!(
+            supervisor
+                .observe_owner_cancellation()
+                .expect("owner cancellation is observed")
+        );
+        assert_eq!(supervisor.state(), SupervisorState::Stopped);
+        assert_eq!(
+            supervisor.runtime.metrics().created_actors(),
+            created_before_cancel
+        );
+        assert_eq!(supervisor.runtime.metrics().cleanups(), 2);
+        assert_eq!(
+            supervisor
+                .runtime
+                .snapshot(divider.actor())
+                .expect("failed Divider record")
+                .cleanup_count(),
+            1
+        );
+        assert_eq!(
+            supervisor
+                .runtime
+                .snapshot(counter.actor())
+                .expect("stopped Counter record")
+                .cleanup_count(),
+            1
+        );
+        assert!(supervisor.snapshot().children.iter().all(|child| {
+            child.state == SupervisorChildState::Stopped
+                && child.eligible_tick.is_none()
+                && child.open_until.is_none()
+        }));
+        assert!(matches!(
+            supervisor.advance_to(2, &mut console),
+            Err(SupervisorError::NotRunning {
+                state: SupervisorState::Stopped
+            })
+        ));
+    }
+
+    #[test]
+    fn restart_preflight_exhaustion_is_terminal_and_attempt_free() {
+        let checked = checked("restart-resource.ling", TWO_ACTORS.as_bytes().to_vec());
+        let divider = actor(&checked, "Divider");
+        let divider_type = actor_type(&checked, &divider);
+        let control = LocalTaskControl::new();
+        let mut console = MemoryConsole::default();
+        let limits = ActorRuntimeLimits::new(2, 1, 4, 3, 4, 16, 2, 1);
+        let mut supervisor = LocalActorSupervisor::start_restarting(
+            &checked,
+            ActorRuntimeId::new(77),
+            limits,
+            &control,
+            &[divider],
+            RestartBudget::new(1, 5, 1),
+            &mut console,
+        )
+        .expect("construction fits the bounded runtime");
+        let reference = supervisor
+            .child_reference(divider_type)
+            .expect("Divider child")
+            .clone();
+        supervisor
+            .send(&reference, ActorSenderId::new(1), integer(0))
+            .expect("faulting message uses the second command");
+        assert!(matches!(
+            supervisor.step(reference.actor(), &mut console),
+            Ok(SupervisorTurnResult::RestartScheduled {
+                eligible_tick: 1,
+                ..
+            })
+        ));
+        assert_eq!(supervisor.runtime.metrics().commands(), 3);
+        assert!(matches!(
+            supervisor.advance_to(1, &mut console),
+            Err(SupervisorError::Runtime(
+                ActorRuntimeError::ResourceExhausted {
+                    resource: "commands",
+                    limit: 3,
+                }
+            ))
+        ));
+        assert_eq!(supervisor.runtime.metrics().created_actors(), 1);
+        assert_eq!(supervisor.runtime.metrics().faults(), 1);
+        assert_eq!(supervisor.state(), SupervisorState::Failed);
+        assert!(control.is_cancelled());
     }
 
     #[test]
@@ -1048,7 +2248,7 @@ mod tests {
                 .children
                 .iter()
                 .all(|child| child.state == SupervisorChildState::Contained
-                    && child.actor_state == ActorInstanceState::Failed
+                    && child.actor_state == Some(ActorInstanceState::Failed)
                     && child.cleanup_count == 1)
         );
 
@@ -1375,5 +2575,86 @@ mod tests {
         assert_eq!(projections[0], projections[1]);
         assert_eq!(projections[0], projections[2]);
         assert!(projections[0].6 > 0);
+    }
+
+    #[test]
+    fn unicode_bom_crlf_reconstruction_preserves_restart_projection_and_span() {
+        let source = concat!(
+            "module Main\n\n",
+            "actor 计数器 : Int =\n",
+            "    mailbox capacity 2 overflow Reject\n",
+            "    state Int = 10\n",
+            "    receive 状态 消息 =\n",
+            "        状态 / 消息\n\n",
+            "let main () = ()\n",
+        );
+        let variants = [
+            ("restart-unicode-lf.ling", source.as_bytes().to_vec()),
+            (
+                "restart-unicode-crlf.ling",
+                source.replace('\n', "\r\n").into_bytes(),
+            ),
+            (
+                "restart-unicode-bom.ling",
+                format!("\u{feff}{source}").into_bytes(),
+            ),
+        ];
+        let projections = variants
+            .into_iter()
+            .map(|(source_name, bytes)| {
+                let checked = checked(source_name, bytes);
+                let definition = actor(&checked, "计数器");
+                let actor_type = actor_type(&checked, &definition);
+                let control = LocalTaskControl::new();
+                let mut console = MemoryConsole::default();
+                let mut supervisor = LocalActorSupervisor::start_restarting(
+                    &checked,
+                    ActorRuntimeId::new(102),
+                    limits(),
+                    &control,
+                    &[definition],
+                    RestartBudget::new(1, 5, 1),
+                    &mut console,
+                )
+                .expect("Unicode restarting Supervisor starts");
+                let reference = supervisor
+                    .child_reference(actor_type)
+                    .expect("Unicode child")
+                    .clone();
+                supervisor
+                    .send(&reference, ActorSenderId::new(1), integer(0))
+                    .expect("faulting message");
+                let SupervisorTurnResult::RestartScheduled { report, .. } = supervisor
+                    .step(reference.actor(), &mut console)
+                    .expect("Unicode Fault schedules restart")
+                else {
+                    panic!("division by zero must schedule a restart");
+                };
+                let advanced = supervisor
+                    .advance_to(1, &mut console)
+                    .expect("Unicode child restarts");
+                let replacement = supervisor
+                    .child_reference(actor_type)
+                    .expect("Unicode replacement");
+                let snapshot = supervisor.snapshot();
+                let slot = &snapshot.children[0];
+                (
+                    actor_type.get(),
+                    report.category,
+                    report.cleanup_count,
+                    report.span.end().get() - report.span.start().get(),
+                    advanced,
+                    replacement.actor().get(),
+                    slot.restart_attempts.clone(),
+                    slot.circuit,
+                )
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(projections[0], projections[1]);
+        assert_eq!(projections[0], projections[2]);
+        assert!(projections[0].3 > 0);
+        assert_eq!(projections[0].5, 2);
+        assert_eq!(projections[0].6, [1]);
+        assert_eq!(projections[0].7, Some(SupervisorCircuitState::Closed));
     }
 }

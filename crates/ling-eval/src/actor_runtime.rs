@@ -661,6 +661,12 @@ enum ActorFaultPolicy {
     SupervisorContainment,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ActorSpawnFaultPolicy {
+    FailRuntime,
+    ReturnToSupervisor,
+}
+
 /// Deterministic, run-scoped local Actor runtime over `CheckedActorCore` only.
 pub struct ActorRuntime<'checked> {
     checked: &'checked CheckedProgram,
@@ -833,6 +839,28 @@ impl<'checked> ActorRuntime<'checked> {
         definition: &DefinitionId,
         console: &mut dyn Console,
     ) -> Result<LocalActorRef, ActorSpawnError> {
+        self.spawn_with_fault_policy(definition, console, ActorSpawnFaultPolicy::FailRuntime)
+    }
+
+    pub(super) fn spawn_for_restart(
+        &mut self,
+        definition: &DefinitionId,
+        console: &mut dyn Console,
+    ) -> Result<LocalActorRef, ActorSpawnError> {
+        debug_assert_eq!(self.fault_policy, ActorFaultPolicy::SupervisorContainment);
+        self.spawn_with_fault_policy(
+            definition,
+            console,
+            ActorSpawnFaultPolicy::ReturnToSupervisor,
+        )
+    }
+
+    fn spawn_with_fault_policy(
+        &mut self,
+        definition: &DefinitionId,
+        console: &mut dyn Console,
+        spawn_fault_policy: ActorSpawnFaultPolicy,
+    ) -> Result<LocalActorRef, ActorSpawnError> {
         self.observe_owner_cancellation()?;
         self.ensure_running()?;
         let core = self
@@ -865,6 +893,8 @@ impl<'checked> ActorRuntime<'checked> {
         );
 
         let value = catch_unwind(AssertUnwindSafe(|| {
+            #[cfg(test)]
+            test_hooks::panic_initializer_evaluation_if_requested();
             let mut interpreter = Interpreter::new(self.checked, console);
             interpreter.eval_expression(module, &initializer, &mut Environment::new())
         }))
@@ -888,7 +918,7 @@ impl<'checked> ActorRuntime<'checked> {
                         ActorFaultPhase::Initializer,
                         "Actor initializer value disagrees with Checked Actor state type",
                     );
-                    return Err(self.fail_spawn(actor_id, &core, fault));
+                    return Err(self.fail_spawn(actor_id, &core, fault, spawn_fault_policy));
                 }
                 Err(_) => {
                     let fault = actor_invariant_fault(
@@ -897,10 +927,12 @@ impl<'checked> ActorRuntime<'checked> {
                         ActorFaultPhase::Initializer,
                         "Actor initializer returned a non-closed runtime value",
                     );
-                    return Err(self.fail_spawn(actor_id, &core, fault));
+                    return Err(self.fail_spawn(actor_id, &core, fault, spawn_fault_policy));
                 }
             },
-            Err(fault) => return Err(self.fail_spawn(actor_id, &core, fault)),
+            Err(fault) => {
+                return Err(self.fail_spawn(actor_id, &core, fault, spawn_fault_policy));
+            }
         };
 
         let reference = LocalActorRef {
@@ -923,6 +955,53 @@ impl<'checked> ActorRuntime<'checked> {
         self.live_actors += 1;
         self.push_event(ActorRuntimeEventKind::ActorStarted { actor: actor_id });
         Ok(reference)
+    }
+
+    pub(super) fn preflight_supervised_restarts(
+        &self,
+        attempts: usize,
+    ) -> Result<(), ActorRuntimeError> {
+        debug_assert_eq!(self.fault_policy, ActorFaultPolicy::SupervisorContainment);
+        self.ensure_running()?;
+        require_additional_capacity(
+            self.created_actors,
+            attempts,
+            self.limits.max_created_actors,
+            "created_actors",
+        )?;
+        require_additional_capacity(
+            self.live_actors,
+            attempts,
+            self.limits.max_live_actors,
+            "live_actors",
+        )?;
+        require_additional_capacity(
+            self.commands,
+            attempts,
+            self.limits.max_commands,
+            "commands",
+        )?;
+        require_additional_capacity(self.faults, attempts, self.limits.max_faults, "faults")?;
+        require_additional_capacity(
+            self.live_actors,
+            attempts,
+            self.limits.max_shutdown_work,
+            "shutdown_work",
+        )?;
+        let restart_events = attempts
+            .checked_mul(2)
+            .and_then(|events| events.checked_add(self.live_actors))
+            .and_then(|events| events.checked_add(1))
+            .ok_or(ActorRuntimeError::ResourceExhausted {
+                resource: "events",
+                limit: self.limits.max_events,
+            })?;
+        self.require_event_capacity(restart_events)
+    }
+
+    #[cfg(test)]
+    pub(super) fn request_initializer_panic() {
+        test_hooks::request_initializer_panic();
     }
 
     pub fn send(
@@ -1287,6 +1366,7 @@ impl<'checked> ActorRuntime<'checked> {
         actor: ActorId,
         core: &CheckedActorCore,
         cause: RuntimeFault,
+        policy: ActorSpawnFaultPolicy,
     ) -> ActorSpawnError {
         let fault = ActorFault {
             runtime: self.id,
@@ -1299,8 +1379,10 @@ impl<'checked> ActorRuntime<'checked> {
         };
         self.faults += 1;
         self.push_event(ActorRuntimeEventKind::ActorSpawnFaulted { actor });
-        self.owner_control.cancel();
-        self.fail_runtime();
+        if policy == ActorSpawnFaultPolicy::FailRuntime {
+            self.owner_control.cancel();
+            self.fail_runtime();
+        }
         ActorSpawnError::Fault(Box::new(fault))
     }
 
@@ -1453,6 +1535,19 @@ impl<'checked> ActorRuntime<'checked> {
             .checked_add(1)
             .expect("bounded Actor commands cannot exhaust u128 event identities");
         self.events.push_back(ActorRuntimeEvent { sequence, kind });
+    }
+}
+
+fn require_additional_capacity(
+    current: usize,
+    additional: usize,
+    limit: usize,
+    resource: &'static str,
+) -> Result<(), ActorRuntimeError> {
+    if additional <= limit.saturating_sub(current) {
+        Ok(())
+    } else {
+        Err(ActorRuntimeError::ResourceExhausted { resource, limit })
     }
 }
 
@@ -1629,6 +1724,26 @@ fn actor_invariant_fault(
         kind: RuntimeFaultKind::InvalidCheckedCore { invariant },
         source_name,
         span,
+    }
+}
+
+#[cfg(test)]
+mod test_hooks {
+    use std::cell::Cell;
+
+    thread_local! {
+        static INITIALIZER_PANIC_REQUESTED: Cell<bool> = const { Cell::new(false) };
+    }
+
+    pub(super) fn panic_initializer_evaluation_if_requested() {
+        let requested = INITIALIZER_PANIC_REQUESTED.with(|requested| requested.replace(false));
+        if requested {
+            panic!("SUP-2402 private initializer panic");
+        }
+    }
+
+    pub(super) fn request_initializer_panic() {
+        INITIALIZER_PANIC_REQUESTED.with(|requested| requested.set(true));
     }
 }
 
