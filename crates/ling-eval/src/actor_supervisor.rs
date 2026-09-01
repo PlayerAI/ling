@@ -2,7 +2,7 @@
 //!
 //! This module owns one fixed child set over the real checked-Core Actor
 //! runtime. It deliberately has no public re-export, source operation,
-//! restart path, serialized protocol, or backend execution surface.
+//! serialized protocol, or backend execution surface.
 
 use std::collections::{BTreeMap, VecDeque};
 use std::error::Error;
@@ -1298,6 +1298,10 @@ const fn runtime_fault_category(kind: &RuntimeFaultKind) -> &'static str {
 }
 
 #[cfg(test)]
+#[path = "actor_supervisor_evidence.rs"]
+mod evidence_tests;
+
+#[cfg(test)]
 mod tests {
     use ling_ast::lower as lower_ast;
     use ling_effects::{CheckedProgram, check};
@@ -1428,7 +1432,7 @@ mod tests {
     }
 
     #[test]
-    fn budgeted_restart_waits_for_backoff_and_publishes_fresh_initializer_state() {
+    pub(super) fn budgeted_restart_waits_for_backoff_and_publishes_fresh_initializer_state() {
         let checked = checked("restart.ling", TWO_ACTORS.as_bytes().to_vec());
         let control = LocalTaskControl::new();
         let mut console = MemoryConsole::default();
@@ -1514,7 +1518,7 @@ mod tests {
     }
 
     #[test]
-    fn exact_window_boundary_opens_and_half_open_probe_closes_the_circuit() {
+    pub(super) fn exact_window_boundary_opens_and_half_open_probe_closes_the_circuit() {
         let checked = checked("circuit.ling", TWO_ACTORS.as_bytes().to_vec());
         let control = LocalTaskControl::new();
         let mut console = MemoryConsole::default();
@@ -1599,7 +1603,7 @@ mod tests {
     }
 
     #[test]
-    fn initializer_fault_consumes_attempt_and_half_open_failure_reopens_once() {
+    pub(super) fn initializer_fault_consumes_attempt_and_half_open_failure_reopens_once() {
         let checked = checked("initializer-retry.ling", TWO_ACTORS.as_bytes().to_vec());
         let divider = actor(&checked, "Divider");
         let divider_type = actor_type(&checked, &divider);
@@ -1682,7 +1686,7 @@ mod tests {
     }
 
     #[test]
-    fn restart_configuration_clock_and_overflow_fail_at_the_defined_boundaries() {
+    pub(super) fn restart_configuration_clock_and_overflow_fail_at_the_defined_boundaries() {
         let checked = checked("restart-boundaries.ling", TWO_ACTORS.as_bytes().to_vec());
         let divider = actor(&checked, "Divider");
         let mut console = MemoryConsole::default();
@@ -1784,7 +1788,7 @@ mod tests {
     }
 
     #[test]
-    fn simultaneous_due_slots_restart_in_canonical_actor_type_order() {
+    pub(super) fn simultaneous_due_slots_restart_in_canonical_actor_type_order() {
         let checked = checked(
             "canonical-restarts.ling",
             TWO_FAULTING_ACTORS.as_bytes().to_vec(),
@@ -1850,7 +1854,7 @@ mod tests {
     }
 
     #[test]
-    fn pending_restart_is_cancelled_without_new_actor_or_double_cleanup() {
+    pub(super) fn pending_restart_is_cancelled_without_new_actor_or_double_cleanup() {
         let checked = checked("cancel-restart.ling", TWO_ACTORS.as_bytes().to_vec());
         let control = LocalTaskControl::new();
         let mut console = MemoryConsole::default();
@@ -1924,7 +1928,7 @@ mod tests {
     }
 
     #[test]
-    fn restart_preflight_exhaustion_is_terminal_and_attempt_free() {
+    pub(super) fn restart_preflight_exhaustion_is_terminal_and_attempt_free() {
         let checked = checked("restart-resource.ling", TWO_ACTORS.as_bytes().to_vec());
         let divider = actor(&checked, "Divider");
         let divider_type = actor_type(&checked, &divider);
@@ -1972,7 +1976,7 @@ mod tests {
     }
 
     #[test]
-    fn contain_one_fault_seals_only_the_child_and_preserves_the_sibling() {
+    pub(super) fn contain_one_fault_seals_only_the_child_and_preserves_the_sibling() {
         let checked = checked("supervisor.ling", TWO_ACTORS.as_bytes().to_vec());
         let control = LocalTaskControl::new();
         let mut console = MemoryConsole::default();
@@ -2102,7 +2106,7 @@ mod tests {
     }
 
     #[test]
-    fn every_stale_duplicate_or_inconsistent_report_uses_root_fallback() {
+    pub(super) fn every_stale_duplicate_or_inconsistent_report_uses_root_fallback() {
         for mutation in 0..10 {
             let checked = checked(
                 &format!("invalid-report-{mutation}.ling"),
@@ -2187,7 +2191,7 @@ mod tests {
     }
 
     #[test]
-    fn sequential_faults_can_contain_all_children_without_restart_or_double_cleanup() {
+    pub(super) fn sequential_faults_can_contain_all_children_without_restart_or_double_cleanup() {
         let source = concat!(
             "module Main\n\n",
             "actor First : Int =\n",
@@ -2408,7 +2412,7 @@ mod tests {
     }
 
     #[test]
-    fn stop_and_owner_cancellation_cleanup_each_live_child_once() {
+    pub(super) fn stop_and_owner_cancellation_cleanup_each_live_child_once() {
         let checked = checked("stop.ling", TWO_ACTORS.as_bytes().to_vec());
         let control = LocalTaskControl::new();
         let mut console = MemoryConsole::default();
@@ -2513,7 +2517,7 @@ mod tests {
     }
 
     #[test]
-    fn unicode_bom_crlf_reconstruction_preserves_containment_projection_and_span() {
+    pub(super) fn unicode_bom_crlf_reconstruction_preserves_containment_projection_and_span() {
         let source = concat!(
             "module Main\n\n",
             "actor 计数器 : Int =\n",
@@ -2578,7 +2582,7 @@ mod tests {
     }
 
     #[test]
-    fn unicode_bom_crlf_reconstruction_preserves_restart_projection_and_span() {
+    pub(super) fn unicode_bom_crlf_reconstruction_preserves_restart_projection_and_span() {
         let source = concat!(
             "module Main\n\n",
             "actor 计数器 : Int =\n",
