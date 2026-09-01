@@ -7959,3 +7959,29 @@ unresolved_alternatives = [
   "Effect Log/event protocol choice, privacy/redaction, integrity, corruption, divergence, checkpoints, Actor messages, cross-process/backend replay, performance, and Stable support remain REP-2502 through REP-2506 or later authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0280"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0280-private-local-replay-record-structure-evidence.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-09-01"
+proposed = "2026-09-01"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Execute exactly five private structure-evidence cases against real validated DEC-0267 Task traces and complete mutation, replay, and resource-bound assertions.",
+  "Record all thirteen DEC-0105 concern labels exactly once while distinguishing seven existing private trace evidence concerns from six explicitly deferred public concerns.",
+  "Prove the absence of production/public Effect Log Replay schema encoder/decoder checksum privacy migration diagnostic CLI schema fixture and implemented protocol surfaces while preserving Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "Proposes private cfg(test) executable evidence only and adds no production runtime schema model transition recorder reader writer or public API.",
+  "Proposes no source, CLI/LSP/editor, diagnostic, schema registry, Semantic ID, protocol, package/ABI, bytecode/VM/backend, stored-data, migration, dependency, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Public envelope encoding fields tags optionality event identity ordering payload framing checksum integrity and reader/writer behavior remain RFC-0010 work.",
+  "Effect and Actor event scope, privacy/redaction/retention, corruption/divergence, checkpoints, resource limits, migration, cross-process/backend replay, and Stable support remain REP-2503 through REP-2506 or later authority.",
+]
+superseded_by = ""
