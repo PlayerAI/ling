@@ -11003,7 +11003,7 @@ notes = [
 [[task]]
 id = "SUP-2403"
 title = "Supervision tests"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -11045,18 +11045,18 @@ artifacts = [
 ]
 acceptance = [
   "The current audit recognizes that ACT-2301 through ACT-2306 and SUP-2401/SUP-2402 are Done under Accepted DEC-0270 through DEC-0277, but DEC-0277 explicitly excludes the distinct SUP-2403 completion claim.",
-  "Proposed DEC-0278 maps the stale plan scenarios to supported ContainOne, initializer-Fault restart, circuit Open, parent stop/cancellation, mailbox discard, and root-fallback outcomes or to explicit unsupported restore/escalation/concurrent-recovery boundaries.",
-  "The proposed matrix consumes CheckedProgram and the real private Actor/Supervisor runtime, uses finite explicit command scripts and in-memory bounded projections, and compares Unicode/BOM/CRLF/source-identity/insertion-order reconstruction without creating a fixture protocol.",
+  "Accepted DEC-0278 maps the stale plan scenarios to supported ContainOne, initializer-Fault restart, circuit Open, parent stop/cancellation, mailbox discard, and root-fallback outcomes or to explicit unsupported restore/escalation/concurrent-recovery boundaries.",
+  "The accepted matrix consumes CheckedProgram and the real private Actor/Supervisor runtime, uses finite explicit command scripts and in-memory bounded projections, and compares Unicode/BOM/CRLF/source-identity/insertion-order reconstruction without creating a fixture protocol.",
   "Accepted DEC-0103 authorizes only the publish-disabled supervision scenario test corpus; it does not close fixture-schema, execution, transition, outcome, cleanup, replay, or differential gaps.",
-  "DEC-0278 must become Accepted before executable SUP-2403 work begins; Proposed text is not implementation authority and no placeholder runtime or public API may be added meanwhile.",
+  "Accepted DEC-0278 closes only SUP-2403's private executable-evidence authority blocker and adds no new runtime behavior or public API.",
   "State restore, escalation, parallel/group recovery, public fixture/query/diagnostic protocols, Replay, remote/backend differential evidence, migration, fairness/liveness/performance, and Stable compatibility remain deferred.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "ACT-2301 through ACT-2306 and SUP-2401/SUP-2402 are Done under scoped Accepted decisions. SUP-2403 remains BlockedSpec until Proposed DEC-0278 is explicitly Accepted.",
+  "ACT-2301 through ACT-2306 and SUP-2401/SUP-2402 are Done under scoped Accepted decisions; Accepted DEC-0278 makes SUP-2403 Ready for its bounded private evidence matrix.",
   "Current private Actor/Supervisor tests cover DEC-0274 through DEC-0277 behavior, but they do not by themselves authorize SUP-2403's broader state-restore, escalation, public fixture, Replay, cross-backend, or conformance claims; compiler-query scheduling is not runtime evidence.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Supervisor, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]

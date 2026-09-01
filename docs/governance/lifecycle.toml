@@ -7911,13 +7911,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0278"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0278-private-supervision-executable-evidence-matrix.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-09-01"
 proposed = "2026-09-01"
-decided = ""
-stable_basis = false
+decided = "2026-09-01"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Execute the exact bounded SUP-2403 case families against the real checked-Core DEC-0274 through DEC-0277 Actor/Supervisor path with direct in-memory outcome assertions.",

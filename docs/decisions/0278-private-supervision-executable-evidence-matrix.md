@@ -1,18 +1,18 @@
 # DEC-0278: Private supervision executable evidence matrix / 私有监督可执行证据矩阵
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-09-01<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-09-01<br>
 > Owner role：actor-supervision<br>
 > 相关 RFC/缺口：DEC-0103 | DEC-0274 | DEC-0275 | DEC-0276 | DEC-0277 | GAP-ACTOR-MAILBOX-SUPERVISOR-001 | SUP-2403<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This proposal defines the smallest executable evidence package that can close
+This decision defines the smallest executable evidence package that can close
 SUP-2403 over the already Accepted private local Actor/Supervisor behavior. It
 does not authorize a new recovery transition, state restore, escalation,
 Replay, public fixture protocol, or backend execution surface.
 
-本提案定义可基于既有 Accepted 私有本地 Actor/Supervisor 行为完成 SUP-2403
+本决定定义可基于既有 Accepted 私有本地 Actor/Supervisor 行为完成 SUP-2403
 的最小可执行证据包。它不授权新的恢复转换、state restore、escalation、Replay、公开
 fixture 协议或后端执行面。
 
@@ -180,7 +180,7 @@ fixtures into new language semantics or a compatibility protocol?
 - State restore and migration, escalation channels, concurrent/group recovery,
   dynamic/nested supervisors, lifetime classes, mailbox drain/transfer, remote
   delivery, fairness/liveness, performance/stress thresholds, and Stable
-  support remain outside this proposal.
+  support remain outside this decision.
 - Broadening SUP-2403 to match every stale plan label is rejected until those
   semantics exist; negative evidence is the truthful outcome for unsupported
   labels in this scoped matrix.

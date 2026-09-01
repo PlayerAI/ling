@@ -9,13 +9,13 @@ private checked-Core Actor runtime and local Supervisor implement bounded
 mailboxes, turns, containment, restart budgets, fixed backoff, circuits,
 termination, and cleanup.
 
-The remaining blocker is narrower: DEC-0277 clause 18 explicitly does not
+The former blocker was narrower: DEC-0277 clause 18 explicitly did not
 authorize SUP-2403, and the non-normative G2 checklist mixes already Accepted
 outcomes with unaccepted state restore, escalation, concurrency, Replay, and
-cross-backend expectations. Proposed DEC-0278 therefore defines a private
+cross-backend expectations. Accepted DEC-0278 now defines a private
 executable evidence matrix that tests only DEC-0274 through DEC-0277 behavior
-and records unsupported plan labels honestly. No executable SUP-2403 tests or
-placeholder APIs may be added until DEC-0278 is Accepted.
+and records unsupported plan labels honestly. SUP-2403 is Ready for that exact
+bounded matrix; placeholder APIs remain prohibited.
 
 ## Normative traceability
 
@@ -65,8 +65,7 @@ placeholder APIs may be added until DEC-0278 is Accepted.
 
 ## Required authority before implementation
 
-Proposed DEC-0278 supplies the minimum missing boundary, subject to explicit
-acceptance:
+Accepted DEC-0278 supplies the minimum missing boundary:
 
 1. exactly eight private case families execute only the Accepted ContainOne,
    restart, circuit, termination, cleanup, invalid-evidence, resource, and
@@ -85,11 +84,11 @@ acceptance:
    `L-ACTOR-0002` boundary checks, full repository gates, commit binding, and
    synchronized status evidence.
 
-Until DEC-0278 is Accepted, its Proposed text is not implementation authority.
+DEC-0278 authorizes only this private evidence task and no new runtime behavior.
 
 ## Evidence and compatibility
 
-This refreshed audit and Proposed DEC-0278 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This refreshed audit and Accepted DEC-0278 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
 DEC-0021, DEC-0103, DEC-0274, DEC-0275, DEC-0276, DEC-0277, RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
@@ -104,8 +103,8 @@ Semantic ID, source-span, public protocol, or Unicode 17.0.0 behavior.
 
 ## Intentionally deferred
 
-`SUP-2403` can begin only after DEC-0278 is Accepted. Even then, the task remains
-limited to private in-memory evidence over DEC-0274 through DEC-0277. State
+`SUP-2403` may now begin, but remains limited to private in-memory evidence over
+DEC-0274 through DEC-0277. State
 restore, escalation, concurrent/group recovery, public fixture/query/Fault
 protocols, Replay, remote delivery, interpreter/VM/backend differential claims,
 migration, fairness, liveness, performance/stress guarantees, and Stable
