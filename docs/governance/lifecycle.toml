@@ -7907,3 +7907,29 @@ unresolved_alternatives = [
   "Public query/metrics/Fault protocols, Replay, remote delivery, backend ABIs, fairness/liveness/performance guarantees, migration, and Stable support remain later Accepted work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0278"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0278-private-supervision-executable-evidence-matrix.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-09-01"
+proposed = "2026-09-01"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Execute the exact bounded SUP-2403 case families against the real checked-Core DEC-0274 through DEC-0277 Actor/Supervisor path with direct in-memory outcome assertions.",
+  "Map stale plan scenarios to Accepted containment/restart/circuit/termination behavior or explicit unsupported restore/escalation/concurrency boundaries without placeholder APIs.",
+  "Compare only bounded private projections across Unicode, BOM, LF/CRLF, source identity, insertion order, exact logical-tick boundaries, cancellation, cleanup, invalid evidence, and resource fallback while retaining L-ACTOR-0002 publicly.",
+]
+compatibility_impact = [
+  "Proposes private cfg(test) executable evidence only and adds no production runtime transition or public API.",
+  "Proposes no source, CLI/LSP/editor, diagnostic, schema, Semantic ID, protocol, package/ABI, bytecode/VM/backend, stored-data, migration, dependency, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "State restore, escalation, concurrent/group recovery, dynamic/nested supervision, public Fault queries, Replay, remote/backend differential evidence, fairness/liveness/performance, migration, and Stable support remain later authority work.",
+  "Public or serialized supervision fixtures and cross-process deterministic comparison require separate versioning, privacy, resource, migration, and compatibility decisions.",
+]
+superseded_by = ""

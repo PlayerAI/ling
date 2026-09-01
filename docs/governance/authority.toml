@@ -4472,3 +4472,16 @@ covers = ["SUP-2402 private RestartOneBudgeted profile", "explicit logical-tick 
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0010", "DEC-0013", "DEC-0102", "DEC-0268", "DEC-0270", "DEC-0271", "DEC-0272", "DEC-0273", "DEC-0274", "DEC-0275", "DEC-0276", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0278"
+title = "Private supervision executable evidence matrix"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0278-private-supervision-executable-evidence-matrix.md"
+covers = ["SUP-2403 private checked-runtime evidence matrix", "accepted supervision scenario-to-outcome mapping", "bounded in-memory recovery and cleanup projection", "explicit unsupported restore escalation replay and backend boundaries"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0010", "DEC-0013", "DEC-0103", "DEC-0274", "DEC-0275", "DEC-0276", "DEC-0277", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false

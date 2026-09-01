@@ -2,25 +2,30 @@
 
 ## Outcome
 
-`SUP-2403` is correctly recorded as `BlockedSpec`. The G2 plan requires tests
-for single and repeated child Faults, Faults during restart, budget-exceeded
-escalation, parent termination, state-snapshot restore failure, and explicit
-cleanup of unprocessed mailbox messages. Without Accepted Supervisor,
-restart-budget, Actor, mailbox, Task, and replay contracts, those tests would
-only ratify an implementation-specific policy.
+`SUP-2403` remains correctly recorded as `BlockedSpec`, but the original audit
+is obsolete about its prerequisites. ACT-2301 through ACT-2306 and SUP-2401/
+SUP-2402 are now Done under scoped Accepted DEC-0270 through DEC-0277. The real
+private checked-Core Actor runtime and local Supervisor implement bounded
+mailboxes, turns, containment, restart budgets, fixed backoff, circuits,
+termination, and cleanup.
 
-No supervision test corpus, fixture schema, runtime harness, restart policy,
-diagnostic, protocol, or placeholder G2 API was added.
+The remaining blocker is narrower: DEC-0277 clause 18 explicitly does not
+authorize SUP-2403, and the non-normative G2 checklist mixes already Accepted
+outcomes with unaccepted state restore, escalation, concurrency, Replay, and
+cross-backend expectations. Proposed DEC-0278 therefore defines a private
+executable evidence matrix that tests only DEC-0274 through DEC-0277 behavior
+and records unsupported plan labels honestly. No executable SUP-2403 tests or
+placeholder APIs may be added until DEC-0278 is Accepted.
 
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its test checklist does not
   authorize a Supervisor state machine, recovery outcome, trace schema, or
   cross-backend equivalence relation.
-- SUP-2403 depends on RFC-C204, ACT-2305, SUP-2401, and SUP-2402. No Accepted
-  RFC-C204 or replacement RFC-0009 exists; ACT-2301 through ACT-2306,
-  SUP-2401, and SUP-2402 are `BlockedSpec`; RFC-0001 remains Draft under
-  DEC-0018.
+- SUP-2403's registered dependency SUP-2402 is Done. No Accepted RFC-C204 or
+  replacement public RFC-0009 exists, but scoped DEC-0274 through DEC-0277 now
+  authorize the private local runtime behavior needed for a bounded test-only
+  slice. RFC-0001 remains Draft under DEC-0018 and cannot broaden that slice.
 - `docs/SEMANTICS.md` requires explicit supervision strategy, shutdown order,
   state restore, and Fault escalation, but does not fix the transitions,
   budgets, snapshot identity, mailbox cleanup, or test equivalence relation;
@@ -31,73 +36,77 @@ diagnostic, protocol, or placeholder G2 API was added.
   protocols.
 - Accepted DEC-0010/DEC-0013 cover Seed State/Capability and main/runtime
   Faults only; DEC-0021 covers compiler-query scheduling only; RFC-0020
-  excludes Ling Task/Actor cancellation, scheduling, and replay. None
-  authorizes supervision test semantics.
+  excludes Ling Task/Actor cancellation, scheduling, and replay. DEC-0274
+  through DEC-0277 now authorize private Actor/Supervisor execution and
+  focused evidence, but each completion boundary excludes SUP-2403.
+- Accepted DEC-0103 authorizes only the structural
+  `SUP-2403-OBSERVATION` vocabulary. It cannot be used as a runtime harness or
+  expected-outcome source.
 - `GAP-ACTOR-MAILBOX-SUPERVISOR-001` remains Open and blocks SUP-2403; its
   resolution requires positive/negative/migration/stress, ordering,
   backpressure, and resource-limit evidence.
 
 ## Current implementation evidence
 
-- The workspace has no Actor runtime, Supervisor, restart budget, state
-  snapshot/restore, mailbox cleanup, Fault provenance, deterministic scheduler,
-  or replay harness. `ling-eval` and `ling-vm` only test Seed execution and
-  host VM cancellation/resource faults.
-- There is no accepted source/Core/runtime representation for child Faults,
-  restart-in-progress, budget exhaustion, escalation, parent shutdown, or
-  unprocessed-message disposition. No schema or diagnostic can identify these
-  events.
-- Existing conformance and VM differential fixtures cannot exercise Actor
-  supervision, and compiler-query scheduling evidence is not runtime
-  interleaving evidence.
+- `crates/ling-eval/src/actor_runtime.rs` implements the DEC-0274 bounded local
+  checked-Core Actor registry, typed send/FIFO admission, explicit turn,
+  lifecycle, Fault provenance, shutdown, discard, and exactly-once cleanup.
+- `crates/ling-eval/src/actor_supervisor.rs` implements DEC-0276 `ContainOne`
+  and DEC-0277 `RestartOneBudgeted`, including logical ticks, exact attempt
+  windows, fixed backoff, Closed/Open/HalfOpen circuits, fresh identities,
+  initializer Fault handling, canonical recovery order, stop/cancellation,
+  resource fallback, and private snapshots.
+- Existing focused tests already prove many individual DEC-0276/DEC-0277
+  clauses. They are not a distinct accepted SUP-2403 matrix and do not define
+  state restore, escalation, concurrent recovery, serialized fixtures, Replay,
+  or cross-backend equivalence.
+- Every public Actor-bearing route remains unavailable with `L-ACTOR-0002`;
+  there is no public Actor/Supervisor query, diagnostic, schema, or protocol.
 
 ## Required authority before implementation
 
-An Accepted RFC or decision must define, at minimum:
+Proposed DEC-0278 supplies the minimum missing boundary, subject to explicit
+acceptance:
 
-1. the supervision state machine and strategy/lifetime classes under test,
-   legal Fault/restart/stop/escalate transitions, parent/child ordering, and
-   concurrent-failure aggregation;
-2. restart budget/window/backoff/circuit semantics, deterministic clock/replay
-   inputs, budget-exceeded result, and the exact escalation channel;
-3. state snapshot/restore identity, versioning and invariant checks, restore
-   failure behavior, Resource/Managed cleanup, mailbox drain/drop policy,
-   cancellation, and parent termination semantics;
-4. fixture/test metadata, stable event/provenance schema, deterministic seeds,
-   random-interleaving model, platform/resource bounds, privacy, migration,
-   diagnostics, Semantic Graph/Audit Source projection, and interpreter/VM/
-   runtime comparison rules; and
-5. executable positive/negative/migration/stress fixtures for single/multiple/
-   repeated Faults, Fault during restart, budget exhaustion/escalation, parent
-   termination, restore failure, unprocessed-mailbox cleanup, concurrent
-   failures, cancellation, Unicode/CRLF/BOM spans, deterministic reruns, and
-   cross-backend behavior without unchecked-AST execution.
+1. exactly eight private case families execute only the Accepted ContainOne,
+   restart, circuit, termination, cleanup, invalid-evidence, resource, and
+   Unicode reconstruction behavior;
+2. the stale checklist maps budget exhaustion to circuit Open rather than
+   escalation, restart-time Fault to serialized initializer Fault, parent
+   termination to stop/cancellation, and mailbox cleanup to accepted discard
+   and cleanup evidence;
+3. state restore, escalation, concurrent/group recovery, public fixtures,
+   Replay, and backend differential behavior are explicit negative/deferred
+   boundaries and must not gain placeholders;
+4. finite explicit command scripts consume successful `CheckedProgram` and the
+   real private runtime, then compare only bounded in-memory DEC-0274 through
+   DEC-0277 projections; and
+5. SUP-2403 completes only after dedicated executable evidence, public
+   `L-ACTOR-0002` boundary checks, full repository gates, commit binding, and
+   synchronized status evidence.
 
-Until these decisions are Accepted, adding tests would make an unapproved
-recovery policy look normative and could hide data loss, leaked resources,
-non-determinism, or unsafe Fault handling.
+Until DEC-0278 is Accepted, its Proposed text is not implementation authority.
 
 ## Evidence and compatibility
 
-This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This refreshed audit and Proposed DEC-0278 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
-DEC-0021, RFC-0001, RFC-0020,
+DEC-0021, DEC-0103, DEC-0274, DEC-0275, DEC-0276, DEC-0277, RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`,
 `docs/governance/protocol-inventory.toml`, and the current syntax, AST, HIR,
 types, effects, evaluator, bytecode, VM, diagnostic, and schema crates.
 
-No compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol,
-Supervisor, diagnostic, schema, Semantic ID, source-span, runtime, or Unicode
-17.0.0 behavior changed.
+The re-audit and proposal change no compiler, interpreter, VM, bytecode,
+scheduler, mailbox, Actor protocol, Supervisor runtime, diagnostic, schema,
+Semantic ID, source-span, public protocol, or Unicode 17.0.0 behavior.
 
 ## Intentionally deferred
 
-`SUP-2403` can begin only after SUP-2401/SUP-2402, ACT-2301 through ACT-2306,
-and Accepted RFC-C204 (or replacement RFC-0009) resolve supervision,
-restart-budget, Actor, mailbox, turn, Fault, cleanup, and replay boundaries.
-The future tests must consume accepted fixtures and checked Core/runtime traces
-only, exercise each accepted recovery transition, and publish bounded cleanup,
-ordering, determinism, and interpreter/VM evidence before claiming
-supervision conformance.
+`SUP-2403` can begin only after DEC-0278 is Accepted. Even then, the task remains
+limited to private in-memory evidence over DEC-0274 through DEC-0277. State
+restore, escalation, concurrent/group recovery, public fixture/query/Fault
+protocols, Replay, remote delivery, interpreter/VM/backend differential claims,
+migration, fairness, liveness, performance/stress guarantees, and Stable
+compatibility require later Accepted authority and keep the broader gap Open.
