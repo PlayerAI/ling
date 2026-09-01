@@ -964,7 +964,7 @@ superseded_by = ""
         let text = fs::read_to_string(root.join("docs/governance/lifecycle.toml"))
             .expect("read repository lifecycle registry");
         let registry: LifecycleRegistry = toml::from_str(&text).expect("parse lifecycle registry");
-        assert_eq!(registry.record.len(), 318);
+        assert_eq!(registry.record.len(), 319);
         assert_eq!(
             registry
                 .record

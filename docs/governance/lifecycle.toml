@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-08-31"
+updated = "2026-09-01"
 
 # RFC-0001 and DEC-0001 through DEC-0016 predate the checked section
 # templates. This is a closed migration set; the checker rejects any new
@@ -7879,5 +7879,31 @@ compatibility_impact = [
 unresolved_alternatives = [
   "Automatic restart, budgets, backoff, circuit breaking, state restore, mailbox transfer, and restart provenance remain SUP-2402 work.",
   "Dynamic/nested supervisors, lifetime classes, rest-for-one/one-for-all, parallel recovery, source/public protocols, Replay, remote delivery, backend ABIs, and Stable support remain later Accepted work.",
+]
+superseded_by = ""
+
+[[record]]
+id = "DEC-0277"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0277-bounded-deterministic-local-supervisor-restart.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-09-01"
+proposed = "2026-09-01"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Exercise exact logical-window and fixed-backoff boundaries, successful and initializer-Fault attempt accounting, fresh Actor identities and initializer state, and unaffected-sibling preservation against the real checked local Supervisor runtime.",
+  "Prove Closed, Open, and single-probe HalfOpen transitions; reject clock regression, overflow, malformed evidence, exhausted resources, concurrent recovery, state restore, mailbox transfer, and public execution while preserving L-ACTOR-0002.",
+  "Compare bounded deterministic projections across insertion order, logical-tick boundaries, Unicode, BOM, LF/CRLF, source-name, path, and source-ID reconstruction without creating a public query or Replay protocol.",
+]
+compatibility_impact = [
+  "Proposes one opt-in private Experimental RestartOneBudgeted profile while preserving the Accepted ContainOne and no-Supervisor runtime profiles.",
+  "Adds no source or CLI behavior, public API, diagnostic, schema, Semantic ID, protocol, package/ABI migration, backend execution, stored data, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Wall-clock time, jitter, adaptive backoff, persisted/manual circuits, state restore, mailbox transfer, dynamic/nested supervisors, lifetime classes, group restart, escalation, and parallel recovery remain unresolved.",
+  "Public query/metrics/Fault protocols, Replay, remote delivery, backend ABIs, fairness/liveness/performance guarantees, migration, and Stable support remain later Accepted work.",
 ]
 superseded_by = ""
