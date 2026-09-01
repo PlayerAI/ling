@@ -7937,13 +7937,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0279"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0279-private-local-determinism-class-evidence-matrix.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-09-01"
 proposed = "2026-09-01"
-decided = ""
-stable_basis = false
+decided = "2026-09-01"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Execute exactly five private determinism-category cases against real checked Seed, DEC-0267 Task test scheduler/replay, DEC-0268 production Task, and DEC-0274 through DEC-0278 Actor/Supervisor routes.",

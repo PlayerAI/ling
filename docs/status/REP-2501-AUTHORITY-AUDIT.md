@@ -2,19 +2,18 @@
 
 ## Outcome
 
-`REP-2501` remains correctly recorded as `BlockedSpec`, but its implementation
-dependency is now satisfied: SUP-2403 is Done under Accepted DEC-0278. The
-remaining blocker is authority. `SEMANTICS.md` section 22.1 names five category
+`REP-2501` is `Ready` only for the bounded private baseline authorized by
+Accepted DEC-0279. Its implementation dependency is satisfied: SUP-2403 is
+Done under Accepted DEC-0278. `SEMANTICS.md` section 22.1 names five category
 shapes, while the lower-authority G2 plan proposes four different provisional
 labels and public metadata placement. The repository still has no Accepted
 classification relation, public claim/inference rules, replay header, privacy,
 or migration contract.
 
-Proposed DEC-0279 defines the smallest honest next slice: a private executable
+Accepted DEC-0279 defines the smallest honest next slice: a private executable
 five-case matrix over existing Accepted checked, Task, and Actor execution
 routes. It deliberately does not alias the two naming sets, classify programs,
-or create build metadata, Semantic Graph fields, or a Replay protocol. No
-implementation may begin unless DEC-0279 becomes Accepted.
+or create build metadata, Semantic Graph fields, or a Replay protocol.
 
 No determinism enum, class inference, build-metadata field, Semantic Graph
 field, replay header, diagnostic, protocol, or placeholder G2 API was added.
@@ -62,9 +61,9 @@ field, replay header, diagnostic, protocol, or placeholder G2 API was added.
   divergence. Compiler-query scheduling evidence from DEC-0021 is intentionally
   internal and cannot be reused as runtime replay evidence.
 
-## Required authority before implementation
+## Accepted implementation boundary
 
-Proposed DEC-0279 supplies only the minimum private evidence boundary:
+Accepted DEC-0279 supplies only the minimum private evidence boundary:
 
 1. exactly five test-local case families use the category shapes already named
    by `SEMANTICS.md` section 22.1 without freezing a production enum;
@@ -80,15 +79,14 @@ Proposed DEC-0279 supplies only the minimum private evidence boundary:
    exact matrix, negative inventory, full gates, commit binding, and status
    synchronization pass.
 
-DEC-0279 must become Accepted before this matrix is implemented. Public
-classification still requires an Accepted RFC defining names/parameters,
+Public classification still requires an Accepted RFC defining names/parameters,
 ordering/composition, inference/declaration, equivalence, Effect/scheduler
 boundaries, metadata/versioning, privacy, integrity, diagnostics, migration,
 and cross-process evidence.
 
 ## Evidence and compatibility
 
-This refreshed audit and Proposed DEC-0279 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This refreshed audit and Accepted DEC-0279 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
 DEC-0021, DEC-0104, DEC-0267, DEC-0268, DEC-0274 through DEC-0278, RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
@@ -103,8 +101,8 @@ replay, diagnostic, schema, Semantic ID, source-span, runtime, or Unicode
 
 ## Intentionally deferred
 
-`REP-2501` may begin only if DEC-0279 is Accepted, and then only as its private
-five-case executable baseline. Public determinism classification still requires
+`REP-2501` may proceed only as Accepted DEC-0279's private five-case executable
+baseline. Public determinism classification still requires
 Accepted RFC-C205/RFC-0010 (or a replacement) to resolve class semantics,
 effect/scheduler boundaries, replay identity, privacy, corruption, divergence,
 metadata, migration, and cross-process evidence. REP-2502 through REP-2506,

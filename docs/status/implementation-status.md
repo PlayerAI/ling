@@ -427,7 +427,7 @@
 | `REM-2604-OBSERVATION` | Internal reference-transport boundary evidence | `G2` | `S` | `Done` | `REM-2603-OBSERVATION` | `529e13a8e3e3017346cc0deb816c74a7a3036c30` |
 | `REM-2605` | Security and resource limits | `G2` | `L` | `BlockedSpec` | `REM-2604` | `` |
 | `REM-2605-OBSERVATION` | Internal security and resource boundary evidence | `G2` | `S` | `Done` | `REM-2604-OBSERVATION` | `84d3ef501c979778ee88e2f5ed19b4a955095044` |
-| `REP-2501` | Determinism class | `G2` | `L` | `BlockedSpec` | `SUP-2403` | `` |
+| `REP-2501` | Determinism class | `G2` | `L` | `Ready` | `SUP-2403` | `` |
 | `REP-2501-OBSERVATION` | Internal determinism-class evidence | `G2` | `S` | `Done` | `SUP-2403-OBSERVATION` | `0d3d11d9be50790c35ac014b33318d3966b10464` |
 | `REP-2502` | Replay log schema | `G2` | `L` | `BlockedSpec` | `REP-2501` | `` |
 | `REP-2502-OBSERVATION` | Internal replay-schema field evidence | `G2` | `S` | `Done` | `REP-2501-OBSERVATION` | `040ef2ca03438fe39df121acc07c2f554d24382f` |

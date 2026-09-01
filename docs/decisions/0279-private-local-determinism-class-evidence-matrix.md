@@ -1,8 +1,8 @@
 # DEC-0279: Private local determinism-class evidence matrix / 私有本地确定性等级证据矩阵
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-09-01<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-09-01<br>
 > Owner role：determinism-design<br>
 > 相关 RFC/缺口：DEC-0104 | DEC-0267 | DEC-0268 | DEC-0274 | DEC-0278 | GAP-DETERMINISTIC-REPLAY-001 | REP-2501<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
