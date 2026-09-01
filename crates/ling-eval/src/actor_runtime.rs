@@ -655,6 +655,12 @@ struct ActorInstance {
     fault: Option<ActorFault>,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ActorFaultPolicy {
+    CancelRoot,
+    SupervisorContainment,
+}
+
 /// Deterministic, run-scoped local Actor runtime over `CheckedActorCore` only.
 pub struct ActorRuntime<'checked> {
     checked: &'checked CheckedProgram,
@@ -662,6 +668,7 @@ pub struct ActorRuntime<'checked> {
     state: ActorRuntimeState,
     limits: ActorRuntimeLimits,
     owner_control: LocalTaskControl,
+    fault_policy: ActorFaultPolicy,
     actors: BTreeMap<ActorId, ActorInstance>,
     sender_sequences: BTreeMap<ActorSenderId, u64>,
     events: VecDeque<ActorRuntimeEvent>,
@@ -684,6 +691,37 @@ impl<'checked> ActorRuntime<'checked> {
         limits: ActorRuntimeLimits,
         owner_control: &LocalTaskControl,
     ) -> Result<Self, ActorRuntimeError> {
+        Self::new_with_fault_policy(
+            checked,
+            id,
+            limits,
+            owner_control,
+            ActorFaultPolicy::CancelRoot,
+        )
+    }
+
+    pub(super) fn new_supervised(
+        checked: &'checked CheckedProgram,
+        id: ActorRuntimeId,
+        limits: ActorRuntimeLimits,
+        owner_control: &LocalTaskControl,
+    ) -> Result<Self, ActorRuntimeError> {
+        Self::new_with_fault_policy(
+            checked,
+            id,
+            limits,
+            owner_control,
+            ActorFaultPolicy::SupervisorContainment,
+        )
+    }
+
+    fn new_with_fault_policy(
+        checked: &'checked CheckedProgram,
+        id: ActorRuntimeId,
+        limits: ActorRuntimeLimits,
+        owner_control: &LocalTaskControl,
+        fault_policy: ActorFaultPolicy,
+    ) -> Result<Self, ActorRuntimeError> {
         if !id.is_valid() {
             return Err(ActorRuntimeError::InvalidRuntimeId);
         }
@@ -699,6 +737,7 @@ impl<'checked> ActorRuntime<'checked> {
             state: ActorRuntimeState::Running,
             limits,
             owner_control: owner_control.clone(),
+            fault_policy,
             actors: BTreeMap::new(),
             sender_sequences: BTreeMap::new(),
             events: VecDeque::new(),
@@ -967,7 +1006,11 @@ impl<'checked> ActorRuntime<'checked> {
                 payload,
             ));
         }
-        if let Err(error) = self.require_event_capacity(1) {
+        let required_events = match self.fault_policy {
+            ActorFaultPolicy::CancelRoot => 1,
+            ActorFaultPolicy::SupervisorContainment => self.live_actors + 2,
+        };
+        if let Err(error) = self.require_event_capacity(required_events) {
             return Err(reject(send_runtime_error_kind(error), payload));
         }
         let sender_sequence = self
@@ -1027,7 +1070,11 @@ impl<'checked> ActorRuntime<'checked> {
                 })?;
         self.require_capacity(self.turns, self.limits.max_turns, "turns")?;
         self.require_command_capacity()?;
-        self.require_event_capacity(self.live_actors + 2)?;
+        let required_events = match self.fault_policy {
+            ActorFaultPolicy::CancelRoot => self.live_actors + 2,
+            ActorFaultPolicy::SupervisorContainment => self.live_actors + 3,
+        };
+        self.require_event_capacity(required_events)?;
 
         self.commands += 1;
         self.turns += 1;
@@ -1312,8 +1359,10 @@ impl<'checked> ActorRuntime<'checked> {
             actor,
             discarded_messages,
         });
-        self.owner_control.cancel();
-        self.fail_runtime();
+        if self.fault_policy == ActorFaultPolicy::CancelRoot {
+            self.owner_control.cancel();
+            self.fail_runtime();
+        }
         ActorTurnResult::Faulted {
             actor,
             previous_state,
@@ -1336,6 +1385,13 @@ impl<'checked> ActorRuntime<'checked> {
         }
         self.state = ActorRuntimeState::Failed;
         self.push_event(ActorRuntimeEventKind::RuntimeFailed);
+    }
+
+    pub(super) fn fail_unacknowledged_supervised_fault(&mut self) {
+        debug_assert_eq!(self.fault_policy, ActorFaultPolicy::SupervisorContainment);
+        debug_assert_eq!(self.state, ActorRuntimeState::Running);
+        self.owner_control.cancel();
+        self.fail_runtime();
     }
 
     fn shutdown_internal(&mut self, reason: ActorShutdownReason) -> ActorShutdownResult {
