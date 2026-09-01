@@ -7855,3 +7855,29 @@ unresolved_alternatives = [
   "Any larger stress bounds or performance claim need separate portable resource evidence and Accepted authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0276"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0276-minimal-local-supervisor-containment.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-08-31"
+proposed = "2026-08-31"
+decided = "2026-09-01"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Exercise failure-atomic fixed-child construction, ContainOne child Fault acknowledgement, sibling preservation, explicit stop, Task cancellation, and root fallback against the real checked local Actor runtime.",
+  "Reject malformed, duplicate, stale, cross-run, parallel, restart, restore, nesting, dynamic-child, and public execution surfaces while preserving L-ACTOR-0002.",
+  "Compare deterministic bounded projections across insertion order, Unicode, BOM, LF/CRLF, source-name, path, and source-ID reconstruction without creating a protocol.",
+]
+compatibility_impact = [
+  "Authorizes one optional internal Experimental non-nested local Supervisor with fixed children and no automatic restart; the accepted no-Supervisor profile remains unchanged.",
+  "Adds no source or CLI behavior, diagnostic, schema, Semantic ID, protocol, package/ABI migration, backend execution, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Automatic restart, budgets, backoff, circuit breaking, state restore, mailbox transfer, and restart provenance remain SUP-2402 work.",
+  "Dynamic/nested supervisors, lifetime classes, rest-for-one/one-for-all, parallel recovery, source/public protocols, Replay, remote delivery, backend ABIs, and Stable support remain later Accepted work.",
+]
+superseded_by = ""

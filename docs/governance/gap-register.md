@@ -50,7 +50,7 @@
 
 | ID | Priority | Status | Title | Blocked tasks | Candidate RFCs |
 | --- | --- | --- | --- | --- | --- |
-| `GAP-ACTOR-MAILBOX-SUPERVISOR-001` | `P1` | `Open` | Bounded mailbox, backpressure, ordering, and supervision | `SUP-2401`, `SUP-2402`, `SUP-2403` | `RFC-0009` |
+| `GAP-ACTOR-MAILBOX-SUPERVISOR-001` | `P1` | `Open` | Bounded mailbox, backpressure, ordering, and supervision | `SUP-2402`, `SUP-2403` | `RFC-0009` |
 | `GAP-ACTOR-REMOTE-DELIVERY-001` | `P1` | `Open` | Remote Actor identity, transport, and delivery strategy | `REM-2601`, `REM-2602`, `REM-2603`, `REM-2604`, `REM-2605` | `RFC-0009` |
 | `GAP-DETERMINISTIC-REPLAY-001` | `P1` | `Open` | Determinism classes and Replay protocol | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504`, `REP-2505`, `REP-2506` | `RFC-0010` |
 | `GAP-ACTOR-AWAIT-REENTRY-001` | `P1` | `Accepted` | Actor turn await and reentry semantics | `ACT-2304`, `ACT-2305`, `ACT-2306` | — |

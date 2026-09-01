@@ -3687,7 +3687,7 @@ notes = [
 [[task]]
 id = "ZED-6804"
 title = "DAP Status"
-state = "BlockedSpec"
+state = "Ready"
 release = "G6"
 size = "M"
 owner = "Codex"
@@ -9369,6 +9369,7 @@ spec = [
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0276-minimal-local-supervisor-containment.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/decisions/0264-structured-task-frontend-core.md",
@@ -10783,6 +10784,7 @@ spec = [
 ]
 artifacts = [
   "docs/status/SUP-2401-AUTHORITY-AUDIT.md",
+  "docs/decisions/0276-minimal-local-supervisor-containment.md",
   "docs/status/SUP-2401-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/SUP-2401-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0101-supervisor-observation.md",
@@ -10800,17 +10802,18 @@ acceptance = [
   "The audit distinguishes SEMANTICS/LANGUAGE/ROADMAP high-level supervision requirements and host-only runtime Fault/cancellation from the absent Accepted RFC-C204 authority, and preserves the checked-only evaluation boundary.",
   "The audit covers single/multiple/repeated child Faults, each restart strategy and lifetime class, budget exhaustion, state-restore failure, parent shutdown, mailbox cleanup, concurrent failures, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM/runtime differential fixtures.",
   "Accepted DEC-0101 authorizes only the publish-disabled Supervisor-observation child; it does not close child ownership, strategy, restart budget, state restore, Fault channel, runtime, or shutdown gaps.",
-  "No Supervisor type, child specification, restart strategy, escalation API, Fault channel, state snapshot protocol, diagnostic allocation, public protocol, or placeholder G2 API is added while the authority is absent.",
-  "The future implementation must consume accepted types and checked Core only, publish a versioned Supervisor state machine and Fault channel, enforce bounded restart/resource behavior, and provide recovery, cleanup, and interpreter/VM evidence before supervision is exposed.",
+  "Accepted DEC-0276 clauses 1-17 authorize exactly one optional non-nested fixed-child local Supervisor with synchronous ContainOne Fault acknowledgement and no restart.",
+  "The implementation must change the real DEC-0274 runtime Fault path so a valid synchronous Supervisor acknowledgement suppresses only the no-Supervisor root-cancellation fallback; an outer wrapper may not fabricate containment after root cancellation.",
+  "The required evidence covers failure-atomic construction, canonical child order, sibling preservation, invalid/stale/duplicate report fallback, explicit stop and owner cancellation, exact cleanup, bounded resources, deterministic reconstruction, and the unchanged L-ACTOR-0002 public boundary.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "SUP-2401 is BlockedSpec by ACT-2301 through ACT-2306, absent RFC-C204/RFC-0009, GAP-ACTOR-MAILBOX-SUPERVISOR-001, and unresolved Supervisor identity/strategy/lifecycle/Fault contracts.",
-  "Current Seed syntax/types/effects/evaluator/bytecode/VM have no Supervisor, child registry, restart budget, state snapshot/restore, escalation channel, lifecycle event schema, or public supervision protocol; Seed runtime Faults are not supervisor Faults.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Supervisor, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "ACT-2301 through ACT-2306 are Done and Accepted DEC-0276 removes SUP-2401's scoped internal authority blocker; the task is Ready for its ContainOne vertical slice.",
+  "Public supervision, restart, budget, state restore, escalation, parallel recovery, and Supervisor protocols remain blocked by absent RFC-C204/RFC-0009 and GAP-ACTOR-MAILBOX-SUPERVISOR-001.",
+  "No implementation or completion is claimed yet; the accepted decision changes no compiler, interpreter, VM, bytecode, scheduler, mailbox, diagnostics, schemas, Semantic IDs, source spans, public runtime support, or Unicode 17.0.0 behavior by itself.",
 ]
 
 [[task]]

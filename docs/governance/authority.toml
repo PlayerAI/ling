@@ -4446,3 +4446,16 @@ covers = ["proposed ACT-2306 local Actor property outcome projection", "proposed
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0010", "DEC-0013", "DEC-0021", "DEC-0266", "DEC-0268", "DEC-0270", "DEC-0271", "DEC-0272", "DEC-0273", "DEC-0274", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0276"
+title = "Minimal local Supervisor containment"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0276-minimal-local-supervisor-containment.md"
+covers = ["SUP-2401 single local root Supervisor boundary", "fixed checked child slots and ContainOne policy", "synchronous child-Fault acknowledgement and root fallback", "bounded deterministic stop and cleanup evidence"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0010", "DEC-0013", "DEC-0101", "DEC-0268", "DEC-0270", "DEC-0271", "DEC-0272", "DEC-0273", "DEC-0274", "DEC-0275", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = true
