@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ling 语言梦想特性清单：用通俗中文说明已实现、正在推进、等待规范和长期规划的主要能力。">
+  <title>Ling 语言梦想特性清单</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f0e8;
+      --surface: #fffdf8;
+      --surface-soft: #ece7dc;
+      --ink: #18201d;
+      --muted: #5d6863;
+      --line: #cfc8ba;
+      --accent: #075e54;
+      --accent-soft: #dceee8;
+      --done: #176b3a;
+      --done-soft: #dff3e6;
+      --active: #93620c;
+      --active-soft: #fff0c7;
+      --blocked: #a53b32;
+      --blocked-soft: #f9dfdc;
+      --dream: #315a87;
+      --dream-soft: #e0ebf7;
+      --internal: #665084;
+      --internal-soft: #ece4f7;
+      --shadow: 0 14px 38px rgba(24, 32, 29, 0.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121715;
+        --surface: #1b211e;
+        --surface-soft: #242b27;
+        --ink: #eef3ef;
+        --muted: #adb8b2;
+        --line: #3d4742;
+        --accent: #72c7b6;
+        --accent-soft: #183c35;
+        --done: #7bd09a;
+        --done-soft: #173825;
+        --active: #efc36b;
+        --active-soft: #493815;
+        --blocked: #f2968e;
+        --blocked-soft: #4b2421;
+        --dream: #91bbe5;
+        --dream-soft: #20364d;
+        --internal: #c0a7df;
+        --internal-soft: #352948;
+        --shadow: 0 14px 38px rgba(0, 0, 0, 0.24);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+
+    a { color: var(--accent); }
+
+    code {
+      padding: 0.12rem 0.38rem;
+      border: 1px solid var(--line);
+      border-radius: 0.35rem;
+      background: var(--surface-soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 72px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(32px, 6vw, 72px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "零";
+      position: absolute;
+      right: clamp(16px, 5vw, 64px);
+      bottom: -0.38em;
+      color: var(--accent-soft);
+      font-family: Georgia, "Noto Serif SC", serif;
+      font-size: clamp(150px, 27vw, 330px);
+      font-weight: 700;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 { line-height: 1.25; }
+
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0;
+      font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+      font-size: clamp(2.4rem, 7vw, 5.6rem);
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+    }
+
+    .snapshot {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .snapshot span {
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--bg);
+      font-size: 0.86rem;
+      font-weight: 650;
+    }
+
+    .notice {
+      margin: 24px 0 0;
+      padding: 18px 20px;
+      border-left: 5px solid var(--active);
+      background: var(--active-soft);
+      color: var(--ink);
+    }
+
+    .notice strong { color: var(--active); }
+
+    .section {
+      margin-top: 54px;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 0;
+      font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+      font-size: clamp(1.75rem, 4vw, 2.8rem);
+      letter-spacing: -0.025em;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .legend-item {
+      min-height: 108px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .legend-item strong { display: block; margin-bottom: 6px; }
+    .legend-item small { color: var(--muted); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      padding: 0.22rem 0.62rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      vertical-align: middle;
+    }
+
+    .badge.done { color: var(--done); background: var(--done-soft); }
+    .badge.active { color: var(--active); background: var(--active-soft); }
+    .badge.blocked { color: var(--blocked); background: var(--blocked-soft); }
+    .badge.dream { color: var(--dream); background: var(--dream-soft); }
+    .badge.internal { color: var(--internal); background: var(--internal-soft); }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 24px 0 30px;
+    }
+
+    .filter-button {
+      min-height: 40px;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 750;
+    }
+
+    .filter-button:hover,
+    .filter-button[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .feature-group {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .feature-group h3 {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 0 0 16px;
+      font-size: 1.25rem;
+    }
+
+    .group-no {
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 1.7rem;
+    }
+
+    .feature-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .feature {
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .feature:first-child { border-top: 0; padding-top: 0; }
+    .feature:last-child { padding-bottom: 0; }
+
+    .feature-title {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 5px;
+      font-weight: 800;
+    }
+
+    .feature p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .network {
+      padding: 24px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .mermaid {
+      min-width: 920px;
+      margin: 0;
+      background: transparent;
+      font-family: inherit;
+      white-space: pre-wrap;
+    }
+
+    .reading-guide {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .reading-guide div {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .reading-guide strong { display: block; margin-bottom: 4px; }
+    .reading-guide span { color: var(--muted); font-size: 0.9rem; }
+
+    .truth-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .truth-table th,
+    .truth-table td {
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .truth-table th {
+      background: var(--surface-soft);
+      font-size: 0.86rem;
+    }
+
+    .truth-table tr:last-child td { border-bottom: 0; }
+
+    footer {
+      margin-top: 56px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    footer p { margin: 8px 0; }
+
+    [hidden] { display: none !important; }
+
+    @media (max-width: 860px) {
+      .section-heading,
+      .feature-grid { grid-template-columns: 1fr; }
+      .legend { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .reading-guide { grid-template-columns: 1fr; }
+      .hero::after { opacity: 0.62; }
+    }
+
+    @media (max-width: 520px) {
+      .page { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .hero { padding: 28px 20px; border-radius: 16px; }
+      .legend { grid-template-columns: 1fr; }
+      .feature-group, .network { padding: 18px; }
+      .truth-table { display: block; overflow-x: auto; }
+    }
+
+    @media print {
+      :root { color-scheme: light; }
+      body { background: #fff; }
+      .page { width: 100%; padding: 0; }
+      .hero, .feature-group, .network { box-shadow: none; break-inside: avoid; }
+      .filters { display: none; }
+      .feature[hidden], .feature-group[hidden] { display: block !important; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <p class="eyebrow">Ling · 梦想与现实</p>
+      <h1>Ling 语言<br>梦想特性清单</h1>
+      <p class="hero-copy">
+        这不是一张“什么都已经有了”的宣传海报，而是一份说人话的全景图：
+        Ling 已经能做什么、哪些能力只是内部实验、眼下正在推进什么，以及通往 1.0 的梦想还差哪些承重墙。
+      </p>
+      <div class="snapshot" aria-label="状态快照">
+        <span>状态快照：2026-09-01</span>
+        <span>编译器：0.0.1-dev</span>
+        <span>已发布：v0.0.1 Seed</span>
+        <span>任务登记：351 / 499 Done</span>
+      </div>
+    </header>
+
+    <aside class="notice">
+      <strong>当前真实情况：</strong>
+      状态表里没有 <code>InProgress</code> 任务。眼下的下一条主线是 <code>REP-2502</code> Replay 记录结构证据，
+      但它仍是 <code>BlockedSpec</code>；<code>DEC-0280</code> 只是 Proposed，尚不能授权编码。
+      因此本文把它标成“正在推进（规范阶段）”，不会假装成“正在实现代码”。
+    </aside>
+
+    <main>
+      <section class="section" aria-labelledby="legend-title">
+        <div class="section-heading">
+          <h2 id="legend-title">先看懂状态标记</h2>
+          <p>“任务 Done”只表示某个有边界的实现或证据切片完成，不自动等于公开、稳定或可从 CLI 使用。</p>
+        </div>
+
+        <div class="legend">
+          <div class="legend-item">
+            <strong><span class="badge done">✅ 已实现</span></strong>
+            <small>已有代码、测试和文档；仍可能处于 Experimental 或 Preview。</small>
+          </div>
+          <div class="legend-item">
+            <strong><span class="badge internal">🔬 内部实验</span></strong>
+            <small>真实代码或测试证据存在，但公开语言入口仍被明确拒绝。</small>
+          </div>
+          <div class="legend-item">
+            <strong><span class="badge active">🚧 正在推进</span></strong>
+            <small>当前焦点；可能正在做规范、验收证据或编码准备。</small>
+          </div>
+          <div class="legend-item">
+            <strong><span class="badge blocked">⛔ 等待规范</span></strong>
+            <small>没有 Accepted 决议就不能实现，避免代码偷偷创造语义。</small>
+          </div>
+          <div class="legend-item">
+            <strong><span class="badge dream">🧭 梦想规划</span></strong>
+            <small>路线图方向，不是发布日期或兼容性承诺。</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="network-title">
+        <div class="section-heading">
+          <h2 id="network-title">语言特性网络</h2>
+          <p>箭头表示“后者依赖前者”或“前者为后者提供语义基础”。越靠下，通常离 1.0 越远、依赖也越多。</p>
+        </div>
+
+        <div class="network">
+          <pre class="mermaid" aria-label="Ling 语言特性网络图">
+flowchart TB
+  SOURCE["✅ Author Source<br/>中文标识符・Seed 语法"]:::done
+  FRONTEND["✅ 编译器前端<br/>解析・名称解析・类型检查"]:::done
+  CORE["✅ Checked Typed Core<br/>唯一受信语义入口"]:::done
+
+  SOURCE --> FRONTEND --> CORE
+
+  subgraph LIVING["v0.1 Living：让语言真正好用"]
+    PROJECT["✅ 工程与本地依赖<br/>manifest・module・lock"]:::done
+    INC["✅ 增量查询与缓存"]:::done
+    FORMAT["✅ Formatter / Audit"]:::done
+    GRAPH["✅ Semantic Graph<br/>查询与语义事务"]:::done
+    LSP["✅ Preview LSP<br/>诊断・导航・重命名・补全"]:::done
+    INTERP["✅ Checked-Core 解释器<br/>run・REPL"]:::done
+    BYTECODE["✅ Experimental Bytecode<br/>编码・解码・Verifier"]:::done
+    VM["✅ Experimental VM<br/>库级执行"]:::done
+    TRAIT["✅ Experimental Trait Core<br/>约束・字典 Lowering"]:::done
+  end
+
+  FRONTEND --> PROJECT
+  FRONTEND --> INC
+  SOURCE --> FORMAT
+  CORE --> GRAPH --> LSP
+  CORE --> INTERP
+  CORE --> BYTECODE --> VM
+  CORE --> TRAIT
+
+  subgraph CONCURRENT["v0.2 Concurrent：显式并发与可重放行为"]
+    EFFECT["✅ Experimental Effect Handler<br/>Effect 与 Capability"]:::done
+    TASK["✅ Experimental Structured Task<br/>本地固定 worker pool"]:::done
+    ACTOR["🔬 Actor + bounded mailbox<br/>内部 Runtime，公开执行仍拒绝"]:::internal
+    SUP["🔬 Supervisor<br/>内部重启预算与测试"]:::internal
+    DET["🔬 Determinism Class<br/>私有证据矩阵"]:::internal
+    REP["🚧 REP-2502<br/>Replay 记录结构证据"]:::active
+    REPLAY["⛔ 公开 Replay<br/>录制・播放・隐私・跨进程"]:::blocked
+    REMOTE["🧭 Remote Actor<br/>显式网络失败语义"]:::dream
+  end
+
+  CORE --> EFFECT --> TASK --> ACTOR --> SUP --> DET --> REP --> REPLAY --> REMOTE
+
+  subgraph NATIVE["v0.3 Native：资源安全与本机性能"]
+    MEMORY["⛔ Value / Managed / Resource<br/>可执行内存分类"]:::blocked
+    OWN["🧭 Ownership / Borrow / Region"]:::dream
+    GC["🧭 最小 Managed GC"]:::dream
+    NIR["🧭 Native IR + Verifier"]:::dream
+    AOT["🧭 Native AOT Backend"]:::dream
+    FFI["🧭 Typed FFI + 可审计 ABI"]:::dream
+  end
+
+  CORE --> MEMORY
+  MEMORY --> OWN --> NIR --> AOT --> FFI
+  MEMORY --> GC --> NIR
+
+  subgraph DEVICE["v0.4 Heterogeneous：从 CPU 到 GPU"]
+    KERNEL["🧭 受限 Kernel 子集"]:::dream
+    CPU["🧭 CPU Reference + SIMD"]:::dream
+    BUFFER["🧭 Device Buffer + Device IR"]:::dream
+    GPU["🧭 GPU / Accelerator Backend"]:::dream
+    PLACE["🧭 Placement 与可重放缓存"]:::dream
+  end
+
+  FFI --> KERNEL --> CPU --> BUFFER --> GPU --> PLACE
+
+  subgraph CRITICAL["v0.5 Critical 与 1.0：可分析、可审计、可承诺"]
+    PROFILE["🧭 Explore / Native / Critical Profile"]:::dream
+    BOUNDS["🧭 有界时间・内存・递归"]:::dream
+    NODE["🧭 Node + 虚拟时间"]:::dream
+    CONTRACT["🧭 Contract + Proof 状态"]:::dream
+    MODEL["🧭 有界模型检查<br/>反例可 Replay"]:::dream
+    EVIDENCE["🧭 独立 Evidence Bundle<br/>含 AI provenance"]:::dream
+    V1["🧭 Ling 1.0<br/>稳定核心・Schema・兼容承诺"]:::dream
+  end
+
+  TASK --> PROFILE
+  REPLAY --> MODEL
+  AOT --> PROFILE
+  PLACE --> PROFILE
+  PROFILE --> BOUNDS --> NODE --> CONTRACT --> MODEL --> EVIDENCE --> V1
+
+  classDef done fill:#dff3e6,stroke:#176b3a,color:#133d25,stroke-width:1.5px;
+  classDef internal fill:#ece4f7,stroke:#665084,color:#3e2e58,stroke-width:1.5px;
+  classDef active fill:#fff0c7,stroke:#93620c,color:#533a0c,stroke-width:2.5px;
+  classDef blocked fill:#f9dfdc,stroke:#a53b32,color:#5c241f,stroke-width:2px;
+  classDef dream fill:#e0ebf7,stroke:#315a87,color:#203d5c,stroke-width:1.5px;
+          </pre>
+        </div>
+
+        <div class="reading-guide">
+          <div>
+            <strong>一条主干</strong>
+            <span>源码必须先进入 Checked Typed Core，解释器、VM、语义工具和未来后端都不能绕过检查。</span>
+          </div>
+          <div>
+            <strong>两条扩展轴</strong>
+            <span>一条从 Effect 走向 Task、Actor 与 Replay；另一条从内存模型走向 Native、设备和 Critical。</span>
+          </div>
+          <div>
+            <strong>一个最终约束</strong>
+            <span>1.0 不是“功能堆满”，而是稳定语义、稳定协议、兼容测试和诚实支持矩阵同时闭合。</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="checklist-title">
+        <div class="section-heading">
+          <h2 id="checklist-title">梦想特性逐条清单</h2>
+          <p>可以用下面的按钮只看某种状态。页面打印时会自动恢复为完整清单。</p>
+        </div>
+
+        <div class="filters" role="group" aria-label="按状态筛选特性">
+          <button class="filter-button" type="button" data-filter="all" aria-pressed="true">全部</button>
+          <button class="filter-button" type="button" data-filter="done" aria-pressed="false">✅ 已实现</button>
+          <button class="filter-button" type="button" data-filter="internal" aria-pressed="false">🔬 内部实验</button>
+          <button class="filter-button" type="button" data-filter="active" aria-pressed="false">🚧 正在推进</button>
+          <button class="filter-button" type="button" data-filter="blocked" aria-pressed="false">⛔ 等待规范</button>
+          <button class="filter-button" type="button" data-filter="dream" aria-pressed="false">🧭 梦想规划</button>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-group">
+            <h3><span class="group-no">01</span> 写代码：让人读得懂，也让机器不含糊</h3>
+            <ul class="feature-list">
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>中文标识符是一等公民</div>
+                <p>变量、函数和类型可以直接用中文命名；编译器按 Unicode 17、NFC 和混淆字符规则检查，不把“长得一样”当成“就是同一个”。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>小而清楚的 Seed 语法</div>
+                <p>已有 <code>let</code>、函数、<code>if</code>、空格函数调用、pipeline、record、ADT 和穷尽 <code>match</code>，先把常用表达能力做扎实。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>局部类型推导与模式匹配</div>
+                <p>常见代码少写类型标注，编译器仍会检查 <code>Option</code>、<code>Result</code>、tuple、record 和 variant 是否被正确处理。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>默认不可变，修改必须说清楚</div>
+                <p>普通绑定不能暗中变化；只有声明为 <code>mutable</code> 的 Place 才能用 <code>&lt;-</code> 更新，读代码时能一眼看见状态改变。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>Effect 与 Capability 分开</div>
+                <p>Effect 说明“程序做了什么”，Capability 说明“程序获准做什么”。这为可测试 I/O、最小权限和未来 Replay 打基础。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>第一阶段 Effect Handler</div>
+                <p>Effect row 推导、约束求解、Checked Core 表示和解释器/VM handler 执行已有 Experimental 切片，不再只是文档设想。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>基础 Trait 静态分派</div>
+                <p>声明、约束收集、coherence/orphan 检查、solver 和 dictionary lowering 已完成；高级 specialization 和动态分派没有偷跑。</p>
+              </li>
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 等待规范</span>Trait 的完整 IDE 与性能承诺</div>
+                <p>已有 Semantic Graph 投影和只读查询证据，但完整 IDE 体验、solver 性能边界与终止承诺仍不能对外宣称。</p>
+              </li>
+            </ul>
+          </article>
+
+          <article class="feature-group">
+            <h3><span class="group-no">02</span> 执行：同一份语义，多种可靠跑法</h3>
+            <ul class="feature-list">
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>先检查，再执行</div>
+                <p>源码必须经过解析、名称解析、类型与 Effect 检查，执行器只消费 Checked Typed Core，不会把未解决的 AST 节点当成合法程序。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>解释器与事务式 REPL</div>
+                <p><code>ling run</code> 和 REPL 能执行当前支持范围；REPL 的失败输入不会把半截状态悄悄留在会话里。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>版本化 Bytecode 与独立 Verifier</div>
+                <p><code>ling.bytecode/1.0</code> 有确定性编码、bounded decoder 和 verifier；非法跳转、版本与资源问题在执行前被拒绝。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>库级 VM 与差分测试</div>
+                <p>函数、闭包、递归、聚合、match、可变 Place、Effect/Capability/Fault 已有 VM 路径，并与解释器比较可观察结果。</p>
+              </li>
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 对外未开放</span>CLI 选择 VM 后端</div>
+                <p>VM 是真实的 Experimental 库能力，但目前没有 Accepted 的 CLI bytecode 读写命令、backend selector 或默认资源上限。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Interpreter ↔ VM ↔ Native 三方一致</div>
+                <p>未来不同执行引擎要跑同一套 conformance，并明确浮点、Fault、I/O 和资源释放允许出现哪些差异。</p>
+              </li>
+            </ul>
+          </article>
+
+          <article class="feature-group">
+            <h3><span class="group-no">03</span> 工程体验：从单文件到可维护项目</h3>
+            <ul class="feature-list">
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>项目、模块和本地锁定依赖</div>
+                <p>已有 manifest、确定性模块发现、跨包可见性、vendored path dependency 和 canonical lockfile；锁定后可离线解析。</p>
+              </li>
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 不在当前支持面</span>在线包安装、发布与中心 Registry</div>
+                <p>Ling 目前重视可重复的本地依赖，不假装已经拥有成熟包生态；Registry 行为至少推迟到 1.0 之后再决定。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>增量查询与可丢弃缓存</div>
+                <p>Source、parse、resolve、type/effect 和 semantic 有明确查询边界；增量结果会与 clean 结果比较，坏缓存可以回退重算。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>Formatter 与 Audit Source 分工</div>
+                <p><code>ling fmt</code> 面向作者代码并追求幂等、保留注释；Audit Source 负责展开隐含语义，两者不是同一份文本。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>统一 CLI 工作流</div>
+                <p><code>init/check/run/test/fmt/semantic/audit/query/patch/build/lsp/completion</code> 已有统一命令模型、退出行为和帮助证据，但各命令只承诺自己的受支持边界。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ Preview</span>够用的 LSP 主干</div>
+                <p>已有诊断、symbols、hover、definition、references、rename、completion、code action、semantic tokens、formatting、取消与资源上限。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>Tree-sitter 语法与编辑查询</div>
+                <p>已有语法、错误恢复、高亮、括号、缩进等查询，并与编译器 corpus 做差分；编辑器解析不会冒充语言权威。</p>
+              </li>
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 等待规范</span>完整 Zed 扩展与 DAP 调试器</div>
+                <p>当前有兼容性边界证据，但安装、发现、任务、崩溃恢复、Marketplace、断点和变量查看尚未形成可发布产品。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 已实现</span>Semantic Graph 与 AI 可审计修改</div>
+                <p>工具可以按稳定身份查询定义和关系，并通过语义事务检查前置条件；AI 生成文本本身不进入 Trusted Computing Base。</p>
+              </li>
+            </ul>
+          </article>
+
+          <article class="feature-group">
+            <h3><span class="group-no">04</span> 并发：任务、Actor 与可重放世界</h3>
+            <ul class="feature-list">
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ Experimental</span>Structured Task 主干</div>
+                <p>已有语法、Checked Core、状态机、生命周期 Runtime、确定性测试调度器和本地固定 worker pool。</p>
+              </li>
+              <li class="feature" data-status="done">
+                <div class="feature-title"><span class="badge done">✅ 有边界可运行</span><code>task main ()</code></div>
+                <p>精确的文件/工程入口可由 <code>ling run</code> 解释执行；<code>test</code>、<code>build</code>、REPL、bytecode、VM、Native 与 Wasm 仍明确拒绝 Task。</p>
+              </li>
+              <li class="feature" data-status="internal">
+                <div class="feature-title"><span class="badge internal">🔬 内部实验</span>Actor、隔离状态与 bounded mailbox</div>
+                <p>身份、消息可发送性、背压、turn/reentry、Runtime 和压力性质已有实现切片；公开 Actor 源码执行仍以 <code>L-ACTOR-0002</code> 拒绝。</p>
+              </li>
+              <li class="feature" data-status="internal">
+                <div class="feature-title"><span class="badge internal">🔬 内部实验</span>Supervisor 与重启预算</div>
+                <p>内部模型、restart budget、circuit breaker 和测试已经存在，但没有公开 Supervisor 语言/API 协议。</p>
+              </li>
+              <li class="feature" data-status="internal">
+                <div class="feature-title"><span class="badge internal">🔬 内部实验</span>Determinism Class 证据</div>
+                <p><code>REP-2501</code> 已完成私有、test-only 的确定性分类证据；它不是公开 metadata，也不是 Replay 格式。</p>
+              </li>
+              <li class="feature" data-status="active">
+                <div class="feature-title"><span class="badge active">🚧 正在推进·规范阶段</span>Replay 记录结构证据</div>
+                <p><code>REP-2502</code> 是下一焦点。Proposed <code>DEC-0280</code> 只拟授权 crate-private、非序列化证据；接受前不能编码。</p>
+              </li>
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 等待规范</span>真正的录制与重放</div>
+                <p>公开 schema、Effect recorder、Replay player、checksum、隐私裁剪、损坏检测和跨进程验收仍全部缺失。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Remote Actor，但不假装“网络透明”</div>
+                <p>未来远程消息会显式暴露延迟、断连、重试、重复或丢失，不把网络调用伪装成本地函数调用。</p>
+              </li>
+            </ul>
+          </article>
+
+          <article class="feature-group">
+            <h3><span class="group-no">05</span> Native：性能建立在清楚的资源语义上</h3>
+            <ul class="feature-list">
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 等待规范</span>Value / Managed / Resource 真正落地</div>
+                <p>三分内存模型目前是设计方向；Copy/Move、Drop、finalization 和 Profile 边界未形成可执行稳定语义。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Ownership / Borrow / Region 检查</div>
+                <p>目标是提前抓住 use-after-move、别名冲突、region escape 和错误 drop 顺序，同时不泄露 Rust 实现细节。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>最小 Managed Runtime 与 GC</div>
+                <p>Explore/Native 可以有受管对象，但 root、finalization、OOM 和 FFI pinning 必须先说清楚；Critical 不引入通用 GC。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>可验证 Native IR 与 AOT</div>
+                <p>Checked Core 先 Lower 到 backend-neutral IR，再接一个基线 Native backend；后端只负责实现语义，不能自己发明语义。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Typed FFI 与可审计 TCB</div>
+                <p>FFI 声明要说清 ABI、ownership、线程、重入、Fault 与 Capability，不安全部分集中在可盘点的 Target Primitive Package。</p>
+              </li>
+            </ul>
+          </article>
+
+          <article class="feature-group">
+            <h3><span class="group-no">06</span> 异构计算：先有 CPU 标尺，再谈 GPU</h3>
+            <ul class="feature-list">
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 整块等待规范</span>受限 Kernel 子集</div>
+                <p>要先定义可用类型、控制流、Effect、递归、分配和数值模式；不允许拿 backend 编译失败代替语言诊断。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>CPU Reference 与 SIMD</div>
+                <p>先用标量 CPU 建立可比较语义，再做合法向量化、尾部处理与 fallback，优化不能改变声明的确定性等级。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Device Buffer 与 Device IR</div>
+                <p>显式建模 buffer ownership、address space、传输 Effect、同步和 canonical device IR。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>GPU / TPU / NPU 插件</div>
+                <p>先接一个可测试的 GPU backend；其他加速器走窄插件接口，不让每个厂商在编译器里复制一套语言规则。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>可解释 Placement</div>
+                <p>“为什么放在这个设备上”要能查询、记录和重放；设备缺失时明确拒绝或执行规范允许的 fallback。</p>
+              </li>
+            </ul>
+          </article>
+
+          <article class="feature-group">
+            <h3><span class="group-no">07</span> Critical 与 1.0：把“可靠”变成证据</h3>
+            <ul class="feature-list">
+              <li class="feature" data-status="blocked">
+                <div class="feature-title"><span class="badge blocked">⛔ 尚未实现</span>Explore / Native / Critical Profile 选择</div>
+                <p>三个 Profile 目前只是路线图模型；CLI 没有 profile 选项，也没有 profile validation pass。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>有界资源与时间</div>
+                <p>让循环、递归、内存预算和 deadline 能被静态检查或明确标成运行时义务，而不是一句“应该不会超”。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Node 与虚拟时间</div>
+                <p>面向可预测系统建立静态调度、虚拟时间参考 Runtime，并定义 Node 与 Actor 的清楚边界。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Contract 与证据等级</div>
+                <p>前置条件、后置条件和不变量要区分 <code>Proved</code>、<code>RuntimeChecked</code>、<code>Tested</code>、<code>Assumed</code>、<code>Unverified</code>，测试绝不冒充证明。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Proof IR 与独立检查器</div>
+                <p>编译器可以产出证明证据，但最终由更小、更容易审计的独立 checker 复核，并公开所有假设。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>有界模型检查与可重放反例</div>
+                <p>探索 Task/Actor/Node 的有限状态；报告必须写出搜索边界，找到反例后交给 Replay 复现。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 梦想规划</span>Evidence Bundle 与 AI provenance</div>
+                <p>把源码身份、构建、测试、分析、假设和 AI 修改来源装进可独立验证的证据包。</p>
+              </li>
+              <li class="feature" data-status="dream">
+                <div class="feature-title"><span class="badge dream">🧭 最终目标</span>Ling 1.0 兼容承诺</div>
+                <p>冻结语言核心、Semantic Graph、诊断、CLI 和关键 schema，完成历史 corpus、迁移、fuzz、安全审计与多平台发布证据。</p>
+              </li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="truth-title">
+        <div class="section-heading">
+          <h2 id="truth-title">三个最容易误解的地方</h2>
+          <p>这三条决定了本文为什么没有把所有 Done 项都涂成绿色。</p>
+        </div>
+
+        <table class="truth-table">
+          <thead>
+            <tr>
+              <th>看到的状态</th>
+              <th>真实含义</th>
+              <th>不能推出什么</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Done</code></td>
+              <td>登记任务的 Accepted 范围、实现或证据已经闭合。</td>
+              <td>不能自动推出“Stable”“所有入口都能用”或“已经达到 1.0 质量”。</td>
+            </tr>
+            <tr>
+              <td><code>*-OBSERVATION Done</code></td>
+              <td>边界、缺失项或内部结构已有可执行/文档证据。</td>
+              <td>不能推出它的 BlockedSpec 父功能已经实现。</td>
+            </tr>
+            <tr>
+              <td>任务 351 / 499 Done</td>
+              <td>说明治理和切片推进很多，且 148 项仍为 BlockedSpec。</td>
+              <td>不能直接换算成“1.0 完成 70%”；后续 Native、GPU、Critical 的风险与体量远高于普通观察任务。</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        状态依据：
+        <a href="status/implementation-status.md">实现状态表</a>、
+        <a href="governance/support-matrix.md">支持矩阵</a>、
+        <a href="ROADMAP-1.0.md">1.0 路线图</a>、
+        <a href="decisions/0280-private-local-replay-record-structure-evidence.md">DEC-0280</a>、
+        <a href="SEMANTICS.md">语义规范</a>与
+        <a href="LANGUAGE.md">语言设计</a>。
+      </p>
+      <p>本页是非规范性产品全景，不替代 Accepted RFC、Decision、规范正文或 conformance tests。</p>
+      <p>Mermaid 图通过 jsDelivr 加载 Mermaid 11；离线打开时会保留可读的 Mermaid 源码，但不保证自动渲染。</p>
+    </footer>
+  </div>
+
+  <script>
+    const filterButtons = document.querySelectorAll("[data-filter]");
+    const features = document.querySelectorAll(".feature");
+    const groups = document.querySelectorAll(".feature-group");
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const filter = button.dataset.filter;
+
+        filterButtons.forEach((candidate) => {
+          candidate.setAttribute("aria-pressed", String(candidate === button));
+        });
+
+        features.forEach((feature) => {
+          feature.hidden = filter !== "all" && feature.dataset.status !== filter;
+        });
+
+        groups.forEach((group) => {
+          group.hidden = !group.querySelector(".feature:not([hidden])");
+        });
+      });
+    });
+  </script>
+
+  <script type="module">
+    try {
+      const { default: mermaid } = await import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs");
+      mermaid.initialize({
+        startOnLoad: true,
+        securityLevel: "strict",
+        theme: "base",
+        flowchart: {
+          curve: "basis",
+          htmlLabels: true,
+          nodeSpacing: 30,
+          rankSpacing: 42
+        },
+        themeVariables: {
+          fontFamily: "Inter, PingFang SC, Microsoft YaHei, sans-serif",
+          primaryTextColor: "#18201d",
+          lineColor: "#718078",
+          clusterBkg: "#fffdf8",
+          clusterBorder: "#cfc8ba"
+        }
+      });
+    } catch (error) {
+      document.documentElement.dataset.mermaid = "unavailable";
+      console.warn("Mermaid 加载失败，页面将保留图表源码。", error);
+    }
+  </script>
+</body>
+</html>
