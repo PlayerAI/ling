@@ -2,8 +2,10 @@
 
 ## Outcome
 
-`REP-2501` is `Ready` only for the bounded private baseline authorized by
-Accepted DEC-0279. Its implementation dependency is satisfied: SUP-2403 is
+`REP-2501` is `Done` only for the bounded private baseline authorized by
+Accepted DEC-0279 and implemented by commit
+`45ea3c9749aea87da96b03857d34d5de908593cd`. Its implementation dependency is
+satisfied: SUP-2403 is
 Done under Accepted DEC-0278. `SEMANTICS.md` section 22.1 names five category
 shapes, while the lower-authority G2 plan proposes four different provisional
 labels and public metadata placement. The repository still has no Accepted
@@ -15,8 +17,9 @@ five-case matrix over existing Accepted checked, Task, and Actor execution
 routes. It deliberately does not alias the two naming sets, classify programs,
 or create build metadata, Semantic Graph fields, or a Replay protocol.
 
-No determinism enum, class inference, build-metadata field, Semantic Graph
-field, replay header, diagnostic, protocol, or placeholder G2 API was added.
+No production determinism enum, class inference, build-metadata field,
+Semantic Graph field, replay header, diagnostic, protocol, or placeholder G2
+API was added.
 
 ## Normative traceability
 
@@ -49,10 +52,11 @@ field, replay header, diagnostic, protocol, or placeholder G2 API was added.
 ## Current implementation evidence
 
 - The workspace has no production determinism-class model, public effect
-  recorder/log/header/player, or cross-process comparison tool. `ling-eval`
-  does have the Accepted DEC-0267 internal `TaskScheduleTrace`, seeded driver,
-  strict replay, and DEC-0268 production scheduler, plus explicit checked Actor
-  runtime/Supervisor drivers under DEC-0274 through DEC-0278.
+  recorder/log/header/player, or cross-process comparison tool. The private
+  `ling-eval` matrix now executes the five DEC-0279 cases over the Accepted
+  DEC-0267 internal `TaskScheduleTrace`, strict replay, DEC-0268 production
+  scheduler, pure checked evaluator, and explicit Actor/Supervisor drivers
+  under DEC-0274 through DEC-0278.
 - `ling-semantic` has no accepted determinism-class Semantic Graph node or
   build/replay metadata projection. `ling-effects` computes only the Seed
   closed effect rows and module Capability closure.
@@ -75,9 +79,9 @@ Accepted DEC-0279 supplies only the minimum private evidence boundary:
 4. DEC-0104's four provisional plan labels remain separate and no public class,
    build/Semantic Graph/header field, Effect Log, diagnostic, or protocol is
    added; and
-5. REP-2501 completes only for the internal Experimental baseline after the
+5. REP-2501 completion is limited to the internal Experimental baseline: the
    exact matrix, negative inventory, full gates, commit binding, and status
-   synchronization pass.
+   synchronization have passed.
 
 Public classification still requires an Accepted RFC defining names/parameters,
 ordering/composition, inference/declaration, equivalence, Effect/scheduler
@@ -101,7 +105,7 @@ replay, diagnostic, schema, Semantic ID, source-span, runtime, or Unicode
 
 ## Intentionally deferred
 
-`REP-2501` may proceed only as Accepted DEC-0279's private five-case executable
+`REP-2501` is complete only as Accepted DEC-0279's private five-case executable
 baseline. Public determinism classification still requires
 Accepted RFC-C205/RFC-0010 (or a replacement) to resolve class semantics,
 effect/scheduler boundaries, replay identity, privacy, corruption, divergence,

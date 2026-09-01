@@ -11127,7 +11127,7 @@ notes = [
 [[task]]
 id = "REP-2501"
 title = "Determinism class"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -11159,7 +11159,11 @@ spec = [
 ]
 artifacts = [
   "docs/status/REP-2501-AUTHORITY-AUDIT.md",
+  "docs/status/REP-2501-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0279-private-local-determinism-class-evidence-matrix.md",
+  "crates/ling-eval/src/determinism_evidence.rs",
+  "crates/ling-eval/src/task_scheduler.rs",
+  "crates/ling-eval/src/actor_supervisor_evidence.rs",
   "docs/status/REP-2501-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/REP-2501-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0104-determinism-class-evidence.md",
@@ -11174,18 +11178,19 @@ artifacts = [
 acceptance = [
   "SUP-2403 is Done under Accepted DEC-0278, so REP-2501's implementation dependency is satisfied.",
   "The refreshed audit distinguishes SEMANTICS section 22.1's five category shapes from DEC-0104 and the execution plan's four provisional labels; no unaccepted alias or ordering is inferred.",
-  "Accepted DEC-0279 authorizes exactly five private executable cases over pure checked execution, DEC-0267 seeded Task scheduling and strict trace replay, explicit DEC-0274 through DEC-0278 Actor scheduling, and DEC-0268's nondeterministic production boundary.",
-  "Each authorized case fixes checked inputs, arguments, limits, host/schedule inputs, bounded allowed projections, reconstruction evidence, and forbidden physical/runtime observations.",
-  "The implementation has not started at this governance milestone; no production/public determinism enum, classifier, build metadata, Semantic Graph field, Replay header, Effect Log, diagnostic, protocol, or placeholder API is added.",
+  "Accepted DEC-0279's exact five private executable cases run over pure checked execution, DEC-0267 seeded Task scheduling and strict trace replay, explicit DEC-0274 through DEC-0278 Actor scheduling, and DEC-0268's nondeterministic production boundary.",
+  "Each case fixes checked inputs, arguments, limits, host/schedule inputs, bounded allowed projections, reconstruction evidence, and forbidden physical/runtime observations; identity and first-event trace mutations fail closed.",
+  "Implementation commit 45ea3c9749aea87da96b03857d34d5de908593cd adds only crate-private cfg(test) evidence and no production/public determinism enum, classifier, build metadata, Semantic Graph field, Replay header, Effect Log, diagnostic, protocol, or placeholder API.",
+  "Focused ling-eval tests, strict Clippy, retained CLI Task/Actor boundaries, the full locked/offline workspace suite, governance/status/docs/RC0 gates, formatting, and diff checks pass.",
   "Public class inference/composition/equivalence, metadata, Replay, privacy, integrity, corruption, divergence, cross-process/backend evidence, and migration remain deferred to RFC-0010 or replacement authority and REP-2502 through REP-2506.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "45ea3c9749aea87da96b03857d34d5de908593cd"
+completion_commit = "45ea3c9749aea87da96b03857d34d5de908593cd"
+integration_state = "committed"
+completed = "2026-09-01"
 notes = [
-  "SUP-2403 and ACT-2301 through ACT-2306 are Done. REP-2501 is Ready only for Accepted DEC-0279's private five-case matrix; public scope remains blocked by absent RFC-C205/RFC-0010 and GAP-DETERMINISTIC-REPLAY-001.",
-  "Current runtime evidence includes DEC-0267 internal Task traces/replay and explicit Actor/Supervisor scripts, but no public determinism class, Effect Log/header, cross-process comparison, or compatibility protocol.",
+  "REP-2501 is Done only for Accepted DEC-0279's internal Experimental five-case matrix; public scope remains blocked by absent RFC-C205/RFC-0010 and GAP-DETERMINISTIC-REPLAY-001.",
+  "Current runtime evidence includes DEC-0267 internal Task traces/replay and explicit Actor/Supervisor scripts, but it creates no public determinism class, Effect Log/header, cross-process comparison, or compatibility protocol.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, replay, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 
