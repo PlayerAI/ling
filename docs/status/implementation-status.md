@@ -461,7 +461,7 @@
 | `SUP-2401-OBSERVATION` | Internal Supervisor observation | `G2` | `S` | `Done` | `ACT-2306-PROPERTY-OBSERVATION` | `c29d95c7bc7b926c92757b2c32fccf960500e421` |
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `Done` | `SUP-2401` | `be9b8dd842815cff100267a645b9bef88b13c369` |
 | `SUP-2402-OBSERVATION` | Internal restart-budget observation | `G2` | `S` | `Done` | `SUP-2401-OBSERVATION` | `7ee0cf0bf90971bb6844c8bf467f5506e5e5e796` |
-| `SUP-2403` | Supervision tests | `G2` | `L` | `Ready` | `SUP-2402` | `` |
+| `SUP-2403` | Supervision tests | `G2` | `L` | `Done` | `SUP-2402` | `d175501b007cf59928c47f9221f5a451d4fd1963` |
 | `SUP-2403-OBSERVATION` | Internal supervision test evidence | `G2` | `S` | `Done` | `SUP-2402-OBSERVATION` | `73046c5049324455ec87d0011e62482de97c07aa` |
 | `TASK-2201` | Structured Task syntax and Checked Core | `G2` | `M` | `Done` | `EFF-2103` | `54e4cecb6ad56685f93b155ef7395a1b0a7a7e26` |
 | `TASK-2201-CORE-MODEL` | Internal Structured Task Checked-Core identity model | `G2` | `S` | `Done` | `TASK-2201-TASK-SYNTAX-REJECTION` | `6028e78ce4091e58d5df1289c59b8fd6b0f61c4e` |

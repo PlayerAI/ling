@@ -11003,7 +11003,7 @@ notes = [
 [[task]]
 id = "SUP-2403"
 title = "Supervision tests"
-state = "Ready"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -11022,6 +11022,7 @@ spec = [
   "docs/decisions/0275-local-actor-property-and-stress-evidence.md",
   "docs/decisions/0276-minimal-local-supervisor-containment.md",
   "docs/decisions/0277-bounded-deterministic-local-supervisor-restart.md",
+  "docs/decisions/0278-private-supervision-executable-evidence-matrix.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
@@ -11031,7 +11032,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/SUP-2403-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2403-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0278-private-supervision-executable-evidence-matrix.md",
+  "crates/ling-eval/src/actor_supervisor.rs",
+  "crates/ling-eval/src/actor_supervisor_evidence.rs",
   "docs/status/SUP-2403-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/SUP-2403-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0103-supervision-test-evidence.md",
@@ -11044,21 +11048,21 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The current audit recognizes that ACT-2301 through ACT-2306 and SUP-2401/SUP-2402 are Done under Accepted DEC-0270 through DEC-0277, but DEC-0277 explicitly excludes the distinct SUP-2403 completion claim.",
-  "Accepted DEC-0278 maps the stale plan scenarios to supported ContainOne, initializer-Fault restart, circuit Open, parent stop/cancellation, mailbox discard, and root-fallback outcomes or to explicit unsupported restore/escalation/concurrent-recovery boundaries.",
-  "The accepted matrix consumes CheckedProgram and the real private Actor/Supervisor runtime, uses finite explicit command scripts and in-memory bounded projections, and compares Unicode/BOM/CRLF/source-identity/insertion-order reconstruction without creating a fixture protocol.",
-  "Accepted DEC-0103 authorizes only the publish-disabled supervision scenario test corpus; it does not close fixture-schema, execution, transition, outcome, cleanup, replay, or differential gaps.",
-  "Accepted DEC-0278 closes only SUP-2403's private executable-evidence authority blocker and adds no new runtime behavior or public API.",
-  "State restore, escalation, parallel/group recovery, public fixture/query/diagnostic protocols, Replay, remote/backend differential evidence, migration, fairness/liveness/performance, and Stable compatibility remain deferred.",
+  "Accepted DEC-0278 clauses 1-3 authorize exactly one crate-private cfg(test) ling-eval matrix with eight named case families over Accepted DEC-0274 through DEC-0277 behavior.",
+  "The matrix constructs successful immutable CheckedProgram values and directly executes the real private Actor/Supervisor runtime; it reuses focused assertions only where they visibly prove the complete required outcomes.",
+  "The eight cases cover ContainOne single/sequential Faults, fresh restart, initializer Fault, exact Open/HalfOpen circuit behavior, stop/cancellation mailbox cleanup, terminal root fallback, and Unicode/BOM/CRLF reconstruction determinism.",
+  "Negative inventory assertions prove no public Supervisor module or callable restore, escalation, group/dynamic recovery, serialization, Replay, or Serde production surface was added.",
+  "Focused ling-eval tests and strict Clippy, the CLI Actor boundary, full locked/offline workspace tests, 174 xtask tests, governance/status/docs/RC0 gates, formatting, and diff checks pass for implementation commit d175501b007cf59928c47f9221f5a451d4fd1963.",
+  "Public Actor execution remains L-ACTOR-0002; state restore, escalation, parallel/group recovery, public fixture/query/diagnostic protocols, Replay, remote/backend differential evidence, migration, fairness/liveness/performance, and Stable compatibility remain deferred.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "d175501b007cf59928c47f9221f5a451d4fd1963"
+completion_commit = "d175501b007cf59928c47f9221f5a451d4fd1963"
+integration_state = "committed"
+completed = "2026-09-01"
 notes = [
-  "ACT-2301 through ACT-2306 and SUP-2401/SUP-2402 are Done under scoped Accepted decisions; Accepted DEC-0278 makes SUP-2403 Ready for its bounded private evidence matrix.",
-  "Current private Actor/Supervisor tests cover DEC-0274 through DEC-0277 behavior, but they do not by themselves authorize SUP-2403's broader state-restore, escalation, public fixture, Replay, cross-backend, or conformance claims; compiler-query scheduling is not runtime evidence.",
-  "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, Supervisor, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
+  "Implementation commit d175501b007cf59928c47f9221f5a451d4fd1963 completes only DEC-0278's private executable-evidence boundary and adds no production runtime behavior or public API.",
+  "GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open for broader/public supervision; GAP-DETERMINISTIC-REPLAY-001 remains Open for REP-2501 onward.",
+  "No diagnostic, schema, Semantic ID, compatibility version, dependency, migration, source-span unit, or Unicode 17.0.0 behavior changed.",
 ]
 
 [[task]]
