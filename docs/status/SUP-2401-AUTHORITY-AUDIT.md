@@ -2,8 +2,9 @@
 
 ## Outcome
 
-SUP-2401 is Ready for one bounded internal implementation slice under Accepted
-DEC-0276. That decision authorizes exactly one optional, run-owned,
+SUP-2401 is Done for one bounded internal implementation slice under Accepted
+DEC-0276. Commit `10f8e0c1d09177c97adbfcef283b2ed6c314649d`
+implements exactly one optional, run-owned,
 non-nested local Supervisor with a fixed duplicate-free child set and the
 `ContainOne` policy. A contained child is terminal; unaffected siblings keep
 running; no child is restarted or restored.
@@ -38,26 +39,29 @@ Every public Actor-bearing execution route must continue to stop with
   restart, escalation, parallel recovery, and public Supervisor behavior. It no
   longer blocks the narrower internal SUP-2401 slice.
 
-## Current implementation boundary
+## Implemented boundary
 
-- `crates/ling-eval/src/actor_runtime.rs` already owns the real checked Actor
-  registry and performs deterministic spawn, send, step, stop, Fault cleanup,
-  and Task-root cancellation.
-- Its current turn-Fault path immediately cancels the root and closes every
-  sibling. Therefore a correct implementation must modify that coordinator
-  boundary so only a valid synchronous Supervisor acknowledgement suppresses
-  the existing fallback. A wrapper that observes the result after cancellation
-  cannot satisfy DEC-0276.
+- `crates/ling-eval/src/actor_runtime.rs` owns the real checked Actor registry
+  and performs deterministic spawn, send, step, stop, Fault cleanup, and
+  Task-root cancellation. Its private `ActorFaultPolicy` keeps `CancelRoot` as
+  the default and permits `SupervisorContainment` only through the crate-private
+  supervised constructor.
+- `crates/ling-eval/src/actor_supervisor.rs` owns the fixed canonical child
+  slots, constructs children failure-atomically, validates the synchronous
+  report against the retained Actor Fault and event, and acknowledges before
+  returning the coordinator boundary. Invalid acknowledgement fails the real
+  runtime, stops siblings, and cancels the root; containment is not fabricated
+  after cancellation.
 - Initializer Fault already retires the reserved Actor identity, cleans live
   siblings, fails the runtime, and cancels the owner. This is the required
   failure-atomic Supervisor-construction outcome; no recovery path is needed.
-- The existing no-Supervisor constructor and behavior must remain unchanged.
-  The new Supervisor surface remains internal to `ling-eval` and must not be
-  re-exported as a public Rust embedding API.
+- The existing no-Supervisor constructor and behavior remain unchanged. The
+  Supervisor module is internal to `ling-eval` and is not re-exported as a
+  public Rust embedding API.
 
-## Required implementation evidence
+## Completion evidence
 
-The SUP-2401 implementation must prove:
+The SUP-2401 tests prove:
 
 1. empty, duplicate, unknown, wrong-program, malformed, and over-limit child
    sets fail before Supervisor publication;

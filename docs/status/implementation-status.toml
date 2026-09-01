@@ -3687,7 +3687,7 @@ notes = [
 [[task]]
 id = "ZED-6804"
 title = "DAP Status"
-state = "Ready"
+state = "BlockedSpec"
 release = "G6"
 size = "M"
 owner = "Codex"
@@ -9369,7 +9369,6 @@ spec = [
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
-  "docs/decisions/0276-minimal-local-supervisor-containment.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/decisions/0264-structured-task-frontend-core.md",
@@ -10761,7 +10760,7 @@ notes = [
 [[task]]
 id = "SUP-2401"
 title = "Supervisor model"
-state = "BlockedSpec"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10775,6 +10774,7 @@ spec = [
   "docs/decisions/0010-state-and-capability-model.md",
   "docs/decisions/0013-main-and-runtime-failures.md",
   "docs/decisions/0018-rfc-0001-lifecycle.md",
+  "docs/decisions/0276-minimal-local-supervisor-containment.md",
   "docs/RFC-0001.md",
   "docs/RFC-0020.md",
   "docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md",
@@ -10784,12 +10784,12 @@ spec = [
 ]
 artifacts = [
   "docs/status/SUP-2401-AUTHORITY-AUDIT.md",
+  "docs/status/SUP-2401-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0276-minimal-local-supervisor-containment.md",
-  "docs/status/SUP-2401-OBSERVATION-AUTHORITY-AUDIT.md",
-  "docs/status/SUP-2401-OBSERVATION-IMPLEMENTATION-REPORT.md",
-  "docs/decisions/0101-supervisor-observation.md",
-  "crates/ling-concurrency/src/supervisor.rs",
-  "crates/ling-concurrency/src/lib.rs",
+  "crates/ling-eval/src/actor_runtime.rs",
+  "crates/ling-eval/src/actor_supervisor.rs",
+  "crates/ling-eval/src/lib.rs",
+  "crates/ling-cli/tests/actor_boundary.rs",
   "docs/governance/authority.toml",
   "docs/governance/authority.md",
   "docs/governance/lifecycle.toml",
@@ -10798,22 +10798,21 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The audit records the missing supervisor/child ownership and state machine, restart/stop/escalate strategies, child lifetime classes, budgets/windows, state restore, parent Fault channel, mailbox/cancellation, diagnostics, protocol, resource, and migration contracts.",
-  "The audit distinguishes SEMANTICS/LANGUAGE/ROADMAP high-level supervision requirements and host-only runtime Fault/cancellation from the absent Accepted RFC-C204 authority, and preserves the checked-only evaluation boundary.",
-  "The audit covers single/multiple/repeated child Faults, each restart strategy and lifetime class, budget exhaustion, state-restore failure, parent shutdown, mailbox cleanup, concurrent failures, Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM/runtime differential fixtures.",
-  "Accepted DEC-0101 authorizes only the publish-disabled Supervisor-observation child; it does not close child ownership, strategy, restart budget, state restore, Fault channel, runtime, or shutdown gaps.",
-  "Accepted DEC-0276 clauses 1-17 authorize exactly one optional non-nested fixed-child local Supervisor with synchronous ContainOne Fault acknowledgement and no restart.",
-  "The implementation must change the real DEC-0274 runtime Fault path so a valid synchronous Supervisor acknowledgement suppresses only the no-Supervisor root-cancellation fallback; an outer wrapper may not fabricate containment after root cancellation.",
-  "The required evidence covers failure-atomic construction, canonical child order, sibling preservation, invalid/stale/duplicate report fallback, explicit stop and owner cancellation, exact cleanup, bounded resources, deterministic reconstruction, and the unchanged L-ACTOR-0002 public boundary.",
+  "Accepted DEC-0276 clauses 1-17 authorize and bound the implemented checked-Core-only, optional, non-nested, fixed-child local Supervisor with synchronous ContainOne Fault acknowledgement and no restart.",
+  "ActorRuntime retains CancelRoot as its default private Fault policy; only the crate-private supervised constructor selects SupervisorContainment, so the existing no-Supervisor root-cancellation behavior and public Rust exports remain unchanged.",
+  "The implementation canonically creates one child per ActorTypeId, fails construction atomically, seals only a valid faulting child, preserves siblings, and turns stale, duplicate, cross-run, wrong-identity, inconsistent, or unrecordable reports into Supervisor/runtime failure plus root cancellation.",
+  "Tests cover successive containment through all children, closed post-Fault admission, explicit stop, owner cancellation, exactly-once cleanup, command/event/shutdown reserve preflight, Unicode/BOM/CRLF source spans, and deterministic child ordering without restart or restore.",
+  "cargo test -p ling-eval --all-targets --locked --offline, strict ling-eval Clippy, the ling-cli actor boundary, and cargo test --workspace --all-targets --locked --offline pass; every public Actor route retains L-ACTOR-0002.",
+  "GAP-ACTOR-MAILBOX-SUPERVISOR-001 remains Open and SUP-2402/SUP-2403 remain BlockedSpec for restart budgets, circuit breaking, escalation, parallel recovery, and public Supervisor behavior.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "ready"
-completed = ""
+verified_against_commit = "10f8e0c1d09177c97adbfcef283b2ed6c314649d"
+completion_commit = "10f8e0c1d09177c97adbfcef283b2ed6c314649d"
+integration_state = "committed"
+completed = "2026-09-01"
 notes = [
-  "ACT-2301 through ACT-2306 are Done and Accepted DEC-0276 removes SUP-2401's scoped internal authority blocker; the task is Ready for its ContainOne vertical slice.",
-  "Public supervision, restart, budget, state restore, escalation, parallel recovery, and Supervisor protocols remain blocked by absent RFC-C204/RFC-0009 and GAP-ACTOR-MAILBOX-SUPERVISOR-001.",
-  "No implementation or completion is claimed yet; the accepted decision changes no compiler, interpreter, VM, bytecode, scheduler, mailbox, diagnostics, schemas, Semantic IDs, source spans, public runtime support, or Unicode 17.0.0 behavior by itself.",
+  "SUP-2401 completes only DEC-0276's internal Experimental ContainOne profile. The Supervisor module is not re-exported, accepts no dynamic or nested children, and exposes no source, CLI, schema, protocol, backend, or Stable surface.",
+  "Automatic restart, replacement identity, budget/window/backoff/circuit behavior, snapshot/restore, mailbox transfer, lifetime classes, escalation, parallel recovery, and public Fault channels remain SUP-2402/SUP-2403 or later Accepted work.",
+  "No compiler frontend, public interpreter entry, VM, bytecode, public scheduler, mailbox protocol, diagnostic, schema, Semantic ID, source-span unit, migration, or Unicode 17.0.0 behavior changed.",
 ]
 
 [[task]]

@@ -457,7 +457,7 @@
 | `STD-6302-OBSERVATION` | Internal Convenience API Removal Audit boundary evidence | `G6` | `S` | `Done` | `STD-6301-OBSERVATION` | `74eff3886fd9305f1c4bdc3c78025a7289200a81` |
 | `STD-6303` | Unicode and Chinese-Programming Stability | `G6` | `L` | `BlockedSpec` | `STD-6302` | `` |
 | `STD-6303-OBSERVATION` | Internal Unicode and Chinese-programming stability boundary evidence | `G6` | `S` | `Done` | `STD-6302-OBSERVATION` | `e4d1aa815a6f9da69dfe6036d73e7fa9a1a8ef47` |
-| `SUP-2401` | Supervisor model | `G2` | `L` | `BlockedSpec` | `ACT-2305` | `` |
+| `SUP-2401` | Supervisor model | `G2` | `L` | `Done` | `ACT-2305` | `10f8e0c1d09177c97adbfcef283b2ed6c314649d` |
 | `SUP-2401-OBSERVATION` | Internal Supervisor observation | `G2` | `S` | `Done` | `ACT-2306-PROPERTY-OBSERVATION` | `c29d95c7bc7b926c92757b2c32fccf960500e421` |
 | `SUP-2402` | Restart budgets and circuit breakers | `G2` | `L` | `BlockedSpec` | `SUP-2401` | `` |
 | `SUP-2402-OBSERVATION` | Internal restart-budget observation | `G2` | `S` | `Done` | `SUP-2401-OBSERVATION` | `7ee0cf0bf90971bb6844c8bf467f5506e5e5e796` |
@@ -522,7 +522,7 @@
 | `ZED-6803` | Full Zed Extension Acceptance | `G6` | `L` | `BlockedSpec` | `ZED-6802` | `` |
 | `ZED-6803-CURRENT-EVIDENCE` | Current grammar, LSP, and position acceptance evidence | `G6` | `S` | `Done` | `ZED-6801-CURRENT-EVIDENCE`, `ZED-6802-CURRENT-EVIDENCE`, `ZED-6803-SEED` | `75ac1729356af7ac4af5b0d7b6304d7e6f3adf5b` |
 | `ZED-6803-SEED` | Seed Zed extension acceptance inventory drift gate | `G6` | `S` | `Done` | `ZED-6802-SEED` | `75b6dd213dc1b07717f8cf2718dbe939176b76ae` |
-| `ZED-6804` | DAP Status | `G6` | `M` | `Ready` | `ZED-6803` | `` |
+| `ZED-6804` | DAP Status | `G6` | `M` | `BlockedSpec` | `ZED-6803` | `` |
 | `ZED-6804-CURRENT-EVIDENCE` | Current DAP observation evidence | `G6` | `S` | `Done` | `DAP-3601-OBSERVATION`, `DAP-3602-OBSERVATION`, `DAP-3603-OBSERVATION`, `ZED-6803-CURRENT-EVIDENCE`, `ZED-6804-SEED` | `e6987c928437d5c5d80b92051b6df8f5c0fafbcf` |
 | `ZED-6804-SEED` | Seed DAP status inventory drift gate | `G6` | `S` | `Done` | `ZED-6803-SEED` | `cf49269ecee39eeb8f3033a5520127f2837f4755` |
 | `ZQ-3201` | Syntax highlighting queries | `G1` | `S` | `Done` | `TS-3108` | `77aab24ff8160e1535ea15b67d5302c1a4bb3fc8` |
