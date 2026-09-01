@@ -151,7 +151,7 @@ fn invalid_or_resource_root_fallback() {
 }
 
 #[test]
-fn unicode_reconstruction_determinism() {
+pub(crate) fn unicode_reconstruction_determinism() {
     assert_registered(
         EvidenceCase::UnicodeReconstructionDeterminism,
         "unicode-reconstruction-determinism",

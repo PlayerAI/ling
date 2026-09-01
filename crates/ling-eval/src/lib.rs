@@ -20,6 +20,9 @@ use num_bigint::BigInt;
 mod actor_runtime;
 #[cfg_attr(not(test), allow(dead_code))]
 mod actor_supervisor;
+#[cfg(test)]
+#[path = "determinism_evidence.rs"]
+mod determinism_evidence;
 mod machine;
 mod task_local_scheduler;
 mod task_runtime;

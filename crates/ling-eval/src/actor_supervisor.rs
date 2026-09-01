@@ -1299,7 +1299,7 @@ const fn runtime_fault_category(kind: &RuntimeFaultKind) -> &'static str {
 
 #[cfg(test)]
 #[path = "actor_supervisor_evidence.rs"]
-mod evidence_tests;
+pub(crate) mod evidence_tests;
 
 #[cfg(test)]
 mod tests {

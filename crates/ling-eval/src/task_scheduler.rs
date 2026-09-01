@@ -1915,7 +1915,7 @@ fn push_u64(output: &mut Vec<u8>, value: u64) {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use ling_ast::lower as lower_ast;
     use ling_effects::check;
     use ling_hir::lower as lower_hir;
@@ -2070,7 +2070,7 @@ mod tests {
     }
 
     #[test]
-    fn replay_reports_the_first_mutated_selection_field() {
+    pub(crate) fn replay_reports_the_first_mutated_selection_field() {
         let checked = checked(PARENT);
         let root = task(&checked, "parent");
         let original = run_task_schedule(
@@ -2147,7 +2147,7 @@ mod tests {
     }
 
     #[test]
-    fn replay_reports_deadline_host_and_terminal_mutations_at_their_event() {
+    pub(crate) fn replay_reports_deadline_host_and_terminal_mutations_at_their_event() {
         let echo = checked(concat!(
             "module Main\n\n",
             "task echo value =\n",
