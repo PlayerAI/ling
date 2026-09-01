@@ -7933,3 +7933,29 @@ unresolved_alternatives = [
   "Public or serialized supervision fixtures and cross-process deterministic comparison require separate versioning, privacy, resource, migration, and compatibility decisions.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0279"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0279-private-local-determinism-class-evidence-matrix.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-09-01"
+proposed = "2026-09-01"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "Execute exactly five private determinism-category cases against real checked Seed, DEC-0267 Task test scheduler/replay, DEC-0268 production Task, and DEC-0274 through DEC-0278 Actor/Supervisor routes.",
+  "Keep SEMANTICS section 22.1 evidence labels separate from DEC-0104 provisional plan vocabulary and compare only each case's bounded accepted projection across deterministic reconstruction.",
+  "Prove the absence of production/public class, build or Semantic Graph metadata, Effect Log, Replay header, diagnostics, protocols, and cross-process/backend claims while retaining Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "Proposes private cfg(test) executable evidence only and adds no production runtime classifier, transition, or public API.",
+  "Proposes no source, CLI/LSP/editor, diagnostic, schema, Semantic ID, protocol, package/ABI, bytecode/VM/backend, stored-data, migration, dependency, or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Public class names and parameters, inference, declarations, composition, equivalence, metadata, Semantic Graph and Replay-header fields, diagnostics, and migration remain RFC-0010 work.",
+  "Effect Log/event protocol choice, privacy/redaction, integrity, corruption, divergence, checkpoints, Actor messages, cross-process/backend replay, performance, and Stable support remain REP-2502 through REP-2506 or later authority.",
+]
+superseded_by = ""

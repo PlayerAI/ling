@@ -4485,3 +4485,16 @@ covers = ["SUP-2403 private checked-runtime evidence matrix", "accepted supervis
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "DEC-0010", "DEC-0013", "DEC-0103", "DEC-0274", "DEC-0275", "DEC-0276", "DEC-0277", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0279"
+title = "Private local determinism-class evidence matrix"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0279-private-local-determinism-class-evidence-matrix.md"
+covers = ["REP-2501 private five-category executable evidence matrix", "checked pure seeded input-driven schedule-driven and nondeterministic local execution boundaries", "SEMANTICS category evidence without plan-label aliasing", "explicit absence of public class metadata Effect Log and Replay protocol"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "RFC-0020", "DEC-0010", "DEC-0013", "DEC-0104", "DEC-0267", "DEC-0268", "DEC-0274", "DEC-0276", "DEC-0277", "DEC-0278", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY"]
+supersedes = []
+stable_basis = false
