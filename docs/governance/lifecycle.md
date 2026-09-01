@@ -334,7 +334,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0274` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0274](../decisions/0274-minimal-local-actor-runtime.md) |
 | `DEC-0275` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-08-31` | [DEC-0275](../decisions/0275-local-actor-property-and-stress-evidence.md) |
 | `DEC-0276` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-01` | [DEC-0276](../decisions/0276-minimal-local-supervisor-containment.md) |
-| `DEC-0277` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0277](../decisions/0277-bounded-deterministic-local-supervisor-restart.md) |
+| `DEC-0277` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-01` | [DEC-0277](../decisions/0277-bounded-deterministic-local-supervisor-restart.md) |
 
 ## Migration boundary
 

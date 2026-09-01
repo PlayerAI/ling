@@ -1,20 +1,20 @@
 # DEC-0277: Bounded deterministic local Supervisor restart / 有界确定性本地 Supervisor 重启
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-09-01<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-09-01<br>
 > Owner role：actor-semantics<br>
 > 相关 RFC/缺口：DEC-0010 | DEC-0013 | DEC-0102 | DEC-0268 | DEC-0270 | DEC-0271 | DEC-0272 | DEC-0273 | DEC-0274 | DEC-0275 | DEC-0276 | GAP-ACTOR-MAILBOX-SUPERVISOR-001 | GAP-DETERMINISTIC-REPLAY-001 | SUP-2402<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`
 
-This proposal defines the smallest internal restart-budget and circuit-breaker
+This decision defines the smallest internal restart-budget and circuit-breaker
 profile that can extend DEC-0276 without introducing wall-clock scheduling,
-state restoration, public queries, Replay, remote, or backend semantics. While
-it remains Proposed, it is not implementation authority for SUP-2402.
+state restoration, public queries, Replay, remote, or backend semantics. It is
+Accepted scoped authority for the private SUP-2402 vertical slice only.
 
-本提案定义可扩展 DEC-0276 的最小内部 restart-budget 与 circuit-breaker
-profile，同时不引入 wall clock 调度、状态恢复、公开查询、Replay、远程或后端语义。在状态仍为
-Proposed 时，它不是 SUP-2402 的实现权威。
+本决定定义可扩展 DEC-0276 的最小内部 restart-budget 与 circuit-breaker
+profile，同时不引入 wall clock 调度、状态恢复、公开查询、Replay、远程或后端语义。它只为
+SUP-2402 的私有纵切提供 Accepted scoped authority。
 
 ## Question
 
@@ -25,11 +25,10 @@ Closed/Open/HalfOpen circuit without changing any public Ling behavior?
 
 ## Decision
 
-1. **Proposed authority boundary.** If Accepted, this decision authorizes only
+1. **Accepted authority boundary.** This decision authorizes only
    an internal Experimental SUP-2402 profile in `ling-eval`. It does not close
    either related gap, authorize SUP-2403, expose Supervisor execution, or make
-   restart timing a Ling language or compatibility guarantee. No implementation
-   may cite this document while its lifecycle state is Proposed.
+   restart timing a Ling language or compatibility guarantee.
 
 2. **Checked inputs and fixed ownership.** The restarting profile consumes the
    same successful immutable `CheckedProgram`, run-owned local Task root,
@@ -161,7 +160,7 @@ Closed/Open/HalfOpen circuit without changing any public Ling behavior?
     continues to stop with `L-ACTOR-0002`. Unicode remains 17.0.0 and original
     UTF-8 byte spans remain authoritative.
 
-18. **Completion boundary.** Acceptance would authorize only the private
+18. **Completion boundary.** This decision authorizes only the private
     `RestartOneBudgeted` vertical slice and its executable evidence. SUP-2402 is
     Done only after the real DEC-0276 Supervisor/Actor runtime implements these
     transitions and all repository gates pass. SUP-2403, public observability,
@@ -172,7 +171,7 @@ Closed/Open/HalfOpen circuit without changing any public Ling behavior?
 
 - Reject zero/overflowing configuration, incompatible resource bounds,
   non-monotonic ticks, unchecked inputs, dynamic/duplicate children, and every
-  policy other than existing `ContainOne` or proposed `RestartOneBudgeted`
+  policy other than existing `ContainOne` or accepted `RestartOneBudgeted`
   before publication.
 - Fault a child at known ticks and prove exact half-open window boundaries,
   fixed backoff eligibility, attempt counting for successful and initializer-
@@ -201,10 +200,10 @@ Closed/Open/HalfOpen circuit without changing any public Ling behavior?
 - Diagnostics, schemas, Semantic IDs, protocols, packages, ABI, and stored data:
   none; configuration, logical ticks, attempts, circuits, and provenance remain
   private Experimental Rust state with no serialization or migration contract.
-- Runtime: if Accepted and implemented, adds one explicit private restart
-  policy while preserving DEC-0276 `ContainOne` and DEC-0274 no-Supervisor
-  behavior. Restarted children receive new runtime identities and initializer
-  state; existing public APIs remain unchanged.
+- Runtime: authorizes one explicit private restart policy while preserving
+  DEC-0276 `ContainOne` and DEC-0274 no-Supervisor behavior. Once implemented,
+  restarted children receive new runtime identities and initializer state;
+  existing public APIs remain unchanged.
 - Determinism and Unicode: decisions use explicit logical ticks, checked
   identities, and serialized canonical commands—not host time or scheduling;
   Unicode 17.0.0 and original UTF-8 byte spans are unchanged.

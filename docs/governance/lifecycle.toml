@@ -7885,13 +7885,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0277"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0277-bounded-deterministic-local-supervisor-restart.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-09-01"
 proposed = "2026-09-01"
-decided = ""
-stable_basis = false
+decided = "2026-09-01"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Exercise exact logical-window and fixed-backoff boundaries, successful and initializer-Fault attempt accounting, fresh Actor identities and initializer state, and unaffected-sibling preservation against the real checked local Supervisor runtime.",

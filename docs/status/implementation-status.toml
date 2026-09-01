@@ -10876,7 +10876,7 @@ notes = [
 [[task]]
 id = "SUP-2402"
 title = "Restart budgets and circuit breakers"
-state = "BlockedSpec"
+state = "Ready"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -10919,21 +10919,21 @@ artifacts = [
   "docs/status/implementation-status.toml",
 ]
 acceptance = [
-  "The updated audit records that ACT-2301 through ACT-2306 and SUP-2401 are Done, while restart replacement identity, attempts, logical windows, backoff, circuit transitions, initializer Faults, and provenance still lack Accepted authority.",
-  "Proposed DEC-0277 specifies one reviewable checked-Core-only private RestartOneBudgeted profile with explicit logical ticks, independent per-slot half-open windows, fixed backoff, Closed/Open/HalfOpen transitions, fresh Actor identities, initializer-only state, and bounded last-Fault provenance.",
-  "The proposal defines exact window, attempt, overflow, backoff, circuit, cleanup, cancellation, Unicode/CRLF/BOM, resource, determinism, and negative public-boundary evidence while deferring state restore, mailbox transfer, public query/Replay, remote/backend, and Stable behavior.",
+  "ACT-2301 through ACT-2306 and SUP-2401 are Done, and Accepted DEC-0277 closes the scoped private authority blocker for restart replacement identity, attempts, logical windows, fixed backoff, circuit transitions, initializer Faults, and bounded provenance.",
+  "Accepted DEC-0277 clauses 1-18 specify one checked-Core-only private RestartOneBudgeted profile with explicit logical ticks, independent per-slot half-open windows, fixed backoff, Closed/Open/HalfOpen transitions, fresh Actor identities, initializer-only state, and bounded last-Fault provenance.",
+  "Required evidence covers exact window/attempt/overflow boundaries, successful and initializer-Fault restart, backoff, circuit reopening, cancellation, cleanup, Unicode/CRLF/BOM, resource limits, determinism, and unchanged L-ACTOR-0002 public behavior.",
   "Accepted DEC-0102 authorizes only the publish-disabled restart-budget observation child; it does not close clock, budget, backoff, circuit, provenance, query, runtime, or replay gaps.",
-  "DEC-0277 remains Proposed and is not implementation authority; no restart counter, budget, backoff scheduler, circuit breaker, Fault provenance store, runtime query, diagnostic allocation, public protocol, or placeholder G2 API is added by this drafting milestone.",
-  "If Accepted, implementation must modify the real DEC-0276 Supervisor/Actor runtime path, preserve ContainOne and L-ACTOR-0002, and pass executable recovery, resource, cleanup, determinism, and repository gates before SUP-2402 can be Done.",
+  "Implementation must modify the real DEC-0276 Supervisor/Actor runtime path rather than the DEC-0102 observation model, while preserving ContainOne and L-ACTOR-0002.",
+  "SUP-2402 becomes Done only after executable recovery, resource, cleanup, determinism, and repository gates pass; public query/Replay, state restore, remote/backend, group strategies, and Stable behavior remain deferred.",
 ]
 verified_against_commit = ""
 completion_commit = ""
-integration_state = "blocked"
+integration_state = "ready"
 completed = ""
 notes = [
-  "SUP-2402 remains BlockedSpec until Proposed DEC-0277 is reviewed and Accepted; its implementation dependency SUP-2401 is Done, while GAP-ACTOR-MAILBOX-SUPERVISOR-001 and GAP-DETERMINISTIC-REPLAY-001 stay Open for broader behavior.",
+  "Accepted DEC-0277 removes SUP-2402's scoped private authority blocker; GAP-ACTOR-MAILBOX-SUPERVISOR-001 and GAP-DETERMINISTIC-REPLAY-001 stay Open for broader and public behavior.",
   "The existing private Supervisor implements ContainOne only. Current source/types/effects/public evaluator/bytecode/VM have no restart loop, logical clock, public budget/circuit state, runtime query, or public supervision protocol.",
-  "This drafting milestone changes governance and planning evidence only; it changes no compiler, interpreter, VM, bytecode, runtime execution, diagnostic, schema, Semantic ID, source span, public protocol, or Unicode 17.0.0 behavior.",
+  "The accepted decision changes governance only until implementation lands; it changes no compiler, interpreter, VM, bytecode, runtime execution, diagnostic, schema, Semantic ID, source span, public protocol, or Unicode 17.0.0 behavior by itself.",
 ]
 
 [[task]]

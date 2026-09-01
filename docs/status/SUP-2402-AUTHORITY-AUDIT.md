@@ -2,20 +2,19 @@
 
 ## Outcome
 
-`SUP-2402` remains correctly recorded as `BlockedSpec`. Its implementation
-dependency is now satisfied: SUP-2401 is Done under Accepted DEC-0276 and the
-real checked-Core local Supervisor can contain a child Fault. The remaining
-blocker is semantic authority for replacement identity, restart attempts,
-logical windows, backoff, circuit transitions, initializer Faults, and
-provenance.
+`SUP-2402` is Ready for one bounded private implementation slice. SUP-2401 is
+Done under Accepted DEC-0276, the real checked-Core local Supervisor can contain
+a child Fault, and Accepted DEC-0277 now fixes replacement identity, restart
+attempts, logical windows, backoff, circuit transitions, initializer Faults,
+and bounded provenance for the scoped `RestartOneBudgeted` profile.
 
-Proposed DEC-0277 now supplies a reviewable minimal design: an opt-in private
+Accepted DEC-0277 supplies the minimal design: an opt-in private
 `RestartOneBudgeted` profile with explicit logical ticks, an independent
 per-child sliding attempt budget, fixed backoff, Closed/Open/HalfOpen circuit
 states, fresh Actor identities, initializer-only state, and bounded last-Fault
-provenance. Because it is Proposed, it is not implementation authority and no
-restart counter, scheduler, circuit, runtime query, diagnostic, protocol, or
-placeholder public API has been added.
+provenance. No restart counter, scheduler, circuit, runtime query, diagnostic,
+protocol, or placeholder public API has been added yet; implementation and
+executable evidence remain pending.
 
 Accepted DEC-0102 authorizes the bounded child `SUP-2402-OBSERVATION`,
 which records only immutable budget/circuit observation identities and
@@ -43,11 +42,12 @@ provenance, query, runtime, or replay gaps described below.
   Faults, DEC-0018 governs RFC lifecycle, DEC-0021 covers only compiler-query
   scheduling, and RFC-0020 excludes Ling Task/Actor scheduling and replay.
   Accepted DEC-0276 authorizes fixed-child `ContainOne` only and explicitly
-  requires separate SUP-2402 authority before restart. Proposed DEC-0277 is
-  that candidate authority but cannot authorize implementation until Accepted.
-- `GAP-ACTOR-MAILBOX-SUPERVISOR-001` remains Open and blocks SUP-2402; its
-  required evidence includes stress, ordering, backpressure, and resource
-  limits.
+  requires separate SUP-2402 authority before restart. Accepted DEC-0277 is
+  that scoped private authority.
+- `GAP-ACTOR-MAILBOX-SUPERVISOR-001` remains Open for broader/public Supervisor
+  behavior, SUP-2403, escalation, parallel recovery, Replay, ordering,
+  backpressure, and resource evidence. It no longer blocks DEC-0277's narrower
+  private SUP-2402 slice.
 
 ## Current implementation boundary
 
@@ -71,10 +71,9 @@ provenance, query, runtime, or replay gaps described below.
 - Existing VM resource limits and compiler-query scheduling are not Actor
   restart controls and cannot establish recovery or liveness properties.
 
-## Proposed authority and remaining review
+## Accepted implementation boundary
 
-DEC-0277 proposes the minimum private vertical slice needed before SUP-2402 can
-move to implementation:
+DEC-0277 authorizes the following minimum private vertical slice for SUP-2402:
 
 1. one opt-in `RestartOneBudgeted` policy over DEC-0276's existing fixed slots,
    with one immutable `(max_restarts, window_ticks, backoff_ticks)`
@@ -92,14 +91,13 @@ move to implementation:
    while retaining `L-ACTOR-0002` and adding no public query, schema, protocol,
    diagnostic, Replay, remote, or backend surface.
 
-The proposal must be reviewed and moved to Accepted before any production
-restart implementation begins. Its explicit non-goals keep public
-observability, Replay, state restore, group strategies, remote behavior,
-fairness/liveness, and Stable compatibility under their existing gaps.
+Its explicit non-goals keep public observability, Replay, state restore, group
+strategies, remote behavior, fairness/liveness, and Stable compatibility under
+their existing gaps.
 
 ## Evidence and compatibility
 
-This audit and Proposed DEC-0277 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This audit and Accepted DEC-0277 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0010, DEC-0013, DEC-0018,
 DEC-0021, DEC-0102, DEC-0274, DEC-0275, DEC-0276, RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
@@ -114,8 +112,8 @@ Supervisor, diagnostic, schema, Semantic ID, source-span, runtime, or Unicode
 
 ## Intentionally deferred
 
-`SUP-2402` implementation remains deferred until DEC-0277 is Accepted. Even
-after that scoped implementation, wall-clock or jitter scheduling, mutable or
+SUP-2402 implementation may now begin only within DEC-0277's scoped private
+profile. Wall-clock or jitter scheduling, mutable or
 persisted configuration, state snapshot/restore, mailbox transfer, stable
 references, dynamic/nested trees, lifetime classes, group restart, escalation,
 parallel recovery, public query/metrics/Fault protocols, Replay, remote
