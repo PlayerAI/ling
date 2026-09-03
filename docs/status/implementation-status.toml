@@ -11250,7 +11250,7 @@ notes = [
 [[task]]
 id = "REP-2502"
 title = "Replay log schema"
-state = "BlockedSpec"
+state = "Done"
 release = "G2"
 size = "L"
 owner = "Codex"
@@ -11279,7 +11279,10 @@ spec = [
 ]
 artifacts = [
   "docs/status/REP-2502-AUTHORITY-AUDIT.md",
+  "docs/status/REP-2502-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0280-private-local-replay-record-structure-evidence.md",
+  "crates/ling-eval/src/replay_structure_evidence.rs",
+  "crates/ling-eval/src/task_scheduler.rs",
   "docs/status/REP-2502-OBSERVATION-AUTHORITY-AUDIT.md",
   "docs/status/REP-2502-OBSERVATION-IMPLEMENTATION-REPORT.md",
   "docs/decisions/0105-replay-schema-field-evidence.md",
@@ -11296,18 +11299,20 @@ acceptance = [
   "The refreshed audit records the missing canonical public event envelope/bytes, IDs/types, ordering, identity, checksum, class/toolchain/profile/schema, migration, payload, privacy/redaction, corruption, divergence, diagnostics, protocol, resource, and cross-process contracts.",
   "The audit distinguishes DEC-0012 Seed Semantic ID/canonical bytes from the absent Accepted RFC-C205 replay wire authority and preserves the checked-only evaluation boundary.",
   "Accepted DEC-0105 authorizes only test-only replay-schema field vocabulary evidence; it does not close wire, payload, identity, integrity, privacy, migration, or runtime gaps.",
-  "Proposed DEC-0280 defines exactly five crate-private non-serialized structure-evidence cases and a complete thirteen-concern disposition over validated DEC-0267 Task traces; it is not implementation authority until Accepted.",
-  "DEC-0280 keeps checksum, determinism-class metadata, toolchain, profile, migration, and privacy explicitly deferred and does not promote TaskScheduleTrace canonical bytes into a public Effect Log or Replay schema.",
-  "No replay schema, encoder/decoder, event ID assignment, checksum rule, redaction policy, protocol inventory implementation, diagnostic allocation, public protocol, or placeholder G2 API is added while DEC-0280 remains Proposed.",
-  "The future implementation must consume accepted effect/runtime traces and checked Core only, register versioned schema and integrity/privacy rules, and publish cross-process and cross-backend evidence before exposing replay logs.",
+  "Accepted DEC-0280's exact five crate-private non-serialized cases execute validated private-envelope, event identity/kind/order, typed payload/terminal, mutation/limit rejection, and public-schema absence evidence over real DEC-0267 Task traces.",
+  "The duplicate-free thirteen-concern inventory maps canonical envelope, event ID/kind, ordering, identity, private trace version, and payload to existing private evidence while explicitly deferring checksum, determinism-class metadata, toolchain, profile, migration, and privacy.",
+  "Implementation commit ca1fcce6f435fb8419acc97fe813f3a773d5df8b adds only crate-private cfg(test) evidence, directly executes complete DEC-0267 validation and mutation assertions, and rejects every zero scheduler and runtime bound before execution.",
+  "Repeated LF and reconstructed Unicode/BOM/CRLF success and host-Fault traces validate and have identical canonical bytes while source names and original UTF-8 spans remain sidecar evidence.",
+  "No public replay schema, encoder/decoder, checksum rule, redaction policy, protocol implementation, diagnostic allocation, CLI command, fixture, migration adapter, or placeholder G2 API is added; PROTO-REPLAY remains Future and unimplemented.",
+  "Focused and full locked/offline tests, strict Clippy, retained CLI Task/Actor boundaries, governance/status/docs/RC0 gates, formatting, and diff checks pass.",
 ]
-verified_against_commit = ""
-completion_commit = ""
-integration_state = "blocked"
-completed = ""
+verified_against_commit = "ca1fcce6f435fb8419acc97fe813f3a773d5df8b"
+completion_commit = "ca1fcce6f435fb8419acc97fe813f3a773d5df8b"
+integration_state = "committed"
+completed = "2026-09-03"
 notes = [
-  "REP-2501 is Done. REP-2502 remains BlockedSpec until Proposed DEC-0280 is explicitly Accepted; public scope remains blocked by absent RFC-C205/RFC-0010, GAP-DETERMINISTIC-REPLAY-001, and unresolved replay envelope/ordering/identity/privacy/corruption/migration contracts.",
-  "Current DEC-0267 TaskScheduleTrace is a publish-disabled in-process test trace, not an Effect Log or Replay schema; syntax/types/effects/evaluator/VM have no public replay event model, encoder/decoder, checksum, redaction, header, or cross-process reader.",
+  "REP-2502 is Done only for Accepted DEC-0280's private Experimental structure-evidence baseline; public scope remains blocked by absent RFC-C205/RFC-0010, GAP-DETERMINISTIC-REPLAY-001, and unresolved replay envelope/ordering/identity/privacy/corruption/migration contracts.",
+  "DEC-0267 TaskScheduleTrace remains a publish-disabled in-process test trace, not an Effect Log or Replay schema; syntax/types/effects/evaluator/VM have no public replay event model, encoder/decoder, checksum, redaction, header, or cross-process reader.",
   "The authority audit preserves Seed behavior and does not change compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol, replay schema, diagnostics, schemas, Semantic IDs, source spans, runtime, or Unicode 17.0.0 behavior.",
 ]
 

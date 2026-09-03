@@ -2,25 +2,26 @@
 
 ## Outcome
 
-`REP-2502` remains correctly recorded as `BlockedSpec`, but its registered
-dependency is now satisfied: REP-2501 is Done for the private DEC-0279
-baseline. The G2 plan lists a versioned replay event containing
+`REP-2502` is complete only for the private Experimental baseline authorized
+by Accepted DEC-0280 and implemented in commit
+`ca1fcce6f435fb8419acc97fe813f3a773d5df8b`. Its registered dependency is
+satisfied: REP-2501 is Done for the private DEC-0279 baseline. The G2 plan
+lists a versioned replay event containing
 Program/Semantic ID, toolchain/runtime, profile/target, Effect operation ID,
 logical Actor/Task ID, logical sequence, input/result/Fault, schema version,
 privacy metadata, and an integrity checksum. No Accepted RFC defines the
 canonical encoding, event ordering, identity scope, payload types, redaction
 rules, corruption behavior, or version migration.
 
-Proposed DEC-0280 defines the smallest honest next slice: a crate-private,
-non-serialized five-case structure-evidence matrix over real validated
-DEC-0267 `TaskScheduleTrace` values. It keeps all thirteen DEC-0105 concerns
-traceable while explicitly deferring checksum, determinism-class metadata,
-toolchain, profile, migration, and privacy. No implementation may begin unless
-DEC-0280 becomes Accepted.
+Accepted DEC-0280 defines and the implementation executes the smallest honest
+slice: a crate-private, non-serialized five-case structure-evidence matrix over
+real validated DEC-0267 `TaskScheduleTrace` values. It keeps all thirteen
+DEC-0105 concerns traceable while explicitly deferring checksum,
+determinism-class metadata, toolchain, profile, migration, and privacy.
 
-No replay schema, encoder/decoder, event ID, checksum rule, privacy layer,
-protocol inventory entry, diagnostic, fixture, or placeholder G2 API was
-added.
+No public replay schema, encoder/decoder, checksum rule, privacy layer,
+implemented protocol inventory entry, diagnostic, fixture, or placeholder G2
+API was added. Event IDs remain private DEC-0267 trace identities only.
 
 ## Normative traceability
 
@@ -66,9 +67,11 @@ added.
 - Existing source-span and Unicode tests cannot establish replay serialization;
   VM resource/cancellation evidence does not provide replay records.
 
-## Proposed bounded implementation authority
+## Implemented bounded authority
 
-Proposed DEC-0280 would authorize only the following private baseline:
+Accepted DEC-0280 authorizes and commit
+`ca1fcce6f435fb8419acc97fe813f3a773d5df8b` implements only the following
+private baseline:
 
 1. exactly five crate-private cases execute validated DEC-0267 trace envelope,
    event identity/kind/order, typed payload/terminal, mutation/limit rejection,
@@ -86,8 +89,10 @@ Proposed DEC-0280 would authorize only the following private baseline:
    field, diagnostic, CLI, fixture, schema-registry entry, or implemented
    protocol is added.
 
-DEC-0280 must become Accepted before this private matrix is implemented. A
-public implementation still requires an Accepted RFC defining, at minimum:
+The matrix executes all five exact cases and keeps the thirteen-concern
+inventory duplicate-free with seven existing private observations and six
+explicit deferrals. A public implementation still requires an Accepted RFC
+defining, at minimum:
 
 1. canonical event envelope and bytes, event IDs, field types, optional versus
    required fields, sequence/order rules, actor/task/effect identity, logical
@@ -114,7 +119,8 @@ intentionally leaves open.
 
 ## Evidence and compatibility
 
-This refreshed audit and Proposed DEC-0280 were checked against `AGENTS.md`, `docs/SEMANTICS.md`,
+This refreshed audit, Accepted DEC-0280, and its implementation were checked
+against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0012, DEC-0010, DEC-0013,
 DEC-0018, DEC-0021, DEC-0105, DEC-0267, DEC-0279, RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
@@ -129,9 +135,9 @@ replay schema, diagnostic, Semantic ID, source-span, runtime, or Unicode
 
 ## Intentionally deferred
 
-`REP-2502` may begin only if DEC-0280 is Accepted, and then only as its private
-non-serialized five-case structure-evidence baseline. Public Replay schema work
-still requires Accepted RFC-C205/RFC-0010 (or replacement authority) to resolve
+`REP-2502` is Done only for DEC-0280's private non-serialized five-case
+structure-evidence baseline. Public Replay schema work still requires Accepted
+RFC-C205/RFC-0010 (or replacement authority) to resolve
 event ordering, canonical bytes, payloads, integrity, privacy, corruption,
 divergence, and migration. A future public implementation must consume
 accepted effect/runtime traces and checked Core only, register versioned schema

@@ -429,7 +429,7 @@
 | `REM-2605-OBSERVATION` | Internal security and resource boundary evidence | `G2` | `S` | `Done` | `REM-2604-OBSERVATION` | `84d3ef501c979778ee88e2f5ed19b4a955095044` |
 | `REP-2501` | Determinism class | `G2` | `L` | `Done` | `SUP-2403` | `45ea3c9749aea87da96b03857d34d5de908593cd` |
 | `REP-2501-OBSERVATION` | Internal determinism-class evidence | `G2` | `S` | `Done` | `SUP-2403-OBSERVATION` | `0d3d11d9be50790c35ac014b33318d3966b10464` |
-| `REP-2502` | Replay log schema | `G2` | `L` | `BlockedSpec` | `REP-2501` | `` |
+| `REP-2502` | Replay log schema | `G2` | `L` | `Done` | `REP-2501` | `ca1fcce6f435fb8419acc97fe813f3a773d5df8b` |
 | `REP-2502-OBSERVATION` | Internal replay-schema field evidence | `G2` | `S` | `Done` | `REP-2501-OBSERVATION` | `040ef2ca03438fe39df121acc07c2f554d24382f` |
 | `REP-2503` | Effect recorder | `G2` | `L` | `BlockedSpec` | `EFF-2105`, `REP-2502` | `` |
 | `REP-2503-OBSERVATION` | Internal effect-recorder boundary evidence | `G2` | `S` | `Done` | `REP-2502-OBSERVATION` | `d85ca61b119d9e7ee70ebad6ec9c4eb48be9accf` |
