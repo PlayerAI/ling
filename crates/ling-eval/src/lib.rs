@@ -23,6 +23,9 @@ mod actor_supervisor;
 #[cfg(test)]
 #[path = "determinism_evidence.rs"]
 mod determinism_evidence;
+#[cfg(test)]
+#[path = "effect_recording_evidence.rs"]
+mod effect_recording_evidence;
 mod machine;
 #[cfg(test)]
 #[path = "replay_structure_evidence.rs"]

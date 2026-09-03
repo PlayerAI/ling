@@ -7985,3 +7985,29 @@ unresolved_alternatives = [
   "Effect and Actor event scope, privacy/redaction/retention, corruption/divergence, checkpoints, resource limits, migration, cross-process/backend replay, and Stable support remain REP-2503 through REP-2506 or later authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0281"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0281-private-checked-effect-boundary-recording-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-09-03"
+proposed = "2026-09-03"
+decided = "2026-09-03"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Execute exactly five private checked Effect-boundary recording cases through the real source-to-checked interpreter and injected Console adapter after accepted Handler dispatch.",
+  "Observe bounded ordered Console host escapes and structured failure only while proving handled operations remain absent and all six DEC-0106 provisional boundaries retain explicit deferred dispositions.",
+  "Prove the absence of production recorder Effect Log Replay payload schema privacy migration diagnostic CLI and implemented protocol surfaces while preserving Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "Authorizes private cfg(test) executable evidence only and adds no production runtime transition recorder hook event sink buffer or public API.",
+  "Authorizes no source CLI/LSP/editor diagnostic schema Semantic ID protocol package/ABI bytecode/VM/backend stored-data migration dependency or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Public recordability Clock Random external input network file device and scheduler capture remain RFC-0010 work.",
+  "Payload/result/Fault encoding privacy integrity corruption divergence recorder lifecycle migration checkpoints cross-process/backend behavior and Stable support remain REP-2504 through REP-2506 or later authority.",
+]
+superseded_by = ""
