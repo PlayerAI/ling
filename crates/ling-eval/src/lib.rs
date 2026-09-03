@@ -28,6 +28,9 @@ mod determinism_evidence;
 mod effect_recording_evidence;
 mod machine;
 #[cfg(test)]
+#[path = "replay_player_execution_evidence.rs"]
+mod replay_player_execution_evidence;
+#[cfg(test)]
 #[path = "replay_structure_evidence.rs"]
 mod replay_structure_evidence;
 mod task_local_scheduler;

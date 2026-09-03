@@ -4524,3 +4524,16 @@ covers = ["REP-2503 private five-case checked Effect-boundary recording evidence
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "RFC-0020", "DEC-0010", "DEC-0013", "DEC-0106", "DEC-0260", "DEC-0261", "DEC-0280", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY", "SCHEMA-REGISTRY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0282"
+title = "Private Task replay-player evidence"
+kind = "Decision"
+status = "Accepted"
+version = "1"
+authority = "Accepted"
+path = "docs/decisions/0282-private-task-replay-player-evidence.md"
+covers = ["REP-2504 private five-case Task replay-player evidence", "validated fresh-runtime replay and exact checked-recipe preflight", "first private event divergence plus Fault and deadline-cancellation reconstruction", "explicit absence of checkpoint reader public player CLI schema privacy integrity and migration surfaces"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "RFC-0020", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0107", "DEC-0267", "DEC-0280", "DEC-0281", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY", "SCHEMA-REGISTRY"]
+supersedes = []
+stable_basis = true

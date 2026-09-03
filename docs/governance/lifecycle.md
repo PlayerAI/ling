@@ -339,6 +339,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0279` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-01` | [DEC-0279](../decisions/0279-private-local-determinism-class-evidence-matrix.md) |
 | `DEC-0280` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-03` | [DEC-0280](../decisions/0280-private-local-replay-record-structure-evidence.md) |
 | `DEC-0281` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-03` | [DEC-0281](../decisions/0281-private-checked-effect-boundary-recording-evidence.md) |
+| `DEC-0282` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-03` | [DEC-0282](../decisions/0282-private-task-replay-player-evidence.md) |
 
 ## Migration boundary
 

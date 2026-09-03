@@ -8011,3 +8011,29 @@ unresolved_alternatives = [
   "Payload/result/Fault encoding privacy integrity corruption divergence recorder lifecycle migration checkpoints cross-process/backend behavior and Stable support remain REP-2504 through REP-2506 or later authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0282"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0282-private-task-replay-player-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-09-03"
+proposed = "2026-09-03"
+decided = "2026-09-03"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Execute exactly five private Task replay-player cases through real checked sources validated DEC-0267 traces and fresh-runtime replay.",
+  "Prove exact recipe preflight source-independent reconstruction first-event divergence and Fault/cancellation replay while retaining all eleven DEC-0107 concerns with explicit dispositions.",
+  "Prove the absence of checkpoint decoding persistence public player CLI diagnostic schema privacy integrity migration and implemented Replay protocol surfaces while preserving Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "Authorizes private cfg(test) executable evidence only and adds no production runtime transition player checkpoint log reader restore path decoder or public API.",
+  "Authorizes no source CLI/LSP/editor diagnostic schema Semantic ID protocol package/ABI bytecode/VM/backend stored-data migration dependency or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Checkpoint identity public binding fields encoded log input event application privacy integrity and diagnostics remain RFC-0010 work.",
+  "Reader/writer compatibility migration partial replay cross-process/backend behavior and Stable support remain REP-2505 REP-2506 or later authority.",
+]
+superseded_by = ""

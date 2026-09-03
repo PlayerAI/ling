@@ -1423,8 +1423,20 @@ fn runtime_identity(
             pending.push_back(spawn.target().clone());
         }
     }
+    let snapshot = ling_semantic::build(checked.clone()).map_err(|_| {
+        runtime_error(
+            TaskPath::root(),
+            RuntimeFault {
+                kind: RuntimeFaultKind::InvalidCheckedCore {
+                    invariant: "Task scheduler recipe has no semantic snapshot",
+                },
+                source_name: String::new(),
+                span: checked.typed().resolved().entry_module().hir.span,
+            },
+        )
+    })?;
     let mut output = Vec::new();
-    push_field(&mut output, b"ling.task-runtime-recipe/0");
+    push_field(&mut output, b"ling.task-runtime-recipe/1");
     push_u64(&mut output, definitions.len() as u64);
     for definition in definitions {
         let core = checked
@@ -1442,6 +1454,19 @@ fn runtime_identity(
                 },
             )
         })?;
+        let body_id = snapshot.body_id(&definition).ok_or_else(|| {
+            runtime_error(
+                TaskPath::root(),
+                RuntimeFault {
+                    kind: RuntimeFaultKind::InvalidCheckedCore {
+                        invariant: "Task scheduler recipe has no semantic body identity",
+                    },
+                    source_name: String::new(),
+                    span: core.source_span(),
+                },
+            )
+        })?;
+        push_field(&mut output, body_id.as_str().as_bytes());
         push_field(&mut output, &core.canonical_bytes(checked.typed()));
         push_field(&mut output, &machine.canonical_bytes(checked.typed()));
     }
