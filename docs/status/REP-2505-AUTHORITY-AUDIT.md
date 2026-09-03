@@ -2,15 +2,21 @@
 
 ## Outcome
 
-`REP-2505` is correctly recorded as `BlockedSpec`. The G2 plan requires
-field-level redaction, exclusion of secrets/PII from default logs,
-dependency-preserving log trimming, chunk checksums, truncation/corruption
-diagnostics, and offline replay tools. No accepted replay schema, sensitivity
-classification, redaction authority, retention policy, dependency graph,
-checksum scope, corruption taxonomy, or offline protocol exists.
+`REP-2505` is Done only for the private Experimental baseline authorized by
+Accepted DEC-0283 and bound to implementation commit
+`b31bd278df5f3482052c463186063b03e13329c9`. Its five-case matrix over existing
+DEC-0267/DEC-0282 Task traces proves raw payload retention, strict prefix/gap
+rejection, mutation refusal, and explicit-input hermetic reconstruction without
+claiming a public privacy or integrity contract.
 
-No redaction implementation, log trimmer, checksum/chunk format, corruption
-diagnostic, privacy metadata, key/retention policy, offline replay tool, or
+The public G2 plan still requires field-level redaction, exclusion of
+secrets/PII from default logs, dependency-preserving trimming, chunk checksums,
+corruption diagnostics, and offline Replay tools. No accepted public replay
+schema, sensitivity taxonomy, redaction/retention policy, dependency graph,
+checksum scope, corruption recovery taxonomy, or offline protocol exists.
+
+No production redactor, log trimmer, checksum/chunk format, corruption
+diagnostic, privacy metadata, key/retention component, offline Replay tool, or
 placeholder G2 API was added.
 
 ## Normative traceability
@@ -18,9 +24,10 @@ placeholder G2 API was added.
 - The G2 execution package is non-normative. Its privacy checklist cannot
   authorize a data-classification model, redaction bytes, retention behavior,
   checksum algorithm, or diagnostic contract.
-- REP-2505 depends on REP-2501 through REP-2504 and RFC-C205. No Accepted
-  RFC-C205 or replacement RFC-0010 exists; `GAP-DETERMINISTIC-REPLAY-001`
-  remains Open and RFC-0001 remains a Draft baseline under DEC-0018.
+- REP-2501 through REP-2504 are Done only for private Experimental baselines.
+  No Accepted RFC-C205 or replacement RFC-0010 exists;
+  `GAP-DETERMINISTIC-REPLAY-001` remains Open and RFC-0001 remains a Draft
+  baseline under DEC-0018.
 - `docs/SEMANTICS.md` mentions replay logs, payload hashes, privacy boundaries,
   and Audit Source, but does not define sensitivity labels, secret/PII rules,
   redaction semantics, dependency-preserving trim closure, checksum/chunk
@@ -34,12 +41,22 @@ placeholder G2 API was added.
   RFC-0020 excludes Task/Actor replay. None authorizes this data policy.
 - `GAP-DETERMINISTIC-REPLAY-001` explicitly requires privacy, corruption,
   migration, and cross-process evidence before replay tasks can graduate.
+- Accepted DEC-0108 is vocabulary-only evidence. Accepted DEC-0283 permits
+  exact executable evidence for raw retention and private validation refusal
+  while leaving all public privacy, checksum, trimming, and recovery contracts
+  deferred.
 
 ## Current implementation evidence
 
-- The workspace has no replay log, sensitivity metadata, redaction layer,
-  trimmer, dependency graph, chunk checksum, corruption decoder, offline player,
-  or privacy diagnostic. No CLI replay command exists.
+- The workspace has no public replay log, sensitivity metadata, redaction
+  layer, trimmer, dependency graph, chunk checksum, corruption decoder, offline
+  player, or privacy diagnostic. No CLI replay command exists.
+- `replay_privacy_execution_evidence.rs` contains the exact DEC-0283 five-case
+  matrix. The test-local scheduler assertion rejects every strict prefix and
+  event gap with exact private structural reasons.
+- The repository-local Unicode sentinel remains raw in Host events and private
+  canonical trace bytes. This is negative privacy evidence: the bytes must not
+  be described as redacted, persisted, or safe for disclosure.
 - `ling-semantic` and `ling-bytecode` formats do not define replay payload
   labels, chunk boundaries, or redaction/checksum fields. `ling-eval`/`ling-vm`
   have no replay data sink or privacy boundary.
@@ -86,16 +103,15 @@ DEC-0018, RFC-0001, RFC-0020,
 `docs/governance/protocol-inventory.toml`, and the current syntax, AST, HIR,
 types, effects, evaluator, bytecode, VM, CLI, diagnostic, and schema crates.
 
-No compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol,
-replay privacy/corruption behavior, diagnostic, schema, Semantic ID,
-source-span, runtime, or Unicode 17.0.0 behavior changed.
+No production compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor
+protocol, Replay privacy/corruption behavior, diagnostic, schema, Semantic ID,
+source-span, runtime, or Unicode 17.0.0 behavior changed. The only scheduler
+addition is a complete `cfg(test)` prefix/gap rejection assertion.
 
 ## Intentionally deferred
 
-`REP-2505` can begin only after Accepted RFC-C205 (or replacement RFC-0010)
-and REP-2501 through REP-2504 resolve replay identity, event/chunk bytes,
-privacy, redaction, retention, trimming, checksums, corruption, and offline
-boundaries. The future implementation must consume accepted logs and checked
-Core/runtime evidence only, fail closed on privacy/integrity violations, and
-publish migration, corruption, privacy, and cross-process evidence before
-exposing replay data tooling.
+REP-2505 is Done only for the private DEC-0283 Experimental baseline. Public
+privacy, redaction, retention, trimming, checksums, corruption recovery, and
+offline tooling still require Accepted RFC-0010 or replacement authority. See
+`docs/status/REP-2505-IMPLEMENTATION-REPORT.md` for exact evidence and executed
+verification.
