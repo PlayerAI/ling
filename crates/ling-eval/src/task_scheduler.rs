@@ -2004,7 +2004,7 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn trace_validation_rejects_version_event_and_closure_corruption() {
+    pub(crate) fn trace_validation_rejects_version_event_and_closure_corruption() {
         let closure = TaskScheduleEvent {
             id: 1,
             tick: 0,

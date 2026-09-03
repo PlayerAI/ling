@@ -1,8 +1,8 @@
 # DEC-0280: Private local replay-record structure evidence / 私有本地 Replay Record 结构证据
 
-> 状态：Proposed<br>
+> 状态：Accepted<br>
 > 提出日期：2026-09-01<br>
-> 决定日期：Pending<br>
+> 决定日期：2026-09-03<br>
 > Owner role：determinism-design<br>
 > 相关 RFC/缺口：DEC-0105 | DEC-0267 | DEC-0279 | GAP-DETERMINISTIC-REPLAY-001 | REP-2502<br>
 > 生命周期记录：`docs/governance/lifecycle.toml`

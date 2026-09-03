@@ -1,5 +1,5 @@
 schema_version = 1
-updated = "2026-09-01"
+updated = "2026-09-03"
 
 # RFC-0001 and DEC-0001 through DEC-0016 predate the checked section
 # templates. This is a closed migration set; the checker rejects any new
@@ -7963,13 +7963,13 @@ superseded_by = ""
 [[record]]
 id = "DEC-0280"
 kind = "Decision"
-status = "Proposed"
+status = "Accepted"
 path = "docs/decisions/0280-private-local-replay-record-structure-evidence.md"
-history = ["Open", "Draft", "Proposed"]
+history = ["Open", "Draft", "Proposed", "Accepted"]
 opened = "2026-09-01"
 proposed = "2026-09-01"
-decided = ""
-stable_basis = false
+decided = "2026-09-03"
+stable_basis = true
 legacy_format = false
 conformance_plan = [
   "Execute exactly five private structure-evidence cases against real validated DEC-0267 Task traces and complete mutation, replay, and resource-bound assertions.",

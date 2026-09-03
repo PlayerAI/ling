@@ -24,6 +24,9 @@ mod actor_supervisor;
 #[path = "determinism_evidence.rs"]
 mod determinism_evidence;
 mod machine;
+#[cfg(test)]
+#[path = "replay_structure_evidence.rs"]
+mod replay_structure_evidence;
 mod task_local_scheduler;
 mod task_runtime;
 mod task_scheduler;

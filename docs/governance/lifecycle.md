@@ -1,7 +1,7 @@
 # RFC 与 Decision 生命周期 / Lifecycle Registry
 
 > 状态：由 `lifecycle.toml` 确定性生成
-> 更新日期：2026-09-01
+> 更新日期：2026-09-03
 > 本文件定义治理状态和证据要求，不新增语言语义。
 
 ## State machine
@@ -337,7 +337,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0277` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-01` | [DEC-0277](../decisions/0277-bounded-deterministic-local-supervisor-restart.md) |
 | `DEC-0278` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-01` | [DEC-0278](../decisions/0278-private-supervision-executable-evidence-matrix.md) |
 | `DEC-0279` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-01` | [DEC-0279](../decisions/0279-private-local-determinism-class-evidence-matrix.md) |
-| `DEC-0280` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0280](../decisions/0280-private-local-replay-record-structure-evidence.md) |
+| `DEC-0280` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-03` | [DEC-0280](../decisions/0280-private-local-replay-record-structure-evidence.md) |
 
 ## Migration boundary
 
