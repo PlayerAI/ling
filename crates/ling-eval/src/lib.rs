@@ -31,6 +31,9 @@ mod machine;
 #[path = "replay_player_execution_evidence.rs"]
 mod replay_player_execution_evidence;
 #[cfg(test)]
+#[path = "replay_privacy_execution_evidence.rs"]
+mod replay_privacy_execution_evidence;
+#[cfg(test)]
 #[path = "replay_structure_evidence.rs"]
 mod replay_structure_evidence;
 mod task_local_scheduler;

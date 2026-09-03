@@ -801,7 +801,7 @@ stable_basis = false
             .expect("xtask is under tools/xtask");
         let summary = check_repository(root).expect("repository authority index is valid");
         assert!(summary.document_count >= 20);
-        assert_eq!(summary.accepted_count, 323);
+        assert_eq!(summary.accepted_count, 324);
 
         let task_status = fs::read_to_string(root.join("docs/status/implementation-status.toml"))
             .expect("read implementation task status");

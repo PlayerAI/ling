@@ -2082,6 +2082,54 @@ pub(crate) mod tests {
     }
 
     #[test]
+    pub(crate) fn trace_validation_rejects_truncated_and_gapped_event_sequences() {
+        let checked = checked(PARENT);
+        let root = task(&checked, "parent");
+        let original = run_task_schedule(
+            &checked,
+            &root,
+            vec![integer(4)],
+            config(),
+            vec![],
+            TaskHostScript::default(),
+        )
+        .expect("recorded trace");
+        original.validate().expect("complete trace");
+        assert!(original.events.len() > 2);
+
+        for retained in 0..original.events.len() {
+            let mut prefix = original.clone();
+            prefix.events = original.events[..retained].to_vec().into_boxed_slice();
+            let error = prefix
+                .validate()
+                .expect_err("every strict prefix must be rejected");
+            let expected_reason = if retained == 0 {
+                "invalid_event_count"
+            } else {
+                "trace_requires_one_closure"
+            };
+            assert!(matches!(
+                error,
+                TaskSchedulerError::InvalidTrace { reason, .. } if reason == expected_reason
+            ));
+        }
+
+        for removed in 0..original.events.len() - 1 {
+            let mut gapped = original.clone();
+            let mut events = gapped.events.into_vec();
+            events.remove(removed);
+            gapped.events = events.into_boxed_slice();
+            assert!(matches!(
+                gapped.validate(),
+                Err(TaskSchedulerError::InvalidTrace {
+                    reason: "nonconsecutive_event_identity",
+                    ..
+                })
+            ));
+        }
+    }
+
+    #[test]
     fn duplicate_and_noncanonical_deadlines_are_rejected() {
         let root = TaskPath::root();
         let duplicate = [

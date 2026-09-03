@@ -8037,3 +8037,29 @@ unresolved_alternatives = [
   "Reader/writer compatibility migration partial replay cross-process/backend behavior and Stable support remain REP-2505 REP-2506 or later authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0283"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0283-private-task-replay-privacy-and-corruption-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-09-04"
+proposed = "2026-09-04"
+decided = "2026-09-04"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Execute exactly five private Task replay privacy and corruption cases over real checked DEC-0267 traces and DEC-0282 strict replay.",
+  "Prove raw fixture payload retention source-name exclusion fail-closed strict-prefix gap mutation behavior and explicit-input hermetic reconstruction while retaining all sixteen DEC-0108 concerns with exact dispositions.",
+  "Prove the absence of production privacy redaction trimming chunk checksum retention key decoder CLI diagnostic schema and implemented Replay protocol surfaces while preserving Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "Authorizes private cfg(test) executable evidence and one complete private prefix/gap validation assertion only; it adds no production privacy integrity persistence recovery or public Replay transition.",
+  "Authorizes no source CLI/LSP/editor diagnostic schema Semantic ID protocol package/ABI bytecode/VM/backend stored-data migration dependency or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Sensitivity redaction authorization keys retention dependency-preserving trimming chunking checksums diagnostics unknown fields and public offline tooling remain RFC-0010 work.",
+  "Reader/writer compatibility migration cross-process/backend behavior and Stable support remain REP-2506 or later authority.",
+]
+superseded_by = ""
