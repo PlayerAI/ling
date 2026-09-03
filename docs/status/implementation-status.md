@@ -431,7 +431,7 @@
 | `REP-2501-OBSERVATION` | Internal determinism-class evidence | `G2` | `S` | `Done` | `SUP-2403-OBSERVATION` | `0d3d11d9be50790c35ac014b33318d3966b10464` |
 | `REP-2502` | Replay log schema | `G2` | `L` | `Done` | `REP-2501` | `ca1fcce6f435fb8419acc97fe813f3a773d5df8b` |
 | `REP-2502-OBSERVATION` | Internal replay-schema field evidence | `G2` | `S` | `Done` | `REP-2501-OBSERVATION` | `040ef2ca03438fe39df121acc07c2f554d24382f` |
-| `REP-2503` | Effect recorder | `G2` | `L` | `BlockedSpec` | `EFF-2105`, `REP-2502` | `` |
+| `REP-2503` | Effect recorder | `G2` | `L` | `Done` | `EFF-2105`, `REP-2502` | `8a0f05b9a38f922c73339d4111e6927ac9cb693b` |
 | `REP-2503-OBSERVATION` | Internal effect-recorder boundary evidence | `G2` | `S` | `Done` | `REP-2502-OBSERVATION` | `d85ca61b119d9e7ee70ebad6ec9c4eb48be9accf` |
 | `REP-2504` | Replay player | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503` | `` |
 | `REP-2504-OBSERVATION` | Internal replay-player boundary evidence | `G2` | `S` | `Done` | `REP-2503-OBSERVATION` | `c095d8bd3ff81132a66ae3710c20fe251732748d` |
