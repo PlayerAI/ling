@@ -433,7 +433,7 @@
 | `REP-2502-OBSERVATION` | Internal replay-schema field evidence | `G2` | `S` | `Done` | `REP-2501-OBSERVATION` | `040ef2ca03438fe39df121acc07c2f554d24382f` |
 | `REP-2503` | Effect recorder | `G2` | `L` | `Done` | `EFF-2105`, `REP-2502` | `8a0f05b9a38f922c73339d4111e6927ac9cb693b` |
 | `REP-2503-OBSERVATION` | Internal effect-recorder boundary evidence | `G2` | `S` | `Done` | `REP-2502-OBSERVATION` | `d85ca61b119d9e7ee70ebad6ec9c4eb48be9accf` |
-| `REP-2504` | Replay player | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503` | `` |
+| `REP-2504` | Replay player | `G2` | `L` | `Done` | `REP-2501`, `REP-2502`, `REP-2503` | `c3e05bac815e55ace2bef58779094869f342b237` |
 | `REP-2504-OBSERVATION` | Internal replay-player boundary evidence | `G2` | `S` | `Done` | `REP-2503-OBSERVATION` | `c095d8bd3ff81132a66ae3710c20fe251732748d` |
 | `REP-2505` | Replay privacy, trimming, and corruption | `G2` | `L` | `BlockedSpec` | `REP-2501`, `REP-2502`, `REP-2503`, `REP-2504` | `` |
 | `REP-2505-OBSERVATION` | Internal replay privacy and integrity boundary evidence | `G2` | `S` | `Done` | `REP-2504-OBSERVATION` | `4d8c485ab390c616369736750680985688f831cb` |
