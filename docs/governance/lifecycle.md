@@ -343,6 +343,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0283` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-04` | [DEC-0283](../decisions/0283-private-task-replay-privacy-and-corruption-evidence.md) |
 | `DEC-0284` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-04` | [DEC-0284](../decisions/0284-private-cross-process-task-trace-reconstruction-evidence.md) |
 | `DEC-0285` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-04` | [DEC-0285](../decisions/0285-private-remote-reference-separation-evidence.md) |
+| `DEC-0286` | Decision | `Proposed` | `Open` → `Draft` → `Proposed` | no | no | — | [DEC-0286](../decisions/0286-private-transport-neutral-envelope-parts-evidence.md) |
 
 ## Migration boundary
 

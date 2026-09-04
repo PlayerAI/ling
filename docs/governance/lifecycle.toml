@@ -8115,3 +8115,29 @@ unresolved_alternatives = [
   "Authentication authorization privacy integrity retry duplication ordering transport cross-process cross-backend cross-platform and Stable support remain future authority and evidence work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0286"
+kind = "Decision"
+status = "Proposed"
+path = "docs/decisions/0286-private-transport-neutral-envelope-parts-evidence.md"
+history = ["Open", "Draft", "Proposed"]
+opened = "2026-09-04"
+proposed = "2026-09-04"
+decided = ""
+stable_basis = false
+legacy_format = false
+conformance_plan = [
+  "If Accepted execute exactly five private REM-2602 cases over real checked local Actor type and schema evidence owned Actor values inert test-only candidate message parts and negative production-surface assertions.",
+  "Prove LF versus BOM-CRLF and cross-runtime reconstruction twelve independent required-part distinctions payload versus integrity-marker separation and absence of transport codec local-reference fields while retaining all eighteen DEC-0111 concerns.",
+  "Prove the absence of production Envelope encoder decoder checksum protocol authentication transport CLI diagnostic schema and remote protocol surfaces while preserving Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "If Accepted authorizes private cfg(test) executable evidence only and adds no production Envelope bytes checksum algorithm protocol identity authentication transport delivery result or public API.",
+  "Authorizes no source CLI/LSP/editor diagnostic schema Semantic ID protocol package/ABI bytecode/VM/backend stored-data migration dependency security or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Public envelope encoding field rules version negotiation remote identity deadline cancellation delivery authentication checksum integrity resources and migration remain RFC-0009 work.",
+  "Transport framing endpoint integration schemas diagnostics compatibility cross-process cross-backend cross-platform and Stable support remain future authority and evidence work.",
+]
+superseded_by = ""

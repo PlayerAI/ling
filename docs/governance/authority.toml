@@ -4576,3 +4576,16 @@ covers = ["REM-2601 private five-case local and remote-reference separation evid
 depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "RFC-0020", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0110", "DEC-0270", "DEC-0271", "DEC-0274", "DEC-0284", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY", "SCHEMA-REGISTRY"]
 supersedes = []
 stable_basis = true
+
+[[document]]
+id = "DEC-0286"
+title = "Private transport-neutral envelope-parts evidence"
+kind = "Decision"
+status = "Proposed"
+version = "1"
+authority = "Draft"
+path = "docs/decisions/0286-private-transport-neutral-envelope-parts-evidence.md"
+covers = ["REM-2602 proposed private five-case transport-neutral envelope-parts evidence", "checked local Actor type schema and owned payload bindings independent of source runtime and local instance identity", "twelve structurally separate private required parts with payload and inert integrity-marker separation", "continued absence of wire encoding checksum transport public envelope APIs diagnostics schemas and protocols"]
+depends_on = ["SEMANTICS", "LANGUAGE", "ROADMAP-1.0", "RFC-0006", "RFC-0020", "DEC-0010", "DEC-0012", "DEC-0013", "DEC-0111", "DEC-0270", "DEC-0271", "DEC-0274", "DEC-0285", "GAP-REGISTER", "ERROR-CODES", "PROTOCOL-INVENTORY", "SCHEMA-REGISTRY"]
+supersedes = []
+stable_basis = false
