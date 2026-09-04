@@ -417,7 +417,7 @@
 | `REL-6604` | Performance Baseline | `G6` | `L` | `BlockedSpec` | `REL-6603` | `` |
 | `REL-6604-ARTIFACT` | Performance-baseline artifact integrity gate | `G6` | `S` | `Done` | `REL-6604-SEED` | `f6557b9ea238fbaa2a0c6b95d1be7ca43993e5c5` |
 | `REL-6604-SEED` | Seed performance-matrix drift gate | `G6` | `S` | `Done` | `REL-6603-SEED` | `1177fdf133de670ad039aac64aa1c8add92ab249` |
-| `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `BlockedSpec` | `ACT-2305`, `REP-2506` | `` |
+| `REM-2601` | RemoteRef and endpoint | `G2` | `L` | `Done` | `ACT-2305`, `REP-2506` | `ec5b2182676a1f2b8311b7a0e416dec42efe5705` |
 | `REM-2601-OBSERVATION` | Internal RemoteRef and endpoint boundary evidence | `G2` | `S` | `Done` | `REP-2506-OBSERVATION` | `ab2f17e86bbeb105dc7bd35870d053897c7c66cd` |
 | `REM-2602` | Transport-neutral envelope | `G2` | `L` | `BlockedSpec` | `REM-2601` | `` |
 | `REM-2602-OBSERVATION` | Internal transport-neutral envelope boundary evidence | `G2` | `S` | `Done` | `REM-2601-OBSERVATION` | `a64cadce09b158820ba5c8841d4695778e8a86af` |
