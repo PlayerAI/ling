@@ -2,25 +2,28 @@
 
 ## Outcome
 
-`REP-2506` is correctly recorded as `BlockedSpec`. The G2 plan requires two
-independent processes with clean caches and a fixed toolchain to generate a
-log, replay it, compare observable results, repeat the run N times, and reject
-mutated Program IDs or Schemas. No accepted definition fixes process
-isolation, toolchain identity, cache scope, observable-equivalence relation,
-repeat count/statistics, mutation diagnostics, or cross-platform boundary.
+`REP-2506` is Done only for the private Experimental same-binary reconstruction
+baseline authorized by Accepted DEC-0284 and bound to implementation commit
+`e5f16355e02abb76680f6984427207ad96ae7b0a`. Its five-case matrix starts fresh
+copies of the current `ling-eval` unit-test executable, clears the inherited
+environment, reconstructs checked DEC-0267 Task traces from fixed in-memory
+inputs, and compares complete private canonical bytes.
 
-No cross-process harness, replay acceptance test, process fixture, cache
-protocol, comparison relation, mutation tool, diagnostic, protocol, or
-placeholder G2 API was added.
+The public G2 plan still requires clean build caches, fixed and identified
+toolchains, a versioned generator/player protocol, persisted log playback,
+normative observable equivalence, Program/Schema mutation rejection,
+provenance, cross-backend evidence, and cross-platform acceptance. No public
+process harness, Replay protocol, cache tool, toolchain lock, comparator,
+mutation validator, diagnostic, schema, or placeholder G2 API was added.
 
 ## Normative traceability
 
 - The G2 execution package is non-normative. Its two-process checklist cannot
   authorize a replay protocol, reproducibility claim, process/cache contract,
   or CI acceptance threshold.
-- REP-2506 depends on REP-2501 through REP-2505 and RFC-C205. No Accepted
-  RFC-C205 or replacement RFC-0010 exists; all preceding REP tasks are
-  `BlockedSpec`, and RFC-0001 remains a Draft baseline under DEC-0018.
+- REP-2501 through REP-2505 are Done only for their private Experimental
+  baselines. No Accepted RFC-C205 or replacement RFC-0010 exists, and RFC-0001
+  remains a Draft baseline under DEC-0018.
 - `docs/SEMANTICS.md` describes replay and deterministic classes but does not
   define independent-process identity, clean-cache requirements, toolchain
   provenance, observable comparison, repeat-count confidence, or mutated
@@ -31,25 +34,37 @@ placeholder G2 API was added.
 - Accepted DEC-0012 covers current Semantic ID/canonical bytes, DEC-0021 covers
   only compiler-query scheduling, and RFC-0020 excludes Task/Actor replay.
   None authorizes cross-process replay semantics.
+- Accepted DEC-0109 records the eighteen boundary concerns without process
+  execution. Accepted DEC-0284 narrowly authorizes same-binary process
+  reconstruction evidence while explicitly deferring public playback,
+  Program/Schema mutation refusal, provenance, cross-build, cross-backend, and
+  cross-platform contracts.
 - `GAP-DETERMINISTIC-REPLAY-001` remains Open and requires cross-process,
   corruption, privacy, migration, and divergence evidence before resolution.
 
 ## Current implementation evidence
 
-- The workspace has no replay generator/player, event schema, process harness,
-  clean-cache isolation, toolchain lock, observable-result comparator,
-  repeatability runner, or Program ID/Schema mutation validator. `ling-cli`
-  has no replay command.
-- Existing compiler and VM tests run in one repository process/environment and
-  do not provide replay logs or cross-process equivalence evidence. DEC-0021's
-  compiler-query tests are not runtime replay tests.
+- The workspace has no public replay generator/player, event schema, persisted
+  process artifact, clean-cache tool, toolchain lock, normative observable
+  comparator, or Program ID/Schema mutation validator. `ling-cli` has no
+  replay command.
+- `replay_cross_process_execution_evidence.rs` contains the exact DEC-0284
+  parent matrix and four ignored child probes. Parent cases invoke children
+  only through fresh same-binary processes, require zero inherited environment
+  entries, repeat the LF case three times, compare LF with BOM/CRLF, and
+  distinguish changed body and argument recipes.
+- Child probes build only checked Task Core from constants and emit a private
+  hexadecimal transport of existing canonical trace bytes. They read no
+  source, trace, cache, schema, dependency, or configuration file and use no
+  network. This is not log playback or a process protocol.
 - No protocol inventory entry, diagnostic allocation, fixture schema, privacy
   metadata, or compatibility lock defines acceptance results, rejected
   mutations, environment fingerprints, or nondeterministic allowances.
-- No Actor/Task/Effect runtime exists whose observable outputs could be
-  compared across independent processes.
+- The existing private Task scheduler supplies the trace under DEC-0267. Actor,
+  Effect Log, bytecode, VM, cross-backend, and public Replay outputs do not
+  participate in this evidence.
 
-## Required authority before implementation
+## Required authority before public implementation
 
 An Accepted RFC or decision must define, at minimum:
 
@@ -71,31 +86,36 @@ An Accepted RFC or decision must define, at minimum:
    Unicode/CRLF/BOM spans, deterministic output, and interpreter/VM/runtime
    behavior without unchecked-AST execution.
 
-Until these decisions are Accepted, a cross-process test could certify local
-environment coincidence or hide incompatible logs behind an unspecified
-comparison rule.
+DEC-0284 avoids these unresolved choices by certifying only bounded
+same-binary reconstruction of one existing private checked Task trace. Until
+the remaining decisions are Accepted, that result must not be presented as
+public Replay acceptance, reproducible-build evidence, log compatibility, or
+cross-platform/backend equivalence.
 
 ## Evidence and compatibility
 
 This audit was checked against `AGENTS.md`, `docs/SEMANTICS.md`,
 `docs/LANGUAGE.md`, `docs/ROADMAP-1.0.md`, DEC-0012, DEC-0010, DEC-0013,
-DEC-0018, DEC-0021, RFC-0001, RFC-0020,
+DEC-0018, DEC-0021, DEC-0109, DEC-0267, DEC-0282, DEC-0283, DEC-0284,
+RFC-0001, RFC-0020,
 `docs/ling_execution_plan/06-G2-V0.2-CONCURRENT.md`,
 `docs/ling_execution_plan/13-IMPLEMENTATION-BACKLOG.md`,
 `docs/governance/gap-register.toml`,
 `docs/governance/protocol-inventory.toml`, and the current syntax, AST, HIR,
 types, effects, evaluator, bytecode, VM, CLI, diagnostic, and schema crates.
 
-No compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor protocol,
-replay acceptance harness, diagnostic, schema, Semantic ID, source-span,
-runtime, or Unicode 17.0.0 behavior changed.
+No production compiler, interpreter, VM, bytecode, scheduler, mailbox, Actor
+protocol, Replay behavior, diagnostic, schema, Semantic ID, source-span,
+runtime, or Unicode 17.0.0 behavior changed. All new process execution and
+stdout markers are confined to `cfg(test)` evidence.
 
 ## Intentionally deferred
 
-`REP-2506` can begin only after Accepted RFC-C205 (or replacement RFC-0010)
-and REP-2501 through REP-2505 resolve replay identity, process/toolchain
-provenance, observable equivalence, privacy, corruption, divergence, and
-migration. The future harness must run accepted generator/player protocols in
-independent clean environments, fail closed on Program/Schema mismatch, and
-publish repeatable cross-process and cross-backend evidence before replay
-acceptance is claimed.
+REP-2506 is Done only for the private DEC-0284 Experimental baseline. Public
+generator/player protocols, persisted logs, process/toolchain/profile/target
+provenance, clean-cache tooling, observable equivalence, Program/Schema
+mutation rejection, privacy, integrity, migration, divergence, cross-backend
+evidence, cross-platform matrices, diagnostics, CI artifacts, and Stable
+support still require Accepted RFC-0010 or replacement authority. See
+`docs/status/REP-2506-IMPLEMENTATION-REPORT.md` for the exact evidence and
+executed verification.
