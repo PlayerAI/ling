@@ -342,6 +342,7 @@ Draft and Proposed documents cannot authorize Stable implementation. Accepted re
 | `DEC-0282` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-03` | [DEC-0282](../decisions/0282-private-task-replay-player-evidence.md) |
 | `DEC-0283` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-04` | [DEC-0283](../decisions/0283-private-task-replay-privacy-and-corruption-evidence.md) |
 | `DEC-0284` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-04` | [DEC-0284](../decisions/0284-private-cross-process-task-trace-reconstruction-evidence.md) |
+| `DEC-0285` | Decision | `Accepted` | `Open` → `Draft` → `Proposed` → `Accepted` | yes | no | `2026-09-04` | [DEC-0285](../decisions/0285-private-remote-reference-separation-evidence.md) |
 
 ## Migration boundary
 

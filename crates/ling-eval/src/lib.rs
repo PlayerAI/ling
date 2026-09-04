@@ -28,6 +28,9 @@ mod determinism_evidence;
 mod effect_recording_evidence;
 mod machine;
 #[cfg(test)]
+#[path = "remote_ref_execution_evidence.rs"]
+mod remote_ref_execution_evidence;
+#[cfg(test)]
 #[path = "replay_cross_process_execution_evidence.rs"]
 mod replay_cross_process_execution_evidence;
 #[cfg(test)]

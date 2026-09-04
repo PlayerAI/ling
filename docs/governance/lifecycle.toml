@@ -8089,3 +8089,29 @@ unresolved_alternatives = [
   "Cross-build toolchain profile target cache provenance cross-backend cross-platform and Stable acceptance remain future authority and evidence work.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0285"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0285-private-remote-reference-separation-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-09-04"
+proposed = "2026-09-04"
+decided = "2026-09-04"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Execute exactly five private REM-2601 cases over real checked local Actor references inert test-only candidate remote dimensions and negative production-surface assertions.",
+  "Prove local runtime-scope refusal LF versus BOM-CRLF local type reconstruction independent candidate endpoint actor protocol and capability distinctions and absence of Local-to-Remote conversion while retaining all fourteen DEC-0110 concerns.",
+  "Prove the absence of production RemoteRef endpoint token network delivery CLI diagnostic schema and protocol surfaces while preserving Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "Authorizes private cfg(test) executable evidence only and adds no production RemoteRef endpoint registry token verifier network Effect transport delivery result conversion or public API.",
+  "Authorizes no source CLI/LSP/editor diagnostic schema Semantic ID protocol package/ABI bytecode/VM/backend stored-data migration dependency security or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Public remote identity endpoint authority protocol negotiation capability lifecycle Network and ActorSend Effects delivery Fault serialization and migration remain RFC-0009 work.",
+  "Authentication authorization privacy integrity retry duplication ordering transport cross-process cross-backend cross-platform and Stable support remain future authority and evidence work.",
+]
+superseded_by = ""
