@@ -8063,3 +8063,29 @@ unresolved_alternatives = [
   "Reader/writer compatibility migration cross-process/backend behavior and Stable support remain REP-2506 or later authority.",
 ]
 superseded_by = ""
+
+[[record]]
+id = "DEC-0284"
+kind = "Decision"
+status = "Accepted"
+path = "docs/decisions/0284-private-cross-process-task-trace-reconstruction-evidence.md"
+history = ["Open", "Draft", "Proposed", "Accepted"]
+opened = "2026-09-04"
+proposed = "2026-09-04"
+decided = "2026-09-04"
+stable_basis = true
+legacy_format = false
+conformance_plan = [
+  "Execute exactly five private REP-2506 parent evidence cases using fresh copies of the current ling-eval test binary fixed in-memory checked inputs and an empty inherited environment.",
+  "Prove three-run complete-trace repeatability LF versus BOM-CRLF equivalence changed-body and changed-argument distinction explicit scheduler bounds and exact dispositions for all eighteen DEC-0109 concerns.",
+  "Prove the absence of production process-acceptance APIs public Replay CLI diagnostics schema and implemented protocol surfaces while preserving Unicode 17.0.0 and original UTF-8 spans.",
+]
+compatibility_impact = [
+  "Authorizes private cfg(test) executable evidence only and adds no production process harness replay reader/player persisted log cache manager toolchain lock acceptance artifact or public API.",
+  "Authorizes no source CLI/LSP/editor diagnostic schema Semantic ID protocol package/ABI bytecode/VM/backend stored-data migration dependency or Unicode 17.0.0 change.",
+]
+unresolved_alternatives = [
+  "Public generator/player Program and Schema binding mutation rejection privacy integrity migration divergence diagnostics and compatibility remain RFC-0010 work.",
+  "Cross-build toolchain profile target cache provenance cross-backend cross-platform and Stable acceptance remain future authority and evidence work.",
+]
+superseded_by = ""
